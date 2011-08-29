@@ -1,0 +1,85 @@
+
+#ifndef TCPSOCKETCONNECTION_H
+#define TCPSOCKETCONNECTION_H
+
+#include <QHostAddress>
+#include <QString>
+#include <QTcpSocket>
+#include <QTime>
+#include <QTimer>
+
+#include "../global_network.h"
+
+static const int MaxBufferSize = 1024000;
+
+class TcpSocketConnection : public QTcpSocket
+{
+    Q_OBJECT
+
+public:
+
+    TcpSocketConnection(const QString &greetingMessage = "", QObject *parent = 0);
+
+
+    void setGreetingMessage(const QString &message);
+    //QString getGreetingMessage() const;
+
+
+
+    QString getID() const {return id; }
+    void setID(QString id) {this->id = id; }
+
+    QString getPeerID() const {return peerID; }
+    void setPeerID(QString peerid) {this->peerID = peerid; }
+
+    bool sendMessage(const QString &message);
+
+
+private:
+    int readDataIntoBuffer(int maxSize = MaxBufferSize);
+    int dataLengthForCurrentDataType();
+    bool readProtocolHeader();
+    bool hasEnoughData();
+    void processData();
+
+signals:
+    void signalTcpSocketConnectionReadyForUse();
+    void signalTCPDatagramsReceived(const QByteArray &data);
+    void signalNewChatMessageReceivedFromPeer(const QString & from, const QString & message);
+
+protected:
+    void timerEvent(QTimerEvent *timerEvent);
+
+private slots:
+    void slotProcessReadyRead();
+    void slotSendPing();
+    void slotSendGreetingMessage();
+
+
+
+
+private:
+
+    static QString id;
+
+    QString peerID;
+
+    QString greetingMessage;
+    QString peerGreetingMessage;
+
+    QTimer pingTimer;
+    QTime pongTime;
+    QByteArray buffer;
+    HEHUI::ConnectionState state;
+    HEHUI::DataType currentDataType;
+    int numBytesForCurrentDataType;
+    int transferTimerId;
+    bool isGreetingMessageSent;
+
+    quint16 nextBlockSize;
+
+
+
+};
+
+#endif
