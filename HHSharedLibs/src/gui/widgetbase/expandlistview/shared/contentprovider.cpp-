@@ -1,0 +1,37 @@
+/*
+ * contentprovider.h.cpp
+ *
+ *  Created on: 2009-10-27
+ *      Author: 贺辉
+ */
+
+#include "contentprovider.h"
+
+namespace HEHUI {
+
+ContentProvider::ContentProvider(QObject *parent)
+	:QObject(parent)
+{
+	// TODO Auto-generated constructor stub
+
+}
+
+ContentProvider::~ContentProvider() {
+	// TODO Auto-generated destructor stub
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
