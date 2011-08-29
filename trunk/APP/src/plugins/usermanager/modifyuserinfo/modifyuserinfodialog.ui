@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ModifyUserInfoDialog</class>
+ <widget class="QDialog" name="ModifyUserInfoDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>168</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Chinese &amp;Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>lineEditChineseName</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="lineEditChineseName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelDepartment">
+     <property name="text">
+      <string>&amp;Department:</string>
+     </property>
+     <property name="buddy">
+      <cstring>comboBoxUserDept</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="comboBoxUserDept">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Department</string>
+     </property>
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string>Department</string>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <item>
+      <property name="text">
+       <string notr="true">Account</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">AdminDept</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Cost</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Custom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">GMO</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">HR</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Marker</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>MIS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">PDS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">PG</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Plan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">PMC</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Purchase</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">QC</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Retail</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Sales</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Sample</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Secretary</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Ship</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">Shop</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string notr="true">WHouse</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBoxEmail">
+     <property name="title">
+      <string>Email</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkBoxExternalEmail">
+        <property name="toolTip">
+         <string>External Email Account</string>
+        </property>
+        <property name="text">
+         <string notr="true">@sitoy.com</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="checkBoxInternalEmail">
+        <property name="toolTip">
+         <string>Internal Email Account</string>
+        </property>
+        <property name="text">
+         <string notr="true">@sitoydg.com</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLineEdit" name="lineEditEmailAccount">
+        <property name="toolTip">
+         <string>Email Account Name</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonOK">
+       <property name="text">
+        <string>&amp;OK</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="text">
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

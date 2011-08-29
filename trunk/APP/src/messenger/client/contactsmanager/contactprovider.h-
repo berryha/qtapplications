@@ -1,0 +1,53 @@
+/*
+ * contactprovider.h
+ *
+ *  Created on: 2009-10-28
+ *      Author: 贺辉
+ */
+
+#ifndef CONTACTPROVIDER_H_
+#define CONTACTPROVIDER_H_
+
+#include <QObject>
+#include <QHash>
+
+#include "../shared/contactbase.h"
+#include "../../shared/gui/widgetbase/expandlistview/shared/contentprovider.h"
+
+
+namespace HEHUI {
+
+class ContactProvider :public ContentProvider{
+	Q_OBJECT
+
+public:
+    typedef ExpandListViewInterface::ObjectItem ObjectItem;
+    typedef ExpandListViewInterface::ObjectItemList ObjectItemList;
+    typedef ExpandListViewInterface::Category Category;
+    typedef ExpandListViewInterface::CategoryList CategoryList;
+
+	ContactProvider(QList<ContactBase *> list, QObject *parent = 0);
+	virtual ~ContactProvider();
+
+	virtual CategoryList getCategoryList (/*QList<QObject *> list*/);
+
+	QList<ContactBase*> getContactList() const;
+	void setContactList(QList<ContactBase*> contactList);
+
+
+private:
+	void addObjectItemToCategory(ObjectItem *item );
+
+private:
+	QList<ContactBase *> contactList;
+
+	QHash<QString, ObjectItem*> objectItemHash;
+	QHash<QString, Category*> categoryHash;
+
+	CategoryList categoryList;
+
+};
+
+} //namespace HEHUI
+
+#endif /* CONTACTPROVIDER_H_ */
