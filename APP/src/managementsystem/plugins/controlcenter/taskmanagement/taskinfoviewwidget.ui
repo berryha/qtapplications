@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskInfoViewWidgetClass</class>
+ <widget class="QWidget" name="TaskInfoViewWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>878</width>
+    <height>526</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TaskInfoViewWidget</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBoxGeneralInfo">
+     <property name="title">
+      <string>General</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelTaskID">
+        <property name="text">
+         <string>Task ID:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditID">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labelAuthor">
+        <property name="text">
+         <string>Author:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="lineEditAuthor">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="labelDescription">
+        <property name="text">
+         <string>Description:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5" rowspan="2">
+       <widget class="QTextEdit" name="textEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelName">
+        <property name="text">
+         <string>Task Name:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditName">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="labelCreationTime">
+        <property name="text">
+         <string>Creation Time:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+      </item>
+      <item row="0" column="7">
+       <widget class="QToolButton" name="toolButton_3">
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7">
+       <widget class="QToolButton" name="toolButton_4">
+        <property name="text">
+         <string>Clone</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" rowspan="2">
+       <widget class="Line" name="line">
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabTriggers">
+      <attribute name="title">
+       <string>Triggers</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0" colspan="4">
+        <widget class="QLabel" name="labelTrigger">
+         <property name="text">
+          <string>When you create a task,you can specify the conditions that will trigger the task.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4">
+        <widget class="QTableView" name="tableViewTriggers"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="pushButtonNewTrigger">
+         <property name="text">
+          <string>New</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButtonEditTrigger">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Edit</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="pushButtonDeleteTrigger">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabActions">
+      <attribute name="title">
+       <string>Actions</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0" colspan="6">
+        <widget class="QLabel" name="labelAction">
+         <property name="text">
+          <string>When you create a task,you must specify the action that will occur when your task starts.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="6">
+        <widget class="QTableView" name="tableViewActions"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="pushButtonNewAction">
+         <property name="text">
+          <string>New</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButtonEditAction">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Edit</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="pushButtonDeleteAction">
+         <property name="text">
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>446</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="4">
+        <widget class="QToolButton" name="toolButtonMoveUp">
+         <property name="text">
+          <string>Move UP</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <widget class="QToolButton" name="toolButtonMoveDown">
+         <property name="text">
+          <string>Move Down</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabSettings">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tabHistory">
+      <attribute name="title">
+       <string>Histroy</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

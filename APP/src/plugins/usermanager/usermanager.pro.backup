@@ -1,0 +1,36 @@
+INCLUDEPATH += $$UI_DIR \
+    $$PWD \
+
+TEMPLATE = lib
+CONFIG += plugin
+TARGET = usermanager
+
+QT += core \
+    gui \
+    sql
+
+SHARED_FOLDER = ../../shared
+include($$SHARED_FOLDER/shared.pri)
+ !include($$SHARED_FOLDER/shared.pri) {
+     message( "Can not include $$SHARED_FOLDER/shared.pri !" )
+ }
+
+LIBS += -L$$SHARED_FOLDER/ -lsharedhehui
+
+
+UI_DIR = ./ui
+OBJECTS_DIR = ./tmp
+MOC_DIR = ./tmp
+
+
+
+# Input
+HEADERS += usermanager.h
+FORMS += usermanager.ui
+SOURCES += usermanager.cpp
+RESOURCES += usermanager.qrc
+
+DESTDIR = ../../bin/plugins/hehui
+unix:target.path += ../../bin/plugins/hehui
+win32:target.path += %windir%/system32/plugins/hehui
+INSTALLS += target

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>*********************************************************************
+**
+** Copyright (C) 1992-2006 Trolltech ASA. All rights reserved.
+**
+** This file is part of the Qt Assistant of the Qt Toolkit.
+**
+** This file may be used under the terms of the GNU General Public
+** License version 2.0 as published by the Free Software Foundation
+** and appearing in the file LICENSE.GPL included in the packaging of
+** this file.  Please review the following information to ensure GNU
+** General Public Licensing requirements will be met:
+** http://www.trolltech.com/products/qt/opensource.html
+**
+** If you are unsure which license is appropriate for your use, please
+** review the following information:
+** http://www.trolltech.com/products/qt/licensing.html or contact the
+** sales department at sales@trolltech.com.
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+*********************************************************************</comment>
+ <class>DataExplorerUI</class>
+ <widget class="QWidget" name="DataExplorerUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>986</width>
+    <height>585</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SQL Data Explorer</string>
+  </property>
+  <property name="toolTip">
+   <string>SQL Data Explorer</string>
+  </property>
+  <property name="statusTip">
+   <string>SQL Data Explorer</string>
+  </property>
+  <property name="whatsThis">
+   <string>SQL Data Explorer</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTableView" name="dataViewTable">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>2</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionInsertRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Insert Row</string>
+   </property>
+   <property name="statusTip">
+    <string>Inserts a new row</string>
+   </property>
+  </action>
+  <action name="actionDeleteRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete Row(s)</string>
+   </property>
+   <property name="iconText">
+    <string>Delete the selected Row(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the selected Row(s)</string>
+   </property>
+   <property name="statusTip">
+    <string>Delete the selected Row(s)</string>
+   </property>
+  </action>
+  <action name="actionExportData">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/resources/images/exportdata.png</normaloff>:/resources/images/exportdata.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export</string>
+   </property>
+   <property name="iconText">
+    <string>Export Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Data</string>
+   </property>
+   <property name="statusTip">
+    <string>Export Data</string>
+   </property>
+  </action>
+  <action name="actionImportData">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>:/resources/images/importdata.png</normaloff>:/resources/images/importdata.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import</string>
+   </property>
+   <property name="toolTip">
+    <string>Import</string>
+   </property>
+   <property name="statusTip">
+    <string>Export Data</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/resources/images/printer.png</normaloff>:/resources/images/printer.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Print</string>
+   </property>
+  </action>
+  <action name="actionPrintPreview">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/resources/images/printer.png</normaloff>:/resources/images/printer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Print Preview</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

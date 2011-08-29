@@ -1,0 +1,77 @@
+INCLUDEPATH += $$UI_DIR \
+    $$PWD \
+
+TEMPLATE = app
+TARGET = app
+
+QT += core \
+    gui \
+    sql
+
+SHARED_FOLDER = ../shared
+include($$SHARED_FOLDER/shared.pri)
+ !include($$SHARED_FOLDER/shared.pri) {
+     message( "Can not include $$SHARED_FOLDER/shared.pri !" )
+ }
+
+LIBS += -L$$SHARED_FOLDER/ -lsharedhehui
+      
+
+UI_DIR = ./ui
+OBJECTS_DIR = ./tmp
+MOC_DIR = ./tmp
+
+DEPENDPATH += . about debug mainwindow ui
+INCLUDEPATH += . mainwindow ui about
+
+# Input
+HEADERS += about/aboutdialog.h \
+           mainwindow/mainwindow.h \
+           #../shared/mainwindowbase.h \
+           #../shared/global.h \
+           #../shared/settings.h \
+           #../shared/singleton.h \
+           #../shared/databaseutility.h \
+           #../shared/login/login.h \
+           #../shared/login/logindlg.h \
+           #../shared/databaseconnecter/databaseconnecter.h \
+           #../shared/databaseconnecter/databaseconnecterdialog.h \
+           #../shared/user.h
+
+SOURCES += main.cpp \
+           about/aboutdialog.cpp \
+           mainwindow/mainwindow.cpp \
+           #../shared/mainwindowbase.cpp \
+           #../shared/settings.cpp \
+           #../shared/singleton.cpp \
+           #../shared/databaseutility.cpp \
+           #../shared/login/login.cpp \
+           #../shared/login/logindlg.cpp \
+           #../shared/databaseconnecter/databaseconnecter.cpp \
+           #../shared/databaseconnecter/databaseconnecterdialog.cpp \
+           #../shared/user.cpp
+
+FORMS += about/aboutdialog.ui\
+	  mainwindow/mainwindow.ui\
+	#../shared/login/logindlg.ui \
+    #../shared/databaseconnecter/databaseconnecterdialog.ui \
+
+RESOURCES += resources.qrc
+
+win32:RC_FILE = iconresource.rc
+mac { 
+    ICON = ./resources/images/app.icns
+#    QMAKE_INFO_PLIST = Info_mac.plist
+#    TARGET = Designer
+}
+
+DESTDIR = ../bin
+
+unix:target.path +=  ../bin
+win32:target.path +=%windir%/system32
+INSTALLS += target
+ #unix:INSTALLS += target
+# win32:INSTALLS += target
+
+#TRANSLATIONS += ts_zh_CN.ts \
+#    ts_zh_TW.ts
