@@ -35,7 +35,7 @@ public:
     void setPeerHostPort(quint16 port){m_peerPort = port;}
     quint16 getPeerHostPort()const{return m_peerPort;}
 
-    bool canSendData(quint64 size);
+    bool canSendData(qint64 size);
 
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
