@@ -679,7 +679,8 @@ void RUDPChannel::sendKeepAlivePacket(){
     //out << "Goodbye";
     packet->setPacketData(ba);
 
-    tryingToSendPacket(packet);
+    //tryingToSendPacket(packet);
+    sendPacket(packet);
 
 }
 
@@ -1178,9 +1179,11 @@ void RUDPChannel::checkPeerAliveTimerTimeout(){
     if(m_checkPeerAliveTimes < 1){
         reset();
         qWarning()<<"Error! Peer Offline!";
-        qDebug()<<"------m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:ss:zzz")<<" m_keepAliveTimerInterval:"<<m_keepAliveTimerInterval;
         emit peerDisconnected(m_peerAddress, m_peerPort);
     }
+
+    qDebug()<<"------m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:ss:zzz")<<" m_keepAliveTimerInterval:"<<m_keepAliveTimerInterval;
+
 
 }
 
@@ -2352,7 +2355,11 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
         m_peerLastLiveTime = QDateTime::currentDateTime();
 
-        qDebug()<<"~~KeepAlive--";
+        if(!m_keepAliveTimer || !m_keepAliveTimer->isActive()){
+            sendKeepAlivePacket();
+        }
+
+        qDebug()<<"~~KeepAlive--"<<" m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:dd:zzz");
     }
     break;
     case quint8(RUDP::CompleteDataPacket):
@@ -2578,7 +2585,7 @@ void RUDPChannel::updateFirstWaitingForACKPacketIDInSendWindow(quint16 peerFirst
     if(m_firstWaitingForACKPacketIDInSendWindow <= peerFirstReceivedPacketIDInQueue){
         removeWaitingForACKPackets(m_firstWaitingForACKPacketIDInSendWindow, peerFirstReceivedPacketIDInQueue-1);
     }else{
-        if(peerFirstReceivedPacketIDInQueue < LSSN){
+        if((peerFirstReceivedPacketIDInQueue - 1) <= LSSN){
             removeWaitingForACKPackets(m_firstWaitingForACKPacketIDInSendWindow, RUDP_MAX_PACKET_SN);
             removeWaitingForACKPackets(1, peerFirstReceivedPacketIDInQueue-1);
         }
@@ -2659,7 +2666,7 @@ void RUDPChannel::cleanAllUnusedPackets(){
 
 }
 
-bool RUDPChannel::canSendData(quint64 size){
+bool RUDPChannel::canSendData(qint64 size){
 
     if(size > getGlobalFreeSendBufferSize()){
         qCritical()<<"ERROR! Can not send data! There is not enough buffer to cache the data! Free buffer size:"<<getGlobalFreeSendBufferSize();
