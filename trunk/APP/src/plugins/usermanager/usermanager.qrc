@@ -1,7 +1,0 @@
-<RCC>
-  <qresource prefix="/" >
-    <file>resources/images/find.png</file>
-    <file>resources/images/user.png</file>
-    <file>resources/images/usermanager.png</file>
-  </qresource>
-</RCC>
