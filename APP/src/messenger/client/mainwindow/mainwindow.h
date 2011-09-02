@@ -51,10 +51,8 @@ protected:
 
 
 signals:
-    //void signalUserOnlineStateChanged(IM::OnlineState state);
     void signalOnlineStateChanged(quint8 onlineStateCode);
 
-    //void signalRequestContactInfo(const QString &contactID = QString());
 
 public slots:
     void slotIconActivated(QSystemTrayIcon::ActivationReason reason);

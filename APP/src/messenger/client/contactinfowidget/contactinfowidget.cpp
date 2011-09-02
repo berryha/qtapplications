@@ -14,6 +14,8 @@
 
 namespace HEHUI {
 
+QHash<QString, ContactInfoWidget*> ContactInfoWidget::m_openWindows = QHash<QString, ContactInfoWidget*>();
+
 ContactInfoWidget::ContactInfoWidget(IMUserBase *user, QWidget *parent, Qt::WindowFlags fl)
     : WidgetBase(parent, fl), m_user(user)
 {
@@ -21,8 +23,13 @@ ContactInfoWidget::ContactInfoWidget(IMUserBase *user, QWidget *parent, Qt::Wind
 
     Q_ASSERT_X(m_user, "ContactInfoWidget::ContactInfoWidget(...)", "Invalid IMUserBase!");
 
+    m_openWindows.insert(m_user->getUserID(), this);
+
 
     initUI();
+
+    on_pushButtonGeneralInformation_clicked();
+
 
     moveWindow(HEHUI::Center);
 
@@ -32,6 +39,8 @@ ContactInfoWidget::~ContactInfoWidget()
 {
 
     //QMessageBox::information(this, "~ContactInfoWidget()", "~ContactInfoWidget()");
+
+    m_openWindows.remove(m_user->getUserID());
 
 }
 
@@ -46,8 +55,16 @@ void ContactInfoWidget::languageChange(){
 void ContactInfoWidget::closeEvent(QCloseEvent *){
     //QMessageBox::information(this, "closeEvent()", "closeEvent()");
 
+
+
     deleteLater();
 
+}
+
+ContactInfoWidget * ContactInfoWidget::getContactInfoWidget(IMUserBase *user){
+    Q_ASSERT_X(user, "ContactInfoWidget::getContactInfoWidget(...)", "Invalid IMUserBase!");
+
+    return m_openWindows.value(user->getUserID());
 }
 
 void ContactInfoWidget::initUI(){
@@ -59,7 +76,11 @@ void ContactInfoWidget::initUI(){
 
     ui.comboBoxGender->setCurrentIndex(m_user->getGender());
     ui.spinBoxAge->setValue(m_user->getAge());
-    ui.dateEditBirthday->setDate(m_user->getBirthday());
+
+    QDate birthday = m_user->getBirthday();
+    ui.spinBoxYear->setValue(birthday.year());
+    ui.spinBoxMonth->setValue(birthday.month());
+    ui.spinBoxDay->setValue(birthday.day());
 
 
     //TODO
@@ -78,7 +99,9 @@ void ContactInfoWidget::initUI(){
         ui.plainTextEditSignature->setReadOnly(true);
         ui.comboBoxGender->setEnabled(false);
         ui.spinBoxAge->setReadOnly(true);
-        ui.dateEditBirthday->setReadOnly(true);
+        ui.spinBoxYear->setReadOnly(true);
+        ui.spinBoxMonth->setReadOnly(true);
+        ui.spinBoxDay->setReadOnly(true);
 
 
         ui.toolButtonChangeFace->setEnabled(false);
@@ -90,7 +113,6 @@ void ContactInfoWidget::initUI(){
 
     setWindowIcon(ImageResource::createIconForContact(m_user->getFace(), IM::ONLINESTATE_ONLINE));
 
-    on_pushButtonGeneralInformation_clicked();
 
 
 }
@@ -124,10 +146,18 @@ void ContactInfoWidget::on_pushButtonSettings_clicked(){
 void ContactInfoWidget::on_pushButtonUpdate_clicked(){
     //TODO
 
+    emit updateUserInfoRequested(m_user);
+
+    initUI();
+
 }
 
 void ContactInfoWidget::on_pushButtonOK_clicked(){
     //TODO
+
+    emit saveUserInfoRequested(m_user);
+
+    close();
 
 }
 
@@ -137,6 +167,25 @@ void ContactInfoWidget::on_pushButtonCancel_clicked(){
 
 void ContactInfoWidget::on_pushButtonApply_clicked(){
     //TODO
+
+    emit saveUserInfoRequested(m_user);
+
+    ui.pushButtonApply->setEnabled(false);
+
+
+
+}
+
+void ContactInfoWidget::on_lineEditNickName_editingFinished(){
+    QString newNickName = ui.lineEditNickName->text();
+    if(newNickName != m_user->getNickName()){
+        m_user->setNickName(newNickName);
+        m_user->addUpdatedProperty(IM::PI_NickName, newNickName);
+    }
+
+}
+
+void ContactInfoWidget::on_plainTextEditSignature_textChanged(){
 
 }
 

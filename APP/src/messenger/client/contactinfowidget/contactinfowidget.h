@@ -22,10 +22,16 @@ public:
 
     QSystemTrayIcon *SystemTrayIcon(){return 0;}
 
+    static ContactInfoWidget * getContactInfoWidget(IMUserBase *user);
+
 protected:
     void languageChange();
     void closeEvent(QCloseEvent *);
 
+
+signals:
+    void saveUserInfoRequested(IMUserBase *user);
+    void updateUserInfoRequested(IMUserBase *user);
 
 private slots:
 
@@ -39,6 +45,9 @@ private slots:
     void on_pushButtonCancel_clicked();
     void on_pushButtonApply_clicked();
 
+    void on_lineEditNickName_editingFinished();
+    void on_plainTextEditSignature_textChanged();
+
 
 private:
     void initUI();
@@ -50,6 +59,8 @@ private:
 
 
     IMUserBase *m_user;
+
+    static QHash<QString, ContactInfoWidget*> m_openWindows;
 
 
 
