@@ -44,9 +44,10 @@ namespace HEHUI {
 
 class MYSHAREDLIB_API User : public UserBase
 {
-    Q_OBJECT;
+    Q_OBJECT
+
 public:
-    enum Gender{ GENDER_UNKNOWN = 0, MAIL, FEMAIL};
+    enum Gender{ GENDER_UNKNOWN = 0, MALE, FEMALE};
     User(const QString &userID = "", const QString &userName = "", const QString &password = "", QObject *parent = 0);
     virtual ~User();
 
@@ -107,6 +108,10 @@ public:
     quint8 getAge() const
     {
         return age;
+    }
+
+    QDate getBirthday() const{
+        return birthday;
     }
 
     QString getHomeAddress() const
@@ -250,6 +255,10 @@ public:
         this->age = age;
     }
 
+    void setBirthday(const QDate &date){
+        this->birthday = date;
+    }
+
     void setHomeAddress(const QString & homeAddress)
     {
         this->homeAddress = homeAddress;
@@ -341,6 +350,7 @@ private:
 	QString nickName;
 	Gender gender;
         quint8 age;
+        QDate birthday;
         QString face;
         
 	QString homeAddress;

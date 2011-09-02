@@ -45,10 +45,10 @@ class MYSHAREDLIB_API WidgetBase :public QWidget {
     Q_OBJECT
 
 public:
-    WidgetBase(QWidget *parent = 0);
+    WidgetBase(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Widget);
     virtual ~WidgetBase();
 
-    virtual void initUI() = 0;
+
     virtual void moveWindow(HEHUI::WindowPosition positon);
 
     virtual QSystemTrayIcon *SystemTrayIcon() = 0;
@@ -60,7 +60,7 @@ protected:
     void languageChange() = 0;
     void closeEvent ( QCloseEvent * event ) = 0;
 
-
+private:
 
 
 

@@ -76,8 +76,7 @@ QList<QHostAddress> NetworkUtilities::broadcastAddresses(){
          foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
              qDebug()<<"entry.ip():"<<entry.ip().toString();
              QHostAddress broadcastAddress = entry.broadcast();
-             if (broadcastAddress != QHostAddress::Null &&
-                 entry.ip() != QHostAddress::LocalHost) {
+             if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
                  ipAddresses << entry.ip();
              }
          }
@@ -88,9 +87,11 @@ QList<QHostAddress> NetworkUtilities::broadcastAddresses(){
 
 
 QString NetworkUtilities::hardwareAddress(const QHostAddress &ipAddress){
+    if(ipAddress.isNull()){return "";}
 
     foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
         foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+            //qDebug()<<"IP:"<<entry.ip()<<" Hardware Address:"<<interface.hardwareAddress();
             if (entry.ip() == ipAddress) {
                 return interface.hardwareAddress();
             }

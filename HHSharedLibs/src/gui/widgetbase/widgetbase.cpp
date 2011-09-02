@@ -39,10 +39,11 @@
 
 
 
-WidgetBase::WidgetBase(QWidget *parent)
-    :QWidget(parent)
+WidgetBase::WidgetBase(QWidget *parent, Qt::WindowFlags flags)
+    :QWidget(parent, flags)
 {
     // TODO Auto-generated constructor stub
+
 
 }
 
@@ -105,4 +106,6 @@ void WidgetBase::showSystemTrayMsg(const QString & title,
     SystemTrayIcon()->showMessage(title, message, icon, secondsTimeoutHint
                                   * 1000);
 }
+
+
 
