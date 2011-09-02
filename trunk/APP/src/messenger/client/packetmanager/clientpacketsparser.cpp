@@ -308,7 +308,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString name;
         QString version;
         in >> address >> udpPort >> tcpPort >> name >> version;
-        m_serverAddress = QHostAddress(address);
+        //m_serverAddress = QHostAddress(address);
+        m_serverAddress = peerAddress;
         m_serverUDPListeningPort = udpPort;
         m_serverTCPListeningPort = tcpPort;
         serverName = name;
