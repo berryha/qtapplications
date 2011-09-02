@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskManagementClass</class>
+ <widget class="QWidget" name="TaskManagementClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1167</width>
+    <height>565</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TaskManagement</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidgetTasks">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabTasksList">
+      <attribute name="title">
+       <string>Tasks List</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Query</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelTaskID">
+            <property name="text">
+             <string>Task ID:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="labelType">
+            <property name="text">
+             <string>Type:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QComboBox" name="comboBoxType">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string/>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Announce</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Update Password</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QLabel" name="labelState">
+            <property name="text">
+             <string>State:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QComboBox" name="comboBoxState">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string/>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Done</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>In Progress</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Waiting</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="7">
+           <widget class="QCheckBox" name="checkBox_2">
+            <property name="text">
+             <string>Creation:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="8">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Between</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="9">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_3"/>
+          </item>
+          <item row="0" column="10">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>And</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="11">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_4"/>
+          </item>
+          <item row="0" column="12">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="13">
+           <widget class="QToolButton" name="toolButtonQuery">
+            <property name="text">
+             <string>Query</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../controlcenter.qrc">
+              <normaloff>:/icon/resources/images/querydatabase.png</normaloff>:/icon/resources/images/querydatabase.png</iconset>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelTaskName">
+            <property name="text">
+             <string>Task Name:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEditTaskName"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="labelAuthor">
+            <property name="text">
+             <string>Author:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="comboBoxCreator">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QLabel" name="labelWorkgroup">
+            <property name="text">
+             <string>Workgroup:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="6">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="7">
+           <widget class="QCheckBox" name="checkBox_3">
+            <property name="text">
+             <string>Execution:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="8">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Between</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="9">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_5"/>
+          </item>
+          <item row="1" column="10">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>And</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="11">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_6"/>
+          </item>
+          <item row="1" column="12">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="13">
+           <widget class="QToolButton" name="toolButtonCreate">
+            <property name="toolTip">
+             <string>Create new task</string>
+            </property>
+            <property name="statusTip">
+             <string>Create new task</string>
+            </property>
+            <property name="text">
+             <string>Create</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../controlcenter.qrc">
+              <normaloff>:/icon/resources/images/addtab.png</normaloff>:/icon/resources/images/addtab.png</iconset>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QComboBox" name="comboBoxWorkgroup">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Department</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string>Department</string>
+            </property>
+            <item>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Account</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">AdminDept</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Cost</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Custom</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>GMO</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">HR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Marker</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">PDS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">PG</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Plan</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">PMC</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Purchase</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">QC</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Retail</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Sales</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Sample</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Secretary</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Ship</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Shop</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">WHouse</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelComputerName">
+            <property name="text">
+             <string>Computer Name:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEdit_2"/>
+          </item>
+          <item row="2" column="8" colspan="6">
+           <widget class="QLineEdit" name="lineEdit_3"/>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="labelUseName">
+            <property name="text">
+             <string>User Name:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLineEdit" name="lineEdit_4"/>
+          </item>
+          <item row="2" column="7">
+           <widget class="QLabel" name="labelDescription">
+            <property name="text">
+             <string>Description:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QLabel" name="labelIPAddress">
+            <property name="text">
+             <string>IP Address:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5">
+           <widget class="QLineEdit" name="lineEditIPAddress"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTableView" name="tableView"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../controlcenter.qrc"/>
+ </resources>
+ <connections/>
+</ui>

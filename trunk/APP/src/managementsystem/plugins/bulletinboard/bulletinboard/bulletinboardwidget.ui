@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SystemManagementWidgetClass</class>
+ <widget class="QWidget" name="SystemManagementWidgetClass">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>448</width>
+    <height>270</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Announcement</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../bulletinboard.qrc">
+    <normaloff>:/icon/resources/images/announcement.png</normaloff>:/icon/resources/images/announcement.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="toolTip">
+      <string>Announcement</string>
+     </property>
+     <property name="statusTip">
+      <string>Announcement</string>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QTextEdit::NoWrap</enum>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="toolButtonPrevious">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Previous Announcement</string>
+       </property>
+       <property name="statusTip">
+        <string>Previous Announcement</string>
+       </property>
+       <property name="text">
+        <string>&amp;Previous</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bulletinboard.qrc">
+         <normaloff>:/icon/resources/images/previous.png</normaloff>:/icon/resources/images/previous.png</iconset>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelCount">
+       <property name="text">
+        <string>0/0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonNext">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Next Announcement</string>
+       </property>
+       <property name="statusTip">
+        <string>Next Announcement</string>
+       </property>
+       <property name="text">
+        <string>&amp;Next</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../bulletinboard.qrc">
+         <normaloff>:/icon/resources/images/next.png</normaloff>:/icon/resources/images/next.png</iconset>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonClose">
+       <property name="text">
+        <string>&amp;Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionAddAdmin">
+   <property name="text">
+    <string>Add Admin</string>
+   </property>
+   <property name="toolTip">
+    <string>Add user to local admin group</string>
+   </property>
+  </action>
+  <action name="actionDeleteAdmin">
+   <property name="text">
+    <string>Delete Admin</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete user from local admin group</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../bulletinboard.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButtonClose</sender>
+   <signal>clicked()</signal>
+   <receiver>SystemManagementWidgetClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>197</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,18 @@
+
+1.undefined reference to `QtServiceBase::exec()'	main.cpp	/APP/managementsystem/clientservice	line 23	C/C++ Problem
+  ---在工程文件里添加 -lHHSharedService
+ 
+2./opt/workspace/qt/APP/managementsystem/serverservice'
+  /usr/lib/gcc/i586-suse-linux/4.5/../../../../i586-suse-linux/bin/ld: warning: libHHSharedNetwork_debug.so.2010, needed by ../lib/libHHSharedMS_debug.so, not found (try using -rpath or -rpath-link)
+  ../lib/libHHSharedMS_debug.so: undefined reference to `HEHUI::NetworkManagerBase::qt_metacast(char const*)'
+  ----对shared工程执行make install后解决
+  ----serverservice工程连接libHHSharedMS，没有直接引用到HHSharedNetwork里的文件，但libHHSharedMS用到了libHHSharedNetwork里的文件，libHHSharedMS连接了libHHSharedNetwork，serverservice工程没有连接到libHHSharedNetwork
+       serverservice工程也需要添加-lHHSharedNetwork
+
+3.Program received signal SIGSEGV, Segmentation fault.
+  Linux下对libHHSharedGUI进行修改后出现错误！
+  ----对shared工程执行'make uninstall',重新编译shared工程！
+
+4.widgetbase/mainwindowbase.cpp:86:9: error: ‘PluginManager’ has not been declared
+  ‘PluginManager’ 类的头文件已经引入!
+  ----‘PluginManager’类具有命名空间‘HEHUI’，而mainwindowbase没有这个空间，加入命名空间‘HEHUI’后解决！

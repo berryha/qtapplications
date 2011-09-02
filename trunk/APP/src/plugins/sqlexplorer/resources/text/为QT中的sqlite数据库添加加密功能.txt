@@ -1,0 +1,67 @@
+﻿为QT中的sqlite数据库添加加密功能
+
+http://blog.csdn.net/babafall/archive/2009/02/04/3862342.aspx
+
+sqlite数据库默认没有加密功能,对一些需要对工程文件进行保密的场合产生了不便,本文以QT4.4.3为例,
+对qt源代码中的sql模块进行修改,为qt集成的sqlite数据库添加了加密功能.
+
+1. /wxsqlite3_prj/sqlite3目录 下的文件进行编译生成 sqlite3.lib
+
+2 将 sqlite3.h 和 上一步骤生成的sqlite3.lib 拷贝到目录 ?:\Qt\4.4.3\src\plugins\sqldrivers\sqlite 中.
+
+3 将 ?:\Qt\4.4.3\src\plugins\sqldrivers\sqlite 目录下的sqlite.pro文件修改为:
+
+   TARGET  = qsqlite
+   
+   # 不使用qt自带的sqilte源码文件,而是使用外部生成的库
+   win32:LIBS += sqlite3.lib
+   #
+   
+   HEADERS  = ../../../sql/drivers/sqlite/qsql_sqlite.h
+   SOURCES  = smain.cpp \
+       ../../../sql/drivers/sqlite/qsql_sqlite.cpp
+   
+   !system-sqlite:!contains( LIBS, .*sqlite.* ) {
+       CONFIG(release, debug|release):DEFINES *= NDEBUG
+       DEFINES += SQLITE_CORE SQLITE_OMIT_LOAD_EXTENSION SQLITE_OMIT_COMPLETE 
+   #    INCLUDEPATH += ../../../3rdparty/sqlite
+   #    SOURCES += ../../../3rdparty/sqlite/sqlite3.c
+   } else {
+       LIBS *= $$QT_LFLAGS_SQLITE
+       QMAKE_CXXFLAGS *= $$QT_CFLAGS_SQLITE
+   }
+   
+   include(../qsqldriverbase.pri)
+   
+4 修改 ?:\Qt\4.4.3\src\sql\drivers\sqlite 目录下的文件 qsql_sqlite.cpp
+ 需要修改的函数 bool QSQLiteDriver::open(),函数体修改为:
+ 
+  bool QSQLiteDriver::open(const QString & db, const QString &, const QString &, const QString &, int, const QString &conOpts)
+  {
+      if (isOpen())
+          close();
+  
+      if (db.isEmpty())
+          return false;
+  
+      if (sqlite3_open16(db.constData(), &d->access) == SQLITE_OK) {
+          sqlite3_busy_timeout(d->access, qGetSqliteTimeout(conOpts));
+          setOpen(true);
+          setOpenError(false);
+          
+        //添加加密功能  "Trucc"为加密密匙,5为密匙长度
+     sqlite3_key( d->access, "Trucc", 5);
+  
+     return true;
+      } else {
+          setLastError(qMakeError(d->access, tr("Error opening database"),
+                       QSqlError::ConnectionError));
+          setOpenError(true);
+          return false;
+      }
+   
+  }
+
+5 编译 ?:\Qt\4.4.3\src\plugins\sqldrivers\sqlite 下的工程, 在目录 ?:\Qt\4.4.3\plugins\sqldrivers 中生成添加加密功能的sqlite
+  相应库文件.
+
