@@ -2197,8 +2197,12 @@ void MainWindow::showUserInfo(IMUserBase *user){
 
     Q_ASSERT_X(user, "MainWindow::showUserInfo(...)", "Invalid IMUserBase!");
 
-    ContactInfoWidget *  m_ContactInfoWidget = new ContactInfoWidget(user);
+    ContactInfoWidget *  m_ContactInfoWidget = ContactInfoWidget::getContactInfoWidget(user);
+    if(!m_ContactInfoWidget){
+        m_ContactInfoWidget = new ContactInfoWidget(user);
+    }
     m_ContactInfoWidget->show();
+    m_ContactInfoWidget->raise();
 
 
 }

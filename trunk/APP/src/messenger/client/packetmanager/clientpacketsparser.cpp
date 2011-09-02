@@ -322,7 +322,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalServerDeclarePacketReceived(m_serverAddress.toString(), m_serverUDPListeningPort, m_serverTCPListeningPort, serverName, version);
 
 
-        //            qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<name <<" serverTCPListeningPort:"<<serverTCPListeningPort;
+        //qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<name <<" serverTCPListeningPort:"<<serverTCPListeningPort;
     }
     break;
     case quint8(IM::ServerOnline):
