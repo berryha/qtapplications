@@ -56,7 +56,7 @@ public:
 
 
 protected:
-	void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 private:
     void updateModel();
@@ -64,7 +64,7 @@ private:
     
 signals:
     void signalLookForServer(const QHostAddress &targetAddress, quint16 targetPort);
-//    void signalServersUpdated();
+    //    void signalServersUpdated();
     void signalServerSelected(const QString &serverInfoString);
     
 
@@ -72,23 +72,23 @@ public slots:
     void serverFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
     
 private slots:
-        void slotRequestForLANServer(const QString &ip = IM_SERVER_IPMC_ADDRESS, quint16 port = quint16(IM_SERVER_UDP_LISTENING_PORT));
-	void slotTestServers();
-	void slotTimeout();
+    void slotRequestForLANServer(const QString &ip = IM_SERVER_IPMC_ADDRESS, quint16 port = quint16(IM_SERVER_UDP_LISTENING_PORT));
+    void slotTestServers();
+    void slotTimeout();
 
-	void slotSaveServers();
-	void slotLoadServers();
+    void slotSaveServers();
+    void slotLoadServers();
 
-        void slotUpdateUI();
+    void slotUpdateUI();
 
-        void on_toolButtonSearchServer_clicked();
-        void on_toolButtonAddServer_clicked();
-        void on_toolButtonShowAddServer_toggled(bool checked);
-	void on_lineEditIP_editingFinished ();
-        void on_toolButtonDeleteServer_clicked();
-        void on_toolButtonTestServers_clicked();
-        
-        void slotServerSelected(const QModelIndex &index);
+    void on_toolButtonSearchServer_clicked();
+    void on_toolButtonAddServer_clicked();
+    void on_toolButtonShowAddServer_toggled(bool checked);
+    void on_lineEditIP_editingFinished ();
+    void on_toolButtonDeleteServer_clicked();
+    void on_toolButtonTestServers_clicked();
+
+    void slotServerSelected(const QModelIndex &index);
 
 
 
@@ -101,7 +101,7 @@ private:
 
     QHash<QString/*Server Address*/, ServerInfo *> serversHash;
 
-//    ClientPacketsParser *clientPacketsParser;
+    //    ClientPacketsParser *clientPacketsParser;
 
 
 };
