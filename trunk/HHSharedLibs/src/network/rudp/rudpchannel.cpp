@@ -10,7 +10,7 @@
 
 namespace HEHUI {
 
-qint64 RUDPChannel::m_freeSendBufferSize = 1024000;
+qint64 RUDPChannel::m_freeSendBufferSize = 102400;
 QMutex * RUDPChannel::m_freeSendBufferSizeMutex = new QMutex();
 //quint64 RUDPChannel::m_globalFreeSendBufferSize = 1024000;
 //QList<RUDPPacket *> * RUDPChannel::m_unusedPackets = new QList<RUDPPacket *>();
@@ -274,8 +274,7 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, quint64 offset, bool fragmen
         return 0;
     }
 
-//    if(waitingForACKPackets.size() > 128){
-//        retransmitLostPacket();
+//    if(waitingForACKPackets.size() > 512){
 //        return 0;
 //    }
 
@@ -448,7 +447,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
                 sendPacketDroppedInfo(packetSerialNumber);
                 return;
             }else{
-                if( (LRSN + 1) >= m_firstReceivedPacketIDInReceiveWindow){
+                if( (LRSN + 1) > m_firstReceivedPacketIDInReceiveWindow){
                     if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID){
                         addLostPacketsInReceiverSide(LRSN, RUDP_MAX_PACKET_SN);
                         addLostPacketsInReceiverSide(0, packetSerialNumber-1);
@@ -457,11 +456,13 @@ void RUDPChannel::datagramReceived(QByteArray &block){
                         addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
                         LRSN = packetSerialNumber;
                     }
-                }else{
+                }else if((LRSN + 1) < m_firstReceivedPacketIDInReceiveWindow){
                     if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID && LRSN < packetSerialNumber){
                         addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
                         LRSN = packetSerialNumber;
                     }
+                }else{
+                    LRSN = packetSerialNumber;
                 }
 
             }
@@ -498,7 +499,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
         }else{
             if(LRSN == RUDP_MAX_PACKET_SN){LRSN = 0;}
             if(LRSN < packetSerialNumber){
-                if(LRSN >= 1){
+                if(LRSN >= 1 && ( (LRSN + 1) < packetSerialNumber) ){
                     addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
                 }
                 LRSN = packetSerialNumber;
@@ -1679,6 +1680,10 @@ void RUDPChannel::startRetransmissionTimer(){
 void RUDPChannel::retransmissionTimerTimeout(){
     //qDebug()<<"--RUDPChannel::retransmissionTimerTimeout()";
 
+//    if(retransmissionTimer->interval() != retransmissionTimerInterval){
+//        startRetransmissionTimer();
+//    }
+
     QDateTime curTime = QDateTime::currentDateTime();
 
 
@@ -1728,7 +1733,7 @@ void RUDPChannel::retransmissionTimerTimeout(){
 
     EXPCOUNT++;
 
-    if(EXPCOUNT > 2){
+    if(EXPCOUNT > 4){
         retransmitLostPacket();
     }
 
@@ -1751,7 +1756,7 @@ void RUDPChannel::init(){
     //------发送端------
     //sendPacketTimer = new QTimer();
     sendPacketTimer = 0;
-    sendPacketInterval = 1;
+    sendPacketInterval = 2;
     LSSN = 0;
 
     m_ToBeSentPacketsHash.clear();
@@ -2112,12 +2117,13 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
         sendACK2(packetSerialNumber);
 
-        RTT = rtt;
-        RTTVar = rttvar;
+        RTT = ((rtt == 0)?100:rtt);
+        RTTVar = (rttvar == 0)?100:rttvar;
         sendACKTimerInterval = sendNACKTimerInterval = 4 * RTT + RTTVar + SYN;
         if(sendACKTimerInterval > RUDP_MAX_SEND_ACK_TIMER_INTERVAL){
             sendACKTimerInterval = sendNACKTimerInterval = RUDP_MAX_SEND_ACK_TIMER_INTERVAL;
         }
+        //retransmissionTimerInterval = 3 * RTT + SYN;
 
         //TODO
         if(m_sendWindowSize < RUDP_MAX_SEND_WINDOW_SIZE){
@@ -2188,6 +2194,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         if(sendACKTimerInterval > RUDP_MAX_SEND_ACK_TIMER_INTERVAL){
             sendACKTimerInterval = sendNACKTimerInterval = RUDP_MAX_SEND_ACK_TIMER_INTERVAL;
         }
+        //retransmissionTimerInterval = 3 * RTT + SYN;
+
 
         qDebug()<<"------------------- ACK2 ---------------------"<<"rtt:"<<rtt<<" RTT:"<<RTT<<" RTTVar:"<<RTTVar<<" sendACKTimerInterval:"<<sendACKTimerInterval;
 //        startSendACKTimer();
@@ -2347,7 +2355,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
 
 
-        qDebug()<<"~~PacketDropped--"<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow<<" peerFirstReceivedPacketIDInQueue:"<<peerFirstReceivedPacketIDInQueue<<" peerReceiveWindowSize:"<<peerReceiveWindowSize;
+        qDebug()<<"~~PacketDropped--"<<"packetSerialNumber:"<<packetSerialNumber<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow<<" peerFirstReceivedPacketIDInQueue:"<<peerFirstReceivedPacketIDInQueue<<" peerReceiveWindowSize:"<<peerReceiveWindowSize;
     }
     break;
     case quint8(RUDP::KeepAlive):
