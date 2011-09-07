@@ -73,7 +73,7 @@ private slots:
     void requestClientInfoTimeout();
 
     void clientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool running, const QString &extraMessage);
-    void remoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, quint16 packetSerialNumber, const QString &result);
+    void remoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, const QString &result);
     void requestRemoteConsoleTimeout();
 
     void userResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);

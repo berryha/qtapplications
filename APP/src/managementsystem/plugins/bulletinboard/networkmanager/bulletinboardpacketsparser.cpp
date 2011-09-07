@@ -188,30 +188,30 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     QString peerID = "";
     in >> peerID;
 
-    quint16 packetSerialNumber = packet->getPacketSerialNumber();    
+//    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--BulletinBoardPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+//    qDebug()<<"--BulletinBoardPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        QString computerName;
-        in >> computerName;
-        emit signalHeartbeatPacketReceived(computerName);
-    }
-    break;
-    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-    {
-        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-        in >> packetSerialNumber1 >> packetSerialNumber2;
-        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
-    }
-    break;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        QString computerName;
+//        in >> computerName;
+//        emit signalHeartbeatPacketReceived(computerName);
+//    }
+//    break;
+//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+//    {
+//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+//        in >> packetSerialNumber1 >> packetSerialNumber2;
+//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+//        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
+//    }
+//    break;
     case quint8(MS::LocalServiceServerDeclare):
     {
-        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
         
         //QString localComputerName = "";
         //in >> localComputerName;
@@ -223,7 +223,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::AdminRequestRemoteAssistance):
     {
-        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
         
         QString adminAddress = "", adminName = "";
         quint16 adminPort = 0;
@@ -239,7 +239,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::InformUserNewPassword):
     {
 
-        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
         
         QString adminAddress = "", adminName = "",  oldPassword = "",  newPassword = "";
         quint16 adminPort = 0;
@@ -253,7 +253,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     
     case quint8(MS::ServerAnnouncement):
     {
-        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
         
         QString adminName = "", serverAnnouncement = "";
         quint32 announcementID = 0;
@@ -267,7 +267,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 
     default:
         qWarning()<<"BulletinBoardPacketsParser! Unknown Packet Type:"<<packetType
-                 <<" Serial Number:"<<packetSerialNumber
+//                 <<" Serial Number:"<<packetSerialNumber
                 <<" From:"<<packet->getPeerHostAddress().toString()
                <<":"<<packet->getPeerHostPort()
               <<" Local Port:"<<localUDPListeningPort;
@@ -282,51 +282,51 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
-void BulletinBoardPacketsParser::startHeartbeat(int interval){
-    if(NULL == heartbeatTimer){
-        heartbeatTimer = new QTimer(this);
-        heartbeatTimer->setSingleShot(false);
-        heartbeatTimer->setInterval(interval);
-        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
-    }else{
-        heartbeatTimer->stop();
-        heartbeatTimer->setInterval(interval);
+//void BulletinBoardPacketsParser::startHeartbeat(int interval){
+//    if(NULL == heartbeatTimer){
+//        heartbeatTimer = new QTimer(this);
+//        heartbeatTimer->setSingleShot(false);
+//        heartbeatTimer->setInterval(interval);
+//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
+//    }else{
+//        heartbeatTimer->stop();
+//        heartbeatTimer->setInterval(interval);
 
-    }
+//    }
 
-    heartbeatTimer->start();
-
-
-}
-
-void BulletinBoardPacketsParser::heartbeat(){
-
-    static QString computerName = "";
-    if(computerName.isEmpty()){
-        computerName = QHostInfo::localHostName().toLower() ;
-    }
-
-    if(serverAddress.isNull()){
-        serverAddress = QHostAddress::Broadcast;
-    }
-
-    //UDPPacket *packet = new UDPPacket(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
-    Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
-
-    packet->setPacketType(quint8(MS::UserHeartbeat));
-    QByteArray ba;
-    QDataStream out(&ba, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_6);
-    out << computerName;
-    packet->setPacketData(ba);
-    m_packetHandlerBase->appendOutgoingPacket(packet);
+//    heartbeatTimer->start();
 
 
-}
+//}
 
-void BulletinBoardPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
+//void BulletinBoardPacketsParser::heartbeat(){
 
-}
+//    static QString computerName = "";
+//    if(computerName.isEmpty()){
+//        computerName = QHostInfo::localHostName().toLower() ;
+//    }
+
+//    if(serverAddress.isNull()){
+//        serverAddress = QHostAddress::Broadcast;
+//    }
+
+//    //UDPPacket *packet = new UDPPacket(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
+//    Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+
+//    packet->setPacketType(quint8(MS::UserHeartbeat));
+//    QByteArray ba;
+//    QDataStream out(&ba, QIODevice::WriteOnly);
+//    out.setVersion(QDataStream::Qt_4_6);
+//    out << computerName;
+//    packet->setPacketData(ba);
+//    m_packetHandlerBase->appendOutgoingPacket(packet);
+
+
+//}
+
+//void BulletinBoardPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
+
+//}
 
 
 quint16 BulletinBoardPacketsParser::getLastReceivedPacketSN(const QString &peerID){

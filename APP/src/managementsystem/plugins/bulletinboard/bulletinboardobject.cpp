@@ -123,7 +123,7 @@ void BulletinBoardObject::networkReady(){
         
         m_networkReady = true;
         
-        bulletinBoardPacketsParser->startHeartbeat();
+//        bulletinBoardPacketsParser->startHeartbeat();
 
         qWarning()<<QString("UDP listening on port %1! (BulletinBoardObject)").arg(port);
 
