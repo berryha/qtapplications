@@ -74,55 +74,48 @@ public:
 public slots:
 
 
-    quint16 sendHeartbeatPacket(){
-        qDebug()<<"----sendHeartbeatPacket()";
+//    quint16 sendHeartbeatPacket(){
+//        qDebug()<<"----sendHeartbeatPacket()";
 
-        //        static QString computerName = "";
-        //        if(computerName.isEmpty()){
-        //            computerName = QHostInfo::localHostName() ;
-        //        }
+//        if(serverAddress.isNull()){
+//            serverAddress = QHostAddress::Broadcast;
+//        }
 
-        if(serverAddress.isNull()){
-            serverAddress = QHostAddress::Broadcast;
-        }
+//        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+//        packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_6);
+//        out << m_localComputerName;
+//        packet->setPacketData(ba);
+//        m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress.toString(), localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+//        return packet->getPacketSerialNumber();
 
-        packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
-        out << m_localComputerName;
-        packet->setPacketData(ba);
-        m_packetHandlerBase->appendOutgoingPacket(packet);
-
-        return packet->getPacketSerialNumber();
-
-    }
+//    }
 
 
-    quint16 sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
-        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
+//    quint16 sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
+//        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
 
-        //        UDPPacket *packet = new UDPPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
-        //UDPPacket *packet = new UDPPacket(peerAddress, peerPort);
-        Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort);
+//        //        UDPPacket *packet = new UDPPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
+//        //UDPPacket *packet = new UDPPacket(peerAddress, peerPort);
+//        Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort);
         
-        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
-        out << m_localComputerName << packetSerialNumber << getLastReceivedPacketSN(peerID);
-        packet->setPacketData(ba);
-        m_packetHandlerBase->appendOutgoingPacket(packet);
+//        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_6);
+//        out << m_localComputerName << packetSerialNumber << getLastReceivedPacketSN(peerID);
+//        packet->setPacketData(ba);
+//        m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        m_receivedPacketsHash.insert(peerID, qMakePair(packetSerialNumber, QDateTime::currentDateTime()));
+//        m_receivedPacketsHash.insert(peerID, qMakePair(packetSerialNumber, QDateTime::currentDateTime()));
 
-        return packet->getPacketSerialNumber();
-    }
+//        return packet->getPacketSerialNumber();
+//    }
 
-    quint16 sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
+    void sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
         qDebug()<<"----sendClientLookForServerPacket(...)";
 
         //UDPPacket *packet = new UDPPacket(QString(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -144,13 +137,13 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        clientLookForServerPacketSerialNumber = packet->getPacketSerialNumber();
-        return clientLookForServerPacketSerialNumber;
+//        clientLookForServerPacketSerialNumber = packet->getPacketSerialNumber();
+//        return clientLookForServerPacketSerialNumber;
         //return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientOnlinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOnlinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -164,10 +157,10 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendClientOfflinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOfflinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOfflinePacket(...)";
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -181,11 +174,11 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientResponseRemoteConsoleStatusPacket(const QHostAddress adminAddress, quint16 adminPort, bool running, const QString &extraMessage){
+    void sendClientResponseRemoteConsoleStatusPacket(const QHostAddress adminAddress, quint16 adminPort, bool running, const QString &extraMessage){
         qDebug()<<"----sendClientResponseRemoteConsolePacket(...)";
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -204,10 +197,10 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendRemoteConsoleCMDResultFromClientPacket(const QHostAddress adminAddress, quint16 adminPort, const QString &result){
+    void sendRemoteConsoleCMDResultFromClientPacket(const QHostAddress adminAddress, quint16 adminPort, const QString &result){
         qDebug()<<"----sendRemoteConsoleCMDResultFromClientPacket(...)";
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -227,10 +220,10 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendClientResponseClientSummaryInfoPacket(const QString &targetAddress, quint16 targetPort, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins){
+    void sendClientResponseClientSummaryInfoPacket(const QString &targetAddress, quint16 targetPort, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins){
         //qWarning()<<"----sendClientResponseClientInfoPacket(...)"<<" targetAddress:"<<targetAddress<<" targetPort:"<<targetPort;
 
         QHostAddress address = QHostAddress(targetAddress);
@@ -260,12 +253,12 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
 
-    quint16 sendClientRequestSoftwareVersionPacket(const QString &softwareName){
+    void sendClientRequestSoftwareVersionPacket(const QString &softwareName){
         qDebug()<<"----sendClientRequestSoftwareVersionPacket(...)";
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -280,11 +273,11 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientLogPacket(const QString &users, quint8 logType, const QString &log){
+    void sendClientLogPacket(const QString &users, quint8 logType, const QString &log){
         //qWarning()<<"----sendClientLogPacket(...) log:"<<log;
 
         //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
@@ -299,19 +292,19 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
 
 
-    quint16 sendClientResponseClientDetailedInfoPacket(const QString &systemInfoFilePath, const QString &peerAddress = "", quint16 peerPort = quint16(IP_MULTICAST_GROUP_PORT)){
+    void sendClientResponseClientDetailedInfoPacket(const QString &systemInfoFilePath, const QString &peerAddress = "", quint16 peerPort = quint16(IP_MULTICAST_GROUP_PORT)){
 
         QFile file(systemInfoFilePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
             //TODO
             //sendClientMessagePacket(peerAddress, peerPort, localComputerName, "Can not read system info file!");
-            return 0;
+            return ;
         }
         QTextStream in(&file);
         QString info = in.readAll();
@@ -325,7 +318,7 @@ public slots:
         quint16 port = peerPort;
         if(address.isNull()){
             if(serverAddress.isNull()){
-                return 0;
+                return ;
             }
             address = serverAddress;
             port = localIPMCListeningPort;
@@ -353,11 +346,11 @@ public slots:
         qDebug()<<"----sendClientResponseClientDetailedInfoPacket(...) Host:"<<address.toString()<<" Port:"<<port;
 
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientResponseAdminConnectionResultPacket(const QHostAddress adminAddress, quint16 adminPort, bool result, const QString &message){
+    void sendClientResponseAdminConnectionResultPacket(const QHostAddress adminAddress, quint16 adminPort, bool result, const QString &message){
         //qWarning()<<"----sendClientResponseVerifyInfoResultPacket(...):"<<adminAddress.toString()<<" "<<adminPort;
 
         //后两个参数必须为空，才能发送给本机
@@ -376,11 +369,11 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientMessagePacket(const QHostAddress adminAddress, quint16 adminPort, const QString &message){
+    void sendClientMessagePacket(const QHostAddress adminAddress, quint16 adminPort, const QString &message){
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
@@ -398,7 +391,7 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     } 
 
@@ -406,7 +399,7 @@ public slots:
     
     
     
-    quint16 sendLocalServiceServerDeclarePacket(const QHostAddress userAddress, quint16 userPort){
+    void sendLocalServiceServerDeclarePacket(const QHostAddress userAddress, quint16 userPort){
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
@@ -424,7 +417,7 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
     
@@ -440,7 +433,7 @@ public slots:
         
     }
 
-    quint16 sendRequestRemoteAssistancePacket( const QHostAddress userAddress, quint16 userPort, const QString &adminAddress, quint16 adminPort, const QString &adminName){
+    void sendRequestRemoteAssistancePacket( const QHostAddress userAddress, quint16 userPort, const QString &adminAddress, quint16 adminPort, const QString &adminName){
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
@@ -458,11 +451,11 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendInformUpdatePasswordPacket(const QString &userName, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
+    void sendInformUpdatePasswordPacket(const QString &userName, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
         //qWarning()<<"sendInformUpdatePasswordPacket(...)"<<" userName:"<<userName<<" Port:"<<localUsersHash.value(userName) << " newPassword:"<<newPassword;
         
         //后两个参数必须为空，才能发送给本机
@@ -481,7 +474,7 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
     
@@ -498,7 +491,7 @@ public slots:
 
     }
     
-    quint16 sendServerAnnouncementPacket(const QHostAddress userAddress, quint16 userPort, const QString &adminName, quint32 announcementID, const QString &serverAnnouncement){
+    void sendServerAnnouncementPacket(const QHostAddress userAddress, quint16 userPort, const QString &adminName, quint32 announcementID, const QString &serverAnnouncement){
         //qWarning()<<"sendServerAnnouncementPacket(...)"<<" userAddress:"<<userAddress.toString()<<" Port:"<<userPort;
         
         //后两个参数必须为空，才能发送给本机
@@ -517,38 +510,31 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
     
     
     
 private slots:
-    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
-    void stopHeartbeat();
+//    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
+//    void stopHeartbeat();
 
 
 signals:
     void  signalHeartbeatPacketReceived(const QString &computerName);
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
-    //    void signalClientLookForServerPacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
     void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
-
-    //    void signalClientOnlinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
-    //    void signalClientOfflinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
 
     void signalServerOnlinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
     void signalServerOfflinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
 
     void signalClientDetailedInfoRequestedPacketReceived(const QString &computerName, bool rescan, const QString &adminAddress, quint16 adminPort);
     void signalAdminRequestRemoteConsolePacketReceived(const QString &computerName, const QString &applicationPath, const QString &adminID, bool startProcess, const QString &adminAddress, quint16 adminPort);
-    //    void signalClientResponseRemoteConsolePacketReceived(bool accept);
     void signalRemoteConsoleCMDFromServerPacketReceived(const QString &computerName, const QString &command, const QString &adminAddress, quint16 adminPort);
-    //    void signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &result);
 
     void signalServerRequestClientSummaryInfoPacketReceived(const QString &groupName, const QString &computerName, const QString &userName);
-    //    void signalClientResponseClientInfoPacketReceived(const QString &clientInfo);
 
     void signalClientRequestSoftwareVersionPacketReceived(const QString &softwareName);
     void signalServerResponseSoftwareVersionPacketReceived(const QString &softwareName, const QString &version);
@@ -578,13 +564,13 @@ private:
     quint16 serverTCPListeningPort;
     QString serverName;
 
-    quint16 clientLookForServerPacketSerialNumber;
+//    quint16 clientLookForServerPacketSerialNumber;
 
     QHostAddress localIPMCListeningAddress;
     quint16 localIPMCListeningPort;
 
     QTimer *heartbeatTimer;
-    //        QTimer *processWaitingForReplyPacketsTimer;
+    //QTimer *processWaitingForReplyPacketsTimer;
 
     PacketHandlerBase *m_packetHandlerBase;
     //ClientNetworkManager *networkManager;

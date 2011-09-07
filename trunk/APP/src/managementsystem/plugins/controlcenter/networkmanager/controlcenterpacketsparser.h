@@ -65,29 +65,29 @@ public:
 
 
 
-    quint16 sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
-        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
+//    void sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
+//        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
 
-        UDPPacket *packet = new UDPPacket(peerAddress.toString(), peerPort, localUDPListeningAddress.toString(), localUDPListeningPort);
-        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << packetSerialNumber << getLastReceivedPacketSN(peerID);
-        packet->setPacketData(ba);
-        m_packetHandlerBase->appendOutgoingPacket(packet);
+//        Packet *packet = new Packet(peerAddress.toString(), peerPort, localUDPListeningAddress.toString(), localUDPListeningPort);
+//        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_6);
+//        out << m_localID << packetSerialNumber << getLastReceivedPacketSN(peerID);
+//        packet->setPacketData(ba);
+//        m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        m_receivedPacketsHash.insert(peerID, qMakePair(packetSerialNumber, QDateTime::currentDateTime()));
+//        m_receivedPacketsHash.insert(peerID, qMakePair(packetSerialNumber, QDateTime::currentDateTime()));
 
-        return packet->getPacketSerialNumber();
-    }
+////        return packet->getPacketSerialNumber();
+//    }
 
-    quint16 sendClientLookForServerPacket(){
+    void sendClientLookForServerPacket(){
         qDebug()<<"----sendClientLookForServerPacket(...)";
         //qWarning()<<"ipmcListeningAddress:"<<ipmcGroupAddress.toString()<<" ipmcListeningPort"<<ipmcListeningPort<<" localUDPListeningPort"<<localUDPListeningPort;
 
 
-        UDPPacket *packet = new UDPPacket(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientLookForServer));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*10));
         QByteArray ba;
@@ -98,14 +98,14 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendClientOnlinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOnlinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
-        UDPPacket *packet = new UDPPacket(serverAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(serverAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientOnline));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -114,13 +114,13 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendClientOfflinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOfflinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOfflinePacket(...)";
 
-        UDPPacket *packet = new UDPPacket(serverAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(serverAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientOffline));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -129,7 +129,7 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
@@ -179,7 +179,7 @@ public:
     //    }
 
     //    quint16 sendServerAnnouncementPacket(const QString &groupName, const QString &computerName, const QString &announcement, bool mustRead = true){
-    //        UDPPacket *packet = new UDPPacket(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    //        Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
     //        packet->setPacketType(quint8(MS::ServerAnnouncement));
     //        QByteArray ba;
     //        QDataStream out(&ba, QIODevice::WriteOnly);
@@ -195,10 +195,10 @@ public:
 
     /////////////////////////////////////////////////////
 
-    quint16 sendRequestClientDetailedInfoPacket(const QHostAddress &peerAddress, const QString &computerName, bool rescan){
+    void sendRequestClientDetailedInfoPacket(const QHostAddress &peerAddress, const QString &computerName, bool rescan){
         //qWarning()<<"peerAddress:"<<peerAddress.toString()<<" ipmcListeningPort"<<ipmcListeningPort<<" localUDPListeningPort"<<localUDPListeningPort;
 
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientDetailedInfoRequested));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -210,13 +210,13 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
         qDebug()<<"sendAdminRequestClientInfoPacket";
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendAdminRequestRemoteConsolePacket(const QHostAddress &peerAddress, const QString &computerName, const QString &applicationPath, const QString &adminID, bool startProcess = true){
+    void sendAdminRequestRemoteConsolePacket(const QHostAddress &peerAddress, const QString &computerName, const QString &applicationPath, const QString &adminID, bool startProcess = true){
         qDebug()<<"----sendServerRequestRemoteConsolePacket(...)";
 
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::AdminRequestRemoteConsole));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -228,14 +228,14 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendRemoteConsoleCMDFromAdminPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &command){
+    void sendRemoteConsoleCMDFromAdminPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &command){
         qDebug()<<"----sendRemoteConsoleCMDFromServerPacket(...)";
 
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::RemoteConsoleCMDFromAdmin));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -247,14 +247,14 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
-    quint16 sendSetupUSBSDPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
+    void sendSetupUSBSDPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
         //qWarning()<<"peerAddress:"<<peerAddress.toString()<<" ipmcListeningPort"<<ipmcListeningPort<<" localUDPListeningPort"<<localUDPListeningPort;
 
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::SetupUSBSD));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -264,11 +264,11 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
         qDebug()<<"sendSetupUSBSDPacket";
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendSetupProgramesPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    void sendSetupProgramesPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::SetupProgrames));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -278,11 +278,11 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendShowAdminPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool show){
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    void sendShowAdminPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool show){
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ShowAdmin));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -292,11 +292,11 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendModifyAdminGroupUserPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName){
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    void sendModifyAdminGroupUserPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName){
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::ModifyAdminGroupUser));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -306,12 +306,12 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendAdminRequestConnectionToClientPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &users){
+    void sendAdminRequestConnectionToClientPacket(const QHostAddress &peerAddress, const QString &computerName, const QString &users){
 
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::AdminRequestConnectionToClient));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
         QByteArray ba;
@@ -323,12 +323,12 @@ public:
 
         qWarning()<<"sendAdminRequestVerifyClientInfoPacket:"<<peerAddress.toString()<<" "<<ipmcListeningPort;
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
     
-    quint16 sendAdminSearchClientPacket(const QHostAddress &targetAddress, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName){
-        //UDPPacket *packet = new UDPPacket(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
-        UDPPacket *packet = new UDPPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    void sendAdminSearchClientPacket(const QHostAddress &targetAddress, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName){
+        //Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::AdminSearchClient));
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -338,11 +338,11 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
     
-    quint16 sendRemoteAssistancePacket(const QHostAddress &peerAddress, const QString &computerName, const QString &adminName){
-        UDPPacket *packet = new UDPPacket(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+    void sendRemoteAssistancePacket(const QHostAddress &peerAddress, const QString &computerName, const QString &adminName){
+        Packet *packet = new Packet(peerAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::AdminRequestRemoteAssistance));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -352,15 +352,15 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
 
-    quint16 sendUpdateMSUserPasswordPacket(const QString &peerAddress, const QString &workgroupName, const QString &adminName){
+    void sendUpdateMSUserPasswordPacket(const QString &peerAddress, const QString &workgroupName, const QString &adminName){
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
             targetAddress = ipmcGroupAddress;
         }
-        UDPPacket *packet = new UDPPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        Packet *packet = new Packet(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         packet->setPacketType(quint8(MS::UpdateMSWUserPassword));
         packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -370,10 +370,10 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
     }
     
-    quint16 sendInformUpdatePasswordPacket(const QString &peerAddress, const QString &workgroupName, const QString &adminName){
+    void sendInformUpdatePasswordPacket(const QString &peerAddress, const QString &workgroupName, const QString &adminName){
 
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
@@ -382,7 +382,7 @@ public:
         
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
         Packet *packet = m_packetHandlerBase->getPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         
         packet->setPacketType(quint8(MS::InformUserNewPassword));
@@ -396,18 +396,18 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
     
-    quint16 sendAnnouncementPacket(const QString &peerAddress, const QString &groupName, const QString &computerName, quint32 announcementID, const QString &announcement, const QString &adminName, bool mustRead = true){
+    void sendAnnouncementPacket(const QString &peerAddress, const QString &groupName, const QString &computerName, quint32 announcementID, const QString &announcement, const QString &adminName, bool mustRead = true){
 
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
             targetAddress = ipmcGroupAddress;
         }
         
-        //UDPPacket *packet = packetHandlerBase->getUDPPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
+        //Packet *packet = packetHandlerBase->getUDPPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         Packet *packet = m_packetHandlerBase->getPacket(targetAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
         
         //Packet *packet = packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
@@ -421,7 +421,7 @@ public:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-        return packet->getPacketSerialNumber();
+//        return packet->getPacketSerialNumber();
 
     }
 
@@ -434,7 +434,7 @@ public:
     //        }
 
 
-    //        UDPPacket *packet = new UDPPacket(address, ipmcListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
+    //        Packet *packet = new Packet(address, ipmcListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
     //        packet->setPacketType(quint8(MS::AdminLookForClient));
     //        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
     //        QByteArray ba;
@@ -471,7 +471,7 @@ signals:
     //    void signalServerRequestRemoteConsolePacketReceived(const QString &adminID);
     void signalClientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool accept, const QString &extraMessage);
     //    void signalRemoteConsoleCMDFromServerPacketReceived(const QString &command);
-    void signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, quint16 packetSerialNumber, const QString &result);
+    void signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, const QString &result);
 
 
 
@@ -495,9 +495,9 @@ signals:
 
 public slots:
     //HeartbeatPacket: PacketType+ComputerName+IP
-    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
-    void heartbeat();
-    void confirmPacketReceipt(quint16 packetSerialNumber);
+//    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
+//    void heartbeat();
+//    void confirmPacketReceipt(quint16 packetSerialNumber);
 
 private:
     quint16 getLastReceivedPacketSN(const QString &peerID);

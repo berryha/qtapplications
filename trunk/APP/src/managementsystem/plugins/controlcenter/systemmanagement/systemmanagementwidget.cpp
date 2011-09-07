@@ -202,7 +202,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
 
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &)), this, SLOT(clientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &)));
-    connect(controlCenterPacketsParser, SIGNAL(signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &, quint16, const QString &)), this, SLOT(remoteConsoleCMDResultFromClientPacketReceived(const QString &, quint16, const QString &)));
+    connect(controlCenterPacketsParser, SIGNAL(signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &, const QString &)), this, SLOT(remoteConsoleCMDResultFromClientPacketReceived(const QString &, const QString &)));
 
     connect(controlCenterPacketsParser, SIGNAL(signalUserResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)), this, SLOT(userResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)));
     
@@ -898,7 +898,7 @@ void SystemManagementWidget::clientResponseRemoteConsoleStatusPacketReceived(con
 
 }
 
-void SystemManagementWidget::remoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, quint16 packetSerialNumber, const QString &result){
+void SystemManagementWidget::remoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, const QString &result){
 
 
     if(computerName != this->m_computerName){

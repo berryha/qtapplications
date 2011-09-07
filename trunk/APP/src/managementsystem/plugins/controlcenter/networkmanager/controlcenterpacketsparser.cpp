@@ -185,9 +185,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
-    quint16 packetSerialNumber = packet->getPacketSerialNumber();
+//    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--ControlCenterPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+//    qDebug()<<"--ControlCenterPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
     case quint8(HEHUI::HeartbeatPacket):
@@ -197,20 +197,18 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalHeartbeatPacketReceived(peerName);
     }
     break;
-    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-    {
-        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-        in >> packetSerialNumber1 >> packetSerialNumber2;
-        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
-    }
-    break;
-    //    case quint8(MS::ClientLookForServer):
-    //        break;
+//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+//    {
+//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+//        in >> packetSerialNumber1 >> packetSerialNumber2;
+//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+//        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
+//    }
+//    break;
     case quint8(MS::ServerDeclare):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString address = "";
         quint16 port = 0;
@@ -256,7 +254,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
 
         QString systemInfo = "";
@@ -277,7 +275,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientResponseRemoteConsoleStatus):
     {
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString extraMessage = "";
         quint8 running = false;
@@ -297,11 +295,11 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::RemoteConsoleCMDResultFromClient):
     {
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString result = "";
         in >> result;
-        emit signalRemoteConsoleCMDResultFromClientPacketReceived(peerName, packet->getPacketSerialNumber(), result);
+        emit signalRemoteConsoleCMDResultFromClientPacketReceived(peerName, result);
         qDebug()<<"~~RemoteConsoleCMDResultFromClient";
     }
     break;
@@ -325,7 +323,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientResponseClientSummaryInfo):
     {
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString workgroupName = "", networkInfo = "", usersInfo = "", osInfo = "", admins = "", clientVersion = "";
         bool usbsdEnabled = false, programesEnabled = false;
@@ -337,7 +335,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientResponseAdminConnectionResult):
     {
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString message = "";
         bool result = false;
@@ -349,7 +347,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientMessage):
     {
         //一定要用ipmcListeningPort
-        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString message = "";
         in >> message;
@@ -360,7 +358,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::UserResponseRemoteAssistance):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString userName = "", computerName = "";
         bool accept = false;
@@ -374,7 +372,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::NewPasswordRetrevedByUser):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString userName = "", computerName = "";
         in >> userName >> computerName ;
@@ -389,7 +387,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     default:
         qWarning()<<"ControlCenterPacketsParser! Unknown Packet Type: "<<packetType
-                 <<"    Serial Number: "<<packetSerialNumber
+//                 <<"    Serial Number: "<<packetSerialNumber
                 <<"    From: "<<peerAddress.toString()
                <<":"<<peerPort;
         break;
@@ -455,51 +453,51 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 //}
 
 
-void ControlCenterPacketsParser::startHeartbeat(int interval){
-    if(NULL == heartbeatTimer){
-        heartbeatTimer = new QTimer(this);
-        heartbeatTimer->setSingleShot(false);
-        heartbeatTimer->setInterval(interval);
-        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
-    }else{
-        heartbeatTimer->stop();
-        heartbeatTimer->setInterval(interval);
+//void ControlCenterPacketsParser::startHeartbeat(int interval){
+//    if(NULL == heartbeatTimer){
+//        heartbeatTimer = new QTimer(this);
+//        heartbeatTimer->setSingleShot(false);
+//        heartbeatTimer->setInterval(interval);
+//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
+//    }else{
+//        heartbeatTimer->stop();
+//        heartbeatTimer->setInterval(interval);
 
-    }
+//    }
 
-    heartbeatTimer->start();
-
-
-}
-
-void ControlCenterPacketsParser::heartbeat(){
-
-    qDebug()<<"----sendHeartbeatPacket()";
-
-    static QString computerName = "";
-    if(computerName.isEmpty()){
-        computerName = QHostInfo::localHostName().toLower() ;
-    }
-
-    if(serverAddress.isNull()){
-        serverAddress = QHostAddress::Broadcast;
-    }
-
-    UDPPacket *packet = new UDPPacket(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
-    packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
-    QByteArray ba;
-    QDataStream out(&ba, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_6);
-    out << computerName;
-    packet->setPacketData(ba);
-    m_packetHandlerBase->appendOutgoingPacket(packet);
+//    heartbeatTimer->start();
 
 
-}
+//}
 
-void ControlCenterPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
+//void ControlCenterPacketsParser::heartbeat(){
 
-}
+//    qDebug()<<"----sendHeartbeatPacket()";
+
+//    static QString computerName = "";
+//    if(computerName.isEmpty()){
+//        computerName = QHostInfo::localHostName().toLower() ;
+//    }
+
+//    if(serverAddress.isNull()){
+//        serverAddress = QHostAddress::Broadcast;
+//    }
+
+//    Packet *packet = new Packet(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
+//    packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
+//    QByteArray ba;
+//    QDataStream out(&ba, QIODevice::WriteOnly);
+//    out.setVersion(QDataStream::Qt_4_6);
+//    out << computerName;
+//    packet->setPacketData(ba);
+//    m_packetHandlerBase->appendOutgoingPacket(packet);
+
+
+//}
+
+//void ControlCenterPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
+
+//}
 
 
 

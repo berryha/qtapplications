@@ -58,7 +58,7 @@ ServerPacketsParser::ServerPacketsParser(NetworkManagerInstance *networkManager,
     Q_ASSERT_X(m_packetHandlerBase, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid PacketHandlerBase!");
 
 
-    heartbeatTimer = 0;
+//    heartbeatTimer = 0;
 
     serverAddress = m_networkManager->localTCPListeningAddress();
     serverTCPListeningPort = m_networkManager->localTCPListeningPort();
@@ -77,11 +77,11 @@ ServerPacketsParser::~ServerPacketsParser() {
 
     QMutexLocker locker(&mutex);
 
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
-    delete heartbeatTimer;
-    heartbeatTimer = 0;
+//    if(heartbeatTimer){
+//        heartbeatTimer->stop();
+//    }
+//    delete heartbeatTimer;
+//    heartbeatTimer = 0;
 
     //    if(processWaitingForReplyPacketsTimer){
     //        processWaitingForReplyPacketsTimer->stop();
@@ -208,9 +208,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
-    quint16 packetSerialNumber = packet->getPacketSerialNumber();
+//    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+//    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
     case quint8(HEHUI::HeartbeatPacket):
@@ -221,18 +221,18 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~HeartbeatPacket--"<<" peerID:"<<peerID;
     }
     break;
-    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-    {
-        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-        in >> packetSerialNumber1 >> packetSerialNumber2;
-        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
-    }
-    break;
+//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+//    {
+//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+//        in >> packetSerialNumber1 >> packetSerialNumber2;
+//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+//        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
+//    }
+//    break;
     case quint8(MS::ClientLookForServer):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         sendServerDeclarePacket(peerAddress, peerPort, serverAddress, serverTCPListeningPort);
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
@@ -314,7 +314,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::ClientResponseClientSummaryInfo):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
 
         //            QHostAddress add = packet->getPeerHostAddress();
@@ -348,7 +348,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientResponseClientDetailedInfo):
     {
         //sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), quint16(IP_MULTICAST_GROUP_PORT), packet->getPacketSerialNumber(), peerID);
-        sendConfirmationOfReceiptPacket(peerAddress, quint16(IP_MULTICAST_GROUP_PORT), packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(peerAddress, quint16(IP_MULTICAST_GROUP_PORT), packetSerialNumber, peerID);
 
         QString systemInfo = "";
         in >> systemInfo;
@@ -360,7 +360,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::ClientRequestSoftwareVersion):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString softwareName;
         in >> softwareName;
@@ -374,7 +374,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::ClientLog):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString users = "", log = "", clientTime = "";
         quint8 logType = 0;
@@ -385,7 +385,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     default:
         qWarning()<<"Unknown Packet Type: "<<packetType
-                 <<"    Serial Number: "<<packetSerialNumber
+                 //<<"    Serial Number: "<<packetSerialNumber
                 <<"    From: "<<peerAddress.toString()
                <<":"<<peerPort;
         break;
@@ -399,28 +399,28 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
-void ServerPacketsParser::startHeartbeat(int interval){
-    if(NULL == heartbeatTimer){
-        heartbeatTimer = new QTimer();
-        heartbeatTimer->setSingleShot(false);
-        heartbeatTimer->setInterval(interval);
-        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
+//void ServerPacketsParser::startHeartbeat(int interval){
+//    if(NULL == heartbeatTimer){
+//        heartbeatTimer = new QTimer();
+//        heartbeatTimer->setSingleShot(false);
+//        heartbeatTimer->setInterval(interval);
+//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
 
-    }else{
-        heartbeatTimer->stop();
-        heartbeatTimer->setInterval(interval);
+//    }else{
+//        heartbeatTimer->stop();
+//        heartbeatTimer->setInterval(interval);
 
-    }
+//    }
 
-    heartbeatTimer->start();
+//    heartbeatTimer->start();
 
 
-}
+//}
 
-void ServerPacketsParser::stopHeartbeat(){
+//void ServerPacketsParser::stopHeartbeat(){
 
-    heartbeatTimer->stop();
-}
+//    heartbeatTimer->stop();
+//}
 
 quint16 ServerPacketsParser::getLastReceivedPacketSN(const QString &peerID){
     quint16 lastpacketSN = 0;
