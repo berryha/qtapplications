@@ -71,7 +71,7 @@ public slots:
     virtual void parseIncomingPackets();
     virtual void parseIncomingPacketData(Packet *packet) = 0;
     virtual void processOutgoingPackets();
-    virtual void processWaitingForReplyPackets();
+//    virtual void processWaitingForReplyPackets();
 
 
 protected:

@@ -59,8 +59,8 @@ PacketHandlerBase::PacketHandlerBase(QObject *parent)
     incomingPacketsMutex = new QMutex();
     outgoingPackets = new QList<Packet *> ();
     outgoingPacketsMutex = new QMutex();
-    waitingForReplyPackets = new QHash<quint16, Packet *> ();
-    waitingForReplyPacketsMutex = new QMutex();
+//    waitingForReplyPackets = new QHash<quint16, Packet *> ();
+//    waitingForReplyPacketsMutex = new QMutex();
 
 
 }
@@ -83,11 +83,11 @@ PacketHandlerBase::~PacketHandlerBase() {
     }
     outgoingPackets->clear();
 
-    QMutexLocker waitingForReplyLocker(waitingForReplyPacketsMutex);
-    foreach (Packet *p, waitingForReplyPackets->values()) {
-        recylePacket(p);
-    }
-    waitingForReplyPackets->clear();
+//    QMutexLocker waitingForReplyLocker(waitingForReplyPacketsMutex);
+//    foreach (Packet *p, waitingForReplyPackets->values()) {
+//        recylePacket(p);
+//    }
+//    waitingForReplyPackets->clear();
 
 
 }
@@ -146,56 +146,56 @@ int PacketHandlerBase::outgoingPacketsCount(){
 
 
 
-void PacketHandlerBase::appendWaitingForReplyPacket(Packet *packet){
+//void PacketHandlerBase::appendWaitingForReplyPacket(Packet *packet){
 
-    QMutexLocker locker(waitingForReplyPacketsMutex);
-    if(packet && packet->isValid()){
-        //waitingForReplyPackets.append(packet);
-        waitingForReplyPackets->insert(packet->getPacketSerialNumber(), packet);
-    }
+//    QMutexLocker locker(waitingForReplyPacketsMutex);
+//    if(packet && packet->isValid()){
+//        //waitingForReplyPackets.append(packet);
+//        waitingForReplyPackets->insert(packet->getPacketSerialNumber(), packet);
+//    }
 
-}
+//}
 
-Packet * PacketHandlerBase::takeWaitingForReplyPacket(){
-    QMutexLocker locker(waitingForReplyPacketsMutex);
-    if(waitingForReplyPackets->isEmpty()){
-        return 0;
-    }else{
-        return waitingForReplyPackets->take(waitingForReplyPackets->keys().at(0));
-    }
+//Packet * PacketHandlerBase::takeWaitingForReplyPacket(){
+//    QMutexLocker locker(waitingForReplyPacketsMutex);
+//    if(waitingForReplyPackets->isEmpty()){
+//        return 0;
+//    }else{
+//        return waitingForReplyPackets->take(waitingForReplyPackets->keys().at(0));
+//    }
 
-}
+//}
 
-int PacketHandlerBase::waitingForReplyPacketsCount(){
-    QMutexLocker locker(waitingForReplyPacketsMutex);
-    return waitingForReplyPackets->count();
-}
+//int PacketHandlerBase::waitingForReplyPacketsCount(){
+//    QMutexLocker locker(waitingForReplyPacketsMutex);
+//    return waitingForReplyPackets->count();
+//}
 
-void PacketHandlerBase::removeWaitingForReplyPacket(quint16 packetSerialNumber1, quint16 packetSerialNumber2){
-    QMutexLocker locker(waitingForReplyPacketsMutex);
-    if(waitingForReplyPackets->isEmpty()){
-        return;
-    }else{
-        Packet *packet = waitingForReplyPackets->take(packetSerialNumber1);
-        if(packet){
-            recylePacket(packet);
-        }
+//void PacketHandlerBase::removeWaitingForReplyPacket(quint16 packetSerialNumber1, quint16 packetSerialNumber2){
+//    QMutexLocker locker(waitingForReplyPacketsMutex);
+//    if(waitingForReplyPackets->isEmpty()){
+//        return;
+//    }else{
+//        Packet *packet = waitingForReplyPackets->take(packetSerialNumber1);
+//        if(packet){
+//            recylePacket(packet);
+//        }
 
-        packet = waitingForReplyPackets->take(packetSerialNumber2);
-        if(packet){
-            recylePacket(packet);
-        }
+//        packet = waitingForReplyPackets->take(packetSerialNumber2);
+//        if(packet){
+//            recylePacket(packet);
+//        }
 
-        //        delete packet;
-        //        packet = 0;
-    }
-}
+//        //        delete packet;
+//        //        packet = 0;
+//    }
+//}
 
 
-bool PacketHandlerBase::hasWaitingForReplyPackets(){
-    QMutexLocker locker(waitingForReplyPacketsMutex);
-    return (!waitingForReplyPackets->isEmpty());
-}
+//bool PacketHandlerBase::hasWaitingForReplyPackets(){
+//    QMutexLocker locker(waitingForReplyPacketsMutex);
+//    return (!waitingForReplyPackets->isEmpty());
+//}
 
 
 
@@ -228,29 +228,29 @@ Packet *PacketHandlerBase::getPacket(const QHostAddress &peerAddress, quint16 pe
     }
     
     packet->setTransmissionProtocol(transmissionProtocol);
-    packet->setPacketSerialNumber(packet->createSerialNumber());
+//    packet->setPacketSerialNumber(packet->createSerialNumber());
     
     return packet;
 
 }
 
-UDPPacket *PacketHandlerBase::getUDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort){
-    QMutexLocker locker(unusedPacketsMutex);
-    if(unusedPackets->isEmpty()){
-        return new UDPPacket(peerAddress, peerPort, localAddress, localPort);
-    }else{
-        //Packet *packet = unusedPackets->takeFirst();
-        UDPPacket *packet = static_cast<UDPPacket *>(unusedPackets->takeFirst());
-        packet->setTransmissionProtocol(TP_UDP);
-        packet->setPeerHostAddress(peerAddress);
-        packet->setPeerHostPort(peerPort);
-        packet->setLocalHostAddress(localAddress);
-        packet->setLocalHostPort(localPort);
-        //UDPPacket *udpPacket = static_cast<UDPPacket *>(packet);
-        return packet;
-    }
+//UDPPacket *PacketHandlerBase::getUDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort){
+//    QMutexLocker locker(unusedPacketsMutex);
+//    if(unusedPackets->isEmpty()){
+//        return new UDPPacket(peerAddress, peerPort, localAddress, localPort);
+//    }else{
+//        //Packet *packet = unusedPackets->takeFirst();
+//        UDPPacket *packet = static_cast<UDPPacket *>(unusedPackets->takeFirst());
+//        packet->setTransmissionProtocol(TP_UDP);
+//        packet->setPeerHostAddress(peerAddress);
+//        packet->setPeerHostPort(peerPort);
+//        packet->setLocalHostAddress(localAddress);
+//        packet->setLocalHostPort(localPort);
+//        //UDPPacket *udpPacket = static_cast<UDPPacket *>(packet);
+//        return packet;
+//    }
     
-}
+//}
 
 void PacketHandlerBase::recylePacket(Packet *packet){
     QMutexLocker locker(unusedPacketsMutex);

@@ -10,6 +10,7 @@
 #include "../mysharedlib_global.h"
 
 #include "rudppacket.h"
+#include "../packethandler/packethandlerbase.h"
 
 
 
@@ -21,8 +22,8 @@ class MYSHAREDLIB_API RUDPChannel : public QThread
 public:
     enum ChannelState {UnconnectedState, ConnectingState, DisconnectingState, ConnectedState, ListeningState};
 
-    explicit RUDPChannel(QUdpSocket *udpSocket, QObject *parent = 0);
-    RUDPChannel(QUdpSocket *udpSocket, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent = 0);
+    explicit RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
+    RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent = 0);
 
     ~RUDPChannel();
 
@@ -43,7 +44,7 @@ signals:
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
     //void channelClosed();
 
-    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
+//    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 public slots:
@@ -114,6 +115,7 @@ private slots:
     void retransmissionTimerTimeout();
 
 
+
 private:
     void init();
     void reset();
@@ -127,6 +129,8 @@ private:
 
     void processPacket(RUDPPacket *packet);
     void getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStream *in);
+
+    void cacheData(QByteArray *data);
 
 //    RUDPPacket * takedWaitingForACKPacket(quint16 packetID);
 
@@ -254,7 +258,7 @@ private:
     quint16 m_packetSerialNumber;
 
     QUdpSocket *m_udpSocket;
-
+    PacketHandlerBase *m_packetHandlerBase;
 
 
 ////    QTimer *m_connectToPeerTimer;

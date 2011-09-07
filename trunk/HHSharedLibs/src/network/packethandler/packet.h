@@ -91,10 +91,10 @@ public:
 	quint8 getPacketType() const;
 	void setPacketType(quint8 packetType);
 
-        static quint16 createSerialNumber();
+//        static quint16 createSerialNumber();
 
-	quint16 getPacketSerialNumber() const;
-	void setPacketSerialNumber(quint16 packetSerialNumber);
+//	quint16 getPacketSerialNumber() const;
+//	void setPacketSerialNumber(quint16 packetSerialNumber);
 
         QByteArray  getPacketData() const;
 	void setPacketData(const QByteArray &data);
@@ -130,7 +130,7 @@ private:
 
 
 	quint8 packetType;
-        quint16 m_packetSerialNumber;
+        //quint16 m_packetSerialNumber;
 
 
 	QByteArray packetData;
@@ -152,45 +152,45 @@ private:
 
 };
 
-class MYSHAREDLIB_API TCPPacket : public Packet
-{
+//class MYSHAREDLIB_API TCPPacket : public Packet
+//{
 
-public:
-	TCPPacket();
-        TCPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "", quint16 localPort = 0);
-        TCPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Null, quint16 localPort = 0);
+//public:
+//	TCPPacket();
+//        TCPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "", quint16 localPort = 0);
+//        TCPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Null, quint16 localPort = 0);
 
-        virtual ~TCPPacket();
+//        virtual ~TCPPacket();
 
-private:
+//private:
 
-};
+//};
 
-class MYSHAREDLIB_API UDPPacket : public Packet
-{
+//class MYSHAREDLIB_API UDPPacket : public Packet
+//{
 
-public:
-	UDPPacket();
-        UDPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "", quint16 localPort = 0);
-        UDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Null, quint16 localPort = 0);
+//public:
+//	UDPPacket();
+//        UDPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "", quint16 localPort = 0);
+//        UDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Null, quint16 localPort = 0);
 
-        virtual ~UDPPacket();
+//        virtual ~UDPPacket();
 
-	//For UDP
+//	//For UDP
 
-	UDPTransmissionMode getUDPTransmissionMode();
-	void setUDPTransmissionMode(UDPTransmissionMode udpTransmissionMode);
-
-
-
-private:
-
-
-	UDPTransmissionMode udpTransmissionMode;
+//	UDPTransmissionMode getUDPTransmissionMode();
+//	void setUDPTransmissionMode(UDPTransmissionMode udpTransmissionMode);
 
 
 
-};
+//private:
+
+
+//	UDPTransmissionMode udpTransmissionMode;
+
+
+
+//};
 
 
 

@@ -44,6 +44,7 @@ rudpSocket->endDataTransmission(m_peerAddress, m_peerPort, fragmentDataID);
 //#include "../mysharedlib_global.h"
 
 #include "rudpchannel.h"
+#include "../packethandler/packethandlerbase.h"
 
 
 namespace HEHUI{
@@ -52,7 +53,7 @@ class MYSHAREDLIB_API RUDPSocket : public QUdpSocket
 {
     Q_OBJECT
 public:
-    explicit RUDPSocket(QObject *parent = 0);
+    explicit RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
 
     ~RUDPSocket();
 
@@ -93,6 +94,7 @@ private:
     void recyleRUDPChannel(RUDPChannel *channel);
 
 private:
+    PacketHandlerBase *m_packetHandlerBase;
 
     QHash<QString/*IP:Port*/, RUDPChannel*> peers;
 

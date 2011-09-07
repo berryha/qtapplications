@@ -76,9 +76,6 @@ NetworkManagerBase::~NetworkManagerBase() {
 }
 
 void NetworkManagerBase::closeUDPServer(quint16 port){
-
-    //    UDPServer *udpServer = getUDPServer(port);
-    
     QMutexLocker udpLocker(&udpMutex);
     if(!udpServers.isEmpty()){
         QList<UDPServer *> udpServerList = udpServers.values(port);
@@ -95,6 +92,22 @@ void NetworkManagerBase::closeUDPServer(quint16 port){
 
     }
     
+}
+
+void NetworkManagerBase::closeRUDPServer(quint16 port){
+    QMutexLocker rudpLocker(&rudpMutex);
+    if(!rudpServers.isEmpty()){
+        QList<RUDPServer *> rudpServerList = rudpServers.values(port);
+        foreach(RUDPServer *rudpServer, rudpServerList){
+            if(!rudpServer){continue;}
+                rudpServer->close();
+                delete rudpServer;
+                rudpServer = 0;
+                rudpServers.remove(port, rudpServer);
+        }
+
+    }
+
 }
 
 void NetworkManagerBase::closeTCPServer(quint16 port){
@@ -131,7 +144,20 @@ void NetworkManagerBase::closeAllServers(){
         }
         udpServerList.clear();
         udpServers.clear();
+    }
 
+    QMutexLocker rudpLocker(&rudpMutex);
+    if(!rudpServers.isEmpty()){
+        QList<RUDPServer *> rudpServerList = rudpServers.values();
+        foreach(RUDPServer *rudpServer, rudpServerList){
+            if(!rudpServer){continue;}
+                rudpServer->close();
+                delete rudpServer;
+                rudpServer = 0;
+                rudpServers.remove(port, rudpServer);
+        }
+        rudpServerList.clear();
+        rudpServers.clear();
     }
 
     QMutexLocker tcpLocker(&tcpMutex);
@@ -216,7 +242,7 @@ UDPServer * NetworkManagerBase::startUDPServerListening(const QHostAddress &loca
     delete udpServer;
     udpServer = 0;
 
-    qCritical()<<QString("ERROR! Failed to start UDPServer Listening! Local Address:%1, Port:%2").arg(localAddress.toString()).arg(localPort);
+    qCritical()<<QString("ERROR! Failed to start UDP Server Listening! Local Address:%1, Port:%2").arg(localAddress.toString()).arg(localPort);
 
     return udpServer;
 
@@ -249,6 +275,65 @@ bool NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &ipM
 
 
     return false;
+
+}
+
+RUDPServer * NetworkManagerBase::getRUDPServer(quint16 port, const QHostAddress &localAddress){
+
+    QMutexLocker locker(&rudpMutex);
+
+    QHostAddress address = localAddress;
+    if(localAddress == QHostAddress::Null){
+        address = QHostAddress::Any;
+    }
+
+    QList<RUDPServer *> list;
+    if(port == 0){
+        list = rudpServers.values();
+    }else{
+        list = rudpServers.values(port);
+    }
+    if(!list.isEmpty()){
+        if(address == QHostAddress::Any){
+            return list.at(0);
+        }
+        foreach(RUDPServer *rudpServer, list){
+            if((rudpServer->localAddress() == address) || (rudpServer->localAddress() == QHostAddress::Any)){
+                return rudpServer;
+            }
+        }
+    }
+
+    return 0;
+
+}
+
+RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort){
+
+    RUDPServer *rudpServer = getRUDPServer(localPort, localAddress);
+    if(rudpServer){
+        qWarning("RUDP Server has already started!");
+        return rudpServer;
+    }else{
+        rudpServer = new RUDPServer(m_packetHandlerBase, this);
+    }
+
+    QHostAddress address = localAddress;
+    if(localAddress == QHostAddress::Null){
+        address = QHostAddress::Any;
+    }
+
+    if (rudpServer->bind(address, localPort)) {
+        QMutexLocker locker(&rudpMutex);
+        rudpServers.insert(localPort, rudpServer);
+        return rudpServer;
+    }
+
+    qCritical()<<QString("ERROR! Failed to start RUDP Server Listening! Local Address:%1, Port:%2. %3").arg(localAddress.toString()).arg(localPort).arg(rudpSocket->errorString());
+
+    delete rudpServer;
+    rudpServer = 0;
+    return 0;
 
 }
 
@@ -364,28 +449,38 @@ bool NetworkManagerBase::slotSendNewTCPDatagram(const QHostAddress &targetAddres
 
 }
 
-bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort){
+bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort, bool useRUDP){
     //qWarning()<< "NetworkManagerBase::slotSendNewUDPDatagram(...): Target Address:"<<targetAddress.toString()<<" Target Port:"<<targetPort << " Local Port"<<localPort;
 
     bool result = false;
 
-    if(localPort == 0){
-        result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
-    }else{
-        UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
-        if (udpServer) {
-            qint64 size = udpServer->writeDatagram(data, targetAddress,targetPort);
-            result = (size == data.size())?true:false;
-        } else {
-            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
+    if(useRUDP){
+        RUDPServer *rudpServer = getRUDPServer(localPort, QHostAddress::Any);
+        if(!rudpServer){
+            qCritical()<<"RUDP Server Not Running!";
+            result = false;
         }
 
-    }
+    }else{
+        if(localPort == 0){
+            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
+        }else{
+            UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
+            if (udpServer) {
+                qint64 size = udpServer->writeDatagram(data, targetAddress,targetPort);
+                result = (size == data.size())?true:false;
+            } else {
+                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
+            }
 
-    if (result) {
-        //qDebug()<< "UDP Datagram Sent Successfully! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;
-    } else {
-        qCritical()<< "ERROR! UDP Datagram Sent Failed! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;
+        }
+
+        if (result) {
+            //qDebug()<< "UDP Datagram Sent Successfully! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;
+        } else {
+            qCritical()<< "ERROR! UDP Datagram Sent Failed! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;
+        }
+
     }
 
 
@@ -424,8 +519,8 @@ bool NetworkManagerBase::slotSendPacket(Packet *packet){
     if (transmissionProtocol == TP_TCP) {
         result = slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
     } else if (transmissionProtocol == TP_UDP) {
-        UDPPacket *udpPacket = static_cast<UDPPacket *> (packet);
-        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, udpPacket->getLocalHostPort());
+        //UDPPacket *udpPacket = static_cast<UDPPacket *> (packet);
+        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort());
 
     }
 

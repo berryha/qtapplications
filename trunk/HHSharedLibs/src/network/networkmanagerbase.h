@@ -39,6 +39,7 @@
 
 #include "global_network.h"
 #include "./udp/udpsocket.h"
+#include "./rudp/rudpsocket.h"
 #include "./tcp/tcpsocketconnection.h"
 #include "./tcp/tcpserver.h"
 //#include "udp/multicast/multicast.h"
@@ -59,6 +60,7 @@ public:
     virtual ~NetworkManagerBase();
 
     void closeUDPServer(quint16 port);
+    void closeRUDPServer(quint16 port);
     void closeTCPServer(quint16 port);
     void closeAllServers();
 
@@ -74,6 +76,9 @@ public:
     UDPServer *getUDPServer(quint16 port, const QHostAddress &localAddress);
     UDPServer * startUDPServerListening(const QHostAddress &localAddress, quint16 localPort);
     bool startIPMulticastServerListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
+
+    RUDPServer * getRUDPServer(quint16 port, const QHostAddress &localAddress);
+    RUDPServer * startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort);
 
     TcpServer *getTcpServer(quint16 port, const QHostAddress &serverIPAddress);
     bool startTCPServerListening(const QHostAddress &localAddress = QHostAddress::Any, quint16 port = 0);
@@ -94,7 +99,8 @@ public slots:
     void slotProcessNewTCPConnectionConnected(TcpSocketConnection *tcpSocketConnection);
 
     bool slotSendNewTCPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
-    bool slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort);
+    bool slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort, bool useRUDP);
+
 
     bool slotSendPacket(Packet *packet);
 
@@ -121,9 +127,11 @@ private:
     CommunicationMode communicationMode;
 
     QMultiHash<quint16, UDPServer *> udpServers;
+    QMultiHash<quint16, RUDPServer *> rudpServers;
     QMultiHash<quint16, TcpServer *> tcpServers;
     QMultiHash<QHostAddress, TcpSocketConnection *> tcpSocketConnections;
     QMutex udpMutex;
+    QMutex rudpMutex;
     QMutex tcpMutex;
 
 

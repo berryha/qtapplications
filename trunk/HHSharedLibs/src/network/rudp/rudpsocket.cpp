@@ -18,9 +18,11 @@
 namespace HEHUI{
 
 
-RUDPSocket::RUDPSocket(QObject *parent) :
-    QUdpSocket(parent)
+RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent) :
+    QUdpSocket(parent), m_packetHandlerBase(packetHandlerBase)
 {
+
+    Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
     peers.clear();
 
@@ -195,7 +197,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
     if(!peers.contains(channelID)){
         if(m_unusedRUDPChannels.isEmpty()){
             qWarning()<<"Create new channel:"<<channelID;
-            channel = new RUDPChannel(this, hostAddress, port, this);
+            channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, this);
             connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));

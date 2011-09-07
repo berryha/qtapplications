@@ -65,7 +65,7 @@ Packet::Packet() {
     //	packetTail.resize(0);
     
     this->packetType = HEHUI::UnKnownPacket;
-    this->m_packetSerialNumber = 0;
+    //this->m_packetSerialNumber = 0;
     this->packetData = QByteArray();
     this->packetData.resize(0);
     
@@ -92,7 +92,7 @@ Packet::Packet(const QString &peerAddress, quint16 peerPort, const QString &loca
     //	packetTail.resize(0);
     
     this->packetType = UnKnownPacket;
-    this->m_packetSerialNumber = 0;
+    //this->m_packetSerialNumber = 0;
     this->packetData = QByteArray();
     this->packetData.resize(0);
     
@@ -120,7 +120,7 @@ Packet::Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAdd
     //	packetTail.resize(0);
     
     this->packetType = UnKnownPacket;
-    this->m_packetSerialNumber = 0;
+    //this->m_packetSerialNumber = 0;
     this->packetData = QByteArray();
     this->packetData.resize(0);
     
@@ -146,7 +146,7 @@ Packet::Packet(const Packet &packet){
 Packet & Packet::operator = (const Packet &packet){
 
     this->packetType = packet.getPacketType();
-    this->m_packetSerialNumber = packet.getPacketSerialNumber();
+    //this->m_packetSerialNumber = packet.getPacketSerialNumber();
     this->packetData = packet.getPacketData();
     this->peerHostAddress = packet.getPeerHostAddress();
     this->peerHostPort = packet.getPeerHostPort();
@@ -167,7 +167,7 @@ Packet::~Packet() {
 
 void Packet::resetPacket(){
     this->packetType = UnKnownPacket;
-    this->m_packetSerialNumber = 0;
+    //this->m_packetSerialNumber = 0;
     this->packetData.resize(0);
     
     this->peerHostAddress = QHostAddress::Null;
@@ -199,35 +199,28 @@ void Packet::setPacketType(quint8 packetType) {
 	this->packetType = packetType;
 }
 
-quint16 Packet::createSerialNumber() {
-	static QMutex serialNumberMutex;
-	QMutexLocker locker(&serialNumberMutex);
+//quint16 Packet::createSerialNumber() {
+//	static QMutex serialNumberMutex;
+//	QMutexLocker locker(&serialNumberMutex);
 
-        static quint16 sn = 0;
-
-//        if ((++PacketSerialNumber) == 0XFFFF) {
-//                PacketSerialNumber = 0;
+//        static quint16 sn = 0;
+//        if (sn == quint16(0XFFFF)) {
+//            sn = 1;
+//        }else{
+//            sn++;
 //        }
-//        PacketSerialNumber = (PacketSerialNumber % 0XFFFF);
-//        return (PacketSerialNumber == 0) ? (++PacketSerialNumber) : PacketSerialNumber;
 
-        if (sn == quint16(0XFFFF)) {
-            sn = 1;
-        }else{
-            sn++;
-        }
+//        return sn;
 
-        return sn;
+//}
 
-}
+//quint16 Packet::getPacketSerialNumber() const {
+//        return m_packetSerialNumber;
+//}
 
-quint16 Packet::getPacketSerialNumber() const {
-        return m_packetSerialNumber;
-}
-
-void Packet::setPacketSerialNumber(quint16 packetSerialNumber) {
-        this->m_packetSerialNumber = packetSerialNumber;
-}
+//void Packet::setPacketSerialNumber(quint16 packetSerialNumber) {
+//        this->m_packetSerialNumber = packetSerialNumber;
+//}
 
 QByteArray Packet::getPacketData() const {
 	//    QMutexLocker locker(&mutex);
@@ -351,94 +344,94 @@ void Packet::packetTransmissionFailed() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-TCPPacket::TCPPacket()
-    :Packet()
-{
+//TCPPacket::TCPPacket()
+//    :Packet()
+//{
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    setTransmissionProtocol( TP_TCP);
+//    setTransmissionProtocol( TP_TCP);
 
-}
+//}
 
-TCPPacket::TCPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress, quint16 localPort) 
-    :Packet(peerAddress, peerPort, localAddress, localPort) 
-{
+//TCPPacket::TCPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress, quint16 localPort)
+//    :Packet(peerAddress, peerPort, localAddress, localPort)
+//{
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    setTransmissionProtocol( TP_TCP);
+//    setTransmissionProtocol( TP_TCP);
 
-}
+//}
 
-TCPPacket::TCPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort)
-    :Packet(peerAddress, peerPort, localAddress, localPort) 
-{
+//TCPPacket::TCPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort)
+//    :Packet(peerAddress, peerPort, localAddress, localPort)
+//{
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    setTransmissionProtocol( TP_TCP);
+//    setTransmissionProtocol( TP_TCP);
 
-}
+//}
 
-TCPPacket::~TCPPacket() {
+//TCPPacket::~TCPPacket() {
 
-}
+//}
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-UDPPacket::UDPPacket() 
-    :Packet() 
-{
+//UDPPacket::UDPPacket()
+//    :Packet()
+//{
 
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    this->udpTransmissionMode = UDP_TM_DIRECT;
+//    this->udpTransmissionMode = UDP_TM_DIRECT;
     
-    setTransmissionProtocol( TP_UDP);
+//    setTransmissionProtocol( TP_UDP);
     
 
-}
+//}
 
-UDPPacket::UDPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress, quint16 localPort) 
-    :Packet(peerAddress, peerPort, localAddress, localPort) 
-{
+//UDPPacket::UDPPacket(const QString &peerAddress, quint16 peerPort, const QString &localAddress, quint16 localPort)
+//    :Packet(peerAddress, peerPort, localAddress, localPort)
+//{
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    this->udpTransmissionMode = UDP_TM_DIRECT;
+//    this->udpTransmissionMode = UDP_TM_DIRECT;
     
-    setTransmissionProtocol( TP_UDP);
+//    setTransmissionProtocol( TP_UDP);
     
-}
+//}
 
-UDPPacket::UDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort) 
-    :Packet(peerAddress, peerPort, localAddress, localPort) 
-{
+//UDPPacket::UDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort)
+//    :Packet(peerAddress, peerPort, localAddress, localPort)
+//{
 
-    setPacketSerialNumber(createSerialNumber());
+//    setPacketSerialNumber(createSerialNumber());
     
-    this->udpTransmissionMode = UDP_TM_DIRECT;
+//    this->udpTransmissionMode = UDP_TM_DIRECT;
     
-    setTransmissionProtocol( TP_UDP);
+//    setTransmissionProtocol( TP_UDP);
 
     
-}
+//}
 
-UDPPacket::~UDPPacket() {
+//UDPPacket::~UDPPacket() {
 
-}
+//}
 
 
 
-UDPTransmissionMode UDPPacket::getUDPTransmissionMode() {
-	return udpTransmissionMode;
-}
+//UDPTransmissionMode UDPPacket::getUDPTransmissionMode() {
+//	return udpTransmissionMode;
+//}
 
-void UDPPacket::setUDPTransmissionMode(UDPTransmissionMode udpTransmissionMode) {
-	this->udpTransmissionMode = udpTransmissionMode;
-}
+//void UDPPacket::setUDPTransmissionMode(UDPTransmissionMode udpTransmissionMode) {
+//	this->udpTransmissionMode = udpTransmissionMode;
+//}
 
 
 

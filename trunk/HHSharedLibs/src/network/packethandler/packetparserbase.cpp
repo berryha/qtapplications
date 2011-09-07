@@ -90,7 +90,7 @@ void PacketsParserBase::run(){
     while(!isAboutToQuit()){
         parseIncomingPackets();
         processOutgoingPackets();
-        processWaitingForReplyPackets();
+//        processWaitingForReplyPackets();
 
     }
 
@@ -199,8 +199,11 @@ void PacketsParserBase::processOutgoingPackets() {
             result = m_networkManagerBase->slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
 
         } else if (transmissionProtocol == TP_UDP) {
-            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), block, packet->getLocalHostPort());
+            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), block, packet->getLocalHostPort(), false);
+        }else if(transmissionProtocol == TP_RUDP){
+            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), block, packet->getLocalHostPort(), true);
         }
+
         if (packet->getRemainingRetransmissionTimes() > 0) {
             if (!result) {
                 packet->packetTransmissionFailed();
@@ -210,7 +213,7 @@ void PacketsParserBase::processOutgoingPackets() {
             } else {
                 if (transmissionProtocol == TP_UDP) {
                     packet->setLastTransmissionTime(QDateTime::currentDateTime());
-                    m_packetHandlerBase->appendWaitingForReplyPacket(packet);
+//                    m_packetHandlerBase->appendWaitingForReplyPacket(packet);
                 }
             }
 
@@ -224,33 +227,33 @@ void PacketsParserBase::processOutgoingPackets() {
 
 }
 
-void PacketsParserBase::processWaitingForReplyPackets() {
-    qDebug()<<"----PacketsParserBase::processWaitingForReplyPackets()";
+//void PacketsParserBase::processWaitingForReplyPackets() {
+//    qDebug()<<"----PacketsParserBase::processWaitingForReplyPackets()";
 
-    for(int i = 0; i < m_packetHandlerBase->waitingForReplyPacketsCount(); i++){
-        Packet *packet = m_packetHandlerBase->takeWaitingForReplyPacket();
-        if (!packet) {
-            break;
-        }
-        if (!packet->isValid()) {
-            m_packetHandlerBase->recylePacket(packet);
-            continue;
-        }
+//    for(int i = 0; i < m_packetHandlerBase->waitingForReplyPacketsCount(); i++){
+//        Packet *packet = m_packetHandlerBase->takeWaitingForReplyPacket();
+//        if (!packet) {
+//            break;
+//        }
+//        if (!packet->isValid()) {
+//            m_packetHandlerBase->recylePacket(packet);
+//            continue;
+//        }
 
-        QDateTime t = packet->getLastTransmissionTime().addMSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-        if (t <= QDateTime::currentDateTime()) {
-            packet->packetTransmissionFailed();
-            m_packetHandlerBase->appendOutgoingPacket(packet);
-        }else{
-            m_packetHandlerBase->appendWaitingForReplyPacket(packet);
-        }
+//        QDateTime t = packet->getLastTransmissionTime().addMSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
+//        if (t <= QDateTime::currentDateTime()) {
+//            packet->packetTransmissionFailed();
+//            m_packetHandlerBase->appendOutgoingPacket(packet);
+//        }else{
+//            m_packetHandlerBase->appendWaitingForReplyPacket(packet);
+//        }
 
-        QCoreApplication::processEvents();
+//        QCoreApplication::processEvents();
 
-    }
+//    }
 
 
-}
+//}
 
 
 
