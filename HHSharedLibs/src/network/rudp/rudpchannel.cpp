@@ -17,9 +17,11 @@ QMutex * RUDPChannel::m_freeSendBufferSizeMutex = new QMutex();
 //QMutex * RUDPChannel::unusedPacketsMutex = new QMutex();
 
 
-RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, QObject *parent)
-    :QThread(parent)
+RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent)
+    :QThread(parent), m_packetHandlerBase(packetHandlerBase)
 {
+
+    Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
     init();
 
@@ -32,10 +34,11 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, QObject *parent)
 
 }
 
-RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent)
-    :QThread(parent)
+RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent)
+    :QThread(parent), m_packetHandlerBase(packetHandlerBase)
 {
 
+    Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
     init();
 
@@ -1797,7 +1800,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         QByteArray data;
         in >> data;
 
-        emit dataReceived(m_peerAddress, m_peerPort, data);
+        //emit dataReceived(m_peerAddress, m_peerPort, data);
+        cacheData(&data);
 
         qDebug()<<"~~CompleteDataPacket--"<<" SN:"<<packetSerialNumber<<" data.size():"<<data.size();
     }
@@ -1884,7 +1888,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             activeFragmentID = 0;
             firstFragmentDataPacketSN = 0;
             m_receivedFragmentDataPackets.clear();
-            emit dataReceived(m_peerAddress, m_peerPort, fullData);
+            //emit dataReceived(m_peerAddress, m_peerPort, fullData);
+            cacheData(&fullData);
 
 
             qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size();
@@ -1952,6 +1957,26 @@ void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStrea
 
     }
 
+
+}
+
+void RUDPChannel::cacheData(QByteArray *data){
+
+    QDataStream in(data, QIODevice::ReadOnly);
+    in.setVersion(QDataStream::Qt_4_7);
+    QVariant v;
+    in >> v;
+    if (v.canConvert<Packet>()){
+        Packet *packet = m_packetHandlerBase->getPacket();
+        *packet = v.value<Packet>();
+        packet->setTransmissionProtocol(TP_RUDP);
+        packet->setPeerHostAddress(m_peerAddress);
+        packet->setPeerHostPort(m_peerPort);
+        packet->setLocalHostAddress(m_udpSocket->localAddress());
+        packet->setLocalHostPort(m_udpSocket->localPort());
+
+        m_packetHandlerBase->appendIncomingPacket(packet);
+    }
 
 }
 

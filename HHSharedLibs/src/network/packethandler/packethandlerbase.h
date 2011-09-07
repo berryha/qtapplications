@@ -59,17 +59,17 @@ public:
     Packet * takeOutgoingPacket();
     int outgoingPacketsCount();
     
-    void appendWaitingForReplyPacket(Packet *packet);
-    Packet * takeWaitingForReplyPacket();
-    int waitingForReplyPacketsCount();
+//    void appendWaitingForReplyPacket(Packet *packet);
+//    Packet * takeWaitingForReplyPacket();
+//    int waitingForReplyPacketsCount();
     
-    void removeWaitingForReplyPacket(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
-    bool hasWaitingForReplyPackets();
+//    void removeWaitingForReplyPacket(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
+//    bool hasWaitingForReplyPackets();
     
     static Packet * getPacket();
     static Packet * getPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Null, quint16 localPort = 0, TransmissionProtocol transmissionProtocol = TP_UDP);
 
-    static UDPPacket *getUDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort);
+//    static UDPPacket *getUDPPacket(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress, quint16 localPort);
     static void recylePacket(Packet *packet);
     static int recyledPacketsCount();
     static void clean();
@@ -85,9 +85,8 @@ private:
     QList<Packet *> *outgoingPackets;
     QMutex *outgoingPacketsMutex;
 
-    //static QList<Packet *> waitingForReplyPackets;
-    QHash<quint16, Packet *> *waitingForReplyPackets;
-    QMutex *waitingForReplyPacketsMutex;
+    //QHash<quint16, Packet *> *waitingForReplyPackets;
+    //QMutex *waitingForReplyPacketsMutex;
 
 
 
