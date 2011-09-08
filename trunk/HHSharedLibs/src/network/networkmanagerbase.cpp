@@ -154,7 +154,6 @@ void NetworkManagerBase::closeAllServers(){
                 rudpServer->close();
                 delete rudpServer;
                 rudpServer = 0;
-                rudpServers.remove(port, rudpServer);
         }
         rudpServerList.clear();
         rudpServers.clear();
@@ -329,7 +328,7 @@ RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &lo
         return rudpServer;
     }
 
-    qCritical()<<QString("ERROR! Failed to start RUDP Server Listening! Local Address:%1, Port:%2. %3").arg(localAddress.toString()).arg(localPort).arg(rudpSocket->errorString());
+    qCritical()<<QString("ERROR! Failed to start RUDP Server Listening! Local Address:%1, Port:%2. %3").arg(localAddress.toString()).arg(localPort).arg(rudpServer->errorString());
 
     delete rudpServer;
     rudpServer = 0;
@@ -520,8 +519,10 @@ bool NetworkManagerBase::slotSendPacket(Packet *packet){
         result = slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
     } else if (transmissionProtocol == TP_UDP) {
         //UDPPacket *udpPacket = static_cast<UDPPacket *> (packet);
-        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort());
+        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort(), false);
 
+    }else if(transmissionProtocol == TP_RUDP){
+        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort(), true);
     }
 
     return result;
