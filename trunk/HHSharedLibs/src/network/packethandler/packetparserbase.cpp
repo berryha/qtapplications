@@ -199,9 +199,9 @@ void PacketsParserBase::processOutgoingPackets() {
             result = m_networkManagerBase->slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
 
         } else if (transmissionProtocol == TP_UDP) {
-            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), block, packet->getLocalHostPort(), false);
+            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
         }else if(transmissionProtocol == TP_RUDP){
-            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), block, packet->getLocalHostPort(), true);
+            result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), true);
         }
 
         if (packet->getRemainingRetransmissionTimes() > 0) {

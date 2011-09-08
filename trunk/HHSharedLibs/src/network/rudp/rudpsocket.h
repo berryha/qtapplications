@@ -78,7 +78,7 @@ public slots:
     bool sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data);
 //    quint64 sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset);
     quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment);
-//    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data);
+    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data);
 
     void endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID);
 
