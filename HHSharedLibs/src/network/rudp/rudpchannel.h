@@ -57,7 +57,7 @@ public slots:
     void datagramReceived(QByteArray &block);
 
     bool sendData( QByteArray &data);
-//    quint64 sendDatagram(QByteArray *data);
+    quint64 sendDatagram(QByteArray *data);
 
 //private:
     quint16 beginDataTransmission();

@@ -448,7 +448,7 @@ bool NetworkManagerBase::slotSendNewTCPDatagram(const QHostAddress &targetAddres
 
 }
 
-bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort, bool useRUDP){
+bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, QByteArray *data, quint16 localPort, bool useRUDP){
     //qWarning()<< "NetworkManagerBase::slotSendNewUDPDatagram(...): Target Address:"<<targetAddress.toString()<<" Target Port:"<<targetPort << " Local Port"<<localPort;
 
     bool result = false;
@@ -457,19 +457,22 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
         RUDPServer *rudpServer = getRUDPServer(localPort, QHostAddress::Any);
         if(!rudpServer){
             qCritical()<<"RUDP Server Not Running!";
-            result = false;
+            return false;
         }
+        quint64 sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data);
+        result = (sentSize == data->size());
 
     }else{
         if(localPort == 0){
-            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
+            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data);
         }else{
             UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
             if (udpServer) {
-                qint64 size = udpServer->writeDatagram(data, targetAddress,targetPort);
-                result = (size == data.size())?true:false;
+                qint64 size = udpServer->writeDatagram(*data, targetAddress,targetPort);
+                //result = (size == data->size())?true:false;
+                result = (size == data->size());
             } else {
-                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, data);
+                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data);
             }
 
         }
@@ -519,10 +522,10 @@ bool NetworkManagerBase::slotSendPacket(Packet *packet){
         result = slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
     } else if (transmissionProtocol == TP_UDP) {
         //UDPPacket *udpPacket = static_cast<UDPPacket *> (packet);
-        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort(), false);
+        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
 
     }else if(transmissionProtocol == TP_RUDP){
-        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block, packet->getLocalHostPort(), true);
+        result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), true);
     }
 
     return result;

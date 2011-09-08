@@ -241,34 +241,40 @@ bool RUDPChannel::sendData( QByteArray &data){
 
 }
 
-//quint64 RUDPChannel::sendDatagram(QByteArray *data){
+quint64 RUDPChannel::sendDatagram(QByteArray *data){
 
-//    int size = data->size();
-//    int totalSent = 0;
+    int size = data->size();
+    int totalSent = 0;
 
-//    if(size > m_MSS){
-//        quint16 fragmentDataID = beginDataTransmission();
-//        int sent;
-//        while (totalSent < size)
-//        {
-//            QCoreApplication::processEvents();
-//            if (0 == (sent = sendDatagram(data, totalSent, true)) )
-//            {
-//                msleep(1);
-//                //cout << "Send Error!" << endl;
-//                //break;
-//            }
+    if(size > m_MSS){
+        quint16 fragmentDataID = beginDataTransmission();
+        int sent;
+        while (totalSent < size)
+        {
+            QCoreApplication::processEvents();
+            if (0 == (sent = sendDatagram(data, totalSent, true)) )
+            {
+                msleep(1);
+            }
+            totalSent += sent;
+        }
 
-//            totalSent += sent;
-//        }
+        endDataTransmission(fragmentDataID);
+    }else{
+        while (totalSent == 0)
+        {
+            QCoreApplication::processEvents();
+            if (0 == (totalSent = sendDatagram(data, 0, false)) )
+            {
+                msleep(1);
+            }
 
-//        endDataTransmission(fragmentDataID);
-//    }else{
-//        totalSent = sendDatagram(data, 0, false);
-//    }
+        }
 
-//    return totalSent;
-//}
+    }
+
+    return totalSent;
+}
 
 quint64 RUDPChannel::sendDatagram(QByteArray *data, quint64 offset, bool fragment){
 

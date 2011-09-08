@@ -113,11 +113,11 @@ quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPo
 
 }
 
-//quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data){
+quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data){
 
-//    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-//    return channel->sendDatagram(data);
-//}
+    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+    return channel->sendDatagram(data);
+}
 
 void RUDPSocket::endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID){
     RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);

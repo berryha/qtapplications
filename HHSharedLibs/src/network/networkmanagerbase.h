@@ -99,7 +99,7 @@ public slots:
     void slotProcessNewTCPConnectionConnected(TcpSocketConnection *tcpSocketConnection);
 
     bool slotSendNewTCPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
-    bool slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, quint16 localPort, bool useRUDP);
+    bool slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, QByteArray *data, quint16 localPort, bool useRUDP);
 
 
     bool slotSendPacket(Packet *packet);
