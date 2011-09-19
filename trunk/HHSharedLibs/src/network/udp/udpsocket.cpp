@@ -134,11 +134,15 @@ bool UDPSocket::startIPMulticastListening(const QHostAddress &ipMulticastGroupAd
 
 }
 
-bool UDPSocket::sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data){
+bool UDPSocket::sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, QString *errorString){
     //qDebug()<<"UDPSocket::sendUDPDatagram(...)-targetAddress:"<<targetAddress.toString()<<" targetPort:"<<targetPort;
 
     QUdpSocket udpSocket;
     qint64 size = udpSocket.writeDatagram(data, targetAddress, targetPort);
+    if(errorString){
+        *errorString = udpSocket.errorString();
+    }
+
     if(size == -1){
         qCritical()<<QString("UDP Datagram Sent Failed! Target Address:%1, Port:%2, Error Code:%3").arg(targetAddress.toString()).arg(targetPort).arg(udpSocket.error());
         return false;
@@ -166,7 +170,7 @@ void UDPSocket::readPendingDatagrams() {
         //qDebug()<<"~~datagramSize:"<<datagramSize;
 
         QDataStream in(datagram, QIODevice::ReadOnly);
-        in.setVersion(QDataStream::Qt_4_6);
+        in.setVersion(QDataStream::Qt_4_7);
         QVariant v;
         in >> v;
         if (v.canConvert<Packet>()){

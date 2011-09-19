@@ -69,7 +69,7 @@ signals:
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
-    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
+    //void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 public slots:

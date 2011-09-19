@@ -14,7 +14,6 @@
 
 
 
-
 namespace HEHUI{
 
 
@@ -204,7 +203,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
             connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16)));
 
-            connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+            //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
             channel->start();
             peers.insert(channelID, channel);

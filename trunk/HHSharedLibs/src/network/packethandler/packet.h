@@ -205,7 +205,7 @@ private:
 
 
 //自定义类型，要在使用前注册该类型：qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
-Q_DECLARE_METATYPE(HEHUI::Packet);
+Q_DECLARE_METATYPE(HEHUI::Packet)
 
 
 

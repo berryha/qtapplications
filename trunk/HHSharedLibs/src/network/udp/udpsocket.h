@@ -55,7 +55,7 @@ public:
     bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
 
 
-    static bool sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
+    static bool sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, QString *errorString = 0);
 
 
 signals:

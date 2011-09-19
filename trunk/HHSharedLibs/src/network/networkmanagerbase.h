@@ -87,6 +87,7 @@ public:
     void removeConnection(TcpSocketConnection *connection);
     TcpSocketConnection* getConnection(const QString &ip, quint16 port);
 
+    QString errorString() const;
 
 signals:
     void signalTCPConnectionDisconnected(const QString &peerAddress, quint16 peerPort);
@@ -116,7 +117,8 @@ private slots:
 
 
 
-private:
+protected:
+    void setErrorString(const QString &errorString);
 
 
 private:
@@ -134,14 +136,14 @@ private:
     QMutex rudpMutex;
     QMutex tcpMutex;
 
-
+    QString m_errorString;
 
 
 };
 
 } //namespace HEHUI
 
-Q_DECLARE_METATYPE(QAbstractSocket::SocketError);
+Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 
 
 #endif /* NETWORKMANAGERBASE_H_ */

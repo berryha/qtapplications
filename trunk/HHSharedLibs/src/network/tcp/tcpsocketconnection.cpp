@@ -64,7 +64,7 @@ bool TcpSocketConnection::sendTCPDatagram(const QByteArray &data) {
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_6);
+    out.setVersion(QDataStream::Qt_4_7);
     out << quint16(0) << data;
 
     out.device()->seek(0);
@@ -95,7 +95,7 @@ void TcpSocketConnection::slotProcessReadyRead() {
     qDebug("----TcpSocketConnection::slotProcessReadyRead()");
 
     QDataStream in(this);
-    in.setVersion(QDataStream::Qt_4_6);
+    in.setVersion(QDataStream::Qt_4_7);
 
     forever {
         if (nextBlockSize == 0) {
@@ -119,7 +119,7 @@ void TcpSocketConnection::slotProcessReadyRead() {
         qDebug()<<"----buffer.size():"<<buffer.size();
         QVariant v(buffer);
         if (v.canConvert<Packet>()){
-            //                    Packet *packet = new Packet();
+            //Packet *packet = new Packet();
             Packet *packet = m_packetHandlerBase->getPacket();
             *packet = v.value<Packet>();
             packet->setTransmissionProtocol(TP_TCP);
