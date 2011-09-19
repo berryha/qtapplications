@@ -24,7 +24,8 @@ RUDPWidget::RUDPWidget(QWidget *parent)
 {
 	ui.setupUi(this);
 
-        rudpSocket = new RUDPSocket(this);
+        m_packetHandlerBase = new PacketHandlerBase(this);
+        rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
         isListening = false;
         isConnected = false;
 

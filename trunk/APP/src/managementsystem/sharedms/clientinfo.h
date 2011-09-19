@@ -13,13 +13,16 @@
 #include <QString>
 #include <QDateTime>
 
+#include "HHSharedCore/hmysharedlib_global.h"
+
 
 namespace HEHUI {
 
-    class ClientInfo : public QObject{
+class MYSHAREDLIB_API ClientInfo : public QObject{
+
 public:
-        ClientInfo(const QString &computerName = "", QObject *parent = 0);
-	virtual ~ClientInfo();
+    ClientInfo(const QString &computerName = "", QObject *parent = 0);
+    virtual ~ClientInfo();
 
 
 public:
@@ -27,325 +30,325 @@ public:
 
 
 
-        QString getNic1Info() const
-        {
-            return nic1Info;
-        }
+    QString getNic1Info() const
+    {
+        return nic1Info;
+    }
 
-        QString getNic2Info() const
-        {
-            return nic2Info;
-        }
+    QString getNic2Info() const
+    {
+        return nic2Info;
+    }
 
-        void setNic1Info(QString nic1Info)
-        {
-            this->nic1Info = nic1Info;
-        }
+    void setNic1Info(QString nic1Info)
+    {
+        this->nic1Info = nic1Info;
+    }
 
-        void setNic2Info(QString nic2Info)
-        {
-            this->nic2Info = nic2Info;
-        }
+    void setNic2Info(QString nic2Info)
+    {
+        this->nic2Info = nic2Info;
+    }
 
-        QString getStorage() const
-        {
-            return storage;
-        }
+    QString getStorage() const
+    {
+        return storage;
+    }
 
-        void setStorage(QString storage)
-        {
-            this->storage = storage;
-        }
+    void setStorage(QString storage)
+    {
+        this->storage = storage;
+    }
 
-        QString getAdministrators() const
-        {
-            return administrators;
-        }
+    QString getAdministrators() const
+    {
+        return administrators;
+    }
 
-        QString getAudio() const
-        {
-            return audio;
-        }
+    QString getAudio() const
+    {
+        return audio;
+    }
 
-        QString getChipset() const
-        {
-            return chipset;
-        }
+    QString getChipset() const
+    {
+        return chipset;
+    }
 
-        QString getClientTCPListeningAddress() const
-        {
-            return clientTCPListeningAddress;
-        }
+    QString getClientTCPListeningAddress() const
+    {
+        return clientTCPListeningAddress;
+    }
 
-        quint16 getClientTCPListeningPort() const
-        {
-            return clientTCPListeningPort;
-        }
+    quint16 getClientTCPListeningPort() const
+    {
+        return clientTCPListeningPort;
+    }
 
-        QString getClientVersion() const
-        {
-            return clientVersion;
-        }
+    QString getClientVersion() const
+    {
+        return clientVersion;
+    }
 
-        QString getComputerName() const
-        {
-            return computerName;
-        }
+    QString getComputerName() const
+    {
+        return computerName;
+    }
 
-        QString getCpu() const
-        {
-            return cpu;
-        }
+    QString getCpu() const
+    {
+        return cpu;
+    }
 
-        bool getDetailedInfoSavedTODatabase() const
-        {
-            return detailedInfoSavedTODatabase;
-        }
+    bool getDetailedInfoSavedTODatabase() const
+    {
+        return detailedInfoSavedTODatabase;
+    }
 
-        QString getDmiUUID() const
-        {
-            return dmiUUID;
-        }
+    QString getDmiUUID() const
+    {
+        return dmiUUID;
+    }
 
-        QString getInstallationDate() const
-        {
-            return installationDate;
-        }
+    QString getInstallationDate() const
+    {
+        return installationDate;
+    }
 
-        QDateTime getLastHeartbeatTime() const
-        {
-            return lastHeartbeatTime;
-        }
+    QDateTime getLastHeartbeatTime() const
+    {
+        return lastHeartbeatTime;
+    }
 
-        QDateTime getLastOnlineTime() const
-        {
-            return lastOnlineTime;
-        }
+    QDateTime getLastOnlineTime() const
+    {
+        return lastOnlineTime;
+    }
 
-        QString getMemory() const
-        {
-            return memory;
-        }
+    QString getMemory() const
+    {
+        return memory;
+    }
 
-        QString getMonitor() const
-        {
-            return monitor;
-        }
+    QString getMonitor() const
+    {
+        return monitor;
+    }
 
-        QString getMotherboardName() const
-        {
-            return motherboardName;
-        }
+    QString getMotherboardName() const
+    {
+        return motherboardName;
+    }
 
-        QString getNetwork() const
-        {
-            return network;
-        }
+    QString getNetwork() const
+    {
+        return network;
+    }
 
-        bool getOnline() const
-        {
-            return online;
-        }
+    bool getOnline() const
+    {
+        return online;
+    }
 
-        QString getOs() const
-        {
-            return os;
-        }
+    QString getOs() const
+    {
+        return os;
+    }
 
-        QString getOsKey() const
-        {
-            return osKey;
-        }
+    QString getOsKey() const
+    {
+        return osKey;
+    }
 
-        bool getProgramsEnabled() const
-        {
-            return programsEnabled;
-        }
+    bool getProgramsEnabled() const
+    {
+        return programsEnabled;
+    }
 
-        bool getSummaryInfoSavedTODatabase() const
-        {
-            return summaryInfoSavedTODatabase;
-        }
+    bool getSummaryInfoSavedTODatabase() const
+    {
+        return summaryInfoSavedTODatabase;
+    }
 
-        QString getUpdateDetailedInfoStatement() const
-        {
-            return updateDetailedInfoStatement;
-        }
+    QString getUpdateDetailedInfoStatement() const
+    {
+        return updateDetailedInfoStatement;
+    }
 
-        QString getUpdateSummaryInfoStatement() const
-        {
-            return updateSummaryInfoStatement;
-        }
+    QString getUpdateSummaryInfoStatement() const
+    {
+        return updateSummaryInfoStatement;
+    }
 
-        bool getUsbSDEnabled() const
-        {
-            return usbSDEnabled;
-        }
+    bool getUsbSDEnabled() const
+    {
+        return usbSDEnabled;
+    }
 
-        QString getUsers() const
-        {
-            return users;
-        }
+    QString getUsers() const
+    {
+        return users;
+    }
 
-        QString getVideo() const
-        {
-            return video;
-        }
+    QString getVideo() const
+    {
+        return video;
+    }
 
-        QString getWindowsDir() const
-        {
-            return windowsDir;
-        }
+    QString getWindowsDir() const
+    {
+        return windowsDir;
+    }
 
-        QString getWorkgroup() const
-        {
-            return workgroup;
-        }
+    QString getWorkgroup() const
+    {
+        return workgroup;
+    }
 
-        void setAdministrators(QString administrators)
-        {
-            this->administrators = administrators;
-        }
+    void setAdministrators(QString administrators)
+    {
+        this->administrators = administrators;
+    }
 
-        void setAudio(QString audio)
-        {
-            this->audio = audio;
-        }
+    void setAudio(QString audio)
+    {
+        this->audio = audio;
+    }
 
-        void setChipset(QString chipset)
-        {
-            this->chipset = chipset;
-        }
+    void setChipset(QString chipset)
+    {
+        this->chipset = chipset;
+    }
 
-        void setClientTCPListeningAddress(QString clientTCPListeningAddress)
-        {
-            this->clientTCPListeningAddress = clientTCPListeningAddress;
-        }
+    void setClientTCPListeningAddress(QString clientTCPListeningAddress)
+    {
+        this->clientTCPListeningAddress = clientTCPListeningAddress;
+    }
 
-        void setClientTCPListeningPort(quint16 clientTCPListeningPort)
-        {
-            this->clientTCPListeningPort = clientTCPListeningPort;
-        }
+    void setClientTCPListeningPort(quint16 clientTCPListeningPort)
+    {
+        this->clientTCPListeningPort = clientTCPListeningPort;
+    }
 
-        void setClientVersion(QString clientVersion)
-        {
-            this->clientVersion = clientVersion;
-        }
+    void setClientVersion(QString clientVersion)
+    {
+        this->clientVersion = clientVersion;
+    }
 
-        void setComputerName(QString computerName)
-        {
-            this->computerName = computerName;
-        }
+    void setComputerName(QString computerName)
+    {
+        this->computerName = computerName;
+    }
 
-        void setCpu(QString cpu)
-        {
-            this->cpu = cpu;
-        }
+    void setCpu(QString cpu)
+    {
+        this->cpu = cpu;
+    }
 
-        void setDetailedInfoSavedTODatabase(bool detailedInfoSavedTODatabase)
-        {
-            this->detailedInfoSavedTODatabase = detailedInfoSavedTODatabase;
-        }
+    void setDetailedInfoSavedTODatabase(bool detailedInfoSavedTODatabase)
+    {
+        this->detailedInfoSavedTODatabase = detailedInfoSavedTODatabase;
+    }
 
-        void setDmiUUID(QString dmiUUID)
-        {
-            this->dmiUUID = dmiUUID;
-        }
+    void setDmiUUID(QString dmiUUID)
+    {
+        this->dmiUUID = dmiUUID;
+    }
 
-        void setInstallationDate(QString installationDate)
-        {
-            this->installationDate = installationDate;
-        }
+    void setInstallationDate(QString installationDate)
+    {
+        this->installationDate = installationDate;
+    }
 
-        void setLastHeartbeatTime(QDateTime lastHeartbeatTime)
-        {
-            this->lastHeartbeatTime = lastHeartbeatTime;
-        }
+    void setLastHeartbeatTime(QDateTime lastHeartbeatTime)
+    {
+        this->lastHeartbeatTime = lastHeartbeatTime;
+    }
 
-        void setLastOnlineTime(QDateTime lastOnlineTime)
-        {
-            this->lastOnlineTime = lastOnlineTime;
-        }
+    void setLastOnlineTime(QDateTime lastOnlineTime)
+    {
+        this->lastOnlineTime = lastOnlineTime;
+    }
 
-        void setMemory(QString memory)
-        {
-            this->memory = memory;
-        }
+    void setMemory(QString memory)
+    {
+        this->memory = memory;
+    }
 
-        void setMonitor(QString monitor)
-        {
-            this->monitor = monitor;
-        }
+    void setMonitor(QString monitor)
+    {
+        this->monitor = monitor;
+    }
 
-        void setMotherboardName(QString motherboardName)
-        {
-            this->motherboardName = motherboardName;
-        }
+    void setMotherboardName(QString motherboardName)
+    {
+        this->motherboardName = motherboardName;
+    }
 
-        void setNetwork(QString network)
-        {
-            this->network = network;
-        }
+    void setNetwork(QString network)
+    {
+        this->network = network;
+    }
 
-        void setOnline(bool online)
-        {
-            this->online = online;
-        }
+    void setOnline(bool online)
+    {
+        this->online = online;
+    }
 
-        void setOs(QString os)
-        {
-            this->os = os;
-        }
+    void setOs(QString os)
+    {
+        this->os = os;
+    }
 
-        void setOsKey(QString osKey)
-        {
-            this->osKey = osKey;
-        }
+    void setOsKey(QString osKey)
+    {
+        this->osKey = osKey;
+    }
 
-        void setProgramsEnabled(bool programsEnabled)
-        {
-            this->programsEnabled = programsEnabled;
-        }
+    void setProgramsEnabled(bool programsEnabled)
+    {
+        this->programsEnabled = programsEnabled;
+    }
 
-        void setSummaryInfoSavedTODatabase(bool summaryInfoSavedTODatabase)
-        {
-            this->summaryInfoSavedTODatabase = summaryInfoSavedTODatabase;
-        }
+    void setSummaryInfoSavedTODatabase(bool summaryInfoSavedTODatabase)
+    {
+        this->summaryInfoSavedTODatabase = summaryInfoSavedTODatabase;
+    }
 
-        void setUpdateDetailedInfoStatement(QString updateDetailedInfoStatement)
-        {
-            this->updateDetailedInfoStatement = updateDetailedInfoStatement;
-        }
+    void setUpdateDetailedInfoStatement(QString updateDetailedInfoStatement)
+    {
+        this->updateDetailedInfoStatement = updateDetailedInfoStatement;
+    }
 
-        void setUpdateSummaryInfoStatement(QString updateSummaryInfoStatement)
-        {
-            this->updateSummaryInfoStatement = updateSummaryInfoStatement;
-        }
+    void setUpdateSummaryInfoStatement(QString updateSummaryInfoStatement)
+    {
+        this->updateSummaryInfoStatement = updateSummaryInfoStatement;
+    }
 
-        void setUsbSDEnabled(bool usbSDEnabled)
-        {
-            this->usbSDEnabled = usbSDEnabled;
-        }
+    void setUsbSDEnabled(bool usbSDEnabled)
+    {
+        this->usbSDEnabled = usbSDEnabled;
+    }
 
-        void setUsers(QString users)
-        {
-            this->users = users;
-        }
+    void setUsers(QString users)
+    {
+        this->users = users;
+    }
 
-        void setVideo(QString video)
-        {
-            this->video = video;
-        }
+    void setVideo(QString video)
+    {
+        this->video = video;
+    }
 
-        void setWindowsDir(QString windowsDir)
-        {
-            this->windowsDir = windowsDir;
-        }
+    void setWindowsDir(QString windowsDir)
+    {
+        this->windowsDir = windowsDir;
+    }
 
-        void setWorkgroup(QString workgroup)
-        {
-            this->workgroup = workgroup;
-        }
+    void setWorkgroup(QString workgroup)
+    {
+        this->workgroup = workgroup;
+    }
 
 private:
 
@@ -364,7 +367,7 @@ private:
     bool summaryInfoSavedTODatabase;
 
 
-///////////////////////////////////////////
+    ///////////////////////////////////////////
     QString installationDate;
     QString windowsDir;
     QString osKey;
@@ -387,7 +390,7 @@ private:
     bool detailedInfoSavedTODatabase;
 
 
-/////////////////////////////////////////////////
+    /////////////////////////////////////////////////
 
 
 

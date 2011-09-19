@@ -53,7 +53,9 @@ private:
 
 
 
+    PacketHandlerBase *m_packetHandlerBase;
     RUDPSocket *rudpSocket;
+
 
     bool isListening;
 
