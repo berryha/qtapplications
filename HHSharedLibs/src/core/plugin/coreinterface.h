@@ -44,7 +44,7 @@ namespace HEHUI {
 class MYSHAREDLIB_API CoreInterface : public AbstractPluginInterface{
     public:
 
-        virtual ~CoreInterface(){};
+        virtual ~CoreInterface(){}
 
 //        virtual QString name() const = 0;
 //        virtual QString version() const = 0;
@@ -69,7 +69,7 @@ class MYSHAREDLIB_API CoreInterface : public AbstractPluginInterface{
 
 }
 
-Q_DECLARE_INTERFACE(HEHUI::CoreInterface, "org.hehui.Interface.CoreInterface/2011.3");
+Q_DECLARE_INTERFACE(HEHUI::CoreInterface, "org.hehui.Interface.CoreInterface/2011.3")
 
 
 
