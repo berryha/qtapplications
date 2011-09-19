@@ -43,7 +43,7 @@ class AbstractPluginInterface {
     
 public:
     
-    virtual ~AbstractPluginInterface(){};
+    virtual ~AbstractPluginInterface(){}
     
     virtual QString name() const = 0;
     virtual QString version() const = 0;
@@ -70,7 +70,7 @@ public:
 
 }
 
-Q_DECLARE_INTERFACE(HEHUI::AbstractPluginInterface, "org.hehui.Interface.AbstractPluginInterface/2011.3");
+Q_DECLARE_INTERFACE(HEHUI::AbstractPluginInterface, "org.hehui.Interface.AbstractPluginInterface/2011.3")
 
 
 
