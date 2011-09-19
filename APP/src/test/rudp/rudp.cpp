@@ -1,5 +1,8 @@
 
+
 #include <QMessageBox>
+#include <QtConcurrentRun>
+
 
 #include "HHSharedCore/hcryptography.h"
 
@@ -24,8 +27,16 @@ RUDPWidget::RUDPWidget(QWidget *parent)
 {
 	ui.setupUi(this);
 
+
+        rudpSocket = 0;
         m_packetHandlerBase = new PacketHandlerBase(this);
-        rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
+        //rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
+        networkManager = new NetworkManagerBase(m_packetHandlerBase);
+        clientPacketsParser = new ClientPacketsParser(networkManager, this);
+
+        //Single Process Thread
+        QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
+
         isListening = false;
         isConnected = false;
 
@@ -34,33 +45,67 @@ RUDPWidget::RUDPWidget(QWidget *parent)
         m_peerAddress = QHostAddress(ui.lineEditIP->text());
         m_peerPort = ui.spinBoxRemotePort->value();
 
-        connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
-        connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
-        connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
-        connect(rudpSocket, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+        localPort = 0;
+//        connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+//        connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
+//        connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+//        connect(rudpSocket, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
 }
 
 RUDPWidget::~RUDPWidget()
 {
 
-    delete rudpSocket;
+    if(clientPacketsParser){
+        on_toolButtonConnect_clicked();
+        clientPacketsParser->aboutToQuit();
+    }
+
+    delete clientPacketsParser;
+    clientPacketsParser = 0;
+
+    networkManager->closeRUDPServer(0);
+    delete networkManager;
+    networkManager = 0;
+
+    m_packetHandlerBase->clean();
+    delete m_packetHandlerBase;
+    m_packetHandlerBase = 0;
+
 
 }
 
 void RUDPWidget::listen(){
 
     if(isListening){
-        rudpSocket->close();
+        networkManager->closeRUDPServer(0);
+        //rudpSocket->close();
         ui.toolButtonListen->setText("Listen");
         isListening = false;
         return;
     }
 
-    if(!rudpSocket->bind(ui.spinBoxLocalPort->value())){
-        QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+//    if(!rudpSocket){
+//        rudpSocket = networkManager->startRUDPServerListening(QHostAddress::Null, ui.spinBoxLocalPort->value());
+//    }
+//    if(0 == rudpSocket){
+//        QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+//        return;
+//    }
+//    localPort = rudpSocket->localPort();
+
+//    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+//    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
+//    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+//    connect(clientPacketsParser, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+    if(!startRUDPServer(ui.spinBoxLocalPort->value())){
         return;
     }
+
+//    if(!rudpSocket->bind(ui.spinBoxLocalPort->value())){
+//        QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+//        return;
+//    }
 
     ui.toolButtonListen->setText("Close");
     isListening = true;
@@ -86,13 +131,46 @@ void RUDPWidget::connectToPeer(){
         rudpSocket->disconnectFromPeer(m_peerAddress, m_peerPort);
         ui.toolButtonConnect->setText("Disconnecting...");
     }else{
+//        if(!rudpSocket){
+//            rudpSocket = networkManager->startRUDPServerListening(QHostAddress::Null, 0);
+//        }
+//        if(0 == rudpSocket){
+//            QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+//            ui.toolButtonConnect->setEnabled(true);
+//            return;
+//        }
+        if(!startRUDPServer(0)){
+            ui.toolButtonConnect->setEnabled(true);
+            return;
+        }
+        ui.textBrowser->append("Listening on port:"+QString::number(localPort));
+
         rudpSocket->connectToPeer(m_peerAddress, m_peerPort);
         ui.toolButtonConnect->setText("Connecting...");
+
     }
 
 
 }
 
+bool RUDPWidget::startRUDPServer(quint16 port){
+
+    if(!rudpSocket){
+        rudpSocket = networkManager->startRUDPServerListening(QHostAddress::Null, port);
+    }
+    if(0 == rudpSocket){
+        QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+        return false;
+    }
+    localPort = rudpSocket->localPort();
+
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+    connect(clientPacketsParser, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+
+    return true;
+}
 
 void RUDPWidget::send(){
 
@@ -118,26 +196,28 @@ void RUDPWidget::send(){
     int i = 0;
     while (i<count) {
 
+clientPacketsParser->sendTestData(m_peerAddress, m_peerPort, QHostAddress::Null, localPort, &data);
 
         //Method 1
-        quint16 fragmentDataID = rudpSocket->beginDataTransmission(m_peerAddress, m_peerPort);
-        int totalSent = 0;
-        int sent;
-        while (totalSent < size)
-        {
-            qApp->processEvents();
-            if (0 == (sent = rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data, totalSent, true)) )
-            {
-                //msleep(10);
-                //cout << "Send Error!" << endl;
-                //break;
-            }
+//        quint16 fragmentDataID = rudpSocket->beginDataTransmission(m_peerAddress, m_peerPort);
+//        int totalSent = 0;
+//        int sent;
+//        while (totalSent < size)
+//        {
+//            qApp->processEvents();
+//            if (0 == (sent = rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data, totalSent, true)) )
+//            {
+//                //msleep(10);
+//                //cout << "Send Error!" << endl;
+//                //break;
+//            }
 
-            totalSent += sent;
-        }
+//            totalSent += sent;
+//        }
+
         i++;
 
-        rudpSocket->endDataTransmission(m_peerAddress, m_peerPort, fragmentDataID);
+//        rudpSocket->endDataTransmission(m_peerAddress, m_peerPort, fragmentDataID);
 
 
 
@@ -186,6 +266,7 @@ void RUDPWidget::clean(){
 }
 
 void RUDPWidget::connected(const QHostAddress &peerAddress, quint16 peerPort){
+
     ui.textBrowser->append("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
     if(!isListening){
@@ -195,6 +276,7 @@ void RUDPWidget::connected(const QHostAddress &peerAddress, quint16 peerPort){
         ui.toolButtonConnect->setEnabled(true);
         ui.toolButtonSend->setEnabled(true);
     }
+    isConnected = true;
 
 }
 
@@ -205,6 +287,8 @@ void RUDPWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, qui
     ui.spinBoxRemotePort->setEnabled(true);
     ui.toolButtonConnect->setText("Connect");
     ui.toolButtonConnect->setEnabled(true);
+
+    isConnected = false;
 
 }
 
@@ -217,18 +301,18 @@ void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort)
         ui.toolButtonConnect->setText("Connect");
         ui.toolButtonConnect->setEnabled(true);
         ui.toolButtonSend->setEnabled(false);
-
-
     }
+
+    isConnected = false;
 
 }
 
 void RUDPWidget::dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data){
+
     m_receivedDataCount++;
     QString md5 = Cryptography::MD5(data).toBase64();
 
     ui.textBrowser->append(QString::number(m_receivedDataCount)+" Data Received From "+peerAddress.toString()+":"+QString::number(peerPort)+" MD5:"+md5+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
-
 
 }
 

@@ -33,14 +33,16 @@ INCLUDEPATH += . \
     about
 
 # Input
-HEADERS += screenshot/selecttargetimagewidget.h \
+HEADERS += rudp/clientpacketsparser.h \
+    screenshot/selecttargetimagewidget.h \
     screenshot/screenshot.h \
     rudp/rudp.h \
     shared/global_app.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h
-SOURCES += screenshot/selecttargetimagewidget.cpp \
+SOURCES += rudp/clientpacketsparser.cpp \
+    screenshot/selecttargetimagewidget.cpp \
     screenshot/screenshot.cpp \
     rudp/rudp.cpp \
     shared/settings.cpp \
