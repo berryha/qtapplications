@@ -8,17 +8,18 @@
 #ifndef NETWORKMANAGER_H_
 #define NETWORKMANAGER_H_
 
-
+#include <QObject>
 #include <QCoreApplication>
 
 #include "global_shared.h"
 #include "HHSharedNetwork/hnetworkmanagerbase.h"
 
+#include "HHSharedCore/hmysharedlib_global.h"
 
 namespace HEHUI {
 
 
-class NetworkManager : public NetworkManagerBase {
+class MYSHAREDLIB_API NetworkManager : public NetworkManagerBase {
     Q_OBJECT
 
 public:
