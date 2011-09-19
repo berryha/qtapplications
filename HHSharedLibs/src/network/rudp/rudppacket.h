@@ -146,7 +146,7 @@ private:
 
 
 //自定义类型，要在使用前注册该类型：qRegisterMetaTypeStreamOperators<HEHUI::RUDPPacket>("HEHUI::RUDPPacket");
-Q_DECLARE_METATYPE(HEHUI::RUDPPacket);
+Q_DECLARE_METATYPE(HEHUI::RUDPPacket)
 
 
 

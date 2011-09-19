@@ -6,6 +6,7 @@
 
 //#include "cryptography/cryptography.h"
 
+#include "packethandler/packet.h"
 
 
 namespace HEHUI {
@@ -30,6 +31,8 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
     m_peerAddress = QHostAddress::Null;
     m_peerPort = 0;
+
+
 
 
 }
@@ -70,7 +73,7 @@ void RUDPChannel::run(){
 
 
 void RUDPChannel::connectToPeer(int msecTimeout){
-    qDebug()<<"--RUDPChannel::connectToPeer(...)";
+    //qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
     if(m_peerAddress.isNull() || m_peerPort ==0){
         qCritical()<<"ERROR! Invalid Host Address Or Port!";
@@ -82,7 +85,7 @@ void RUDPChannel::connectToPeer(int msecTimeout){
 }
 
 void RUDPChannel::connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout){
-    qDebug()<<"--RUDPChannel::connectToPeer(...)";
+    //qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
     QHostAddress address = QHostAddress(peerAddressString);
     if(address.isNull() || m_peerPort ==0){
@@ -242,6 +245,7 @@ bool RUDPChannel::sendData( QByteArray &data){
 }
 
 quint64 RUDPChannel::sendDatagram(QByteArray *data){
+    //qDebug()<<"--RUDPChannel::sendDatagram(QByteArray *data) "<<" data->size():"<<data->size();
 
     int size = data->size();
     int totalSent = 0;
@@ -272,6 +276,7 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data){
         }
 
     }
+    //qDebug()<<"-----------------------totalSent:"<<totalSent;
 
     return totalSent;
 }
@@ -402,9 +407,9 @@ void RUDPChannel::datagramReceived(QByteArray &block){
     quint8 packetType = packet->getPacketType();
     quint16 packetSerialNumber = packet->getPacketSerialNumber();
 
-    if(isDataPacket(packetType)){
-        qDebug()<<"--datagramReceived "<<" packetType:"<<packetType<<" packetSerialNumber:"<<packetSerialNumber<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
-    }
+//    if(isDataPacket(packetType)){
+//        qDebug()<<"--datagramReceived "<<" packetType:"<<packetType<<" packetSerialNumber:"<<packetSerialNumber<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+//    }
 
     if(waitingForACKPackets.isEmpty()){
         EXPCOUNT = 0;
@@ -672,7 +677,7 @@ void RUDPChannel::endDataTransmission(quint16 fragmentDataID){
 
     tryingToSendPacket(packet);
 
-    qDebug()<<"------------------------------------DataTransmission End--"<<" fragmentDataID:"<<fragmentDataID<<" SN:"<<packet->getPacketSerialNumber();
+    qDebug()<<"------------------------------------DataTransmission End--"<<" fragmentDataID:"<<fragmentDataID<<" m_fragmentCount"<<m_fragmentCount<<" SN:"<<packet->getPacketSerialNumber();
 
     m_fragmentCount = 0;
 
@@ -819,7 +824,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
 
     packetsSent++;
 
-    qDebug()<<"OK! Packet Sent! sn:"<<sn<<" packetType:"<<packetType<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow;;
+//    qDebug()<<"OK! Packet Sent! sn:"<<sn<<" packetType:"<<packetType<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow;;
     qWarning()<<"--------------Total Packets Sent:"<<packetsSent;
 
 
@@ -1127,7 +1132,7 @@ void RUDPChannel::sendACKTimerTimeout(){
 
     sendPacket(packet);
 
-    qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+//    qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
 
     //Record the ACK sequence number and the departure time
     ACKPacketInfo * info = new ACKPacketInfo();
@@ -1454,7 +1459,7 @@ void RUDPChannel::init(){
 }
 
 void RUDPChannel::reset(){
-    qDebug()<<"--RUDPChannel::cleanup()";
+    qDebug()<<"--RUDPChannel::reset()";
 
 
     if(sendPacketTimer){
@@ -1692,7 +1697,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             updateFirstWaitingForACKPacketIDInSendWindow(peerFirstReceivedPacketIDInReceiveWindow);
         }
 
-        qDebug()<<"~~ACK--"<<" peerFirstReceivedPacketIDInReceiveWindow:"<<peerFirstReceivedPacketIDInReceiveWindow<<" rtt:"<<rtt<<" rttvar:"<<rttvar<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow;
+        //qDebug()<<"~~ACK--"<<" peerFirstReceivedPacketIDInReceiveWindow:"<<peerFirstReceivedPacketIDInReceiveWindow<<" rtt:"<<rtt<<" rttvar:"<<rttvar<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow;
     }
         break;
     case quint8(RUDP::ACK2):
@@ -1711,12 +1716,12 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //retransmissionTimerInterval = 3 * RTT + SYN;
 
 
-        qDebug()<<"------------------- ACK2 ---------------------"<<"rtt:"<<rtt<<" RTT:"<<RTT<<" RTTVar:"<<RTTVar<<" sendACKTimerInterval:"<<sendACKTimerInterval;
+//        qDebug()<<"------------------- ACK2 ---------------------"<<"rtt:"<<rtt<<" RTT:"<<RTT<<" RTTVar:"<<RTTVar<<" sendACKTimerInterval:"<<sendACKTimerInterval;
 
         //TODO: 删除 ACKPacketInfo
         // delete info;
 
-        qDebug()<<"~~ACK2--";
+        //qDebug()<<"~~ACK2--";
 
     }
         break;
@@ -1890,15 +1895,13 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
             }
 
+            qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size();
 
             activeFragmentID = 0;
             firstFragmentDataPacketSN = 0;
             m_receivedFragmentDataPackets.clear();
             //emit dataReceived(m_peerAddress, m_peerPort, fullData);
             cacheData(&fullData);
-
-
-            qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size();
 
         }
 
@@ -1967,6 +1970,7 @@ void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStrea
 }
 
 void RUDPChannel::cacheData(QByteArray *data){
+    qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
 
     QDataStream in(data, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_7);
@@ -1982,7 +1986,9 @@ void RUDPChannel::cacheData(QByteArray *data){
         packet->setLocalHostPort(m_udpSocket->localPort());
 
         m_packetHandlerBase->appendIncomingPacket(packet);
+        qDebug()<<"------------m_packetHandlerBase->incomingPacketsCount():"<<m_packetHandlerBase->incomingPacketsCount();
     }
+    qDebug()<<"-----------------------0";
 
 }
 
@@ -1994,7 +2000,7 @@ inline void RUDPChannel::addWaitingForACKPacket(RUDPPacket *packet){
 }
 
 void RUDPChannel::removeWaitingForACKPackets(quint16 start, quint16 end){
-    qDebug()<<"--removeWaitingForACKPackets(...)--start:"<<start<<" end:"<<end;
+    //qDebug()<<"--removeWaitingForACKPackets(...)--start:"<<start<<" end:"<<end;
 
     while (start <= end) {
         if( (end - start) > RUDP_MAX_SEND_WINDOW_SIZE ){break;}
@@ -2023,7 +2029,7 @@ void RUDPChannel::removeWaitingForACKPackets(quint16 start, quint16 end){
 }
 
 void RUDPChannel::updateFirstWaitingForACKPacketIDInSendWindow(quint16 peerFirstReceivedPacketIDInQueue){
-    qDebug()<<"--RUDPChannel::updateFirstWaitingForACKPacketIDInSendWindow(...)--"<<" peerFirstReceivedPacketIDInQueue:"<<peerFirstReceivedPacketIDInQueue<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow<<" LSSN:"<<LSSN ;
+    //qDebug()<<"--RUDPChannel::updateFirstWaitingForACKPacketIDInSendWindow(...)--"<<" peerFirstReceivedPacketIDInQueue:"<<peerFirstReceivedPacketIDInQueue<<" m_firstWaitingForACKPacketIDInSendWindow:"<<m_firstWaitingForACKPacketIDInSendWindow<<" LSSN:"<<LSSN ;
 
     if(m_firstWaitingForACKPacketIDInSendWindow <= peerFirstReceivedPacketIDInQueue){
         removeWaitingForACKPackets(m_firstWaitingForACKPacketIDInSendWindow, peerFirstReceivedPacketIDInQueue-1);
@@ -2063,7 +2069,7 @@ RUDPPacket * RUDPChannel::getUnusedPacket(){
     QMutexLocker locker(&unusedPacketsMutex);
     RUDPPacket *packet = 0;
     if(m_unusedPackets.isEmpty()){
-        packet = new RUDPPacket(this, quint8(RUDP::UnKnownPacket), 0, RUDP_PACKET_RETRANSMISSION_TIMES);
+        packet = new RUDPPacket(0, quint8(RUDP::UnKnownPacket), 0, RUDP_PACKET_RETRANSMISSION_TIMES);
     }else{
         packet = m_unusedPackets.takeFirst();
     }

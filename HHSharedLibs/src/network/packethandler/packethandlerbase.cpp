@@ -33,6 +33,7 @@
 
 #include "packethandlerbase.h"
 
+#include "packetstreamoperator.h"
 
 
 namespace HEHUI {
@@ -62,6 +63,8 @@ PacketHandlerBase::PacketHandlerBase(QObject *parent)
 //    waitingForReplyPackets = new QHash<quint16, Packet *> ();
 //    waitingForReplyPacketsMutex = new QMutex();
 
+    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
 
 }
 

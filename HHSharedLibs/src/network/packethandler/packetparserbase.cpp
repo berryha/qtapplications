@@ -35,7 +35,7 @@
 
 #include "packetparserbase.h"
 #include "packet.h"
-#include "packetstreamoperator.h"
+//#include "packetstreamoperator.h"
 
 
 #ifdef Q_CC_MSVC
@@ -66,8 +66,8 @@ PacketsParserBase::PacketsParserBase(NetworkManagerBase *networkManagerBase, QOb
     m_aboutToQuit = false;
 
 
-    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
-    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+//    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+//    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
 
 
 }
@@ -161,7 +161,6 @@ void PacketsParserBase::parseIncomingPackets(){
 
         parseIncomingPacketData(packet);
 
-
         m_packetHandlerBase->recylePacket(packet);
 
         QCoreApplication::processEvents();
@@ -186,11 +185,10 @@ void PacketsParserBase::processOutgoingPackets() {
 
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
+        out.setVersion(QDataStream::Qt_4_7);
         QVariant v;
         v.setValue(*packet);
         out << v;
-
 
         TransmissionProtocol transmissionProtocol = packet->getTransmissionProtocol();
 
@@ -202,6 +200,8 @@ void PacketsParserBase::processOutgoingPackets() {
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
         }else if(transmissionProtocol == TP_RUDP){
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), true);
+            qDebug()<<"-----------------------------block.size():"<<block.size()<<" packet->getPacketData().size()"<<packet->getPacketData().size();
+
         }
 
         if (packet->getRemainingRetransmissionTimes() > 0) {
