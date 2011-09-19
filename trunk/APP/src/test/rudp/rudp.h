@@ -5,8 +5,9 @@
 
 #include "ui_rudp.h"
 
+#include "clientpacketsparser.h"
 #include "HHSharedNetwork/hrudpsocket.h"
-
+#include "HHSharedNetwork/hnetworkmanagerbase.h"
 
 namespace HEHUI {
 
@@ -36,6 +37,7 @@ private slots:
 
     void listen();
     void connectToPeer();
+    bool startRUDPServer(quint16 port);
     void send();
     void clean();
 
@@ -53,9 +55,10 @@ private:
 
 
 
+    NetworkManagerBase *networkManager;
     PacketHandlerBase *m_packetHandlerBase;
     RUDPSocket *rudpSocket;
-
+    ClientPacketsParser *clientPacketsParser;
 
     bool isListening;
 
@@ -63,6 +66,8 @@ private:
 
     QHostAddress m_peerAddress;
     quint16 m_peerPort;
+
+    quint16 localPort;
 
     quint16 m_receivedDataCount;
 
