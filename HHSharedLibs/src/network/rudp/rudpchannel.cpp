@@ -350,6 +350,7 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, quint64 offset, bool fragmen
             tryingToSendPacket(packet);
 
             m_fragmentCount++;
+            //qDebug()<<"----------Fragment Data! SN:"<<packet->getPacketSerialNumber()<<" size:"<<packet->packetDataSize();
 
         }
 
@@ -1847,7 +1848,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
             QByteArray fullData;
             QDataStream out(&fullData, QIODevice::WriteOnly);
-            in.setVersion(QDataStream::Qt_4_7);
+            out.setVersion(QDataStream::Qt_4_7);
+            QIODevice *dev = out.device();
 
             //            quint32 fragmentCount = 0;
             quint16 lastFragmentDataPacketSN = 0;
@@ -1885,17 +1887,17 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                 }
                 RUDPPacket *p = m_receivedFragmentDataPackets.value(sn);
                 if(!p){continue;}
-                //out << packet->getPacketData();
 
-                out.device()->write(p->getPacketData().data());
-                qDebug()<<"------------------fragmentDataID:"<<fragmentDataID<<" SN:"<<sn<< " size:"<<p->getPacketData().size()<<" Checksum:"<<qChecksum(p->getPacketData().data(), p->getPacketData().size());
+                qint64 sizeWrite = dev->write(p->getPacketData().data(), p->packetDataSize());
+                //qDebug()<<"----------sizeWrite:"<<sizeWrite<<" fullData.size():"<<fullData.size();
+                qDebug()<<"------------------fragmentDataID:"<<fragmentDataID<<" SN:"<<sn<< " size:"<<p->packetDataSize()<<" Checksum:"<<qChecksum(p->getPacketData().data(), p->packetDataSize());
 
                 recylePacket(p);
                 m_freeReceiveBufferSize += packet->packetDataSize();
 
             }
 
-            qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size();
+            qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size()<<" fullData.size():"<<fullData.size();
 
             activeFragmentID = 0;
             firstFragmentDataPacketSN = 0;
