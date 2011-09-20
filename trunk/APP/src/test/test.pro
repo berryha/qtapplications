@@ -9,6 +9,8 @@ QT += core \
 # include config file
 include( ../config_global.pri )
 include(../HHSharedLibs.pri)
+
+
 VER_MAJ = 2010
 VER_MIN = 06
 VER_PAT = 26
