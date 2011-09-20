@@ -159,7 +159,7 @@ bool RUDPWidget::startRUDPServer(quint16 port){
         rudpSocket = networkManager->startRUDPServerListening(QHostAddress::Null, port);
     }
     if(0 == rudpSocket){
-        QMessageBox::critical(this, "Bind Error", rudpSocket->errorString());
+        QMessageBox::critical(this, "Bind Error", networkManager->errorString());
         return false;
     }
     localPort = rudpSocket->localPort();
