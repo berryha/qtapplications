@@ -135,3 +135,4 @@ DEFINES	*= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\"" \
         "APP_COPYRIGHTS=\"\\\"$${QMAKE_TARGET_COPYRIGHT}\\\"\""
 
 
+QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
