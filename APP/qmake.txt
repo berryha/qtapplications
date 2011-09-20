@@ -1,12 +1,14 @@
  
-Linux
+
+//--------------Linux---------------
 #Starting: /usr/bin/qmake /opt/workspace/qt/APP/APP.pro -spec /usr/share/qt4/mkspecs/linux-g++ -r CONFIG+=debug_and_release CONFIG+=debug 
 /usr/bin/qmake /opt/workspace/qt/APP/APP.pro -spec /usr/share/qt4/mkspecs/linux-g++ -r  CONFIG+=debug 
 
-Windows
+
+
+//-------------Windows--------------
 Starting: "qmake.exe" E:/workspace/Qt/HHSharedLibs/HHSharedLibs.pro -r -spec win32-g++ CONFIG+=debug_and_release 
 Starting: "qmake.exe" E:/workspace/Qt/APP/APP.pro -r -spec win32-g++ 
-
 
 windows平台下qmake的Fix，为EXE程序添加图标和版本信息
 1.修改 qmake\generators\win32\winmakefile.cpp 中的processRcFileVar() //可注释掉 && project->values("RC_FILE").isEmpty()
@@ -28,3 +30,8 @@ windows平台下qmake的Fix，为EXE程序添加图标和版本信息
 4.在app程序的工程文件中添加新变量APP_ICON，值为ico格式图标的位置。如：win32:APP_ICON = resources/images/app.ico
 5.重新生成工程Makefile
 6.重新编译工程
+
+
+
+Qt4.7.2以上版本中文件mkspecs\win32-g++\qmake.conf中配置
+QMAKE_LFLAGS		= -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
