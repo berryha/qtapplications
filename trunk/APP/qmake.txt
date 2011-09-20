@@ -10,28 +10,28 @@
 Starting: "qmake.exe" E:/workspace/Qt/HHSharedLibs/HHSharedLibs.pro -r -spec win32-g++ CONFIG+=debug_and_release 
 Starting: "qmake.exe" E:/workspace/Qt/APP/APP.pro -r -spec win32-g++ 
 
-windows∆ΩÃ®œ¬qmakeµƒFix£¨Œ™EXE≥Ã–ÚÃÌº”Õº±Í∫Õ∞Ê±æ–≈œ¢
-1.–ﬁ∏ƒ qmake\generators\win32\winmakefile.cpp ÷–µƒprocessRcFileVar() //ø…◊¢ ÕµÙ && project->values("RC_FILE").isEmpty()
-2.‘⁄¥˙¬Î
+windowsÂπ≥Âè∞‰∏ãqmakeÁöÑFixÔºå‰∏∫EXEÁ®ãÂ∫èÊ∑ªÂä†ÂõæÊ†áÂíåÁâàÊú¨‰ø°ÊÅØ
+1.‰øÆÊîπ qmake\generators\win32\winmakefile.cpp ‰∏≠ÁöÑprocessRcFileVar() //ÂèØÊ≥®ÈáäÊéâ && project->values("RC_FILE").isEmpty()
+2.Âú®‰ª£Á†Å
         ts << "# if defined(UNDER_CE)" << endl;
         ts << "#  include <winbase.h>" << endl;
         ts << "# else" << endl;
         ts << "#  include <winver.h>" << endl;
         ts << "# endif" << endl;
-œ¬ÃÌº”“‘œ¬¥˙¬Î
+‰∏ãÊ∑ªÂä†‰ª•‰∏ã‰ª£Á†Å
         QStringList iconPath = project->values("APP_ICON");
         if(!iconPath.isEmpty()){
         	ts << endl;
         	ts << "IDI_ICON1              ICON    DISCARDABLE     \"" << iconPath.first() << "\"" << endl;	
         	ts << endl;
         }
-3.÷ÿ–¬±‡“Îqmake
+3.ÈáçÊñ∞ÁºñËØëqmake
 
-4.‘⁄app≥Ã–Úµƒπ§≥ÃŒƒº˛÷–ÃÌº”–¬±‰¡øAPP_ICON£¨÷µŒ™ico∏Ò ΩÕº±ÍµƒŒª÷√°£»Á£∫win32:APP_ICON = resources/images/app.ico
-5.÷ÿ–¬…˙≥…π§≥ÃMakefile
-6.÷ÿ–¬±‡“Îπ§≥Ã
+4.Âú®appÁ®ãÂ∫èÁöÑÂ∑•Á®ãÊñá‰ª∂‰∏≠Ê∑ªÂä†Êñ∞ÂèòÈáèAPP_ICONÔºåÂÄº‰∏∫icoÊ†ºÂºèÂõæÊ†áÁöÑ‰ΩçÁΩÆ„ÄÇÂ¶ÇÔºöwin32:APP_ICON = resources/images/app.ico
+5.ÈáçÊñ∞ÁîüÊàêÂ∑•Á®ãMakefile
+6.ÈáçÊñ∞ÁºñËØëÂ∑•Á®ã
 
 
 
-Qt4.7.2“‘…œ∞Ê±æ÷–Œƒº˛mkspecs\win32-g++\qmake.conf÷–≈‰÷√
-QMAKE_LFLAGS		= -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
+Qt4.7.2‰ª•‰∏äÁâàÊú¨‰∏≠Êñá‰ª∂mkspecs\win32-g++\qmake.conf‰∏≠ÈÖçÁΩÆ
+QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
