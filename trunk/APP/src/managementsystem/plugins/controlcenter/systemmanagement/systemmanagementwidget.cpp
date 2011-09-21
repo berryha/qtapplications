@@ -227,7 +227,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
     //    }
 
 
-    controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerIPAddress, this->m_computerName, this->m_users);
+    controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerIPAddress, RUDP_LISTENING_PORT, this->m_computerName, this->m_users);
 
 
     //    if(!requestConnectionToClientTimer){
@@ -267,7 +267,7 @@ void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
         m_temporarilyAllowed = temporarilyAllowed();
     }
 
-    controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerIPAddress, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
+    controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
 
     ui.pushButtonUSBSD->setEnabled(false);
 
@@ -298,7 +298,7 @@ void SystemManagementWidget::on_pushButtonPrograms_clicked(){
         m_temporarilyAllowed = temporarilyAllowed();
     }
 
-    controlCenterPacketsParser->sendSetupProgramesPacket(m_peerIPAddress, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
+    controlCenterPacketsParser->sendSetupProgramesPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
 
     ui.pushButtonPrograms->setEnabled(false);
 
@@ -311,7 +311,7 @@ void SystemManagementWidget::on_pushButtonShowAdmin_clicked(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendShowAdminPacket(m_peerIPAddress, m_computerName, m_users, true);
+    controlCenterPacketsParser->sendShowAdminPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, true);
 
     ui.pushButtonShowAdmin->setEnabled(false);
 
@@ -326,7 +326,7 @@ void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
     //ui.pushButtonRemoteAssistance->setEnabled(false);
     emit requestRemoteAssistance();
     
-    controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerIPAddress, m_computerName, m_adminName);
+    controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_adminName);
     
 
 }
@@ -356,7 +356,7 @@ void SystemManagementWidget::on_actionAddAdmin_triggered(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, m_computerName, item, true, m_adminName);
+    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, item, true, m_adminName);
     ui.pushButtonAdminsManagement->setEnabled(false);
 
 
@@ -387,7 +387,7 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, m_computerName, item, false, m_adminName);
+    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, item, false, m_adminName);
     ui.pushButtonAdminsManagement->setEnabled(false);
 
 
@@ -434,7 +434,7 @@ void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, m_computerName, false);
+    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, false);
 
     QTimer::singleShot(60000, this, SLOT(requestClientInfoTimeout()));
 
@@ -458,7 +458,7 @@ void SystemManagementWidget::on_toolButtonRescanSystemInfo_clicked(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, m_computerName, true);
+    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, true);
 
 
     QTimer::singleShot(60000, this, SLOT(requestClientInfoTimeout()));
@@ -506,14 +506,14 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
     if(remoteConsoleRunning){
         int rep = QMessageBox::question(this, tr("Confirm"), tr("Do you really want to terminate the process?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if(rep == QMessageBox::Yes){
-            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, m_computerName, "", m_adminName, false);
+            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, "", m_adminName, false);
             //ui.toolButtonRunRemoteApplication->setEnabled(false);
         }
 
     }else{
         QString remoteAPPPath = ui.comboBoxRemoteApplicationPath->currentText();
         if(!remoteAPPPath.trimmed().isEmpty()){
-            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, m_computerName, remoteAPPPath, m_adminName, true);
+            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, remoteAPPPath, m_adminName, true);
         }
 
         ui.comboBoxRemoteApplicationPath->setEnabled(false);
@@ -540,7 +540,7 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
     }
 
     QString cmd = ui.comboBoxCommand->currentText();
-    controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerIPAddress, m_computerName, cmd);
+    controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, cmd);
 
     ui.comboBoxCommand->insertItem(0, cmd);
 

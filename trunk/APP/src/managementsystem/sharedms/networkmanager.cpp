@@ -43,8 +43,8 @@ NetworkManager::NetworkManager(PacketHandlerBase *packetHandlerBase, NetworkType
     m_localIPMCListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
     m_ipMCGroupAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
 
-    //    m_localUDPListeningAddress = QHostAddress::Any;
-    //    m_localUDPListeningPort = 0;
+    m_localRUDPListeningAddress = QHostAddress::Any;
+    m_localRUDPListeningPort = 0;
 
 
     //    if(!isNetworkReady()){
@@ -71,21 +71,21 @@ NetworkManager::~NetworkManager() {
 //    return m_hostName;
 //}
 
-QHostAddress NetworkManager::localTCPListeningAddress(){
-    return m_localTCPListeningAddress;
-}
+//QHostAddress NetworkManager::localTCPListeningAddress(){
+//    return m_localTCPListeningAddress;
+//}
 
-void NetworkManager::setLocalTCPListeningAddress(const QHostAddress &address){
-    this->m_localTCPListeningAddress = address;
-}
+//void NetworkManager::setLocalTCPListeningAddress(const QHostAddress &address){
+//    this->m_localTCPListeningAddress = address;
+//}
 
-quint16 NetworkManager::localTCPListeningPort(){
-    return m_localTCPListeningPort;
-}
+//quint16 NetworkManager::localTCPListeningPort(){
+//    return m_localTCPListeningPort;
+//}
 
-void NetworkManager::setLocalTCPListeningPort(quint16 port){
-    this->m_localTCPListeningPort = port;
-}
+//void NetworkManager::setLocalTCPListeningPort(quint16 port){
+//    this->m_localTCPListeningPort = port;
+//}
 
 QHostAddress NetworkManager::localIPMCListeningAddress(){
     return m_localIPMCListeningAddress;
@@ -111,13 +111,13 @@ void NetworkManager::setIPMCGroupAddress(const QHostAddress &address){
     this->m_ipMCGroupAddress = address;
 }
 
-//QHostAddress NetworkManager::localUDPListeningAddress(){
-//    return m_localUDPListeningAddress;
-//}
+QHostAddress NetworkManager::localRUDPListeningAddress(){
+    return m_localRUDPListeningAddress;
+}
 
-//quint16 NetworkManager::localUDPListeningPort(){
-//    return m_localUDPListeningPort;
-//}
+quint16 NetworkManager::localRUDPListeningPort(){
+    return m_localRUDPListeningPort;
+}
 
 QString NetworkManager::hardwareAddress() const{
     return m_hardwareAddress;
@@ -188,6 +188,27 @@ quint16 NetworkManager::startUDPServer(const QHostAddress &address, quint16 star
     //    return 0;
 
 }
+
+RUDPSocket * NetworkManager::startRUDPServer(const QHostAddress &address, quint16 port, bool tryOtherPort){
+
+    RUDPSocket *rudpSocket = 0;
+    if(m_localRUDPListeningPort){
+        rudpSocket = getRUDPServer(m_localRUDPListeningPort, m_localRUDPListeningAddress);
+    }
+    if(!rudpSocket){
+        rudpSocket = startRUDPServerListening(address, port);
+    }
+    if(!rudpSocket && tryOtherPort){
+        rudpSocket = startRUDPServerListening(address, 0);
+    }
+    if(rudpSocket){
+        m_localRUDPListeningPort = rudpSocket->localPort();
+        m_localRUDPListeningAddress = address;
+    }
+
+    return rudpSocket;
+}
+
 
 //bool NetworkManager::startUDPServer(){
 //    quint16 startPort = m_localIPMCListeningPort + 1;

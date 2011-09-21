@@ -65,6 +65,8 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     peerAddressThatRequiresDetailedInfo = "";
     peerPortThatRequiresDetailedInfo = 0;
 
+    rudpSocket = 0;
+
 
 }
 
@@ -124,16 +126,28 @@ bool ClientService::startMainService(){
         networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
     }else{
         //logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
-        qWarning()<<QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
+        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
 
-    result = networkManager->startTCPServer();
-    if(result == false){
-        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
+//    result = networkManager->startTCPServer();
+//    if(result == false){
+//        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
+//    }else{
+//        //logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
+//        qWarning()<<QString("TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT);
+//    }
+
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, RUDP_LISTENING_PORT);
+    if(!rudpSocket){
+        logMessage(QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString()), QtServiceBase::Error);
+        return false;
     }else{
-        //logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
-        qWarning()<<QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT);
+        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
     }
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+
 
     clientPacketsParser = new ClientPacketsParser(networkManager, this);
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
@@ -1583,6 +1597,22 @@ void ClientService::checkHasAnyServerBeenFound(){
 
 }
 
+void ClientService::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void ClientService::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+
 
 
 void ClientService::update(){
@@ -1672,7 +1702,7 @@ void ClientService::stop()
     }
 
     if(clientPacketsParser){
-        clientPacketsParser->sendClientOfflinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), localComputerName, false);
+        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
         clientPacketsParser->aboutToQuit();
         //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));
     }

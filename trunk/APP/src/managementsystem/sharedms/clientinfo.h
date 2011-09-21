@@ -77,12 +77,12 @@ public:
 
     QString getClientTCPListeningAddress() const
     {
-        return clientTCPListeningAddress;
+        return clientRUDPListeningAddress;
     }
 
     quint16 getClientTCPListeningPort() const
     {
-        return clientTCPListeningPort;
+        return clientRUDPListeningPort;
     }
 
     QString getClientVersion() const
@@ -220,14 +220,14 @@ public:
         this->chipset = chipset;
     }
 
-    void setClientTCPListeningAddress(QString clientTCPListeningAddress)
+    void setClientRUDPListeningAddress(QString clientRUDPListeningAddress)
     {
-        this->clientTCPListeningAddress = clientTCPListeningAddress;
+        this->clientRUDPListeningAddress = clientRUDPListeningAddress;
     }
 
-    void setClientTCPListeningPort(quint16 clientTCPListeningPort)
+    void setClientRUDPListeningPort(quint16 clientRUDPListeningPort)
     {
-        this->clientTCPListeningPort = clientTCPListeningPort;
+        this->clientRUDPListeningPort = clientRUDPListeningPort;
     }
 
     void setClientVersion(QString clientVersion)
@@ -402,8 +402,8 @@ private:
 
     bool online;
 
-    QString clientTCPListeningAddress;
-    quint16 clientTCPListeningPort;
+    QString clientRUDPListeningAddress;
+    quint16 clientRUDPListeningPort;
 
 
 

@@ -28,10 +28,10 @@ public:
 
 
     //QString hostName();
-    QHostAddress localTCPListeningAddress();
-    void setLocalTCPListeningAddress(const QHostAddress &address);
-    quint16 localTCPListeningPort();
-    void setLocalTCPListeningPort(quint16 port);
+//    QHostAddress localTCPListeningAddress();
+//    void setLocalTCPListeningAddress(const QHostAddress &address);
+//    quint16 localTCPListeningPort();
+//    void setLocalTCPListeningPort(quint16 port);
 
     QHostAddress localIPMCListeningAddress();
     void setLocalIPMCListeningAddress(const QHostAddress &address);
@@ -40,16 +40,17 @@ public:
     QHostAddress ipMCGroupAddress();
     void setIPMCGroupAddress(const QHostAddress &address);
 
-    //    QHostAddress localUDPListeningAddress();
-    //    quint16 localUDPListeningPort();
+    QHostAddress localRUDPListeningAddress();
+    quint16 localRUDPListeningPort();
 
     QString hardwareAddress() const;
 
 
     bool startTCPServer();
     bool startIPMCServer();
-    //    quint16 startUDPServer(const QHostAddress &address = QHostAddress::Any);
     quint16 startUDPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true);
+
+    RUDPSocket * startRUDPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true);
 
 
 private:
@@ -79,8 +80,8 @@ private:
     quint16 m_localIPMCListeningPort;
     QHostAddress m_ipMCGroupAddress;
 
-    //    QHostAddress m_localUDPListeningAddress;
-    //    quint16 m_localUDPListeningPort;
+    QHostAddress m_localRUDPListeningAddress;
+    quint16 m_localRUDPListeningPort;
 
     QTimer *checkNetworkStatusTimer;
 

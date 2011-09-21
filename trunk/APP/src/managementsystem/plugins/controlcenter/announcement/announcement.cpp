@@ -80,7 +80,7 @@ void Announcement::on_pushButtonSend_clicked(){
             QStringList networkInfoList = index.sibling(row,2).data().toString().split(",");
             foreach (QString info, networkInfoList) {
                 if(info.trimmed().isEmpty()){continue;}
-                m_controlCenterPacketsParser->sendAnnouncementPacket(info.split("/").at(0), workgroup, computerName, announcementID, announcementString, m_adminName);
+                m_controlCenterPacketsParser->sendAnnouncementPacket(info.split("/").at(0), RUDP_LISTENING_PORT, workgroup, computerName, announcementID, announcementString, m_adminName);
             }
             
             
@@ -117,7 +117,7 @@ void Announcement::on_pushButtonSend_clicked(){
         
         
     }else{
-        m_controlCenterPacketsParser->sendAnnouncementPacket("", ui.comboBoxWorkgroup->currentText(), "", announcementID, announcementString, m_adminName);
+        m_controlCenterPacketsParser->sendAnnouncementPacket("", RUDP_LISTENING_PORT, ui.comboBoxWorkgroup->currentText(), "", announcementID, announcementString, m_adminName);
         
     }
 

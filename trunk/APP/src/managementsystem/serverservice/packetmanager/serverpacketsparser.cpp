@@ -60,8 +60,8 @@ ServerPacketsParser::ServerPacketsParser(NetworkManagerInstance *networkManager,
 
 //    heartbeatTimer = 0;
 
-    serverAddress = m_networkManager->localTCPListeningAddress();
-    serverTCPListeningPort = m_networkManager->localTCPListeningPort();
+    serverAddress = m_networkManager->localRUDPListeningAddress();
+    localRUDPListeningPort = m_networkManager->localRUDPListeningPort();
     //m_serverName = m_networkManager->hostName();
     m_serverName = QHostInfo::localHostName().toLower();
 
@@ -77,18 +77,6 @@ ServerPacketsParser::~ServerPacketsParser() {
 
     QMutexLocker locker(&mutex);
 
-//    if(heartbeatTimer){
-//        heartbeatTimer->stop();
-//    }
-//    delete heartbeatTimer;
-//    heartbeatTimer = 0;
-
-    //    if(processWaitingForReplyPacketsTimer){
-    //        processWaitingForReplyPacketsTimer->stop();
-    //    }
-    //    delete processWaitingForReplyPacketsTimer;
-    //    processWaitingForReplyPacketsTimer = 0;
-
 
 
 
@@ -100,18 +88,13 @@ void ServerPacketsParser::run(){
 
     QMutexLocker locker(&mutex);
 
-    //    processWaitingForReplyPacketsTimer = new QTimer();
-    //    processWaitingForReplyPacketsTimer->setSingleShot(false);
-    //    processWaitingForReplyPacketsTimer->setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 100);
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    //    processWaitingForReplyPacketsTimer->start();
 
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         //QCoreApplication::processEvents();
@@ -120,7 +103,7 @@ void ServerPacketsParser::run(){
         msleep(50);
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
@@ -165,39 +148,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     //    qDebug()<<"----ServerPacketsParser::parseIncomingPacketData(Packet *packet)";
 
-    //    if((packet->getTransmissionProtocol() == TP_UDP)
-    //        && (networkManager->isLocalAddress(packet->getPeerHostAddress()))
-    //        && (packet->getPeerHostPort() == localIPMCListeningPort)){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }else if((packet->getTransmissionProtocol() == TP_TCP)
-    //        && (packet->getPeerHostAddress() == networkManager->localTCPListeningAddress())
-    //        && (packet->getPeerHostPort() == networkManager->localTCPListeningPort())){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }
 
-    //qDebug()<<"~~networkManager->localAddress():"<<networkManager->localTCPListeningAddress().toString();
-    //qDebug()<<"~~localIPMCListeningAddress.toString():"<<localIPMCListeningAddress.toString();
-    //qWarning()<<"~~packet->getPeerHostAddress():"<<packet->getPeerHostAddress().toString();
-
-    //    static int dp = 0;
-    //    QHostAddress add = packet->getPeerHostAddress();
-    //    quint16 p = packet->getPeerHostPort();
-    //    quint16 sn = packet->getPacketSerialNumber();
-    
-    //    QString str = add.toString() + ":" + QString::number(p) + ":" + QString::number(sn);
-    //    if(receivedPackets.contains(str)){
-    //        sendConfirmationOfReceiptPacket(add, p, sn);
-
-    //        qCritical()<<"!!!!! Packet already received! ADD.:"<<add.toString()<<" Port:"<<p<<" SN.:"<<sn;
-    //        qCritical()<<"Duplicate Packet:"<<++dp;
-    //        return;
-    //    }else{
-    //        receivedPackets.append(str);
-    //        qCritical()<<"Total Packet:"<<receivedPackets.size();
-
-    //    }
     
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
@@ -234,35 +185,38 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
 //        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
-        sendServerDeclarePacket(peerAddress, peerPort, serverAddress, serverTCPListeningPort);
+        quint16 peerRUDPListeningPort;
+        in >> peerRUDPListeningPort;
+
+        sendServerDeclarePacket(peerAddress, peerRUDPListeningPort );
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress<<"   peerPort:"<<peerPort;
+        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ServerDeclare):
     //        break;
     case quint8(MS::ClientOnline):
     {
-        QString peerTCPListeningAddress;
-        quint16 peerTCPListeningPort;
+        QString peerRUDPListeningAddress;
+        quint16 peerRUDPListeningPort;
         QString peerName;
         bool isAdmin;
-        in >> peerTCPListeningAddress >> peerTCPListeningPort >> peerName >> isAdmin;
-        emit signalClientOnlineStatusChanged(peerTCPListeningAddress, peerTCPListeningPort, peerName, true, isAdmin);
+        in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
+        emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, true, isAdmin);
         //emit signalClientOnlinePacketReceived(QHostAddress(peerAddress), peerPort, peerName);
-        qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerTCPListeningAddress<<"   peerName:"<<peerName;
+        qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerRUDPListeningAddress<<"   peerName:"<<peerName;
     }
     break;
     case quint8(MS::ClientOffline):
     {
-        QString peerTCPListeningAddress;
-        quint16 peerTCPListeningPort;
+        QString peerRUDPListeningAddress;
+        quint16 peerRUDPListeningPort;
         QString peerName;
         bool isAdmin;
-        in >> peerTCPListeningAddress >> peerTCPListeningPort >> peerName >> isAdmin;
-        emit signalClientOnlineStatusChanged(peerTCPListeningAddress, peerTCPListeningPort, peerName, false, isAdmin);
+        in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
+        emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, false, isAdmin);
         //emit signalClientOfflinePacketReceived(QHostAddress(peerAddress), peerPort, peerName);
-        qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerTCPListeningAddress<<"   peerName:"<<peerName;;
+        qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerRUDPListeningAddress<<"   peerName:"<<peerName;;
     }
     break;
     //    case quint8(MS::ServerOnline):
@@ -314,29 +268,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::ClientResponseClientSummaryInfo):
     {
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
-
-
-        //            QHostAddress add = packet->getPeerHostAddress();
-        //            quint16 p = packet->getPeerHostPort();
-        //            quint16 sn = packet->getPacketSerialNumber();
-        //            sendConfirmationOfReceiptPacket(add, p, sn);
-
-        //            QString str = add.toString() + ":" + QString::number(p) + ":" + QString::number(sn);
-        //            if(receivedPackets.contains(str)){
-
-        //                qCritical()<<"!!!!! CSI Packet already received! ADD.:"<<add.toString()<<" Port:"<<p<<" SN.:"<<sn<<" Time:"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
-        //                qCritical()<<"Duplicate CSI Packet:"<<++dp;
-        //                return;
-        //            }else{
-        //                receivedPackets.append(str);
-        //                qCritical()<<"CSI Packet received! ADD.:"<<add.toString()<<" Port:"<<p<<" SN.:"<<sn<<" Time:"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
-        //                qCritical()<<"Total CSI Packet:"<<receivedPackets.size();
-
-        //            }
-
-
-
         QString workgroupName = "", networkInfo = "", usersInfo = "", osInfo = "", admins = "", clientVersion = "";
         bool usbsdEnabled = false, programesEnabled = false;
         in >> workgroupName >> networkInfo >> usersInfo >> osInfo >> usbsdEnabled >> programesEnabled >> admins >> clientVersion;
@@ -347,9 +278,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::ClientResponseClientDetailedInfo):
     {
-        //sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), quint16(IP_MULTICAST_GROUP_PORT), packet->getPacketSerialNumber(), peerID);
-//        sendConfirmationOfReceiptPacket(peerAddress, quint16(IP_MULTICAST_GROUP_PORT), packetSerialNumber, peerID);
-
         QString systemInfo = "";
         in >> systemInfo;
         emit signalClientResponseClientDetailedInfoPacketReceived(peerID, systemInfo);

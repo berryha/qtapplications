@@ -77,7 +77,11 @@ private slots:
     void getRecordsInDatabase();
 
     void processHeartbeatPacket(const QString &clientAddress, const QString &computerName);
-    void processClientOnlineStatusChangedPacket(const QString &clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool online, bool isAdmin);
+    void processClientOnlineStatusChangedPacket(const QString &clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool online, bool isAdmin);
+
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
 
 private:
@@ -114,6 +118,7 @@ private:
 
     QStringList logs;
 
+    RUDPSocket *rudpSocket;
 
 };
 

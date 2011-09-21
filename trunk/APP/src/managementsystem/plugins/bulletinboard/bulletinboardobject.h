@@ -39,7 +39,10 @@ private slots:
     
     void newPasswordRetreved(const QString &adminAddress, quint16 adminPort);
     
-    
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
+
     
 private:
 
@@ -55,7 +58,7 @@ private:
     
     quint16 localUDPListeningPort;
 
-    
+    RUDPSocket *rudpSocket;
     
 };
 

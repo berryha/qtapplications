@@ -116,12 +116,12 @@ void ClientPacketsParser::startparseIncomingPackets(){
 
 void ClientPacketsParser::startprocessOutgoingPackets(){
 
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         //QCoreApplication::processEvents();
@@ -129,7 +129,7 @@ void ClientPacketsParser::startprocessOutgoingPackets(){
         msleep(500);
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 

@@ -87,6 +87,10 @@ private slots:
 
     void updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
     
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
+
 
 private:
     void updateActions();
@@ -153,7 +157,7 @@ private:
     
     quint16 localUDPListeningPort;
     
-
+    RUDPSocket *rudpSocket;
     
 };
 
