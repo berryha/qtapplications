@@ -107,6 +107,9 @@ private slots:
 
     void checkHasAnyServerBeenFound();
 
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
 
 
@@ -154,6 +157,7 @@ private:
     QString peerAddressThatRequiresDetailedInfo;
     quint16 peerPortThatRequiresDetailedInfo;
 
+    RUDPSocket *rudpSocket;
 
 
 };

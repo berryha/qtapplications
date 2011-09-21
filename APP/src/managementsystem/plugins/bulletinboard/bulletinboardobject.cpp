@@ -1,6 +1,7 @@
 
 #include <QThreadPool>
 #include <QtConcurrentRun>
+#include <QMessageBox>
 
 #include "bulletinboardobject.h"
 
@@ -24,7 +25,7 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
         networkReady();
 
     }else{
-        qWarning()<<"Can not find valid IP address! Service startup failed!";
+        qWarning()<<"Can not find valid IP address!";
 
         connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(networkReady()));
         networkManager->startWaitingNetworkReady();
@@ -92,17 +93,31 @@ void BulletinBoardObject::networkReady(){
     networkManager->setPacketHandler(m_packetHandler);
 
     int port = 0;
-    port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+10));
+    //port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+10));
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (RUDP_LISTENING_PORT+10));
+    if(!rudpSocket){
+        QMessageBox::critical(0, tr("Error"), QString("Can not start RUDP listening!"));
+        delete m_packetHandler;
+        m_packetHandler = 0;
+        return;
+    }else{
+        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+    }
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+
+    port = rudpSocket->localPort();
     if(port == 0){
-        QString msg = tr("Can not start UDP listening!");
+        QString msg = tr("Can not start RUDP listening!");
         //QMessageBox::critical(this, tr("Error"), msg);
         qCritical()<<msg;
         return;
     }else{
         if(!bulletinBoardPacketsParser){
             bulletinBoardPacketsParser = new BulletinBoardPacketsParser(networkManager, this);
-            bulletinBoardPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
-            bulletinBoardPacketsParser->setLocalUDPListeningPort(port);
+            bulletinBoardPacketsParser->setLocalRUDPListeningAddress(QHostAddress::Any);
+            bulletinBoardPacketsParser->setLocalRUDPListeningPort(port);
             localUDPListeningPort = port;
             
         }
@@ -186,7 +201,20 @@ void BulletinBoardObject::newPasswordRetreved(const QString &adminAddress, quint
     bulletinBoardPacketsParser->sendNewPasswordRetrevedByUserPacket(adminAddress, adminPort);
 }
 
+void BulletinBoardObject::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
+}
+
+void BulletinBoardObject::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void BulletinBoardObject::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
 
 
 

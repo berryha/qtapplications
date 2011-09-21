@@ -117,7 +117,7 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
         networkReady();
 
     }else{
-        qWarning()<<"Can not find valid IP address! Service startup failed!";
+        qWarning()<<"Can not find valid IP address!";
 
         connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(networkReady()));
         networkManager->startWaitingNetworkReady();
@@ -272,7 +272,7 @@ void ControlCenter::languageChange() {
 void ControlCenter::closeEvent(QCloseEvent *e) {
 
     if(controlCenterPacketsParser){
-        controlCenterPacketsParser->sendClientOfflinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), m_adminName+"@"+localComputerName, true);
+        controlCenterPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
         controlCenterPacketsParser->aboutToQuit();
     }
 
@@ -855,7 +855,7 @@ void ControlCenter::slotUpdateUserLogonPassword(){
     
     ui.toolButtonUpdatePassword->setDefaultAction(ui.actionUpdatePassword);
     
-    controlCenterPacketsParser->sendUpdateMSUserPasswordPacket("", workgroup(), m_adminName);
+    controlCenterPacketsParser->sendUpdateMSUserPasswordPacket("", 0, workgroup(), m_adminName);
 }
 
 void ControlCenter::slotInformUserNewLogonPassword(){
@@ -878,7 +878,7 @@ void ControlCenter::slotInformUserNewLogonPassword(){
     
     ui.toolButtonUpdatePassword->setDefaultAction(ui.actionInformNewPassword);
     
-    controlCenterPacketsParser->sendInformUpdatePasswordPacket("", workgroup(), m_adminName);
+    controlCenterPacketsParser->sendInformUpdatePasswordPacket("", 0, workgroup(), m_adminName);
     
 }
 
@@ -966,7 +966,21 @@ void ControlCenter::networkReady(){
 
     int port = 0;
     //port = networkManager->startUDPServer();
-    port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+20));
+    //port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+20));
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (RUDP_LISTENING_PORT+20));
+    if(!rudpSocket){
+        QMessageBox::critical(this, tr("Error"), QString("Can not start RUDP listening!"));
+        delete m_packetHandler;
+        m_packetHandler = 0;
+        return;
+    }else{
+        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+    }
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+
+    port = rudpSocket->localPort();
     if(port == 0){
         QString msg = tr("Can not start UDP listening!");
         //QMessageBox::critical(this, tr("Error"), msg);
@@ -975,8 +989,8 @@ void ControlCenter::networkReady(){
     }else{
         if(!controlCenterPacketsParser){
             controlCenterPacketsParser = new ControlCenterPacketsParser(networkManager, this);
-            controlCenterPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
-            controlCenterPacketsParser->setLocalUDPListeningPort(port);
+//            controlCenterPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
+//            controlCenterPacketsParser->setLocalUDPListeningPort(port);
             localUDPListeningPort = port;
         }
 
@@ -1011,7 +1025,7 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverTCPL
 
     qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverTCPListeningPort<<" Name:"<<serverName;
 
-    controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), m_adminName+"@"+localComputerName, true);
+    controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 
 
     QString msg = tr("IP: %1<br>Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName).arg(version);
@@ -1071,7 +1085,20 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
 
 }
 
+void ControlCenter::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
+}
+
+void ControlCenter::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
 
 
 

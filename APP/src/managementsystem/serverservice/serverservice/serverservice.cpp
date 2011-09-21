@@ -126,14 +126,26 @@ bool ServerService::startMainService(){
         logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
     }
 
-    result = networkManager->startTCPServer();
+//    result = networkManager->startTCPServer();
 
-    if(result == false){
-        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
-        //        return false;
+//    if(result == false){
+//        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
+//        //        return false;
+//    }else{
+//        logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
+//    }
+
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, RUDP_LISTENING_PORT);
+    if(!rudpSocket){
+        logMessage(QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString()), QtServiceBase::Error);
+        return false;
     }else{
-        logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
+        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
     }
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+
 
     serverPacketsParser = new ServerPacketsParser(networkManager, this);
     connect(serverPacketsParser, SIGNAL(signalClientLogReceived(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), this, SLOT(saveClientLog(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), Qt::QueuedConnection);
@@ -210,9 +222,9 @@ void ServerService::saveClientLog(const QString &computerName, const QString &us
 void ServerService::sendServerOnlinePacket(){
     qDebug()<<"----ServerService::sendServerOnlinePacket()";
 
-    serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT), networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort());
+    serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT));
     
-    serverPacketsParser->sendServerOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort());
+    serverPacketsParser->sendServerOnlinePacket();
     
     updateOrSaveAllClientsInfoToDatabase();
 
@@ -687,7 +699,7 @@ void ServerService::processHeartbeatPacket(const QString &clientAddress, const Q
 
 }
 
-void ServerService::processClientOnlineStatusChangedPacket(const QString &clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool online, bool isAdmin){
+void ServerService::processClientOnlineStatusChangedPacket(const QString &clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool online, bool isAdmin){
 
     if(isAdmin){
         if(online){
@@ -707,13 +719,13 @@ void ServerService::processClientOnlineStatusChangedPacket(const QString &client
             info = clientInfoHash.value(clientName);
             info->setOnline(online);
             if(online){
-                info->setClientTCPListeningAddress(clientTCPListeningAddress);
-                info->setClientTCPListeningPort(clientTCPListeningPort);
+                info->setClientRUDPListeningAddress(clientRUDPListeningAddress);
+                info->setClientRUDPListeningPort(clientRUDPListeningPort);
             }
             qWarning()<<QString("Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         }else{
             if(online){
-                serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", clientName, "", clientTCPListeningAddress);
+                serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", clientName, "", clientRUDPListeningAddress);
             }
             qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         }
@@ -721,6 +733,21 @@ void ServerService::processClientOnlineStatusChangedPacket(const QString &client
     }
 
 
+
+}
+
+void ServerService::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void ServerService::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void ServerService::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
@@ -869,7 +896,7 @@ void ServerService::stop()
 {
 
     if(serverPacketsParser){
-        serverPacketsParser->sendServerOfflinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort());
+        serverPacketsParser->sendServerOfflinePacket();
         serverPacketsParser->aboutToQuit();
     }
 
@@ -909,7 +936,7 @@ void ServerService::processCommand(int code)
     case 3:
         serverPacketsParser->sendRequestClientDetailedInfoPacket();
     case 4:
-        serverPacketsParser->sendRequestClientDetailedInfoPacket("255.255.255.255" /*QString(IP_MULTICAST_GROUP_ADDRESS)*/, "", false);
+        serverPacketsParser->sendRequestClientDetailedInfoPacket("255.255.255.255", IP_MULTICAST_GROUP_PORT, "", false);
         break;
     default:
         qWarning()<<QString("Unknown Command Code '%1'!").arg(code);

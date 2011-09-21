@@ -58,9 +58,9 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(NetworkManagerInstance *n
     Q_ASSERT_X(m_packetHandlerBase, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid PacketHandlerBase!");
 
 
-    serverAddress = QHostAddress::Null;
-    serverTCPListeningPort = 0;
-    serverName = "";
+    //serverAddress = QHostAddress::Null;
+    localServerRUDPListeningPort = 0;
+    //serverName = "";
 
     heartbeatTimer = 0;
     //    processWaitingForReplyPacketsTimer = 0;
@@ -76,8 +76,8 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(NetworkManagerInstance *n
     //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
     //    localUDPListeningPort = networkManager->localUDPListeningPort();
 
-    localUDPListeningAddress = QHostAddress::Any;
-    localUDPListeningPort = 0;
+    localRUDPListeningAddress = QHostAddress::Any;
+    localRUDPListeningPort = 0;
 
     m_userName = Utilities::currentUserNameOfOS();
     m_localComputerName = QHostInfo::localHostName().toLower();
@@ -112,13 +112,13 @@ BulletinBoardPacketsParser::~BulletinBoardPacketsParser() {
 
 }
 
-void BulletinBoardPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
+void BulletinBoardPacketsParser::setLocalRUDPListeningAddress(const QHostAddress &address){
 
-    this->localUDPListeningAddress = address;
+    this->localRUDPListeningAddress = address;
 }
-void BulletinBoardPacketsParser::setLocalUDPListeningPort(quint16 port){
+void BulletinBoardPacketsParser::setLocalRUDPListeningPort(quint16 port){
 
-    this->localUDPListeningPort = port;
+    this->localRUDPListeningPort = port;
 }
 
 
@@ -126,23 +126,12 @@ void BulletinBoardPacketsParser::run(){
     QMutexLocker locker(&mutex);
 
 
-    //    QTimer *processWaitingForReplyPacketsTimer = new QTimer();
-    //    processWaitingForReplyPacketsTimer->setSingleShot(false);
-    //    processWaitingForReplyPacketsTimer->setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 500);
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-
-    //    connect(this, SIGNAL(signalAboutToQuit()), processWaitingForReplyPacketsTimer, SLOT(stop()));
-    //    connect(this, SIGNAL(signalAboutToQuit()), processWaitingForReplyPacketsTimer, SLOT(deleteLater()));
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(destroyed(QObject *)), this, SLOT(destroyed(QObject *)));
-
-    //    processWaitingForReplyPacketsTimer->start();
-
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         parseIncomingPackets();
@@ -152,35 +141,17 @@ void BulletinBoardPacketsParser::run(){
         qApp->processEvents();
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
-
-
-    //    delete processWaitingForReplyPacketsTimer;
-    //    processWaitingForReplyPacketsTimer = 0;
 
 }
 
 void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     qDebug()<<"----BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet)";
     
-    //    if((packet->getTransmissionProtocol() == TP_UDP)
-    //        && (networkManager->isLocalAddress(packet->getPeerHostAddress()))
-    //        && (packet->getPeerHostPort() == localIPMCListeningPort)){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }else if((packet->getTransmissionProtocol() == TP_TCP)
-    //        && (packet->getPeerHostAddress() == networkManager->localTCPListeningAddress())
-    //        && (packet->getPeerHostPort() == networkManager->localTCPListeningPort())){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }
-    
-    //qDebug()<<"~~networkManager->localAddress():"<<networkManager->localTCPListeningAddress().toString();
-    //qDebug()<<"~~packet->getPeerHostAddress():"<<packet->getPeerHostAddress().toString();
-    
+
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_6);
@@ -223,7 +194,6 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::AdminRequestRemoteAssistance):
     {
-//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
         
         QString adminAddress = "", adminName = "";
         quint16 adminPort = 0;
@@ -270,7 +240,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 //                 <<" Serial Number:"<<packetSerialNumber
                 <<" From:"<<packet->getPeerHostAddress().toString()
                <<":"<<packet->getPeerHostPort()
-              <<" Local Port:"<<localUDPListeningPort;
+              <<" Local Port:"<<localRUDPListeningPort;
 
         break;
 

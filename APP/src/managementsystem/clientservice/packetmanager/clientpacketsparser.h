@@ -118,78 +118,68 @@ public slots:
     void sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
         qDebug()<<"----sendClientLookForServerPacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(QString(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress.toString(), localIPMCListeningPort);
         QHostAddress address = QHostAddress(targetAddress);
         if(address.isNull()){
             address = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
         }
         
-        //UDPPacket *packet = new UDPPacket(address, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
         Packet *packet = m_packetHandlerBase->getPacket(address, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
         
         packet->setPacketType(quint8(MS::ClientLookForServer));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*3));
+        packet->setTransmissionProtocol(TP_UDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*3));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        //out << clientTCPListeningPort << clientName;
-        out << m_localComputerName;
+        out << m_localComputerName << m_localRUDPListeningPort;
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        clientLookForServerPacketSerialNumber = packet->getPacketSerialNumber();
-//        return clientLookForServerPacketSerialNumber;
-        //return packet->getPacketSerialNumber();
-
     }
 
-    void sendClientOnlinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOnlinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
         Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
         
         packet->setPacketType(quint8(MS::ClientOnline));
+        packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_localComputerName << clientTCPListeningAddress.toString() << clientTCPListeningPort <<clientName << isAdmin;
+        out << m_localComputerName << clientRUDPListeningAddress.toString() << clientRUDPListeningPort <<clientName << isAdmin;
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
     }
 
-    void sendClientOfflinePacket(const QHostAddress clientTCPListeningAddress, quint16 clientTCPListeningPort, const QString &clientName, bool isAdmin){
+    void sendClientOfflinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOfflinePacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
         Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
         
         packet->setPacketType(quint8(MS::ClientOffline));
+        packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_localComputerName << clientTCPListeningAddress.toString() << clientTCPListeningPort << clientName << isAdmin;
+        out << m_localComputerName << clientRUDPListeningAddress.toString() << clientRUDPListeningPort << clientName << isAdmin;
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
-
-//        return packet->getPacketSerialNumber();
 
     }
 
     void sendClientResponseRemoteConsoleStatusPacket(const QHostAddress adminAddress, quint16 adminPort, bool running, const QString &extraMessage){
         qDebug()<<"----sendClientResponseRemoteConsolePacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
-
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientResponseRemoteConsoleStatus));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -197,22 +187,20 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
     }
 
     void sendRemoteConsoleCMDResultFromClientPacket(const QHostAddress adminAddress, quint16 adminPort, const QString &result){
         qDebug()<<"----sendRemoteConsoleCMDResultFromClientPacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
-
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::RemoteConsoleCMDResultFromClient));
+        packet->setTransmissionProtocol(TP_RUDP);
         //packet->setPacketSerialNumber(packetSerialNumber);
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -220,7 +208,6 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
     }
 
     void sendClientResponseClientSummaryInfoPacket(const QString &targetAddress, quint16 targetPort, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins){
@@ -228,24 +215,23 @@ public slots:
 
         QHostAddress address = QHostAddress(targetAddress);
         quint16 port = targetPort;
-        //UDPPacket *packet = 0;
         Packet *packet = 0;
 
-        if(address == QHostAddress::LocalHost){
-            //packet = new UDPPacket(address, port);
-            packet = m_packetHandlerBase->getPacket(address, port);
-        }else{
-            if(address.isNull()){
-                address = serverAddress;
-                port = localIPMCListeningPort;
-            }
-            //packet = new UDPPacket(address, port, localIPMCListeningAddress, localIPMCListeningPort);
-            packet = m_packetHandlerBase->getPacket(address, port, localIPMCListeningAddress, localIPMCListeningPort);
-        }
+//        if(address == QHostAddress::LocalHost){
+//            packet = m_packetHandlerBase->getPacket(address, port);
+//        }else{
+//            if(address.isNull()){
+//                address = serverAddress;
+//                port = localIPMCListeningPort;
+//            }
+//            packet = m_packetHandlerBase->getPacket(address, port, localIPMCListeningAddress, localIPMCListeningPort);
+//        }
 
+        packet = m_packetHandlerBase->getPacket(address, port, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientResponseClientSummaryInfo));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -253,19 +239,16 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     }
-
 
     void sendClientRequestSoftwareVersionPacket(const QString &softwareName){
         qDebug()<<"----sendClientRequestSoftwareVersionPacket(...)";
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, serverRUDPListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::ClientRequestSoftwareVersion));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -273,18 +256,16 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     }
 
     void sendClientLogPacket(const QString &users, quint8 logType, const QString &log){
         //qWarning()<<"----sendClientLogPacket(...) log:"<<log;
 
-        //UDPPacket *packet = new UDPPacket(serverAddress.toString(), localIPMCListeningPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, serverRUDPListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::ClientLog));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -292,13 +273,9 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     }
 
-
-
-    void sendClientResponseClientDetailedInfoPacket(const QString &systemInfoFilePath, const QString &peerAddress = "", quint16 peerPort = quint16(IP_MULTICAST_GROUP_PORT)){
+    void sendClientResponseClientDetailedInfoPacket(const QString &systemInfoFilePath, const QString &peerAddress = "", quint16 peerPort = quint16(RUDP_LISTENING_PORT)){
 
         QFile file(systemInfoFilePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -311,7 +288,6 @@ public slots:
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
         //Packet *packet = packetHandlerBase->getPacket(peerAddress, peerPort);
 
         QHostAddress address = QHostAddress(peerAddress);
@@ -321,19 +297,17 @@ public slots:
                 return ;
             }
             address = serverAddress;
-            port = localIPMCListeningPort;
+            port = serverRUDPListeningPort;
         }
         if(port == 0){
-            port = quint16(IP_MULTICAST_GROUP_PORT);
+            port = quint16(RUDP_LISTENING_PORT);
         }
 
-        Packet *packet = m_packetHandlerBase->getPacket(address, port, localIPMCListeningAddress, localIPMCListeningPort);
-
-        
-        //TCPPacket *packet = new TCPPacket(adminAddress, adminPort, localIPMCListeningAddress.toString(), localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(address, port, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientResponseClientDetailedInfo));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES)*2);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -345,9 +319,6 @@ public slots:
 
         qDebug()<<"----sendClientResponseClientDetailedInfoPacket(...) Host:"<<address.toString()<<" Port:"<<port;
 
-
-//        return packet->getPacketSerialNumber();
-
     }
 
     void sendClientResponseAdminConnectionResultPacket(const QHostAddress adminAddress, quint16 adminPort, bool result, const QString &message){
@@ -355,11 +326,12 @@ public slots:
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::ClientResponseAdminConnectionResult));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -369,19 +341,18 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     }
 
     void sendClientMessagePacket(const QHostAddress adminAddress, quint16 adminPort, const QString &message){
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(adminAddress, adminPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::ClientMessage));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -391,23 +362,18 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     } 
 
-    
-    
-    
-    
     void sendLocalServiceServerDeclarePacket(const QHostAddress userAddress, quint16 userPort){
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::LocalServiceServerDeclare));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -416,8 +382,6 @@ public slots:
 
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
-
-//        return packet->getPacketSerialNumber();
 
     }
     
@@ -437,11 +401,12 @@ public slots:
 
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort);
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::AdminRequestRemoteAssistance));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -451,8 +416,6 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//        return packet->getPacketSerialNumber();
-
     }
 
     void sendInformUpdatePasswordPacket(const QString &userName, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
@@ -460,11 +423,12 @@ public slots:
         
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
-        //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, localUsersHash.value(userName));
+        //Packet *packet = new Packet(adminAddress, adminPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, localUsersHash.value(userName), m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::InformUserNewPassword));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -473,8 +437,6 @@ public slots:
 
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
-
-//        return packet->getPacketSerialNumber();
 
     }
     
@@ -497,10 +459,11 @@ public slots:
         //后两个参数必须为空，才能发送给本机
         //The last two parameters must be null to send the packet to itself!
         //UDPPacket *packet = new UDPPacket(adminAddress, adminPort);
-        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort);
+        Packet *packet = m_packetHandlerBase->getPacket(userAddress, userPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::ServerAnnouncement));
-        packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -509,8 +472,6 @@ public slots:
 
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
-
-//        return packet->getPacketSerialNumber();
 
     }
     
@@ -525,7 +486,7 @@ signals:
     void  signalHeartbeatPacketReceived(const QString &computerName);
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
-    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
 
     void signalServerOnlinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
     void signalServerOfflinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
@@ -561,19 +522,19 @@ private:
 
 private:
     QHostAddress serverAddress;
-    quint16 serverTCPListeningPort;
+    quint16 serverRUDPListeningPort;
     QString serverName;
-
-//    quint16 clientLookForServerPacketSerialNumber;
 
     QHostAddress localIPMCListeningAddress;
     quint16 localIPMCListeningPort;
 
+    QHostAddress m_localRUDPListeningAddress;
+    quint16 m_localRUDPListeningPort;
+
+
     QTimer *heartbeatTimer;
-    //QTimer *processWaitingForReplyPacketsTimer;
 
     PacketHandlerBase *m_packetHandlerBase;
-    //ClientNetworkManager *networkManager;
 
     QDateTime serverLastOnlineTime;
 

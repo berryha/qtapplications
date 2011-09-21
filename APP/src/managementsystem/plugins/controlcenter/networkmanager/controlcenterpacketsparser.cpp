@@ -74,8 +74,11 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(NetworkManagerInstance *n
 
     //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
     //    localUDPListeningPort = networkManager->localUDPListeningPort();
-    localUDPListeningAddress = QHostAddress::Any;
-    localUDPListeningPort = 0;
+//    localRUDPListeningAddress = QHostAddress::Any;
+//    localRUDPListeningPort = 0;
+    localRUDPListeningAddress = networkManager->localRUDPListeningAddress();
+    localRUDPListeningPort = networkManager->localRUDPListeningPort();
+
 
     m_localComputerName = QHostInfo::localHostName().toLower();
     m_localID = m_localComputerName + "/ControlCenter";
@@ -108,36 +111,25 @@ ControlCenterPacketsParser::~ControlCenterPacketsParser() {
 
 }
 
-void ControlCenterPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
+//void ControlCenterPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
 
-    this->localUDPListeningAddress = address;
-}
-void ControlCenterPacketsParser::setLocalUDPListeningPort(quint16 port){
+//    this->localUDPListeningAddress = address;
+//}
+//void ControlCenterPacketsParser::setLocalUDPListeningPort(quint16 port){
 
-    this->localUDPListeningPort = port;
-}
+//    this->localUDPListeningPort = port;
+//}
 
 void ControlCenterPacketsParser::run(){
     QMutexLocker locker(&mutex);
 
 
-    //    QTimer *processWaitingForReplyPacketsTimer = new QTimer();
-    //    processWaitingForReplyPacketsTimer->setSingleShot(false);
-    //    processWaitingForReplyPacketsTimer->setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 500);
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-
-    //    connect(this, SIGNAL(signalAboutToQuit()), processWaitingForReplyPacketsTimer, SLOT(stop()));
-    //    connect(this, SIGNAL(signalAboutToQuit()), processWaitingForReplyPacketsTimer, SLOT(deleteLater()));
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(destroyed(QObject *)), this, SLOT(destroyed(QObject *)));
-
-    //    processWaitingForReplyPacketsTimer->start();
-
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         parseIncomingPackets();
@@ -147,14 +139,10 @@ void ControlCenterPacketsParser::run(){
         qApp->processEvents();
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
-
-
-    //    delete processWaitingForReplyPacketsTimer;
-    //    processWaitingForReplyPacketsTimer = 0;
 
 }
 
@@ -252,11 +240,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qDebug()<<"ClientResponseClientInfoToAdminRequest";
 
-
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
-
-
         QString systemInfo = "";
         in >> systemInfo;
         emit signalClientResponseClientDetailedInfoPacketReceived(peerName, systemInfo);
@@ -274,9 +257,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::ClientResponseRemoteConsoleStatus):
     {
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
-
         QString extraMessage = "";
         quint8 running = false;
         in >> running >> extraMessage;
@@ -294,9 +274,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::RemoteConsoleCMDResultFromClient):
     {
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
-
         QString result = "";
         in >> result;
         emit signalRemoteConsoleCMDResultFromClientPacketReceived(peerName, result);
@@ -322,9 +299,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::ClientResponseClientSummaryInfo):
     {
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
-
         QString workgroupName = "", networkInfo = "", usersInfo = "", osInfo = "", admins = "", clientVersion = "";
         bool usbsdEnabled = false, programesEnabled = false;
         in >> workgroupName >> networkInfo >> usersInfo >> osInfo >> usbsdEnabled >> programesEnabled >> admins >> clientVersion;
@@ -334,9 +308,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::ClientResponseAdminConnectionResult):
     {
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
-
         QString message = "";
         bool result = false;
         in >> result >> message;
@@ -357,8 +328,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::UserResponseRemoteAssistance):
     {
-
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString userName = "", computerName = "";
         bool accept = false;
