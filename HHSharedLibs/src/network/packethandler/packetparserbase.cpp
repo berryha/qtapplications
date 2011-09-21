@@ -200,8 +200,6 @@ void PacketsParserBase::processOutgoingPackets() {
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
         }else if(transmissionProtocol == TP_RUDP){
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), true);
-            qDebug()<<"-----------------------------block.size():"<<block.size()<<" packet->getPacketData().size()"<<packet->getPacketData().size();
-
         }
 
         if (packet->getRemainingRetransmissionTimes() > 0) {

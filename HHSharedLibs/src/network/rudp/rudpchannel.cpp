@@ -1988,9 +1988,8 @@ void RUDPChannel::cacheData(QByteArray *data){
         packet->setLocalHostPort(m_udpSocket->localPort());
 
         m_packetHandlerBase->appendIncomingPacket(packet);
-        qDebug()<<"------------m_packetHandlerBase->incomingPacketsCount():"<<m_packetHandlerBase->incomingPacketsCount();
+        //qDebug()<<"------------m_packetHandlerBase->incomingPacketsCount():"<<m_packetHandlerBase->incomingPacketsCount();
     }
-    qDebug()<<"-----------------------0";
 
 }
 
