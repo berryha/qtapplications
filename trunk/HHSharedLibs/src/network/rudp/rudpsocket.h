@@ -58,9 +58,6 @@ public:
     ~RUDPSocket();
 
 
-    void connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
-    void connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
-    void disconnectFromPeer(const QHostAddress &peerAddress, quint16 peerPort);
 
 //    bool canSendData(quint64 size);
 
@@ -73,6 +70,10 @@ signals:
 
 
 public slots:
+    void connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+    void connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+    void disconnectFromPeer(const QHostAddress &peerAddress, quint16 peerPort);
+
 
 //    quint16 beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort);
     bool sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data);
