@@ -138,28 +138,13 @@ void ClientPacketsParser::run(){
     QMutexLocker locker(&mutex);
 
 
-    //    processWaitingForReplyPacketsTimer = new QTimer();
-    //    processWaitingForReplyPacketsTimer->setSingleShot(false);
-    //    processWaitingForReplyPacketsTimer->setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 500);
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    //    processWaitingForReplyPacketsTimer->start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
-    //qDebug()<<QString("run()-1:"+QDateTime::currentDateTime().toString("ss.zzz"));
-
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
-
-    //    do{
-    //        qWarning()<<"ClientPacketsParser::run()---0";
-    //        QCoreApplication::processEvents();
-    //        parseIncomingPackets();
-    //        processOutgoingPackets();
-    //        msleep(500);
-    //    } while(!isAboutToQuit());
 
     while(1){
 
@@ -174,12 +159,11 @@ void ClientPacketsParser::run(){
     }
 
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
 
-    //processWaitingForReplyPacketsTimer->stop();
 
 }
 
@@ -223,13 +207,12 @@ void ClientPacketsParser::startprocessOutgoingPackets(){
     }
 
 
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    //processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         //QCoreApplication::processEvents();
@@ -237,7 +220,7 @@ void ClientPacketsParser::startprocessOutgoingPackets(){
         msleep(200);
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 

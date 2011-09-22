@@ -112,7 +112,7 @@ public slots:
 //    }
 
     void sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort){
-        qWarning()<<"----sendServerDeclarePacket(...)"<<" Peer Address:"<<peerAddress.toString()<<":"<<peerPort;
+        qWarning()<<"--sendServerDeclarePacket(...)"<<" Peer Address:"<<peerAddress.toString()<<":"<<peerPort;
 
         Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
         if(peerAddress == QHostAddress(IM_SERVER_IPMC_ADDRESS) || peerAddress == QHostAddress::Broadcast){
