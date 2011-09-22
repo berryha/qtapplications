@@ -244,8 +244,14 @@ bool RUDPChannel::sendData( QByteArray &data){
 
 }
 
-quint64 RUDPChannel::sendDatagram(QByteArray *data){
+quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
     //qDebug()<<"--RUDPChannel::sendDatagram(QByteArray *data) "<<" data->size():"<<data->size();
+
+
+    if(!isReliableDataPacket){
+        sendUnreliableDataPacket(data);
+        return data->size();
+    }
 
     int size = data->size();
     int totalSent = 0;
@@ -397,7 +403,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
         packet = getUnusedPacket();
         *packet = v.value<RUDPPacket>();
     }else{
-        qWarning()<<"ERROR! Invalid Packet!";
+        qWarning()<<"ERROR! Invalid RUDPPacket!";
         return;
     }
 
@@ -419,7 +425,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
         //retransmissionTimer->start(retransmissionTimerInterval);
     }
 
-    if(!isDataPacket(packetType)){
+    if(isUnreliablePacket(packetType)){
     //if(packetType != quint8(RUDP::BeginOrEndDataTransmission) && packetType != quint8(RUDP::CompleteDataPacket) && (packetType != quint8(RUDP::FragmentDataPacket)) && (packetType != quint8(RUDP::DataStreamPacket)) ){
         processPacket(packet);
         return;
@@ -684,22 +690,38 @@ void RUDPChannel::endDataTransmission(quint16 fragmentDataID){
 
 }
 
-bool RUDPChannel::isDataPacket(quint8 packetType){
+void RUDPChannel::sendUnreliableDataPacket(QByteArray *data){
+
+    RUDPPacket *packet = getUnusedPacket();
+
+    packet->setPacketType(quint8(RUDP::UnreliableDataPacket));
+    packet->setPacketSerialNumber(createSerialNumberForControlPacket());
+    QByteArray ba;
+    QDataStream out(&ba, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_7);
+    out << *data;
+    packet->setPacketData(ba);
+
+    tryingToSendPacket(packet);
+
+}
+
+bool RUDPChannel::isUnreliablePacket(quint8 packetType){
     //RUDPPacketType type = RUDPPacketType(packetType);
     switch(packetType){
     case quint8(RUDP::BeginOrEndDataTransmission):
     case quint8(RUDP::CompleteDataPacket):
     case quint8(RUDP::FragmentDataPacket):
     case quint8(RUDP::DataStreamPacket):
-        return true;
+        return false;
         break;
 
     default:
-        return false;
+        return true;
 
     }
 
-    return false;
+    return true;
 
 }
 
@@ -779,11 +801,11 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
 
 
     if(!packet){
-        qCritical()<<"ERROR! Invalid Packet!";
+        qCritical()<<"ERROR! Invalid RUDPPacket!";
         return false;
     }
     if(packet->isNull()){
-        qCritical()<<"ERROR! Invalid Packet!";
+        qCritical()<<"ERROR! Invalid RUDPPacket!";
         recylePacket(packet);
         return false;
     }
@@ -994,7 +1016,7 @@ bool RUDPChannel::sendPacket(RUDPPacket *packet){
     }
 
 
-    if(isDataPacket(packet->getPacketType())){
+    if(!isUnreliablePacket(packet->getPacketType())){
         addWaitingForACKPacket(packet);
         LSSN = packet->getPacketSerialNumber();
     }
@@ -1926,8 +1948,16 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //qDebug()<<"~~FragmentDataPacket---fragmentData.size():"<<fragmentData.size()<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size();
     }
         break;
+    case quint8(RUDP::UnreliableDataPacket):
+    {
+        QByteArray data;
+        in >> data;
 
+        cacheData(&data);
 
+        //qDebug()<<"~~UnreliableDataPacket";
+    }
+        break;
 
     default:
         qWarning()<<"Unknown Packet Type:"<<packetType

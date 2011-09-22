@@ -57,14 +57,16 @@ public slots:
     void datagramReceived(QByteArray &block);
 
     bool sendData( QByteArray &data);
-    quint64 sendDatagram(QByteArray *data);
+    quint64 sendDatagram(QByteArray *data, bool isReliableDataPacket = true);
 
-//private:
+private:
     quint16 beginDataTransmission();
     quint64 sendDatagram(QByteArray *data, quint64 offset, bool fragment);
     void endDataTransmission(quint16 fragmentDataID);
 
-    bool isDataPacket(quint8 packetType);
+    void sendUnreliableDataPacket(QByteArray *data);
+
+    bool isUnreliablePacket(quint8 packetType);
 
 
 

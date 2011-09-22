@@ -477,42 +477,52 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
 
     bool result = false;
 
-    if(useRUDP){
-        RUDPServer *rudpServer = getRUDPServer(localPort, QHostAddress::Any);
-        if(!rudpServer){
-            m_errorString = tr("RUDP Server Not Running!");
-            qCritical()<<m_errorString;
-            return false;
-        }
-        int sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data);
-        result = (sentSize == data->size());
-        m_errorString = rudpServer->errorString();
-
-    }else{
-        if(localPort == 0){
-            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
-        }else{
-            UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
-            if (udpServer) {
-                qint64 size = udpServer->writeDatagram(*data, targetAddress,targetPort);
-                //result = (size == data->size())?true:false;
-                result = (size == data->size());
-                m_errorString = udpServer->errorString();
-
-            } else {
-                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
-            }
-
-
-        }
-
-        if (result) {
-            //qDebug()<< "UDP Datagram Sent Successfully! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;
-        } else {
-            qCritical()<< "ERROR! UDP Datagram Sent Failed! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;
-        }
-
+    RUDPServer *rudpServer = getRUDPServer(localPort, QHostAddress::Any);
+    if(!rudpServer){
+        m_errorString = tr("RUDP Server Not Running On Port %1!").arg(localPort);
+        qCritical()<<m_errorString;
+        return false;
     }
+    int sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data, useRUDP);
+    result = (sentSize == data->size());
+    m_errorString = rudpServer->errorString();
+
+//    if(useRUDP){
+//        RUDPServer *rudpServer = getRUDPServer(localPort, QHostAddress::Any);
+//        if(!rudpServer){
+//            m_errorString = tr("RUDP Server Not Running!");
+//            qCritical()<<m_errorString;
+//            return false;
+//        }
+//        int sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data);
+//        result = (sentSize == data->size());
+//        m_errorString = rudpServer->errorString();
+
+//    }else{
+//        if(localPort == 0){
+//            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
+//        }else{
+//            UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
+//            if (udpServer) {
+//                qint64 size = udpServer->writeDatagram(*data, targetAddress,targetPort);
+//                //result = (size == data->size())?true:false;
+//                result = (size == data->size());
+//                m_errorString = udpServer->errorString();
+
+//            } else {
+//                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
+//            }
+
+
+//        }
+
+//        if (result) {
+//            //qDebug()<< "UDP Datagram Sent Successfully! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;
+//        } else {
+//            qCritical()<< "ERROR! UDP Datagram Sent Failed! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;
+//        }
+
+//    }
 
 
     return result;

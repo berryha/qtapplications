@@ -74,13 +74,12 @@ signals:
 
 public slots:
 
-    quint16 beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort);
+//    quint16 beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort);
     bool sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data);
-//    quint64 sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset);
-    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment);
-    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data);
+//    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment);
+    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, bool isReliableDataPacket = true);
 
-    void endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID);
+//    void endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID);
 
 
 private slots:
