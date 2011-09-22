@@ -75,7 +75,7 @@ signals:
     void signalRequestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort);
     void signalLookForServer(const QHostAddress &targetAddress, quint16 targetPort);
     void signalUserVerified();
-    void signalServerFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void signalServerFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
 
 
 public slots:

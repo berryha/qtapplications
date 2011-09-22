@@ -69,10 +69,10 @@ signals:
     
 
 public slots:
-    void serverFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
     
 private slots:
-    void slotRequestForLANServer(const QString &ip = IM_SERVER_IPMC_ADDRESS, quint16 port = quint16(IM_SERVER_UDP_LISTENING_PORT));
+    void slotRequestForLANServer(const QString &ip = IM_SERVER_IPMC_ADDRESS, quint16 port = quint16(IM_SERVER_IPMC_LISTENING_PORT));
     void slotTestServers();
     void slotTimeout();
 

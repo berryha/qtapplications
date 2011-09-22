@@ -118,7 +118,7 @@ public slots:
             targetAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
             targetPort = quint16(IP_MULTICAST_GROUP_PORT);
 
-            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort);
+            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
@@ -142,7 +142,7 @@ public slots:
     void sendServerOnlinePacket(){
         qDebug()<<"----sendServerOnlinePacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), serverAddress, localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ServerOnline));
         packet->setTransmissionProtocol(TP_UDP);
@@ -158,7 +158,7 @@ public slots:
     void sendServerOfflinePacket(){
         qDebug()<<"----sendServerOfflinePacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), serverAddress, localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ServerOffline));
         packet->setTransmissionProtocol(TP_UDP);
@@ -184,7 +184,7 @@ public slots:
             targetAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
             targetPort = quint16(IP_MULTICAST_GROUP_PORT);
 
-            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort);
+            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
@@ -214,7 +214,7 @@ public slots:
             targetAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
             targetPort = quint16(IP_MULTICAST_GROUP_PORT);
 
-            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort);
+            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, serverAddress, localRUDPListeningPort);
@@ -259,7 +259,7 @@ public slots:
     void sendUpdateClientSoftwarePacket(){
         qDebug()<<"----sendUpdateClientSoftwarePacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), serverAddress, localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::Update));
         packet->setTransmissionProtocol(TP_UDP);

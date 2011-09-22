@@ -122,6 +122,9 @@ private slots:
     void showUserInfo(IMUserBase *user);
 
 
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
 
 
@@ -176,6 +179,7 @@ private:
     UserInfoTipWindow *m_userInfoTipWindow;
     //ContactInfoWidget *m_ContactInfoWidget;
 
+    RUDPSocket *rudpSocket;
 
 };
 

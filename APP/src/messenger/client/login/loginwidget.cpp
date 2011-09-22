@@ -496,7 +496,7 @@ void LoginWidget::on_toolButtonServersManager_clicked(){
     QVBoxLayout vbl(&dlg);
 
     ServerManagerWindow smw(&dlg);
-    connect(this, SIGNAL(signalServerFound(const QString&, quint16, quint16, const QString&, const QString&)), &smw, SLOT(serverFound(const QString& ,quint16, quint16, const QString&, const QString&))/*, Qt::QueuedConnection*/);
+    connect(this, SIGNAL(signalServerFound(const QString&, quint16, const QString&, const QString&)), &smw, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&))/*, Qt::QueuedConnection*/);
     connect(&smw, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), this, SIGNAL(signalLookForServer(const QHostAddress &, quint16)));
     //        connect(&smw, SIGNAL(signalServersUpdated()), this, SLOT(slotServersUpdated()));
     connect(&smw, SIGNAL(signalServerSelected(const QString &)), this, SLOT(slotServerSelected(const QString &)));

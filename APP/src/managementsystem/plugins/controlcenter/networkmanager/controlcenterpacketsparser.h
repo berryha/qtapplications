@@ -85,7 +85,7 @@ public:
     void sendClientLookForServerPacket(){
         qDebug()<<"----sendClientLookForServerPacket(...)";
 
-        Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort);
+        Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientLookForServer));
         packet->setTransmissionProtocol(TP_UDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*10));
@@ -101,7 +101,7 @@ public:
     void sendClientOnlinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
-        Packet *packet = new Packet(serverAddress, ipmcListeningPort);
+        Packet *packet = new Packet(serverAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientOnline));
         packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
@@ -116,7 +116,7 @@ public:
     void sendClientOfflinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOfflinePacket(...)";
 
-        Packet *packet = new Packet(serverAddress, ipmcListeningPort);
+        Packet *packet = new Packet(serverAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
         packet->setPacketType(quint8(MS::ClientOffline));
         packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
@@ -263,7 +263,7 @@ public:
     void sendAdminSearchClientPacket(const QHostAddress &targetAddress, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName){
 
         //Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
-        Packet *packet = new Packet(targetAddress, ipmcListeningPort);
+        Packet *packet = new Packet(targetAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
         packet->setPacketType(quint8(MS::AdminSearchClient));
         packet->setTransmissionProtocol(TP_UDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
@@ -298,7 +298,7 @@ public:
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
             targetAddress = ipmcGroupAddress;
-            packet = new Packet(targetAddress, ipmcListeningPort);
+            packet = new Packet(targetAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = new Packet(targetAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
@@ -323,7 +323,7 @@ public:
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
             targetAddress = ipmcGroupAddress;
-            packet = new Packet(targetAddress, ipmcListeningPort);
+            packet = new Packet(targetAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = new Packet(targetAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
@@ -356,7 +356,7 @@ public:
         QHostAddress targetAddress = QHostAddress(peerAddress);
         if(targetAddress.isNull()){
             targetAddress = ipmcGroupAddress;
-            packet = new Packet(targetAddress, ipmcListeningPort);
+            packet = new Packet(targetAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
             packet = new Packet(targetAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);

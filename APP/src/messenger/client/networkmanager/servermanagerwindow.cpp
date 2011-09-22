@@ -56,7 +56,7 @@ ServerManagerWindow::ServerManagerWindow(QWidget *parent)
 
         if(clientNetworkManager->getNetworkType() == NetworkManagerBase::LAN){
                 ui.lineEditIP->setText(QString(IM_SERVER_IPMC_ADDRESS));
-                ui.spinBoxPort->setValue(IM_SERVER_UDP_LISTENING_PORT);
+                ui.spinBoxPort->setValue(IM_SERVER_IPMC_LISTENING_PORT);
 		ui.toolButtonSearchServer->show();
                 ui.toolButtonSearchServer->setEnabled(true);
                 ui.toolButtonSearchServer->setFocus();
@@ -144,17 +144,17 @@ bool ServerManagerWindow::isIPAddressValid(){
 
 }
 
-void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version){
+void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
 
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverTCPListeningPort<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<" Name:"<<serverName;
     qWarning();
 
     ServerInfo *info;
     if(serversHash.contains(serverAddress)){
             info = serversHash.value(serverAddress);
     }else{
-            info = new ServerInfo(serverAddress, serverUDPListeningPort, this);
+            info = new ServerInfo(serverAddress, serverRUDPListeningPort, this);
     }
 
     info->setCurState(ServerInfo::TestOK);

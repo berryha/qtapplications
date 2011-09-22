@@ -36,6 +36,8 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     updatePasswordWidget = 0;
     
     localUDPListeningPort = 0;
+
+    rudpSocket = 0;
     
     
 }
@@ -89,16 +91,16 @@ void BulletinBoardObject::networkReady(){
         return;
     }
 
-    m_packetHandler = new PacketHandlerBase(this);
-    networkManager->setPacketHandler(m_packetHandler);
+    if(!m_packetHandler){
+        m_packetHandler = new PacketHandlerBase(this);
+        networkManager->setPacketHandler(m_packetHandler);
+    }
 
     int port = 0;
     //port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+10));
     rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (RUDP_LISTENING_PORT+10));
     if(!rudpSocket){
         QMessageBox::critical(0, tr("Error"), QString("Can not start RUDP listening!"));
-        delete m_packetHandler;
-        m_packetHandler = 0;
         return;
     }else{
         qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
