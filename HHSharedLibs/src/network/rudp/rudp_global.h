@@ -73,7 +73,7 @@
 namespace HEHUI {
     namespace RUDP {
 
-        enum RUDPPacketType{UnKnownPacket = 0, Handshake, Goodbye, ACK, ACK2, NACK, PacketDropped, KeepAlive, BeginOrEndDataTransmission, CompleteDataPacket, FragmentDataPacket, DataStreamPacket, UserDefinedPacket};
+        enum RUDPPacketType{UnKnownPacket = 0, Handshake, Goodbye, ACK, ACK2, NACK, PacketDropped, KeepAlive, BeginOrEndDataTransmission, CompleteDataPacket, FragmentDataPacket, DataStreamPacket, UnreliableDataPacket, UserDefinedPacket};
 
 
 

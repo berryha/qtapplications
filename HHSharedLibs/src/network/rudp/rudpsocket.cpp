@@ -86,10 +86,10 @@ void RUDPSocket::disconnectFromPeer(const QHostAddress &peerAddress, quint16 pee
 //    return RUDPChannel::canSendData(size);
 //}
 
-quint16 RUDPSocket::beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort){
-    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    return channel->beginDataTransmission();
-}
+//quint16 RUDPSocket::beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort){
+//    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+//    return channel->beginDataTransmission();
+//}
 
 bool RUDPSocket::sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data){
 
@@ -98,30 +98,22 @@ bool RUDPSocket::sendData(const QHostAddress &peerAddress, quint16 peerPort, QBy
 
 }
 
-//quint64 RUDPSocket::sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset){
+//quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment){
 
 //    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-//    return channel->sendDatagram(data);
-
+//    return channel->sendDatagram(data, offset, fragment);
 //}
 
-quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment){
+quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, bool isReliableDataPacket){
 
     RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    return channel->sendDatagram(data, offset, fragment);
-
+    return channel->sendDatagram(data, isReliableDataPacket);
 }
 
-quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data){
-
-    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    return channel->sendDatagram(data);
-}
-
-void RUDPSocket::endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID){
-    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    return channel->endDataTransmission(fragmentDataID);
-}
+//void RUDPSocket::endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID){
+//    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+//    return channel->endDataTransmission(fragmentDataID);
+//}
 
 void RUDPSocket::readPendingDatagrams() {
     //qDebug()<<"----RUDPSocket::readPendingDatagrams()";
@@ -196,7 +188,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
     if(!peers.contains(channelID)){
         if(m_unusedRUDPChannels.isEmpty()){
             qWarning()<<"Create new channel:"<<channelID;
-            channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, this);
+            channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, 0);
             connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
