@@ -51,6 +51,8 @@ public slots:
     void connectToPeer(int msecTimeout = RUDP_CONNECTION_TIMEOUT);
     void connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
     void connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+    bool waitForConnected(int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+
     void disconnectFromPeer();
     void closeChannel();
 
