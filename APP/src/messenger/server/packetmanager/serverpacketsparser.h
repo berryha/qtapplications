@@ -133,7 +133,6 @@ public slots:
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 
-
     }
 
     void sendServerOnlinePacket(){
