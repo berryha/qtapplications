@@ -67,6 +67,8 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 
     onlineAdminsCount = 0;
 
+    rudpSocket = 0;
+
 
 }
 
@@ -109,8 +111,10 @@ bool ServerService::startMainService(){
         return true;
     }
 
-    m_packetHandler = new PacketHandlerBase(this);
-    networkManager->setPacketHandler(m_packetHandler);
+    if(!m_packetHandler){
+        m_packetHandler = new PacketHandlerBase(this);
+        networkManager->setPacketHandler(m_packetHandler);
+    }
 
     if(openDatabase()){
         getRecordsInDatabase();

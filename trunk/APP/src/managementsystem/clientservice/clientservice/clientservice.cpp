@@ -115,8 +115,10 @@ bool ClientService::startMainService(){
         return true;
     }
 
-    m_packetHandler = new PacketHandlerBase(this);
-    networkManager->setPacketHandler(m_packetHandler);
+    if(!m_packetHandler){
+        m_packetHandler = new PacketHandlerBase(this);
+        networkManager->setPacketHandler(m_packetHandler);
+    }
 
 
     bool result = false;

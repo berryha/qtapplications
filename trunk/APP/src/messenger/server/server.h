@@ -65,9 +65,13 @@ signals:
 
 private slots:
     bool startMainService();
-    void sendServerOnlinePacket();
+//    void sendServerOnlinePacket();
     void saveClientLog(const QString &computerName, const QString &users, const QString &log, const QString &clientAddress);
 
+
+    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
 
 private:
@@ -87,7 +91,7 @@ private:
     DatabaseUtility *databaseUtility;
     QSqlQuery *query;
 
-    QTimer *sendServerOnlinePacketTimer;
+//    QTimer *sendServerOnlinePacketTimer;
 
     QHash<QString, UserInfo *> clientInfoHash;
 
@@ -98,7 +102,7 @@ private:
     QStringList logs;
 
 
-
+    RUDPSocket *rudpSocket;
 
 };
 

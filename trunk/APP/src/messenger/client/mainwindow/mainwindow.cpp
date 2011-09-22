@@ -285,13 +285,27 @@ void MainWindow::startNetwork(){
         return;
     }
 
-    m_packetHandler = new PacketHandlerBase(this);
-    networkManager->setPacketHandler(m_packetHandler);
+    if(!m_packetHandler){
+        m_packetHandler = new PacketHandlerBase(this);
+        networkManager->setPacketHandler(m_packetHandler);
+    }
 
 
     int port = 0;
     //port = networkManager->startUDPServer();
-    port = networkManager->startUDPServer(QHostAddress::Any, (IM_SERVER_UDP_LISTENING_PORT+10));
+    //port = networkManager->startRUDPServer(QHostAddress::Any, (IM_SERVER_RUDP_LISTENING_PORT+10));
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (IM_SERVER_RUDP_LISTENING_PORT+10));
+    if(!rudpSocket){
+        QMessageBox::critical(this, tr("Error"), QString("Can not start RUDP listening!"));
+        return;
+    }else{
+        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+    }
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+
+    port = rudpSocket->localPort();
     if(port == 0){
         QString msg = tr("Can not start UDP listening!");
         //QMessageBox::critical(this, tr("Error"), msg);
@@ -316,7 +330,7 @@ void MainWindow::startNetwork(){
     
     //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
-    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), clientPacketsParser, SLOT(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(requestLogin(const QHostAddress &, quint16)));
@@ -2204,6 +2218,21 @@ void MainWindow::showUserInfo(IMUserBase *user){
     m_ContactInfoWidget->show();
     m_ContactInfoWidget->raise();
 
+
+}
+
+void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void MainWindow::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+}
+
+void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 

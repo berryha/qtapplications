@@ -37,14 +37,14 @@ NetworkManager::NetworkManager(PacketHandlerBase *packetHandlerBase, NetworkType
     //    }
 
     m_hostName = QHostInfo::localHostName();
-    m_localTCPListeningAddress = QHostAddress::Any;
-    m_localTCPListeningPort = quint16(IM_SERVER_TCP_LISTENING_PORT);
+//    m_localTCPListeningAddress = QHostAddress::Any;
+//    m_localTCPListeningPort = quint16(IM_SERVER_TCP_LISTENING_PORT);
     m_localIPMCListeningAddress = QHostAddress::Any;
-    m_localIPMCListeningPort = quint16(IM_SERVER_UDP_LISTENING_PORT);
+    m_localIPMCListeningPort = quint16(IM_SERVER_IPMC_LISTENING_PORT);
     m_ipMCGroupAddress = QHostAddress(IM_SERVER_IPMC_ADDRESS);
 
-    //    m_localUDPListeningAddress = QHostAddress::Any;
-    //    m_localUDPListeningPort = 0;
+    m_localRUDPListeningAddress = QHostAddress::Any;
+    m_localRUDPListeningPort = 0;
 
 
     //    if(!isNetworkReady()){
@@ -71,21 +71,21 @@ QString NetworkManager::hostName(){
     return m_hostName;
 }
 
-QHostAddress NetworkManager::localTCPListeningAddress(){
-    return m_localTCPListeningAddress;
-}
+//QHostAddress NetworkManager::localTCPListeningAddress(){
+//    return m_localTCPListeningAddress;
+//}
 
-void NetworkManager::setLocalTCPListeningAddress(const QHostAddress &address){
-    this->m_localTCPListeningAddress = address;
-}
+//void NetworkManager::setLocalTCPListeningAddress(const QHostAddress &address){
+//    this->m_localTCPListeningAddress = address;
+//}
 
-quint16 NetworkManager::localTCPListeningPort(){
-    return m_localTCPListeningPort;
-}
+//quint16 NetworkManager::localTCPListeningPort(){
+//    return m_localTCPListeningPort;
+//}
 
-void NetworkManager::setLocalTCPListeningPort(quint16 port){
-    this->m_localTCPListeningPort = port;
-}
+//void NetworkManager::setLocalTCPListeningPort(quint16 port){
+//    this->m_localTCPListeningPort = port;
+//}
 
 QHostAddress NetworkManager::localIPMCListeningAddress(){
     return m_localIPMCListeningAddress;
@@ -111,43 +111,18 @@ void NetworkManager::setIPMCGroupAddress(const QHostAddress &address){
     this->m_ipMCGroupAddress = address;
 }
 
-//QHostAddress NetworkManager::localUDPListeningAddress(){
-//    return m_localUDPListeningAddress;
-//}
+QHostAddress NetworkManager::localRUDPListeningAddress(){
+    return m_localRUDPListeningAddress;
+}
 
-//quint16 NetworkManager::localUDPListeningPort(){
-//    return m_localUDPListeningPort;
-//}
+quint16 NetworkManager::localRUDPListeningPort(){
+    return m_localRUDPListeningPort;
+}
 
 //QString NetworkManager::hardwareAddress() const{
 //    return m_hardwareAddress;
 //}
 
-
-bool NetworkManager::startTCPServer(){
-    qDebug()<<"----NetworkManager::startTCPServer()";
-
-    //    if(!isNetworkReady()){
-    //        startWaitingNetworkReady();
-    //        return false;
-    //    }
-
-    //    if((!m_localTCPListeningAddress.toString().startsWith("200.200.", Qt::CaseInsensitive)) && (!m_localTCPListeningAddress.toString().startsWith("193.168.", Qt::CaseInsensitive))){
-    //        qCritical()<<"Invalid local hostaddress!";
-    //        return false;
-    //    }
-
-    //    if(m_localAddress.isNull()
-    //        || m_localAddress.toString().contains("127.0", Qt::CaseInsensitive)
-    //        || m_localAddress.toString().contains("169.254", Qt::CaseInsensitive)
-    //        || m_localAddress.toString().contains("0.0", Qt::CaseInsensitive)
-    //        || m_localAddress.toString().contains("255.255", Qt::CaseInsensitive)){
-    //        qCritical()<<"Invalid local hostaddress!";
-    //        return false;
-    //    }
-
-    return startTCPServerListening(m_localTCPListeningAddress, m_localTCPListeningPort);
-}
 
 bool NetworkManager::startIPMCServer(){
     //    if(!isNetworkReady()){
@@ -187,6 +162,26 @@ quint16 NetworkManager::startUDPServer(const QHostAddress &address, quint16 star
 
     //    return 0;
 
+}
+
+RUDPSocket * NetworkManager::startRUDPServer(const QHostAddress &address, quint16 port, bool tryOtherPort){
+
+    RUDPSocket *rudpSocket = 0;
+    if(m_localRUDPListeningPort){
+        rudpSocket = getRUDPServer(m_localRUDPListeningPort, m_localRUDPListeningAddress);
+    }
+    if(!rudpSocket){
+        rudpSocket = startRUDPServerListening(address, port);
+    }
+    if(!rudpSocket && tryOtherPort){
+        rudpSocket = startRUDPServerListening(address, 0);
+    }
+    if(rudpSocket){
+        m_localRUDPListeningPort = rudpSocket->localPort();
+        m_localRUDPListeningAddress = address;
+    }
+
+    return rudpSocket;
 }
 
 bool NetworkManager::isNetworkReady(){

@@ -65,8 +65,8 @@ ServerPacketsParser::ServerPacketsParser(ServerNetworkManager *networkManager, Q
     //packetHandlerBase = new PacketHandlerBase(this);
 
     networkManager = ServerNetworkManager::instance();
-    serverTCPListeningAddress = networkManager->localTCPListeningAddress();
-    serverTCPListeningPort = networkManager->localTCPListeningPort();
+//    serverTCPListeningAddress = networkManager->localTCPListeningAddress();
+//    serverTCPListeningPort = networkManager->localTCPListeningPort();
     //m_serverName = networkManager->hostName();
     m_serverName = QHostInfo::localHostName().toLower();
 
@@ -75,8 +75,8 @@ ServerPacketsParser::ServerPacketsParser(ServerNetworkManager *networkManager, Q
 
     //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
     //    localUDPListeningPort = networkManager->localUDPListeningPort();
-    localUDPListeningAddress = QHostAddress::Any;
-    localUDPListeningPort = 0;
+    localRUDPListeningAddress = networkManager->localRUDPListeningAddress();
+    localRUDPListeningPort = networkManager->localRUDPListeningPort();
 
     //    usersManager = UsersManager::instance();
     cryptography = new Cryptography();
@@ -120,31 +120,25 @@ ServerPacketsParser::~ServerPacketsParser() {
 
 }
 
-void ServerPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
+//void ServerPacketsParser::setLocalRUDPListeningAddress(const QHostAddress &address){
 
-    this->localUDPListeningAddress = address;
-}
-void ServerPacketsParser::setLocalUDPListeningPort(quint16 port){
+//    this->localRUDPListeningAddress = address;
+//}
+//void ServerPacketsParser::setLocalRUDPListeningPort(quint16 port){
 
-    this->localUDPListeningPort = port;
-}
+//    this->localRUDPListeningPort = port;
+//}
 
 void ServerPacketsParser::run(){
 
     QMutexLocker locker(&mutex);
 
-    //    processWaitingForReplyPacketsTimer = new QTimer();
-    //    processWaitingForReplyPacketsTimer->setSingleShot(false);
-    //    processWaitingForReplyPacketsTimer->setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 100);
-    //    connect(processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    //    processWaitingForReplyPacketsTimer->start();
-
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         QCoreApplication::processEvents();
@@ -153,7 +147,7 @@ void ServerPacketsParser::run(){
         msleep(50);
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
@@ -173,13 +167,12 @@ void ServerPacketsParser::startparseIncomingPackets(){
 
 void ServerPacketsParser::startprocessOutgoingPackets(){
 
-    QTimer processWaitingForReplyPacketsTimer;
-    processWaitingForReplyPacketsTimer.setSingleShot(false);
-    //processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-    processWaitingForReplyPacketsTimer.start();
+//    QTimer processWaitingForReplyPacketsTimer;
+//    processWaitingForReplyPacketsTimer.setSingleShot(false);
+//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
+//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
+//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
+//    processWaitingForReplyPacketsTimer.start();
 
     while(!isAboutToQuit()){
         //QCoreApplication::processEvents();
@@ -187,7 +180,7 @@ void ServerPacketsParser::startprocessOutgoingPackets(){
         msleep(50);
     }
 
-    processWaitingForReplyPacketsTimer.stop();
+//    processWaitingForReplyPacketsTimer.stop();
 
     processOutgoingPackets();
 
@@ -198,21 +191,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     //    qDebug()<<"----ServerPacketsParser::parseIncomingPacketData(Packet *packet)";
 
-    //    if((packet->getTransmissionProtocol() == TP_UDP)
-    //        && (networkManager->isLocalAddress(packet->getPeerHostAddress()))
-    //        && (packet->getPeerHostPort() == localIPMCListeningPort)){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }else if((packet->getTransmissionProtocol() == TP_TCP)
-    //        && (packet->getPeerHostAddress() == networkManager->localTCPListeningAddress())
-    //        && (packet->getPeerHostPort() == networkManager->localTCPListeningPort())){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }
-
-    //qDebug()<<"~~networkManager->localAddress():"<<networkManager->localTCPListeningAddress().toString();
-    //qDebug()<<"~~localIPMCListeningAddress.toString():"<<localIPMCListeningAddress.toString();
-    //qWarning()<<"~~packet->getPeerHostAddress():"<<packet->getPeerHostAddress().toString();
 
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
@@ -223,39 +201,39 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
-    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+//    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
 
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        QString userID = peerID;
-        //in >> userID;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        QString userID = peerID;
+//        //in >> userID;
 
-        UserInfo *userInfo = getOnlineUserInfo(userID);
-        if(userInfo){
-            userInfo->updateRemainingOnlineStatusCheckingTimes(true);
-        }
+//        UserInfo *userInfo = getOnlineUserInfo(userID);
+//        if(userInfo){
+//            userInfo->updateRemainingOnlineStatusCheckingTimes(true);
+//        }
 
-        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), userID);
-        qWarning()<<"~~HeartbeatPacket--"<<" userID:"<<userID;
-    }
-    break;
-    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-    {
-        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-        in >> packetSerialNumber1 >> packetSerialNumber2;
-        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-        //qDebug()<<"~~ConfirmationOfReceiptPacket--"<<"packetSerialNumber:"<<packetSerialNumber;
-    }
-    break;
+//        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), userID);
+//        qWarning()<<"~~HeartbeatPacket--"<<" userID:"<<userID;
+//    }
+//    break;
+//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+//    {
+//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+//        in >> packetSerialNumber1 >> packetSerialNumber2;
+//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+//        //qDebug()<<"~~ConfirmationOfReceiptPacket--"<<"packetSerialNumber:"<<packetSerialNumber;
+//    }
+//    break;
     case quint8(IM::ClientLookForServer):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packet->getPacketSerialNumber(), peerID);
+        quint16 peerRUDPListeningPort = 0;
+        in >> peerRUDPListeningPort;
 
-        sendServerDeclarePacket(peerAddress, peerPort, serverTCPListeningAddress, localUDPListeningPort, serverTCPListeningPort, m_serverName);
+        sendServerDeclarePacket(peerAddress, peerRUDPListeningPort);
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
         //qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort;
     }
@@ -265,8 +243,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"--CLIENT_REQUEST_REGISTRATION";
         
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
-
         QString userID = "", password = "", email = "";
         in >> userID >> password >> email;
 
@@ -280,8 +256,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_UPDATE_PASSWORD):
     {
-
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedNewPassword;
@@ -305,8 +279,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_LOGIN):
     {
-
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
 
@@ -333,8 +305,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_LOGIN_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
-        qWarning()<<"--CLIENT_LOGIN_INFO-SN:"<<packet->getPacketSerialNumber();
+        qDebug()<<"--CLIENT_LOGIN_INFO";
 
         QString userID = peerID;
         QByteArray encryptedPassword;
@@ -416,7 +387,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::ONLINE_STATE_CHANGED):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedOnlineState;
@@ -440,7 +410,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CONTACT_GROUPS_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID =peerID;
         quint8 uploadToServer = 0;
@@ -476,7 +445,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_USER_SUMMARY_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedUserID;
@@ -521,7 +489,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_SEARCH_CONTACTS):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -552,7 +519,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"--CLIENT_REQUEST_ADD_CONTACT";
         
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -608,7 +574,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_MOVE_CONTACT):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -640,7 +605,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_RESPONSE_ADD_CONTACT_REQUEST):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -696,7 +660,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_DELETE_CONTACT):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -735,7 +698,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -773,7 +735,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUPS_LIST):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         //in >> userID ;
@@ -789,7 +750,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -815,7 +775,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
 
         QString userID = peerID;
@@ -843,7 +802,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::BLACKLIST_INFO):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         //in >> userID ;
@@ -859,7 +817,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CLIENT_REQUEST_MODIFY_CONTACT_REMARK):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -884,7 +841,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::RENAME_CONTACT_GROUP):
     {
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -912,7 +868,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         qWarning()<<"--CREATE_OR_DELETE_CONTACT_GROUP";
 
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -939,7 +894,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"--SESSION_ENCRYPTION_KEY_WITH_CONTACT";
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -976,7 +930,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         qWarning()<<"--CHAT_MESSAGES_CACHED_ON_SERVER";
 
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -1003,7 +956,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         qWarning()<<"--GROUP_CHAT_MESSAGE";
 
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -1058,8 +1010,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
     default:
-        qWarning()<<"Unknown Packet Type:"<<packetType
-                 <<" Serial Number:"<<packetSerialNumber
+        qWarning()<<"Unknown Packet Type:"<<packetType                
                 <<" From:"<<peerAddress.toString()
                <<" Port:"<<peerPort;
         break;

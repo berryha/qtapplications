@@ -57,8 +57,8 @@ ClientPacketsParser::ClientPacketsParser(ClientNetworkManager *networkManager, Q
 
 
     m_serverAddress = QHostAddress::Null;
-    m_serverTCPListeningPort = 0;
-    m_serverUDPListeningPort = quint16(IM_SERVER_UDP_LISTENING_PORT);
+//    m_serverTCPListeningPort = 0;
+    m_serverRUDPListeningPort = quint16(IM_SERVER_RUDP_LISTENING_PORT);
     serverName = "";
 
     clientLookForServerPacketSerialNumber = 0;
@@ -78,8 +78,8 @@ ClientPacketsParser::ClientPacketsParser(ClientNetworkManager *networkManager, Q
     //    localIPMCListeningPort = NetworkManager::instance()->localIPMCListeningPort();
 
     
-    localUDPListeningAddress = QHostAddress::Any;
-    localUDPListeningPort = 0;
+    localRUDPListeningAddress = QHostAddress::Any;
+    localRUDPListeningPort = 0;
 
 
     serverLastOnlineTime = QDateTime();
@@ -126,11 +126,11 @@ ClientPacketsParser::~ClientPacketsParser() {
 
 void ClientPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
 
-    this->localUDPListeningAddress = address;
+    this->localRUDPListeningAddress = address;
 }
 void ClientPacketsParser::setLocalUDPListeningPort(quint16 port){
 
-    this->localUDPListeningPort = port;
+    this->localRUDPListeningPort = port;
 }
 
 void ClientPacketsParser::run(){
@@ -278,48 +278,43 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
-    quint16 packetSerialNumber = packet->getPacketSerialNumber();
 
     quint8 packetType = packet->getPacketType();
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        QString contactID;
-        in >> contactID;
-        emit signalHeartbeatPacketReceived(contactID);
-        qDebug()<<"~~HeartbeatPacket--"<<" contactID:"<<contactID;
-    }
-    break;
-    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-    {
-        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-        in >> packetSerialNumber1 >> packetSerialNumber2;
-        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-        //qDebug()<<"~~ConfirmationOfReceiptPacket:"<<packetSerialNumber;
-    }
-    break;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        QString contactID;
+//        in >> contactID;
+//        emit signalHeartbeatPacketReceived(contactID);
+//        qDebug()<<"~~HeartbeatPacket--"<<" contactID:"<<contactID;
+//    }
+//    break;
+//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+//    {
+//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+//        in >> packetSerialNumber1 >> packetSerialNumber2;
+//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+//        //qDebug()<<"~~ConfirmationOfReceiptPacket:"<<packetSerialNumber;
+//    }
+//    break;
     case quint8(IM::ServerDeclare):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString address;
-        quint16 udpPort = 0, tcpPort = 0;
-        QString name;
+        quint16 rudpPort = 0;
         QString version;
-        in >> address >> udpPort >> tcpPort >> name >> version;
+        in >> address >> rudpPort >> version;
         //m_serverAddress = QHostAddress(address);
         m_serverAddress = peerAddress;
-        m_serverUDPListeningPort = udpPort;
-        m_serverTCPListeningPort = tcpPort;
-        serverName = name;
+        m_serverRUDPListeningPort = rudpPort;
+        serverName = peerID;
 
         serverLastOnlineTime = QDateTime::currentDateTime();
 
-        m_packetHandlerBase->removeWaitingForReplyPacket(clientLookForServerPacketSerialNumber, 0);
         //m_networkManager->serverFound(m_serverAddress.toString(), m_serverUDPListeningPort, m_serverTCPListeningPort, serverName, version);
 
-        emit signalServerDeclarePacketReceived(m_serverAddress.toString(), m_serverUDPListeningPort, m_serverTCPListeningPort, serverName, version);
+        emit signalServerDeclarePacketReceived(m_serverAddress.toString(), m_serverRUDPListeningPort, serverName, version);
 
 
         //qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<name <<" serverTCPListeningPort:"<<serverTCPListeningPort;
@@ -329,15 +324,15 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         QString address;
         quint16 port;
-        QString name;
-        in >> address >> port >> name;
+        in >> address >> port;
         m_serverAddress = QHostAddress(address);
-        m_serverTCPListeningPort = port;
-        serverName = name;
+        m_serverRUDPListeningPort = port;
+        serverName = peerID;
+
 
         serverLastOnlineTime = QDateTime::currentDateTime();
 
-        emit signalServerOnlinePacketReceived(m_serverAddress, m_serverTCPListeningPort, serverName);
+        emit signalServerOnlinePacketReceived(m_serverAddress, m_serverRUDPListeningPort, serverName);
         qDebug()<<"~~ServerOnline";
     }
     break;
@@ -345,21 +340,20 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         QString address;
         quint16 port;
-        QString name;
-        in >> address >> port >> name;
+        in >> address >> port;
+
         m_serverAddress = QHostAddress::Null;
-        m_serverTCPListeningPort = 0;
+        m_serverRUDPListeningPort = 0;
         serverName = "";
 
         stopHeartbeat();
 
-        emit signalServerOfflinePacketReceived(m_serverAddress, m_serverTCPListeningPort, serverName);
+        emit signalServerOfflinePacketReceived(QHostAddress(address), port, peerID);
         qWarning()<<"~~ServerOffline";
     }
     break;
     case quint8(IM::ServerAnnouncement):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString groupName, computerName, announcement;
         quint8 mustRead;
@@ -374,7 +368,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         
         qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION";
         
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
@@ -390,7 +383,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         
         qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_UPDATE_PASSWORD";
         
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         QString message = "";
@@ -402,7 +394,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_REQUEST_LOGIN):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         quint8 requestLoginResultCode = 0;
         in >> requestLoginResultCode;
@@ -412,7 +403,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
             in >> serverAddress >> serverPort;
             if(!QHostAddress(serverAddress).isNull()){
                 m_serverAddress = QHostAddress(serverAddress);
-                m_serverUDPListeningPort = serverPort;
+                m_serverRUDPListeningPort = serverPort;
             }
 
             login();
@@ -429,21 +420,19 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_LOGIN_REDIRECTION):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QString serverAddress = "";
         quint16 serverPort = 0;
         in >> serverAddress >> serverPort;
 
         m_serverAddress = serverAddress;
-        m_serverUDPListeningPort = serverPort;
+        m_serverRUDPListeningPort = serverPort;
         login();
     }
     break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_LOGIN_RESULT):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         quint8 loginResultCode = 10;
         in >> loginResultCode;
@@ -456,18 +445,18 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
             QByteArray decryptedData;
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
 
-            //TODO 验证数据是否解密成功！
+            //TODO
             QDataStream stream(&decryptedData, QIODevice::ReadOnly);
             stream.setVersion(QDataStream::Qt_4_7);
             stream >> sessionEncryptionKey;
 
             user->setSessionEncryptionKey(sessionEncryptionKey);
             this->m_serverAddress = peerAddress;
-            this->m_serverUDPListeningPort = peerPort;
+            this->m_serverRUDPListeningPort = peerPort;
 
             errorTypeCode = quint8(IM::ERROR_NoError);
 
-            //TODO:载入本地信息
+            //TODO:
             user->loadMyInfoFromLocalDatabase();
 
             if(personalInfoVersionOnServer != user->getPersonalInfoVersion()){requestContactInfo(m_myUserID);}
@@ -492,7 +481,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::ONLINE_STATE_CHANGED):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
@@ -500,7 +488,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "", contactHostAddress = "";
@@ -519,7 +507,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"--CONTACTS_ONLINE_INFO";
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
@@ -527,7 +514,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactsOnlineInfoString = "";
@@ -545,10 +532,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"--SERVER_RESPONSE_USER_SUMMARY_INFO";
         
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
-        //TODO:用户信息的格式
-
+        //TODO:
         QString userID = "";
         QByteArray encryptedData;
         in >> userID >> encryptedData;
@@ -556,7 +541,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString userInfo = "";
@@ -577,15 +562,14 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CONTACT_GROUPS_INFO):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO 
+       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString groupsInfo = "";
         quint32 personalContactGroupsInfoVersionOnServer = 1;
@@ -602,16 +586,15 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SERVER_RESPONSE_SEARCH_CONTACTS):
     {
-        //TODO:搜索结果的格式
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+        //TODO:
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO 
+       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString result = "";
         stream >> result;
@@ -624,14 +607,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString userID = "", userNickName = "", userFace = "", verificationMessage = "";
@@ -645,14 +627,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_RESPONSE_ADD_CONTACT_REQUEST):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString userID = "", userNickName = "", userFace = "", reasonMessage = "";
@@ -670,14 +651,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qDebug()<<"--SERVER_RESPONSE_INTEREST_GROUPS_LIST";
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString interestGroupsListOnServerForUser = "";
@@ -692,14 +672,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SERVER_RESPONSE_INTEREST_GROUP_INFO):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         quint32 groupID = 0;
@@ -716,14 +695,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qWarning()<<"----SERVER_RESPONSE_INTEREST_GROUP_MEMBERS_INFO";
 
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString interestGroupMembersInfoStringFromServer = "";
@@ -738,14 +716,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::BLACKLIST_INFO):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString blacklistOnServer = "";
@@ -761,14 +738,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SESSION_ENCRYPTION_KEY_WITH_CONTACT):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "";
@@ -782,9 +758,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CHAT_MESSAGE_FROM_CONTACT):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
-        //TODO:判断加密KEY
+        //TODO:
 
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -792,8 +767,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
-        //TODO 验证数据是否解密成功！
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO 
+      QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString message = "";
         stream  >> message;
@@ -805,15 +780,14 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CHAT_MESSAGES_CACHED_ON_SERVER):
     {
-        //TODO:缓存消息的格式
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+        //TODO:
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString messagesString = "";
@@ -826,21 +800,20 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CHAT_IMAGE):
     {
-        //TODO:接收文件
+        //TODO:
     }
     break;
 
     case quint8(IM::GROUP_CHAT_MESSAGES_CACHED_ON_SERVER):
     {
-        //TODO:缓存消息的格式
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
+        //TODO:
 
         QByteArray encryptedData;
         in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 验证数据是否解密成功！
+        //TODO 
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString messagesString = "";
@@ -853,7 +826,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::GROUP_CHAT_MESSAGE):
     {
-        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -861,8 +833,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
-        //TODO 验证数据是否解密成功！
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO 
+       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         quint32 interestGroupID = 0;
         QString message = "";
@@ -919,7 +891,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     default:
         qWarning()<<"Unknown Packet Type:"<<packetType
-                 <<" Serial Number:"<<packetSerialNumber
                 <<" From:"<<peerAddress.toString()
                <<" Port:"<<peerPort;
         break;
@@ -943,7 +914,7 @@ QHostAddress ClientPacketsParser::getServerAddress() const{
 //}
 
 quint16 ClientPacketsParser::getServerPort() const{
-    return m_serverUDPListeningPort;
+    return m_serverRUDPListeningPort;
 }
 
 void ClientPacketsParser::startHeartbeat(int interval){
