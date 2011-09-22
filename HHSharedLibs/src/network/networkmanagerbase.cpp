@@ -483,6 +483,7 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
         qCritical()<<m_errorString;
         return false;
     }
+
     int sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data, useRUDP);
     result = (sentSize == data->size());
     m_errorString = rudpServer->errorString();
