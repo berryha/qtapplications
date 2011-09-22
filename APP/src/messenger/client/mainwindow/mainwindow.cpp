@@ -312,7 +312,7 @@ void MainWindow::startNetwork(){
         qCritical()<<msg;
         return;
     }else{
-        qWarning()<<QString("UDP listening on port %1!").arg(port);
+        //qWarning()<<QString("RUDP listening on port %1!").arg(port);
     }
 
     //    result = networkManager->startTCPServer();
