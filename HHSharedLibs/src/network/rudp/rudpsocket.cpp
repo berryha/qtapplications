@@ -37,13 +37,9 @@ RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent) :
 
 RUDPSocket::~RUDPSocket(){
 
-    foreach (RUDPChannel *channel, peers.values()) {
-        if(!channel){continue;}
-        channel->closeChannel();
-        recyleRUDPChannel(channel);
-    }
-    close();
-    peers.clear();
+
+
+    closeAllChannels();
 
     foreach (RUDPChannel *channel, m_unusedRUDPChannels) {
         channel->quit();
@@ -115,6 +111,17 @@ quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPo
 //    return channel->endDataTransmission(fragmentDataID);
 //}
 
+void RUDPSocket::closeAllChannels(){
+
+    foreach (RUDPChannel *channel, peers.values()) {
+        if(!channel){continue;}
+        channel->closeChannel();
+        recyleRUDPChannel(channel);
+    }
+    peers.clear();
+
+}
+
 void RUDPSocket::readPendingDatagrams() {
     //qDebug()<<"----RUDPSocket::readPendingDatagrams()";
 
@@ -163,6 +170,8 @@ void RUDPSocket::readPendingDatagrams() {
 
 }
 
+
+
 void RUDPSocket::channelclosed(){
     qDebug()<<"--RUDPSocket::channelclosed()";
 
@@ -194,6 +203,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16)));
+            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(channelclosed()));
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 

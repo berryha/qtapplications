@@ -150,7 +150,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 }
 
 void RUDPChannel::disconnectFromPeer(){
-    qDebug()<<"--RUDPChannel::disconnectFromPeer()";
+    qDebug()<<"--RUDPChannel::disconnectFromPeer()"<<" m_peerPort:"<<m_peerPort<<" localPort:"<<m_udpSocket->localPort();
 
     if(m_ChannelState == UnconnectedState || m_ChannelState == ListeningState){
         return;
@@ -168,6 +168,8 @@ void RUDPChannel::disconnectFromPeer(){
     packet->setPacketData(ba);
 
     tryingToSendPacket(packet);
+
+    m_ChannelState = DisconnectingState;
 
 
 }
@@ -269,6 +271,7 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
     }
 
     if(m_ChannelState != ConnectedState){
+        if(m_ChannelState == DisconnectingState){return 0;}
         connectToPeer();
         waitForConnected();
     }
@@ -435,7 +438,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
     quint16 packetSerialNumber = packet->getPacketSerialNumber();
 
     if(!isUnreliablePacket(packetType)){
-        qDebug()<<"--datagramReceived "<<" packetType:"<<packetType<<" packetSerialNumber:"<<packetSerialNumber<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+        qDebug()<<"--datagramReceived "<<" packetType:"<<packetType<<" packetSerialNumber:"<<packetSerialNumber<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
     }
 
     if(waitingForACKPackets.isEmpty()){
@@ -868,7 +871,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
     packetsSent++;
 
     if(!isUnreliablePacket(packetType)){
-        qDebug()<<"OK! RUDPPacket Sent! sn:"<<sn<<" packetType:"<<packetType<<" packetDataSize:"<<packet->packetDataSize()<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow;;
+        qDebug()<<"OK! RUDPPacket Sent! sn:"<<sn<<" packetType:"<<packetType<<" packetDataSize:"<<packet->packetDataSize()<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow<<" m_peerPort:"<<m_peerPort;
     //    qWarning()<<"--------------Total Packets Sent:"<<packetsSent;
 
     }
@@ -1093,9 +1096,12 @@ void RUDPChannel::sendACKTimerTimeout(){
 //    }
 
 
-    if(!ackPacketsSNHistory.isEmpty() && largestACK2SN == ackPacketsSNHistory.last() ){
-        ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
+    if(!ackPacketsSNHistory.isEmpty() ){
+    //if(!ackPacketsSNHistory.isEmpty() && largestACK2SN == ackPacketsSNHistory.last() ){
+        //ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
+        ACKPacketInfo * info = ackPacketsHistory.value(ackPacketsSNHistory.last());
         quint16 sn = info->firstReceivedPacketIDInReceiveWindow;
+        //qDebug()<<"---------------------------------"<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
         if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1)) ){
             return;
         }
@@ -1426,13 +1432,13 @@ void RUDPChannel::init(){
     //connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
     sendACKTimerInterval = 10;
     sendACKTimer = 0;
-    startSendACKTimer();
+    //startSendACKTimer();
 
     //sendNACKTimer = new QTimer(this);
     //connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
     sendNACKTimerInterval = 3 * RTT;
     sendNACKTimer = 0;
-    startSendNACKTimer();
+    //startSendNACKTimer();
 
     m_packetArrivalSpeed = 0;
     m_linkCapacity = 0;
@@ -1441,7 +1447,7 @@ void RUDPChannel::init(){
     //connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
     retransmissionTimerInterval = 3 * RTT + SYN;
     retransmissionTimer = 0;
-    startRetransmissionTimer();
+    //startRetransmissionTimer();
 
     EXPCOUNT = 0;
     timeEXPCOUNTReset = curTime;
@@ -1646,9 +1652,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         uint handshakeID = 0;
         in >> peerVersion >> peerMSS >> handshakeID;
 
-
         //qDebug()<<"--------------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID<<" SN:"<<packetSerialNumber;
-
 
         if(m_ChannelState == ConnectingState){
             if(handshakeID == (m_handshakeID+1)){
@@ -1679,6 +1683,9 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         startCheckPeerAliveTimer();
 
         m_ChannelState = ConnectedState;
+        startSendACKTimer();
+        startSendNACKTimer();
+        startRetransmissionTimer();
 
         emit peerConnected(m_peerAddress, m_peerPort);
 
@@ -1690,8 +1697,11 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         QString msg = "";
         in >> msg;
 
+        disconnectFromPeer();
+        disconnectFromPeer();
         reset();
         emit peerDisconnected(m_peerAddress, m_peerPort);
+
         qDebug()<<"~~Goodbye--"<<"msg:"<<msg;
     }
         break;
