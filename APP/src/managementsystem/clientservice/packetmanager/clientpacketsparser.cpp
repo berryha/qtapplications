@@ -469,8 +469,9 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         //sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
 
+        quint16 peerRUDPListeningPort = 0;
         QString computerName = "", userName = "", workgroup = "", macAddress = "", ipAddress = "", osVersion = "", adminName = "" ;
-        in >> computerName >> userName >> workgroup >> macAddress >> ipAddress >> osVersion >> adminName;
+        in >> peerRUDPListeningPort >> computerName >> userName >> workgroup >> macAddress >> ipAddress >> osVersion >> adminName;
 
         if(!computerName.isEmpty()){
             if(computerName.toLower() != m_localComputerName){
@@ -478,7 +479,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
             }
         }
 
-        emit signalAdminSearchClientPacketReceived(packet->getPeerHostAddress().toString(), packet->getPeerHostPort(), computerName, userName, workgroup, macAddress, ipAddress, osVersion, adminName);
+        emit signalAdminSearchClientPacketReceived(peerAddress.toString(), peerRUDPListeningPort, computerName, userName, workgroup, macAddress, ipAddress, osVersion, adminName);
 
         qDebug()<<"~~AdminSearchClient";
     }

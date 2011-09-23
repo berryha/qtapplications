@@ -124,7 +124,7 @@ public slots:
     void sendClientLookForServerPacket(const QHostAddress &targetAddress, quint16 targetPort){
         //qDebug()<<"----sendClientLookForServerPacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(targetAddress, targetPort);
         
         packet->setPacketType(quint8(IM::ClientLookForServer));
         packet->setTransmissionProtocol(TP_UDP);

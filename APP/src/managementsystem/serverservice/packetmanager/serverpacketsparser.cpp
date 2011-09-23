@@ -60,7 +60,7 @@ ServerPacketsParser::ServerPacketsParser(NetworkManagerInstance *networkManager,
 
 //    heartbeatTimer = 0;
 
-    serverAddress = m_networkManager->localRUDPListeningAddress();
+    localRUDPListeningAddress = m_networkManager->localRUDPListeningAddress();
     localRUDPListeningPort = m_networkManager->localRUDPListeningPort();
     //m_serverName = m_networkManager->hostName();
     m_serverName = QHostInfo::localHostName().toLower();

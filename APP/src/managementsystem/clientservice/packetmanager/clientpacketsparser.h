@@ -123,8 +123,8 @@ public slots:
             address = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
         }
         
-        //Packet *packet = m_packetHandlerBase->getPacket(address, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(address, quint16(IP_MULTICAST_GROUP_PORT), m_localRUDPListeningAddress, m_localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(address, quint16(IP_MULTICAST_GROUP_PORT), localIPMCListeningAddress, localIPMCListeningPort);
+        //Packet *packet = m_packetHandlerBase->getPacket(address, quint16(IP_MULTICAST_GROUP_PORT), m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
 
         packet->setPacketType(quint8(MS::ClientLookForServer));
@@ -142,8 +142,8 @@ public slots:
     void sendClientOnlinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
-        //Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
+        //Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientOnline));
         packet->setTransmissionProtocol(TP_UDP);
@@ -159,8 +159,8 @@ public slots:
     void sendClientOfflinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOfflinePacket(...)";
 
-        //Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
-        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, localIPMCListeningAddress, localIPMCListeningPort);
+        //Packet *packet = m_packetHandlerBase->getPacket(serverAddress, localIPMCListeningPort, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientOffline));
         packet->setTransmissionProtocol(TP_UDP);

@@ -89,8 +89,9 @@ public:
     void sendClientLookForLocalServiceServerPacket(){
         qDebug()<<"----sendClientLookForLocalServiceServerPacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
-        
+        //Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, RUDP_LISTENING_PORT, localRUDPListeningAddress, localRUDPListeningPort);
+
         packet->setPacketType(quint8(MS::ClientLookForLocalServiceServer));
         packet->setTransmissionProtocol(TP_UDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*10));
@@ -144,7 +145,7 @@ public:
         Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(adminAddress), adminPort, localRUDPListeningAddress, localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::UserResponseRemoteAssistance));
-        packet->setTransmissionProtocol(TP_UDP);
+        packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
@@ -159,7 +160,7 @@ public:
         Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(adminAddress), adminPort, localRUDPListeningAddress, localRUDPListeningPort);
         
         packet->setPacketType(quint8(MS::NewPasswordRetrevedByUser));
-        packet->setTransmissionProtocol(TP_UDP);
+        packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);

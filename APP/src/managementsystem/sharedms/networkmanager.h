@@ -37,6 +37,7 @@ public:
     void setLocalIPMCListeningAddress(const QHostAddress &address);
     quint16 localIPMCListeningPort();
     void setLocalIPMCListeningPort(quint16 port);
+
     QHostAddress ipMCGroupAddress();
     void setIPMCGroupAddress(const QHostAddress &address);
 

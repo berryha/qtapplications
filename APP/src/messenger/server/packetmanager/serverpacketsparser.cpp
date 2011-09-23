@@ -1066,33 +1066,33 @@ bool ServerPacketsParser::decryptData(const QString &userID, QByteArray *destina
 
 }
 
-void ServerPacketsParser::startCheckIMUsersOnlineStateTimer(){
-    qWarning()<<"--startCheckIMUsersOnlineStateTimer()";
+//void ServerPacketsParser::startCheckIMUsersOnlineStateTimer(){
+//    qWarning()<<"--startCheckIMUsersOnlineStateTimer()";
     
-    if(!checkIMUsersOnlineStateTimer){
-        checkIMUsersOnlineStateTimer = new QTimer(this);
-        checkIMUsersOnlineStateTimer->setInterval(HEARTBEAT_TIMER_INTERVAL); //1 minute
-        checkIMUsersOnlineStateTimer->setSingleShot(false);
-        connect(checkIMUsersOnlineStateTimer, SIGNAL(timeout()), this, SLOT(slotCheckIMUsersOnlineStatus()));
-    }
+//    if(!checkIMUsersOnlineStateTimer){
+//        checkIMUsersOnlineStateTimer = new QTimer(this);
+//        checkIMUsersOnlineStateTimer->setInterval(HEARTBEAT_TIMER_INTERVAL); //1 minute
+//        checkIMUsersOnlineStateTimer->setSingleShot(false);
+//        connect(checkIMUsersOnlineStateTimer, SIGNAL(timeout()), this, SLOT(slotCheckIMUsersOnlineStatus()));
+//    }
 
-    //    if(!checkIMUsersOnlineStateTimer->isActive()){
-    //    }
+//    //    if(!checkIMUsersOnlineStateTimer->isActive()){
+//    //    }
     
-    checkIMUsersOnlineStateTimer->start();
+//    checkIMUsersOnlineStateTimer->start();
 
-}
+//}
 
-void ServerPacketsParser::slotCheckIMUsersOnlineStatus(){
-    qWarning()<<"--slotCheckIMUsersOnlineStatus()";
-    QList<UserInfo*>  users = onlineUsers();
-    foreach(UserInfo *info, users){
-        if(!info->isOnLine()){
-            processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, "", 0);
-        }
-    }
+//void ServerPacketsParser::slotCheckIMUsersOnlineStatus(){
+//    qWarning()<<"--slotCheckIMUsersOnlineStatus()";
+//    QList<UserInfo*>  users = onlineUsers();
+//    foreach(UserInfo *info, users){
+//        if(!info->isOnLine()){
+//            processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, "", 0);
+//        }
+//    }
 
-}
+//}
 
 
 quint16 ServerPacketsParser::getLastReceivedPacketSN(const QString &peerID){
