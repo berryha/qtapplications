@@ -78,8 +78,8 @@ public:
     quint16 getServerPort() const;
 
 
-    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
-    void stopHeartbeat();
+//    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
+//    void stopHeartbeat();
 
 public slots:
 

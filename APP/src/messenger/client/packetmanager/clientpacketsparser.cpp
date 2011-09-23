@@ -329,7 +329,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         m_serverRUDPListeningPort = 0;
         serverName = "";
 
-        stopHeartbeat();
+//        stopHeartbeat();
 
         emit signalServerOfflinePacketReceived(QHostAddress(address), port, peerID);
         qWarning()<<"~~ServerOffline";
@@ -900,29 +900,29 @@ quint16 ClientPacketsParser::getServerPort() const{
     return m_serverRUDPListeningPort;
 }
 
-void ClientPacketsParser::startHeartbeat(int interval){
-    if(NULL == heartbeatTimer){
-        heartbeatTimer = new QTimer();
-        heartbeatTimer->setSingleShot(false);
-        heartbeatTimer->setInterval(interval);
-        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(sendHeartbeatPacket()));
+//void ClientPacketsParser::startHeartbeat(int interval){
+//    if(NULL == heartbeatTimer){
+//        heartbeatTimer = new QTimer();
+//        heartbeatTimer->setSingleShot(false);
+//        heartbeatTimer->setInterval(interval);
+//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(sendHeartbeatPacket()));
 
-    }else{
-        heartbeatTimer->stop();
-        heartbeatTimer->setInterval(interval);
-    }
+//    }else{
+//        heartbeatTimer->stop();
+//        heartbeatTimer->setInterval(interval);
+//    }
 
-    heartbeatTimer->start();
+//    heartbeatTimer->start();
 
 
-}
+//}
 
-void ClientPacketsParser::stopHeartbeat(){
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
+//void ClientPacketsParser::stopHeartbeat(){
+//    if(heartbeatTimer){
+//        heartbeatTimer->stop();
+//    }
 
-}
+//}
 
 //int ClientPacketsParser::crypto(QByteArray *destination, const QByteArray &source, bool encrypt){
 
