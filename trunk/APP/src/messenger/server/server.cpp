@@ -165,10 +165,10 @@ bool Server::startMainService(){
     QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
     QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
     QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
-    serverPacketsParser->startCheckIMUsersOnlineStateTimer();
+//    serverPacketsParser->startCheckIMUsersOnlineStateTimer();
 
 
-    serverPacketsParser->sendServerDeclarePacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_RUDP_LISTENING_PORT));
+    serverPacketsParser->sendServerDeclarePacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT));
     //serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT), networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName());
 
 //    sendServerOnlinePacketTimer = new QTimer(this);

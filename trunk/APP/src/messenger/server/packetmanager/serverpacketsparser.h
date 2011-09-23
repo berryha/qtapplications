@@ -67,7 +67,7 @@ public:
     void startparseIncomingPackets();
     void startprocessOutgoingPackets();
 
-    void startCheckIMUsersOnlineStateTimer();
+//    void startCheckIMUsersOnlineStateTimer();
 
 
 
@@ -114,12 +114,13 @@ public slots:
     void sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort){
         qWarning()<<"--sendServerDeclarePacket(...)"<<" Peer Address:"<<peerAddress.toString()<<":"<<peerPort;
 
-        Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = 0;
+        //Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
         if(peerAddress == QHostAddress(IM_SERVER_IPMC_ADDRESS) || peerAddress == QHostAddress::Broadcast){
-            //packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
+            packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
             packet->setTransmissionProtocol(TP_UDP);
         }else{
-            //packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
+            packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
             packet->setTransmissionProtocol(TP_RUDP);
         }
 
@@ -138,7 +139,7 @@ public slots:
     void sendServerOnlinePacket(){
         qDebug()<<"----sendServerOnlinePacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), localIPMCListeningAddress, localIPMCListeningPort);
 
         packet->setPacketType(quint8(IM::ServerOnline));
         packet->setTransmissionProtocol(TP_UDP);
@@ -155,7 +156,7 @@ public slots:
     void sendServerOfflinePacket(){
         qDebug()<<"----sendServerOfflinePacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), localIPMCListeningAddress, localIPMCListeningPort);
         packet->setPacketType(quint8(IM::ServerOffline));
         packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
@@ -171,7 +172,7 @@ public slots:
     void sendServerAnnouncementPacket(const QHostAddress peerAddress, quint16 peerPort, const QString &announcement, bool mustRead = true){
         qDebug()<<"----sendServerAnnouncementPacket(...)";
 
-        Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = m_packetHandlerBase->getPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
         packet->setPacketType(quint8(IM::ServerAnnouncement));
         packet->setTransmissionProtocol(TP_UDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
@@ -743,7 +744,7 @@ private slots:
     bool encrypeData(const QString &userID, QByteArray *destination, const QByteArray &source);
     bool decryptData(const QString &userID, QByteArray *destination, const QByteArray &source);
 
-    void slotCheckIMUsersOnlineStatus();
+//    void slotCheckIMUsersOnlineStatus();
 
 
 signals:
