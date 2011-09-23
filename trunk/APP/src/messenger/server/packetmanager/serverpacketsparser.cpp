@@ -202,7 +202,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
     quint8 packetType = packet->getPacketType();
-//    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
+    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
 
     switch(packetType){
 //    case quint8(HEHUI::HeartbeatPacket):
@@ -230,6 +230,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 //    break;
     case quint8(IM::ClientLookForServer):
     {
+        qDebug()<<"~~ClientLookForServer";
+
         quint16 peerRUDPListeningPort = 0;
         in >> peerRUDPListeningPort;
 
@@ -241,7 +243,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REGISTRATION):
     {
-        qWarning()<<"--CLIENT_REQUEST_REGISTRATION";
+        qDebug()<<"~~CLIENT_REGISTRATION";
         
         QString userID = "", password = "", email = "";
         in >> userID >> password >> email;
@@ -256,6 +258,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_UPDATE_PASSWORD):
     {
+
+        qDebug()<<"~~CLIENT_REQUEST_UPDATE_PASSWORD";
 
         QString userID = peerID;
         QByteArray encryptedNewPassword;
@@ -279,6 +283,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_LOGIN):
     {
+        qDebug()<<"~~CLIENT_REQUEST_LOGIN";
 
         QString userID = peerID;
 
@@ -386,7 +391,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::ONLINE_STATE_CHANGED):
     {
-
+        qDebug()<<"~~ONLINE_STATE_CHANGED";
 
         QString userID = peerID;
         QByteArray encryptedOnlineState;
@@ -409,7 +414,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CONTACT_GROUPS_INFO):
     {
-
+        qDebug()<<"~~CONTACT_GROUPS_INFO";
 
         QString userID =peerID;
         quint8 uploadToServer = 0;
@@ -437,14 +442,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }else{
             sendPersonalContactGroupsInfoPacket(userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
         }
-        qWarning()<<"--CONTACT_GROUPS_INFO";
 
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_USER_SUMMARY_INFO):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_USER_SUMMARY_INFO";
 
         QString userID = peerID;
         QByteArray encryptedUserID;
@@ -480,7 +484,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendUserInfoPacket(contactID, userSummaryInfo, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
 
         //        emit signalUserRequestUserInfo(userID, encryptedUserID);
-        qWarning()<<"--CLIENT_REQUEST_USER_SUMMARY_INFO";
     }
     break;
 
@@ -488,7 +491,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_SEARCH_CONTACTS):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_SEARCH_CONTACTS";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -511,13 +514,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             sendSearchResultPacket(usersList, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
         }
         
-        qWarning()<<"--CLIENT_REQUEST_SEARCH_CONTACTS";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
     {
-        qWarning()<<"--CLIENT_REQUEST_ADD_CONTACT";
+        qDebug()<<"--CLIENT_REQUEST_ADD_CONTACT";
         
 
         QString userID = peerID;
@@ -573,7 +575,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_MOVE_CONTACT):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_MOVE_CONTACT";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -598,13 +600,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         userInfo->moveContact(contactID, oldGroupName, newGroupName);
         
-        qWarning()<<"--CLIENT_REQUEST_MOVE_CONTACT";
     }
     break;
 
     case quint8(IM::CLIENT_RESPONSE_ADD_CONTACT_REQUEST):
     {
-
+        qDebug()<<"~~CLIENT_RESPONSE_ADD_CONTACT_REQUEST";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -653,13 +654,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO:从数据库删除请求
         deleteFriendshipApplyRequest(contactID, userID);
         
-        qWarning()<<"--CLIENT_RESPONSE_ADD_CONTACT_REQUEST";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_DELETE_CONTACT):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_DELETE_CONTACT";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -691,13 +691,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         //qDebug()<<"------------contactID:"<<contactID<<" groupName:"<<groupName;
 
-        qWarning()<<"--CLIENT_REQUEST_DELETE_CONTACT";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT):
     {
 
+        qDebug()<<"~~CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -728,13 +728,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             deleteFriendshipApplyRequest(contactID, userID);
         }
 
-        qWarning()<<"--CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUPS_LIST):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_INTEREST_GROUPS_LIST";
 
         QString userID = peerID;
         //in >> userID ;
@@ -743,13 +742,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!userInfo){return;}
         sendUserInterestGroupsListPacket(userInfo, peerAddress, peerPort);
 
-        qWarning()<<"--CLIENT_REQUEST_INTEREST_GROUPS_LIST";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_INFO):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_INTEREST_GROUP_INFO";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -768,14 +766,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         sendUserInterestGroupInfoPacket(userInfo, groupID, peerAddress, peerPort);
 
-        qWarning()<<"--CLIENT_REQUEST_INTEREST_GROUP_INFO";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO):
     {
 
-
+        qDebug()<<"~~CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -794,14 +791,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         sendUserInterestGroupMembersInfoPacket(userInfo, groupID, peerAddress, peerPort);
 
-        qWarning()<<"--CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO";
     }
     break;
 
 
     case quint8(IM::BLACKLIST_INFO):
     {
-
+        qDebug()<<"~~BLACKLIST_INFO";
 
         QString userID = peerID;
         //in >> userID ;
@@ -810,13 +806,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!userInfo){return;}
         sendUserBlacklistInfoPacket(userInfo, peerAddress, peerPort);
 
-        qWarning()<<"--BLACKLIST_INFO";
     }
     break;
 
     case quint8(IM::CLIENT_REQUEST_MODIFY_CONTACT_REMARK):
     {
-
+        qDebug()<<"~~CLIENT_REQUEST_MODIFY_CONTACT_REMARK";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -840,7 +835,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::RENAME_CONTACT_GROUP):
     {
-
+        qDebug()<<"~~RENAME_CONTACT_GROUP";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -859,13 +854,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         userInfo->updateGroupName(oldGroupName, newGroupName);
 
-        qWarning()<<"--RENAME_CONTACT_GROUP";
     }
     break;
 
     case quint8(IM::CREATE_OR_DELETE_CONTACT_GROUP):
     {
-        qWarning()<<"--CREATE_OR_DELETE_CONTACT_GROUP";
+        qDebug()<<"--CREATE_OR_DELETE_CONTACT_GROUP";
 
 
 
@@ -892,7 +886,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SESSION_ENCRYPTION_KEY_WITH_CONTACT):
     {
-        qWarning()<<"--SESSION_ENCRYPTION_KEY_WITH_CONTACT";
+        qDebug()<<"--SESSION_ENCRYPTION_KEY_WITH_CONTACT";
 
 
         QString userID = peerID;
@@ -927,7 +921,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CHAT_MESSAGES_CACHED_ON_SERVER):
     {
-        qWarning()<<"--CHAT_MESSAGES_CACHED_ON_SERVER";
+        qDebug()<<"--CHAT_MESSAGES_CACHED_ON_SERVER";
 
 
 
@@ -953,7 +947,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::GROUP_CHAT_MESSAGE):
     {
-        qWarning()<<"--GROUP_CHAT_MESSAGE";
+        qDebug()<<"--GROUP_CHAT_MESSAGE";
 
 
 

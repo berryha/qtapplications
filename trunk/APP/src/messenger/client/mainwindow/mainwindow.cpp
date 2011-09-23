@@ -1132,7 +1132,7 @@ void MainWindow::slotUserVerified(){
         ui.labelUserNickName->setText(imUser->getNickName());
         ui.labelUserID->setText(userID);
         
-        clientPacketsParser->startHeartbeat();
+//        clientPacketsParser->startHeartbeat();
 
         //contactsManager = ContactsManager::instance();
         
