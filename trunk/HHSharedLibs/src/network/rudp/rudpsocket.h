@@ -82,6 +82,7 @@ public slots:
 
 //    void endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID);
 
+    void closeAllChannels();
 
 private slots:
     void readPendingDatagrams();

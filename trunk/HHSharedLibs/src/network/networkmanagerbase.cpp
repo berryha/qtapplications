@@ -149,9 +149,10 @@ void NetworkManagerBase::closeAllServers(){
         QList<RUDPServer *> rudpServerList = rudpServers.values();
         foreach(RUDPServer *rudpServer, rudpServerList){
             if(!rudpServer){continue;}
-                rudpServer->close();
-                delete rudpServer;
-                rudpServer = 0;
+            rudpServer->closeAllChannels();
+            rudpServer->close();
+            delete rudpServer;
+            rudpServer = 0;
         }
         rudpServerList.clear();
         rudpServers.clear();
