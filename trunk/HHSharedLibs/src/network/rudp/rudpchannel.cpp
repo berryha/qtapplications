@@ -123,7 +123,7 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
 
     m_msecConnectToPeerTimeout = msecTimeout;
     if(!m_connectToPeerTimer){
-        m_connectToPeerTimer = new QTimer(this);
+        m_connectToPeerTimer = new QTimer();
         connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
     }
     m_connectToPeerTimer->start(5000);
