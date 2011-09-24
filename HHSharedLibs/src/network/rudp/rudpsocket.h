@@ -58,7 +58,6 @@ public:
     ~RUDPSocket();
 
 
-
 //    bool canSendData(quint64 size);
 
 signals:

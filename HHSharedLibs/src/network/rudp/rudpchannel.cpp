@@ -1,4 +1,5 @@
 
+
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -7,6 +8,18 @@
 //#include "cryptography/cryptography.h"
 
 #include "packethandler/packet.h"
+
+
+#ifdef Q_CC_MSVC
+#include <windows.h>
+#include "HHSharedWindowsManagement/hwindowsmanagement.h"
+#define msleep(x) Sleep(x)
+#endif
+
+#ifdef Q_CC_GNU
+#include <unistd.h>
+#define msleep(x) usleep(x*1000)
+#endif
 
 
 namespace HEHUI {
@@ -19,7 +32,7 @@ QMutex * RUDPChannel::m_freeSendBufferSizeMutex = new QMutex();
 
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent)
-    :QThread(parent), m_packetHandlerBase(packetHandlerBase)
+    :QObject(parent), m_packetHandlerBase(packetHandlerBase)
 {
 
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
@@ -38,7 +51,7 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 }
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent)
-    :QThread(parent), m_packetHandlerBase(packetHandlerBase)
+    :QObject(parent), m_packetHandlerBase(packetHandlerBase)
 {
 
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
@@ -66,10 +79,10 @@ RUDPChannel::~RUDPChannel(){
 
 }
 
-void RUDPChannel::run(){
+//void RUDPChannel::run(){
 
-    exec();
-}
+//    exec();
+//}
 
 
 void RUDPChannel::connectToPeer(int msecTimeout){
@@ -100,11 +113,15 @@ void RUDPChannel::connectToPeer(const QString &peerAddressString, quint16 peerPo
 void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout){
     //qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
+
+//    if(m_ChannelState == ConnectedState){
+//        return;
+//    }
+
     this->m_peerAddress = peerAddress;
     this->m_peerPort = peerPort;
 
 //    m_msecConnectToPeerTimeout = msecTimeout;
-
 //    if(!m_connectToPeerTimer){
 //        m_connectToPeerTimer = new QTimer(this);
 //        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
@@ -115,6 +132,9 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
 
     m_ChannelState = ConnectingState;
     sendHandshakePacket(m_handshakeID);
+
+
+    //QTimer::singleShot(5000, this, SLOT(connectToPeer()));
 
     QTimer::singleShot(msecTimeout, this, SLOT(connectToPeerTimeout()));
 
@@ -150,7 +170,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 }
 
 void RUDPChannel::disconnectFromPeer(){
-    qDebug()<<"--RUDPChannel::disconnectFromPeer()"<<" m_peerPort:"<<m_peerPort<<" localPort:"<<m_udpSocket->localPort();
+    //qDebug()<<"--RUDPChannel::disconnectFromPeer()"<<" m_peerPort:"<<m_peerPort<<" localPort:"<<m_udpSocket->localPort();
 
     if(m_ChannelState == UnconnectedState || m_ChannelState == ListeningState){
         return;
@@ -178,7 +198,7 @@ void RUDPChannel::closeChannel(){
     qDebug()<<"--RUDPChannel::closeChannel()";
 
     disconnectFromPeer();
-    quit();
+//    quit();
 }
 
 bool RUDPChannel::sendData( QByteArray &data){
@@ -1182,7 +1202,7 @@ void RUDPChannel::sendACKTimerTimeout(){
 
     sendPacket(packet);
 
-    qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+    //qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
 
     //Record the ACK sequence number and the departure time
     ACKPacketInfo * info = new ACKPacketInfo();
@@ -1510,7 +1530,7 @@ void RUDPChannel::init(){
 }
 
 void RUDPChannel::reset(){
-    qDebug()<<"--RUDPChannel::reset()";
+    //qDebug()<<"--RUDPChannel::reset()";
 
 
     if(sendPacketTimer){
@@ -1652,7 +1672,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         uint handshakeID = 0;
         in >> peerVersion >> peerMSS >> handshakeID;
 
-        //qDebug()<<"--------------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID<<" SN:"<<packetSerialNumber;
+        qDebug()<<"-------0-------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID;
 
         if(m_ChannelState == ConnectingState){
             if(handshakeID == (m_handshakeID+1)){
@@ -1661,13 +1681,18 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             }
             //reset();
             startKeepAliveTimer();
+            qDebug()<<"-------1-------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID;
+
 
         }else{
             if(handshakeID != (m_handshakeID+2)){
+                qDebug()<<"-------2-------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID;
 
                 reset();
                 m_handshakeID = handshakeID;
                 sendHandshakePacket(handshakeID+1);
+                qDebug()<<"-------3-------m_handshakeID:"<<m_handshakeID<<" handshakeID"<<handshakeID;
+
                 return;
             }
 
@@ -1702,7 +1727,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         reset();
         emit peerDisconnected(m_peerAddress, m_peerPort);
 
-        qDebug()<<"~~Goodbye--"<<"msg:"<<msg;
+        //qDebug()<<"~~Goodbye--"<<"msg:"<<msg;
     }
         break;
 
@@ -1869,7 +1894,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //emit dataReceived(m_peerAddress, m_peerPort, data);
         cacheData(&data);
 
-        qDebug()<<"~~CompleteDataPacket--"<<" SN:"<<packetSerialNumber<<" data.size():"<<data.size();
+        //qDebug()<<"~~CompleteDataPacket--"<<" SN:"<<packetSerialNumber<<" data.size():"<<data.size();
     }
         break;
     case quint8(RUDP::BeginOrEndDataTransmission):
@@ -2034,7 +2059,7 @@ void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStrea
 }
 
 void RUDPChannel::cacheData(QByteArray *data){
-    qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
+    //qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
 
     QDataStream in(data, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_7);

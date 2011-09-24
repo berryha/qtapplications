@@ -2,7 +2,8 @@
 
 //#include <QCoreApplication>
 
-//#include <QThreadPool>
+#include <QThreadPool>
+#include <QtConcurrentRun>
 #include <QDebug>
 
 
@@ -33,6 +34,11 @@ RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent) :
     //注册自定义类型，必须重载“<<”和“>>”, 见"rudppacketstreamoperator.h"
     qRegisterMetaTypeStreamOperators<HEHUI::RUDPPacket>("HEHUI::RUDPPacket");
 
+    //IMPORTANT For Multi-thread
+    if(    QThreadPool::globalInstance()->maxThreadCount() < MIN_THREAD_COUNT){
+        QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    }
+
 }
 
 RUDPSocket::~RUDPSocket(){
@@ -42,7 +48,7 @@ RUDPSocket::~RUDPSocket(){
     closeAllChannels();
 
     foreach (RUDPChannel *channel, m_unusedRUDPChannels) {
-        channel->quit();
+//        channel->quit();
         delete channel;
         channel = 0;
     }
@@ -160,7 +166,8 @@ void RUDPSocket::readPendingDatagrams() {
 
 
                 RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-                channel->datagramReceived(*datagram);
+                QtConcurrent::run(channel, &RUDPChannel::datagramReceived, *datagram);
+                //channel->datagramReceived(*datagram);
 
         }
 
@@ -198,8 +205,8 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
         if(m_unusedRUDPChannels.isEmpty()){
             qWarning()<<"Create new channel:"<<channelID;
             channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, 0);
-            connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
-            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
+//            connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
+//            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16)));
@@ -207,7 +214,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
-            channel->start();
+//            channel->start();
             peers.insert(channelID, channel);
         }else{
             qWarning()<<"Use idle channel:"<<channelID;

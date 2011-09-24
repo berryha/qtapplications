@@ -69,6 +69,9 @@
 #define RUDP_MAX_SEND_ACK_TIMER_INTERVAL 100
 #endif
 
+#ifndef MIN_THREAD_COUNT
+#define MIN_THREAD_COUNT 10
+#endif
 
 namespace HEHUI {
     namespace RUDP {
