@@ -20,7 +20,7 @@ class MYSHAREDLIB_API RUDPChannel : public QObject
 {
     Q_OBJECT
 public:
-    enum ChannelState {UnconnectedState, ConnectingState, DisconnectingState, ConnectedState, ListeningState};
+    enum ChannelState {UnconnectedState, ConnectingState, DisconnectingState, ConnectedState};
 
     explicit RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
     RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent = 0);
@@ -230,7 +230,8 @@ private:
 
 
 
-    uint m_handshakeID;
+    uint m_myHandshakeID;
+    uint m_peerHandshakeID;
 
     quint16 m_firstReceivedPacketIDInReceiveWindow;
     QHash<quint16/*Packet SN*/, RUDPPacket*> m_cachedReceivedPacketsHash;
@@ -265,8 +266,8 @@ private:
     PacketHandlerBase *m_packetHandlerBase;
 
 
-////    QTimer *m_connectToPeerTimer;
-////    int m_msecConnectToPeerTimeout;
+    QTimer *m_connectToPeerTimer;
+    int m_msecConnectToPeerTimeout;
 
 //    uint m_handshakeID;
 //    //bool m_connected;
