@@ -16,7 +16,9 @@ class UserInfoTipWindow : public QWidget
     Q_OBJECT
 
 public:
-    UserInfoTipWindow(QWidget *parent = 0, Qt::WindowFlags fl = Qt::Popup | Qt::FramelessWindowHint | Qt::SplashScreen);
+    //UserInfoTipWindow(QWidget *parent = 0, Qt::WindowFlags fl = Qt::Popup | Qt::FramelessWindowHint | Qt::SplashScreen);
+    UserInfoTipWindow(QWidget *parent = 0, Qt::WindowFlags fl = Qt::Popup | Qt::FramelessWindowHint );
+
     ~UserInfoTipWindow();
 
 

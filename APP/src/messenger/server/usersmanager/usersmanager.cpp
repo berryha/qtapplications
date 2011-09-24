@@ -199,7 +199,8 @@ void UsersManager::getUserLoginServer(const QString &userID, QHostAddress *serve
 }
 
 UserInfo* UsersManager::logUserIn(const QString &userID, const QByteArray &encryptedPassword, IM::OnlineState loginState, IM::ErrorType *errorType){
-    qWarning()<<"logUserIn(...)";
+    //qWarning()<<"logUserIn(...)";
+
     UserInfo *userInfo = getUserInfo(userID);
     if(!userInfo){
         *errorType = IM::ERROR_IDNotExist;
@@ -823,7 +824,7 @@ UserInfo * UsersManager::queryUserInfo(const QString &imUserID){
 }
 
 bool UsersManager::queryUserInfo(UserInfo *info){
-    qWarning()<<"queryUserInfo(UserInfo *info)";
+    //qWarning()<<"queryUserInfo(UserInfo *info)";
 
     if(!info){
         return false;

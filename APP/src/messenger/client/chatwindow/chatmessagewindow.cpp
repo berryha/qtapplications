@@ -272,7 +272,7 @@ void ChatMessageWindow::appendMessageReceivedFromContact(const QString &message,
          
 
         ui.webView->scroll(0, 0);
-        qDebug()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
+        //qDebug()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
 
 }
 
@@ -304,7 +304,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
 
 	if(message.size() > MAX_MESSAGE_SIZE){
 		QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
-		qDebug()<<"XXXXChatMessageWindow::emitSendMsgSignal()~~Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
+                qCritical()<<"ERROR! ChatMessageWindow::emitSendMsgSignal()~~Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
 		ui.textEdit->setFocus();
 		return;
 	}
@@ -404,7 +404,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
             
         }
         
-        qDebug()<<"-------richMessage2:"<<richMessage;
+        //qDebug()<<"-------richMessage2:"<<richMessage;
         
         //emit sendMsgButtonClicked(m_contact->getUserID(), richMessage, imageList);
 

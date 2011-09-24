@@ -202,7 +202,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
+    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress.toString()<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
 
     switch(packetType){
 //    case quint8(HEHUI::HeartbeatPacket):
