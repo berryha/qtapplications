@@ -75,7 +75,7 @@ public slots:
 
 
 //    quint16 beginDataTransmission(const QHostAddress &peerAddress, quint16 peerPort);
-    bool sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data);
+//    bool sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data);
 //    quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment);
     quint64 sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, bool isReliableDataPacket = true);
 

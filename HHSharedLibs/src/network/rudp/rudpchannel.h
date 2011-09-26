@@ -54,14 +54,17 @@ public slots:
     bool waitForConnected(int msecTimeout = RUDP_CONNECTION_TIMEOUT);
 
     void disconnectFromPeer();
+    bool waitForDisconnected(int msecTimeout = RUDP_CONNECTION_TIMEOUT);
     void closeChannel();
 
     void datagramReceived(QByteArray &block);
 
-    bool sendData( QByteArray &data);
+//    bool sendData( QByteArray &data);
     quint64 sendDatagram(QByteArray *data, bool isReliableDataPacket = true);
 
 private:
+//    void peerConnected();
+
     quint16 beginDataTransmission();
     quint64 sendDatagram(QByteArray *data, quint64 offset, bool fragment);
     void endDataTransmission(quint16 fragmentDataID);
@@ -164,7 +167,7 @@ private:
 
 
     //------发送端------
-    QTimer *sendPacketTimer; //发送包定时器
+    //QTimer *sendPacketTimer; //发送包定时器
     int sendPacketInterval; //包发送周期
     quint16 LSSN; //Last Sent Data packet
     QHash<quint16/*Packet SN*/, RUDPPacket*> m_ToBeSentPacketsHash; //To Be Sent Packets

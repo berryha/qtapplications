@@ -37,6 +37,26 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
+
+
+
+    sendACKTimer = new QTimer();
+    connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
+
+    sendNACKTimer = new QTimer();
+    connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
+
+    retransmissionTimer = new QTimer();
+    connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
+
+    m_keepAliveTimer = new QTimer();
+    connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
+
+    m_checkPeerAliveTimer = new QTimer();
+    connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
+
+
+
     init();
 
     m_udpSocket = udpSocket;
@@ -56,6 +76,24 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
+
+
+    sendACKTimer = new QTimer();
+    connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
+
+    sendNACKTimer = new QTimer();
+    connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
+
+    retransmissionTimer = new QTimer();
+    connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
+
+    m_keepAliveTimer = new QTimer();
+    connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
+
+    m_checkPeerAliveTimer = new QTimer();
+    connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
+
+
     init();
 
     m_udpSocket = udpSocket;
@@ -69,13 +107,13 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 }
 
 RUDPChannel::~RUDPChannel(){
+    qDebug()<<"--RUDPChannel::~RUDPChannel()";
 
-    if(m_ChannelState != UnconnectedState){
-        reset();
-    }
+//    if(m_ChannelState != UnconnectedState){
+//        reset();
+//    }
 
     cleanAllUnusedPackets();
-
 
 }
 
@@ -167,6 +205,20 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 
 }
 
+//void RUDPChannel::peerConnected(){
+//    qDebug()<<"--RUDPChannel::peerConnected()";
+
+//    if(m_connectToPeerTimer){
+//        m_connectToPeerTimer->stop();
+//        delete m_connectToPeerTimer;
+//        m_connectToPeerTimer = 0;
+//    }
+
+//    emit peerConnected(m_peerAddress, m_peerPort);
+
+//}
+
+
 void RUDPChannel::disconnectFromPeer(){
     //qDebug()<<"--RUDPChannel::disconnectFromPeer()"<<" m_peerPort:"<<m_peerPort<<" localPort:"<<m_udpSocket->localPort();
 
@@ -192,96 +244,122 @@ void RUDPChannel::disconnectFromPeer(){
 
 }
 
-void RUDPChannel::closeChannel(){
-    qDebug()<<"--RUDPChannel::closeChannel()";
+bool RUDPChannel::waitForDisconnected(int msecTimeout){
 
-    disconnectFromPeer();
-//    quit();
-}
+    QDateTime startTime = QDateTime::currentDateTime();
 
-bool RUDPChannel::sendData( QByteArray &data){
-    qDebug()<<"--RUDPChannel::sendData(...)";
-
-    //QCoreApplication::processEvents();
-
-    int dataSize = data.size();
-
-    if(dataSize > getGlobalFreeSendBufferSize()){
-        qCritical()<<"ERROR! Can not send data! There is not enough buffer to cache the data! Free buffer size:"<<getGlobalFreeSendBufferSize();
-        return false;
-    }
-
-
-    static quint16 fragmentDataID = 0;
-
-    if(dataSize > m_MSS){
-        if(fragmentDataID == 65535){
-            fragmentDataID = 0;
+    while (m_ChannelState != UnconnectedState) {
+        QCoreApplication::processEvents();
+        msleep(1);
+        if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
+            return false;
         }
-        fragmentDataID++;
-
-        int fragmentSize = m_MSS-3;
-        int fragmentCount = dataSize/fragmentSize;
-        fragmentCount = (dataSize%fragmentSize)?(fragmentCount+1):fragmentCount;
-
-        QDataStream in(&data, QIODevice::ReadOnly);
-        in.setVersion(QDataStream::Qt_4_7);
-
-        for(int i=0; i<fragmentCount; i++){
-            //QCoreApplication::processEvents();
-
-            QByteArray fragmentData;
-            fragmentData.resize(fragmentSize);
-
-            //in.readRawData(fragmentData.data(), fragmentSize);
-            qint64 size = in.device()->read(fragmentData.data(), fragmentSize);
-            quint8 isLastFragment = in.atEnd()?quint8(1):quint8(0);
-            if(isLastFragment){
-                fragmentData.resize(size);
-            }
-//qDebug()<<"---------------------------------fragmentDataID:"<<fragmentDataID<<" size:"<<size<<" fragmentSize:"<<fragmentSize<<" Checksum:"<<qChecksum(fragmentData.data(), size);
-
-            RUDPPacket *packet = getUnusedPacket();
-            packet->setPacketType(quint8(RUDP::FragmentDataPacket));
-            packet->setPacketSerialNumber(createSerialNumber());
-            //packet->setRemainingRetransmissionTimes(int(RUDP_PACKET_RETRANSMISSION_TIMES));
-
-            QByteArray ba;
-            QDataStream out(&ba, QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_4_7);
-            out << fragmentDataID << isLastFragment << fragmentData ;
-            packet->setPacketData(ba);
-
-            tryingToSendPacket(packet);
-
-
-        }
-
-
-
-    }else{
-
-        RUDPPacket *packet = getUnusedPacket();
-
-        packet->setPacketType(quint8(RUDP::CompleteDataPacket));
-        packet->setPacketSerialNumber(createSerialNumber());
-        //packet->setRemainingRetransmissionTimes(int(RUDP_PACKET_RETRANSMISSION_TIMES));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_7);
-        out << data;
-        packet->setPacketData(ba);
-
-        tryingToSendPacket(packet);
-
     }
 
     return true;
 
 }
 
+
+void RUDPChannel::closeChannel(){
+    qDebug()<<"--RUDPChannel::closeChannel()";
+
+    if(m_ChannelState == ConnectedState){
+        disconnectFromPeer();
+    }
+
+    waitForDisconnected();
+
+//    quit();
+}
+
+//bool RUDPChannel::sendData( QByteArray &data){
+//    qDebug()<<"--RUDPChannel::sendData(...)";
+
+//    //QCoreApplication::processEvents();
+
+//    int dataSize = data.size();
+
+//    if(dataSize > getGlobalFreeSendBufferSize()){
+//        qCritical()<<"ERROR! Can not send data! There is not enough buffer to cache the data! Free buffer size:"<<getGlobalFreeSendBufferSize();
+//        return false;
+//    }
+
+
+//    static quint16 fragmentDataID = 0;
+
+//    if(dataSize > m_MSS){
+//        if(fragmentDataID == 65535){
+//            fragmentDataID = 0;
+//        }
+//        fragmentDataID++;
+
+//        int fragmentSize = m_MSS-3;
+//        int fragmentCount = dataSize/fragmentSize;
+//        fragmentCount = (dataSize%fragmentSize)?(fragmentCount+1):fragmentCount;
+
+//        QDataStream in(&data, QIODevice::ReadOnly);
+//        in.setVersion(QDataStream::Qt_4_7);
+
+//        for(int i=0; i<fragmentCount; i++){
+//            //QCoreApplication::processEvents();
+
+//            QByteArray fragmentData;
+//            fragmentData.resize(fragmentSize);
+
+//            //in.readRawData(fragmentData.data(), fragmentSize);
+//            qint64 size = in.device()->read(fragmentData.data(), fragmentSize);
+//            quint8 isLastFragment = in.atEnd()?quint8(1):quint8(0);
+//            if(isLastFragment){
+//                fragmentData.resize(size);
+//            }
+////qDebug()<<"---------------------------------fragmentDataID:"<<fragmentDataID<<" size:"<<size<<" fragmentSize:"<<fragmentSize<<" Checksum:"<<qChecksum(fragmentData.data(), size);
+
+//            RUDPPacket *packet = getUnusedPacket();
+//            packet->setPacketType(quint8(RUDP::FragmentDataPacket));
+//            packet->setPacketSerialNumber(createSerialNumber());
+//            //packet->setRemainingRetransmissionTimes(int(RUDP_PACKET_RETRANSMISSION_TIMES));
+
+//            QByteArray ba;
+//            QDataStream out(&ba, QIODevice::WriteOnly);
+//            out.setVersion(QDataStream::Qt_4_7);
+//            out << fragmentDataID << isLastFragment << fragmentData ;
+//            packet->setPacketData(ba);
+
+//            tryingToSendPacket(packet);
+
+
+//        }
+
+
+
+//    }else{
+
+//        RUDPPacket *packet = getUnusedPacket();
+
+//        packet->setPacketType(quint8(RUDP::CompleteDataPacket));
+//        packet->setPacketSerialNumber(createSerialNumber());
+//        //packet->setRemainingRetransmissionTimes(int(RUDP_PACKET_RETRANSMISSION_TIMES));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_7);
+//        out << data;
+//        packet->setPacketData(ba);
+
+//        tryingToSendPacket(packet);
+
+//    }
+
+//    return true;
+
+//}
+
 quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
     //qDebug()<<"--RUDPChannel::sendDatagram(QByteArray *data) "<<" data->size():"<<data->size();
+
+    if(m_ChannelState == DisconnectingState){
+        return 0;
+    }
 
     if(!isReliableDataPacket){
         sendUnreliableDataPacket(data);
@@ -671,7 +749,6 @@ void RUDPChannel::sendKeepAlivePacket(){
     QByteArray ba;
     QDataStream out(&ba, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_7);
-    //out << "Goodbye";
     packet->setPacketData(ba);
 
     //tryingToSendPacket(packet);
@@ -1429,7 +1506,7 @@ void RUDPChannel::init(){
 
     //------发送端------
     //sendPacketTimer = new QTimer();
-    sendPacketTimer = 0;
+    //sendPacketTimer = 0;
     sendPacketInterval = 2;
     LSSN = 0;
 
@@ -1534,49 +1611,49 @@ void RUDPChannel::init(){
 }
 
 void RUDPChannel::reset(){
-    //qDebug()<<"--RUDPChannel::reset()";
+    qDebug()<<"--RUDPChannel::reset()";
 
 
     if(m_connectToPeerTimer){
         m_connectToPeerTimer->stop();
-        delete m_connectToPeerTimer;
-        m_connectToPeerTimer = 0;
+        //delete m_connectToPeerTimer;
+        //m_connectToPeerTimer = 0;
     }
 
-    if(sendPacketTimer){
-        sendPacketTimer->stop();
-        delete sendPacketTimer;
-        sendPacketTimer = 0;
-    }
+    //if(sendPacketTimer){
+    //    sendPacketTimer->stop();
+        //delete sendPacketTimer;
+        //sendPacketTimer = 0;
+    //}
 
     if(sendACKTimer){
         sendACKTimer->stop();
-        delete sendACKTimer;
-        sendACKTimer = 0;
+        //delete sendACKTimer;
+        //sendACKTimer = 0;
     }
 
     if(sendNACKTimer){
         sendNACKTimer->stop();
-        delete sendNACKTimer;
-        sendNACKTimer = 0;
+        //delete sendNACKTimer;
+        //sendNACKTimer = 0;
     }
 
     if(retransmissionTimer){
         retransmissionTimer->stop();
-        delete retransmissionTimer;
-        retransmissionTimer = 0;
+        //delete retransmissionTimer;
+        //retransmissionTimer = 0;
     }
 
     if(m_keepAliveTimer){
         m_keepAliveTimer->stop();
-        delete m_keepAliveTimer;
-        m_keepAliveTimer = 0;
+        //delete m_keepAliveTimer;
+        //m_keepAliveTimer = 0;
     }
 
     if(m_checkPeerAliveTimer){
         m_checkPeerAliveTimer->stop();
-        delete m_checkPeerAliveTimer;
-        m_checkPeerAliveTimer = 0;
+        //delete m_checkPeerAliveTimer;
+        //m_checkPeerAliveTimer = 0;
     }
 
 
@@ -1725,6 +1802,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             startSendNACKTimer();
             startRetransmissionTimer();
 
+
+//            peerConnected();
             emit peerConnected(m_peerAddress, m_peerPort);
 
         }
@@ -1737,8 +1816,10 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         QString msg = "";
         in >> msg;
 
-        disconnectFromPeer();
-        disconnectFromPeer();
+        if(m_ChannelState != DisconnectingState){
+            disconnectFromPeer();
+        }
+
         reset();
         emit peerDisconnected(m_peerAddress, m_peerPort);
 
