@@ -258,7 +258,6 @@ void EmoticonPanel::addEmoticonsPanel(int iStartIndex){
 
             //TODO:
             QString iconPath = m_baseDirPath + "/" + files[i];
-            qWarning()<<"-----iconPath:"<<iconPath;
             QPixmap smiley;
             if(!QPixmapCache::find(iconPath, &smiley)){
                 smiley = QPixmap(iconPath);// load smileys
