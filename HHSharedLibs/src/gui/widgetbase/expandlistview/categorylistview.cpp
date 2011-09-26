@@ -406,6 +406,7 @@ bool ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, c
 	}
 
 	setData(idx, icon, Qt::DecorationRole);
+
 	return true;
 
 }
@@ -418,7 +419,8 @@ bool ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, c
 		return false;
 	}
 
-	setData(idx, iconName, Qt::DecorationRole);
+        setData(idx, iconName, Qt::DecorationRole);
+
 	return true;
 
 }
@@ -766,7 +768,6 @@ bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon 
         return m_model->updateObjectItemIcon(item_id, icon);
 
 }
-
 
 bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName){
 	qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
