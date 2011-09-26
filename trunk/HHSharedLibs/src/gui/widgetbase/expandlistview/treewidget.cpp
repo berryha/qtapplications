@@ -158,6 +158,7 @@ CategoryListView *TreeWidget::categoryView(const QString &cat_name) const{
             if(QTreeWidgetItem *embedItem = cat_item->child(0)){
                 rc = qobject_cast<CategoryListView*>(itemWidget(embedItem, 0));
                 qDebug()<<"----TreeWidget::categoryView(...)~~cat_item->text(0):"<<cat_item->text(0);
+                break;
             }
 
         }
@@ -1232,7 +1233,7 @@ bool TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &it
 
 	CategoryListView *cat = categoryView(cat_name);
 
-	return cat->updateObjectItemIcon(item_id, icon);
+        return cat->updateObjectItemIcon(item_id, icon);
 
 }
 
@@ -1241,7 +1242,7 @@ bool TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &it
 
 	CategoryListView *cat = categoryView(cat_name);
 
-	return cat->updateObjectItemIcon(item_id, iconName);
+        return cat->updateObjectItemIcon(item_id, iconName);
 
 }
 
