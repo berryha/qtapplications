@@ -1556,6 +1556,8 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
         break;
     }
 
+    update();
+
 
 }
 
@@ -1576,6 +1578,7 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
 
     }
 
+//    update();
 
 }
 
@@ -1598,6 +1601,8 @@ void MainWindow::slotProcessUserInfo(const QString &userID, const QString &userI
             contactsManager->updateContactToUI(friendsListView, contactGroupID, userID);
         }
     }
+
+//    update();
 
 }
 

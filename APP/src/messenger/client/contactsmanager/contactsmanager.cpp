@@ -736,7 +736,7 @@ void ContactsManager::moveContactToUI(ExpandListView *expandListView, const QStr
 }
 
 void ContactsManager::updateContactToUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID){
-    qDebug()<<"ContactsManager::addContactToUI(...)";
+    qDebug()<<"--ContactsManager::updateContactToUI(...)  groupName:"<<groupName<<" contactID:"<<contactID;
 
     Contact *contact = 0;
     if(!contactHash.contains(contactID)){
