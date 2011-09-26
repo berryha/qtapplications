@@ -35,13 +35,14 @@ RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent) :
     qRegisterMetaTypeStreamOperators<HEHUI::RUDPPacket>("HEHUI::RUDPPacket");
 
     //IMPORTANT For Multi-thread
-    if(    QThreadPool::globalInstance()->maxThreadCount() < MIN_THREAD_COUNT){
+    if(QThreadPool::globalInstance()->maxThreadCount() < MIN_THREAD_COUNT){
         QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
     }
 
 }
 
 RUDPSocket::~RUDPSocket(){
+    //qDebug()<<"--RUDPSocket::~RUDPSocket()";
 
 
 
@@ -93,12 +94,12 @@ void RUDPSocket::disconnectFromPeer(const QHostAddress &peerAddress, quint16 pee
 //    return channel->beginDataTransmission();
 //}
 
-bool RUDPSocket::sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data){
+//bool RUDPSocket::sendData(const QHostAddress &peerAddress, quint16 peerPort, QByteArray &data){
 
-    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    return channel->sendData(data);
+//    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+//    return channel->sendData(data);
 
-}
+//}
 
 //quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPort, QByteArray *data, quint64 offset, bool fragment){
 
@@ -118,6 +119,7 @@ quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPo
 //}
 
 void RUDPSocket::closeAllChannels(){
+    qDebug()<<"--RUDPSocket::closeAllChannels()";
 
     foreach (RUDPChannel *channel, peers.values()) {
         if(!channel){continue;}
