@@ -83,14 +83,16 @@ void UserInfo::init(){
 }
 
 bool UserInfo::isOnLine(){
-    if(QDateTime::currentDateTime() < timeLastHeartbeatPacketReceived.addMSecs(ONLINE_STATUS_CHECKING_TIMES*HEARTBEAT_TIMER_INTERVAL)){
-        return true;
+//    if(QDateTime::currentDateTime() < timeLastHeartbeatPacketReceived.addMSecs(ONLINE_STATUS_CHECKING_TIMES*HEARTBEAT_TIMER_INTERVAL)){
+//        return true;
+//    }
+//    return false;
+
+    if(getOnlineState() == IM::ONLINESTATE_OFFLINE){
+        return false;
     }
-    return false;
-    //return (remainingOnlineStatusCheckingTimes > 0);
 
-
-
+    return true;
 
 }
 
