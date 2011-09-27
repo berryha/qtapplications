@@ -411,11 +411,11 @@ public slots:
         userInfo->setOnlineState(IM::OnlineState(onlineStateCode));
         if(onlineStateCode == quint8(IM::ONLINESTATE_OFFLINE)){
             userOffline(userInfo);
-            saveUserLoginInfo(userInfo, userHostAddress, false);
+            saveUserLastLoginInfo(userInfo, userHostAddress, false);
             //saveUserInfoToDatabase(userInfo);
         }else{
             userOnline(userInfo);
-            saveUserLoginInfo(userInfo, userHostAddress, true);
+            saveUserLastLoginInfo(userInfo, userHostAddress, true);
         }
 
         //通知所有在线联系人

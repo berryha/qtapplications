@@ -517,7 +517,7 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
 }
 
-bool UsersManager::saveUserLoginInfo(UserInfo* userInfo, const QString &userHostAddress, bool login){
+bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, bool login){
     qDebug()<<"--UsersManager::saveUserLoginInfo(...)";
 
     if(!userInfo){
@@ -533,7 +533,7 @@ bool UsersManager::saveUserLoginInfo(UserInfo* userInfo, const QString &userHost
 
     QString imUserID = userInfo->getUserID();
     QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    userInfo->setLastLoginTime(QDateTime(curTime));
+    userInfo->setLastLoginTime(QDateTime::fromString(curTime));
     userInfo->setLastLoginHostAddress(userHostAddress);
 
 
@@ -542,8 +542,12 @@ bool UsersManager::saveUserLoginInfo(UserInfo* userInfo, const QString &userHost
         statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime, LogoutTime) values('%1', '%2', '%3', '%4') ").arg(imUserID).arg(userHostAddress).arg(curTime).arg(curTime);
     }else{
         statement = QString("update loginhistories set LogoutTime = '%1' where UserID = '%2' and IPAddress ='%3' and LoginTime = LogoutTime").arg(curTime).arg(imUserID).arg(userHostAddress);
-
     }
+//    if(login){
+//        statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
+//    }else{
+//        statement = QString("update loginhistories set LogoutTime = '%1' where ID = (select max(ID) from loginhistories where UserID = '%2') ").arg(curTime).arg(imUserID);
+//    }
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save user login info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -568,7 +572,7 @@ bool UsersManager::saveUserLoginInfo(UserInfo* userInfo, const QString &userHost
 
 }
 
-bool UsersManager::getUserLoginInfo(UserInfo *userInfo){
+bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
 
     if(!userInfo){
         return false;
@@ -582,7 +586,7 @@ bool UsersManager::getUserLoginInfo(UserInfo *userInfo){
     QSqlQuery query(db);
 
     QString imUserID = userInfo->getUserID();
-    QString statement = QString("SELECT * FROM loginhistories where ID = (select max(ID) from loginhistories where UserID = '%1')  ").arg(imUserID);
+    QString statement = QString("SELECT IPAddress, LoginTime FROM loginhistories where ID = (select max(ID) from loginhistories where UserID = '%1')  ").arg(imUserID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user login info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -602,10 +606,9 @@ bool UsersManager::getUserLoginInfo(UserInfo *userInfo){
         return false;
     }
 
-    //TODO
-    info->setLastLoginTime(query.value(0).toDateTime());
-    info->setLastLoginHostAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toString());
-    info->setLastLoginHostPort(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toUInt());
+
+    userInfo->setLastLoginHostAddress(query.value(0).toString());
+    userInfo->setLastLoginTime(query.value(1).toDateTime());
 
     return true;
 
@@ -1027,6 +1030,9 @@ bool UsersManager::queryUserInfo(UserInfo *info){
 
     info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toString().toUInt()));
     info->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_ShortTalk)))).toString().toUInt()));
+
+
+    getUserLastLoginInfo(info);
 
     info->clearUpdatedProperties();
 

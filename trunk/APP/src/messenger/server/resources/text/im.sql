@@ -37,7 +37,7 @@ CREATE TABLE `cachedchatmessages` (
   KEY `FK_cachemessages_users_ID_SenderID` (`SenderID`),
   CONSTRAINT `FK_cachemessages_users_UserID_ReceiverID` FOREIGN KEY (`RecieverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_cachemessages_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
 
 --
 -- Dumping data for table `cachedchatmessages`
@@ -89,13 +89,15 @@ CREATE TABLE `friendshipapply` (
   KEY `FK_friendshipapply_users_ID_ReceiverID` (`ReceiverID`),
   CONSTRAINT `FK_friendshipapply_users_UserID_ReceiverID` FOREIGN KEY (`ReceiverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_friendshipapply_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友请求';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='好友请求';
 
 --
 -- Dumping data for table `friendshipapply`
 --
 
 /*!40000 ALTER TABLE `friendshipapply` DISABLE KEYS */;
+INSERT INTO `friendshipapply` (`ID`,`SenderID`,`ReceiverID`,`ExtraMessage`,`Result`,`SenderRead`,`ReceiverRead`) VALUES 
+ (1,'admin','kiwa','','1','1','0');
 /*!40000 ALTER TABLE `friendshipapply` ENABLE KEYS */;
 
 
@@ -209,6 +211,36 @@ INSERT INTO `grouptypes` (`ID`,`ParentType`,`TypeName`,`Description`) VALUES
  (1,NULL,'System',NULL),
  (2,NULL,'User',NULL);
 /*!40000 ALTER TABLE `grouptypes` ENABLE KEYS */;
+
+
+--
+-- Definition of table `loginhistories`
+--
+
+DROP TABLE IF EXISTS `loginhistories`;
+CREATE TABLE `loginhistories` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `UserID` varchar(16) NOT NULL,
+  `IPAddress` varchar(15) NOT NULL,
+  `LoginTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LogoutTime` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_loginhistories_UserID` (`UserID`),
+  CONSTRAINT `FK_loginhistories_UserID` FOREIGN KEY (`UserID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='登陆历史';
+
+--
+-- Dumping data for table `loginhistories`
+--
+
+/*!40000 ALTER TABLE `loginhistories` DISABLE KEYS */;
+INSERT INTO `loginhistories` (`ID`,`UserID`,`IPAddress`,`LoginTime`,`LogoutTime`) VALUES 
+ (1,'hehui','200.200.200.1','2011-09-27 18:02:20',NULL),
+ (2,'hehui','200.200.200.1','2011-09-27 18:02:44',NULL),
+ (3,'hehui','200.200.200.17','2011-09-27 18:03:04','2011-09-27 19:50:50'),
+ (4,'admin','200.200.200.2','2011-09-27 18:52:39',NULL),
+ (5,'hehui','200.200.200.17','2011-09-27 18:52:40',NULL);
+/*!40000 ALTER TABLE `loginhistories` ENABLE KEYS */;
 
 
 --
@@ -399,9 +431,6 @@ CREATE TABLE `users_detailed_info` (
   `HomeZipCode` varchar(12) DEFAULT NULL COMMENT '家庭邮编',
   `PersonalHomepage` varchar(255) DEFAULT NULL COMMENT '个人主页',
   `PersonalEmailAddress` varchar(255) DEFAULT NULL COMMENT '个人电子邮箱',
-  `LastLoginTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后登陆时间',
-  `LastLoginHostAddress` char(15) DEFAULT NULL,
-  `LastLoginHostPort` smallint(5) unsigned DEFAULT NULL,
   `QuestionForSecurity` varchar(255) DEFAULT NULL,
   `AnswerForSecurity` varchar(255) DEFAULT NULL,
   `EmailForSecurity` varchar(255) DEFAULT NULL,
@@ -428,13 +457,13 @@ CREATE TABLE `users_detailed_info` (
 --
 
 /*!40000 ALTER TABLE `users_detailed_info` DISABLE KEYS */;
-INSERT INTO `users_detailed_info` (`ID`,`UserID`,`UserPassword`,`TrueName`,`NickName`,`Gender`,`Age`,`Face`,`PersonalContactGroupsInfo`,`PersonalContactGroupsInfoVersion`,`InterestGroupsInfo`,`InterestGroupsInfoVersion`,`BlacklistInfoVersion`,`Blacklist`,`PersonalInfoVersion`,`HomeAddress`,`HomePhoneNumber`,`HomeZipCode`,`PersonalHomepage`,`PersonalEmailAddress`,`LastLoginTime`,`LastLoginHostAddress`,`LastLoginHostPort`,`QuestionForSecurity`,`AnswerForSecurity`,`EmailForSecurity`,`CompanyName`,`JobTitle`,`BusinessAddress`,`BusinessPhoneNumber`,`BusinessZipCode`,`BusinessFaxNumber`,`BusinessHomepage`,`BusinessEmailAddress`,`RegistrationTime`,`LoginTimes`,`FriendshipApply`,`ShortTalk`,`Role`,`Description`) VALUES 
- (1,'hehui','P66eKnCMcBPetxi+LMKG2P7cBSA=','贺辉','辉','1',0,'0','Friends,admin',2,'1',3,0,'',1,NULL,NULL,NULL,NULL,NULL,'2011-07-22 11:22:35',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',1,NULL),
- (2,'admin','P66eKnCMcBPetxi+LMKG2P7cBSA=','Admin','Admin','1',0,'0','',1,'1',3,0,NULL,1,NULL,NULL,NULL,NULL,NULL,'2011-07-22 09:58:05',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',2,NULL),
- (3,'rebort','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',3,0,NULL,1,NULL,NULL,NULL,NULL,NULL,'2011-03-09 14:05:51',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
- (4,'king','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',1,0,NULL,1,NULL,NULL,NULL,NULL,NULL,'2011-03-09 14:06:46',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
- (5,'yu','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',0,0,NULL,1,NULL,NULL,NULL,NULL,NULL,'2011-03-09 14:07:20',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
- (6,'kiwa','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',0,0,NULL,1,NULL,NULL,NULL,NULL,NULL,'2011-03-09 14:07:47',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL);
+INSERT INTO `users_detailed_info` (`ID`,`UserID`,`UserPassword`,`TrueName`,`NickName`,`Gender`,`Age`,`Face`,`PersonalContactGroupsInfo`,`PersonalContactGroupsInfoVersion`,`InterestGroupsInfo`,`InterestGroupsInfoVersion`,`BlacklistInfoVersion`,`Blacklist`,`PersonalInfoVersion`,`HomeAddress`,`HomePhoneNumber`,`HomeZipCode`,`PersonalHomepage`,`PersonalEmailAddress`,`QuestionForSecurity`,`AnswerForSecurity`,`EmailForSecurity`,`CompanyName`,`JobTitle`,`BusinessAddress`,`BusinessPhoneNumber`,`BusinessZipCode`,`BusinessFaxNumber`,`BusinessHomepage`,`BusinessEmailAddress`,`RegistrationTime`,`LoginTimes`,`FriendshipApply`,`ShortTalk`,`Role`,`Description`) VALUES 
+ (1,'hehui','P66eKnCMcBPetxi+LMKG2P7cBSA=','贺辉','辉','1',0,'0','Friends,kiwa,admin',255,'1',3,0,'',1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',1,NULL),
+ (2,'admin','P66eKnCMcBPetxi+LMKG2P7cBSA=','Admin','Admin','1',0,'0','Friends,hehui,kiwa',3,'1',3,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',2,NULL),
+ (3,'rebort','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',3,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
+ (4,'king','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',1,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
+ (5,'yu','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',0,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL),
+ (6,'kiwa','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',0,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL);
 /*!40000 ALTER TABLE `users_detailed_info` ENABLE KEYS */;
 
 
