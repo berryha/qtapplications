@@ -978,7 +978,7 @@ void ControlCenter::networkReady(){
     }
     connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
     connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
 
     port = rudpSocket->localPort();
     if(port == 0){
@@ -1095,7 +1095,7 @@ void ControlCenter::signalConnectToPeerTimeout(const QHostAddress &peerAddress, 
 
 }
 
-void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
+void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
     qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }

@@ -166,7 +166,7 @@ bool RUDPWidget::startRUDPServer(quint16 port){
 
     connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
     connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(disconnected(const QHostAddress &, quint16, bool)));
     connect(clientPacketsParser, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
     return true;
@@ -292,7 +292,7 @@ void RUDPWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, qui
 
 }
 
-void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort){
+void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
     ui.textBrowser->append("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
     if(!isListening){

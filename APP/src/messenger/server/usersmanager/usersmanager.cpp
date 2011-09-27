@@ -474,8 +474,8 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
     QString imUserID = userInfo->getUserID();
 
-    QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' and TransmittingTime>'%2'  ").arg(imUserID).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
-    qDebug()<<"statement:"<<statement;
+    //QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' and TransmittingTime>'%2'  ").arg(imUserID).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
+    QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query chat messages from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -507,13 +507,109 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
     }
 
+    statement = QString("delete from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
+    query.exec(statement);
+
+
     qWarning()<<"messages cached on server:"<<messages.size();
 
     return messages;
 
 }
 
+bool UsersManager::saveUserLoginInfo(UserInfo* userInfo, const QString &userHostAddress, bool login){
+    qDebug()<<"--UsersManager::saveUserLoginInfo(...)";
 
+    if(!userInfo){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString imUserID = userInfo->getUserID();
+    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    userInfo->setLastLoginTime(QDateTime(curTime));
+    userInfo->setLastLoginHostAddress(userHostAddress);
+
+
+    QString statement = "";
+    if(login){
+        statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime, LogoutTime) values('%1', '%2', '%3', '%4') ").arg(imUserID).arg(userHostAddress).arg(curTime).arg(curTime);
+    }else{
+        statement = QString("update loginhistories set LogoutTime = '%1' where UserID = '%2' and IPAddress ='%3' and LoginTime = LogoutTime").arg(curTime).arg(imUserID).arg(userHostAddress);
+
+    }
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not save user login info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        //TODO:数据库重启，重新连接
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query.clear();
+            openDatabase(true);
+        }
+        return false;
+    }
+
+    if((query.lastError().type() != QSqlError::NoError)){
+        qCritical()<<QString("Can not save user login info into database! Error: %1").arg(query.lastError().text());
+        return false;
+    }
+
+
+    return true;
+
+}
+
+bool UsersManager::getUserLoginInfo(UserInfo *userInfo){
+
+    if(!userInfo){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString imUserID = userInfo->getUserID();
+    QString statement = QString("SELECT * FROM loginhistories where ID = (select max(ID) from loginhistories where UserID = '%1')  ").arg(imUserID);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user login info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        //TODO:数据库重启，重新连接
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query.clear();
+            openDatabase(true);
+        }
+        return false;
+    }
+
+    if(!query.first()){
+        qCritical()<<QString("Can not query user login info from database! Error: %1").arg(query.lastError().text());
+        return false;
+    }
+
+    //TODO
+    info->setLastLoginTime(query.value(0).toDateTime());
+    info->setLastLoginHostAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toString());
+    info->setLastLoginHostPort(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toUInt());
+
+    return true;
+
+}
 
 //void UsersManager::slotFetchIMUsersInfo(){
 
@@ -909,9 +1005,9 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     info->setPersonalHomepage(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalHomepage)))).toString());
     info->setPersonalEmailAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalEmailAddress)))).toString());
 
-    info->setLastLoginTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginTime)))).toDateTime());
-    info->setLastLoginHostAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toString());
-    info->setLastLoginHostPort(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toUInt());
+//    info->setLastLoginTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginTime)))).toDateTime());
+//    info->setLastLoginHostAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toString());
+//    info->setLastLoginHostPort(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LastLoginHostAddress)))).toUInt());
 
     info->setQuestionForSecurity(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_QuestionForSecurity)))).toString());
     info->setAnswerForSecurity(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_AnswerForSecurity)))).toString());

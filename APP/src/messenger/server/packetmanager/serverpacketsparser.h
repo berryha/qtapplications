@@ -406,13 +406,16 @@ public slots:
     void processUserOnlineStatusChanged(UserInfo *userInfo, quint8 onlineStateCode, const QString &userHostAddress, quint16 userHostPort){
         //qDebug()<<"processUserOnlineStatusChanged(...)";
         
-        //UserInfo *userInfo = getUserInfo(userID);
         
         if(!userInfo){return;}
         userInfo->setOnlineState(IM::OnlineState(onlineStateCode));
         if(onlineStateCode == quint8(IM::ONLINESTATE_OFFLINE)){
             userOffline(userInfo);
+            saveUserLoginInfo(userInfo, userHostAddress, false);
             //saveUserInfoToDatabase(userInfo);
+        }else{
+            userOnline(userInfo);
+            saveUserLoginInfo(userInfo, userHostAddress, true);
         }
 
         //通知所有在线联系人
@@ -730,6 +733,7 @@ public slots:
     }
 
 
+    void userExceptionalOffline(const QString &peerAddress, quint16 peerPort);
 
 
 

@@ -77,6 +77,8 @@ public:
     bool saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message);
     QStringList cachedChatMessagesForIMUser(UserInfo* userInfo);
 
+    bool saveUserLoginInfo(UserInfo* userInfo, const QString &userHostAddress, bool login);
+    bool getUserLoginInfo(UserInfo *userInfo);
     
 
     bool saveUserInfoToDatabase(UserInfo *info);
@@ -116,6 +118,8 @@ private:
 
     UserInfo * queryUserInfo(const QString &imUserID);
     bool queryUserInfo(UserInfo *info);
+
+
     
     
     
