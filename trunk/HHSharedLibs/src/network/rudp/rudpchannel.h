@@ -79,6 +79,8 @@ private slots:
     void connectToPeerTimeout();
 
     void sendHandshakePacket(uint handshakeID);
+    void sendResetPacket();
+
     void sendPacketDroppedInfo(quint16 packetID);
     void sendKeepAlivePacket();
 
