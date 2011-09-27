@@ -113,6 +113,48 @@ RUDPChannel::~RUDPChannel(){
 //        reset();
 //    }
 
+    if(m_connectToPeerTimer){
+        m_connectToPeerTimer->stop();
+        delete m_connectToPeerTimer;
+        m_connectToPeerTimer = 0;
+    }
+
+    //if(sendPacketTimer){
+    //    sendPacketTimer->stop();
+        //delete sendPacketTimer;
+        //sendPacketTimer = 0;
+    //}
+
+    if(sendACKTimer){
+        sendACKTimer->stop();
+        delete sendACKTimer;
+        sendACKTimer = 0;
+    }
+
+    if(sendNACKTimer){
+        sendNACKTimer->stop();
+        delete sendNACKTimer;
+        sendNACKTimer = 0;
+    }
+
+    if(retransmissionTimer){
+        retransmissionTimer->stop();
+        delete retransmissionTimer;
+        retransmissionTimer = 0;
+    }
+
+    if(m_keepAliveTimer){
+        m_keepAliveTimer->stop();
+        delete m_keepAliveTimer;
+        m_keepAliveTimer = 0;
+    }
+
+    if(m_checkPeerAliveTimer){
+        m_checkPeerAliveTimer->stop();
+        delete m_checkPeerAliveTimer;
+        m_checkPeerAliveTimer = 0;
+    }
+
     cleanAllUnusedPackets();
 
 }
@@ -1627,7 +1669,10 @@ void RUDPChannel::reset(){
     //}
 
     if(sendACKTimer){
+        qDebug()<<"-------------------------------------------1";
         sendACKTimer->stop();
+        qDebug()<<"-------------------------------------------2";
+
         //delete sendACKTimer;
         //sendACKTimer = 0;
     }
