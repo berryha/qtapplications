@@ -41,7 +41,7 @@ public:
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
-    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
     //void channelClosed();
 
 //    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);

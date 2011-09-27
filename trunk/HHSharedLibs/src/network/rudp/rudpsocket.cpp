@@ -181,16 +181,17 @@ void RUDPSocket::readPendingDatagrams() {
 
 
 
-void RUDPSocket::channelclosed(){
+void RUDPSocket::channelclosed(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
     qDebug()<<"--RUDPSocket::channelclosed()";
 
-    RUDPChannel *channel = qobject_cast<RUDPChannel *>(sender());
+    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+    //RUDPChannel *channel = qobject_cast<RUDPChannel *>(sender());
     if(channel){
         QHostAddress address = channel->getPeerHostAddress();
         quint16 port = channel->getPeerHostPort();
         QString channelID = address.toString() + ":" + QString::number(port);
         peers.remove(channelID);
-        emit peerDisconnected(address, port);
+        emit peerDisconnected(address, port, normalClose);
 
         recyleRUDPChannel(channel);
     }
@@ -211,8 +212,8 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 //            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
             connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
-            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16)));
-            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(channelclosed()));
+//            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)));
+            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(channelclosed(const QHostAddress &, quint16, bool)));
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 

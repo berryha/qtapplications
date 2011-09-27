@@ -1083,7 +1083,7 @@ void RUDPChannel::checkPeerAliveTimerTimeout(){
     if(m_checkPeerAliveTimes < 1){
         reset();
         qWarning()<<"Error! Peer Offline!";
-        emit peerDisconnected(m_peerAddress, m_peerPort);
+        emit peerDisconnected(m_peerAddress, m_peerPort, false);
     }
 
     //qDebug()<<"------m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:ss:zzz")<<" m_keepAliveTimerInterval:"<<m_keepAliveTimerInterval;
@@ -1895,7 +1895,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         }
 
         reset();
-        emit peerDisconnected(m_peerAddress, m_peerPort);
+        emit peerDisconnected(m_peerAddress, m_peerPort, true);
 
         //qDebug()<<"~~Goodbye--"<<"msg:"<<msg;
     }

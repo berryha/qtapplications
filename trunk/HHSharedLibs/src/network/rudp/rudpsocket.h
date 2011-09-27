@@ -63,7 +63,7 @@ public:
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
-    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
 
     //void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
 
@@ -86,7 +86,7 @@ public slots:
 private slots:
     void readPendingDatagrams();
 
-    void channelclosed();
+    void channelclosed(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
 
 private:
     RUDPChannel * getRUDPChannel(const QHostAddress &hostAddress = QHostAddress::Null, quint16 port = 0);
