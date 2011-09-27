@@ -218,7 +218,6 @@ UserInfo* UsersManager::logUserIn(const QString &userID, const QByteArray &encry
         return 0;
     }else{
         *errorType = IM::ERROR_NoError;
-        userInfo->setOnline();
         userInfo->setOnlineState(loginState);
         userInfo->setSessionEncryptionKey(ServerUtilities::generateSessionEncryptionKey());
         userOnline(userInfo);
@@ -476,10 +475,10 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
     QString imUserID = userInfo->getUserID();
 
     QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' and TransmittingTime>'%2'  ").arg(imUserID).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
+    qDebug()<<"statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query chat messages from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
 
         //TODO:数据库重启，重新连接

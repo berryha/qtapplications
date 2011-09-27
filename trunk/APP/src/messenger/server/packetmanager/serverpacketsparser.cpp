@@ -309,7 +309,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_LOGIN_INFO):
     {
-
         qDebug()<<"--CLIENT_LOGIN_INFO";
 
         QString userID = peerID;
@@ -331,6 +330,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
             sendContactsOnlineInfo(userInfo);
 
+            //TODO: Last Login Time
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
                 sendCachedChatMessagesPacket(messagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
