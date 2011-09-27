@@ -1536,7 +1536,7 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
     contact->setLastLoginHostAddress(contactHostAddress);
     contact->setLastLoginHostPort(contactHostPort);
 
-    //TODO:提示
+    //TODO:Tip
     contactsManager->updateContactToUI(friendsListView, contact->getContactGroupID(), contactID);
 
     QString nickname = contact->getNickName();
