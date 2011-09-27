@@ -758,21 +758,27 @@ bool CategoryListView::removeCustomObjectItems()
 bool CategoryListView::updateObjectItemName(const QString &item_id, const QString &name){
         qDebug()<<"----CategoryListView::updateObjectItemName(const QString &item_id, const QIcon &icon)";
 
-        return m_model->updateObjectItemName(item_id, name);
+        bool ok = m_model->updateObjectItemName(item_id, name);
+        viewport()->update();
+        return ok;
 
 }
 
 bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon){
 	qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
 
-        return m_model->updateObjectItemIcon(item_id, icon);
+        bool ok =  m_model->updateObjectItemIcon(item_id, icon);
+        viewport()->update();
+        return ok;
 
 }
 
 bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName){
 	qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
 
-        return m_model->updateObjectItemIcon(item_id, iconName);
+        bool ok = m_model->updateObjectItemIcon(item_id, iconName);
+        viewport()->update();
+        return ok;
 
 }
 
