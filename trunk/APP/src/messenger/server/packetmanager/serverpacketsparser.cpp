@@ -320,8 +320,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         IM::ErrorType errorType = IM::ERROR_UnKnownError;
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
+
             userInfo->setLastLoginHostAddress(peerAddress.toString());
             userInfo->setLastLoginHostPort(peerPort);
+            //userInfo->setOnline();
+
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(userID, userInfo->encryptedPassword(), sessionEncryptionKey,
                                            userInfo->getPersonalInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
@@ -330,7 +333,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
             sendContactsOnlineInfo(userInfo);
 
-            //TODO: Last Login Time
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
                 sendCachedChatMessagesPacket(messagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
@@ -1016,7 +1018,17 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 }
 
 
+void ServerPacketsParser::userExceptionalOffline(const QString &peerAddress, quint16 peerPort){
+    qDebug()<<"--userExceptionalOffline(...)"<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort;
 
+    QList<UserInfo*>  users = onlineUsers();
+    foreach(UserInfo *info, users){
+        if(info->getLastLoginHostAddress() == peerAddress && info->getLastLoginHostPort() == peerPort){
+            processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, peerAddress, peerPort);
+        }
+    }
+
+}
 
 void ServerPacketsParser::startHeartbeat(int interval){
     if(NULL == heartbeatTimer){

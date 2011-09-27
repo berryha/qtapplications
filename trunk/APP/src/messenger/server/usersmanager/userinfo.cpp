@@ -72,12 +72,12 @@ void UserInfo::init(){
     setPassword("");
     setVerified(false);
 
-    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
+//    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
 
     remainingAuthenticationRequestTimes = MAX_AUTHENTICATION_REQUEST_TIMES;
     bannedFromAuthenticationRequest = false;
     timeToLiftTheBan = QDateTime();
-    timeLastHeartbeatPacketReceived = QDateTime();
+//    timeLastHeartbeatPacketReceived = QDateTime();
 
 
 }
@@ -88,20 +88,24 @@ bool UserInfo::isOnLine(){
     }
     return false;
     //return (remainingOnlineStatusCheckingTimes > 0);
-}
 
-void UserInfo::updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived){
-    if(heartbeatPacketReceived){
-        timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
-        remainingOnlineStatusCheckingTimes ++;
-        if(remainingOnlineStatusCheckingTimes > ONLINE_STATUS_CHECKING_TIMES){
-            remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
-        }
-    }else{
-        remainingOnlineStatusCheckingTimes --;
-    }
+
+
 
 }
+
+//void UserInfo::updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived){
+//    if(heartbeatPacketReceived){
+//        timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
+//        remainingOnlineStatusCheckingTimes ++;
+//        if(remainingOnlineStatusCheckingTimes > ONLINE_STATUS_CHECKING_TIMES){
+//            remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
+//        }
+//    }else{
+//        remainingOnlineStatusCheckingTimes --;
+//    }
+
+//}
 
 bool UserInfo::isBanned(){
     if(bannedFromAuthenticationRequest){
@@ -147,26 +151,29 @@ void UserInfo::authenticationFailed(){
 
 void UserInfo::setOnline(){
 
-    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
+//    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
 
     remainingAuthenticationRequestTimes = MAX_AUTHENTICATION_REQUEST_TIMES;
     bannedFromAuthenticationRequest = false;
     timeToLiftTheBan = QDateTime();
 
-    timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
-    setLastLoginTime(timeLastHeartbeatPacketReceived);
+//    timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
+//    setLastLoginTime(timeLastHeartbeatPacketReceived);
 }
 
 void UserInfo::setOffline(){
 
     //QDateTime time = QDateTime::currentDateTime();
     //setLastLoginTime(time);
-    setLastLoginTime(timeLastHeartbeatPacketReceived);
+//    setLastLoginTime(timeLastHeartbeatPacketReceived);
 
-    addUpdatedProperty(IM::PI_LastLoginTime, "'"+timeLastHeartbeatPacketReceived.toString("yyyy-MM-dd hh:mm:ss")+"'");
-
+//    addUpdatedProperty(IM::PI_LastLoginTime, "'"+timeLastHeartbeatPacketReceived.toString("yyyy-MM-dd hh:mm:ss")+"'");
 
     //TODO:Save to database
+
+
+    setLastLoginHostPort(0);
+
 }
 
 QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{

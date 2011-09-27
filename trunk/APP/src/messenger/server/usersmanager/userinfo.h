@@ -54,7 +54,7 @@ public:
 
 
     bool isOnLine();
-    void updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived);
+//    void updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived);
 
     bool isBanned();
     void setBanned(bool banned);
@@ -87,12 +87,12 @@ private:
 
 private:
 
-    quint16 remainingOnlineStatusCheckingTimes;
+//    quint16 remainingOnlineStatusCheckingTimes;
 
     quint16 remainingAuthenticationRequestTimes;
     bool bannedFromAuthenticationRequest;
     QDateTime timeToLiftTheBan;
-    QDateTime timeLastHeartbeatPacketReceived;
+//    QDateTime timeLastHeartbeatPacketReceived;
 
 
     //QHash<IM::PropertyID/*Property ID*/, QString/*Property Value*/> updatedProperties;

@@ -140,7 +140,7 @@ bool Server::startMainService(){
     }
     connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
     connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(peerDisconnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
 
 
 //    result = networkManager->startTCPServer();
@@ -236,8 +236,12 @@ void Server::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16
 
 }
 
-void Server::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+void Server::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
+    qWarning()<<QString("Client Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+    if(!normalClose){
+        serverPacketsParser->userExceptionalOffline(peerAddress.toString(), peerPort);
+    }
 
 }
 
