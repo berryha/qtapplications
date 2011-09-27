@@ -210,9 +210,8 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
 
 
     m_ChannelState = ConnectingState;
+    sendResetPacket();
     sendHandshakePacket(m_myHandshakeID);
-
-
 
     //QTimer::singleShot(msecTimeout, this, SLOT(connectToPeerTimeout()));
 
@@ -732,7 +731,7 @@ void RUDPChannel::sendHandshakePacket(uint handshakeID){
 
     packet->setPacketType(quint8(RUDP::Handshake));
     packet->setPacketSerialNumber(createSerialNumberForControlPacket());
-    packet->setRemainingRetransmissionTimes(-1);
+    //packet->setRemainingRetransmissionTimes(-1);
     QByteArray ba;
     QDataStream out(&ba, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_7);
@@ -745,6 +744,26 @@ void RUDPChannel::sendHandshakePacket(uint handshakeID){
 
 }
 
+void RUDPChannel::sendResetPacket(){
+    qDebug()<<"--RUDPChannel::sendResetPacket()";
+
+
+    RUDPPacket *packet = getUnusedPacket();
+
+    packet->setPacketType(quint8(RUDP::Reset));
+    packet->setPacketSerialNumber(createSerialNumberForControlPacket());
+    //packet->setRemainingRetransmissionTimes(-1);
+    QByteArray ba;
+    QDataStream out(&ba, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_7);
+    out << quint8(RUDP_VERSION);
+    packet->setPacketData(ba);
+
+    //tryingToSendPacket(packet);
+    sendPacket(packet);
+
+
+}
 
 void RUDPChannel::sendPacketDroppedInfo(quint16 packetID){
     qDebug()<<"--RUDPChannel::sendPacketDroppedInfo(...)"<<"---packetID:"<<packetID;
@@ -1822,7 +1841,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                         sendHandshakePacket(m_myHandshakeID + 1);
                     }
                 }else{
-                    reset();
+//                    reset();
                     m_peerHandshakeID = handshakeID;
                     sendHandshakePacket(m_myHandshakeID);
                     return;
@@ -1854,6 +1873,16 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         }
 
         qWarning()<<"~~Handshake--"<<" peerVersion:"<<peerVersion<<" peerMSS:"<<peerMSS;
+    }
+        break;
+    case quint8(RUDP::Reset):
+    {
+        quint8 peerVersion =0;
+        in >> peerVersion;
+
+        reset();
+
+        qWarning()<<"~~Reset--"<<" peerVersion:"<<peerVersion;
     }
         break;
     case quint8(RUDP::Goodbye):
