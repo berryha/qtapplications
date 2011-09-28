@@ -25,6 +25,8 @@ public:
     ~SystemManagementWidget();
 
 
+    QHostAddress peerIPAddress() const{return m_peerIPAddress;}
+
     
     
 signals:
@@ -32,6 +34,8 @@ signals:
 
 public slots:
     void setControlCenterPacketsParser(ControlCenterPacketsParser *parser);
+
+    void peerDisconnected(bool normalClose);
 
 
 protected:

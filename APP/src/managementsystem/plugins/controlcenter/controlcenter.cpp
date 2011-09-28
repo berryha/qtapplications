@@ -1096,7 +1096,21 @@ void ControlCenter::signalConnectToPeerTimeout(const QHostAddress &peerAddress, 
 }
 
 void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
-    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    qDebug()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+    if(!normalClose){
+        qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
+    }
+
+    int tabPages = ui.tabWidget->count();
+    for(int i = tabPages; i >= 0; --i){
+        SystemManagementWidget *widget = qobject_cast<SystemManagementWidget *>(ui.tabWidget->widget(i));
+        if(!widget){continue;}
+        if(widget->peerIPAddress() == peerAddress){
+            widget->peerDisconnected(normalClose);
+        }
+
+    }
 
 }
 
