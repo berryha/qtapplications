@@ -539,15 +539,12 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
 
     QString statement = "";
     if(login){
-        statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime, LogoutTime) values('%1', '%2', '%3', '%4') ").arg(imUserID).arg(userHostAddress).arg(curTime).arg(curTime);
+        //statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
+        statement = QString(" call sp_userlogin('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
     }else{
-        statement = QString("update loginhistories set LogoutTime = '%1' where UserID = '%2' and IPAddress ='%3' and LoginTime = LogoutTime").arg(curTime).arg(imUserID).arg(userHostAddress);
+        //statement = QString("start  transcation; select @MAXID:=max(ID) from loginhistories where UserID = '%1'; update loginhistories set LogoutTime = '%2' where ID = @MAXID; commit;").arg(curTime).arg(imUserID);
+        statement = QString(" call sp_userlogout('%1', '%2') ").arg(imUserID).arg(curTime);
     }
-//    if(login){
-//        statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
-//    }else{
-//        statement = QString("update loginhistories set LogoutTime = '%1' where ID = (select max(ID) from loginhistories where UserID = '%2') ").arg(curTime).arg(imUserID);
-//    }
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save user login info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
