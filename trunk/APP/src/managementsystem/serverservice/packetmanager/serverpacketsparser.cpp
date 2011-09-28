@@ -164,14 +164,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 //    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        //QString computerName;
-        //in >> computerName;
-        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), peerID);
-        qDebug()<<"~~HeartbeatPacket--"<<" peerID:"<<peerID;
-    }
-    break;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), peerID);
+//        qDebug()<<"~~HeartbeatPacket--"<<" peerID:"<<peerID;
+//    }
+//    break;
 //    case quint8(HEHUI::ConfirmationOfReceiptPacket):
 //    {
 //        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
@@ -183,7 +181,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 //    break;
     case quint8(MS::ClientLookForServer):
     {
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerID);
 
         quint16 peerRUDPListeningPort;
         in >> peerRUDPListeningPort;

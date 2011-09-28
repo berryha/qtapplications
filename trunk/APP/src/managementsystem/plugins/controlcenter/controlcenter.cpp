@@ -1020,15 +1020,15 @@ void ControlCenter::networkReady(){
 
 }
 
-void ControlCenter::serverFound(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version){
+void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
     qDebug()<<"----ControlCenter::serverFound(...)";
 
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverTCPListeningPort<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
 
     controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 
 
-    QString msg = tr("IP: %1<br>Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName).arg(version);
+    QString msg = tr("IP: %1<br>Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverRUDPListeningPort).arg(serverName).arg(version);
 
 #ifdef Q_OS_WIN
 

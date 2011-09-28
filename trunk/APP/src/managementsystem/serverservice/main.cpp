@@ -38,6 +38,9 @@ int main(int argc, char **argv)
         arguments.append(QString(argv[i]));
     }
 
+    //reset the message handler
+    qInstallMsgHandler(0);
+
     if(arguments.contains("-log", Qt::CaseInsensitive)){
         qInstallMsgHandler(logDebug);
         qAddPostRoutine(closeDebugLog);

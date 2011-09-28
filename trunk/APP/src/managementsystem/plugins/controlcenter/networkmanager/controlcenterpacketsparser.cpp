@@ -58,7 +58,7 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(NetworkManagerInstance *n
     Q_ASSERT_X(m_packetHandlerBase, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid PacketHandlerBase!");
 
     serverAddress = QHostAddress::Null;
-    serverTCPListeningPort = 0;
+    serverRUDPListeningPort = 0;
     serverName = "";
 
     heartbeatTimer = 0;
@@ -178,13 +178,13 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 //    qDebug()<<"--ControlCenterPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        //QString computerName;
-        //in >> computerName;
-        emit signalHeartbeatPacketReceived(peerName);
-    }
-    break;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        //QString computerName;
+//        //in >> computerName;
+//        emit signalHeartbeatPacketReceived(peerName);
+//    }
+//    break;
 //    case quint8(HEHUI::ConfirmationOfReceiptPacket):
 //    {
 //        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
@@ -196,18 +196,17 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 //    break;
     case quint8(MS::ServerDeclare):
     {
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString address = "";
         quint16 port = 0;
         QString version;
         in >> address >> port >> version;
-        serverAddress = QHostAddress(address);
-        serverTCPListeningPort = port;
+        serverAddress = peerAddress;
+        serverRUDPListeningPort = port;
         serverName = peerName;
-        emit signalServerDeclarePacketReceived(address, port, serverName, version);
+        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version);
 
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<peerName <<" serverTCPListeningPort:"<<serverTCPListeningPort;
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ClientOnline):
@@ -220,9 +219,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         quint16 port;
         in >> address >> port;
         serverAddress = QHostAddress(address);
-        serverTCPListeningPort = port;
+        serverRUDPListeningPort = port;
         serverName = peerName;
-        emit signalServerOnlinePacketReceived(serverAddress, serverTCPListeningPort, serverName);
+        emit signalServerOnlinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
     }
     break;
     case quint8(MS::ServerOffline):
@@ -231,9 +230,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         quint16 port = 0;
         in >> address >> port;
         serverAddress = QHostAddress::Null;
-        serverTCPListeningPort = 0;
+        serverRUDPListeningPort = 0;
         serverName = peerName;
-        emit signalServerOfflinePacketReceived(serverAddress, serverTCPListeningPort, serverName);
+        emit signalServerOfflinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
     }
     break;
     case quint8(MS::ClientResponseClientDetailedInfo):

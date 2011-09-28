@@ -231,6 +231,11 @@ public slots:
 //            packet = m_packetHandlerBase->getPacket(address, port, localIPMCListeningAddress, localIPMCListeningPort);
 //        }
 
+        if(address.isNull()){
+            address = serverAddress;
+            port = serverRUDPListeningPort;
+        }
+
         packet = m_packetHandlerBase->getPacket(address, port, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
         packet->setPacketType(quint8(MS::ClientResponseClientSummaryInfo));

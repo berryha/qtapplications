@@ -49,7 +49,7 @@ signals:
 private slots:
     bool startMainService();
 
-    void serverFound(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
     void processServerRequestClientInfoPacket(const QString &groupName, const QString &computerName, const QString &userName/*, const QString &address*/);
 
     void processClientDetailedInfoRequestedPacket(const QString &computerName, bool rescan, const QString &peerAddress, quint16 peerPort);
@@ -158,6 +158,8 @@ private:
     quint16 peerPortThatRequiresDetailedInfo;
 
     RUDPSocket *rudpSocket;
+
+    QTimer *lookForServerTimer;
 
 
 };

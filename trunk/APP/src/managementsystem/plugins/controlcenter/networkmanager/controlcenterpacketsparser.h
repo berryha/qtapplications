@@ -396,7 +396,7 @@ signals:
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
     //    void signalClientLookForServerPacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
-    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
 
     //    void signalClientOnlinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
     //    void signalClientOfflinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
@@ -441,7 +441,7 @@ private:
 
 private:
     QHostAddress serverAddress;
-    quint16 serverTCPListeningPort;
+    quint16 serverRUDPListeningPort;
     QString serverName;
 
     QHostAddress ipmcGroupAddress;
