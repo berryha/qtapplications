@@ -211,6 +211,18 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 
 }
 
+void SystemManagementWidget::peerDisconnected(bool normalClose){
+
+    ui.tabSystemInfo->setEnabled(false);
+    ui.tabRemoteManagement->setEnabled(false);
+    ui.toolButtonVerify->setEnabled(true);
+
+    if(!normalClose){
+        QMessageBox::critical(this, tr("Error"), QString("ERROR! Peer %1 Closed Unexpectedly!").arg(m_peerIPAddress.toString()));
+    }
+
+}
+
 void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     if(!verifyPrivilege()){

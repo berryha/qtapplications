@@ -2240,7 +2240,11 @@ void MainWindow::signalConnectToPeerTimeout(const QHostAddress &peerAddress, qui
 }
 
 void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
-    qWarning()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    qDebug()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+    if(!normalClose){
+        qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
+    }
 
 }
 

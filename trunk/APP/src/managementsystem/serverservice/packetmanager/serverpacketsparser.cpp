@@ -199,9 +199,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString peerName;
         bool isAdmin;
         in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
-        emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, true, isAdmin);
-        //emit signalClientOnlinePacketReceived(QHostAddress(peerAddress), peerPort, peerName);
-        qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerRUDPListeningAddress<<"   peerName:"<<peerName;
+        //emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, true, isAdmin);
+        emit signalClientOnlineStatusChanged(peerAddress.toString(), peerRUDPListeningPort, peerName, true, isAdmin);
+
+        qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerAddress<<"   peerName:"<<peerName;
     }
     break;
     case quint8(MS::ClientOffline):
@@ -211,9 +212,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString peerName;
         bool isAdmin;
         in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
-        emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, false, isAdmin);
-        //emit signalClientOfflinePacketReceived(QHostAddress(peerAddress), peerPort, peerName);
-        qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerRUDPListeningAddress<<"   peerName:"<<peerName;;
+        //emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, false, isAdmin);
+        emit signalClientOnlineStatusChanged(peerAddress.toString(), peerRUDPListeningPort, peerName, false, isAdmin);
+        qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerAddress.toString()<<"   peerName:"<<peerName;;
     }
     break;
     //    case quint8(MS::ServerOnline):
