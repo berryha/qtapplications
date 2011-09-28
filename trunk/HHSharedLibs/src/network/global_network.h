@@ -97,7 +97,7 @@ enum TransmissionProtocol {TP_TCP = 1, TP_UDP = 2, TP_RUDP = 3, TP_UNKNOWN = 4};
 
 enum UDPTransmissionMode {UDP_TM_MULTICAST = 1, UDP_TM_BROADCAST = 2, UDP_TM_DIRECT = 3};
 
-enum PacketType{UnKnownPacket = 0, HeartbeatPacket = 1, ConfirmationOfReceiptPacket = 2, TextPacket = 3, BinPacket = 4, UserDefinedPacket = 5};
+enum PacketType{UnKnownPacket = 0, /*HeartbeatPacket = 1, ConfirmationOfReceiptPacket = 2,*/ TextPacket = 3, BinPacket = 4, UserDefinedPacket = 5};
 
 
 
