@@ -75,10 +75,11 @@ QStringList DatabaseUtility::availableDrivers()  {
 
 
 QSqlError DatabaseUtility::openDatabase(const QString &connectionNameString, const QString &driver,
-                                        const QString &host, int port, const QString &user, const QString &passwd, const QString &databaseName, HEHUI::DatabaseType databaseType)
+                                        const QString &host, int port, const QString &user, const QString &passwd,
+                                        const QString &databaseName, HEHUI::DatabaseType databaseType)
 {
 
-    qDebug()<<"----DatabaseUtility::openDatabase(...)";
+    //qDebug()<<"--DatabaseUtility::DatabaseUtility::openDatabase(...)";
 
     Q_ASSERT_X(!driver.isEmpty(), "DatabaseUtility::openDatabase(...)", "'driver' is empty!");
     Q_ASSERT_X(!databaseName.isEmpty(), "DatabaseUtility::openDatabase(...)", "'databaseName' is empty!");
@@ -143,7 +144,7 @@ QSqlError DatabaseUtility::openDatabase(const QString &connectionNameString, con
 QSqlError DatabaseUtility::openRemoteDatabase(const QString &connectionName, const QString &driver,
                                               const QString &host, int port, const QString &user, const QString &passwd, const QString &databaseName, HEHUI::DatabaseType databaseType)
 {
-    qDebug()<<"----DatabaseUtility::openRemoteDatabase(...)";
+    //qDebug()<<"--DatabaseUtility::DatabaseUtility::openRemoteDatabase(...)";
 
     Q_ASSERT_X(!driver.isEmpty(), "DatabaseUtility::openRemoteDatabase(...)", "'driver' is empty!");
     Q_ASSERT_X(!databaseName.isEmpty(), "DatabaseUtility::openRemoteDatabase(...)", "'databaseName' is empty!");
