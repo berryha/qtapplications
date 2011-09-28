@@ -192,12 +192,12 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 //    qDebug()<<"--ClientPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
-    case quint8(HEHUI::HeartbeatPacket):
-    {
-        emit signalHeartbeatPacketReceived(peerName);
-        qDebug()<<"~~HeartbeatPacket--"<<" computerName:"<<peerName;
-    }
-    break;
+//    case quint8(HEHUI::HeartbeatPacket):
+//    {
+//        emit signalHeartbeatPacketReceived(peerName);
+//        qDebug()<<"~~HeartbeatPacket--"<<" computerName:"<<peerName;
+//    }
+//    break;
 //    case quint8(HEHUI::ConfirmationOfReceiptPacket):
 //    {
 //        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
@@ -209,13 +209,12 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 //    break;
     case quint8(MS::ServerDeclare):
     {
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString address = "";
         quint16 port = 0;
         QString version = "";
         in >> address >> port >> version;
-        serverAddress = QHostAddress(address);
+        serverAddress = peerAddress;
         serverRUDPListeningPort = port;
         serverName = peerName;
 
@@ -223,9 +222,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 //        startHeartbeat();
 
-//        m_packetHandlerBase->removeWaitingForReplyPacket(clientLookForServerPacketSerialNumber, 0);
         emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version);
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<serverName <<" serverTCPListeningPort:"<<serverRUDPListeningPort;
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ClientOnline):

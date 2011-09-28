@@ -871,9 +871,9 @@ signals:
 
 
 
-    void signalServerDeclarePacketReceived(const QString &m_serverAddress, quint16 serverUDPListeningPort, const QString &serverName, const QString &version);
-    void signalServerOnlinePacketReceived(const QHostAddress m_serverAddress, quint16 serverUDPListeningPort, const QString &serverName);
-    void signalServerOfflinePacketReceived(const QHostAddress m_serverAddress, quint16 serverUDPListeningPort, const QString &serverName);
+    void signalServerDeclarePacketReceived(const QString &m_serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
+    void signalServerOnlinePacketReceived(const QHostAddress m_serverAddress, quint16 serverRUDPListeningPort, const QString &serverName);
+    void signalServerOfflinePacketReceived(const QHostAddress m_serverAddress, quint16 serverRUDPListeningPort, const QString &serverName);
     void signalServerAnnouncementPacketReceived(const QString &announcement, bool mustRead = true);
 
 private:

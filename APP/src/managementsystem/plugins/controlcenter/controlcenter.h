@@ -83,7 +83,7 @@ private slots:
 
     void networkReady();
 
-    void serverFound(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
+    void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version);
 
     void updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
     

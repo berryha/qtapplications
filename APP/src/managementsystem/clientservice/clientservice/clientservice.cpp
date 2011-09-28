@@ -67,6 +67,8 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
 
     rudpSocket = 0;
 
+    lookForServerTimer = 0;
+
 
 }
 
@@ -188,7 +190,12 @@ bool ClientService::startMainService(){
     //TODO:
     //clientPacketsParser->sendClientLookForServerPacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName(), getServerLastUsed());
     clientPacketsParser->sendClientLookForServerPacket(getServerLastUsed());
-    QTimer::singleShot(60000, this, SLOT(checkHasAnyServerBeenFound()));
+    //QTimer::singleShot(15000, this, SLOT(checkHasAnyServerBeenFound()));
+    lookForServerTimer = new QTimer(this);
+    lookForServerTimer->setSingleShot(true);
+    connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
+    lookForServerTimer->start(15000);
+
 
     mainServiceStarted = true;
 
@@ -202,7 +209,7 @@ bool ClientService::startMainService(){
     checkUSBSD();
     checkProgrames();
 
-    setupStartupWithSafeMode(true);
+//    setupStartupWithSafeMode(true);
 
     QString section = serviceName() + "/LastCheckUpdate";
     QSettings settings(QCoreApplication::applicationDirPath()+"/.update", QSettings::IniFormat, this);
@@ -239,14 +246,14 @@ bool ClientService::startMainService(){
 
 }
 
-void ClientService::serverFound(const QString &serverAddress, quint16 serverTCPListeningPort, const QString &serverName, const QString &version){
+void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
     qDebug()<<"----ClientService::serverFound(...)";
 
     setServerLastUsed(serverAddress);
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverTCPListeningPort<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
     qWarning();
 
     int msec = QDateTime::currentDateTime().toString("z").toUInt();
@@ -262,8 +269,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverTCPL
     //clientPacketsParser->sendClientOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), QHostInfo::localHostName(), false);
     QTimer::singleShot(60*msec, this, SLOT(uploadClientSummaryInfo()));
     //uploadClientInfo();
-
-
 
 
     QString section = serviceName() + "/LastUpdateSystemDetailedInfo";
@@ -1015,6 +1020,7 @@ void ClientService::consoleProcessOutputRead(const QString &output){
 
 
 void ClientService::uploadClientSummaryInfo(const QString &targetAddress, quint16 targetPort){
+    qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
 
 #ifdef Q_OS_WIN
 
@@ -1590,11 +1596,21 @@ void ClientService::setServerLastUsed(const QString &serverAddress){
 
 void ClientService::checkHasAnyServerBeenFound(){
 
+
     if(clientPacketsParser->getServerAddress().isNull()){
         qWarning()<<"No server found!";
-        //clientPacketsParser->sendClientLookForServerPacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName());
         clientPacketsParser->sendClientLookForServerPacket();
 
+        int interval = lookForServerTimer->interval();
+        interval *= 2;
+        if(interval > 300000){
+            interval = 300000;
+        }
+        lookForServerTimer->start(interval);
+    }else{
+        lookForServerTimer->stop();
+        delete lookForServerTimer;
+        lookForServerTimer = 0;
     }
 
 }
