@@ -37,7 +37,7 @@ CREATE TABLE `cachedchatmessages` (
   KEY `FK_cachemessages_users_ID_SenderID` (`SenderID`),
   CONSTRAINT `FK_cachemessages_users_UserID_ReceiverID` FOREIGN KEY (`RecieverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_cachemessages_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
 
 --
 -- Dumping data for table `cachedchatmessages`
@@ -89,13 +89,15 @@ CREATE TABLE `friendshipapply` (
   KEY `FK_friendshipapply_users_ID_ReceiverID` (`ReceiverID`),
   CONSTRAINT `FK_friendshipapply_users_UserID_ReceiverID` FOREIGN KEY (`ReceiverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_friendshipapply_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友请求';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='好友请求';
 
 --
 -- Dumping data for table `friendshipapply`
 --
 
 /*!40000 ALTER TABLE `friendshipapply` DISABLE KEYS */;
+INSERT INTO `friendshipapply` (`ID`,`SenderID`,`ReceiverID`,`ExtraMessage`,`Result`,`SenderRead`,`ReceiverRead`) VALUES 
+ (1,'admin','kiwa','','1','1','0');
 /*!40000 ALTER TABLE `friendshipapply` ENABLE KEYS */;
 
 
@@ -225,13 +227,19 @@ CREATE TABLE `loginhistories` (
   PRIMARY KEY (`ID`),
   KEY `FK_loginhistories_UserID` (`UserID`),
   CONSTRAINT `FK_loginhistories_UserID` FOREIGN KEY (`UserID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='登陆历史';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='登陆历史';
 
 --
 -- Dumping data for table `loginhistories`
 --
 
 /*!40000 ALTER TABLE `loginhistories` DISABLE KEYS */;
+INSERT INTO `loginhistories` (`ID`,`UserID`,`IPAddress`,`LoginTime`,`LogoutTime`) VALUES 
+ (1,'hehui','200.200.200.1','2011-09-27 18:02:20',NULL),
+ (2,'hehui','200.200.200.1','2011-09-27 18:02:44',NULL),
+ (3,'hehui','200.200.200.17','2011-09-27 18:03:04','2011-09-27 19:50:50'),
+ (4,'admin','200.200.200.2','2011-09-27 18:52:39',NULL),
+ (5,'hehui','200.200.200.17','2011-09-27 18:52:40',NULL);
 /*!40000 ALTER TABLE `loginhistories` ENABLE KEYS */;
 
 
@@ -498,34 +506,6 @@ CREATE TABLE `users_summary_info_` (
 /*!40000 ALTER TABLE `users_summary_info_` DISABLE KEYS */;
 /*!40000 ALTER TABLE `users_summary_info_` ENABLE KEYS */;
 
-
---
--- Definition of procedure `sp_userlogin`
---
-
-DROP PROCEDURE IF EXISTS `sp_userlogin`;
-
-DELIMITER $$
-
-/*!50003 SET @TEMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ $$
-(nil) $$
-/*!50003 SET SESSION SQL_MODE=@TEMP_SQL_MODE */  $$
-
-DELIMITER ;
-
---
--- Definition of procedure `sp_userlogout`
---
-
-DROP PROCEDURE IF EXISTS `sp_userlogout`;
-
-DELIMITER $$
-
-/*!50003 SET @TEMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ $$
-(nil) $$
-/*!50003 SET SESSION SQL_MODE=@TEMP_SQL_MODE */  $$
-
-DELIMITER ;
 
 
 
