@@ -40,7 +40,7 @@
 //#endif
 
 #ifndef RUDP_MAX_CHECK_ALIVE_TIMES
-#define RUDP_MAX_CHECK_ALIVE_TIMES 3
+#define RUDP_MAX_CHECK_ALIVE_TIMES 2
 #endif
 
 #ifndef RUDP_MAX_PACKET_SN

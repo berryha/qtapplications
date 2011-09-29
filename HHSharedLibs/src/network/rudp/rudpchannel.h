@@ -22,8 +22,8 @@ class MYSHAREDLIB_API RUDPChannel : public QObject
 public:
     enum ChannelState {UnconnectedState, ConnectingState, DisconnectingState, ConnectedState};
 
-    explicit RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
-    RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent = 0);
+    explicit RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL, QObject *parent = 0);
+    explicit RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL, QObject *parent = 0);
 
     ~RUDPChannel();
 
@@ -36,7 +36,10 @@ public:
     void setPeerHostPort(quint16 port){m_peerPort = port;}
     quint16 getPeerHostPort()const{return m_peerPort;}
 
-    bool canSendData(qint64 size);
+    void setKeepAliveTimerInterval(int msec){this->m_keepAliveTimerInterval = msec;}
+    int getKeepAliveTimerInterval(){return m_keepAliveTimerInterval;}
+
+//    bool canSendData(qint64 size);
 
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
@@ -158,6 +161,9 @@ private:
 
 private:
 
+    QUdpSocket *m_udpSocket;
+    PacketHandlerBase *m_packetHandlerBase;
+
     QHostAddress m_peerAddress;
     quint16 m_peerPort;
 
@@ -267,64 +273,11 @@ private:
 
     quint16 m_packetSerialNumber;
 
-    QUdpSocket *m_udpSocket;
-    PacketHandlerBase *m_packetHandlerBase;
 
 
     QTimer *m_connectToPeerTimer;
     int m_msecConnectToPeerTimeout;
 
-//    uint m_handshakeID;
-//    //bool m_connected;
-
-//    quint16 m_firstReceivedPacketIDInReceiveWindow;
-//    QHash<quint16/*Packet SN*/, RUDPPacket*> m_cachedReceivedPacketsHash;
-
-//    quint16 m_sendWindowSize;
-////    quint64 m_sendBufferSize;
-//    quint64 m_globalFreeSendBufferSize;
-//    QMutex m_globalFreeSendBufferSizeMutex;
-////    quint32 m_maxCachedToBeSentPacketsCount;
-
-//    quint16 m_firstWaitingForACKPacketIDInSendWindow;
-//    QHash<quint16/*Packet SN*/, RUDPPacket*> m_waitingForACKPacketsHash; //waiting for ACK
-//    QList<quint16/*Packet SN*/> m_ackedPackets;
-
-
-//    QHash<quint16/*Packet SN*/, RUDPPacket*> m_ToBeSentPacketsHash; //waiting for Tx
-//    //QList<quint16/*Packet SN*/>  m_ToBeSentPacketQueue;
-
-
-
-//    quint16 m_receivedFragmentDataPacketID;
-//    QHash<quint16/*Packet SN*/, RUDPPacket*> m_receivedFragmentDataPackets;
-
-
-
-//    QList<quint16/*Packet SN*/> m_lastReceivedPackets;
-
-
-
-
-
-//    QList<RUDPPacket *> m_unusedPackets;
-//    QMutex unusedPacketsMutex;
-
-
-
-//    QTimer *m_keepAliveTimer;
-//    int m_keepAliveTimerInterval;
-//    QDateTime m_peerLastLiveTime;
-//    QDateTime m_lastPacketSentTime;
-
-//    QTimer *m_checkPeerAliveTimer;
-//    int m_checkPeerAliveTimes;
-
-//    ChannelState m_ChannelState;
-
-//    quint16 m_packetSerialNumber;
-
-//    QUdpSocket *m_udpSocket;
 
 
     quint32 m_fragmentCount;

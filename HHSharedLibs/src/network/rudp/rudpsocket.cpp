@@ -18,8 +18,8 @@
 namespace HEHUI{
 
 
-RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent) :
-    QUdpSocket(parent), m_packetHandlerBase(packetHandlerBase)
+RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval, QObject *parent) :
+    QUdpSocket(parent), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
@@ -168,8 +168,8 @@ void RUDPSocket::readPendingDatagrams() {
 
 
                 RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-                QtConcurrent::run(channel, &RUDPChannel::datagramReceived, *datagram);
-                //channel->datagramReceived(*datagram);
+                //QtConcurrent::run(channel, &RUDPChannel::datagramReceived, *datagram);
+                channel->datagramReceived(*datagram);
 
         }
 
@@ -207,7 +207,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
     if(!peers.contains(channelID)){
         if(m_unusedRUDPChannels.isEmpty()){
             qWarning()<<"Create new channel:"<<channelID;
-            channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, 0);
+            channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, m_keepAliveTimerInterval, 0);
 //            connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
 //            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
             connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
@@ -235,7 +235,6 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 //        }
 
         channel = peers.value(channelID);
-
     }
 
     return channel;
