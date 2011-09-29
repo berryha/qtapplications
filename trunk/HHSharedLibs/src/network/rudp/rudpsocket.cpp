@@ -217,11 +217,12 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
-//            channel->start();
+            channel->start();
             peers.insert(channelID, channel);
         }else{
             qWarning()<<"Use idle channel:"<<channelID;
             channel = m_unusedRUDPChannels.takeFirst();
+            channel->start();
         }
 
     }else{
@@ -243,6 +244,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
 inline void RUDPSocket::recyleRUDPChannel(RUDPChannel *channel){
 
+    channel->quit();
     m_unusedRUDPChannels.append(channel);
 
 }

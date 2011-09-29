@@ -32,7 +32,7 @@ QMutex * RUDPChannel::m_freeSendBufferSizeMutex = new QMutex();
 
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval, QObject *parent)
-    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
+    :QThread(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
     Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
@@ -80,7 +80,7 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 }
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, int keepAliveTimerInterval, QObject *parent)
-    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
+    :QThread(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
     Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
@@ -177,10 +177,10 @@ RUDPChannel::~RUDPChannel(){
 
 }
 
-//void RUDPChannel::run(){
+void RUDPChannel::run(){
 
-//    exec();
-//}
+    exec();
+}
 
 
 void RUDPChannel::connectToPeer(int msecTimeout){

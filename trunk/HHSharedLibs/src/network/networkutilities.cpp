@@ -52,21 +52,20 @@ NetworkUtilities::~NetworkUtilities() {
 
 
 QList<QHostAddress> NetworkUtilities::broadcastAddresses(){
-	  QList<QHostAddress> broadcastAddresses;
-	  //QList<QHostAddress> ipAddresses;
-  foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-      foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
-          QHostAddress broadcastAddress = entry.broadcast();
-          if (broadcastAddress != QHostAddress::Null &&
-              entry.ip() != QHostAddress::LocalHost) {
-              broadcastAddresses << broadcastAddress;
-              qDebug()<<"----NetworkUtilities::broadcastAddresses()~~broadcastAddress:"<<broadcastAddress.toString();
-              //ipAddresses << entry.ip();
-          }
-      }
-  }
+    QList<QHostAddress> broadcastAddresses;
+    //QList<QHostAddress> ipAddresses;
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+            QHostAddress broadcastAddress = entry.broadcast();
+            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
+                broadcastAddresses << broadcastAddress;
+                qDebug()<<"----NetworkUtilities::broadcastAddresses()~~broadcastAddress:"<<broadcastAddress.toString();
+                //ipAddresses << entry.ip();
+            }
+        }
+    }
 
-  return broadcastAddresses;
+    return broadcastAddresses;
 
 }
 
