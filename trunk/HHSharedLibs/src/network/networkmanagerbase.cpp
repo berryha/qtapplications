@@ -314,7 +314,7 @@ RUDPServer * NetworkManagerBase::getRUDPServer(quint16 port, const QHostAddress 
 
 }
 
-RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort){
+RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort, int keepAliveTimerInterval){
 
     m_errorString = "";
 
@@ -324,7 +324,7 @@ RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &lo
         qWarning()<<m_errorString;
         return rudpServer;
     }else{
-        rudpServer = new RUDPServer(m_packetHandlerBase, this);
+        rudpServer = new RUDPServer(m_packetHandlerBase, keepAliveTimerInterval, this);
     }
 
     QHostAddress address = localAddress;

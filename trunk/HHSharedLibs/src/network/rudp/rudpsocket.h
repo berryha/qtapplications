@@ -53,7 +53,7 @@ class MYSHAREDLIB_API RUDPSocket : public QUdpSocket
 {
     Q_OBJECT
 public:
-    explicit RUDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
+    explicit RUDPSocket(PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL, QObject *parent = 0);
 
     ~RUDPSocket();
 
@@ -101,6 +101,8 @@ private:
     QByteArray *datagram;
 
     QList<RUDPChannel*> m_unusedRUDPChannels;
+
+    int m_keepAliveTimerInterval;
 
 
 

@@ -31,36 +31,45 @@ QMutex * RUDPChannel::m_freeSendBufferSizeMutex = new QMutex();
 //QMutex * RUDPChannel::unusedPacketsMutex = new QMutex();
 
 
-RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, QObject *parent)
-    :QObject(parent), m_packetHandlerBase(packetHandlerBase)
+RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval, QObject *parent)
+    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
+    Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
 
+
+    init();
 
 
 
     sendACKTimer = new QTimer();
     connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
+//    sendACKTimer = 0;
+//    startSendACKTimer();
 
     sendNACKTimer = new QTimer();
     connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
+//    sendNACKTimer = 0;
+//    startSendNACKTimer();
 
     retransmissionTimer = new QTimer();
     connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
+//    retransmissionTimer = 0;
+//    startRetransmissionTimer();
 
     m_keepAliveTimer = new QTimer();
     connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
+//    m_keepAliveTimer = 0;
+//    startKeepAliveTimer();
 
     m_checkPeerAliveTimer = new QTimer();
     connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
+//    m_checkPeerAliveTimer = 0;
+//    startCheckPeerAliveTimer();
 
 
 
-    init();
-
-    m_udpSocket = udpSocket;
-    Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
 
     m_peerAddress = QHostAddress::Null;
     m_peerPort = 0;
@@ -70,34 +79,43 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
 }
 
-RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, QObject *parent)
-    :QObject(parent), m_packetHandlerBase(packetHandlerBase)
+RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, int keepAliveTimerInterval, QObject *parent)
+    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
+    Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
     Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
-
-
-
-    sendACKTimer = new QTimer();
-    connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
-
-    sendNACKTimer = new QTimer();
-    connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
-
-    retransmissionTimer = new QTimer();
-    connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
-
-    m_keepAliveTimer = new QTimer();
-    connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
-
-    m_checkPeerAliveTimer = new QTimer();
-    connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
 
 
     init();
 
-    m_udpSocket = udpSocket;
-    Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
+
+        sendACKTimer = new QTimer();
+        connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
+//    sendACKTimer = 0;
+//    startSendACKTimer();
+
+        sendNACKTimer = new QTimer();
+        connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
+//    sendNACKTimer = 0;
+//    startSendNACKTimer();
+
+        retransmissionTimer = new QTimer();
+        connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
+//    retransmissionTimer = 0;
+//    startRetransmissionTimer();
+
+        m_keepAliveTimer = new QTimer();
+        connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
+//    m_keepAliveTimer = 0;
+//    startKeepAliveTimer();
+
+        m_checkPeerAliveTimer = new QTimer();
+        connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
+//    m_checkPeerAliveTimer = 0;
+//    startCheckPeerAliveTimer();
+
+
 
     m_peerAddress = peerAddress;
     m_peerPort = peerPort;
@@ -800,7 +818,7 @@ void RUDPChannel::sendPacketDroppedInfo(quint16 packetID){
 }
 
 void RUDPChannel::sendKeepAlivePacket(){
-    //qDebug()<<"--RUDPChannel::sendKeepAlivePacket()";
+    qDebug()<<"--RUDPChannel::sendKeepAlivePacket()";
 
     RUDPPacket *packet = getUnusedPacket();
 
@@ -1042,7 +1060,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
 }
 
 void RUDPChannel::startKeepAliveTimer(){
-    //qDebug()<<"--RUDPChannel::startKeepAliveTimer()";
+    qDebug()<<"--RUDPChannel::startKeepAliveTimer()";
 
     if(!m_keepAliveTimer){
         m_keepAliveTimer = new QTimer();
@@ -1053,7 +1071,7 @@ void RUDPChannel::startKeepAliveTimer(){
 }
 
 void RUDPChannel::keepAliveTimerTimeout(){
-    //qDebug()<<"--RUDPChannel::keepAliveTimerTimeout()";
+    qDebug()<<"--RUDPChannel::keepAliveTimerTimeout()";
 
     //if(m_lastPacketSentTime.addMSecs(m_keepAliveTimerInterval+RTT) <= QDateTime::currentDateTime()){
         sendKeepAlivePacket();
@@ -1062,7 +1080,7 @@ void RUDPChannel::keepAliveTimerTimeout(){
 }
 
 void RUDPChannel::startCheckPeerAliveTimer(){
-    //qDebug()<<"--RUDPChannel::startCheckPeerAliveTimer()";
+    qDebug()<<"--RUDPChannel::startCheckPeerAliveTimer()";
 
     if(!m_checkPeerAliveTimer){
         m_checkPeerAliveTimer = new QTimer();
@@ -1072,7 +1090,7 @@ void RUDPChannel::startCheckPeerAliveTimer(){
 }
 
 void RUDPChannel::checkPeerAliveTimerTimeout(){
-    //qDebug()<<"--RUDPChannel::checkPeerAliveTimerTimeout()";
+    qDebug()<<"--RUDPChannel::checkPeerAliveTimerTimeout()";
 
     if(m_peerLastLiveTime.addMSecs(m_keepAliveTimerInterval) <= QDateTime::currentDateTime()){
         m_checkPeerAliveTimes--;
@@ -1232,6 +1250,7 @@ void RUDPChannel::startSendACKTimer(){
 }
 
 void RUDPChannel::sendACKTimerTimeout(){
+
 //    qDebug()<<"--RUDPChannel::sendACKTimerTimeout()";
 
 //    quint16 sn = 0;
@@ -1656,9 +1675,8 @@ void RUDPChannel::init(){
 
 
     m_keepAliveTimer = 0;
-    m_keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL;
+    //m_keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL;
     m_peerLastLiveTime = QDateTime();
-//    m_lastPacketSentTime = QDateTime();
 
     m_checkPeerAliveTimer = 0;
     m_checkPeerAliveTimes = RUDP_MAX_CHECK_ALIVE_TIMES;
@@ -1676,7 +1694,11 @@ void RUDPChannel::reset(){
 
 
     if(m_connectToPeerTimer){
+        qDebug()<<"-------------------------------------------1";
+
         m_connectToPeerTimer->stop();
+        qDebug()<<"-------------------------------------------1";
+
         //delete m_connectToPeerTimer;
         //m_connectToPeerTimer = 0;
     }
@@ -1688,34 +1710,50 @@ void RUDPChannel::reset(){
     //}
 
     if(sendACKTimer){
-        qDebug()<<"-------------------------------------------1";
+        qDebug()<<"-------------------------------------------3";
         sendACKTimer->stop();
-        qDebug()<<"-------------------------------------------2";
+        qDebug()<<"-------------------------------------------4";
 
         //delete sendACKTimer;
         //sendACKTimer = 0;
     }
 
     if(sendNACKTimer){
+        qDebug()<<"-------------------------------------------5";
+
         sendNACKTimer->stop();
+        qDebug()<<"-------------------------------------------6";
+
         //delete sendNACKTimer;
         //sendNACKTimer = 0;
     }
 
     if(retransmissionTimer){
+        qDebug()<<"-------------------------------------------7";
+
         retransmissionTimer->stop();
+        qDebug()<<"-------------------------------------------8";
+
         //delete retransmissionTimer;
         //retransmissionTimer = 0;
     }
 
     if(m_keepAliveTimer){
+        qDebug()<<"-------------------------------------------9";
+
         m_keepAliveTimer->stop();
+        qDebug()<<"-------------------------------------------10";
+
         //delete m_keepAliveTimer;
         //m_keepAliveTimer = 0;
     }
 
     if(m_checkPeerAliveTimer){
+        qDebug()<<"-------------------------------------------11";
+
         m_checkPeerAliveTimer->stop();
+        qDebug()<<"-------------------------------------------12";
+
         //delete m_checkPeerAliveTimer;
         //m_checkPeerAliveTimer = 0;
     }
@@ -1840,6 +1878,9 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                     if(m_ChannelState == UnconnectedState){
                         sendHandshakePacket(m_myHandshakeID + 1);
                     }
+                    if(m_ChannelState == ConnectingState){
+                        startKeepAliveTimer();
+                    }
                 }else{
 //                    reset();
                     m_peerHandshakeID = handshakeID;
@@ -1859,20 +1900,22 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                 m_MSS = peerMSS;
             }
 
-            startCheckPeerAliveTimer();
 
             m_ChannelState = ConnectedState;
             startSendACKTimer();
             startSendNACKTimer();
             startRetransmissionTimer();
 
+            startCheckPeerAliveTimer();
 
 //            peerConnected();
             emit peerConnected(m_peerAddress, m_peerPort);
 
+            qDebug()<<"--Peer Connected! IP:"<<m_peerAddress;
+
         }
 
-        qWarning()<<"~~Handshake--"<<" peerVersion:"<<peerVersion<<" peerMSS:"<<peerMSS;
+        //qDebug()<<"~~Handshake--"<<" peerVersion:"<<peerVersion<<" peerMSS:"<<peerMSS;
     }
         break;
     case quint8(RUDP::Reset):
@@ -1966,7 +2009,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //retransmissionTimerInterval = 3 * RTT + SYN;
 
 
-        qDebug()<<"------------------- ACK2 ---------------------"<<"rtt:"<<rtt<<" RTT:"<<RTT<<" RTTVar:"<<RTTVar<<" sendACKTimerInterval:"<<sendACKTimerInterval;
+        //qDebug()<<"------------------- ACK2 ---------------------"<<"rtt:"<<rtt<<" RTT:"<<RTT<<" RTTVar:"<<RTTVar<<" sendACKTimerInterval:"<<sendACKTimerInterval;
 
         //TODO: 删除 ACKPacketInfo
         // delete info;
@@ -2371,16 +2414,15 @@ void RUDPChannel::cleanAllUnusedPackets(){
 
 }
 
-bool RUDPChannel::canSendData(qint64 size){
+//bool RUDPChannel::canSendData(qint64 size){
 
-    if(size > getGlobalFreeSendBufferSize()){
-        qCritical()<<"ERROR! Can not send data! There is not enough buffer to cache the data! Free buffer size:"<<getGlobalFreeSendBufferSize();
-        return false;
-    }
+//    if(size > getGlobalFreeSendBufferSize()){
+//        qCritical()<<"ERROR! Can not send data! There is not enough buffer to cache the data! Free buffer size:"<<getGlobalFreeSendBufferSize();
+//        return false;
+//    }
 
-    return true;
-
-}
+//    return true;
+//}
 
 void RUDPChannel::setGlobalSendBufferSize(qint64 size){
 

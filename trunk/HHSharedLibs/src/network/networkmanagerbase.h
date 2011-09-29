@@ -78,7 +78,7 @@ public:
     bool startIPMulticastServerListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
 
     RUDPServer * getRUDPServer(quint16 port, const QHostAddress &localAddress);
-    RUDPServer * startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort);
+    RUDPServer * startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL);
 
     TcpServer *getTcpServer(quint16 port, const QHostAddress &serverIPAddress);
     bool startTCPServerListening(const QHostAddress &localAddress = QHostAddress::Any, quint16 port = 0);
