@@ -235,6 +235,9 @@ public slots:
             address = serverAddress;
             port = serverRUDPListeningPort;
         }
+        if(address.isNull()){
+            return;
+        }
 
         packet = m_packetHandlerBase->getPacket(address, port, m_localRUDPListeningAddress, m_localRUDPListeningPort);
 
