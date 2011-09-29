@@ -16,7 +16,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API RUDPChannel : public QObject
+class MYSHAREDLIB_API RUDPChannel : public QThread
 {
     Q_OBJECT
 public:
@@ -27,7 +27,7 @@ public:
 
     ~RUDPChannel();
 
-//    void run();
+    void run();
 
 
 
