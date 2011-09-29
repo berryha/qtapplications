@@ -674,10 +674,10 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     case STIDT_Unknown:
     {
         qWarning()<<"Unknown SystemTrayIconDataType: "<<dataTypeCode;
-        if(reason == QSystemTrayIcon::DoubleClick){
+        //if(reason == QSystemTrayIcon::DoubleClick){
             this->showNormal();
             this->raise();
-        }
+        //}
     }
     break;
     case STIDT_SystemMessage:
