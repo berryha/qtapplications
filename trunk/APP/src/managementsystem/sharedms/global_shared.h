@@ -78,6 +78,10 @@
 #define MIN_THREAD_COUNT 10
 #endif
 
+#ifndef MS_RUDP_KEEPALIVE_TIMER_INTERVAL
+#define MS_RUDP_KEEPALIVE_TIMER_INTERVAL 30000 //1 minute
+#endif
+
 
 #include "HHSharedNetwork/hglobal_network.h"
 

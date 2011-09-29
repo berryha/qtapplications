@@ -171,10 +171,10 @@ RUDPSocket * NetworkManager::startRUDPServer(const QHostAddress &address, quint1
         rudpSocket = getRUDPServer(m_localRUDPListeningPort, m_localRUDPListeningAddress);
     }
     if(!rudpSocket){
-        rudpSocket = startRUDPServerListening(address, port);
+        rudpSocket = startRUDPServerListening(address, port, IM_RUDP_KEEPALIVE_TIMER_INTERVAL);
     }
     if(!rudpSocket && tryOtherPort){
-        rudpSocket = startRUDPServerListening(address, 0);
+        rudpSocket = startRUDPServerListening(address, 0, IM_RUDP_KEEPALIVE_TIMER_INTERVAL);
     }
     if(rudpSocket){
         m_localRUDPListeningPort = rudpSocket->localPort();
