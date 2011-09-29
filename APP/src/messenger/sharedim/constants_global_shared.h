@@ -102,6 +102,10 @@
 #define MAX_MESSAGE_SIZE    470
 #endif
 
+#ifndef IM_RUDP_KEEPALIVE_TIMER_INTERVAL
+#define IM_RUDP_KEEPALIVE_TIMER_INTERVAL 30000 //1 minute
+#endif
+
 
 
 namespace HEHUI {
