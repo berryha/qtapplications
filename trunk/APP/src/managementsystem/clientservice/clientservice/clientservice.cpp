@@ -70,6 +70,11 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     lookForServerTimer = 0;
 
 
+    m_serverAddress = QHostAddress::Null;
+    m_serverRUDPListeningPort = 0;
+    m_serverName = "";
+
+
 }
 
 ClientService::~ClientService(){
@@ -248,6 +253,10 @@ bool ClientService::startMainService(){
 
 void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
     qDebug()<<"----ClientService::serverFound(...)";
+
+    m_serverAddress = QHostAddress(serverAddress);
+    m_serverRUDPListeningPort = serverRUDPListeningPort;
+    m_serverName = serverName;
 
     setServerLastUsed(serverAddress);
 
@@ -650,7 +659,7 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
         }
     }
     
-    
+
     QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();
     QString networkInfo = "";
     QStringList networkInfoList;
@@ -1022,6 +1031,10 @@ void ClientService::consoleProcessOutputRead(const QString &output){
 void ClientService::uploadClientSummaryInfo(const QString &targetAddress, quint16 targetPort){
     qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
 
+    if(targetAddress.trimmed().isEmpty() && m_serverAddress.isNull()){
+        return;
+    }
+
 #ifdef Q_OS_WIN
 
     //WindowsManagement wm;
@@ -1084,10 +1097,9 @@ void ClientService::uploadClientSummaryInfo(const QString &targetAddress, quint1
 
 }
 
-void ClientService::uploadClientDetailedInfoToServer(){
+//void ClientService::uploadClientDetailedInfoToServer(){
 
-
-}
+//}
 
 bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
@@ -1632,7 +1644,19 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
         qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
     }
 
+    if(peerAddress == m_serverAddress && peerPort == m_serverRUDPListeningPort){
+        qWarning()<<QString("Server %1:%2 Offline!").arg(m_serverAddress.toString()).arg(m_serverRUDPListeningPort);
+        m_serverAddress = QHostAddress::Null;
+        m_serverRUDPListeningPort = 0;
+        m_serverName = "";
 
+    }else if(peerAddress.toString() == m_adminAddress && peerPort == m_adminPort){
+
+        qWarning()<<QString("Admin %1:%2 Offline!").arg(m_adminAddress).arg(m_adminPort);
+        m_adminAddress = "";
+        m_adminPort = 0;
+
+    }
 
 
 }

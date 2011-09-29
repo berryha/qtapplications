@@ -77,7 +77,7 @@ private slots:
 
 
     void uploadClientSummaryInfo(const QString &targetAddress = "", quint16 targetPort = 0);
-    void uploadClientDetailedInfoToServer();
+//    void uploadClientDetailedInfoToServer();
 
     void update();
     bool updateAdministratorPassword(const QString &newPassword);
@@ -160,6 +160,10 @@ private:
     RUDPSocket *rudpSocket;
 
     QTimer *lookForServerTimer;
+
+    QHostAddress m_serverAddress;
+    quint16 m_serverRUDPListeningPort;
+    QString m_serverName;
 
 
 };
