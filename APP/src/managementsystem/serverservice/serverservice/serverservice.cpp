@@ -368,7 +368,7 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     }
     if(!info->isInstalledSoftwaresInfoSavedTODatabase()){
         updateInstalledSoftwaresInfoStatement = info->getUpdateInstalledSoftwaresInfoStatement();
-        qDebug()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
+        //qDebug()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
     }
 
 
@@ -449,8 +449,10 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     }
 
     if(!updateInstalledSoftwaresInfoStatement.trimmed().isEmpty()){
-        if(!query->exec(updateInstalledSoftwaresInfoStatement)){
-            QSqlError error = query->lastError();
+        query->exec(updateInstalledSoftwaresInfoStatement);
+        QSqlError error = query->lastError();
+        if(error.type() != QSqlError::NoError){
+            //QSqlError error = query->lastError();
             QString msg = QString("Can not write client installed softwares info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
             logMessage(msg, QtServiceBase::Error);
             qCritical()<<msg;
@@ -687,11 +689,11 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
     }
 
     if(changed){
-        QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from installedsoftware where ComputerName = '%1' ").arg(computerName);
+        QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from installedsoftware where ComputerName = '%1'; ").arg(computerName);
         foreach (QString info, softwares) {
             QStringList values = info.split(" | ");
             if(values.size() != 5){continue;}
-            updateInstalledSoftwaresInfoStatement += QString(" insert into installedsoftware(ComputerName, SoftwareName, Version, Size, InstallationDate, Publisher) values('%1', '%2', '%3', '%4', '%5'); ").arg(values.at(0)).arg(values.at(1)).arg(values.at(2)).arg(values.at(3)).arg(values.at(4));
+            updateInstalledSoftwaresInfoStatement += QString(" insert into installedsoftware(ComputerName, SoftwareName, SoftwareVersion, Size, InstallationDate, Publisher) values('%1', '%2', '%3', '%4', '%5', '%6'); ").arg(computerName).arg(values.at(0)).arg(values.at(1)).arg(values.at(2)).arg(values.at(3)).arg(values.at(4));
         }
         updateInstalledSoftwaresInfoStatement += "COMMIT;";
 
