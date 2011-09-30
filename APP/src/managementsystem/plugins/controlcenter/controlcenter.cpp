@@ -16,7 +16,7 @@
 
 
 
-
+#include "constants.h"
 #include "controlcenter.h"
 #include "announcement/announcement.h"
 
@@ -46,7 +46,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 
 
 
-    databaseConnectionName = QString(REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME) + "-ControlCenter";
+    //databaseConnectionName = QString(REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME) + "-ControlCenter";
+    databaseConnectionName = QString(DB_CONNECTION_NAME);
     queryModel = new QSqlQueryModel(this);
 
     clientInfoModel = new ClientInfoModel(this);

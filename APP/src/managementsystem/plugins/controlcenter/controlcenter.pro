@@ -33,7 +33,8 @@ HEADERS += networkmanager/networkmanagerinstance.h \
     clientinfomodel/clientinfomodel.h \
     systemmanagement/systemmanagementwidget.h \
     controlcenter.h \
-    controlcenterplugin.h
+    controlcenterplugin.h \
+    constants.h
 FORMS += taskmanagement/taskinfoviewwidget.ui \
     taskmanagement/taskmanagement.ui \
     announcement/announcement.ui \
@@ -53,3 +54,4 @@ RESOURCES += controlcenter.qrc
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "Control Center"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Control Center For Sitoy Based On Qt"
+

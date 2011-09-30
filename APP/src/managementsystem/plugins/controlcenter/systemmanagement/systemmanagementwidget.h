@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 #include <QCloseEvent>
 #include <QMenu>
-
+#include <QSqlQueryModel>
 
 #include "ui_systemmanagementwidget.h"
 
@@ -56,6 +56,7 @@ private slots:
     void on_pushButtonRegedit_clicked();
     void on_pushButtonOtherEXE_clicked();
 
+    void on_toolButtonQuerySystemInfo_clicked();
     void on_toolButtonRequestSystemInfo_clicked();
     void on_toolButtonRescanSystemInfo_clicked();
     void on_toolButtonSaveAs_clicked();
@@ -89,6 +90,7 @@ private:
 
     void runProgrameAsAdmin(const QString &exeFilePath, const QString &parameters = "", bool show = true);
 
+    void resetSystemInfo();
 
 private:
     Ui::SystemManagementWidgetClass ui;
@@ -118,6 +120,8 @@ private:
     //    ClientInfo *clientInfo;
 
     QString m_winDirPath;
+
+    QSqlQueryModel *queryModel;
 
 
 

@@ -356,6 +356,7 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
 
     QString summaryStatement = "";
     QString detailedStatement = "";
+    QString updateInstalledSoftwaresInfoStatement = "";
 
     //    if(isRecordExistInDB(info->getComputerName())){
     if(!info->getSummaryInfoSavedTODatabase()){
@@ -364,6 +365,10 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     if(!info->getDetailedInfoSavedTODatabase()){
         detailedStatement = info->getUpdateDetailedInfoStatement();
         //qWarning()<<"detailedStatement:"<<detailedStatement;
+    }
+    if(!info->isInstalledSoftwaresInfoSavedTODatabase()){
+        updateInstalledSoftwaresInfoStatement = info->getUpdateInstalledSoftwaresInfoStatement();
+        qDebug()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
     }
 
 
@@ -438,6 +443,31 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
         info->setDetailedInfoSavedTODatabase(true);
         info->setUpdateDetailedInfoStatement("");
         qWarning()<<"Client detailed info from "<<computerName<<" has been saved!";
+
+        query->clear();
+
+    }
+
+    if(!updateInstalledSoftwaresInfoStatement.trimmed().isEmpty()){
+        if(!query->exec(updateInstalledSoftwaresInfoStatement)){
+            QSqlError error = query->lastError();
+            QString msg = QString("Can not write client installed softwares info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+            logMessage(msg, QtServiceBase::Error);
+            qCritical()<<msg;
+
+            //MySQL数据库重启，重新连接
+            if(error.number() == 2006){
+                query->clear();
+                openDatabase(true);
+            }else{
+                getRecordsInDatabase();
+            }
+
+            return false;
+        }
+        info->setInstalledSoftwaresInfoSavedTODatabase(true);
+        info->setUpdateInstalledSoftwaresInfoStatement("");
+        qWarning()<<"Client installed softwares info from "<<computerName<<" has been saved!";
 
         query->clear();
 
@@ -548,6 +578,12 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
 
 
 
+    systemInfo.beginGroup("InstalledSoftwareInfo");
+    QStringList softwares;
+    for(int k = 0; k < 400; k++){
+        softwares << systemInfo.value(QString::number(k)).toString();
+    }
+    systemInfo.endGroup();
 
 
 
@@ -635,6 +671,38 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
     info->setUpdateDetailedInfoStatement(statement);
 
 
+
+
+    QStringList installedSoftwaresInfo = info->getInstalledSoftwaresInfo();
+    bool changed = false;
+    if(softwares.size() == installedSoftwaresInfo.size()){
+        foreach (QString info, softwares) {
+            if(!installedSoftwaresInfo.contains(info)){
+                changed = true;
+                break;
+            }
+        }
+    }else{
+        changed = true;
+    }
+
+    if(changed){
+        QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from installedsoftware where ComputerName = '%1' ").arg(computerName);
+        foreach (QString info, softwares) {
+            QStringList values = info.split(" | ");
+            if(values.size() != 5){continue;}
+            updateInstalledSoftwaresInfoStatement += QString(" insert into installedsoftware(ComputerName, SoftwareName, Version, Size, InstallationDate, Publisher) values('%1', '%2', '%3', '%4', '%5'); ").arg(values.at(0)).arg(values.at(1)).arg(values.at(2)).arg(values.at(3)).arg(values.at(4));
+        }
+        updateInstalledSoftwaresInfoStatement += "COMMIT;";
+
+        info->setInstalledSoftwaresInfoSavedTODatabase(false);
+        info->setUpdateInstalledSoftwaresInfoStatement(updateInstalledSoftwaresInfoStatement);
+
+    }
+
+
+
+
     if(onlineAdminsCount > 0){
         if(updateOrSaveClientInfoToDatabase(info)){
             info->setInstallationDate(installationDate);
@@ -653,6 +721,8 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
 
             info->setNic1Info(nic1Info);
             info->setNic2Info(nic2Info);
+
+            info->setInstalledSoftwaresInfo(softwares);
         }
     }
 

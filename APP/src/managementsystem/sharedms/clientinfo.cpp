@@ -50,6 +50,10 @@ ClientInfo::ClientInfo(const QString &computerName, QObject *parent)
         updateDetailedInfoStatement = "";
         detailedInfoSavedTODatabase = false;
 
+        installedSoftwaresInfo.clear();
+        updateInstalledSoftwaresInfoStatement = "";
+        installedSoftwaresInfoSavedTODatabase = false;
+
 
         lastHeartbeatTime = QDateTime();
 

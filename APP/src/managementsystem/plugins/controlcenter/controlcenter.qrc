@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/icon">
+    <file>resources/images/rescan.png</file>
     <file>resources/images/querydatabase.png</file>
     <file>resources/images/informnewpassword.png</file>
     <file>resources/images/password.png</file>
