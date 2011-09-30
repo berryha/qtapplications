@@ -28,7 +28,7 @@ SystemInfo::SystemInfo(QObject *parent) :
 
     QDir::setCurrent(QCoreApplication::applicationDirPath ());
     //QString everestDirPath = QCoreApplication::applicationDirPath () + QString("/everest");
-    everestDirPath = QString("./everest");
+    everestDirPath = QString("./aida64business");
 
     m_systemInfoFilePath = everestDirPath + QString("/systeminfo.ini");
 

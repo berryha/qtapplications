@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
+#include <QStringList>
 
 #include "HHSharedCore/hmysharedlib_global.h"
 
@@ -350,6 +351,25 @@ public:
         this->workgroup = workgroup;
     }
 
+    QStringList getInstalledSoftwaresInfo(){
+        return installedSoftwaresInfo;
+    }
+    void setInstalledSoftwaresInfo(const QStringList &list){
+        this->installedSoftwaresInfo = list;
+    }
+    QString getUpdateInstalledSoftwaresInfoStatement(){
+        return updateInstalledSoftwaresInfoStatement;
+    }
+    void setUpdateInstalledSoftwaresInfoStatement(const QString &statement){
+        this->updateInstalledSoftwaresInfoStatement = statement;
+    }
+    bool isInstalledSoftwaresInfoSavedTODatabase(){
+        return installedSoftwaresInfoSavedTODatabase;
+    }
+    void setInstalledSoftwaresInfoSavedTODatabase(bool saved){
+        this->installedSoftwaresInfoSavedTODatabase = saved;
+    }
+
 private:
 
     QString computerName;
@@ -392,8 +412,11 @@ private:
 
     /////////////////////////////////////////////////
 
+    QStringList installedSoftwaresInfo;
+    QString updateInstalledSoftwaresInfoStatement;
+    bool installedSoftwaresInfoSavedTODatabase;
 
-
+    /////////////////////////////////////////////////
 
 
 

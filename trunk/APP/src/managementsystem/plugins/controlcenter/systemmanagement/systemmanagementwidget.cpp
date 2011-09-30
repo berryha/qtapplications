@@ -14,6 +14,10 @@
     #include "../../sharedms/global_shared.h"
 #endif
 
+#include "constants.h"
+
+#include "HHSharedGUI/hdatabaseconnecter.h"
+
 
 namespace HEHUI {
 
@@ -39,6 +43,8 @@ SystemManagementWidget::SystemManagementWidget(const QString &adminName, Control
     }
 
     m_winDirPath = "";
+
+    queryModel = 0;
 
 
 #ifdef Q_OS_WIN32
@@ -105,7 +111,16 @@ SystemManagementWidget::SystemManagementWidget(const QString &adminName, Control
     ui.horizontalLayoutCommand->setEnabled(false);
 
 
-    ui.tabSystemInfo->setEnabled(false);
+    //ui.tabSystemInfo->setEnabled(false);
+    ui.toolButtonRequestSystemInfo->setEnabled(false);
+    ui.toolButtonRescanSystemInfo->setEnabled(false);
+    ui.toolButtonSaveAs->setEnabled(false);
+
+    QHeaderView *view = ui.tableWidgetSoftware->horizontalHeader();
+    view->resizeSection(0, 200);
+    view->setVisible(true);
+
+
     ui.tabRemoteManagement->setEnabled(false);
 
 
@@ -140,6 +155,11 @@ SystemManagementWidget::~SystemManagementWidget()
 
     qDebug()<<"~SystemManagementWidget()";
 
+//    if(queryModel){
+//        queryModel->clear();
+//        delete queryModel;
+//        queryModel = 0;
+//    }
 
 
     //#ifdef Q_OS_WIN32
@@ -183,6 +203,12 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
 
     controlCenterPacketsParser->disconnect(this);
 
+    if(queryModel){
+        queryModel->clear();
+        delete queryModel;
+        queryModel = 0;
+    }
+
     event->accept();
 
 }
@@ -213,7 +239,13 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 
 void SystemManagementWidget::peerDisconnected(bool normalClose){
 
-    ui.tabSystemInfo->setEnabled(false);
+    //ui.tabSystemInfo->setEnabled(false);
+    ui.toolButtonRequestSystemInfo->setEnabled(false);
+    ui.toolButtonRescanSystemInfo->setEnabled(false);
+    if(ui.osVersionLineEdit->text().trimmed().isEmpty()){
+        ui.toolButtonSaveAs->setEnabled(false);
+    }
+
     ui.tabRemoteManagement->setEnabled(false);
     ui.toolButtonVerify->setEnabled(true);
 
@@ -435,6 +467,124 @@ void SystemManagementWidget::on_pushButtonOtherEXE_clicked(){
 
 }
 
+void SystemManagementWidget::on_toolButtonQuerySystemInfo_clicked(){
+
+    resetSystemInfo();
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    DatabaseConnecter dc(this);
+    if(!dc.isDatabaseOpened(DB_CONNECTION_NAME,
+                            REMOTE_SITOY_COMPUTERS_DB_DRIVER,
+                            REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
+                            REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
+                            REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
+                            REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
+                            REMOTE_SITOY_COMPUTERS_DB_NAME,
+                            HEHUI::MYSQL
+                            )){
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
+        qCritical() << QString("Error: Database Connection Failed! Query Failed!");
+        return ;
+    }
+
+
+    QSqlDatabase db;
+    db = QSqlDatabase::database(DB_CONNECTION_NAME);
+
+
+    if(!queryModel){
+        queryModel = new QSqlQueryModel(this);
+    }
+    queryModel->clear();
+
+    QString queryString = QString("SELECT s.OS, s.Workgroup, s.Users, d.* FROM summaryinfo s, detailedinfo d WHERE s.ComputerName = '%1' AND d.ComputerName = '%1' ").arg(m_computerName);
+    queryModel->setQuery(QSqlQuery(queryString, db));
+    QApplication::restoreOverrideCursor();
+
+    QSqlError error = queryModel->lastError();
+    if (error.type() != QSqlError::NoError) {
+        QString msg = QString("Can not query client info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        //QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Fatal Error"), msg);
+
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            db.close();
+            QSqlDatabase::removeDatabase(DB_CONNECTION_NAME);
+            return;
+        }
+
+    }
+
+    QSqlRecord record = queryModel->record(0);
+    if(record.isEmpty()){
+        QMessageBox::critical(this, tr("Fatal Error"), tr("No Record Found!"));
+        return;
+    }
+
+    ui.osVersionLineEdit->setText(record.value("OS").toString());
+    ui.installationDateLineEdit->setText(record.value("InstallationDate").toString());
+    ui.computerNameLineEdit->setText(m_computerName);
+    ui.workgroupLineEdit->setText(record.value("Workgroup").toString());
+
+    QStringList storageInfo = record.value("Storage").toString().split("|");
+    foreach (QString info, storageInfo) {
+        ui.logicalDrivesComboBox->addItem(info);
+    }
+
+    ui.comboBoxSystemUsers->addItem(record.value("Users").toString());
+
+    ui.osGroupBox->setEnabled(true);
+
+
+    ui.cpuLineEdit->setText(record.value("CPU").toString());
+    ui.motherboardLineEdit->setText(record.value("MotherboardName").toString());
+    ui.dmiUUIDLineEdit->setText(record.value("DMIUUID").toString());
+    ui.chipsetLineEdit->setText(record.value("Chipset").toString());
+    ui.memoryLineEdit->setText(record.value("Memory").toString());
+    ui.videoCardLineEdit->setText(record.value("Video").toString());
+    ui.monitorLineEdit->setText(record.value("Monitor").toString());
+    ui.audioLineEdit->setText(record.value("Audio").toString());
+
+    QStringList nic1Info = record.value("NIC1").toString().split("|");
+    ui.adapter1NameLineEdit->setText(nic1Info.at(0));
+    ui.adapter1HDAddressLineEdit->setText(nic1Info.at(1));
+    ui.adapter1IPAddressLineEdit->setText(nic1Info.at(2));
+
+    QStringList nic2Info = record.value("NIC2").toString().split("|");
+    ui.adapter2NameLineEdit->setText(nic2Info.at(0));
+    ui.adapter2HDAddressLineEdit->setText(nic2Info.at(1));
+    ui.adapter2IPAddressLineEdit->setText(nic2Info.at(2));
+
+    ui.devicesInfoGroupBox->setEnabled(true);
+
+
+    queryModel->clear();
+    queryString = QString("SELECT SoftwareName, Version, Size, InstallationDate, Publisher FROM installedsoftware WHERE ComputerName = '%1' ").arg(m_computerName);
+    queryModel->setQuery(QSqlQuery(queryString, db));
+    while (queryModel->canFetchMore()){
+        queryModel->fetchMore();
+    }
+    int rows = queryModel->rowCount();
+    ui.tableWidgetSoftware->setRowCount(rows);
+    for(int i=0; i<rows; i++){
+        QSqlRecord record = queryModel->record(i);
+        for(int j=0; j<5; j++){
+            ui.tableWidgetSoftware->setItem(i, j, new QTableWidgetItem(record.value(j).toString()));
+        }
+    }
+    queryModel->clear();
+
+    //ui.tableWidgetSoftware->setModel(queryModel);
+    ui.labelReportCreationTime->setText(tr("Last Update Time: %1").arg(record.value("UpdateTime").toString()));
+
+
+    //QApplication::restoreOverrideCursor();
+
+}
+
 void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
 
     if(!verifyPrivilege()){
@@ -574,14 +724,15 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(co
     clientResponseAdminConnectionResultPacketReceived = true;
 
     if(result == true){
-        //ui.groupBoxSettings->setEnabled(true);
-        //ui.groupBoxSettings->show();
-        ui.tabSystemInfo->setEnabled(true);
+        //ui.tabSystemInfo->setEnabled(true);
+        ui.toolButtonRequestSystemInfo->setEnabled(true);
+        ui.toolButtonRescanSystemInfo->setEnabled(true);
+
         if(!message.trimmed().isEmpty()){
             QMessageBox::warning(this, tr("Warning"), message);
         }
     }else{
-        ui.tabSystemInfo->setEnabled(false);
+        //ui.tabSystemInfo->setEnabled(false);
         ui.tabRemoteManagement->setEnabled(false);
         ui.toolButtonVerify->setEnabled(true);
 
@@ -654,7 +805,7 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     //    info->setClientVersion(clientVersion);
 
 
-    ui.toolButtonRequestSystemInfo->setEnabled(true);
+    //ui.toolButtonRequestSystemInfo->setEnabled(true);
 
     if(usbsdEnabled){
         ui.pushButtonUSBSD->setText(tr("Disable USB SD"));
@@ -686,7 +837,11 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     ui.pushButtonAdminsManagement->setEnabled(true);
 
 
-    ui.tabSystemInfo->setEnabled(true);
+    //ui.tabSystemInfo->setEnabled(true);
+    ui.toolButtonRequestSystemInfo->setEnabled(true);
+    ui.toolButtonRescanSystemInfo->setEnabled(true);
+    //ui.toolButtonSaveAs->setEnabled(false);
+
     ui.tabRemoteManagement->setEnabled(true);
 
     ui.groupBoxSettings->setEnabled(true);
@@ -709,6 +864,8 @@ void SystemManagementWidget::clientDetailedInfoPacketReceived(const QString &com
     if(this->m_computerName != computerName){
         return;
     }
+
+    resetSystemInfo();
 
     QDir::setCurrent(QDir::tempPath());
     QString clientInfoFilePath = QString("./%1.ini").arg(computerName);
@@ -831,6 +988,15 @@ void SystemManagementWidget::clientDetailedInfoPacketReceived(const QString &com
     //ui.labelReportCreationTime->show();
     systemInfo.endGroup();
 
+    systemInfo.beginGroup("InstalledSoftwareInfo");
+    for(int k = 0; k < 400; k++){
+        QStringList info = systemInfo.value(QString::number(k)).toString().split(" | ");
+        if(info.size() != 5){break;}
+        for(int m=0; m<5; m++){
+            ui.tableWidgetSoftware->setItem(k, m, new QTableWidgetItem(info.at(m)));
+        }
+    }
+    systemInfo.endGroup();
 
 
     ui.toolButtonRequestSystemInfo->setEnabled(true);
@@ -840,17 +1006,6 @@ void SystemManagementWidget::clientDetailedInfoPacketReceived(const QString &com
 
     //slotResetStatusBar(false);
     //statusBar()->showMessage(tr("Done. Press 'Ctrl+S' to upload the data to server!"));
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
@@ -1002,6 +1157,46 @@ void SystemManagementWidget::runProgrameAsAdmin(const QString &exeFilePath, cons
 
     adminProcesses.append(QFileInfo(exeFilePath).fileName());
 #endif
+
+}
+
+void SystemManagementWidget::resetSystemInfo(){
+
+
+    ui.osVersionLineEdit->clear();
+    ui.installationDateLineEdit->clear();
+    ui.computerNameLineEdit->clear();
+    ui.workgroupLineEdit->clear();
+    ui.logicalDrivesComboBox->clear();
+    ui.comboBoxSystemUsers->clear();
+
+    ui.osGroupBox->setEnabled(false);
+
+
+    ui.cpuLineEdit->clear();
+    ui.memoryLineEdit->clear();
+    ui.motherboardLineEdit->clear();
+    ui.dmiUUIDLineEdit->clear();
+    ui.chipsetLineEdit->clear();
+    ui.videoCardLineEdit->clear();
+    ui.monitorLineEdit->clear();
+    ui.audioLineEdit->clear();
+
+    ui.adapter1NameLineEdit->clear();
+    ui.adapter1HDAddressLineEdit->clear();
+    ui.adapter1IPAddressLineEdit->clear();
+    ui.adapter2NameLineEdit->clear();
+    ui.adapter2HDAddressLineEdit->clear();
+    ui.adapter2IPAddressLineEdit->clear();
+
+    ui.devicesInfoGroupBox->setEnabled(false);
+
+    ui.tableWidgetSoftware->clearContents();
+
+
+    ui.labelReportCreationTime->clear();
+    ui.toolButtonSaveAs->setEnabled(false);
+
 
 }
 
