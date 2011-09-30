@@ -562,7 +562,7 @@ void SystemManagementWidget::on_toolButtonQuerySystemInfo_clicked(){
 
 
     queryModel->clear();
-    queryString = QString("SELECT SoftwareName, Version, Size, InstallationDate, Publisher FROM installedsoftware WHERE ComputerName = '%1' ").arg(m_computerName);
+    queryString = QString("SELECT SoftwareName, SoftwareVersion, Size, InstallationDate, Publisher FROM installedsoftware WHERE ComputerName = '%1' ").arg(m_computerName);
     queryModel->setQuery(QSqlQuery(queryString, db));
     while (queryModel->canFetchMore()){
         queryModel->fetchMore();
