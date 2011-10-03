@@ -1,6 +1,4 @@
-﻿# MySQL-Front 5.0  (Build 1.141)
-
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE */;
+﻿/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE */;
 /*!40101 SET SQL_MODE='STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES */;
 /*!40103 SET SQL_NOTES='ON' */;
@@ -10,18 +8,9 @@
 /*!40014 SET FOREIGN_KEY_CHECKS=0 */;
 
 
-# Host: localhost    Database: im
-# ------------------------------------------------------
-# Server version 5.1.36-community
-
 DROP DATABASE IF EXISTS `im`;
 CREATE DATABASE `im` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `im`;
-
-#
-# Table structure for table cachedchatmessages
-#
-
 CREATE TABLE `cachedchatmessages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `SenderID` varchar(16) NOT NULL COMMENT '发送者ID',
@@ -32,20 +21,11 @@ CREATE TABLE `cachedchatmessages` (
   KEY `FK_cachemessages_users_ID_ReceiverID` (`RecieverID`),
   KEY `FK_cachemessages_users_ID_SenderID` (`SenderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
-
-#
-# Dumping data for table cachedchatmessages
-#
 LOCK TABLES `cachedchatmessages` WRITE;
 /*!40000 ALTER TABLE `cachedchatmessages` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `cachedchatmessages` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table cachedinterestgroupchatmessages
-#
-
 CREATE TABLE `cachedinterestgroupchatmessages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `SenderID` varchar(16) NOT NULL COMMENT '发送者ID',
@@ -56,20 +36,11 @@ CREATE TABLE `cachedinterestgroupchatmessages` (
   KEY `FK_cachemessages_users_ID_ReceiverID` (`InterestGroupID`),
   KEY `FK_cachemessages_users_ID_SenderID` (`SenderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='缓存的消息';
-
-#
-# Dumping data for table cachedinterestgroupchatmessages
-#
 LOCK TABLES `cachedinterestgroupchatmessages` WRITE;
 /*!40000 ALTER TABLE `cachedinterestgroupchatmessages` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `cachedinterestgroupchatmessages` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table friendshipapply
-#
-
 CREATE TABLE `friendshipapply` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `SenderID` varchar(16) NOT NULL,
@@ -82,30 +53,17 @@ CREATE TABLE `friendshipapply` (
   KEY `FK_friendshipapply_users_ID_SenderID` (`SenderID`),
   KEY `FK_friendshipapply_users_ID_ReceiverID` (`ReceiverID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友请求';
-
-#
-# Dumping data for table friendshipapply
-#
 LOCK TABLES `friendshipapply` WRITE;
 /*!40000 ALTER TABLE `friendshipapply` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `friendshipapply` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table groupmemberroles
-#
-
 CREATE TABLE `groupmemberroles` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `RoleName` varchar(16) NOT NULL,
   `Description` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='组员在组中的角色';
-
-#
-# Dumping data for table groupmemberroles
-#
 LOCK TABLES `groupmemberroles` WRITE;
 /*!40000 ALTER TABLE `groupmemberroles` DISABLE KEYS */;
 
@@ -114,11 +72,6 @@ INSERT INTO `groupmemberroles` VALUES (2,'Administrator',NULL);
 INSERT INTO `groupmemberroles` VALUES (3,'Member',NULL);
 /*!40000 ALTER TABLE `groupmemberroles` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table groupmembers
-#
-
 CREATE TABLE `groupmembers` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `MemberUserID` varchar(16) NOT NULL COMMENT '成员ID',
@@ -128,10 +81,6 @@ CREATE TABLE `groupmembers` (
   UNIQUE KEY `Index_MemberUserID_GroupID` (`MemberUserID`,`GroupID`) USING BTREE,
   KEY `FK_groupmembers_GroupID` (`GroupID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COMMENT='组的成员';
-
-#
-# Dumping data for table groupmembers
-#
 LOCK TABLES `groupmembers` WRITE;
 /*!40000 ALTER TABLE `groupmembers` DISABLE KEYS */;
 
@@ -143,11 +92,6 @@ INSERT INTO `groupmembers` VALUES (5,'yu',1,2);
 INSERT INTO `groupmembers` VALUES (6,'kiwa',1,2);
 /*!40000 ALTER TABLE `groupmembers` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table groups
-#
-
 CREATE TABLE `groups` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `TypeID` int(10) unsigned NOT NULL COMMENT '类型',
@@ -163,21 +107,12 @@ CREATE TABLE `groups` (
   PRIMARY KEY (`ID`),
   KEY `FK_groups_Creator` (`Creator`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='组';
-
-#
-# Dumping data for table groups
-#
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
 
 INSERT INTO `groups` VALUES (1,1,NULL,'hehui','IT','2011-03-09 13:21:47',1,1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table grouptypes
-#
-
 CREATE TABLE `grouptypes` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ParentType` int(10) unsigned DEFAULT NULL,
@@ -185,10 +120,6 @@ CREATE TABLE `grouptypes` (
   `Description` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='组类型';
-
-#
-# Dumping data for table grouptypes
-#
 LOCK TABLES `grouptypes` WRITE;
 /*!40000 ALTER TABLE `grouptypes` DISABLE KEYS */;
 
@@ -196,11 +127,6 @@ INSERT INTO `grouptypes` VALUES (1,NULL,'System',NULL);
 INSERT INTO `grouptypes` VALUES (2,NULL,'User',NULL);
 /*!40000 ALTER TABLE `grouptypes` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table loginhistories
-#
-
 CREATE TABLE `loginhistories` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` varchar(16) NOT NULL,
@@ -210,10 +136,6 @@ CREATE TABLE `loginhistories` (
   PRIMARY KEY (`ID`),
   KEY `FK_loginhistories_UserID` (`UserID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='登陆历史';
-
-#
-# Dumping data for table loginhistories
-#
 LOCK TABLES `loginhistories` WRITE;
 /*!40000 ALTER TABLE `loginhistories` DISABLE KEYS */;
 
@@ -222,11 +144,6 @@ INSERT INTO `loginhistories` VALUES (2,'admin','200.200.200.17','2011-09-29 11:5
 INSERT INTO `loginhistories` VALUES (3,'admin','200.200.200.17','2011-09-29 11:55:26','2011-09-29 11:56:57');
 /*!40000 ALTER TABLE `loginhistories` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table membershipapply
-#
-
 CREATE TABLE `membershipapply` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ApplicantSystemID` int(10) unsigned NOT NULL,
@@ -236,20 +153,11 @@ CREATE TABLE `membershipapply` (
   KEY `FK_friendshipapply_users_ID_ReceiverID` (`GroupID`) USING BTREE,
   KEY `FK_friendshipapply_users_ID_SenderID` (`ApplicantSystemID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='加入组请求';
-
-#
-# Dumping data for table membershipapply
-#
 LOCK TABLES `membershipapply` WRITE;
 /*!40000 ALTER TABLE `membershipapply` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `membershipapply` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table software__
-#
-
 CREATE TABLE `software__` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `InternalName` varchar(64) NOT NULL,
@@ -264,20 +172,11 @@ CREATE TABLE `software__` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index_2` (`InternalName`,`Framework`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-#
-# Dumping data for table software__
-#
 LOCK TABLES `software__` WRITE;
 /*!40000 ALTER TABLE `software__` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `software__` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table systemgroupmembers__
-#
-
 CREATE TABLE `systemgroupmembers__` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `MemberID` varchar(16) NOT NULL COMMENT '成员ID',
@@ -287,20 +186,11 @@ CREATE TABLE `systemgroupmembers__` (
   UNIQUE KEY `Index_MemberID_SystemGroupID` (`MemberID`,`SystemGroupID`),
   KEY `FK_systemgroupmembers_SystemGroupID` (`SystemGroupID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='个人兴趣组的成员';
-
-#
-# Dumping data for table systemgroupmembers__
-#
 LOCK TABLES `systemgroupmembers__` WRITE;
 /*!40000 ALTER TABLE `systemgroupmembers__` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `systemgroupmembers__` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table systemgroups__
-#
-
 CREATE TABLE `systemgroups__` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `GroupName` varchar(32) NOT NULL COMMENT '组名',
@@ -316,10 +206,6 @@ CREATE TABLE `systemgroups__` (
   PRIMARY KEY (`ID`),
   KEY `FK_systemgroups_systemusers_ID` (`Creator`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='系统预定义的组';
-
-#
-# Dumping data for table systemgroups__
-#
 LOCK TABLES `systemgroups__` WRITE;
 /*!40000 ALTER TABLE `systemgroups__` DISABLE KEYS */;
 
@@ -327,11 +213,6 @@ INSERT INTO `systemgroups__` VALUES (1,'Undefined',NULL,1,'2010-05-31 12:04:00',
 INSERT INTO `systemgroups__` VALUES (2,'IT',NULL,1,'2010-05-31 12:04:00',NULL,0,'1',1,NULL,0);
 /*!40000 ALTER TABLE `systemgroups__` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table systemusers__
-#
-
 CREATE TABLE `systemusers__` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` varchar(24) NOT NULL,
@@ -344,10 +225,6 @@ CREATE TABLE `systemusers__` (
   `LoginTimes` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
-#
-# Dumping data for table systemusers__
-#
 LOCK TABLES `systemusers__` WRITE;
 /*!40000 ALTER TABLE `systemusers__` DISABLE KEYS */;
 
@@ -355,21 +232,12 @@ INSERT INTO `systemusers__` VALUES (1,'hehui','贺辉','IT','veRES9cTvQSNx8xh/i4
 INSERT INTO `systemusers__` VALUES (2,'administrator','Admin','IT','Y4WjrhimXU9udEG96cTK+8Y1x7g=','','2009-07-20 15:04:02',NULL,0);
 /*!40000 ALTER TABLE `systemusers__` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table userroles
-#
-
 CREATE TABLE `userroles` (
   `ID` int(10) unsigned NOT NULL,
   `RoleName` varchar(16) NOT NULL,
   `Description` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-#
-# Dumping data for table userroles
-#
 LOCK TABLES `userroles` WRITE;
 /*!40000 ALTER TABLE `userroles` DISABLE KEYS */;
 
@@ -378,11 +246,6 @@ INSERT INTO `userroles` VALUES (2,'Admin','');
 INSERT INTO `userroles` VALUES (3,'user','');
 /*!40000 ALTER TABLE `userroles` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table users_detailed_info
-#
-
 CREATE TABLE `users_detailed_info` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` varchar(16) NOT NULL,
@@ -424,10 +287,6 @@ CREATE TABLE `users_detailed_info` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `index_users_UserID` (`UserID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
-
-#
-# Dumping data for table users_detailed_info
-#
 LOCK TABLES `users_detailed_info` WRITE;
 /*!40000 ALTER TABLE `users_detailed_info` DISABLE KEYS */;
 
@@ -439,11 +298,6 @@ INSERT INTO `users_detailed_info` VALUES (5,'yu','P66eKnCMcBPetxi+LMKG2P7cBSA=',
 INSERT INTO `users_detailed_info` VALUES (6,'kiwa','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,'1',0,'0',NULL,0,'1',0,0,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0',3,NULL);
 /*!40000 ALTER TABLE `users_detailed_info` ENABLE KEYS */;
 UNLOCK TABLES;
-
-#
-# Table structure for table users_summary_info_
-#
-
 CREATE TABLE `users_summary_info_` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` varchar(16) NOT NULL,
@@ -470,29 +324,17 @@ CREATE TABLE `users_summary_info_` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `index_users_UserID` (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
-
-#
-# Dumping data for table users_summary_info_
-#
 LOCK TABLES `users_summary_info_` WRITE;
 /*!40000 ALTER TABLE `users_summary_info_` DISABLE KEYS */;
 
 /*!40000 ALTER TABLE `users_summary_info_` ENABLE KEYS */;
 UNLOCK TABLES;
 
-#
-# Source for procedure sp_userlogin
-#
-
 CREATE PROCEDURE `sp_userlogin`(IN userID varchar(16), IN ipAddress varchar(15), IN loginTime datetime)
 begin
 insert into loginhistories(UserID, IPAddress, LoginTime) values(userID, ipAddress, loginTime);
 end;
 
-
-#
-# Source for procedure sp_userlogout
-#
 
 CREATE PROCEDURE `sp_userlogout`(IN userID varchar(16), IN logoutTime datetime)
 begin
@@ -501,55 +343,27 @@ update loginhistories set LogoutTime = logoutTime where ID = @MAXID;
 end;
 
 
-#
-#  Foreign keys for table cachedchatmessages
-#
-
 ALTER TABLE `cachedchatmessages`
 ADD CONSTRAINT `FK_cachemessages_users_UserID_ReceiverID` FOREIGN KEY (`RecieverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
 ADD CONSTRAINT `FK_cachemessages_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION;
-
-#
-#  Foreign keys for table friendshipapply
-#
 
 ALTER TABLE `friendshipapply`
 ADD CONSTRAINT `FK_friendshipapply_users_UserID_ReceiverID` FOREIGN KEY (`ReceiverID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION,
 ADD CONSTRAINT `FK_friendshipapply_users_UserID_SenderID` FOREIGN KEY (`SenderID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
-#
-#  Foreign keys for table groupmembers
-#
-
 ALTER TABLE `groupmembers`
 ADD CONSTRAINT `FK_groupmembers_GroupID` FOREIGN KEY (`GroupID`) REFERENCES `groups` (`ID`) ON DELETE CASCADE,
 ADD CONSTRAINT `FK_groupmembers_MemberUserID` FOREIGN KEY (`MemberUserID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-#
-#  Foreign keys for table groups
-#
-
 ALTER TABLE `groups`
 ADD CONSTRAINT `FK_groups_Creator` FOREIGN KEY (`Creator`) REFERENCES `users_detailed_info` (`UserID`) ON UPDATE CASCADE;
-
-#
-#  Foreign keys for table loginhistories
-#
 
 ALTER TABLE `loginhistories`
 ADD CONSTRAINT `FK_loginhistories_UserID` FOREIGN KEY (`UserID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE;
 
-#
-#  Foreign keys for table systemgroupmembers__
-#
-
 ALTER TABLE `systemgroupmembers__`
 ADD CONSTRAINT `FK_systemgroupmembers_MemberID` FOREIGN KEY (`MemberID`) REFERENCES `users_detailed_info` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD CONSTRAINT `FK_systemgroupmembers_SystemGroupID` FOREIGN KEY (`SystemGroupID`) REFERENCES `systemgroups__` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-#
-#  Foreign keys for table systemgroups__
-#
 
 ALTER TABLE `systemgroups__`
 ADD CONSTRAINT `FK_systemgroups_systemusers_ID` FOREIGN KEY (`Creator`) REFERENCES `systemusers__` (`ID`) ON UPDATE NO ACTION;
