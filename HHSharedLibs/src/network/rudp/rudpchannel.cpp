@@ -69,6 +69,8 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 //    startCheckPeerAliveTimer();
 
 
+    m_connectToPeerTimer = new QTimer();
+    connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
 
     m_peerAddress = QHostAddress::Null;
@@ -224,7 +226,9 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
         m_connectToPeerTimer = new QTimer();
         connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
     }
-    m_connectToPeerTimer->start(5000);
+    m_connectToPeerTimer->setInterval(5000);
+    QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
+    //m_connectToPeerTimer->start(5000);
 
 
     m_ChannelState = ConnectingState;
@@ -729,7 +733,8 @@ void RUDPChannel::connectToPeerTimeout(){
     m_msecConnectToPeerTimeout -= m_connectToPeerTimer->interval();
 
     if(m_ChannelState == ConnectedState){
-        m_connectToPeerTimer->stop();
+        QMetaObject::invokeMethod(m_connectToPeerTimer, "stop");
+        //m_connectToPeerTimer->stop();
         delete m_connectToPeerTimer;
         m_connectToPeerTimer = 0;
         m_msecConnectToPeerTimeout = 0;
@@ -738,7 +743,7 @@ void RUDPChannel::connectToPeerTimeout(){
         if(m_msecConnectToPeerTimeout > 0){
             sendHandshakePacket(m_myHandshakeID);
         }else{
-            qCritical()<<"ERROR! Connection Timeout!";
+            qCritical()<<QString("ERROR! Connection Timeout! Peer Address:%1:%2").arg(m_peerAddress.toString()).arg(m_peerPort);
             QMetaObject::invokeMethod(this, "reset");
             //reset();
             emit signalConnectToPeerTimeout(m_peerAddress, m_peerPort);
@@ -1940,7 +1945,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         QMetaObject::invokeMethod(this, "reset");
         //reset();
 
-        qWarning()<<"~~Reset--"<<" peerVersion:"<<peerVersion;
+        qDebug()<<"~~Reset--"<<" peerVersion:"<<peerVersion;
     }
         break;
     case quint8(RUDP::Goodbye):
