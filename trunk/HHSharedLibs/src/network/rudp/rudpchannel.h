@@ -16,7 +16,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API RUDPChannel : public QThread
+class MYSHAREDLIB_API RUDPChannel : public QObject
 {
     Q_OBJECT
 public:
@@ -27,7 +27,7 @@ public:
 
     ~RUDPChannel();
 
-    void run();
+//    void run();
 
 
 
@@ -127,10 +127,11 @@ private slots:
     void retransmissionTimerTimeout();
 
 
+    void reset();
 
 private:
     void init();
-    void reset();
+
     quint16 createSerialNumber();
     quint16 createSerialNumberForControlPacket();
 
