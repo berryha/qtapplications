@@ -206,7 +206,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
     if(!peers.contains(channelID)){
         if(m_unusedRUDPChannels.isEmpty()){
-            qWarning()<<"Create new channel:"<<channelID;
+            qDebug()<<"Create new channel:"<<channelID;
             channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, m_keepAliveTimerInterval, 0);
 //            connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
 //            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
@@ -220,7 +220,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
             //channel->start();
             peers.insert(channelID, channel);
         }else{
-            qWarning()<<"Use idle channel:"<<channelID;
+            qDebug()<<"Use idle channel:"<<channelID;
             channel = m_unusedRUDPChannels.takeFirst();
             //channel->start();
         }
