@@ -584,7 +584,9 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
     systemInfo.beginGroup("InstalledSoftwareInfo");
     QStringList softwares;
     for(int k = 0; k < 400; k++){
-        softwares << systemInfo.value(QString::number(k)).toString();
+        QString info = systemInfo.value(QString::number(k)).toString();
+        if(info.isEmpty()){break;}
+        softwares << info;
     }
     systemInfo.endGroup();
 

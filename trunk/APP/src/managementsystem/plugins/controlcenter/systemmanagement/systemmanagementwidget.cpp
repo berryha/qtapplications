@@ -995,11 +995,19 @@ void SystemManagementWidget::clientDetailedInfoPacketReceived(const QString &com
     systemInfo.endGroup();
 
     systemInfo.beginGroup("InstalledSoftwareInfo");
-    for(int k = 0; k < 400; k++){
-        QStringList info = systemInfo.value(QString::number(k)).toString().split(" | ");
+    QStringList infoList;
+    for(int k = 1; k < 400; k++){
+        QString info = systemInfo.value(QString::number(k)).toString();
+        if(info.isEmpty()){break;}
+        infoList.append(info);
+    }
+    int rowCount = infoList.size();
+    ui.tableWidgetSoftware->setRowCount(rowCount);
+    for(int m=0; m<rowCount; m++){
+        QStringList info = infoList.at(m).split(" | ");
         if(info.size() != 5){break;}
-        for(int m=0; m<5; m++){
-            ui.tableWidgetSoftware->setItem(k, m, new QTableWidgetItem(info.at(m)));
+        for(int n=0; n<5; n++){
+            ui.tableWidgetSoftware->setItem(m, n, new QTableWidgetItem(info.at(n)));
         }
     }
     systemInfo.endGroup();
