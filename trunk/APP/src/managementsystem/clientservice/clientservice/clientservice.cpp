@@ -186,10 +186,10 @@ bool ClientService::startMainService(){
     //Single Process Thread
     QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
     
-    //    //IMPORTANT For Multi-thread
-    //    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-    //    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
-    //    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
+    //IMPORTANT For Multi-thread
+    //QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
+    //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
 
 
     //TODO:

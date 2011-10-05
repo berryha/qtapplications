@@ -549,14 +549,20 @@ void SystemManagementWidget::on_toolButtonQuerySystemInfo_clicked(){
     ui.audioLineEdit->setText(record.value("Audio").toString());
 
     QStringList nic1Info = record.value("NIC1").toString().split("|");
-    ui.adapter1NameLineEdit->setText(nic1Info.at(0));
-    ui.adapter1HDAddressLineEdit->setText(nic1Info.at(1));
-    ui.adapter1IPAddressLineEdit->setText(nic1Info.at(2));
+    if(nic1Info.size() == 3){
+        ui.adapter1NameLineEdit->setText(nic1Info.at(0));
+        ui.adapter1HDAddressLineEdit->setText(nic1Info.at(1));
+        ui.adapter1IPAddressLineEdit->setText(nic1Info.at(2));
+    }
+
 
     QStringList nic2Info = record.value("NIC2").toString().split("|");
-    ui.adapter2NameLineEdit->setText(nic2Info.at(0));
-    ui.adapter2HDAddressLineEdit->setText(nic2Info.at(1));
-    ui.adapter2IPAddressLineEdit->setText(nic2Info.at(2));
+    if(nic2Info.size() == 3){
+        ui.adapter2NameLineEdit->setText(nic2Info.at(0));
+        ui.adapter2HDAddressLineEdit->setText(nic2Info.at(1));
+        ui.adapter2IPAddressLineEdit->setText(nic2Info.at(2));
+    }
+
 
     ui.devicesInfoGroupBox->setEnabled(true);
 
