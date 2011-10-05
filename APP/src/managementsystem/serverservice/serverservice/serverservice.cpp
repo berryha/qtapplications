@@ -160,12 +160,12 @@ bool ServerService::startMainService(){
     connect(serverPacketsParser, SIGNAL(signalClientOnlineStatusChanged(const QString&, quint16, const QString&, bool, bool)), this, SLOT(processClientOnlineStatusChangedPacket(const QString&, quint16, const QString&, bool, bool)), Qt::QueuedConnection);
 
     //Single Process Thread
-    //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
+    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
 
     //IMPORTANT For Multi-thread
-    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
+    //QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
+    //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
 
 
     //sendServerOnlinePacket();
