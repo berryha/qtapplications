@@ -1075,8 +1075,6 @@ void RUDPChannel::startKeepAliveTimer(){
     m_keepAliveTimer->start(m_keepAliveTimerInterval - 2 * RTT);
 
     qDebug()<<"------------------------keepAliveTimerInterval:"<<m_keepAliveTimer->interval();
-    qDebug()<<"----m_keepAliveTimerInterval:"<<m_keepAliveTimerInterval;
-    qDebug()<<"----RTT:"<<RTT;
 
 }
 
@@ -1097,7 +1095,7 @@ void RUDPChannel::startCheckPeerAliveTimer(){
         connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
     }
     m_checkPeerAliveTimer->start(m_keepAliveTimerInterval + 2 * RTT);
-    qDebug()<<"------------------------keepAliveTimerInterval:"<<m_checkPeerAliveTimer->interval();
+    qDebug()<<"------------------------checkPeerAliveTimerInterval:"<<m_checkPeerAliveTimer->interval();
 
 }
 
@@ -1264,7 +1262,7 @@ void RUDPChannel::startSendACKTimer(){
 
 void RUDPChannel::sendACKTimerTimeout(){
 
-//    qDebug()<<"--RUDPChannel::sendACKTimerTimeout()";
+    //qDebug()<<"--RUDPChannel::sendACKTimerTimeout()"<<" sendACKTimerInterval:"<<sendACKTimerInterval;
 
 //    quint16 sn = 0;
 //    if(lostPacketsInReceiverSide.isEmpty()){
@@ -1371,7 +1369,7 @@ void RUDPChannel::sendACKTimerTimeout(){
 
     sendPacket(packet);
 
-    //qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+    qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
 
     //Record the ACK sequence number and the departure time
     ACKPacketInfo * info = new ACKPacketInfo();
@@ -1391,7 +1389,7 @@ void RUDPChannel::sendACKTimerTimeout(){
 
 void RUDPChannel::startSendNACKTimer(){
 
-    //qDebug()<<"--RUDPChannel::startSendNACKTimer()";
+    qDebug()<<"--RUDPChannel::startSendNACKTimer()";
 
     if(!sendNACKTimer){
         sendNACKTimer = new QTimer();
