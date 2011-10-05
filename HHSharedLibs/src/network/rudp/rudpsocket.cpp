@@ -210,10 +210,10 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
             channel = new RUDPChannel(this, m_packetHandlerBase, hostAddress, port, m_keepAliveTimerInterval, 0);
 //            connect(channel, SIGNAL(finished()), this, SLOT(channelclosed()));
 //            connect(channel, SIGNAL(terminated()), this, SLOT(channelclosed()));
-            connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-            connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
+            connect(channel, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SIGNAL(peerConnected(const QHostAddress &, quint16)));
+            connect(channel, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
 //            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)));
-            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(channelclosed(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
+            connect(channel, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(channelclosed(const QHostAddress &, quint16, bool)));
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
