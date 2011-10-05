@@ -100,7 +100,7 @@ void ServerPacketsParser::run(){
         //QCoreApplication::processEvents();
         parseIncomingPackets();
         processOutgoingPackets();
-        msleep(50);
+        msleep(1);
     }
 
 //    processWaitingForReplyPacketsTimer.stop();
@@ -187,7 +187,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         sendServerDeclarePacket(peerAddress, peerRUDPListeningPort );
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
+        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ServerDeclare):
