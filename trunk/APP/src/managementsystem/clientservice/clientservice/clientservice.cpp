@@ -1628,7 +1628,7 @@ void ClientService::checkHasAnyServerBeenFound(){
 }
 
 void ClientService::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    qDebug()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
@@ -1649,6 +1649,13 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
         m_serverAddress = QHostAddress::Null;
         m_serverRUDPListeningPort = 0;
         m_serverName = "";
+
+        if(!lookForServerTimer){
+            lookForServerTimer = new QTimer(this);
+            lookForServerTimer->setSingleShot(true);
+            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
+        }
+        lookForServerTimer->start(15000);
 
     }else if(peerAddress.toString() == m_adminAddress && peerPort == m_adminPort){
 

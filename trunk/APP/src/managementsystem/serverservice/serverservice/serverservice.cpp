@@ -816,7 +816,7 @@ void ServerService::processClientOnlineStatusChangedPacket(const QString &client
 }
 
 void ServerService::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    qDebug()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
