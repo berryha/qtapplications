@@ -265,6 +265,8 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
     qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
     qWarning();
 
+    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true);
+
     int msec = QDateTime::currentDateTime().toString("z").toUInt();
 
 #ifdef Q_OS_WIN
