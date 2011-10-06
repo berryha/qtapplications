@@ -41,6 +41,10 @@ public:
 
 //    bool canSendData(qint64 size);
 
+    static RUDPPacket * getUnusedPacket();
+    void recylePacket(RUDPPacket *packet);
+    static void cleanAllUnusedPackets();
+
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
@@ -150,9 +154,7 @@ private:
     RUDPPacket * takeToBeSentPacket(quint16 packetID);
     void addToBeSentPacket(RUDPPacket *packet);
 
-    RUDPPacket * getUnusedPacket();
-    void recylePacket(RUDPPacket *packet);
-    void cleanAllUnusedPackets();
+
 
 
     static void setGlobalSendBufferSize(qint64 size);
@@ -259,8 +261,8 @@ private:
     quint16 m_receivedFragmentDataPacketID;
     QHash<quint16/*Packet SN*/, RUDPPacket*> m_receivedFragmentDataPackets;
 
-    QList<RUDPPacket *> m_unusedPackets;
-    QMutex unusedPacketsMutex;
+    static QList<RUDPPacket *> *m_unusedPackets;
+    static QMutex *unusedPacketsMutex;
 
 
     QTimer *m_keepAliveTimer;
