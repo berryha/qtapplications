@@ -1030,7 +1030,7 @@ void ClientService::consoleProcessOutputRead(const QString &output){
 
 void ClientService::uploadClientSummaryInfo(const QString &targetAddress, quint16 targetPort){
     qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
-
+    qDebug()<<"---------targetAddress:"<<targetAddress<<" -m_serverAddress:"<<m_serverAddress.toString();
     if(targetAddress.trimmed().isEmpty() && m_serverAddress.isNull()){
         return;
     }
