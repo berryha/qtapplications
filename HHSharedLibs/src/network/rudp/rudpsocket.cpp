@@ -78,19 +78,19 @@ bool RUDPSocket::isConnected(const QHostAddress &peerAddress, quint16 peerPort){
 
 }
 
-void RUDPSocket::connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout){
+void RUDPSocket::connectToPeer(const QString &peerAddressString, quint16 peerPort, bool wait, int msecTimeout){
 
-    connectToPeer(QHostAddress(peerAddressString), peerPort, msecTimeout);
+    connectToPeer(QHostAddress(peerAddressString), peerPort, wait, msecTimeout);
 }
 
-void RUDPSocket::connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout){
+void RUDPSocket::connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, bool wait, int msecTimeout){
 
     if( 0 == localPort()){
         bind();
     }
 
     RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-    channel->connectToPeer(msecTimeout);
+    channel->connectToPeer(wait, msecTimeout);
 
 }
 
@@ -132,6 +132,13 @@ quint64 RUDPSocket::sendDatagram(const QHostAddress &peerAddress, quint16 peerPo
 //    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
 //    return channel->endDataTransmission(fragmentDataID);
 //}
+
+void RUDPSocket::closeChannel(const QHostAddress &peerAddress, quint16 peerPort){
+    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+    channel->closeChannel();
+    recyleRUDPChannel(channel);
+
+}
 
 void RUDPSocket::closeAllChannels(){
     qDebug()<<"--RUDPSocket::closeAllChannels()";

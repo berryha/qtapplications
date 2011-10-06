@@ -76,7 +76,7 @@ Packet::Packet() {
     
     this->transmissionProtocol = TP_UNKNOWN;
     
-    this->remainingRetransmissionTimes = 0;
+    this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
         
@@ -104,7 +104,7 @@ Packet::Packet(const QString &peerAddress, quint16 peerPort, const QString &loca
     this->transmissionProtocol = TP_UNKNOWN;
     
     //remainingRetransmissionTimes = int(PACKET_RETRANSMISSION_TIMES);
-    this->remainingRetransmissionTimes = 0;
+    this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
 
@@ -132,7 +132,7 @@ Packet::Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAdd
     this->transmissionProtocol = TP_UNKNOWN;
     
     //remainingRetransmissionTimes = int(PACKET_RETRANSMISSION_TIMES);
-    this->remainingRetransmissionTimes = 0;
+    this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
 
@@ -175,7 +175,7 @@ void Packet::resetPacket(){
     this->localHostAddress = QHostAddress::Null;
     this->localHostPort = 0;
     this->transmissionProtocol = TP_UNKNOWN;
-    this->remainingRetransmissionTimes = 0;
+    this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
 

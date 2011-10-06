@@ -193,7 +193,7 @@ bool RUDPChannel::isConnected(){
 
 }
 
-void RUDPChannel::connectToPeer(int msecTimeout){
+void RUDPChannel::connectToPeer(bool wait, int msecTimeout){
     //qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
     if(m_peerAddress.isNull() || m_peerPort ==0){
@@ -201,11 +201,11 @@ void RUDPChannel::connectToPeer(int msecTimeout){
         return;
     }
 
-    connectToPeer(m_peerAddress, m_peerPort, msecTimeout);
+    connectToPeer(m_peerAddress, m_peerPort, wait, msecTimeout);
 
 }
 
-void RUDPChannel::connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout){
+void RUDPChannel::connectToPeer(const QString &peerAddressString, quint16 peerPort, bool wait, int msecTimeout){
     //qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
     QHostAddress address = QHostAddress(peerAddressString);
@@ -214,11 +214,11 @@ void RUDPChannel::connectToPeer(const QString &peerAddressString, quint16 peerPo
         return;
     }
 
-    connectToPeer(address, peerPort, msecTimeout);
+    connectToPeer(address, peerPort, wait, msecTimeout);
 
 }
 
-void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout){
+void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, bool wait, int msecTimeout){
     qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
 
@@ -243,6 +243,10 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
         //m_connectToPeerTimer->start(5000);
         sendHandshakePacket(m_myHandshakeID);
 
+    }
+
+    if(wait){
+        waitForConnected(msecTimeout);
     }
 
 //    //if(m_ChannelState == UnconnectedState){
@@ -276,7 +280,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 
     while (getChannelState() != ConnectedState) {
         QCoreApplication::processEvents();
-        msleep(1);
+        msleep(10);
         if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
             return false;
         }
@@ -344,13 +348,16 @@ bool RUDPChannel::waitForDisconnected(int msecTimeout){
 
 
 void RUDPChannel::closeChannel(){
-    qDebug()<<"--RUDPChannel::closeChannel()";
+    qDebug()<<"--RUDPChannel::closeChannel()"<<" Peer Address:"<<m_peerAddress.toString()<<":"<<m_peerPort;
 
     if(getChannelState() == ConnectedState){
         disconnectFromPeer();
+        waitForDisconnected();
+
     }
 
-    waitForDisconnected();
+
+    QMetaObject::invokeMethod(this, "reset");
 
 //    quit();
 }

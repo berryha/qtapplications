@@ -71,8 +71,9 @@ signals:
 
 
 public slots:
-    void connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
-    void connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+    void connectToPeer(const QString &peerAddressString, quint16 peerPort, bool wait = false, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+    void connectToPeer(const QHostAddress &peerAddress, quint16 peerPort, bool wait = false, int msecTimeout = RUDP_CONNECTION_TIMEOUT);
+
     void disconnectFromPeer(const QHostAddress &peerAddress, quint16 peerPort);
 
 
@@ -83,6 +84,7 @@ public slots:
 
 //    void endDataTransmission(const QHostAddress &peerAddress, quint16 peerPort, quint16 fragmentDataID);
 
+    void closeChannel(const QHostAddress &peerAddress, quint16 peerPort);
     void closeAllChannels();
 
 private slots:
