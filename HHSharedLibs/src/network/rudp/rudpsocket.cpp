@@ -65,6 +65,19 @@ RUDPSocket::~RUDPSocket(){
 
 }
 
+bool RUDPSocket::isConnected(const QString &peerAddressString, quint16 peerPort){
+
+    return isConnected(QHostAddress(peerAddressString), peerPort);
+
+}
+
+bool RUDPSocket::isConnected(const QHostAddress &peerAddress, quint16 peerPort){
+
+    RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+    return channel->isConnected();
+
+}
+
 void RUDPSocket::connectToPeer(const QString &peerAddressString, quint16 peerPort, int msecTimeout){
 
     connectToPeer(QHostAddress(peerAddressString), peerPort, msecTimeout);

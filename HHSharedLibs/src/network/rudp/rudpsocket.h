@@ -57,6 +57,8 @@ public:
 
     ~RUDPSocket();
 
+    bool isConnected(const QString &peerAddressString, quint16 peerPort);
+    bool isConnected(const QHostAddress &peerAddress, quint16 peerPort);
 
 //    bool canSendData(quint64 size);
 
