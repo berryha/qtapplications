@@ -203,10 +203,17 @@ void PacketsParserBase::processOutgoingPackets() {
         }
 
         if (!result) {
-            if(transmissionProtocol == TP_RUDP || (packet->getRemainingRetransmissionTimes() > 0)){
-                packet->packetTransmissionFailed();
+            packet->packetTransmissionFailed();
+
+            if((packet->getRemainingRetransmissionTimes() > 0)){
                 m_packetHandlerBase->appendOutgoingPacket(packet);
+            }else{
+                if(transmissionProtocol == TP_RUDP){
+                    m_networkManagerBase->getRUDPServer(packet->getLocalHostPort(), packet->getLocalHostAddress())->closeChannel(packet->getPeerHostAddress(), packet->getPeerHostPort());
+                }
+                m_packetHandlerBase->recylePacket(packet);
             }
+
             qWarning()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
         }
         //        else if (transmissionProtocol == TP_UDP) {
