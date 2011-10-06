@@ -41,6 +41,8 @@ public:
 
 //    bool canSendData(qint64 size);
 
+    bool isConnected();
+
     static RUDPPacket * getUnusedPacket();
     void recylePacket(RUDPPacket *packet);
     static void cleanAllUnusedPackets();

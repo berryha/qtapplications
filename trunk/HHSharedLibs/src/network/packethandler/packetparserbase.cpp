@@ -202,22 +202,37 @@ void PacketsParserBase::processOutgoingPackets() {
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), true);
         }
 
-        if (packet->getRemainingRetransmissionTimes() > 0) {
-            if (!result) {
+        if (!result) {
+            if(transmissionProtocol == TP_RUDP || (packet->getRemainingRetransmissionTimes() > 0)){
                 packet->packetTransmissionFailed();
                 m_packetHandlerBase->appendOutgoingPacket(packet);
-                qWarning()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
-
-            } else {
-                if (transmissionProtocol == TP_UDP) {
-                    packet->setLastTransmissionTime(QDateTime::currentDateTime());
-//                    m_packetHandlerBase->appendWaitingForReplyPacket(packet);
-                }
             }
-
-        } else {
+            qWarning()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
+        }
+        //        else if (transmissionProtocol == TP_UDP) {
+        //            packet->setLastTransmissionTime(QDateTime::currentDateTime());
+        //            //m_packetHandlerBase->appendWaitingForReplyPacket(packet);
+        //        }
+        else{
             m_packetHandlerBase->recylePacket(packet);
         }
+
+//        if (packet->getRemainingRetransmissionTimes() > 0) {
+//            if (!result) {
+//                packet->packetTransmissionFailed();
+//                m_packetHandlerBase->appendOutgoingPacket(packet);
+//                qWarning()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
+
+//            } else {
+//                if (transmissionProtocol == TP_UDP) {
+//                    packet->setLastTransmissionTime(QDateTime::currentDateTime());
+////                    m_packetHandlerBase->appendWaitingForReplyPacket(packet);
+//                }
+//            }
+
+//        } else {
+//            m_packetHandlerBase->recylePacket(packet);
+//        }
 
         QCoreApplication::processEvents();
 

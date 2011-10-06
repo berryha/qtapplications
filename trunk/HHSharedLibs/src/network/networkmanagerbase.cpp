@@ -496,6 +496,12 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
             qCritical()<<m_errorString;
             return false;
         }
+        if(rudpServer->isConnected(targetAddress, targetPort)){
+            rudpServer->connectToPeer(targetAddress, targetPort);
+            m_errorString = tr("Peer Not Connected!");
+            qCritical()<<m_errorString;
+            return false;
+        }
         int sentSize = rudpServer->sendDatagram(targetAddress, targetPort, data);
         result = (sentSize == data->size());
         m_errorString = rudpServer->errorString();

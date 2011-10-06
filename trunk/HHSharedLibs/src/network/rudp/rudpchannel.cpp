@@ -184,6 +184,11 @@ RUDPChannel::~RUDPChannel(){
 //    exec();
 //}
 
+bool RUDPChannel::isConnected(){
+
+    return m_ChannelState == ConnectedState;
+
+}
 
 void RUDPChannel::connectToPeer(int msecTimeout){
     //qDebug()<<"--RUDPChannel::connectToPeer(...)";
@@ -227,8 +232,11 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
         connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
     }
     m_connectToPeerTimer->setInterval(5000);
-    QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
-    //m_connectToPeerTimer->start(5000);
+    if(!m_connectToPeerTimer->isActive()){
+        QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
+        //m_connectToPeerTimer->start(5000);
+    }
+
 
 
     m_ChannelState = ConnectingState;
