@@ -235,14 +235,15 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString address = "";
         quint16 port = 0;
         in >> address >> port;
-        serverAddress = QHostAddress(address);
+        serverAddress = peerAddress;
         serverRUDPListeningPort = port;
         serverName = peerName;
 
         serverLastOnlineTime = QDateTime::currentDateTime();
 
         emit signalServerOnlinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
-        qDebug()<<"~~ServerOnline";
+        qDebug()<<"~~ServerOnline"<<" serverAddress:"<<serverAddress<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
+
     }
     break;
     case quint8(MS::ServerOffline):

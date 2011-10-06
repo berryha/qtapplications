@@ -308,7 +308,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString address;
         quint16 port;
         in >> address >> port;
-        m_serverAddress = QHostAddress(address);
+        m_serverAddress = peerAddress;
         m_serverRUDPListeningPort = port;
         serverName = peerID;
 

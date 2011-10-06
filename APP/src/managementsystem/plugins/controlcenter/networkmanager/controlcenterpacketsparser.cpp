@@ -218,7 +218,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         QString address = "";
         quint16 port;
         in >> address >> port;
-        serverAddress = QHostAddress(address);
+        serverAddress = peerAddress;
         serverRUDPListeningPort = port;
         serverName = peerName;
         emit signalServerOnlinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
