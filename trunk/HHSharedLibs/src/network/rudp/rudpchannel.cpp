@@ -118,6 +118,9 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 //    startCheckPeerAliveTimer();
 
 
+        m_connectToPeerTimer = new QTimer();
+        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
+
 
     m_peerAddress = peerAddress;
     m_peerPort = peerPort;
@@ -185,8 +188,8 @@ RUDPChannel::~RUDPChannel(){
 //}
 
 bool RUDPChannel::isConnected(){
-
-    return m_ChannelState == ConnectedState;
+    QMutexLocker locker(&m_ChannelStateMutex);
+    return (m_ChannelState == ConnectedState);
 
 }
 
@@ -219,9 +222,9 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
     qDebug()<<"--RUDPChannel::connectToPeer(...)";
 
 
-//    if(m_ChannelState == ConnectedState){
-//        return;
-//    }
+    if(getChannelState() == ConnectedState){
+        return;
+    }
 
     this->m_peerAddress = peerAddress;
     this->m_peerPort = peerPort;
@@ -230,18 +233,25 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
     if(!m_connectToPeerTimer){
         m_connectToPeerTimer = new QTimer();
         connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
+
+        sendResetPacket();
     }
-    m_connectToPeerTimer->setInterval(5000);
+
     if(!m_connectToPeerTimer->isActive()){
+        m_connectToPeerTimer->setInterval(5000);
         QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
         //m_connectToPeerTimer->start(5000);
+        sendHandshakePacket(m_myHandshakeID);
+
     }
 
+//    //if(m_ChannelState == UnconnectedState){
+//        m_ChannelState = ConnectingState;
+//        //sendResetPacket();
+//        sendHandshakePacket(m_myHandshakeID);
+//    //}
 
 
-    m_ChannelState = ConnectingState;
-    sendResetPacket();
-    sendHandshakePacket(m_myHandshakeID);
 
     //QTimer::singleShot(msecTimeout, this, SLOT(connectToPeerTimeout()));
 
@@ -264,7 +274,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 
     QDateTime startTime = QDateTime::currentDateTime();
 
-    while (m_ChannelState != ConnectedState) {
+    while (getChannelState() != ConnectedState) {
         QCoreApplication::processEvents();
         msleep(1);
         if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
@@ -293,7 +303,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 void RUDPChannel::disconnectFromPeer(){
     //qDebug()<<"--RUDPChannel::disconnectFromPeer()"<<" m_peerPort:"<<m_peerPort<<" localPort:"<<m_udpSocket->localPort();
 
-    if(m_ChannelState == UnconnectedState){
+    if(getChannelState() == UnconnectedState){
         return;
     }
 
@@ -310,7 +320,8 @@ void RUDPChannel::disconnectFromPeer(){
 
     tryingToSendPacket(packet);
 
-    m_ChannelState = DisconnectingState;
+    //m_ChannelState = DisconnectingState;
+    updateChannelState(DisconnectingState);
 
 
 }
@@ -319,7 +330,7 @@ bool RUDPChannel::waitForDisconnected(int msecTimeout){
 
     QDateTime startTime = QDateTime::currentDateTime();
 
-    while (m_ChannelState != UnconnectedState) {
+    while (getChannelState() != UnconnectedState) {
         QCoreApplication::processEvents();
         msleep(1);
         if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
@@ -335,7 +346,7 @@ bool RUDPChannel::waitForDisconnected(int msecTimeout){
 void RUDPChannel::closeChannel(){
     qDebug()<<"--RUDPChannel::closeChannel()";
 
-    if(m_ChannelState == ConnectedState){
+    if(getChannelState() == ConnectedState){
         disconnectFromPeer();
     }
 
@@ -428,7 +439,7 @@ void RUDPChannel::closeChannel(){
 quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
     //qDebug()<<"--RUDPChannel::sendDatagram(QByteArray *data) "<<" data->size():"<<data->size();
 
-    if(m_ChannelState == DisconnectingState){
+    if(getChannelState() == DisconnectingState){
         return 0;
     }
 
@@ -437,7 +448,7 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
         return data->size();
     }
 
-    if(m_ChannelState != ConnectedState){
+    if(getChannelState() != ConnectedState){
         if(m_ChannelState == DisconnectingState){return 0;}
         connectToPeer();
         waitForConnected();
@@ -611,7 +622,7 @@ void RUDPChannel::datagramReceived(QByteArray &block){
     }else{
         qDebug()<<"--datagramReceived "<<" packetType:"<<packetType<<" packetSerialNumber:"<<packetSerialNumber<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
 
-        if(m_ChannelState != ConnectedState){
+        if(getChannelState() != ConnectedState){
             sendResetPacket();
         }
     }
@@ -740,7 +751,7 @@ void RUDPChannel::connectToPeerTimeout(){
 
     m_msecConnectToPeerTimeout -= m_connectToPeerTimer->interval();
 
-    if(m_ChannelState == ConnectedState){
+    if(getChannelState() == ConnectedState){
         QMetaObject::invokeMethod(m_connectToPeerTimer, "stop");
         //m_connectToPeerTimer->stop();
         delete m_connectToPeerTimer;
@@ -1649,13 +1660,13 @@ void RUDPChannel::init(){
     //sendACKTimer = new QTimer(this);
     //connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
     sendACKTimerInterval = 10;
-    sendACKTimer = 0;
+    //sendACKTimer = 0;
     //startSendACKTimer();
 
     //sendNACKTimer = new QTimer(this);
     //connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
     sendNACKTimerInterval = 3 * RTT;
-    sendNACKTimer = 0;
+    //sendNACKTimer = 0;
     //startSendNACKTimer();
 
     m_packetArrivalSpeed = 0;
@@ -1664,7 +1675,7 @@ void RUDPChannel::init(){
     //retransmissionTimer = new QTimer(this);
     //connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
     retransmissionTimerInterval = 3 * RTT + SYN;
-    retransmissionTimer = 0;
+    //retransmissionTimer = 0;
     //startRetransmissionTimer();
 
     EXPCOUNT = 0;
@@ -1697,7 +1708,7 @@ void RUDPChannel::init(){
     m_myHandshakeID += qrand();
     m_peerHandshakeID = 0;
 
-    m_connectToPeerTimer = 0;
+    //m_connectToPeerTimer = 0;
     m_msecConnectToPeerTimeout = 0;
 
     m_firstReceivedPacketIDInReceiveWindow = 1;
@@ -1723,7 +1734,8 @@ void RUDPChannel::init(){
     m_checkPeerAliveTimer = 0;
     m_checkPeerAliveTimes = RUDP_MAX_CHECK_ALIVE_TIMES;
 
-    m_ChannelState = UnconnectedState;
+    //m_ChannelState = UnconnectedState;
+    updateChannelState(UnconnectedState);
 
     m_packetSerialNumber = 0;
 
@@ -1737,7 +1749,7 @@ void RUDPChannel::reset(){
 
     if(m_connectToPeerTimer){
         qDebug()<<"-------------------------------------------1";
-
+        //QMetaObject::invokeMethod(m_connectToPeerTimer, "stop");
         m_connectToPeerTimer->stop();
         qDebug()<<"-------------------------------------------1";
 
@@ -1888,7 +1900,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
         if(m_peerHandshakeID == 0){
             m_peerHandshakeID = handshakeID;
-            if(m_ChannelState == ConnectingState){
+            if(getChannelState() == ConnectingState){
                 sendHandshakePacket(m_myHandshakeID + 1);
             }else{
                 sendHandshakePacket(m_myHandshakeID);
@@ -1898,10 +1910,10 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
             if(m_peerHandshakeID != handshakeID){
                 if((m_peerHandshakeID + 1) == handshakeID){
-                    if(m_ChannelState == UnconnectedState){
+                    if(getChannelState() == UnconnectedState){
                         sendHandshakePacket(m_myHandshakeID + 1);
                     }
-                    if(m_ChannelState == ConnectingState){
+                    if(getChannelState() == ConnectingState){
                         QMetaObject::invokeMethod(this, "startKeepAliveTimer");
                         //startKeepAliveTimer();
                     }
@@ -1917,14 +1929,14 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         }
 
 
-        if(m_ChannelState != ConnectedState){
+        if(getChannelState() != ConnectedState){
 
             if(peerMSS < m_MSS){
                 m_MSS = peerMSS;
             }
 
-
-            m_ChannelState = ConnectedState;
+            //m_ChannelState = ConnectedState;
+            updateChannelState(ConnectedState);
 
             QMetaObject::invokeMethod(this, "startSendACKTimer");
             QMetaObject::invokeMethod(this, "startSendNACKTimer");
@@ -1960,7 +1972,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         QString msg = "";
         in >> msg;
 
-        if(m_ChannelState != DisconnectingState){
+        if(getChannelState() != DisconnectingState){
             disconnectFromPeer();
         }
 
@@ -2482,7 +2494,17 @@ void RUDPChannel::updateGlobalFreeSendBufferSize(qint64 size, bool reduce){
 
 }
 
+void RUDPChannel::updateChannelState(ChannelState state){
+    QMutexLocker locker(&m_ChannelStateMutex);
+    this->m_ChannelState = state;
 
+}
+
+RUDPChannel::ChannelState RUDPChannel::getChannelState(){
+    QMutexLocker locker(&m_ChannelStateMutex);
+    return m_ChannelState;
+
+}
 
 
 
