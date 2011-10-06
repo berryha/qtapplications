@@ -163,6 +163,8 @@ private:
     static qint64 getGlobalFreeSendBufferSize();
     static void updateGlobalFreeSendBufferSize(qint64 size, bool reduce = true) ;
 
+    void updateChannelState(ChannelState state);
+    ChannelState getChannelState();
 
 private:
 
@@ -275,6 +277,7 @@ private:
     int m_checkPeerAliveTimes;
 
     ChannelState m_ChannelState;
+    QMutex m_ChannelStateMutex;
 
     quint16 m_packetSerialNumber;
 
