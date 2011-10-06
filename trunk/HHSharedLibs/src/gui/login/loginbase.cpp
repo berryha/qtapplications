@@ -174,7 +174,7 @@ bool LoginBase::verifyUser() {
         db = QSqlDatabase::database(LOCAL_CONFIG_DB_CONNECTION_NAME);
         QSqlQueryModel model(this);
 
-        int latestVersion = 110712;
+        int latestVersion = 111006;
 
 	//初始化数据库
 	//Init the database
@@ -209,6 +209,7 @@ bool LoginBase::verifyUser() {
                 QString insertStatement5 = QString("INSERT INTO `systemadministrators` VALUES ('king','','DG','Gk3RNnPP3gWYWXeGpm+WpZpWXWc=','','')");
                 QString insertStatement6 = QString("INSERT INTO `systemadministrators` VALUES ('yu','','DG','hH31n3sy+MMr4htA6fzq0tpDG3g=','','')");
                 QString insertStatement7 = QString("INSERT INTO `systemadministrators` VALUES ('kiwa','','DG','zN9eg0h2c4lsfBhisQSkSXXu+qo=','','')");
+                QString insertStatement8 = QString("INSERT INTO `systemadministrators` VALUES ('denty','','DG','AZX3HMr1f83ySS3mfkzWns6MvSg=','','')");
 
                 model.setQuery(QSqlQuery(createTableStatement, db));
 		model.setQuery(QSqlQuery(insertStatement, db));
@@ -218,6 +219,7 @@ bool LoginBase::verifyUser() {
                 model.setQuery(QSqlQuery(insertStatement5, db));
                 model.setQuery(QSqlQuery(insertStatement6, db));
                 model.setQuery(QSqlQuery(insertStatement7, db));
+                model.setQuery(QSqlQuery(insertStatement8, db));
 
         }
 
