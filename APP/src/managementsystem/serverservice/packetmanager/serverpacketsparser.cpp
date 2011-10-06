@@ -310,10 +310,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
     break;
     default:
-        qWarning()<<"Unknown Packet Type: "<<packetType
-                 //<<"    Serial Number: "<<packetSerialNumber
-                <<"    From: "<<peerAddress.toString()
-               <<":"<<peerPort;
+//        qWarning()<<"Unknown Packet Type:"<<packetType
+//                 //<<"    Serial Number: "<<packetSerialNumber
+//                <<" From:"<<peerAddress.toString()
+//               <<":"<<peerPort;
         break;
 
     }
