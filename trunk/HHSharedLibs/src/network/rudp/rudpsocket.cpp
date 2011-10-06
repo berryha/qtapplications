@@ -60,6 +60,8 @@ RUDPSocket::~RUDPSocket(){
     delete datagram;
     datagram = 0;
 
+    RUDPChannel::cleanAllUnusedPackets();
+
 
 }
 
