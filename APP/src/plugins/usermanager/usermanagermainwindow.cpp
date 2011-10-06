@@ -71,121 +71,119 @@ bool UserManagerMainWindow::running = false;
 UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
     : QMainWindow(parent), isYDAdmin(isYDAdmin)
 {
-	ui.setupUi(this);
+    ui.setupUi(this);
 
-        databaseConnectionName = QString(REMOTE_SITOY_SQLSERVER_DB_CONNECTION_NAME) + "-UM";
-        model = new QSqlQueryModel(this);
+    databaseConnectionName = QString(REMOTE_SITOY_SQLSERVER_DB_CONNECTION_NAME) + "-UM";
+    model = new QSqlQueryModel(this);
 
-	ui.userListTableView->setModel(model);
-
-
-	connect(ui.queryToolButton, SIGNAL(clicked()), this, SLOT(slotQueryUserButtonClicked()));
-
-	connect(ui.addUserToolButton, SIGNAL(clicked()), this, SLOT(slotAddUserButtonClicked()));
-
-        connect(ui.userListTableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
-        //connect(ui.userListTableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
-        connect(ui.userListTableView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotAddUserButtonClicked()));
+    ui.userListTableView->setModel(model);
 
 
-	initStatusBar();
-	//slotResetStatusBar(true);
-	statusBar()->showMessage(tr("Ctrl+Return: Query    F9: Add"));
+    connect(ui.queryToolButton, SIGNAL(clicked()), this, SLOT(slotQueryUserButtonClicked()));
+
+    connect(ui.addUserToolButton, SIGNAL(clicked()), this, SLOT(slotAddUserButtonClicked()));
+
+    connect(ui.userListTableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
+    //connect(ui.userListTableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
+    connect(ui.userListTableView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotAddUserButtonClicked()));
 
 
-	ui.userIDComboBox->clear();
-	QString username = Utilities::currentUserNameOfOS();
+    initStatusBar();
+    //slotResetStatusBar(true);
+    statusBar()->showMessage(tr("Ctrl+Return: Query    F9: Add"));
 
-        progressDlg = 0;
+
+    ui.userIDComboBox->clear();
+    QString username = Utilities::currentUserNameOfOS();
+
+    progressDlg = 0;
 
 #ifdef Q_OS_WIN32
 
-        wm = new WindowsManagement(this);
-//        wm->test();
+    wm = new WindowsManagement(this);
+    //        wm->test();
 
-        if(wm->isUserAutoLogin()){
-            int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-            if(rep == QMessageBox::Yes){
-                wm->setUserAutoLogin(L"", L"", false);
-            }
-            QString error = wm->lastError();
-            if(!error.isEmpty()){
-                QMessageBox::critical(this, tr("Error"), error);
-            }
+    if(wm->isUserAutoLogin()){
+        int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+        if(rep == QMessageBox::Yes){
+            wm->setUserAutoLogin(L"", L"", false);
         }
+        QString error = wm->lastError();
+        if(!error.isEmpty()){
+            QMessageBox::critical(this, tr("Error"), error);
+        }
+    }
 
 
-        QStringList users = wm->localUsers();
-        ui.userIDComboBox->addItems(users);
-        ui.userIDComboBox->setCurrentIndex(ui.userIDComboBox->findText(username));
+    QStringList users = wm->localUsers();
+    ui.userIDComboBox->addItems(users);
+    ui.userIDComboBox->setCurrentIndex(ui.userIDComboBox->findText(username));
 
 #else
 
-        ui.userIDComboBox->addItem(username);
+    ui.userIDComboBox->addItem(username);
 
 #endif
 
 
-	ui.userIDComboBox->setFocus();
+    ui.userIDComboBox->setFocus();
 
-        this->installEventFilter(this);
-        ui.userPSWDLineEdit->installEventFilter(this);
+    this->installEventFilter(this);
+    ui.userPSWDLineEdit->installEventFilter(this);
 
-	running = true;
+    running = true;
 
-	isAddingUser = false;
+    isAddingUser = false;
 
-        QTimer::singleShot(100, this, SLOT(slotCheckIsInitializingNeeded()));
-
-
-        activityTimer = new QTimer(this);
-        activityTimer->setSingleShot(false);
-        activityTimer->setInterval(120000); //2minutes
-        connect(activityTimer, SIGNAL(timeout()), this, SLOT(activityTimeout()));
-        activityTimer->start();
-
-        m_verified = true;
+    QTimer::singleShot(100, this, SLOT(slotCheckIsInitializingNeeded()));
 
 
+    activityTimer = new QTimer(this);
+    activityTimer->setSingleShot(false);
+    activityTimer->setInterval(120000); //2minutes
+    connect(activityTimer, SIGNAL(timeout()), this, SLOT(activityTimeout()));
+    activityTimer->start();
+
+    m_verified = true;
 
 
 }
 
 UserManagerMainWindow::~UserManagerMainWindow()
 {
-	qDebug()<<"----UserManager::~UserManager()";
+    qDebug()<<"----UserManager::~UserManager()";
 
 
 
-	running = false;
+    running = false;
 
 #ifdef Q_OS_WIN32
-        if(wm){
-            delete wm;
-            wm = 0;
-        }
+    if(wm){
+        delete wm;
+        wm = 0;
+    }
 #endif
 
-        if(progressDlg){
-            delete progressDlg;
-            progressDlg = 0;
-        }
+    if(progressDlg){
+        delete progressDlg;
+        progressDlg = 0;
+    }
 
 
-        if(model){
-            model->clear();
-            delete model;
-            model = 0;
-        }
+    if(model){
+        model->clear();
+        delete model;
+        model = 0;
+    }
 
-        QSqlDatabase db = QSqlDatabase::database(databaseConnectionName);
-        if(db.isOpen()){
-            db.close();
-        }
-        QSqlDatabase::removeDatabase(databaseConnectionName);
+    QSqlDatabase db = QSqlDatabase::database(databaseConnectionName);
+    if(db.isOpen()){
+        db.close();
+    }
+    QSqlDatabase::removeDatabase(databaseConnectionName);
 
-        activityTimer->stop();
-        activityTimer->deleteLater();
+    activityTimer->stop();
+    activityTimer->deleteLater();
 
 
 }
@@ -194,64 +192,64 @@ bool UserManagerMainWindow::eventFilter(QObject *obj, QEvent *event) {
 
     switch(event->type()){
     case QEvent::KeyRelease:
-        {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
-            if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
-                    slotShowUserInfo(ui.userListTableView->currentIndex());
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
+        if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
+            slotShowUserInfo(ui.userListTableView->currentIndex());
+        }
+
+        if(keyEvent->key() == Qt::Key_Escape){
+            if(!ui.userIDComboBox->isEnabled()){
+                ui.userIDComboBox->setEnabled(true);
+                ui.userNameLineEdit->setReadOnly(false);
+                ui.userDeptComboBox->setEnabled(true);
+                ui.userIDComboBox->setFocus();
+            }else{
+                ui.userIDComboBox->setCurrentIndex(-1);
+                ui.userIDComboBox->setEnabled(true);
+                ui.userNameLineEdit->clear();
+                ui.userDeptComboBox->setCurrentIndex(0);
+                ui.userPSWDLineEdit->clear();
+                ui.userIDComboBox->setFocus();
             }
 
-            if(keyEvent->key() == Qt::Key_Escape){
-                    if(!ui.userIDComboBox->isEnabled()){
-                            ui.userIDComboBox->setEnabled(true);
-                            ui.userNameLineEdit->setReadOnly(false);
-                            ui.userDeptComboBox->setEnabled(true);
-                            ui.userIDComboBox->setFocus();
-                    }else{
-                            ui.userIDComboBox->setCurrentIndex(-1);
-                            ui.userIDComboBox->setEnabled(true);
-                            ui.userNameLineEdit->clear();
-                            ui.userDeptComboBox->setCurrentIndex(0);
-                            ui.userPSWDLineEdit->clear();
-                            ui.userIDComboBox->setFocus();
-                    }
+            ui.addUserToolButton->setEnabled(false);
+        }
 
-                    ui.addUserToolButton->setEnabled(false);
-            }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
+            slotExportQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
+            slotPrintQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
+            slotShowUserInfo(ui.userListTableView->currentIndex());
+            slotModifyUserInfo();
+        }
 
-            if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
-                slotExportQueryResult();
-            }
-            if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
-                slotPrintQueryResult();
-            }
-            if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
-                slotShowUserInfo(ui.userListTableView->currentIndex());
-                slotModifyUserInfo();
-            }
-
-            activityTimer->start();
+        activityTimer->start();
+        return true;
+    }
+        break;
+        //    case QEvent::MouseButtonRelease:
+        //        {
+        //            activityTimer->start();
+        //            qWarning()<<"MouseButtonRelease";
+        //            return QObject::eventFilter(obj, event);
+        //        }
+        //        break;
+    case QEvent::ToolTip:
+    {
+        if(obj == ui.userPSWDLineEdit){
+            QString pwd = ui.userPSWDLineEdit->text();
+            if(pwd.isEmpty()){pwd = tr("Password");}
+            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+            QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
+            QToolTip::showText(helpEvent->globalPos(), tip);
             return true;
         }
-        break;
-//    case QEvent::MouseButtonRelease:
-//        {
-//            activityTimer->start();
-//            qWarning()<<"MouseButtonRelease";
-//            return QObject::eventFilter(obj, event);
-//        }
-//        break;
-    case QEvent::ToolTip:
-        {
-            if(obj == ui.userPSWDLineEdit){
-                QString pwd = ui.userPSWDLineEdit->text();
-                if(pwd.isEmpty()){pwd = tr("Password");}
-                QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-                QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
-                QToolTip::showText(helpEvent->globalPos(), tip);
-                return true;
-            }
 
-        }
+    }
         break;
     default:
         return QObject::eventFilter(obj, event);
@@ -261,128 +259,128 @@ bool UserManagerMainWindow::eventFilter(QObject *obj, QEvent *event) {
 
     return QObject::eventFilter(obj, event);
 
-//	if (event->type() == QEvent::KeyRelease ) {
-//		QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
-//		if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
-//			slotShowUserInfo(ui.userListTableView->currentIndex());
-//		}
+    //	if (event->type() == QEvent::KeyRelease ) {
+    //		QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
+    //		if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
+    //			slotShowUserInfo(ui.userListTableView->currentIndex());
+    //		}
 
-//		if(keyEvent->key() == Qt::Key_Escape){
-//                        if(!ui.userIDComboBox->isEnabled()){
-//                                ui.userIDComboBox->setEnabled(true);
-//				ui.userNameLineEdit->setReadOnly(false);
-//				ui.userDeptComboBox->setEnabled(true);
-//                                ui.userIDComboBox->setFocus();
-//			}else{
-//				ui.userIDComboBox->setCurrentIndex(-1);
-//				ui.userIDComboBox->setEnabled(true);
-//				ui.userNameLineEdit->clear();
-//				ui.userDeptComboBox->setCurrentIndex(0);
-//				ui.userPSWDLineEdit->clear();
-//				ui.userIDComboBox->setFocus();
-//			}
+    //		if(keyEvent->key() == Qt::Key_Escape){
+    //                        if(!ui.userIDComboBox->isEnabled()){
+    //                                ui.userIDComboBox->setEnabled(true);
+    //				ui.userNameLineEdit->setReadOnly(false);
+    //				ui.userDeptComboBox->setEnabled(true);
+    //                                ui.userIDComboBox->setFocus();
+    //			}else{
+    //				ui.userIDComboBox->setCurrentIndex(-1);
+    //				ui.userIDComboBox->setEnabled(true);
+    //				ui.userNameLineEdit->clear();
+    //				ui.userDeptComboBox->setCurrentIndex(0);
+    //				ui.userPSWDLineEdit->clear();
+    //				ui.userIDComboBox->setFocus();
+    //			}
 
-//			ui.addUserToolButton->setEnabled(false);
-//		}
+    //			ui.addUserToolButton->setEnabled(false);
+    //		}
 
-//                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
-//                    slotExportQueryResult();
-//                }
-//                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
-//                    slotPrintQueryResult();
-//                }
+    //                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
+    //                    slotExportQueryResult();
+    //                }
+    //                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
+    //                    slotPrintQueryResult();
+    //                }
 
-//                activityTimer->start();
-//                qWarning()<<"Key";
-//		return true;
-//            }else if((event->type() == QEvent::ToolTip) && (obj == ui.userPSWDLineEdit)){
-//                QString pwd = ui.userPSWDLineEdit->text();
-//                if(pwd.isEmpty()){pwd = tr("Password");}
-//                QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-//                QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
-//                QToolTip::showText(helpEvent->globalPos(), tip);
-//                return true;
-//            }else{
-//		// standard event processing
-//		return QObject::eventFilter(obj, event);
-//	}
+    //                activityTimer->start();
+    //                qWarning()<<"Key";
+    //		return true;
+    //            }else if((event->type() == QEvent::ToolTip) && (obj == ui.userPSWDLineEdit)){
+    //                QString pwd = ui.userPSWDLineEdit->text();
+    //                if(pwd.isEmpty()){pwd = tr("Password");}
+    //                QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+    //                QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
+    //                QToolTip::showText(helpEvent->globalPos(), tip);
+    //                return true;
+    //            }else{
+    //		// standard event processing
+    //		return QObject::eventFilter(obj, event);
+    //	}
 
 }
 
 
 void UserManagerMainWindow::languageChange() {
-	retranslateUi();
+    retranslateUi();
 }
 
 void UserManagerMainWindow::closeEvent(QCloseEvent *e) {
 
-	if(isAddingUser){
-		QMessageBox::critical(this, tr("Job Inprogress"), tr("Job Inprogress! Application will exit later!"));
-		e->ignore();
-		return;
-	}else{
+    if(isAddingUser){
+        QMessageBox::critical(this, tr("Job Inprogress"), tr("Job Inprogress! Application will exit later!"));
+        e->ignore();
+        return;
+    }else{
 
-		e->accept();
-		deleteLater();
+        e->accept();
+        deleteLater();
 
-		qDebug()<<"----UserManager::~closeEvent(...)~~e->accept()";
-	}
+        qDebug()<<"----UserManager::~closeEvent(...)~~e->accept()";
+    }
 
 
 }
 
 QString UserManagerMainWindow::UserID() const {
-	QString id = ui.userIDComboBox->currentText().trimmed();
-	//if (id == QString("ID")) {
-	//	return QString("");
-	//}
+    QString id = ui.userIDComboBox->currentText().trimmed();
+    //if (id == QString("ID")) {
+    //	return QString("");
+    //}
 
-	return id;
+    return id;
 
 }
 
 QString UserManagerMainWindow::UserName() const {
-	QString name = ui.userNameLineEdit->text().trimmed();
-	if (name == QString("Name")) {
-		return QString("");
-	}
+    QString name = ui.userNameLineEdit->text().trimmed();
+    if (name == QString("Name")) {
+        return QString("");
+    }
 
-	return name;
+    return name;
 
 }
 
 QString UserManagerMainWindow::UserDept() const {
 
-	return ui.userDeptComboBox->currentText();
+    return ui.userDeptComboBox->currentText();
 
 }
 
 QString UserManagerMainWindow::UserPassword() const {
-	QString pwd = ui.userPSWDLineEdit->text().trimmed();
-	if (pwd == QString("Password")) {
-		return QString("");
-	}
+    QString pwd = ui.userPSWDLineEdit->text().trimmed();
+    if (pwd == QString("Password")) {
+        return QString("");
+    }
 
-	return pwd;
+    return pwd;
 
 }
 
 QString UserManagerMainWindow::hasExtMail() const{
-        if(emails.contains("sitoy.com", Qt::CaseInsensitive)){
-		return "True";
-	}else{
-		return "False";
-	}
+    if(emails.contains("sitoy.com", Qt::CaseInsensitive)){
+        return "True";
+    }else{
+        return "False";
+    }
 
 }
 
 
 QString UserManagerMainWindow::hasIntMail() const{
-        if(emails.contains("sitoydg.com", Qt::CaseInsensitive)){
-		return "True";
-	}else{
-		return "False";
-	}
+    if(emails.contains("sitoydg.com", Qt::CaseInsensitive)){
+        return "True";
+    }else{
+        return "False";
+    }
 
 }
 
@@ -396,9 +394,9 @@ void UserManagerMainWindow::slotCheckIsInitializingNeeded(){
 
     if(wm->userNeedInit()){
         int ret = QMessageBox::question(this, tr("Question"), tr("Do you want to initialize the settings?"),
-                              QMessageBox::Yes | QMessageBox::No,
-                              QMessageBox::Yes
-                              );
+                                        QMessageBox::Yes | QMessageBox::No,
+                                        QMessageBox::Yes
+                                        );
         if(ret == QMessageBox::Yes){
             if(!progressDlg){
                 progressDlg = new ProgressDlg(tr("Initialize user's settings"), this);
@@ -411,23 +409,23 @@ void UserManagerMainWindow::slotCheckIsInitializingNeeded(){
 
             QFuture<bool> future = QtConcurrent::run(wm, &WindowsManagement::initNewSitoyUser);
 
-//                wm->initNewSitoyUser();
-//                bool result = wm->initNewSitoyUser();
-//                if(result == false){
-//                    QMessageBox::critical(this, tr("Error"), wm->lastError());
-//                }else{
-//                    if(!wm->outputMessages().isEmpty()){
-//                        QString msg = tr("<p><b>Some errors occured while initializing the settings!</b></p>");
-//                        msg += "<font color = 'red'>";
-//                        msg += wm->outputMessages().join("<br>");
-//                        msg += "</font>";
-//                        QMessageBox::warning(this, tr("Initialization Done"), msg);
-//                    }else{
-//                        QMessageBox::information(this, tr("Done"), tr("Initialization Done!"));
-//                    }
-//            }
+            //                wm->initNewSitoyUser();
+            //                bool result = wm->initNewSitoyUser();
+            //                if(result == false){
+            //                    QMessageBox::critical(this, tr("Error"), wm->lastError());
+            //                }else{
+            //                    if(!wm->outputMessages().isEmpty()){
+            //                        QString msg = tr("<p><b>Some errors occured while initializing the settings!</b></p>");
+            //                        msg += "<font color = 'red'>";
+            //                        msg += wm->outputMessages().join("<br>");
+            //                        msg += "</font>";
+            //                        QMessageBox::warning(this, tr("Initialization Done"), msg);
+            //                    }else{
+            //                        QMessageBox::information(this, tr("Done"), tr("Initialization Done!"));
+            //                    }
+            //            }
 
-//                disconnect(&dlg, 0, 0, 0);
+            //                disconnect(&dlg, 0, 0, 0);
 
             this->showMinimized();
             this->hide();
@@ -449,12 +447,12 @@ void UserManagerMainWindow::slotResetStatusBar(bool show){
     //delete m_progressWidget;
     //m_progressWidget = 0;
 
-	if(show){
-		m_progressWidget->show();
-	}else{
-		progressBar->reset();
-		m_progressWidget->hide();
-	}
+    if(show){
+        m_progressWidget->show();
+    }else{
+        progressBar->reset();
+        m_progressWidget->hide();
+    }
 
 }
 
@@ -485,77 +483,75 @@ void UserManagerMainWindow::initStatusBar()
 
 void UserManagerMainWindow::slotQueryUserButtonClicked() {
 
-	/*
-	 if(UserID().isEmpty() && UserName().isEmpty()){
-	 QMessageBox::critical(this, QString(tr("Error")), QString(tr("Please input the ID or the name!")));
-	 ui.userIDLineEdit->setFocus();
-	 return;
-	 }
-	 */
+    /*
+  if(UserID().isEmpty() && UserName().isEmpty()){
+  QMessageBox::critical(this, QString(tr("Error")), QString(tr("Please input the ID or the name!")));
+  ui.userIDLineEdit->setFocus();
+  return;
+  }
+  */
 
     if(!verifyPrivilege()){
         return;
     }
 
-	slotQueryUser(UserID(), UserName(), UserDept());
+    slotQueryUser(UserID(), UserName(), UserDept());
 
 }
 
 void UserManagerMainWindow::slotQueryUser(const QString &userID, const QString &userName,
-		const QString &userDept) {
+                                          const QString &userDept) {
 
-        QString queryString = QString("select userid as ID, cname as Name, cgroup as Department, cpassword as Password, mail as Email1, Mail2 from users where userid like '%%1%' and cname like '%%2%' and cgroup like '%%3%' ") .arg(
-                    userID) .arg(userName) .arg(userDept);
+    QString queryString = QString("select userid as ID, cname as Name, cgroup as Department, cpassword as Password, mail as Email1, Mail2 as Email2, Old_Password as 'Old Password' from users where userid like '%%1%' and cname like '%%2%' and cgroup like '%%3%' ") .arg(
+                userID) .arg(userName) .arg(userDept);
 
-	//showQueryResult(queryString);
-	querySitoyUsersInfo(queryString);
+    //showQueryResult(queryString);
+    querySitoyUsersInfo(queryString);
 
 }
 
 void UserManagerMainWindow::querySitoyUsersInfo(const QString &queryString){
-	QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
 
-	DatabaseConnecter dc(this);
-        if(!dc.isDatabaseOpened(databaseConnectionName,
-			REMOTE_SITOY_SQLSERVER_DB_DRIVER,
-			REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
-			REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
-			REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
-			REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
-			REMOTE_SITOY_SQLSERVER_DB_NAME,
-			HEHUI::M$SQLSERVER
-						)){
-		QApplication::restoreOverrideCursor();
-		QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
-		qCritical() << QString("Error: Database Connection Failed! Query Failed!");
-		return ;
-	}
-
-
-        QSqlDatabase db;
-        db = QSqlDatabase::database(databaseConnectionName);
-        
-	model->setQuery(QSqlQuery(queryString, db));
-
-	if (model->lastError().type() != QSqlError::NoError) {
-
-		QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
-				model->lastError().text()));
-
-	}
+    DatabaseConnecter dc(this);
+    if(!dc.isDatabaseOpened(databaseConnectionName,
+                            REMOTE_SITOY_SQLSERVER_DB_DRIVER,
+                            REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
+                            REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
+                            REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
+                            REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
+                            REMOTE_SITOY_SQLSERVER_DB_NAME,
+                            HEHUI::M$SQLSERVER
+                            )){
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
+        qCritical() << QString("Error: Database Connection Failed! Query Failed!");
+        return ;
+    }
 
 
-//        model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-//        model->setHeaderData(1, Qt::Horizontal, tr("Name"));
-//        model->setHeaderData(2, Qt::Horizontal, tr("Dept"));
-//        model->setHeaderData(3, Qt::Horizontal, tr("Password"));
-//        model->setHeaderData(4, Qt::Horizontal, tr("Email"));
-        //ui.userListTableView->horizontalHeader ()->resizeSections(QHeaderView::ResizeToContents);
-        //ui.userListTableView->resizeColumnToContents(0);
+    QSqlDatabase db;
+    db = QSqlDatabase::database(databaseConnectionName);
 
-        ui.userListTableView->setColumnHidden(3, true);
+    model->setQuery(QSqlQuery(queryString, db));
 
-	QApplication::restoreOverrideCursor();
+    if (model->lastError().type() != QSqlError::NoError) {
+
+        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(model->lastError().text()));
+    }
+
+
+    //        model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    //        model->setHeaderData(1, Qt::Horizontal, tr("Name"));
+    //        model->setHeaderData(2, Qt::Horizontal, tr("Dept"));
+    //        model->setHeaderData(3, Qt::Horizontal, tr("Password"));
+    //        model->setHeaderData(4, Qt::Horizontal, tr("Email"));
+    //ui.userListTableView->horizontalHeader ()->resizeSections(QHeaderView::ResizeToContents);
+    //ui.userListTableView->resizeColumnToContents(0);
+
+    ui.userListTableView->setColumnHidden(3, true);
+
+    QApplication::restoreOverrideCursor();
 
 }
 
@@ -569,10 +565,10 @@ void UserManagerMainWindow::modifyUsersInfo(const QString &userID, const QString
 
     if (model->lastError().type() != QSqlError::NoError) {
 
-            QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
-                            model->lastError().text()));
+        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
+                                  model->lastError().text()));
 
-    } 
+    }
     
     
     
@@ -725,8 +721,8 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
         return;
     }
 
-//	ui.userListTableView->setEnabled(false);
-	ui.addUserToolButton->setEnabled(false);
+    //	ui.userListTableView->setEnabled(false);
+    ui.addUserToolButton->setEnabled(false);
 
     slotShowUserInfo(ui.userListTableView->currentIndex());
 
@@ -744,7 +740,7 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
     }
 
     QString userID = UserID();
-//    QString computerName = "";
+    //    QString computerName = "";
     if(wm->localUsers().contains(userID, Qt::CaseInsensitive)){
         int rep = QMessageBox::question(this, tr("Confirm"), tr("<b><font color=red>User '%1' already exists!</font></b><br> "
                                                                 "Do you want to enable 'AutoAdminLogon' with this account?").arg(userID),
@@ -770,92 +766,92 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
         return;
     }
 
-//        QStringList locationStrings;
-//        locationStrings << tr("DongGuan LEATHER PRODUCTS FTY.") << tr("DongGuan HANDBAG FTY.") << tr("DongGuan  No. 3 Branch FTY.") << tr("YingDe   LEATHER PRODUCTS FTY.");
-//        bool ok;
-//        QString locationString = QInputDialog::getItem(this, tr("Select the location"), tr("Location:"), locationStrings, isYDAdmin?3:0, false, &ok);
-//        if (!ok || locationString.isEmpty()){
-//            ui.userListTableView->setEnabled(true);
-//            ui.addUserToolButton->setEnabled(true);
-//            return;
-//        }
-//        int index = locationStrings.indexOf(locationString);
-//        switch(index){
-//        case 0:
-//            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
-//            break;
-//        case 1:
-//            wm->setLocation(WindowsManagement::HANDBAG_FACTORY_DG);
-//            break;
-//        case 2:
-//            wm->setLocation(WindowsManagement::No3_Branch_Factory);
-//            break;
-//        case 3:
-//            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_YD);
-//            break;
-//        default:
-//            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
-//            break;
+    //        QStringList locationStrings;
+    //        locationStrings << tr("DongGuan LEATHER PRODUCTS FTY.") << tr("DongGuan HANDBAG FTY.") << tr("DongGuan  No. 3 Branch FTY.") << tr("YingDe   LEATHER PRODUCTS FTY.");
+    //        bool ok;
+    //        QString locationString = QInputDialog::getItem(this, tr("Select the location"), tr("Location:"), locationStrings, isYDAdmin?3:0, false, &ok);
+    //        if (!ok || locationString.isEmpty()){
+    //            ui.userListTableView->setEnabled(true);
+    //            ui.addUserToolButton->setEnabled(true);
+    //            return;
+    //        }
+    //        int index = locationStrings.indexOf(locationString);
+    //        switch(index){
+    //        case 0:
+    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
+    //            break;
+    //        case 1:
+    //            wm->setLocation(WindowsManagement::HANDBAG_FACTORY_DG);
+    //            break;
+    //        case 2:
+    //            wm->setLocation(WindowsManagement::No3_Branch_Factory);
+    //            break;
+    //        case 3:
+    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_YD);
+    //            break;
+    //        default:
+    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
+    //            break;
 
-//        }
-
-
+    //        }
 
 
 
-        this->showMinimized();
-        this->hide();
-	this->update();
-
-        if(!progressDlg){
-            progressDlg = new ProgressDlg(tr("Add user to local system"), this);
-            connect(wm, SIGNAL(signalProgressUpdate(const QString &, int )), progressDlg, SLOT(slotUpdateProgress(const QString &, int )));
-            connect(wm, SIGNAL(signalProcessOutputUpdated(const QString )), progressDlg, SLOT(slotUpdateProcessOutput(const QString )));
-
-        }
-        connect(wm, SIGNAL(signalAddingUserJobDone(bool)), this, SLOT(slotAddingUserJobDone(bool)));
-        progressDlg->show();
 
 
-	QCoreApplication::processEvents();
+    this->showMinimized();
+    this->hide();
+    this->update();
 
-//        QFutureWatcher *watcher = new QFutureWatcher(this);
-//        connect(watcher, SIGNAL(finished()), this, SLOT(slotAddUserJobDone()));
-//        connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
-        QFuture<bool> future = QtConcurrent::run(wm, &WindowsManagement::addNewSitoyUserToLocalSystem, UserID(), UserPassword(), UserName(), emails, UserDept());
-        //future.waitForFinished();
-        //bool ok = future.result();
-//        watcher->setFuture(future);
+    if(!progressDlg){
+        progressDlg = new ProgressDlg(tr("Add user to local system"), this);
+        connect(wm, SIGNAL(signalProgressUpdate(const QString &, int )), progressDlg, SLOT(slotUpdateProgress(const QString &, int )));
+        connect(wm, SIGNAL(signalProcessOutputUpdated(const QString )), progressDlg, SLOT(slotUpdateProcessOutput(const QString )));
 
-//        bool ok = wm->addNewSitoyUserToLocalSystem(UserID(), UserPassword(), UserName(), email, UserDept());
-
-//	if(ok){
-//            if(wm->outputMessages().isEmpty()){
-//                QMessageBox::information(this, tr("Done"), tr(
-//                                "User '%1' has been successfully added to the system!").arg(UserID()));
-//            }else{
-//                QString msg = tr("<p><b>Some errors occured while adding user '%1' to the system!</b></p>").arg(UserID());
-//                msg += "<font color = 'red'>";
-//                msg += wm->outputMessages().join("<br>");
-//                msg += "</font>";
-//                QMessageBox::warning(this, tr("Done"), msg);
-//            }
-
-//	}else{
-//                QMessageBox::critical(this, tr("Fatal Error"), wm->lastError());
-//	}
+    }
+    connect(wm, SIGNAL(signalAddingUserJobDone(bool)), this, SLOT(slotAddingUserJobDone(bool)));
+    progressDlg->show();
 
 
-//        //disconnect(&dlg, 0, 0, 0);
-//	this->showNormal();
+    QCoreApplication::processEvents();
+
+    //        QFutureWatcher *watcher = new QFutureWatcher(this);
+    //        connect(watcher, SIGNAL(finished()), this, SLOT(slotAddUserJobDone()));
+    //        connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+    QFuture<bool> future = QtConcurrent::run(wm, &WindowsManagement::addNewSitoyUserToLocalSystem, UserID(), UserPassword(), UserName(), emails, UserDept());
+    //future.waitForFinished();
+    //bool ok = future.result();
+    //        watcher->setFuture(future);
+
+    //        bool ok = wm->addNewSitoyUserToLocalSystem(UserID(), UserPassword(), UserName(), email, UserDept());
+
+    //	if(ok){
+    //            if(wm->outputMessages().isEmpty()){
+    //                QMessageBox::information(this, tr("Done"), tr(
+    //                                "User '%1' has been successfully added to the system!").arg(UserID()));
+    //            }else{
+    //                QString msg = tr("<p><b>Some errors occured while adding user '%1' to the system!</b></p>").arg(UserID());
+    //                msg += "<font color = 'red'>";
+    //                msg += wm->outputMessages().join("<br>");
+    //                msg += "</font>";
+    //                QMessageBox::warning(this, tr("Done"), msg);
+    //            }
+
+    //	}else{
+    //                QMessageBox::critical(this, tr("Fatal Error"), wm->lastError());
+    //	}
+
+
+    //        //disconnect(&dlg, 0, 0, 0);
+    //	this->showNormal();
 
 
 
 
 #else
 
-	QMessageBox::information(this, tr("Invalid Operation"), tr(
-			"This Function Is For Fucking M$ Windows Only!"));
+    QMessageBox::information(this, tr("Invalid Operation"), tr(
+                                 "This Function Is For Fucking M$ Windows Only!"));
 #endif
 
 
@@ -864,38 +860,38 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
 void UserManagerMainWindow::slotAddingUserJobDone(bool result){
 
 #ifdef Q_OS_WIN32
-	isAddingUser = false;
-	ui.userListTableView->setEnabled(true);
-        ui.addUserToolButton->setEnabled(true);
+    isAddingUser = false;
+    ui.userListTableView->setEnabled(true);
+    ui.addUserToolButton->setEnabled(true);
 
-        if(progressDlg){
-            progressDlg->hide();
-            disconnect(progressDlg, 0, 0, 0);
-            delete progressDlg;
-            progressDlg = 0;
-        }
+    if(progressDlg){
+        progressDlg->hide();
+        disconnect(progressDlg, 0, 0, 0);
+        delete progressDlg;
+        progressDlg = 0;
+    }
 
-        if(result == true){
-            if(wm->outputMessages().isEmpty()){
-                QMessageBox::information(this, tr("Done"), tr(
-                                "User '%1' has been successfully added to the system!").arg(UserID()));
-            }else{
-                QString msg = tr("<p><b>Some errors occured while adding user '%1' to the system!</b></p>").arg(UserID());
-                msg += "<font color = 'red'>";
-                msg += wm->outputMessages().join("<br>");
-                msg += "</font>";
-                QMessageBox::warning(this, tr("Done"), msg);
-            }
-
+    if(result == true){
+        if(wm->outputMessages().isEmpty()){
+            QMessageBox::information(this, tr("Done"), tr(
+                                         "User '%1' has been successfully added to the system!").arg(UserID()));
         }else{
-                QMessageBox::critical(this, tr("Fatal Error"), wm->lastError());
+            QString msg = tr("<p><b>Some errors occured while adding user '%1' to the system!</b></p>").arg(UserID());
+            msg += "<font color = 'red'>";
+            msg += wm->outputMessages().join("<br>");
+            msg += "</font>";
+            QMessageBox::warning(this, tr("Done"), msg);
         }
 
+    }else{
+        QMessageBox::critical(this, tr("Fatal Error"), wm->lastError());
+    }
 
-        this->showNormal();
 
-        delete wm;
-        wm = 0;
+    this->showNormal();
+
+    delete wm;
+    wm = 0;
 
 #endif
 
@@ -926,16 +922,16 @@ void UserManagerMainWindow::slotInitializingUserJobDone(bool result){
         }
     }
 
-//    if(wm->isUserAutoLogin()){
-//        int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-//        if(rep == QMessageBox::Yes){
-//            wm->setUserAutoLogin(L"", L"", false);
-//        }
-//        QString error = wm->lastError();
-//        if(!error.isEmpty()){
-//            QMessageBox::critical(this, tr("Error"), error);
-//        }
-//    }
+    //    if(wm->isUserAutoLogin()){
+    //        int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    //        if(rep == QMessageBox::Yes){
+    //            wm->setUserAutoLogin(L"", L"", false);
+    //        }
+    //        QString error = wm->lastError();
+    //        if(!error.isEmpty()){
+    //            QMessageBox::critical(this, tr("Error"), error);
+    //        }
+    //    }
 
     this->showNormal();
 
@@ -949,33 +945,33 @@ void UserManagerMainWindow::slotInitializingUserJobDone(bool result){
 
 void UserManagerMainWindow::slotShowUserInfo(const QModelIndex &index) {
 
-	if(!index.isValid()){
-		return;
-	}
+    if(!index.isValid()){
+        return;
+    }
 
-	int row = index.row();
-	QStringList list;
+    int row = index.row();
+    QStringList list;
 
 
-	for(int i = 0; i < 6; i++){
-		QModelIndex idx =  index.sibling(row,i);
-		list << idx.data().toString();
-		//QMessageBox::information(this,QString(row),idx.data().toString());
-	}
+    for(int i = 0; i < 6; i++){
+        QModelIndex idx =  index.sibling(row,i);
+        list << idx.data().toString();
+        //QMessageBox::information(this,QString(row),idx.data().toString());
+    }
 
-	ui.userIDComboBox->setEditText(list.at(0));
-	ui.userNameLineEdit->setText(list.at(1));
-	ui.userDeptComboBox->setCurrentIndex( ui.userDeptComboBox->findText(list.at(2),Qt::MatchStartsWith));
-	ui.userPSWDLineEdit->setText(list.at(3));
+    ui.userIDComboBox->setEditText(list.at(0));
+    ui.userNameLineEdit->setText(list.at(1));
+    ui.userDeptComboBox->setCurrentIndex( ui.userDeptComboBox->findText(list.at(2),Qt::MatchStartsWith));
+    ui.userPSWDLineEdit->setText(list.at(3));
 
-        emails = list.at(4) + "," + list.at(5);
+    emails = list.at(4) + "," + list.at(5);
 
-        if(ui.userIDComboBox->isEnabled()){
-                ui.userIDComboBox->setEnabled(false);
-                ui.userNameLineEdit->setReadOnly(true);
-                ui.userDeptComboBox->setEnabled(false);
-                ui.addUserToolButton->setEnabled(true);
-        }
+    if(ui.userIDComboBox->isEnabled()){
+        ui.userIDComboBox->setEnabled(false);
+        ui.userNameLineEdit->setReadOnly(true);
+        ui.userDeptComboBox->setEnabled(false);
+        ui.addUserToolButton->setEnabled(true);
+    }
 
 
 }
@@ -986,63 +982,63 @@ void UserManagerMainWindow::slotExportQueryResult(){
     dlg.exec();
 
 
-//    QString fileName = QFileDialog::getSaveFileName(this,
-//                    tr("Data File Path:"), "", tr("Text (*.txt);;All(*.*)"));
-//    if (fileName.isEmpty()) {
-//        return;
-//    }
+    //    QString fileName = QFileDialog::getSaveFileName(this,
+    //                    tr("Data File Path:"), "", tr("Text (*.txt);;All(*.*)"));
+    //    if (fileName.isEmpty()) {
+    //        return;
+    //    }
 
-//    QFile file(fileName);
-//    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-//            QMessageBox::critical(this, tr("Fatal Error"), tr("Cannot write file %1:<br>%2.")
-//            .arg(fileName)
-//            .arg(file.errorString()));
-//            return;
-//    }
-//    QTextStream out(&file);
-//    out.setCodec(QTextCodec::codecForName("UTF-8"));
-//    out.setGenerateByteOrderMark(true);
+    //    QFile file(fileName);
+    //    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+    //            QMessageBox::critical(this, tr("Fatal Error"), tr("Cannot write file %1:<br>%2.")
+    //            .arg(fileName)
+    //            .arg(file.errorString()));
+    //            return;
+    //    }
+    //    QTextStream out(&file);
+    //    out.setCodec(QTextCodec::codecForName("UTF-8"));
+    //    out.setGenerateByteOrderMark(true);
 
 
-//    QApplication::setOverrideCursor(Qt::WaitCursor);
+    //    QApplication::setOverrideCursor(Qt::WaitCursor);
 
-//    QAbstractItemModel *model = ui.userListTableView->model();
-//    int columnCount = model->columnCount();
-//    int rowCount = model->rowCount();
-//    QStringList list;
-//    for(int i=0; i<columnCount; i++){
-//            list << model->headerData(i,Qt::Horizontal).toString();
-//    }
-//    out << list.join("\t") << endl;
-//    list.clear();
+    //    QAbstractItemModel *model = ui.userListTableView->model();
+    //    int columnCount = model->columnCount();
+    //    int rowCount = model->rowCount();
+    //    QStringList list;
+    //    for(int i=0; i<columnCount; i++){
+    //            list << model->headerData(i,Qt::Horizontal).toString();
+    //    }
+    //    out << list.join("\t") << endl;
+    //    list.clear();
 
-//    for (int i = 0; i < rowCount; ++i) {
-//            QModelIndex index = model->index(i, 0);
-//            int row = index.row();
-//            QStringList list;
-//            for(int j = 0; j < columnCount; j++){
-//                    QModelIndex idx =  index.sibling(row,j);
-//                    list << idx.data().toString();
-//            }
+    //    for (int i = 0; i < rowCount; ++i) {
+    //            QModelIndex index = model->index(i, 0);
+    //            int row = index.row();
+    //            QStringList list;
+    //            for(int j = 0; j < columnCount; j++){
+    //                    QModelIndex idx =  index.sibling(row,j);
+    //                    list << idx.data().toString();
+    //            }
 
-//            out << list.join("\t") << endl;
-//            list.clear();
+    //            out << list.join("\t") << endl;
+    //            list.clear();
 
-//            qApp->processEvents();
+    //            qApp->processEvents();
 
-//    }
-//    file.flush();
+    //    }
+    //    file.flush();
 
-//    QApplication::restoreOverrideCursor();
+    //    QApplication::restoreOverrideCursor();
 
 }
 
 void UserManagerMainWindow::slotPrintQueryResult(){
 
 #ifndef QT_NO_PRINTER
-//TODO
-        DataOutputDialog dlg(ui.userListTableView, DataOutputDialog::PRINT, this);
-        dlg.exec();
+    //TODO
+    DataOutputDialog dlg(ui.userListTableView, DataOutputDialog::PRINT, this);
+    dlg.exec();
 #endif
 
 }
@@ -1067,7 +1063,7 @@ void UserManagerMainWindow::slotModifyUserInfo(){
     }
     
     modifyUsersInfo(userID, dlg.newChineseName(), dlg.newDepartment(), dlg.newEmailAccountStringList());
-       
+
     
     
     //ui.userIDComboBox->setCurrentIndex(-1);
@@ -1084,7 +1080,7 @@ void UserManagerMainWindow::slotModifyUserInfo(){
 
 void UserManagerMainWindow::retranslateUi() {
 
-	ui.retranslateUi(this);
+    ui.retranslateUi(this);
 
 }
 
@@ -1105,18 +1101,41 @@ bool UserManagerMainWindow::verifyPrivilege(){
         return true;
     }
 
+//    bool ok = false;
+//    QString text = QInputDialog::getText(this, tr("Privilege Required"),
+//                                         tr("Access Code:"), QLineEdit::NoEcho,
+//                                         "", &ok);
+//    if (ok && !text.isEmpty()){
+//        QString accessCodeString = "hehui";
+//        accessCodeString.append(QTime::currentTime().toString("hhmm"));
+//        if(text.toLower() == accessCodeString){
+//            activityTimer->start();
+//            return true;
+//        }
+//    }
+
+//    return false;
+
+//    if(m_adminName == "hehui"){
+//        return true;
+//    }
+
     bool ok = false;
-    QString text = QInputDialog::getText(this, tr("Privilege Required"),
-                                         tr("Access Code:"), QLineEdit::NoEcho,
-                                         "", &ok);
-    if (ok && !text.isEmpty()){
-        QString accessCodeString = "hehui";
-        accessCodeString.append(QTime::currentTime().toString("hhmm"));
-        if(text.toLower() == accessCodeString){
-            activityTimer->start();
-            return true;
+    do {
+        QString text = QInputDialog::getText(this, tr("Privilege Required"),
+                                             tr("Access Code:"), QLineEdit::NoEcho,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            QString accessCodeString = "hehui";
+            accessCodeString.append(QTime::currentTime().toString("hhmm"));
+            if(text.toLower() == accessCodeString){
+                return true;
+            }
         }
-    }
+
+        QMessageBox::critical(this, tr("Error"), tr("Incorrect Access Code!"));
+
+    } while (ok);
 
     return false;
 
