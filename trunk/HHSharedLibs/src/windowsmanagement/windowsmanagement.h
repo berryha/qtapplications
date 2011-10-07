@@ -125,7 +125,8 @@ public:
     QStringList getLocalGroupsTheUserBelongs(const QString &userName = "");
 
     void cleanTemporaryFiles();
-    void deleteFiles(const QString &path);
+    //void deleteFiles(const QString &path);
+    void deleteFiles(const QString &path, const QStringList & nameFilters = QStringList(), const QStringList & ignoredFiles = QStringList(), const QStringList & ignoredDirs = QStringList());
 
     void modifySystemSettings();
 
@@ -143,7 +144,6 @@ public:
 
     bool setupUSBSD(bool enable);
     bool setupProgrames(bool enable);
-
 
 
 

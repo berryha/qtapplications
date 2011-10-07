@@ -2234,25 +2234,55 @@ QString WindowsManagement::outlookInstalledPath(){
 }
 
 void WindowsManagement::cleanTemporaryFiles(){
-    QString tempPath = QDir::tempPath();
 
-    emit signalProgressUpdate(tr("Deleting Temporary Files ..."), 0);
-    deleteFiles(tempPath);
+    QString basepath = QDir::rootPath();
+    QString tempPath = "", tempIEPath = "";
+    if(runningNT6OS){
+        basepath += "Users/";
+        tempPath = "/AppData/Local/Temp";
+        tempIEPath = "/AppData/Local/Microsoft/Windows/Temporary Internet Files";
+    }else{
+        basepath += "Documents and Settings/";
+        tempPath = "/Local Settings/Temp";
+        tempIEPath = "/Local Settings/Temporary Internet Files";
 
-    if(!isNT6OS()){
-        QString tempIEPath = QDir::homePath () + "/Local Settings/Temporary Internet Files/Content.IE5";
-        if(!QDir(tempIEPath).exists()){
-            return;
-        }
-        emit signalProgressUpdate(tr("Deleting Temporary Internet Files ..."), 0);
-        deleteFiles(tempIEPath);
     }
+
+    QStringList filters, ignoredFiles, ignoredDirs;
+    filters << "*" << "*.*";
+    ignoredFiles << "index.dat";
+    ignoredDirs << "Temp" << "Temporary Internet Files";
+
+    QDir dir(basepath);
+    //foreach (QString dirName, dir.entryList(QDir::AllDirs | QDir::Hidden | QDir::System | QDir::Readable | QDir::Writable | QDir::NoDotAndDotDot)) {
+    foreach (QString dirName, dir.entryList(QDir::AllDirs | QDir::Hidden | QDir::NoDotAndDotDot)) {
+
+        qWarning()<<"dirname:"<<dirName;
+
+        QString path = basepath + dirName + tempPath;
+        emit signalProgressUpdate(tr("Deleting Temporary Files ..."), 0);
+        deleteFiles(path, filters, ignoredFiles, ignoredDirs);
+
+        path = basepath + dirName + tempIEPath;
+        emit signalProgressUpdate(tr("Deleting Temporary Internet Files ..."), 0);
+        deleteFiles(path, filters, ignoredFiles, ignoredDirs);
+    }
+
 
 }
 
-void WindowsManagement::deleteFiles(const QString &path){
+void WindowsManagement::deleteFiles(const QString &path, const QStringList & nameFilters, const QStringList & ignoredFiles, const QStringList & ignoredDirs){
+    qDebug()<<"--WindowsManagement::deleteFiles(...)"<<" Path:"<<path;
 
     QDir dir(path);
+    if(!dir.exists()){
+        return;
+    }
+
+    QStringList filters = nameFilters;
+    if(filters.isEmpty()){
+        filters << "*" << "*.*";
+    }
 
     int steps = 100/(dir.count());
     emit signalProgressUpdate(tr("Deleting Files In '%1' ...").arg(path), 0);
@@ -2262,10 +2292,11 @@ void WindowsManagement::deleteFiles(const QString &path){
     //QStringList filters;
     //filters << "*" << "*.*";
     int i = 0;
-    foreach(QString file, dir.entryList(/*filters,*/QDir::Files|QDir::System|QDir::Hidden))
+    //foreach(QString file, dir.entryList(/*filters,*/QDir::Files|QDir::System|QDir::Hidden))
+    foreach(QString file, dir.entryList(filters, QDir::Files | QDir::System | QDir::Hidden))
     {
+        if(ignoredFiles.contains(file)){continue;}
         if(!dir.remove(file)){
-//            int failedFilesTotalSize += QFileInfo(dir.filePath(file)).size();
             qDebug() << "Failed To Delete :" + path + QDir::separator() + file ;
         }
 
@@ -2273,12 +2304,12 @@ void WindowsManagement::deleteFiles(const QString &path){
         qApp->processEvents();
     }
 
-    foreach(QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+    foreach(QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden))
     {
-        deleteFiles(path + QDir::separator() + subDir);
+        deleteFiles(path + QDir::separator() + subDir, filters, ignoredFiles, ignoredDirs);
     }
 
-    if (path != QDir::tempPath()) {
+    if(!ignoredDirs.contains(dir.dirName())){
         dir.rmdir(path);
     }
 
@@ -2776,8 +2807,9 @@ void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
 }
 
 
-
 void WindowsManagement::test(){
+
+    cleanTemporaryFiles();
 
 //    qWarning()<<"hui:"<<getUserAccountState("hui");
 //    qWarning()<<"yan:"<<getUserAccountState("yan");
