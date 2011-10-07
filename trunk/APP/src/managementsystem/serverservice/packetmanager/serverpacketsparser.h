@@ -114,20 +114,25 @@ public slots:
 
         QHostAddress targetAddress = peerAddress;
         quint16 targetPort = peerPort;
+//        if(targetAddress == QHostAddress(IP_MULTICAST_GROUP_ADDRESS) || targetAddress == QHostAddress::Broadcast || targetAddress.isNull()){
+//            targetAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
+//            targetPort = quint16(IP_MULTICAST_GROUP_PORT);
+
+//            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort );
+//            packet->setTransmissionProtocol(TP_UDP);
+//        }else{
+//            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localRUDPListeningAddress, localRUDPListeningPort);
+//            packet->setTransmissionProtocol(TP_RUDP);
+//        }
         if(targetAddress == QHostAddress(IP_MULTICAST_GROUP_ADDRESS) || targetAddress == QHostAddress::Broadcast || targetAddress.isNull()){
             targetAddress = QHostAddress(IP_MULTICAST_GROUP_ADDRESS);
-            targetPort = quint16(IP_MULTICAST_GROUP_PORT);
-
-            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort );
-            packet->setTransmissionProtocol(TP_UDP);
-        }else{
-            packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localRUDPListeningAddress, localRUDPListeningPort);
-            packet->setTransmissionProtocol(TP_RUDP);
         }
+        targetPort = quint16(IP_MULTICAST_GROUP_PORT);
+        packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort );
+        packet->setTransmissionProtocol(TP_UDP);
 
 
         packet->setPacketType(quint8(MS::ServerDeclare));
-
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
