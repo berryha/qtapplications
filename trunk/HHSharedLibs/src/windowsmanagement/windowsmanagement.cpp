@@ -285,8 +285,8 @@ bool WindowsManagement::isNT6OS()
 void WindowsManagement::freeMemory(){
 
 #if defined(Q_OS_WIN32)
-//                SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFF, 0xFFFFFFFF);
-                SetProcessWorkingSetSize(GetCurrentProcess(), -1, -1);
+    //SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFF, 0xFFFFFFFF);
+    SetProcessWorkingSetSize(GetCurrentProcess(), -1, -1);
 #endif
 
 }
@@ -2809,7 +2809,6 @@ void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
 
 void WindowsManagement::test(){
 
-    cleanTemporaryFiles();
 
 //    qWarning()<<"hui:"<<getUserAccountState("hui");
 //    qWarning()<<"yan:"<<getUserAccountState("yan");
