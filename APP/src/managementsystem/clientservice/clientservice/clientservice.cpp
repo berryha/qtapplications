@@ -264,6 +264,9 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
     m_serverRUDPListeningPort = serverRUDPListeningPort;
     m_serverName = serverName;
 
+
+    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true);
+
     setServerLastUsed(serverAddress);
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
@@ -271,7 +274,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
     qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
     qWarning();
 
-    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true);
 
     int msec = QDateTime::currentDateTime().toString("z").toUInt();
 
