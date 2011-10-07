@@ -101,7 +101,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 #ifdef Q_OS_WIN32
 
     wm = new WindowsManagement(this);
-    //        wm->test();
+    //wm->test();
 
     if(wm->isUserAutoLogin()){
         int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);

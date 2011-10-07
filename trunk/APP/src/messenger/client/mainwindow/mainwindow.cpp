@@ -403,7 +403,7 @@ void MainWindow::startNetwork(){
 
 
     //    QString section = serviceName() + "/LastCheckUpdate";
-    //    QSettings settings(QCoreApplication::applicationDirPath()+"/.update", QSettings::IniFormat, this);
+    //    QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
     //    QDateTime time = settings.value(section, QDateTime()).toDateTime();
     //    if(time.isNull() || (time.addDays(1) < QDateTime::currentDateTime())){
     //        update();

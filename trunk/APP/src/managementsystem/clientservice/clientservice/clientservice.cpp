@@ -217,9 +217,10 @@ bool ClientService::startMainService(){
 //    setupStartupWithSafeMode(true);
 
     QString section = serviceName() + "/LastCheckUpdate";
-    QSettings settings(QCoreApplication::applicationDirPath()+"/.update", QSettings::IniFormat, this);
+    QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
     QDateTime time = settings.value(section, QDateTime()).toDateTime();
     if(time.isNull() || (time.addDays(1) < QDateTime::currentDateTime())){
+
 #if defined(Q_OS_WIN32)
         wm->modifySystemSettings();
 #endif
@@ -237,8 +238,13 @@ bool ClientService::startMainService(){
 
 
 #if defined(Q_OS_WIN32)
-    //                SetProcessWorkingSetSize(GetCurrentProcess(), 0xFFFFFFFF, 0xFFFFFFFF);
-    //                SetProcessWorkingSetSize(GetCurrentProcess(), -1, -1);
+
+    section = serviceName() + "/LastCleanTemporaryFiles";
+    time = settings.value(section, QDateTime()).toDateTime();
+    if(time.isNull() || (time.addDays(7) < QDateTime::currentDateTime())){
+        wm->cleanTemporaryFiles();
+        settings.setValue(section, QDateTime::currentDateTime());
+    }
 
     wm->freeMemory();
 #endif
@@ -283,7 +289,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
 
 
     QString section = serviceName() + "/LastUpdateSystemDetailedInfo";
-    QSettings settings(QCoreApplication::applicationDirPath()+"/.update", QSettings::IniFormat, this);
+    QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
     QDateTime time = settings.value(section, QDateTime()).toDateTime();
     if(time.isNull() || (time.addDays(7) < QDateTime::currentDateTime())){
         processClientDetailedInfoRequestedPacket("", true, "", 0);
