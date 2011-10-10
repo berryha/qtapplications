@@ -260,12 +260,22 @@ bool ClientService::startMainService(){
 void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
     qDebug()<<"----ClientService::serverFound(...)";
 
+
+    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true, 30000);
+//    QDateTime startTime = QDateTime::currentDateTime();
+//    while (!rudpSocket->isConnected(serverAddress, serverRUDPListeningPort)) {
+//        QCoreApplication::processEvents();
+//        //msleep(50);
+//        if(startTime.addMSecs(30000) < QDateTime::currentDateTime()){
+//            qDebug()<<"----------------------------Timeout";
+//            return;
+//        }
+//    }
+
+
     m_serverAddress = QHostAddress(serverAddress);
     m_serverRUDPListeningPort = serverRUDPListeningPort;
     m_serverName = serverName;
-
-
-    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true);
 
     setServerLastUsed(serverAddress);
 
@@ -1638,7 +1648,7 @@ void ClientService::checkHasAnyServerBeenFound(){
 }
 
 void ClientService::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qDebug()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
