@@ -224,6 +224,8 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
 
     if(getChannelState() == ConnectedState){
         return;
+    }else{
+        updateChannelState(ConnectingState);
     }
 
     this->m_peerAddress = peerAddress;
@@ -280,7 +282,7 @@ bool RUDPChannel::waitForConnected(int msecTimeout){
 
     while (getChannelState() != ConnectedState) {
         QCoreApplication::processEvents();
-        msleep(10);
+        msleep(50);
         if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
             return false;
         }
@@ -1906,11 +1908,14 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //qDebug()<<"--------------m_handshakeID:"<<m_myHandshakeID<<" m_peerHandshakeID:"<<m_peerHandshakeID<<" handshakeID"<<handshakeID;
 
         if(m_peerHandshakeID == 0){
+            qDebug()<<"---------------------01";
             m_peerHandshakeID = handshakeID;
             if(getChannelState() == ConnectingState){
                 sendHandshakePacket(m_myHandshakeID + 1);
+                qDebug()<<"---------------------02";
             }else{
                 sendHandshakePacket(m_myHandshakeID);
+                qDebug()<<"---------------------03";
             }
             return;
         }else{
@@ -1919,18 +1924,23 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                 if((m_peerHandshakeID + 1) == handshakeID){
                     if(getChannelState() == UnconnectedState){
                         sendHandshakePacket(m_myHandshakeID + 1);
+                        qDebug()<<"---------------------------0";
                     }
                     if(getChannelState() == ConnectingState){
                         QMetaObject::invokeMethod(this, "startKeepAliveTimer");
                         //startKeepAliveTimer();
+                        qDebug()<<"---------------------------00";
                     }
                 }else{
                     m_peerHandshakeID = handshakeID;
                     sendHandshakePacket(m_myHandshakeID);
+                    qDebug()<<"---------------------04";
                     return;
                 }
             }else{
                 sendHandshakePacket(m_myHandshakeID + 1);
+                qDebug()<<"---------------------------------000";
+                return;
             }
 
         }
@@ -2143,7 +2153,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             sendKeepAlivePacket();
         }
 
-        //qDebug()<<"~~KeepAlive--"<<" m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:dd:zzz");
+        qDebug()<<"~~KeepAlive--"<<" m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:dd:zzz");
     }
         break;
     case quint8(RUDP::CompleteDataPacket):
@@ -2502,6 +2512,7 @@ void RUDPChannel::updateGlobalFreeSendBufferSize(qint64 size, bool reduce){
 }
 
 void RUDPChannel::updateChannelState(ChannelState state){
+    qDebug()<<"--RUDPChannel::updateChannelState(...)"<<" state:"<<state;
     QMutexLocker locker(&m_ChannelStateMutex);
     this->m_ChannelState = state;
 
