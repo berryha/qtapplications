@@ -68,12 +68,13 @@ BulletinBoardObject::~BulletinBoardObject(){
     remoteAssistance = 0;
     
     
-    
+    networkManager->closeRUDPServerInstance(rudpSocket);
+
     delete bulletinBoardPacketsParser;
     bulletinBoardPacketsParser = 0;
     
-    networkManager->closeUDPServer(localUDPListeningPort);
-    //    NetworkManager::freeInstance();
+    //NetworkManager::freeInstance();
+    networkManager->cleanInstance();
     networkManager = 0;
 
     m_packetHandler->clean();

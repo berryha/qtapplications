@@ -64,11 +64,15 @@ Server::Server(QObject *parent)
 Server::~Server(){
     qDebug()<<"Server::~Server()";
 
+
+    networkManager->closeAllServers();
+
     delete serverPacketsParser;
     serverPacketsParser = 0;
 
     //TODO:释放资源
-    //    NetworkManager::freeInstance();
+    networkManager->cleanInstance();
+    delete networkManager;
     networkManager = 0;
 
     m_packetHandler->clean();

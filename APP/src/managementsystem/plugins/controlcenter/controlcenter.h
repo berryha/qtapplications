@@ -155,7 +155,8 @@ private:
     ClientInfoModel *clientInfoModel;
     QSortFilterProxyModel *proxyModel;
     
-    quint16 localUDPListeningPort;
+//    quint16 localUDPListeningPort;
+//    quint16 localRUDPListeningPort;
     
     RUDPSocket *rudpSocket;
     

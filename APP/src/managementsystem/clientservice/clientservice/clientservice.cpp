@@ -86,9 +86,10 @@ ClientService::~ClientService(){
         process = 0;
     }
 
+    networkManager->closeAllServers();
+
     delete clientPacketsParser;
     clientPacketsParser = 0;
-
 
     ClientNetworkManager::cleanInstance();
     delete networkManager;

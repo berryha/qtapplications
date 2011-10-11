@@ -158,7 +158,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     //    ui.toolButtonAnnouncement->setEnabled(false);
     
     
-    localUDPListeningPort = 0;
+//    localUDPListeningPort = 0;
+//    localRUDPListeningPort = 0;
     
     rudpSocket = 0;
     
@@ -190,10 +191,16 @@ ControlCenter::~ControlCenter()
     QSqlDatabase::removeDatabase(databaseConnectionName);
 
 
+    //networkManager->closeRUDPServer(rudpSocket->localPort());
+    networkManager->closeRUDPServerInstance(rudpSocket);
+
+
     delete controlCenterPacketsParser;
     controlCenterPacketsParser = 0;
 
-    networkManager->closeUDPServer(localUDPListeningPort);
+    //networkManager->closeAllServers();
+    //delete networkManager;
+    networkManager->cleanInstance();
     networkManager = 0;
 
     m_packetHandler->clean();
@@ -969,13 +976,15 @@ void ControlCenter::networkReady(){
 
     int port = 0;
     //port = networkManager->startUDPServer();
-    //port = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+20));
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (RUDP_LISTENING_PORT+20));
+//    localUDPListeningPort = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+20));
+//    qWarning()<<QString("UDP listening on port %1! (ControlCenter)").arg(localUDPListeningPort);
+
+    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT + 20));
     if(!rudpSocket){
         QMessageBox::critical(this, tr("Error"), QString("Can not start RUDP listening!"));
         return;
     }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+        qWarning()<<QString("RUDP listening on address '%1', port %2! (ControlCenter)").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
     }
     connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
     connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
@@ -992,7 +1001,7 @@ void ControlCenter::networkReady(){
             controlCenterPacketsParser = new ControlCenterPacketsParser(networkManager, this);
 //            controlCenterPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
 //            controlCenterPacketsParser->setLocalUDPListeningPort(port);
-            localUDPListeningPort = port;
+//            localRUDPListeningPort = port;
         }
 
         connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)));
@@ -1003,7 +1012,8 @@ void ControlCenter::networkReady(){
         //IMPORTANT For Multi-thread
         QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
         QtConcurrent::run(controlCenterPacketsParser, &ControlCenterPacketsParser::run);
-        controlCenterPacketsParser->sendClientLookForServerPacket();
+        //controlCenterPacketsParser->sendClientLookForServerPacket(QHostAddress::Any, localUDPListeningPort);
+        controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 
         
         m_networkReady = true;
@@ -1012,7 +1022,7 @@ void ControlCenter::networkReady(){
             localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
         }
 
-        qWarning()<<QString("UDP listening on port %1! (ControlCenter)").arg(port);
+        //qWarning()<<QString("UDP listening on port %1! (ControlCenter)").arg(port);
 
 
     }
@@ -1026,7 +1036,7 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDP
 
     qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
 
-    controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
+    //controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 
 
     QString msg = tr("IP: %1<br>Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverRUDPListeningPort).arg(serverName).arg(version);
@@ -1035,7 +1045,7 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDP
 
     if(Utilities::versionCompare(version, QString(APP_VERSION)) == 1){
         //QMessageBox::warning(this, tr("Update Needed"), tr("New version available! Please update!"));
-        msg += tr("<p><font color = 'red'><b>New version available! Please check update!</b></font></p>");
+        msg += tr("<p><font color = 'red'><b>New version available! Please check for update!</b></font></p>");
         //QMessageBox::warning(this, tr("Server Found"), msg);
     }
 

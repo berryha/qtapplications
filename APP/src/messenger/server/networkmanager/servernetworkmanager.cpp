@@ -56,6 +56,11 @@ ServerNetworkManager * ServerNetworkManager::instance(){
 
 }
 
+void ServerNetworkManager::cleanInstance(){
+    delete serverNetworkManager;
+    serverNetworkManager = 0;
+}
+
 ServerNetworkManager::ServerNetworkManager(PacketHandlerBase *packetHandlerBase, NetworkType type, CommunicationMode mode, QObject *parent)
     :NetworkManager(packetHandlerBase, type, mode, parent)//, mainWindow(mainWindow)
 {

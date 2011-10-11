@@ -82,29 +82,41 @@ public:
 ////        return packet->getPacketSerialNumber();
 //    }
 
-    void sendClientLookForServerPacket(){
-        qDebug()<<"----sendClientLookForServerPacket(...)";
+//    void sendClientLookForServerPacket(const QHostAddress &localAddress, quint16 localPort, const QString &peerAddress = QString(IP_MULTICAST_GROUP_ADDRESS), quint16 peerPort = quint16(IP_MULTICAST_GROUP_PORT)){
+//        qDebug()<<"----sendClientLookForServerPacket(...)";
+//        qDebug()<<" ipmcGroupAddress:"<<ipmcGroupAddress.toString()<<" ipmcListeningPort:"<<ipmcListeningPort<<" localRUDPListeningPort:"<<localRUDPListeningPort;
 
-        //Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
-        Packet *packet = new Packet(ipmcGroupAddress, ipmcListeningPort);
+//        QHostAddress targetAddress = QHostAddress(peerAddress);
+//        quint16 targetPort = peerPort;
+//        if(targetAddress.isNull()){
+//            targetAddress = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
+//            targetPort = quint16(IP_MULTICAST_GROUP_PORT);
+//        }
 
-        packet->setPacketType(quint8(MS::ClientLookForServer));
-        packet->setTransmissionProtocol(TP_UDP);
-        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*10));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << localRUDPListeningPort;
-        packet->setPacketData(ba);
-        m_packetHandlerBase->appendOutgoingPacket(packet);
+//        Packet *packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localAddress, localPort);
 
-    }
+//        packet->setPacketType(quint8(MS::ClientLookForServer));
+//        packet->setTransmissionProtocol(TP_UDP);
+//        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES*10));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_6);
+//        out << m_localID << localRUDPListeningPort;
+//        packet->setPacketData(ba);
+//        m_packetHandlerBase->appendOutgoingPacket(packet);
+
+//    }
 
     void sendClientOnlinePacket(const QHostAddress clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool isAdmin){
         qDebug()<<"----sendClientOnlinePacket(...)";
 
+        QHostAddress targetAddress = serverAddress;
+        if(targetAddress.isNull()){
+            targetAddress = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
+        }
+
         //Packet *packet = new Packet(serverAddress, ipmcListeningPort, localRUDPListeningAddress, localRUDPListeningPort);
-        Packet *packet = new Packet(serverAddress, ipmcListeningPort);
+        Packet *packet = new Packet(targetAddress, ipmcListeningPort);
 
         packet->setPacketType(quint8(MS::ClientOnline));
         packet->setTransmissionProtocol(TP_UDP);
