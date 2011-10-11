@@ -178,7 +178,7 @@ RUDPChannel::~RUDPChannel(){
         m_checkPeerAliveTimer = 0;
     }
 
-    //cleanAllUnusedPackets();
+    cleanAllUnusedPackets();
 
 }
 
@@ -333,15 +333,24 @@ void RUDPChannel::disconnectFromPeer(){
 }
 
 bool RUDPChannel::waitForDisconnected(int msecTimeout){
+    //qDebug()<<"--RUDPChannel::waitForDisconnected(...)";
 
     QDateTime startTime = QDateTime::currentDateTime();
 
-    while (getChannelState() != UnconnectedState) {
-        QCoreApplication::processEvents();
-        msleep(1);
-        if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
-            return false;
+    //NOTICE: Deadlock
+    while ( true ) {
+
+        ChannelState state = getChannelState();
+        if(state != UnconnectedState){
+            QCoreApplication::processEvents();
+            msleep(10);
+            if(startTime.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
+                return false;
+            }
+        }else{
+            return true;
         }
+
     }
 
     return true;
@@ -352,16 +361,17 @@ bool RUDPChannel::waitForDisconnected(int msecTimeout){
 void RUDPChannel::closeChannel(){
     qDebug()<<"--RUDPChannel::closeChannel()"<<" Peer Address:"<<m_peerAddress.toString()<<":"<<m_peerPort;
 
-    if(getChannelState() == ConnectedState){
+    //NOTICE: Deadlock
+    ChannelState state = getChannelState();
+    if(state == ConnectedState){
         disconnectFromPeer();
-        waitForDisconnected();
-
+        //waitForDisconnected();
     }
-
 
     QMetaObject::invokeMethod(this, "reset");
 
 //    quit();
+
 }
 
 //bool RUDPChannel::sendData( QByteArray &data){
@@ -857,7 +867,7 @@ void RUDPChannel::sendPacketDroppedInfo(quint16 packetID){
 }
 
 void RUDPChannel::sendKeepAlivePacket(){
-    qDebug()<<"--RUDPChannel::sendKeepAlivePacket()"<<" Peer:"<<m_peerAddress.toString();
+    //qDebug()<<"--RUDPChannel::sendKeepAlivePacket()"<<" Peer:"<<m_peerAddress.toString();
 
     RUDPPacket *packet = getUnusedPacket();
 
@@ -1133,7 +1143,7 @@ void RUDPChannel::startCheckPeerAliveTimer(){
 }
 
 void RUDPChannel::checkPeerAliveTimerTimeout(){
-    qDebug()<<"--RUDPChannel::checkPeerAliveTimerTimeout()";
+    //qDebug()<<"--RUDPChannel::checkPeerAliveTimerTimeout()";
 
     if(m_peerLastLiveTime.addMSecs(m_keepAliveTimerInterval) <= QDateTime::currentDateTime()){
         m_checkPeerAliveTimes--;
@@ -2153,7 +2163,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             sendKeepAlivePacket();
         }
 
-        qDebug()<<"~~KeepAlive--"<<" m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:dd:zzz");
+        //qDebug()<<"~~KeepAlive--"<<" m_peerLastLiveTime:"<<m_peerLastLiveTime.toString("hh:mm:dd:zzz");
     }
         break;
     case quint8(RUDP::CompleteDataPacket):
@@ -2513,14 +2523,20 @@ void RUDPChannel::updateGlobalFreeSendBufferSize(qint64 size, bool reduce){
 
 void RUDPChannel::updateChannelState(ChannelState state){
     qDebug()<<"--RUDPChannel::updateChannelState(...)"<<" state:"<<state;
-    QMutexLocker locker(&m_ChannelStateMutex);
-    this->m_ChannelState = state;
+
+    {
+        //QMutexLocker locker(&m_ChannelStateMutex);
+        this->m_ChannelState = state;
+    }
 
 }
 
 RUDPChannel::ChannelState RUDPChannel::getChannelState(){
-    QMutexLocker locker(&m_ChannelStateMutex);
-    return m_ChannelState;
+
+    {
+        //QMutexLocker locker(&m_ChannelStateMutex);
+        return m_ChannelState;
+    }
 
 }
 

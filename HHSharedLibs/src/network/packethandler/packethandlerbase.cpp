@@ -57,9 +57,10 @@ PacketHandlerBase::PacketHandlerBase(QObject *parent)
 {
 
     incomingPackets = new QList<Packet *> ();
-    incomingPacketsMutex = new QMutex();
+    //incomingPacketsMutex = new QMutex();
     outgoingPackets = new QList<Packet *> ();
-    outgoingPacketsMutex = new QMutex();
+    //outgoingPacketsMutex = new QMutex();
+
 //    waitingForReplyPackets = new QHash<quint16, Packet *> ();
 //    waitingForReplyPacketsMutex = new QMutex();
 
@@ -72,19 +73,21 @@ PacketHandlerBase::~PacketHandlerBase() {
     qDebug()<<"--PacketHandlerBase::~PacketHandlerBase()";
 
 
-    QMutexLocker incomingPacketsLocker(incomingPacketsMutex);
+    QMutexLocker incomingPacketsLocker(&incomingPacketsMutex);
     for (int  i= 0;  i< incomingPackets->count(); i++) {
         Packet *p = incomingPackets->at(i);
         recylePacket(p);
     }
     incomingPackets->clear();
+    delete incomingPackets;
 
-    QMutexLocker outgoingPacketsLocker(outgoingPacketsMutex);
+    QMutexLocker outgoingPacketsLocker(&outgoingPacketsMutex);
     for (int  i= 0;  i< outgoingPackets->count(); i++) {
         Packet *p = outgoingPackets->at(i);
         recylePacket(p);
     }
     outgoingPackets->clear();
+    delete outgoingPackets;
 
 //    QMutexLocker waitingForReplyLocker(waitingForReplyPacketsMutex);
 //    foreach (Packet *p, waitingForReplyPackets->values()) {
@@ -97,7 +100,7 @@ PacketHandlerBase::~PacketHandlerBase() {
 
 void PacketHandlerBase::appendIncomingPacket(Packet *packet){
 
-    QMutexLocker locker(incomingPacketsMutex);
+    QMutexLocker locker(&incomingPacketsMutex);
     if(packet && packet->isValid()){
         incomingPackets->append(packet);
     }
@@ -107,7 +110,7 @@ void PacketHandlerBase::appendIncomingPacket(Packet *packet){
 
 Packet * PacketHandlerBase::takeIncomingPacket(){
 
-    QMutexLocker locker(incomingPacketsMutex);
+    QMutexLocker locker(&incomingPacketsMutex);
     if(incomingPackets->isEmpty()){
         return 0;
     }else{
@@ -117,13 +120,13 @@ Packet * PacketHandlerBase::takeIncomingPacket(){
 }
 
 int PacketHandlerBase::incomingPacketsCount(){
-    QMutexLocker locker(incomingPacketsMutex);
+    QMutexLocker locker(&incomingPacketsMutex);
     return incomingPackets->count();
 }
 
 void PacketHandlerBase::appendOutgoingPacket(Packet *packet){
 
-    QMutexLocker locker(outgoingPacketsMutex);
+    QMutexLocker locker(&outgoingPacketsMutex);
     if(packet && packet->isValid()){
         outgoingPackets->append(packet);
     }
@@ -132,7 +135,7 @@ void PacketHandlerBase::appendOutgoingPacket(Packet *packet){
 
 Packet * PacketHandlerBase::takeOutgoingPacket(){
 
-    QMutexLocker locker(outgoingPacketsMutex);
+    QMutexLocker locker(&outgoingPacketsMutex);
     if(outgoingPackets->isEmpty()){
         return 0;
     }else{
@@ -143,7 +146,7 @@ Packet * PacketHandlerBase::takeOutgoingPacket(){
 
 int PacketHandlerBase::outgoingPacketsCount(){
 
-    QMutexLocker locker(outgoingPacketsMutex);
+    QMutexLocker locker(&outgoingPacketsMutex);
     return outgoingPackets->count();
 }
 

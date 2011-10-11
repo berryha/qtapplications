@@ -80,10 +80,10 @@ private:
 private:
 
     QList<Packet *> *incomingPackets;
-    QMutex *incomingPacketsMutex;
+    QMutex incomingPacketsMutex;
 
     QList<Packet *> *outgoingPackets;
-    QMutex *outgoingPacketsMutex;
+    QMutex outgoingPacketsMutex;
 
     //QHash<quint16, Packet *> *waitingForReplyPackets;
     //QMutex *waitingForReplyPacketsMutex;

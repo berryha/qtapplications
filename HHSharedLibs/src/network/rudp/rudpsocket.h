@@ -86,6 +86,7 @@ public slots:
 
     void closeChannel(const QHostAddress &peerAddress, quint16 peerPort);
     void closeAllChannels();
+    void closeAllUnusedChannels();
 
 private slots:
     void readPendingDatagrams();

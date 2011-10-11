@@ -61,6 +61,7 @@ public:
 
     void closeUDPServer(quint16 port);
     void closeRUDPServer(quint16 port);
+    void closeRUDPServerInstance(RUDPServer *rudpServer);
     void closeTCPServer(quint16 port);
     void closeAllServers();
 

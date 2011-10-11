@@ -143,12 +143,28 @@ void RUDPSocket::closeChannel(const QHostAddress &peerAddress, quint16 peerPort)
 void RUDPSocket::closeAllChannels(){
     qDebug()<<"--RUDPSocket::closeAllChannels()";
 
+    if(peers.isEmpty()){return;}
+
     foreach (RUDPChannel *channel, peers.values()) {
         if(!channel){continue;}
         channel->closeChannel();
         recyleRUDPChannel(channel);
     }
     peers.clear();
+
+}
+
+void RUDPSocket::closeAllUnusedChannels(){
+    qDebug()<<"--RUDPSocket::closeAllUnusedChannels()";
+
+    if(m_unusedRUDPChannels.isEmpty()){return;}
+
+    foreach (RUDPChannel *channel, m_unusedRUDPChannels) {
+        if(!channel){continue;}
+        delete channel;
+        channel = 0;
+    }
+    m_unusedRUDPChannels.clear();
 
 }
 
