@@ -236,26 +236,42 @@ RUDPSocket * NetworkManager::startRUDPServer(const QHostAddress &address, quint1
 bool NetworkManager::isNetworkReady(){
     qDebug()<<"----NetworkManager::isNetworkReady()";
 
+//    qApp->processEvents();
+//    localIPAddresses = NetworkUtilities::validIPAddresses();
+//    foreach(QHostAddress address, localIPAddresses){
+//        if(address.toString().startsWith("200.200.", Qt::CaseInsensitive) || address.toString().startsWith("193.168.", Qt::CaseInsensitive)){
+//            m_localTCPListeningAddress = address;
+//            m_hardwareAddress = NetworkUtilities::hardwareAddress(address);
+//            if(checkNetworkStatusTimer){
+//                checkNetworkStatusTimer->stop();
+//                delete checkNetworkStatusTimer;
+//                checkNetworkStatusTimer = 0;
+//            }
+//            emit signalNetworkReady();
+
+//            qDebug()<<"Sitoy Network IP Found! "<<address.toString();
+//            return true;
+//        }
+//        qDebug()<<"address:"<<address.toString();
+//    }
+//    return false;
+
+
     qApp->processEvents();
     localIPAddresses = NetworkUtilities::validIPAddresses();
-    foreach(QHostAddress address, localIPAddresses){
-        if(address.toString().startsWith("200.200.", Qt::CaseInsensitive) || address.toString().startsWith("193.168.", Qt::CaseInsensitive)){
-            m_localTCPListeningAddress = address;
-            m_hardwareAddress = NetworkUtilities::hardwareAddress(address);
-            if(checkNetworkStatusTimer){
-                checkNetworkStatusTimer->stop();
-                delete checkNetworkStatusTimer;
-                checkNetworkStatusTimer = 0;
-            }
-            emit signalNetworkReady();
 
-            qDebug()<<"Sitoy Network IP Found! "<<address.toString();
-            return true;
+    if(!localIPAddresses.isEmpty()){
+        if(checkNetworkStatusTimer){
+            checkNetworkStatusTimer->stop();
+            delete checkNetworkStatusTimer;
+            checkNetworkStatusTimer = 0;
         }
-        qDebug()<<"address:"<<address.toString();
+        emit signalNetworkReady();
+        return true;
     }
 
     return false;
+
 }
 
 void NetworkManager::startWaitingNetworkReady(){

@@ -433,17 +433,19 @@ void MainWindow::stopNetwork(){
     while (true) {
         if(clientPacketsParser->readyToQuit()){
 
+            //networkManager->closeRUDPServer(0);
+            networkManager->closeAllServers();
+
             delete clientPacketsParser;
             clientPacketsParser = 0;
 
-            networkManager->closeAllServers();
-            delete networkManager;
+            networkManager->cleanInstance();
+            //delete networkManager;
             networkManager = 0;
 
             m_packetHandler->clean();
             delete m_packetHandler;
             m_packetHandler = 0;
-
 
             break;
         }

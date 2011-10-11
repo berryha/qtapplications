@@ -75,6 +75,9 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 ServerService::~ServerService(){
     qDebug()<<"ServerService::~ServerService()";
 
+
+    networkManager->closeAllServers();
+
     delete serverPacketsParser;
     serverPacketsParser = 0;
 
@@ -123,11 +126,13 @@ bool ServerService::startMainService(){
     bool result = false;
     result = networkManager->startIPMCServer();
     if(result == false){
-        logMessage(QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Error);
+        QString msg = QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
+        logMessage(msg, QtServiceBase::Error);
+        qCritical()<<msg;
         networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
         //return false;
     }else{
-        logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
+        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
 
 //    result = networkManager->startTCPServer();
@@ -141,7 +146,9 @@ bool ServerService::startMainService(){
 
     rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, RUDP_LISTENING_PORT);
     if(!rudpSocket){
-        logMessage(QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString()), QtServiceBase::Error);
+        QString msg = QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString());
+        logMessage(msg, QtServiceBase::Error);
+        qCritical()<<msg;
         return false;
     }else{
         qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
@@ -232,6 +239,10 @@ void ServerService::sendServerOnlinePacket(){
     serverPacketsParser->sendServerOnlinePacket();
     
     updateOrSaveAllClientsInfoToDatabase();
+
+    if(rudpSocket){
+        rudpSocket->closeAllUnusedChannels();
+    }
 
 }
 
@@ -785,6 +796,12 @@ void ServerService::processClientOnlineStatusChangedPacket(const QString &client
             onlineAdminsCount ++;
             updateOrSaveAllClientsInfoToDatabase();
             getRecordsInDatabase();
+
+            rudpSocket->connectToPeer(clientRUDPListeningAddress, clientRUDPListeningPort, true);
+            if(rudpSocket->isConnected(clientRUDPListeningAddress, clientRUDPListeningPort)){
+                serverPacketsParser->sendServerDeclarePacket(QHostAddress(clientRUDPListeningAddress), clientRUDPListeningPort, true);
+            }
+
         }else{
             onlineAdminsCount --;
             if(onlineAdminsCount < 0){

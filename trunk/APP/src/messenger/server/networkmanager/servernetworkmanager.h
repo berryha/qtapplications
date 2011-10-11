@@ -49,6 +49,7 @@ class ServerNetworkManager :public NetworkManager{
     Q_OBJECT
 public:
     static ServerNetworkManager * instance();
+    static void cleanInstance();
 
     virtual ~ServerNetworkManager();
 
