@@ -83,9 +83,13 @@ void NetworkManagerBase::closeUDPServer(quint16 port){
                 udpServer->close();
                 delete udpServer;
                 udpServer = 0;
-                udpServers.remove(port, udpServer);
+                //udpServers.remove(port, udpServer);
             //}
-
+        }
+        if(port == 0){
+            udpServers.clear();
+        }else{
+            udpServers.remove(port);
         }
 
     }
@@ -98,13 +102,38 @@ void NetworkManagerBase::closeRUDPServer(quint16 port){
         QList<RUDPServer *> rudpServerList = (port == 0)?(rudpServers.values()):(rudpServers.values(port));
         foreach(RUDPServer *rudpServer, rudpServerList){
             if(!rudpServer){continue;}
-                rudpServer->close();
-                delete rudpServer;
-                rudpServer = 0;
-                rudpServers.remove(port, rudpServer);
+            rudpServer->closeAllChannels();
+            rudpServer->closeAllUnusedChannels();
+
+            rudpServer->close();
+            delete rudpServer;
+            rudpServer = 0;
+            //rudpServers.remove(port, rudpServer);
+        }
+        if(port == 0){
+            rudpServers.clear();
+        }else{
+            rudpServers.remove(port);
         }
 
     }
+
+}
+
+void NetworkManagerBase::closeRUDPServerInstance(RUDPServer *rudpServer){
+
+    if(!rudpServer){
+        return;
+    }
+    quint16 port = rudpServer->localPort();
+
+    rudpServer->closeAllChannels();
+    rudpServer->closeAllUnusedChannels();
+
+    rudpServer->close();
+    delete rudpServer;
+    rudpServer = 0;
+    rudpServers.remove(port, rudpServer);
 
 }
 
@@ -122,6 +151,11 @@ void NetworkManagerBase::closeTCPServer(quint16 port){
                 tcpServers.remove(port, tcpServer);
             //}
 
+        }
+        if(port == 0){
+            tcpServers.clear();
+        }else{
+            tcpServers.remove(port);
         }
 
     }
@@ -150,6 +184,7 @@ void NetworkManagerBase::closeAllServers(){
         foreach(RUDPServer *rudpServer, rudpServerList){
             if(!rudpServer){continue;}
             rudpServer->closeAllChannels();
+            rudpServer->closeAllUnusedChannels();
             rudpServer->close();
             delete rudpServer;
             rudpServer = 0;
