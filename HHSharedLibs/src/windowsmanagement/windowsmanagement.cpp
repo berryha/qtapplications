@@ -39,6 +39,7 @@
 #include <QTextCodec>
 #include <QDir>
 #include <QProcess>
+#include <QImage>
 
 #include <QDebug>
 
@@ -2784,7 +2785,58 @@ bool WindowsManagement::setupProgrames(bool enable){
 
 }
 
+bool WindowsManagement::setDeskWallpaper(const QString &wallpaperPath){
 
+    error = "";
+
+    QString targetBMPFilePath = wallpaperPath;
+
+    QFileInfo fi(targetBMPFilePath);
+    if(!fi.exists()){
+        error = tr("Can not set wallpaper! File '%1' does not exist!").arg(targetBMPFilePath);
+        return false;
+    }
+
+//    DWORD nSize = 256;
+//    LPWSTR windowsDir = new wchar_t[nSize];
+//    int result = GetEnvironmentVariableW (L"WINDIR", windowsDir, nSize);
+//    if(result == 0){
+//        QString(QDir::rootPath() + "windows").toWCharArray(windowsDir);
+//    }
+//    QString targetDirPath = QString::fromWCharArray(windowsDir) ;
+    //QString targetDirPath = QDir::homePath();
+    QString targetDirPath = QDir::tempPath();
+
+//    if(fi.suffix().toLower() != ".bmp"){
+//        targetBMPFilePath = targetDirPath + QDir::separator() + fi.baseName() + ".bmp";
+//        QImage image(wallpaperPath);
+
+//        QFile file(targetBMPFilePath);
+//        if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
+//            error = tr("Can not open file '%1' ! %2").arg(wallpaperPath).arg(file.errorString());
+//            return false;
+//        }
+
+//        if(!image.save(&file, "BMP")){
+//            error = tr("Can not set wallpaper! Can not save file '%1' !").arg(targetBMPFilePath);
+//            return false;
+//        }
+
+//        file.flush();
+//        file.close();
+//    }
+
+    wchar_t pathArray[targetBMPFilePath.size() * sizeof(wchar_t) + 1];
+    wcscpy(pathArray, targetBMPFilePath.toStdWString().c_str());
+
+    bool ok = SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, pathArray, SPIF_SENDWININICHANGE| SPIF_UPDATEINIFILE);
+    if(!ok){
+        error = QString("Can not set wallpaper! Error Code:%1").arg(GetLastError());
+    }
+
+    return ok;
+
+}
 
 
 
@@ -2809,6 +2861,8 @@ void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
 
 void WindowsManagement::test(){
 
+
+//    setDeskWallpaper("C:\\WINDOWS\\system32\\wallpaper.bmp");
 
 //    qWarning()<<"hui:"<<getUserAccountState("hui");
 //    qWarning()<<"yan:"<<getUserAccountState("yan");
