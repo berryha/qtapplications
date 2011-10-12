@@ -39,6 +39,9 @@ RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, int keepAliveTimerI
         QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
     }
 
+
+    m_maxCachedUnusedChannelsCount = 10;
+
 }
 
 RUDPSocket::~RUDPSocket(){
@@ -168,6 +171,22 @@ void RUDPSocket::closeAllUnusedChannels(){
 
 }
 
+void RUDPSocket::setMaxCachedUnusedChannelsCount(int count){
+    this->m_maxCachedUnusedChannelsCount = count;
+}
+
+int RUDPSocket::getMaxCachedUnusedChannelsCount() const{
+    return m_maxCachedUnusedChannelsCount;
+}
+
+void RUDPSocket::setMaxCachedUnusedPacketsCount(int count){
+    RUDPChannel::setMaxCachedUnusedPacketsCount(count);
+}
+
+int RUDPSocket::getMaxCachedUnusedPacketsCount() const{
+    return RUDPChannel::getMaxCachedUnusedPacketsCount();
+}
+
 void RUDPSocket::readPendingDatagrams() {
     //qDebug()<<"----RUDPSocket::readPendingDatagrams()";
 
@@ -283,6 +302,13 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 inline void RUDPSocket::recyleRUDPChannel(RUDPChannel *channel){
 
     //channel->quit();
+
+    if(m_unusedRUDPChannels.size() >= m_maxCachedUnusedChannelsCount){
+        delete channel;
+        channel = 0;
+        return;
+    }
+
     m_unusedRUDPChannels.append(channel);
 
 }

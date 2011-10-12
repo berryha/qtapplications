@@ -46,6 +46,8 @@ public:
     static RUDPPacket * getUnusedPacket();
     void recylePacket(RUDPPacket *packet);
     static void cleanAllUnusedPackets();
+    static void setMaxCachedUnusedPacketsCount(int count);
+    static int getMaxCachedUnusedPacketsCount();
 
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
@@ -267,6 +269,7 @@ private:
 
     static QList<RUDPPacket *> *m_unusedPackets;
     static QMutex *unusedPacketsMutex;
+    static int m_maxUnusedPacketsCount;
 
 
     QTimer *m_keepAliveTimer;

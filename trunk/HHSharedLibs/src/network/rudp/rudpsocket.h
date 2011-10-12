@@ -87,6 +87,11 @@ public slots:
     void closeChannel(const QHostAddress &peerAddress, quint16 peerPort);
     void closeAllChannels();
     void closeAllUnusedChannels();
+    void setMaxCachedUnusedChannelsCount(int count);
+    int getMaxCachedUnusedChannelsCount() const;
+
+    void setMaxCachedUnusedPacketsCount(int count);
+    int getMaxCachedUnusedPacketsCount() const;
 
 private slots:
     void readPendingDatagrams();
@@ -109,6 +114,7 @@ private:
 
     int m_keepAliveTimerInterval;
 
+    int m_maxCachedUnusedChannelsCount;
 
 
 

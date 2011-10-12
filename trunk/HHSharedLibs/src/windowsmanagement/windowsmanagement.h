@@ -145,8 +145,7 @@ public:
     bool setupUSBSD(bool enable);
     bool setupProgrames(bool enable);
 
-
-
+    bool setDeskWallpaper(const QString &wallpaperPath);
 
     void test();
 
