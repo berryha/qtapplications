@@ -40,6 +40,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QImage>
+#include <QDesktopServices>
 
 #include <QDebug>
 
@@ -2804,27 +2805,26 @@ bool WindowsManagement::setDeskWallpaper(const QString &wallpaperPath){
 //        QString(QDir::rootPath() + "windows").toWCharArray(windowsDir);
 //    }
 //    QString targetDirPath = QString::fromWCharArray(windowsDir) ;
-    //QString targetDirPath = QDir::homePath();
-    QString targetDirPath = QDir::tempPath();
+    QString targetDirPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    if(!QDir(targetDirPath).exists()){
+        targetDirPath = QDir::homePath();
+    }
 
-//    if(fi.suffix().toLower() != ".bmp"){
-//        targetBMPFilePath = targetDirPath + QDir::separator() + fi.baseName() + ".bmp";
-//        QImage image(wallpaperPath);
+    //if(wallpaperPath.startsWith(":/") || fi.suffix().toLower() != ".bmp"){
+        targetBMPFilePath = targetDirPath + QDir::separator() + fi.baseName() + ".bmp";
+        QImage image(wallpaperPath);
+        if(image.isNull()){
+            error = tr("Can not read image '%1' ! ").arg(wallpaperPath);
+            return false;
+        }
 
-//        QFile file(targetBMPFilePath);
-//        if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)){
-//            error = tr("Can not open file '%1' ! %2").arg(wallpaperPath).arg(file.errorString());
-//            return false;
-//        }
+        if(!image.save(targetBMPFilePath, "BMP")){
+            error = tr("Can not set wallpaper! Can not save file '%1' !").arg(targetBMPFilePath);
+            return false;
+        }
 
-//        if(!image.save(&file, "BMP")){
-//            error = tr("Can not set wallpaper! Can not save file '%1' !").arg(targetBMPFilePath);
-//            return false;
-//        }
+    //}
 
-//        file.flush();
-//        file.close();
-//    }
 
     wchar_t pathArray[targetBMPFilePath.size() * sizeof(wchar_t) + 1];
     wcscpy(pathArray, targetBMPFilePath.toStdWString().c_str());
