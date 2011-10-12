@@ -125,11 +125,13 @@ public slots:
                 packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localRUDPListeningAddress, localRUDPListeningPort);
                 packet->setTransmissionProtocol(TP_RUDP);
             }else{
+                targetPort = quint16(IP_MULTICAST_GROUP_PORT);
                 packet = m_packetHandlerBase->getPacket(targetAddress, targetPort, localIPMCListeningAddress, localIPMCListeningPort );
                 packet->setTransmissionProtocol(TP_UDP);
             }
 
         }
+        //qDebug()<<"--======----Peer:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort()<<" Local:"<<packet->getLocalHostAddress().toString()<<":"<<packet->getLocalHostPort();
 
 
         packet->setPacketType(quint8(MS::ServerDeclare));

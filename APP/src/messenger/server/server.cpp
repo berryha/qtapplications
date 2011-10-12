@@ -64,21 +64,23 @@ Server::Server(QObject *parent)
 Server::~Server(){
     qDebug()<<"Server::~Server()";
 
-
-    networkManager->closeAllServers();
+    if(networkManager){
+        networkManager->closeAllServers();
+    }
 
     delete serverPacketsParser;
     serverPacketsParser = 0;
 
     //TODO:释放资源
-    networkManager->cleanInstance();
+    ServerNetworkManager::cleanInstance();
     delete networkManager;
     networkManager = 0;
 
-    m_packetHandler->clean();
-    delete m_packetHandler;
-    m_packetHandler = 0;
-
+    if(m_packetHandler){
+        m_packetHandler->clean();
+        delete m_packetHandler;
+        m_packetHandler = 0;
+    }
 
     QList<UserInfo*> clientInfoList = clientInfoHash.values();
     clientInfoHash.clear();

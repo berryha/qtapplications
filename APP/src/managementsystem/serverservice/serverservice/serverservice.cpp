@@ -75,18 +75,23 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 ServerService::~ServerService(){
     qDebug()<<"ServerService::~ServerService()";
 
+    if(networkManager){
+        networkManager->closeAllServers();
+    }
 
-    networkManager->closeAllServers();
-
-    delete serverPacketsParser;
-    serverPacketsParser = 0;
+    if(serverPacketsParser){
+        delete serverPacketsParser;
+        serverPacketsParser = 0;
+    }
 
     NetworkManagerInstance::cleanInstance();
     networkManager = 0;
 
-    m_packetHandler->clean();
-    delete m_packetHandler;
-    m_packetHandler = 0;
+    if(m_packetHandler){
+        m_packetHandler->clean();
+        delete m_packetHandler;
+        m_packetHandler = 0;
+    }
 
 
     QList<ClientInfo*> clientInfoList = clientInfoHash.values();

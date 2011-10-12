@@ -11,7 +11,9 @@
 
 #include "HHSharedCore/hlogdebug.h"
 
-
+#ifdef Q_OS_WIN32
+    #include "HHSharedWindowsManagement/hwindowsmanagement.h"
+#endif
 
 
 int main(int argc, char **argv)
@@ -37,8 +39,16 @@ int main(int argc, char **argv)
         if(QString(argv[i]).toLower() == "-log"){
             qInstallMsgHandler(logDebug);
             qAddPostRoutine(closeDebugLog);
+        }else if(QString(argv[i]).toLower() == "-setwallpaper"){
+            QString imagePath = "";
+            if(i < (argc - 1) ){
+                imagePath = QString::fromLocal8Bit(argv[i + 1]);
+                //qDebug()<<imagePath;
+            }
+            service.setDeskWallpaper(imagePath);
         }
     }
+
 
 
     return service.exec();
