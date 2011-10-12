@@ -133,7 +133,7 @@ bool ClientService::setDeskWallpaper(const QString &wallpaperPath){
 
     QString path = wallpaperPath;
     if(path.trimmed().isEmpty() || !QFileInfo(path).exists()){
-        path = ":/resources/images/wallpaper.jpg";
+        path = ":/resources/images/wallpaper.png";
     }
 
     if(!wm->setDeskWallpaper(path)){
