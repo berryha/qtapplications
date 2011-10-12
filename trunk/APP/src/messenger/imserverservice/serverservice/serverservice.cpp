@@ -68,6 +68,11 @@ ServerService::~ServerService(){
 
     mainServiceStarted = false;
 
+    if(m_server){
+        delete m_server;
+        m_server = 0;
+    }
+
 
 }
 

@@ -74,6 +74,10 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverRUDPListeningPort = 0;
     m_serverName = "";
 
+#if defined(Q_OS_WIN32)
+    delete wm;
+    wm = 0;
+#endif
 
 }
 
@@ -86,19 +90,24 @@ ClientService::~ClientService(){
         process = 0;
     }
 
-    networkManager->closeAllServers();
+    if(networkManager){
+        networkManager->closeAllServers();
+    }
 
-    delete clientPacketsParser;
-    clientPacketsParser = 0;
+    if(clientPacketsParser){
+        delete clientPacketsParser;
+        clientPacketsParser = 0;
+    }
 
     ClientNetworkManager::cleanInstance();
     delete networkManager;
     networkManager = 0;
 
-    m_packetHandler->clean();
-    delete m_packetHandler;
-    m_packetHandler = 0;
-
+    if(m_packetHandler){
+        m_packetHandler->clean();
+        delete m_packetHandler;
+        m_packetHandler = 0;
+    }
 
     delete databaseUtility;
     databaseUtility = 0;
@@ -112,6 +121,29 @@ ClientService::~ClientService(){
 
 
     mainServiceStarted = false;
+
+}
+
+bool ClientService::setDeskWallpaper(const QString &wallpaperPath){
+
+#if defined(Q_OS_WIN32)
+    if(!wm){
+        wm = new WindowsManagement(this);
+    }
+
+    QString path = wallpaperPath;
+    if(path.trimmed().isEmpty() || !QFileInfo(path).exists()){
+        path = ":/resources/images/wallpaper.jpg";
+    }
+
+    if(!wm->setDeskWallpaper(path)){
+        qCritical()<<wm->lastError();
+        return false;
+    }
+
+#endif
+
+    return true;
 
 }
 
@@ -224,6 +256,7 @@ bool ClientService::startMainService(){
 
 #if defined(Q_OS_WIN32)
         wm->modifySystemSettings();
+
 #endif
         
         update();
@@ -246,6 +279,7 @@ bool ClientService::startMainService(){
         wm->cleanTemporaryFiles();
         settings.setValue(section, QDateTime::currentDateTime());
     }
+
 
     wm->freeMemory();
 #endif

@@ -41,7 +41,7 @@ public:
     ClientService(int argc, char **argv, const QString &serviceName = "ClientService", const QString &description = "Client service for management system.");
     ~ClientService();
 
-
+    bool setDeskWallpaper(const QString &wallpaperPath);
 
 signals:
 

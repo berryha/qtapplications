@@ -187,7 +187,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         sendServerDeclarePacket(peerAddress, peerRUDPListeningPort );
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        //qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
+        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ServerDeclare):
