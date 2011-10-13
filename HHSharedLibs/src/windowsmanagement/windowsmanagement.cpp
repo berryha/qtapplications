@@ -1256,7 +1256,8 @@ QString WindowsManagement::userInfoFilePath(){
         //windowsDir = L"c:/windows";
     }
 
-    QString path = QString::fromWCharArray(windowsDir) + "/system32/.sitoyusers" ;
+    //QString path = QString::fromWCharArray(windowsDir) + "/system32/.sitoyusers" ;
+    QString path = QString::fromWCharArray(windowsDir) + "/.sitoyusers" ;
     //qDebug("WindowsManagement::userInfoFilePath(): %s:", qPrintable(path));
 
     delete [] windowsDir;
@@ -2270,7 +2271,7 @@ void WindowsManagement::cleanTemporaryFiles(){
     //foreach (QString dirName, dir.entryList(QDir::AllDirs | QDir::Hidden | QDir::System | QDir::Readable | QDir::Writable | QDir::NoDotAndDotDot)) {
     foreach (QString dirName, dir.entryList(QDir::AllDirs | QDir::Hidden | QDir::NoDotAndDotDot)) {
 
-        qWarning()<<"dirname:"<<dirName;
+        qDebug()<<"dirname:"<<dirName;
 
         QString path = basepath + dirName + tempPath;
         emit signalProgressUpdate(tr("Deleting Temporary Files ..."), 0);
