@@ -45,14 +45,13 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     localComputerName = QHostInfo::localHostName().toLower();
     m_localWorkgroupName = "";
 
-#if defined(Q_OS_WIN32)
+#ifdef Q_OS_WIN32
     wm = new WindowsManagement(this);
     if(localComputerName.trimmed().isEmpty()){
         localComputerName = wm->getComputerName().toLower();
     }
 
     m_localWorkgroupName = wm->getWorkgroup().toLower();
-
 #endif
 
     process = 0;
@@ -74,10 +73,10 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverRUDPListeningPort = 0;
     m_serverName = "";
 
-#if defined(Q_OS_WIN32)
-    delete wm;
-    wm = 0;
-#endif
+//#if defined(Q_OS_WIN32)
+//    delete wm;
+//    wm = 0;
+//#endif
 
 }
 
@@ -118,7 +117,10 @@ ClientService::~ClientService(){
     delete systemInfo;
     systemInfo = 0;
 
-
+#if defined(Q_OS_WIN32)
+    delete wm;
+    wm = 0;
+#endif
 
     mainServiceStarted = false;
 
@@ -162,7 +164,7 @@ bool ClientService::startMainService(){
 
 
     bool result = false;
-    result = networkManager->startIPMCServer();
+//    result = networkManager->startIPMCServer();
     if(result == false){
         logMessage(QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Error);
         networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
@@ -242,6 +244,7 @@ bool ClientService::startMainService(){
     }else{
         updateAdministratorPassword("trousetrouse");
     }
+    qWarning()<<"------------------------1";
     checkUsersAccount();
 
     checkUSBSD();
@@ -1167,9 +1170,7 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
     }else{
         setWinAdminPassword(administratorPassword);
     }
-    //qWarning()<<"administratorPassword:"<<administratorPassword;
 
-    //WindowsManagement wm;
     if(!wm->updateUserPassword("administrator", administratorPassword, true)){
         QString error = wm->lastError();
         clientPacketsParser->sendClientLogPacket(wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
@@ -1234,7 +1235,7 @@ QString ClientService::getWinAdminPassword() const{
 }
 
 bool ClientService::checkUsersAccount(){
-    qDebug()<<"--ClientService::checkUsersAccount()";
+    qWarning()<<"--ClientService::checkUsersAccount()";
 
 #ifdef Q_OS_WIN
     
