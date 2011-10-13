@@ -244,7 +244,7 @@ bool ClientService::startMainService(){
     }else{
         updateAdministratorPassword("trousetrouse");
     }
-    qWarning()<<"------------------------1";
+
     checkUsersAccount();
 
     checkUSBSD();
@@ -1235,7 +1235,7 @@ QString ClientService::getWinAdminPassword() const{
 }
 
 bool ClientService::checkUsersAccount(){
-    qWarning()<<"--ClientService::checkUsersAccount()";
+    //qDebug()<<"--ClientService::checkUsersAccount()";
 
 #ifdef Q_OS_WIN
     
