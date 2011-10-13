@@ -36,6 +36,7 @@
 
 #include <QCoreApplication>
 #include <QObject>
+#include <QString>
 //#include <QThread>
 #include <QStringList>
 #include <QMutex>
@@ -99,8 +100,8 @@ public:
 
     QString getExeFileVersion(const QString &exeFileName);
 
-    QStringList localUsers();
-    QStringList localCreatedUsers();
+    QStringList localUsers() ;
+    QStringList localCreatedUsers() ;
     QString getUserNameOfCurrentThread();
 
     bool isUserAutoLogin();
@@ -207,12 +208,13 @@ signals:
 
 
 
-public slots:
+private:
+//    void setLastErrorString(const QString &errorString);
 
 
 private:
     QMutex mutex;
-    QString error;
+    QString lastErrorString;
     QStringList m_outputMsgs;
 
     bool runningNT6OS;
@@ -220,7 +222,6 @@ private:
 
     Location location;
     QString m_newComputerNameToBeUsed;
-
 
 
 
