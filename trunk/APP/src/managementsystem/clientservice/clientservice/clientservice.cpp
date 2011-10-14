@@ -164,7 +164,7 @@ bool ClientService::startMainService(){
 
 
     bool result = false;
-//    result = networkManager->startIPMCServer();
+    result = networkManager->startIPMCServer();
     if(result == false){
         logMessage(QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Error);
         networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
