@@ -245,10 +245,6 @@ void ServerService::sendServerOnlinePacket(){
     
     updateOrSaveAllClientsInfoToDatabase();
 
-    if(rudpSocket){
-        rudpSocket->closeAllUnusedChannels();
-    }
-
 }
 
 void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion){
