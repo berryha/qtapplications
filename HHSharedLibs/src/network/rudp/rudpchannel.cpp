@@ -1299,6 +1299,9 @@ void RUDPChannel::startSendACKTimer(){
         //sendACKTimer->setSingleShot(true);
         connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
     }
+    if(sendACKTimerInterval < RUDP_MIN_SEND_ACK_TIMER_INTERVAL){
+        sendACKTimerInterval = RUDP_MIN_SEND_ACK_TIMER_INTERVAL;
+    }
     sendACKTimer->start(sendACKTimerInterval);
 
 }
@@ -1332,7 +1335,7 @@ void RUDPChannel::sendACKTimerTimeout(){
         //ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
         ACKPacketInfo * info = ackPacketsHistory.value(ackPacketsSNHistory.last());
         quint16 sn = info->firstReceivedPacketIDInReceiveWindow;
-        //qDebug()<<"---------------------------------"<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
+        qDebug()<<"---------------------------------"<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
         if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1)) ){
             count++;
             if(count == 3){
@@ -1680,7 +1683,7 @@ void RUDPChannel::init(){
 
     //sendACKTimer = new QTimer(this);
     //connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
-    sendACKTimerInterval = 10;
+    sendACKTimerInterval = RUDP_MIN_SEND_ACK_TIMER_INTERVAL;
     //sendACKTimer = 0;
     //startSendACKTimer();
 
