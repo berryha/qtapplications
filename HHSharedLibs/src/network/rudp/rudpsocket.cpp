@@ -169,6 +169,8 @@ void RUDPSocket::closeAllUnusedChannels(){
     }
     m_unusedRUDPChannels.clear();
 
+    RUDPChannel::cleanAllUnusedPackets();
+
 }
 
 void RUDPSocket::setMaxCachedUnusedChannelsCount(int count){
