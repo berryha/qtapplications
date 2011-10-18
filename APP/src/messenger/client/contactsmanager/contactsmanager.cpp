@@ -1234,7 +1234,7 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
 
 bool ContactsManager::saveMyInfoToDatabase(){
 
-    qDebug()<<"--saveMyInfoToDatabase()";
+    qDebug()<<"--ContactsManager::saveMyInfoToDatabase()";
     
     //IMUser *info = IMUser::instance();
     IMUser *info = m_imUser;
@@ -1371,7 +1371,7 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
 
 bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
 
-    qDebug()<<"--saveContactInfoToDatabase(...)";
+    qDebug()<<"--ContactsManager::saveContactInfoToDatabase(...)";
     
 
     if(!localUserDataDB.isValid()){

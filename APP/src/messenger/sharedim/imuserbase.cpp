@@ -285,7 +285,7 @@ QString IMUserBase::getDefaultGroupName() const{
 
 
 void IMUserBase::setPersonalSummaryInfo(const QString &personalSummaryInfo){
-    qWarning()<<"personalSummaryInfo:"<<personalSummaryInfo;
+    qDebug()<<"--IMUserBase::setPersonalSummaryInfo(...)"<<" personalSummaryInfo:"<<personalSummaryInfo;
     
     QStringList infoList = personalSummaryInfo.split(QString(PACKET_DATA_SEPARTOR));
     if(infoList.at(0) != this->getUserID()){

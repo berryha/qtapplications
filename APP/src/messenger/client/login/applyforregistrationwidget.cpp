@@ -32,12 +32,9 @@
 #include <QMessageBox>
 #include <QTimer>
 
+#include <QDebug>
 
 #include "applyforregistrationwidget.h"
-
-
-
-
 
 
 
@@ -73,6 +70,7 @@ ApplyForRegistrationWidget::ApplyForRegistrationWidget(QWidget *parent) :
 
 ApplyForRegistrationWidget::~ApplyForRegistrationWidget()
 {
+    qDebug()<<"--ApplyForRegistrationWidget::~ApplyForRegistrationWidget()";
 
 }
 
@@ -211,6 +209,11 @@ void ApplyForRegistrationWidget::slotProcessRegistrationResult(quint8 errorTypeC
 }
 
 void ApplyForRegistrationWidget::on_pushButtonRegister_clicked(){
+
+    if(!m_registrationModeInfoResponseReceived){
+        emit canceled();
+        return;
+    }
 
     if(!isUserIDValid()){
         QMessageBox::critical(this, tr("Error"), tr("Invalid User ID!"));

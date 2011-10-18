@@ -326,8 +326,8 @@ void LoginWidget::on_toolButtonApplyForRegistration_clicked(){
     ApplyForRegistrationWidget rw(&dlg);
     connect(this, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), &rw, SLOT(slotProcessRegistrationResult(quint8, const QString&))/*, Qt::QueuedConnection*/);
     connect(&rw, SIGNAL(registration(const QString &, const QString &, const QString &)), this, SLOT(slotRegistration(const QString &, const QString &, const QString &)));
+    connect(&rw, SIGNAL(canceled()), &dlg, SLOT(accept()));
 
-    
     vbl.addWidget(&rw);
     dlg.setLayout(&vbl);
     dlg.updateGeometry();

@@ -159,8 +159,8 @@ private:
 
     ExpandListViewManager *expandListViewManager;
     ExpandListView *friendsListView;
-    ExpandListView *teamWidgetBox;
-    ExpandListView *blacklistWidgetBox;
+//    ExpandListView *teamWidgetBox;
+//    ExpandListView *blacklistWidgetBox;
 
     ContactsManager *contactsManager;
 
