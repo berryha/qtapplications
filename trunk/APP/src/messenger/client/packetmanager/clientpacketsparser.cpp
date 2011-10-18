@@ -444,8 +444,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
             if(personalInfoVersionOnServer != user->getPersonalInfoVersion()){requestContactInfo(m_myUserID);}
             if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){updatePersonalContactGroupsInfo(false);}
-            //if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList();}
-            requestInterestGroupsList();
+            if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList();}
+            //requestInterestGroupsList();
             if(blacklistInfoVersionOnServer != user->getBlacklistInfoVersion()){requestBlacklistInfo();}
 
         }else{

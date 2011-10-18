@@ -77,21 +77,21 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
         moveWindow(positon);
     }
 
-
-
     loadPlugins();
 
+    imUser = IMUser::instance();
+    stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
 
+    expandListViewManager = 0;
+    friendsListView = 0;
 
+    contactsManager = ContactsManager::instance();
 
     chatWindowManager = ChatWindowManager::instance();
 
-    stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
-
-    imUser = IMUser::instance();
 
 
-    contactsManager = ContactsManager::instance();
+
 
     //检查自动登陆
     //Check Auto Login
@@ -1024,12 +1024,20 @@ void MainWindow::savePreferedLanguage(const QString &preferedLanguage){
 }
 
 void MainWindow::slotUpdateContactsInfo(){
-    qDebug()<<"----MainWindow::slotUpdateContactsInfo()~~";
+    qDebug()<<"----MainWindow::slotUpdateContactsInfo()";
 
-
-    expandListViewManager = new ExpandListViewManager(this);
-    friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
-    ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
+    if(!expandListViewManager){
+        expandListViewManager = new ExpandListViewManager(this);
+        //TODO
+        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
+        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
+        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
+        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
+    }
+    if(!friendsListView){
+        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
+        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
+    }
 
     //contactsManager = new ContactsManager(this);
     //if(!contactsManager){
@@ -1037,13 +1045,6 @@ void MainWindow::slotUpdateContactsInfo(){
     //}
     contactsManager->slotFetchContactsInfo(friendsListView);
     contactsManager->slotFetchStrangersInfo();
-
-    //TODO
-    connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
-    connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
-    connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
-    connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
-
 
     ui.contactsToolBox->setEnabled(true);
     ui.stackedWidget->setCurrentWidget(ui.mainPage);
@@ -1114,6 +1115,8 @@ void MainWindow::updateInterestGroupInfoToUI(InterestGroup *interestGroup){
 }
 
 void MainWindow::slotUserVerified(){
+    qDebug()<<"--MainWindow::slotUserVerified()";
+
     if(ui.loginPage->getState() == LoginWidget::VERIFYING){
         QString userID = imUser->getUserID();
         Settings::instance()->setCurrentUser(userID);
@@ -1583,11 +1586,12 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
 
     }
 
-//    update();
 
 }
 
 void MainWindow::slotProcessUserInfo(const QString &userID, const QString &userInfo){
+    qDebug()<<"--MainWindow::slotProcessUserInfo(...)";
+
     if(userID == imUser->getUserID()){
         //imUser->setPersonalSummaryInfo(userInfo);
         ui.toolButtonUserFace->setIcon(ImageResource::createIconForContact(imUser->getFace(), imUser->getOnlineState()));
@@ -1607,11 +1611,11 @@ void MainWindow::slotProcessUserInfo(const QString &userID, const QString &userI
         }
     }
 
-//    update();
 
 }
 
 void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer){
+    qDebug()<<"--MainWindow::slotProcessContactGroupsInfo(...)"<<" -contactGroupsInfo:"<<contactGroupsInfo;
 
     imUser->setContactGroupsInfoString(contactGroupsInfo);
     imUser->setPersonalContactGroupsVersion(personalContactGroupsInfoVersionOnServer);
@@ -1639,8 +1643,6 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         
         
     }
-    
-    
     
     
     

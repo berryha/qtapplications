@@ -61,6 +61,7 @@ protected:
 signals:
     void requestRegistration();
     void registration(const QString &userID, const QString &password, const QString &email);
+    void canceled();
         
 public slots:
     void slotProcessRegistrationModeInfo(bool canRegister, bool extraMessage, IM::RegistrationMode regMode, bool requireActivation);
