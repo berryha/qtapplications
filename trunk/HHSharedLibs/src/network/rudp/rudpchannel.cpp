@@ -178,7 +178,7 @@ RUDPChannel::~RUDPChannel(){
         m_checkPeerAliveTimer = 0;
     }
 
-    cleanAllUnusedPackets();
+    //cleanAllUnusedPackets();
 
 }
 
