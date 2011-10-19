@@ -284,13 +284,19 @@ CategoryListView *TreeWidget::addCategoryView(QTreeWidgetItem *parent, bool icon
 {
     QTreeWidgetItem *embed_item = new QTreeWidgetItem(parent);
     embed_item->setFlags(Qt::ItemIsEnabled);
+
     CategoryListView *categoryView = new CategoryListView(m_core, this);
     categoryView->setViewMode(iconMode ? QListView::IconMode : QListView::ListMode);
+    categoryView->setResizeMode(QListView::Adjust);
+    categoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    categoryView->setFlow(QListView::TopToBottom);
+
     connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
     connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
     //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
     connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
     connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
+
     setItemWidget(embed_item, 0, categoryView);
     return categoryView;
 }
@@ -734,22 +740,21 @@ TreeWidget::CategoryList TreeWidget::loadCustomCategoryList() const
 
 void TreeWidget::adjustSubListSize(QTreeWidgetItem *cat_item)
 {
+    qDebug()<<"--TreeWidget::adjustSubListSize(...)";
+
+
     QTreeWidgetItem *embedItem = cat_item->child(0);
     CategoryListView *list_widget = static_cast<CategoryListView*>(itemWidget(embedItem, 0));
-
     list_widget->setFixedWidth(header()->width());
+    //qDebug()<<"------header()->width():"<<header()->width();
     list_widget->doItemsLayout();
     const int height = qMax(list_widget->contentsSize().height(), 1);
     list_widget->setFixedHeight(height);
     list_widget->setFlow(QListView::TopToBottom);
-    //list_widget->updateGeometry();
-    list_widget->viewport()->update();
+
 
     embedItem->setSizeHint(0, QSize(-1, height - 1));
 
-    updateGeometries();
-    update();
-    viewport()->update();
 
 }
 
@@ -790,6 +795,7 @@ TreeWidget::Category TreeWidget::category(const QString &cat_name) const{
 
 void TreeWidget::addCategory(const Category &cat)
 {
+
 
 //    if (cat.objectItemCount() == 0){
 //        return;
@@ -834,6 +840,9 @@ void TreeWidget::addCategory(const Category &cat)
     }
 
     adjustSubListSize(cat_item);
+
+    qDebug()<<"-----------------------0-cat_item:"<<cat_item->text(0);
+
 
 }
 
@@ -919,6 +928,8 @@ void TreeWidget::addObjectItem(int cat_idx, const ObjectItem &item)
 
     adjustSubListSize(cat_item);
 
+    updateGeometries();
+
 }
 
 void TreeWidget::addObjectItem(const QString &cat_name, const ObjectItem &item){
@@ -935,6 +946,8 @@ void TreeWidget::addObjectItem(const QString &cat_name, const ObjectItem &item){
 
 void TreeWidget::removeObjectItem(int cat_idx, int item_idx)
 {
+    qDebug()<<"--TreeWidget::removeObjectItem(...)";
+
     if (cat_idx >= topLevelItemCount())
         return;
 
@@ -947,9 +960,14 @@ void TreeWidget::removeObjectItem(int cat_idx, int item_idx)
 
     categoryView->removeRow(am, item_idx);
     adjustSubListSize(topLevelItem(cat_idx));
+
+    updateGeometries();
+
 }
 
 void TreeWidget::removeObjectItem(const QString &cat_name, const QString &item_id){
+
+    qDebug()<<"--TreeWidget::removeObjectItem()";
 
     int cat_Idx = indexOfCategory(cat_name);
     if (cat_Idx >= topLevelItemCount() || cat_Idx < 0){return ;}
@@ -966,9 +984,13 @@ void TreeWidget::removeObjectItem(const QString &cat_name, const QString &item_i
     categoryview->removeRow(am, item_idx);
     adjustSubListSize(topLevelItem(cat_Idx));
 
+    updateGeometries();
+
 }
 
 void TreeWidget::moveObjectItem(int old_cat_idx, int new_cat_idx, const QString &item_id){
+
+    qDebug()<<"--TreeWidget::moveObjectItem()";
 
     if (old_cat_idx >= topLevelItemCount() || new_cat_idx >= topLevelItemCount()){
         qCritical()<<"ERROR! Invalid old_cat_idx or new_cat_idx!";
@@ -989,7 +1011,26 @@ void TreeWidget::moveObjectItem(int old_cat_idx, int new_cat_idx, const QString 
 
     addObjectItem(new_cat_idx, objItem);
 
-//    updateGeometries();
+
+
+
+//    QTreeWidgetItem *cat_item = topLevelItem(new_cat_idx);
+//    CategoryListView *categoryView = categoryViewAt(new_cat_idx);
+
+//    const bool scratch = topLevelRole(cat_item) == SCRATCHPAD_ITEM;
+//    //const bool scratch = topLevelRole(cat_item) == NORMAL_ITEM;
+
+//    // The same categories are read from the file $HOME, avoid duplicates
+//    if (!categoryView->containsObjectItem(objItem.id())){
+//        categoryView->addObjectItem(objItem, iconForObjectItem(objItem.iconName(), objItem.iconMode()), scratch);
+//    }else{
+//        qWarning()<<"ERROR! Item "<<objItem.id()<<" already exists!";
+//    }
+
+//    adjustSubListSize(cat_item);
+
+    updateGeometries();
+
 
 
 }
@@ -1006,6 +1047,8 @@ void TreeWidget::moveObjectItem(const QString &old_cat_name, const QString &new_
 
 void TreeWidget::slotScratchPadItemDeleted()
 {
+    qDebug()<<"--TreeWidget::slotScratchPadItemDeleted()";
+
     const int scratch_idx = indexOfScratchpad();
     QTreeWidgetItem *scratch_item = topLevelItem(scratch_idx);
     adjustSubListSize(scratch_item);
@@ -1049,6 +1092,8 @@ void TreeWidget::slotIconMode()
 
 void TreeWidget::updateViewMode()
 {
+    qDebug()<<"--TreeWidget::updateViewMode()";
+
     if (const int numTopLevels = topLevelItemCount()) {
         for (int i = numTopLevels - 1; i >= 0; --i) {
             QTreeWidgetItem *topLevel = topLevelItem(i);
@@ -1067,11 +1112,21 @@ void TreeWidget::updateViewMode()
 
 void TreeWidget::resizeEvent(QResizeEvent *e)
 {
+    qDebug()<<"--TreeWidget::resizeEvent()";
+
     QTreeWidget::resizeEvent(e);
     if (const int numTopLevels = topLevelItemCount()) {
-        for (int i = numTopLevels - 1; i >= 0; --i)
+//        for (int i = numTopLevels - 1; i >= 0; --i)
+//            adjustSubListSize(topLevelItem(i));
+
+        for (int i = 0; i < numTopLevels; i++){
             adjustSubListSize(topLevelItem(i));
+        }
+
+
     }
+
+
 }
 
 void TreeWidget::contextMenuEvent(QContextMenuEvent *e)
@@ -1196,6 +1251,8 @@ void TreeWidget::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_l
 
 void TreeWidget::filter(const QString &f)
 {
+    qDebug()<<"--TreeWidget::filter()";
+
     const bool empty = f.isEmpty();
     const QRegExp re = empty ? QRegExp() : QRegExp(f, Qt::CaseInsensitive, QRegExp::FixedString);
     const int numTopLevels = topLevelItemCount();
