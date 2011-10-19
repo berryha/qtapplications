@@ -287,7 +287,7 @@ CategoryListView *TreeWidget::addCategoryView(QTreeWidgetItem *parent, bool icon
     CategoryListView *categoryView = new CategoryListView(m_core, this);
     categoryView->setViewMode(iconMode ? QListView::IconMode : QListView::ListMode);
     connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
-    connect(categoryView, SIGNAL(pressed(QString,QString,QPoint)), this, SIGNAL(pressed(QString,QString,QPoint)));
+    connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
     //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
     connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
     connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
@@ -742,12 +742,14 @@ void TreeWidget::adjustSubListSize(QTreeWidgetItem *cat_item)
     const int height = qMax(list_widget->contentsSize().height(), 1);
     list_widget->setFixedHeight(height);
     list_widget->setFlow(QListView::TopToBottom);
-    list_widget->updateGeometry();
+    //list_widget->updateGeometry();
+    list_widget->viewport()->update();
 
     embedItem->setSizeHint(0, QSize(-1, height - 1));
 
     updateGeometries();
     update();
+    viewport()->update();
 
 }
 

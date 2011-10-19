@@ -92,34 +92,34 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
     init();
 
 
-        sendACKTimer = new QTimer();
-        connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
-//    sendACKTimer = 0;
-//    startSendACKTimer();
+    sendACKTimer = new QTimer();
+    connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
+    //    sendACKTimer = 0;
+    //    startSendACKTimer();
 
-        sendNACKTimer = new QTimer();
-        connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
-//    sendNACKTimer = 0;
-//    startSendNACKTimer();
+    sendNACKTimer = new QTimer();
+    connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
+    //    sendNACKTimer = 0;
+    //    startSendNACKTimer();
 
-        retransmissionTimer = new QTimer();
-        connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
-//    retransmissionTimer = 0;
-//    startRetransmissionTimer();
+    retransmissionTimer = new QTimer();
+    connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
+    //    retransmissionTimer = 0;
+    //    startRetransmissionTimer();
 
-        m_keepAliveTimer = new QTimer();
-        connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
-//    m_keepAliveTimer = 0;
-//    startKeepAliveTimer();
+    m_keepAliveTimer = new QTimer();
+    connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
+    //    m_keepAliveTimer = 0;
+    //    startKeepAliveTimer();
 
-        m_checkPeerAliveTimer = new QTimer();
-        connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
-//    m_checkPeerAliveTimer = 0;
-//    startCheckPeerAliveTimer();
+    m_checkPeerAliveTimer = new QTimer();
+    connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
+    //    m_checkPeerAliveTimer = 0;
+    //    startCheckPeerAliveTimer();
 
 
-        m_connectToPeerTimer = new QTimer();
-        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
+    m_connectToPeerTimer = new QTimer();
+    connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
 
     m_peerAddress = peerAddress;
@@ -232,17 +232,17 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
     this->m_peerPort = peerPort;
 
     m_msecConnectToPeerTimeout = msecTimeout;
-    if(!m_connectToPeerTimer){
-        m_connectToPeerTimer = new QTimer();
-        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
+//    if(!m_connectToPeerTimer){
+//        m_connectToPeerTimer = new QTimer();
+//        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
-        sendResetPacket();
-    }
+//        //sendResetPacket();
+//    }
 
     if(!m_connectToPeerTimer->isActive()){
         m_connectToPeerTimer->setInterval(5000);
         QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
-        //m_connectToPeerTimer->start(5000);
+        //sendResetPacket();
         sendHandshakePacket(m_myHandshakeID);
 
     }
@@ -812,7 +812,7 @@ void RUDPChannel::sendHandshakePacket(uint handshakeID){
 }
 
 void RUDPChannel::sendResetPacket(){
-    //qDebug()<<"--RUDPChannel::sendResetPacket()";
+    qDebug()<<"--RUDPChannel::sendResetPacket()";
 
 
     RUDPPacket *packet = getUnusedPacket();
@@ -1198,7 +1198,11 @@ void RUDPChannel::sendACK2(quint16 packetSN){
 }
 
 bool RUDPChannel::retransmitLostPacket(){
-    //qDebug()<<"--RUDPChannel::sendReTxPacket(...)--SN:"<<packet->getPacketSerialNumber();
+    //qDebug()<<"--RUDPChannel::retransmitLostPacket(...)--SN:"<<packet->getPacketSerialNumber();
+
+
+    //TODO:Disconnect
+
 
     static int count = 0;
 
@@ -1916,7 +1920,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         uint handshakeID = 0;
         in >> peerVersion >> peerMSS >> handshakeID;
 
-        //qDebug()<<"--------------m_handshakeID:"<<m_myHandshakeID<<" m_peerHandshakeID:"<<m_peerHandshakeID<<" handshakeID"<<handshakeID;
+        qDebug()<<"--------------m_myHandshakeID:"<<m_myHandshakeID<<" m_peerHandshakeID:"<<m_peerHandshakeID<<" handshakeID"<<handshakeID;
 
         if(m_peerHandshakeID == 0){
             m_peerHandshakeID = handshakeID;
@@ -1938,6 +1942,10 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                         //startKeepAliveTimer();
                     }
                 }else{
+                    uint myHandshakeID = m_myHandshakeID;
+                    QMetaObject::invokeMethod(this, "reset");
+                    m_myHandshakeID = myHandshakeID;
+
                     m_peerHandshakeID = handshakeID;
                     sendHandshakePacket(m_myHandshakeID);
                     return;

@@ -87,8 +87,7 @@ ExpandListView::ExpandListView(ExpandListViewManager *core, QWidget *parent, Qt:
 
     // View
     //m_treeWidget = new TreeWidget(this);
-    connect(m_treeWidget, SIGNAL(pressed(QString,QString,QPoint)),
-            this, SLOT(handleMousePress(QString,QString,QPoint)));
+    connect(m_treeWidget, SIGNAL(pressed(const QString &, const QPoint &)), this, SLOT(handleMousePress(const QString &, const QPoint &)));
     vBoxLayout->addWidget(m_treeWidget);
 
     setAcceptDrops (true);
@@ -168,21 +167,18 @@ ExpandListViewManager *ExpandListView::core() const
 
 
 
-/*
 
-void ExpandListView::handleMousePress(const QString &name, const QString &xml, const QPoint &global_mouse_pos)
+
+void ExpandListView::handleMousePress(const QString &name, const QPoint &global_mouse_pos)
 {
+    qDebug()<<"--ExpandListView::handleMousePress(...)";
+
     if (QApplication::mouseButtons() != Qt::LeftButton)
         return;
 
-    DomUI *ui = xmlToUi(name, xml, true);
-    if (ui == 0)
-        return;
-    QList<QDesignerDnDItemInterface*> item_list;
-    item_list.append(new WidgetBoxDnDItem(core(), ui, global_mouse_pos));
-    m_core->formWindowManager()->dragItems(item_list);
+
 }
-*/
+
 
 
 int ExpandListView::categoryCount() const
