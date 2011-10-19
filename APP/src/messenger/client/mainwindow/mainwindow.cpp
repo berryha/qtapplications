@@ -333,7 +333,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), clientPacketsParser, SLOT(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), Qt::QueuedConnection);
-    connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(requestLogin(const QHostAddress &, quint16)));
+    connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
     connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
     connect(this,SIGNAL(signalOnlineStateChanged(quint8)), clientPacketsParser, SLOT(changeMyOnlineState(quint8)));
     
@@ -2230,6 +2230,19 @@ void MainWindow::showUserInfo(IMUserBase *user){
     m_ContactInfoWidget->show();
     m_ContactInfoWidget->raise();
 
+
+}
+
+void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort){
+
+    rudpSocket->connectToPeer(serverHostAddress, serverHostPort, true, 10000);
+    if(rudpSocket->isConnected(serverHostAddress, serverHostPort)){
+        clientPacketsParser->requestLogin(serverHostAddress, serverHostPort);
+    }else{
+        rudpSocket->connectToPeer(serverHostAddress, serverHostPort, true, 20000);
+        clientPacketsParser->requestLogin(serverHostAddress, serverHostPort);
+        //ui.loginPage->loginTimeout();
+    }
 
 }
 

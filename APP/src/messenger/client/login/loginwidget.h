@@ -127,7 +127,7 @@ private:
 
     QLocalServer *localServer;
 
-    //        ClientPacketsParser *clientPacketsParser;
+    //ClientPacketsParser *clientPacketsParser;
 
 
 

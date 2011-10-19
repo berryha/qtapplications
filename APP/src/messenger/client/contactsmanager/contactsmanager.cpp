@@ -539,6 +539,7 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
     
     for (int i=0; i<model->rowCount(); i++) {
         int groupID = QVariant(model->record(i).value("GroupID")).toInt();
+        if(contactGroupHash.contains(groupID)){continue;}
         QString groupName = QVariant(model->record(i).value("GroupName")).toString();
         QList<Contact*> list;
         
