@@ -575,6 +575,14 @@ bool CategoryListView::event(QEvent *event){
         return true;
     }
     break;
+    case QEvent::Resize:
+    {
+        QResizeEvent *e = static_cast<QResizeEvent *>(event);
+        QListView::resizeEvent(e);
+        updateGeometries();
+    }
+
+    break;
     default:
         return false;
 
