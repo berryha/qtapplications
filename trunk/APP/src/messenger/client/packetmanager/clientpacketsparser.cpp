@@ -148,7 +148,7 @@ void ClientPacketsParser::run(){
 
     while(1){
 
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
         parseIncomingPackets();
         processOutgoingPackets();
 
@@ -184,7 +184,7 @@ void ClientPacketsParser::startparseIncomingPackets(){
 
 
     while(!isAboutToQuit()){
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
         parseIncomingPackets();
         msleep(200);
     }

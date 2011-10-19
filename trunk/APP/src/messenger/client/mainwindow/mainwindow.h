@@ -122,6 +122,8 @@ private slots:
     void showUserInfo(IMUserBase *user);
 
 
+    void requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort);
+
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
