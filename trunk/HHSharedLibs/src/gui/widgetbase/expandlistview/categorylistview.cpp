@@ -637,10 +637,10 @@ void CategoryListView::slotPressed(const QModelIndex &index)
     //TODO
     m_core->slotTooltipEventOnObjectItemOccurs("", QPoint(0,0), QPoint(0,0));
 
-    //const ExpandListViewInterface::ObjectItem item = m_model->objectItemAt(m_proxyModel->mapToSource(index));
-    //if (item.isNull())
-    //    return;
-    //emit pressed(item.name(), objectItemDomXml(item), QCursor::pos());
+    const ExpandListViewInterface::ObjectItem item = m_model->objectItemAt(m_proxyModel->mapToSource(index));
+    if (item.isNull())
+        return;
+    emit pressed(item.name(), QCursor::pos());
 }
 
 void CategoryListView::removeCurrentItem()
@@ -708,6 +708,7 @@ int CategoryListView::indexOfObjectItem(const QString &item_id){
 void CategoryListView::removeRow(AccessMode am, int row)
 {
     m_model->removeRow(am == UnfilteredAccess ? row : mapRowToSource(row));
+    viewport()->update();
 
 }
 
@@ -719,6 +720,7 @@ bool CategoryListView::containsObjectItem(const QString &item_id)
 void CategoryListView::addObjectItem(const ExpandListViewInterface::ObjectItem &item, const QIcon &icon, bool editable)
 {
     m_model->addObjectItem(item, icon, editable);
+    viewport()->update();
 
 }
 

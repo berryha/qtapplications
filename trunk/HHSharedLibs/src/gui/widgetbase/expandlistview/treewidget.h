@@ -118,7 +118,7 @@ public:
     bool updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName);
 
 signals:
-    void pressed(const QString name, const QString dom_xml, const QPoint &global_mouse_pos);
+    void pressed(const QString name, const QPoint &global_mouse_pos);
     //void contextMenuEventOnCategoryOccurs(const QString cat_name, const QPoint &global_mouse_pos);
     //void contextMenuEventOnObjectItemOccurs(const QString item_id, const QPoint &global_mouse_pos);
 

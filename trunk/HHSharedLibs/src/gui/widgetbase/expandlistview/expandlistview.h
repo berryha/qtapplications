@@ -118,7 +118,7 @@ protected:
     //virtual void dropEvent (QDropEvent * event);
 
 private slots:
-    //void handleMousePress(const QString &name, const QString &xml, const QPoint &global_mouse_pos);
+    void handleMousePress(const QString &name, const QPoint &global_mouse_pos);
 
 private:
     ExpandListViewManager *m_core;

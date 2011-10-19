@@ -105,7 +105,7 @@ public:
 
 signals:
     void scratchPadChanged();
-    //void pressed(const QString &name, const QString &xml, const QPoint &globalPos);
+    void pressed(const QString &name, const QPoint &globalPos);
     //void contextMenuEventOnObjectItemOccurs(const QString item_id, const QPoint &global_mouse_pos);
     void itemRemoved();
     void lastItemRemoved();
