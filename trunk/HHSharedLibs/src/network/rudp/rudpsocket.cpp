@@ -45,7 +45,7 @@ RUDPSocket::RUDPSocket(PacketHandlerBase *packetHandlerBase, int keepAliveTimerI
 }
 
 RUDPSocket::~RUDPSocket(){
-    //qDebug()<<"--RUDPSocket::~RUDPSocket()";
+    qDebug()<<"--RUDPSocket::~RUDPSocket()";
 
 
 
@@ -144,7 +144,7 @@ void RUDPSocket::closeChannel(const QHostAddress &peerAddress, quint16 peerPort)
 }
 
 void RUDPSocket::closeAllChannels(){
-    qDebug()<<"--RUDPSocket::closeAllChannels()";
+    qDebug()<<"--RUDPSocket::closeAllChannels()"<<" ThreadId:"<<QThread::currentThreadId();
 
     if(peers.isEmpty()){return;}
 

@@ -461,7 +461,7 @@ QWidget *ExpandListViewCategoryEntryDelegate::createEditor(QWidget *parent,
 CategoryListView *CategoryListView::lastFocusedCategoryListView = 0;
 
 CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
-        :QListView(parent), m_core(core),
+    :QListView(parent), m_core(core),
     m_proxyModel(new QSortFilterProxyModel(this)),
     m_model(new ExpandListViewCategoryModel(/*core, */this))
 {
@@ -474,7 +474,7 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setResizeMode(QListView::Adjust);
     setUniformItemSizes(true);
-
+//    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     //setItemDelegate(new ExpandListViewCategoryEntryDelegate(this));
     //setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
@@ -485,9 +485,6 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     //connect(this, SIGNAL(doubleClicked(QModelIndex)), m_core, SLOT(slotItemDoubleClicked(QModelIndex)));
     //connect(this, SIGNAL(entered(QModelIndex)), m_core, SLOT(slotItemEntered(QModelIndex)));
 
-
-    //setEditTriggers(QAbstractItemView::AnyKeyPressed);
-    //setEditTriggers(QAbstractItemView::DoubleClicked);
 
 
     m_proxyModel->setSourceModel(m_model);
@@ -642,6 +639,7 @@ void CategoryListView::slotItemActivated(const QModelIndex &index)
 
 void CategoryListView::slotPressed(const QModelIndex &index)
 {
+
     //TODO
     m_core->slotTooltipEventOnObjectItemOccurs("", QPoint(0,0), QPoint(0,0));
 
