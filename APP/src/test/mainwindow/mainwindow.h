@@ -44,6 +44,7 @@
 #include "HHSharedGUI/hmainwindowbase.h"
 
 #include "rudp/rudp.h"
+#include "listview/explistview.h"
 
 namespace HEHUI {
 
@@ -109,6 +110,7 @@ private:
 
 
     RUDPWidget *rudpWidger;
+    ExpListView *expListView;
 
 
 
