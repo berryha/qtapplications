@@ -63,7 +63,7 @@ ClientPacketsParser::ClientPacketsParser(ClientNetworkManager *networkManager, Q
 
     clientLookForServerPacketSerialNumber = 0;
 
-    heartbeatTimer = 0;
+//    heartbeatTimer = 0;
     //    processWaitingForReplyPacketsTimer = 0;
 
     //packetHandlerBase = new PacketHandlerBase(this);
@@ -101,11 +101,14 @@ ClientPacketsParser::~ClientPacketsParser() {
 
     QMutexLocker locker(&mutex);
 
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
-    delete heartbeatTimer;
-    heartbeatTimer = 0;
+//    if(heartbeatTimer){
+//        qDebug()<<"----------------------------33333333";
+//        heartbeatTimer->stop();
+//        qDebug()<<"----------------------------44444444";
+//    }
+//    delete heartbeatTimer;
+//    heartbeatTimer = 0;
+
 
     //    if(processWaitingForReplyPacketsTimer){
     //        processWaitingForReplyPacketsTimer->stop();
