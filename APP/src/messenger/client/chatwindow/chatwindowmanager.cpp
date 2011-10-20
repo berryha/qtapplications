@@ -75,7 +75,7 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
 
     update();
     showNormal();
-    //show();
+    activateWindow();
     raise();
 
 }

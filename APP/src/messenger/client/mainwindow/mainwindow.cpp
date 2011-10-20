@@ -679,6 +679,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
         //if(reason == QSystemTrayIcon::DoubleClick){
         if(reason != QSystemTrayIcon::Context){
             this->showNormal();
+            this->activateWindow();
             this->raise();
         }
     }
