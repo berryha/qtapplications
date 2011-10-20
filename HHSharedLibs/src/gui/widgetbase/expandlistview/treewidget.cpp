@@ -285,17 +285,15 @@ CategoryListView *TreeWidget::addCategoryView(QTreeWidgetItem *parent, bool icon
     QTreeWidgetItem *embed_item = new QTreeWidgetItem(parent);
     embed_item->setFlags(Qt::ItemIsEnabled);
 
-    CategoryListView *categoryView = new CategoryListView(m_core, this);
+    CategoryListView *categoryView = new CategoryListView(m_core, 0);
     categoryView->setViewMode(iconMode ? QListView::IconMode : QListView::ListMode);
-    categoryView->setResizeMode(QListView::Adjust);
-    categoryView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    categoryView->setFlow(QListView::TopToBottom);
+    categoryView->setFlow(iconMode ? QListView::TopToBottom:QListView::LeftToRight);
 
-    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
-    connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
-    //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
-    connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
-    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
+//    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
+//    connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
+//    //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
+//    connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
+//    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
 
     setItemWidget(embed_item, 0, categoryView);
     return categoryView;
@@ -366,7 +364,7 @@ bool TreeWidget::load(CategoryList *cat_list)
 bool TreeWidget::load(Category *cat)
 {
 
-        addCategory(*cat);
+    addCategory(*cat);
     //restoreExpandedState();
     return true;
 }
@@ -742,7 +740,6 @@ void TreeWidget::adjustSubListSize(QTreeWidgetItem *cat_item)
 {
     qDebug()<<"--TreeWidget::adjustSubListSize(...)";
 
-
     QTreeWidgetItem *embedItem = cat_item->child(0);
     CategoryListView *list_widget = static_cast<CategoryListView*>(itemWidget(embedItem, 0));
     list_widget->setFixedWidth(header()->width());
@@ -803,8 +800,8 @@ void TreeWidget::addCategory(const Category &cat)
 
 
     const bool isScratchPad = cat.type() == Category::Scratchpad;
-    CategoryListView *categoryView;
-    QTreeWidgetItem *cat_item;
+    CategoryListView *categoryView = 0;
+    QTreeWidgetItem *cat_item = 0;
 
     if (isScratchPad) {
         const int idx = ensureScratchpad();
@@ -831,17 +828,17 @@ void TreeWidget::addCategory(const Category &cat)
             cat_item = topLevelItem(existingIndex);
         }
     }
+
     // The same categories are read from the file $HOME, avoid duplicates
     const int widgetCount = cat.objectItemCount();
     for (int i = 0; i < widgetCount; ++i) {
         const ObjectItem w = cat.objectItem(i);
-        if (!categoryView->containsObjectItem(w.id()))
+        if (!categoryView->containsObjectItem(w.id())){
             categoryView->addObjectItem(w, iconForObjectItem(w.iconName(), w.iconMode()), isScratchPad);
+        }
     }
 
     adjustSubListSize(cat_item);
-
-    qDebug()<<"-----------------------0-cat_item:"<<cat_item->text(0);
 
 
 }

@@ -43,33 +43,33 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
 
 
-    sendACKTimer = new QTimer();
+    sendACKTimer = new QTimer(this);
     connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
 //    sendACKTimer = 0;
 //    startSendACKTimer();
 
-    sendNACKTimer = new QTimer();
+    sendNACKTimer = new QTimer(this);
     connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
 //    sendNACKTimer = 0;
 //    startSendNACKTimer();
 
-    retransmissionTimer = new QTimer();
+    retransmissionTimer = new QTimer(this);
     connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
 //    retransmissionTimer = 0;
 //    startRetransmissionTimer();
 
-    m_keepAliveTimer = new QTimer();
+    m_keepAliveTimer = new QTimer(this);
     connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
 //    m_keepAliveTimer = 0;
 //    startKeepAliveTimer();
 
-    m_checkPeerAliveTimer = new QTimer();
+    m_checkPeerAliveTimer = new QTimer(this);
     connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
 //    m_checkPeerAliveTimer = 0;
 //    startCheckPeerAliveTimer();
 
 
-    m_connectToPeerTimer = new QTimer();
+    m_connectToPeerTimer = new QTimer(this);
     connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
 
@@ -92,33 +92,33 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
     init();
 
 
-    sendACKTimer = new QTimer();
+    sendACKTimer = new QTimer(this);
     connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
     //    sendACKTimer = 0;
     //    startSendACKTimer();
 
-    sendNACKTimer = new QTimer();
+    sendNACKTimer = new QTimer(this);
     connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
     //    sendNACKTimer = 0;
     //    startSendNACKTimer();
 
-    retransmissionTimer = new QTimer();
+    retransmissionTimer = new QTimer(this);
     connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
     //    retransmissionTimer = 0;
     //    startRetransmissionTimer();
 
-    m_keepAliveTimer = new QTimer();
+    m_keepAliveTimer = new QTimer(this);
     connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
     //    m_keepAliveTimer = 0;
     //    startKeepAliveTimer();
 
-    m_checkPeerAliveTimer = new QTimer();
+    m_checkPeerAliveTimer = new QTimer(this);
     connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
     //    m_checkPeerAliveTimer = 0;
     //    startCheckPeerAliveTimer();
 
 
-    m_connectToPeerTimer = new QTimer();
+    m_connectToPeerTimer = new QTimer(this);
     connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
 
@@ -130,16 +130,18 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 }
 
 RUDPChannel::~RUDPChannel(){
-    qDebug()<<"--RUDPChannel::~RUDPChannel()";
+    qDebug()<<"--RUDPChannel::~RUDPChannel()"<<" ThreadId:"<<QThread::currentThreadId();
 
 //    if(m_ChannelState != UnconnectedState){
 //        reset();
 //    }
 
     if(m_connectToPeerTimer){
+        qDebug()<<"--------01----";
         m_connectToPeerTimer->stop();
         delete m_connectToPeerTimer;
         m_connectToPeerTimer = 0;
+        qDebug()<<"--------01----";
     }
 
     //if(sendPacketTimer){
@@ -149,33 +151,43 @@ RUDPChannel::~RUDPChannel(){
     //}
 
     if(sendACKTimer){
+        qDebug()<<"--------02----";
         sendACKTimer->stop();
         delete sendACKTimer;
         sendACKTimer = 0;
+        qDebug()<<"--------02----";
     }
 
     if(sendNACKTimer){
+        qDebug()<<"--------03----";
         sendNACKTimer->stop();
         delete sendNACKTimer;
         sendNACKTimer = 0;
+        qDebug()<<"--------03----";
     }
 
     if(retransmissionTimer){
+        qDebug()<<"--------04----";
         retransmissionTimer->stop();
         delete retransmissionTimer;
         retransmissionTimer = 0;
+        qDebug()<<"--------04----";
     }
 
     if(m_keepAliveTimer){
+        qDebug()<<"--------05----";
         m_keepAliveTimer->stop();
         delete m_keepAliveTimer;
         m_keepAliveTimer = 0;
+        qDebug()<<"--------05----";
     }
 
     if(m_checkPeerAliveTimer){
+        qDebug()<<"--------06----";
         m_checkPeerAliveTimer->stop();
         delete m_checkPeerAliveTimer;
         m_checkPeerAliveTimer = 0;
+        qDebug()<<"--------06----";
     }
 
     //cleanAllUnusedPackets();
@@ -359,7 +371,7 @@ bool RUDPChannel::waitForDisconnected(int msecTimeout){
 
 
 void RUDPChannel::closeChannel(){
-    qDebug()<<"--RUDPChannel::closeChannel()"<<" Peer Address:"<<m_peerAddress.toString()<<":"<<m_peerPort;
+    qDebug()<<"--RUDPChannel::closeChannel()"<<" ThreadId:"<<QThread::currentThreadId()<<" Peer Address:"<<m_peerAddress.toString()<<":"<<m_peerPort;
 
     //NOTICE: Deadlock
     ChannelState state = getChannelState();
@@ -369,6 +381,8 @@ void RUDPChannel::closeChannel(){
     }
 
     QMetaObject::invokeMethod(this, "reset");
+
+//    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
 //    quit();
 
@@ -1772,7 +1786,7 @@ void RUDPChannel::init(){
 }
 
 void RUDPChannel::reset(){
-    qDebug()<<"--RUDPChannel::reset()";
+    qDebug()<<"--RUDPChannel::reset()"<<" ThreadId:"<<QThread::currentThreadId();
 
 
     if(m_connectToPeerTimer){
