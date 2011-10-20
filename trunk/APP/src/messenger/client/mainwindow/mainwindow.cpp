@@ -435,12 +435,12 @@ void MainWindow::stopNetwork(){
 
             //networkManager->closeRUDPServer(0);
             networkManager->closeAllServers();
-
+            qDebug()<<"---------------------------------------1----------";
             delete clientPacketsParser;
             clientPacketsParser = 0;
 
-            networkManager->cleanInstance();
-            //delete networkManager;
+            //networkManager->cleanInstance();
+            delete networkManager;
             networkManager = 0;
 
             m_packetHandler->clean();
@@ -677,9 +677,10 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     {
         qWarning()<<"Unknown SystemTrayIconDataType: "<<dataTypeCode;
         //if(reason == QSystemTrayIcon::DoubleClick){
+        if(reason != QSystemTrayIcon::Context){
             this->showNormal();
             this->raise();
-        //}
+        }
     }
     break;
     case STIDT_SystemMessage:

@@ -139,14 +139,13 @@ SystemManagementWidget::SystemManagementWidget(const QString &adminName, Control
 
     //    requestConnectionToClientTimer = 0;
 
-
-
     //    info = new ClientInfo(computerName, this);
     //    info->setUsers(usersInfo);
     //    info->setUsbSDEnabled(usbsdEnabled);
     //    info->setProgramsEnabled(programesEnabled);
 
-
+    //No editing possible.
+    ui.tableWidgetSoftware->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 }
 

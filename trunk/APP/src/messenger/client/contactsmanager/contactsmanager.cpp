@@ -30,13 +30,13 @@ namespace HEHUI {
 //QHash<QString, Contact*> ContactsManager::contactHash = QHash<QString, Contact*>();
 
 ContactsManager::ContactsManager(QObject *parent)
-	:QObject(parent)
+    :QObject(parent)
 {
-	qDebug()<<"----ContactsManager::ContactsManager(QObject *parent)~~";
-        
-//        query = 0;
-        //userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(IMUser::instance()->getUserID());      
-        //openDatabase();
+    qDebug()<<"----ContactsManager::ContactsManager(QObject *parent)~~";
+
+    //        query = 0;
+    //userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(IMUser::instance()->getUserID());
+    //openDatabase();
 
     m_imUser = IMUser::instance();
     //Q_ASSERT_X(m_imUser->getOnlineState() != IM::ONLINESTATE_OFFLINE, "ContactsManager::ContactsManager(QObject *parent)", "User is not online!");
@@ -46,11 +46,11 @@ ContactsManager::ContactsManager(QObject *parent)
 
 ContactsManager::~ContactsManager() {
     
-//    if(query){
-//        query->clear();
-//    }
-//    delete query;
-//    query = 0;
+    //    if(query){
+    //        query->clear();
+    //    }
+    //    delete query;
+    //    query = 0;
     
     
     
@@ -233,7 +233,7 @@ bool ContactsManager::loadInterestGroups(){
         delete model;
         return false;
     }
-     
+
     for (int j=0; j<model->rowCount(); j++) {
         quint32 groupID = QVariant(model->record(j).value("GroupID")).toUInt();
         InterestGroup *interestGroup = new InterestGroup(groupID, this);
@@ -253,7 +253,7 @@ bool ContactsManager::loadInterestGroups(){
         interestGroup->clearUpdatedProperties();
         
         interestGroupsHash.insert(groupID, interestGroup);
-                
+
         qApp->processEvents();
     }
     
@@ -286,9 +286,9 @@ bool ContactsManager::addNewInterestGroupToDatabase(InterestGroup *interestGroup
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
-        
+
     QString queryString = QString("Insert  Into [interestgroups] ([GroupID]) Values('%1')")
             .arg(groupID);
     
@@ -314,7 +314,7 @@ bool ContactsManager::leaveInterestGroup(quint32 groupID){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     
@@ -351,9 +351,9 @@ bool ContactsManager::saveInterestGroupInfoToDatabase(InterestGroup *interestGro
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
-     
+
     QString updateSQLStatement = interestGroup->getUpdateSQLStatement();
     if(updateSQLStatement.trimmed().isEmpty()){
         return false;
@@ -387,9 +387,9 @@ bool ContactsManager::saveInterestGroupMemberToDatabase(quint32 groupID, const Q
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
-        
+
     QString statement = QString("insert into interestgroupmembers(MemberID, GroupID, MemberRole) values('%1', %2, %3)  ").arg(userID).arg(groupID).arg(memberRole);
     
     if(!query.exec(statement)){
@@ -424,9 +424,9 @@ bool ContactsManager::saveInterestGroupMembersToDatabase(InterestGroup *interest
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
-     
+
     QString statement = QString("delete from interestgroupmembers where GroupID=%1 ").arg(groupID);
     
     if(!query.exec(statement)){
@@ -562,8 +562,8 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
             contact->setAge(IMUserBase::Gender(QVariant(contactsModel->record(j).value("Age")).toUInt()));
             contact->setFace(QVariant(contactsModel->record(j).value("Face")).toString());
             
-//            contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
-//            contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
+            //            contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
+            //            contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
             contact->setPersonalInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
             
             contact->setHomeAddress(QVariant(contactsModel->record(j).value("HomeAddress")).toString());
@@ -577,7 +577,7 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
             contact->setLastLoginHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
             
             //contact->setQuestionForSecurity(QVariant(contactsModel->record(j).value("QuestionForSecurity")).toString());
-            //contact->setAnswerForSecurity(QVariant(contactsModel->record(j).value("AnswerForSecurity")).toString());            
+            //contact->setAnswerForSecurity(QVariant(contactsModel->record(j).value("AnswerForSecurity")).toString());
             contact->setCompanyName(QVariant(contactsModel->record(j).value("CompanyName")).toString());
             contact->setJobTitle(QVariant(contactsModel->record(j).value("JobTitle")).toString());
             contact->setBusinessAddress(QVariant(contactsModel->record(j).value("BusinessAddress")).toString());
@@ -588,7 +588,7 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
             contact->setBusinessEmailAddress(QVariant(contactsModel->record(j).value("BusinessEmailAddress")).toString());
             contact->setRegistrationTime(QVariant(contactsModel->record(j).value("RegistrationTime")).toDateTime());
             contact->setLoginTimes(QVariant(contactsModel->record(j).value("LoginTimes")).toInt());
-                 
+
 
             contact->setContactGroupID(groupID);
             contactHash.insert(contactUID, contact);
@@ -632,8 +632,8 @@ void ContactsManager::slotFetchStrangersInfo(){
         contact->setAge(IMUserBase::Gender(QVariant(contactsModel->record(j).value("Age")).toUInt()));
         contact->setFace(QVariant(contactsModel->record(j).value("Face")).toString());
 
-//        contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
-//        contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
+        //        contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
+        //        contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
         contact->setPersonalInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
 
         contact->setHomeAddress(QVariant(contactsModel->record(j).value("HomeAddress")).toString());
@@ -675,10 +675,10 @@ void ContactsManager::slotFetchStrangersInfo(){
 void ContactsManager::slotAddNewContactGroupToUI(ExpandListView *expandListView, int personalContactGroupID, const QString &groupName){
     qDebug()<<"--ContactsManager::slotAddNewContactGroupToUI(...)";
 
-//    Category *category = new Category();
-//    category->setID(QString::number(groupID));
-//    category->setName(groupName);
-//    expandListView->load(category);
+    //    Category *category = new Category();
+    //    category->setID(QString::number(groupID));
+    //    category->setName(groupName);
+    //    expandListView->load(category);
 
     Category category;
     category.setID(QString::number(personalContactGroupID));
@@ -706,7 +706,7 @@ void ContactsManager::addContactToUI(ExpandListView *expandListView, const QStri
 
     QString name = contact->getNickName();
     if(name.isEmpty()){
-            name = contact->getUserID();
+        name = contact->getUserID();
     }
     objectItem.setName(name);
 
@@ -761,14 +761,14 @@ void ContactsManager::updateContactToUI(ExpandListView *expandListView, int pers
 
 void ContactsManager::renameGroupToUI(ExpandListView *expandListView, const QString &old_groupName, const QString &new_groupName){
 
-//    ContactGroup *contactGroup = 0;
-//    int groupID = getGroup(group_name);
-//    if(contactGroupHash.contains(groupID)){
-//        contactGroup = contactGroupHash.value(groupID);
-//    }else{
-//        return;
-//    }
-//    contactGroup->setGroupName(new_groupName);
+    //    ContactGroup *contactGroup = 0;
+    //    int groupID = getGroup(group_name);
+    //    if(contactGroupHash.contains(groupID)){
+    //        contactGroup = contactGroupHash.value(groupID);
+    //    }else{
+    //        return;
+    //    }
+    //    contactGroup->setGroupName(new_groupName);
 
     expandListView->updateCategoryName(old_groupName, new_groupName);
 
@@ -777,39 +777,39 @@ void ContactsManager::renameGroupToUI(ExpandListView *expandListView, const QStr
 
 
 void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
-//    qDebug()<<"ContactsManager::slotLoadContacts(...)";
+    //    qDebug()<<"ContactsManager::slotLoadContacts(...)";
 
-//	Category *category = new Category();
-//	category->setID(QString::number(groupID));
-//	category->setName(groupName);
+    //	Category *category = new Category();
+    //	category->setID(QString::number(groupID));
+    //	category->setName(groupName);
 
-        Category category;
-        category.setID(QString::number(groupID));
-        category.setName(groupName);
+    Category category;
+    category.setID(QString::number(groupID));
+    category.setName(groupName);
 
-        foreach(Contact *contact, contactList)
-		{
+    foreach(Contact *contact, contactList)
+    {
 
-			//ObjectItem *objectItem = new ObjectItem();
-			ObjectItem objectItem;
-                        objectItem.setID(contact->getUserID());
+        //ObjectItem *objectItem = new ObjectItem();
+        ObjectItem objectItem;
+        objectItem.setID(contact->getUserID());
 
-			QString name = contact->getNickName();
-			if(name.isEmpty()){
-                                name = contact->getUserID();
-			}
-			objectItem.setName(name);
+        QString name = contact->getNickName();
+        if(name.isEmpty()){
+            name = contact->getUserID();
+        }
+        objectItem.setName(name);
 
-                        objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
-			//objectItem.setIconMode(QIcon::Disabled);
-                        //objectItem.setCategoryID(groupName);
+        objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
+        //objectItem.setIconMode(QIcon::Disabled);
+        //objectItem.setCategoryID(groupName);
 
-                        category.addObjectItem(objectItem);
+        category.addObjectItem(objectItem);
 
-			qApp->processEvents();
-		}
+        qApp->processEvents();
+    }
 
-        expandListView->load(&category);
+    expandListView->load(&category);
 
 }
 
@@ -867,12 +867,12 @@ bool ContactsManager::moveContact(const QString &contactID, int oldGroupID, int 
 
 void ContactsManager::slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo){
 
-	qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)";
-	qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~contactID:"<<contactID;
-	qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~greetingInfo:"<<greetingInfo;
+    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)";
+    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~contactID:"<<contactID;
+    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~greetingInfo:"<<greetingInfo;
 
-        Contact *contact = contactHash.value(contactID);
-	contact->setOnlineState(IM::OnlineState(onlineStateCode));
+    Contact *contact = contactHash.value(contactID);
+    contact->setOnlineState(IM::OnlineState(onlineStateCode));
 
 }
 
@@ -891,7 +891,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     QString contactUID = contact->getUserID();
@@ -964,7 +964,7 @@ int ContactsManager::getPersonalContactGroupID(const QString &groupName){
         if(!openDatabase()){
             return 0;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     QString queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(groupName);
@@ -972,8 +972,8 @@ int ContactsManager::getPersonalContactGroupID(const QString &groupName){
     //QSqlQuery query = queryDatabase(queryString, true);
     if(!query.exec(queryString)){
         qCritical()<<QString("Can not get contact group ID! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
-            
-            return 0;
+
+        return 0;
     }
     
     query.first();
@@ -993,7 +993,7 @@ QString ContactsManager::getPersonalContactGroupName(int personalContactGroupID)
         if(!openDatabase()){
             return "";
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     QString queryString = QString("Select [GroupName]  From [contactgroups] where [GroupID] = %1 ").arg(personalContactGroupID);
@@ -1001,8 +1001,8 @@ QString ContactsManager::getPersonalContactGroupName(int personalContactGroupID)
     //QSqlQuery query = queryDatabase(queryString, true);
     if(!query.exec(queryString)){
         qCritical()<<QString("Can not get contact group name! Group ID:'%1', Error:%2").arg(personalContactGroupID).arg(query.lastError().text());
-            
-            return "";
+
+        return "";
     }
     
     query.first();
@@ -1022,25 +1022,25 @@ int ContactsManager::slotAddNewContactGroupToDatabase(const QString &groupName){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     QString queryString = QString("Insert  Into [contactgroups] ([GroupName]) Values('%1')").arg(groupName);
 
     //QSqlQuery query = queryDatabase(queryString, true);
     if(!query.exec(queryString)){
-            qCritical()<<QString("Can not add new contact group! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
-            
-            return 0;
+        qCritical()<<QString("Can not add new contact group! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
+
+        return 0;
     }
     
     
     queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(groupName);
     //query = queryDatabase(queryString, true);
     if(!query.exec(queryString)){
-            qCritical()<<QString("Can not query contact group info! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
-            
-            return 0;
+        qCritical()<<QString("Can not query contact group info! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
+
+        return 0;
     }
     
     query.first();
@@ -1052,7 +1052,7 @@ int ContactsManager::slotAddNewContactGroupToDatabase(const QString &groupName){
     ContactGroup *group = new ContactGroup(groupID, groupName, QList<Contact*>());
     contactGroupHash.insert(groupID, group);
 
-            
+
     return groupID;
     
 } 
@@ -1071,13 +1071,13 @@ bool ContactsManager::renameGroupToDatabase(const QString &old_groupName, const 
     if(!query.exec(queryString)){
         qCritical()<<QString("Can not rename contact group! Group Name:'%1', Error:%2").arg(old_groupName).arg(query.lastError().text());
 
-            return false;
+        return false;
     }
 
     queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(new_groupName);
     if(!query.exec(queryString)){
         qCritical()<<QString("Can not get contact group ID! Group Name:'%1', Error:%2").arg(new_groupName).arg(query.lastError().text());
-            return false;
+        return false;
     }
     query.first();
     if(!query.isValid()){
@@ -1127,7 +1127,7 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
     if(!query.exec(queryString)){
         qCritical()<<QString("Can not delete contact group! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
 
-            return false;
+        return false;
     }
 
 
@@ -1138,13 +1138,13 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
 
 bool ContactsManager::getMyInfoFormLocalDatabase(){
     qWarning()<<"--getMyInfoFormLocalDatabase()";
-     
-     
+
+
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
 
     //IMUser *m_imUser = IMUser::instance();
@@ -1168,11 +1168,11 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
     }
     
     
-//    query = queryDatabase(statement, false);
-//    if((query.lastError().type() != QSqlError::NoError)){
-//        qCritical()<<QString("Can not query data from local database! Error: %1").arg(query.lastError().text());
-//        return false;
-//    }
+    //    query = queryDatabase(statement, false);
+    //    if((query.lastError().type() != QSqlError::NoError)){
+    //        qCritical()<<QString("Can not query data from local database! Error: %1").arg(query.lastError().text());
+    //        return false;
+    //    }
     query.first();
     if(!query.isValid()){
         qCritical()<<QString("Can not query user info! Invalid record! User ID:%1").arg(m_imUser->getUserID());
@@ -1248,7 +1248,7 @@ bool ContactsManager::saveMyInfoToDatabase(){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     QString statement = QString("update my_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(info->getUserID());
     if(!query.exec(statement)){
@@ -1283,7 +1283,7 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
     
     Contact *contact = 0;
@@ -1305,11 +1305,11 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
     }
     
     
-//    query = queryDatabase(statement, false);
-//    if((query.lastError().type() != QSqlError::NoError)){
-//        qCritical()<<QString("Can not query data from local database! Error: %1").arg(query.lastError().text());
-//        return false;
-//    }
+    //    query = queryDatabase(statement, false);
+    //    if((query.lastError().type() != QSqlError::NoError)){
+    //        qCritical()<<QString("Can not query data from local database! Error: %1").arg(query.lastError().text());
+    //        return false;
+    //    }
     query.first();
     if(!query.isValid()){
         qCritical()<<QString("Can not query contact's' info! Invalid record! Contact ID:%1").arg(contactID);
@@ -1327,14 +1327,14 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
     contact->setAge(QVariant(query.value(record.indexOf("Age"))).toUInt());
     contact->setFace(QVariant(query.value(record.indexOf("Face"))).toString());
     
-//    contact->setInterestGroupID(QVariant(query.value(record.indexOf("InterestGroupID"))).toUInt());
-//    contact->setSystemGroupID(QVariant(query.value(record.indexOf("SystemGroupID"))).toUInt());
+    //    contact->setInterestGroupID(QVariant(query.value(record.indexOf("InterestGroupID"))).toUInt());
+    //    contact->setSystemGroupID(QVariant(query.value(record.indexOf("SystemGroupID"))).toUInt());
     contact->setContactGroupID(QVariant(query.value(record.indexOf("ContactGroupID"))).toUInt());
     contact->setPersonalInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
     
-//    info->setSystemGroupInfoVersion(QVariant(query.value(record.indexOf("SystemGroupsInfoVersion"))).toUInt());
-//    info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf("PersonalInterestGroupsInfoVersion"))).toUInt());
-//    info->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf("PersonalContactGroupsInfoVersion"))).toUInt());
+    //    info->setSystemGroupInfoVersion(QVariant(query.value(record.indexOf("SystemGroupsInfoVersion"))).toUInt());
+    //    info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf("PersonalInterestGroupsInfoVersion"))).toUInt());
+    //    info->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf("PersonalContactGroupsInfoVersion"))).toUInt());
     
     contact->setHomeAddress(QVariant(query.value(record.indexOf("HomeAddress"))).toString());
     contact->setHomePhoneNumber(QVariant(query.value(record.indexOf("HomePhoneNumber"))).toString());
@@ -1379,9 +1379,9 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
         if(!openDatabase()){
             return false;
         }
-    } 
+    }
     QSqlQuery query(localUserDataDB);
-     
+
     Contact *contact = 0;
     if(contactHash.contains(contactID)){
         contact = contactHash.value(contactID);
@@ -1417,7 +1417,7 @@ bool ContactsManager::saveContactGroupsInfoToDatabase(){
     
     
     QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = m_imUser->getPersonalContactGroupsHash();
-     
+
     
     QStringList groups = personalContactGroupsHash.keys();
     foreach (QString groupName, groups) {
@@ -1464,12 +1464,12 @@ bool ContactsManager::openDatabase(bool reopen){
 
 
 
-    if(reopen){       
-//        if(query){
-//            query->clear();
-//            delete query;
-//            query = 0;
-//        }
+    if(reopen){
+        //        if(query){
+        //            query->clear();
+        //            delete query;
+        //            query = 0;
+        //        }
         DatabaseUtility::closeDBConnection(LOCAL_USERDATA_DB_CONNECTION_NAME);
     }
 
@@ -1501,9 +1501,9 @@ bool ContactsManager::openDatabase(bool reopen){
         return false;
     }
 
-//    if(!query){
-//        query = new QSqlQuery(localUserDataDB);
-//    }
+    //    if(!query){
+    //        query = new QSqlQuery(localUserDataDB);
+    //    }
 
     if(needInitUserDB){
         if(!initLocalDatabase()){
@@ -1524,7 +1524,7 @@ bool ContactsManager::initLocalDatabase(QString *errorMessage){
         if(errorMessage){
             *errorMessage = tr("Database Invalid Or Not Open!");
         }
-            return false;
+        return false;
     }
 
     QSqlQuery query;
@@ -1564,115 +1564,115 @@ void ContactsManager::slotUpdateContactsInfo2(){
 
 
 
-	QSqlQuery query;
-	QSqlRecord record;
+ QSqlQuery query;
+ QSqlRecord record;
 
 
-	//Local
-	QString queryString = QString("select ContactsListVersion from contacts where UID = '%1'") .arg(User::instance()->getUserID());
+ //Local
+ QString queryString = QString("select ContactsListVersion from contacts where UID = '%1'") .arg(User::instance()->getUserID());
 
-	int localContactsListVersion = -1;
+ int localContactsListVersion = -1;
 
-	query = queryDatabase(queryString, true);
-	if(query.lastError().type() == QSqlError::NoError && query.isValid()){
-		query.first();
-		localContactsListVersion = query.value(0).toInt();
-		qDebug()<<"Local Contacts List Version:"<<localContactsListVersion;
-	}else{
-		//QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not query data from local database! <br> %1").arg(model.lastError().text()));
-		qCritical()<<QString("Can not query data from local database!");
-		qCritical()<<QString("Error: %1").arg(query.lastError().text());
-		//statusBar()->showMessage(tr("Error! Can not query data from local database!"));
-	}
-
-
-	if(User::instance()->getRemoteServerContactsListVersion() != localContactsListVersion){
-		qDebug()<<"Remote Server Contacts List Version:"<<User::instance()->getRemoteServerContactsListVersion();
-
-		if(User::instance()->getRemoteServerContactsListVersion() > localContactsListVersion){
-			queryString = QString("update contacts set ContactsList = '%1'  where UID = '%2'") .arg(User::instance()->getContactsList(), User::instance()->getUserID());
-			query = queryDatabase(queryString, true);
-			qDebug()<<"Update Local Contacts List Version";
-		}else{
-			queryString = QString("select ContactsList from contacts where UID = '%1'") .arg(User::instance()->getUserID());
-			QString contactsList;
-			query = queryDatabase(queryString, true);
-			if(query.lastError().type() == QSqlError::NoError && query.isValid()){
-				query.first();
-				contactsList = query.value(0).toString();
-			}else{
-				//QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not query data from database server! <br> %1").arg(model.lastError().text()));
-				qCritical()<<QString("Can not query data from database server!");
-				qCritical()<<QString("Error: %1").arg(query.lastError().text());
-				//statusBar()->showMessage(tr("Error! Can not query data from database server!"));
-			}
-			queryString = QString("update contacts set ContactsList = '%1' , ContactsListVersion = %2 where UID = '%3'") .arg(contactsList).arg(localContactsListVersion).arg(User::instance()->getUserID());
-			query = queryDatabase(queryString, false);
-			if(query.lastError().type() != QSqlError::NoError){qDebug()<<"Query Error:"<<query.lastError().text();}
-			qDebug()<<"Update Remote Server Contacts List Version";
-			User::instance()->setContactsList(contactsList);
-			User::instance()->setRemoteServerContactsListVersion(localContactsListVersion);
-			//qDebug()<<"contactsList~~~~"<<contactsList;
-		}
+ query = queryDatabase(queryString, true);
+ if(query.lastError().type() == QSqlError::NoError && query.isValid()){
+  query.first();
+  localContactsListVersion = query.value(0).toInt();
+  qDebug()<<"Local Contacts List Version:"<<localContactsListVersion;
+ }else{
+  //QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not query data from local database! <br> %1").arg(model.lastError().text()));
+  qCritical()<<QString("Can not query data from local database!");
+  qCritical()<<QString("Error: %1").arg(query.lastError().text());
+  //statusBar()->showMessage(tr("Error! Can not query data from local database!"));
+ }
 
 
-	}
+ if(User::instance()->getRemoteServerContactsListVersion() != localContactsListVersion){
+  qDebug()<<"Remote Server Contacts List Version:"<<User::instance()->getRemoteServerContactsListVersion();
+
+  if(User::instance()->getRemoteServerContactsListVersion() > localContactsListVersion){
+   queryString = QString("update contacts set ContactsList = '%1'  where UID = '%2'") .arg(User::instance()->getContactsList(), User::instance()->getUserID());
+   query = queryDatabase(queryString, true);
+   qDebug()<<"Update Local Contacts List Version";
+  }else{
+   queryString = QString("select ContactsList from contacts where UID = '%1'") .arg(User::instance()->getUserID());
+   QString contactsList;
+   query = queryDatabase(queryString, true);
+   if(query.lastError().type() == QSqlError::NoError && query.isValid()){
+    query.first();
+    contactsList = query.value(0).toString();
+   }else{
+    //QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not query data from database server! <br> %1").arg(model.lastError().text()));
+    qCritical()<<QString("Can not query data from database server!");
+    qCritical()<<QString("Error: %1").arg(query.lastError().text());
+    //statusBar()->showMessage(tr("Error! Can not query data from database server!"));
+   }
+   queryString = QString("update contacts set ContactsList = '%1' , ContactsListVersion = %2 where UID = '%3'") .arg(contactsList).arg(localContactsListVersion).arg(User::instance()->getUserID());
+   query = queryDatabase(queryString, false);
+   if(query.lastError().type() != QSqlError::NoError){qDebug()<<"Query Error:"<<query.lastError().text();}
+   qDebug()<<"Update Remote Server Contacts List Version";
+   User::instance()->setContactsList(contactsList);
+   User::instance()->setRemoteServerContactsListVersion(localContactsListVersion);
+   //qDebug()<<"contactsList~~~~"<<contactsList;
+  }
 
 
-	qDebug()<<"-------------contactsList:"<<User::instance()->getContactsList();
-	//queryString = QString("select UID, Role, Dept, TrueName, NickName, HeadPortrait, LastLoginIP from contacts where UID in (%1) ") .arg(User::instance()->getContactsList());
-	queryString = QString("select UID, Role, Dept, TrueName, NickName, Icon, LastLoginIP from contacts where UID in (%1) ") .arg(User::instance()->getContactsList());
+ }
+
+
+ qDebug()<<"-------------contactsList:"<<User::instance()->getContactsList();
+ //queryString = QString("select UID, Role, Dept, TrueName, NickName, HeadPortrait, LastLoginIP from contacts where UID in (%1) ") .arg(User::instance()->getContactsList());
+ queryString = QString("select UID, Role, Dept, TrueName, NickName, Icon, LastLoginIP from contacts where UID in (%1) ") .arg(User::instance()->getContactsList());
 query.clear();
-	query = queryDatabase(queryString, true);
-	query.first();
-	qDebug()<<"-------------queryString:"<<queryString;
-	qDebug()<<"-------------query.size:"<<query.size();
-	record = query.record();
+ query = queryDatabase(queryString, true);
+ query.first();
+ qDebug()<<"-------------queryString:"<<queryString;
+ qDebug()<<"-------------query.size:"<<query.size();
+ record = query.record();
 
-	while (query.next()){
-		QString contactUID = QVariant(query.value(record.indexOf("UID"))).toString();
-		int contactsRoleID = QVariant(query.value(record.indexOf("Role"))).toInt();
-		QString contactDept = QVariant(query.value(record.indexOf("Dept"))).toString();
-		QString contactTrueName = QVariant(query.value(record.indexOf("TrueName"))).toString();
-		QString contactNickName = QVariant(query.value(record.indexOf("NickName"))).toString();
-		QString contactHeadPortrait = QVariant(query.value(record.indexOf("HeadPortrait"))).toString();
-		QString contactLastLoginIP = QVariant(query.value(record.indexOf("LastLoginIP"))).toString();
+ while (query.next()){
+  QString contactUID = QVariant(query.value(record.indexOf("UID"))).toString();
+  int contactsRoleID = QVariant(query.value(record.indexOf("Role"))).toInt();
+  QString contactDept = QVariant(query.value(record.indexOf("Dept"))).toString();
+  QString contactTrueName = QVariant(query.value(record.indexOf("TrueName"))).toString();
+  QString contactNickName = QVariant(query.value(record.indexOf("NickName"))).toString();
+  QString contactHeadPortrait = QVariant(query.value(record.indexOf("HeadPortrait"))).toString();
+  QString contactLastLoginIP = QVariant(query.value(record.indexOf("LastLoginIP"))).toString();
 
-		ContactBase *contact = new ContactBase();
-		contact->setUID(contactUID);
-		contact->setRoleID(contactsRoleID);
-		contact->setDept(contactDept);
-		contact->setHeadPortrait(contactHeadPortrait);
-		contact->setTrueName(contactTrueName);
-		contact->setNickName(contactNickName);
-		contact->setLastLoginIP(contactLastLoginIP);
+  ContactBase *contact = new ContactBase();
+  contact->setUID(contactUID);
+  contact->setRoleID(contactsRoleID);
+  contact->setDept(contactDept);
+  contact->setHeadPortrait(contactHeadPortrait);
+  contact->setTrueName(contactTrueName);
+  contact->setNickName(contactNickName);
+  contact->setLastLoginIP(contactLastLoginIP);
 
-		contactHash.insert(contactUID, contact);
+  contactHash.insert(contactUID, contact);
 
-	}
+ }
 
-	record.clearValues();
-	queryString = QString("select * from group");
-	query = queryDatabase(queryString, true);
-	record = query.record();
-	while (query.next()){
-		int contactGroupID = QVariant(query.value(record.indexOf("ID"))).toInt();
-		QString contactGroupName = QVariant(query.value(record.indexOf("Name"))).toString();
-		int contactGroupParentID = QVariant(query.value(record.indexOf("ParentCategory"))).toInt();
-		QString contactGroupRemark = QVariant(query.value(record.indexOf("Remark"))).toString();
+ record.clearValues();
+ queryString = QString("select * from group");
+ query = queryDatabase(queryString, true);
+ record = query.record();
+ while (query.next()){
+  int contactGroupID = QVariant(query.value(record.indexOf("ID"))).toInt();
+  QString contactGroupName = QVariant(query.value(record.indexOf("Name"))).toString();
+  int contactGroupParentID = QVariant(query.value(record.indexOf("ParentCategory"))).toInt();
+  QString contactGroupRemark = QVariant(query.value(record.indexOf("Remark"))).toString();
 
-		ContactGroup *group = new ContactGroup();
-		group->setGroupID(contactGroupID);
-		group->setGroupName(contactGroupName);
-		group->setParentGroupID(contactGroupParentID);
+  ContactGroup *group = new ContactGroup();
+  group->setGroupID(contactGroupID);
+  group->setGroupName(contactGroupName);
+  group->setParentGroupID(contactGroupParentID);
 
-		contactGroupHash.insert(contactGroupID, group);
+  contactGroupHash.insert(contactGroupID, group);
 
-	}
+ }
 
 
 
-	qDebug()<<"ContactsManager::slotUpdateContactsInfo()~~~~";
+ qDebug()<<"ContactsManager::slotUpdateContactsInfo()~~~~";
 
 }
 
@@ -1682,22 +1682,22 @@ query.clear();
 /*
  void ContactsManager::slotLoadContacts(ExpandListView *widgetBox, bool loadFromFile, const QString &string){
 
-	QString file; // = QApplication::applicationDirPath()+QDir::separator()+"contacts.xml";
+ QString file; // = QApplication::applicationDirPath()+QDir::separator()+"contacts.xml";
 
-		if(string.isEmpty() || !QFile(string).exists()){
-			file = ":/text/resources/text/default_contacts.xml";
-		}
-
-
-		if(loadFromFile){
-			widgetBox->setFileName(file);
-			widgetBox->load();
-		}else{
-			widgetBox->loadContents(string);
-		}
+  if(string.isEmpty() || !QFile(string).exists()){
+   file = ":/text/resources/text/default_contacts.xml";
+  }
 
 
-		qDebug()<<"~~~~~~~~~~~~~ Load Contacts ~~~~~~~~~~~~~~";
+  if(loadFromFile){
+   widgetBox->setFileName(file);
+   widgetBox->load();
+  }else{
+   widgetBox->loadContents(string);
+  }
+
+
+  qDebug()<<"~~~~~~~~~~~~~ Load Contacts ~~~~~~~~~~~~~~";
 
 
 }
@@ -1706,51 +1706,51 @@ query.clear();
 
 QSqlQuery ContactsManager::queryDatabase(const QString & queryString, bool localConfigDatabase) {
 
-	QSqlQuery query;
-	DatabaseUtility du;
+    QSqlQuery query;
+    DatabaseUtility du;
 
 
-//                QString userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(IMUser::instance()->getUserID());
+    //                QString userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(IMUser::instance()->getUserID());
 
-	if(localConfigDatabase){
-		query = du.queryDatabase(queryString,
-				LOCAL_USERDATA_DB_CONNECTION_NAME,
-				LOCAL_USERDATA_DB_DRIVER,
-				"",
-				0,
-				"",
-				"",
-				userPrivateDataFilePath,
-				HEHUI::SQLITE);
-	}else{
-		query = du.queryDatabase(queryString,
-				REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME,
-				REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-				REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-				REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-				REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-				REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-				REMOTE_SITOY_COMPUTERS_DB_NAME,
-				HEHUI::MYSQL);
-	}
+    if(localConfigDatabase){
+        query = du.queryDatabase(queryString,
+                                 LOCAL_USERDATA_DB_CONNECTION_NAME,
+                                 LOCAL_USERDATA_DB_DRIVER,
+                                 "",
+                                 0,
+                                 "",
+                                 "",
+                                 userPrivateDataFilePath,
+                                 HEHUI::SQLITE);
+    }else{
+        query = du.queryDatabase(queryString,
+                                 REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME,
+                                 REMOTE_SITOY_COMPUTERS_DB_DRIVER,
+                                 REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
+                                 REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
+                                 REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
+                                 REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
+                                 REMOTE_SITOY_COMPUTERS_DB_NAME,
+                                 HEHUI::MYSQL);
+    }
 
-	return query;
+    return query;
 
 
 }
 
 
 QSqlQuery ContactsManager::queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
-		const QString &host, int port, const QString &user, const QString &passwd,
-		const QString &databaseName, HEHUI::DatabaseType databaseType) {
+                                         const QString &host, int port, const QString &user, const QString &passwd,
+                                         const QString &databaseName, HEHUI::DatabaseType databaseType) {
 
 
-	QSqlQuery query;
-	DatabaseUtility du(this);
+    QSqlQuery query;
+    DatabaseUtility du(this);
 
-	query = du.queryDatabase(queryString, connectionName, driver, host, port, user, passwd, databaseName, databaseType);
+    query = du.queryDatabase(queryString, connectionName, driver, host, port, user, passwd, databaseName, databaseType);
 
-	return query;
+    return query;
 
 }
 
