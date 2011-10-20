@@ -9,8 +9,6 @@ QT += core \
 # include config file
 include( ../config_global.pri )
 include(../HHSharedLibs.pri)
-
-
 VER_MAJ = 2010
 VER_MIN = 06
 VER_PAT = 26
@@ -35,7 +33,8 @@ INCLUDEPATH += . \
     about
 
 # Input
-HEADERS += rudp/clientpacketsparser.h \
+HEADERS += listview/explistview.h \
+    rudp/clientpacketsparser.h \
     screenshot/selecttargetimagewidget.h \
     screenshot/screenshot.h \
     rudp/rudp.h \
@@ -43,7 +42,8 @@ HEADERS += rudp/clientpacketsparser.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h
-SOURCES += rudp/clientpacketsparser.cpp \
+SOURCES += listview/explistview.cpp \
+    rudp/clientpacketsparser.cpp \
     screenshot/selecttargetimagewidget.cpp \
     screenshot/screenshot.cpp \
     rudp/rudp.cpp \
@@ -51,7 +51,8 @@ SOURCES += rudp/clientpacketsparser.cpp \
     main.cpp \
     about/aboutdialog.cpp \
     mainwindow/mainwindow.cpp
-FORMS += screenshot/selecttargetimagewidget.ui \
+FORMS += listview/explistview.ui \
+    screenshot/selecttargetimagewidget.ui \
     screenshot/screenshot.ui \
     rudp/rudp.ui \
     about/aboutdialog.ui \

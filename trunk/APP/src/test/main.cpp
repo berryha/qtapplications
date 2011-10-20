@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 
     QDate date = QDate::currentDate();
-    if(date.year() != 2010 && date.month() > 9){
+    if(date.year() != 2011 || date.month() < 9){
         QMessageBox::critical(0, QObject::tr("Error"), QObject::tr("Application has expired!"));
         qDebug()<<"Application has expired! Please update!";
         return 0;
