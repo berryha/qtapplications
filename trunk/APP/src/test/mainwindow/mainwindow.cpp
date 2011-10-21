@@ -104,9 +104,6 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
         ui.mdiArea->addSubWindow(rudpWidger);
         rudpWidger->show();
 
-        expListView = new ExpListView(this);
-        ui.mdiArea->addSubWindow(expListView);
-        expListView->show();
 
 }
 
