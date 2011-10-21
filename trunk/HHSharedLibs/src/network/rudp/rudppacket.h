@@ -102,7 +102,7 @@ public:
     void setMaxCheckTransmissionTimerInterval(int interval);
 
 
-//    void packetTransmissionFailed();
+    //    void packetTransmissionFailed();
 
     int packetDataSize();
 

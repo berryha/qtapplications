@@ -120,49 +120,49 @@ bool RUDPPacket::isNull(){
 
 
 quint8 RUDPPacket::getPacketType() const {
-	return packetType;
+    return packetType;
 }
 
 void RUDPPacket::setPacketType(quint8 packetType) {
-	this->packetType = packetType;
+    this->packetType = packetType;
 }
 
 
 
 quint16 RUDPPacket::getPacketSerialNumber() const {
-        return m_packetSerialNumber;
+    return m_packetSerialNumber;
 }
 
 void RUDPPacket::setPacketSerialNumber(quint16 packetSerialNumber) {
-        this->m_packetSerialNumber = packetSerialNumber;
+    this->m_packetSerialNumber = packetSerialNumber;
 }
 
 QByteArray RUDPPacket::getPacketData() const {
-        return packetData;
+    return packetData;
 }
 
 void RUDPPacket::setPacketData(const QByteArray &data) {
-	this->packetData = data;
+    this->packetData = data;
 }
 
 int RUDPPacket::getRemainingRetransmissionTimes() const{
-	//    QMutexLocker locker(&mutex);
-	return this->remainingRetransmissionTimes;
+    //    QMutexLocker locker(&mutex);
+    return this->remainingRetransmissionTimes;
 }
 
 void RUDPPacket::setRemainingRetransmissionTimes(int remainingRetransmissionTimes) {
-	//    QMutexLocker locker(&mutex);
-	this->remainingRetransmissionTimes = remainingRetransmissionTimes;
+    //    QMutexLocker locker(&mutex);
+    this->remainingRetransmissionTimes = remainingRetransmissionTimes;
 }
 
 QDateTime RUDPPacket::getLastTransmissionTime() const {
-        //    QMutexLocker locker(&mutex);
-        return this->lastTransmissionTime;
+    //    QMutexLocker locker(&mutex);
+    return this->lastTransmissionTime;
 }
 
 void RUDPPacket::setLastTransmissionTime(const QDateTime &time) {
-        //    QMutexLocker locker(&mutex);
-        this->lastTransmissionTime = time;
+    //    QMutexLocker locker(&mutex);
+    this->lastTransmissionTime = time;
 
 }
 
