@@ -131,7 +131,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     m_serverHostAddress = QHostAddress::Null;
     m_serverHostPort = 0;
-//    m_loginTimer = 0;
+    //    m_loginTimer = 0;
     m_serverConnected = false;
 
 }
@@ -159,8 +159,8 @@ MainWindow::~MainWindow() {
 */
 
 
-//    delete m_userInfoTipWindow;
-//    m_userInfoTipWindow = 0;
+    //    delete m_userInfoTipWindow;
+    //    m_userInfoTipWindow = 0;
 
     deleteLater();
 
@@ -168,14 +168,14 @@ MainWindow::~MainWindow() {
 
 void MainWindow::closeEvent(QCloseEvent * event) {
     if (Settings::instance()->getHideOnClose()) {
-    	showMinimized();
+        showMinimized();
         hide();
         event->ignore();
     }else{
 
-	aboutToQuit();
+        aboutToQuit();
 
-	event->accept();
+        event->accept();
     }
 
 }
@@ -430,11 +430,11 @@ void MainWindow::stopNetwork(){
     m_serverHostAddress = QHostAddress::Null;
     m_serverHostPort = 0;
 
-//    if(m_loginTimer){
-//        m_loginTimer->stop();
-//        delete m_loginTimer;
-//        m_loginTimer = 0;
-//    }
+    //    if(m_loginTimer){
+    //        m_loginTimer->stop();
+    //        delete m_loginTimer;
+    //        m_loginTimer = 0;
+    //    }
 
     if(clientPacketsParser){
         clientPacketsParser->logout();
@@ -657,7 +657,7 @@ void MainWindow::setupSystemTray() {
     
     
     
-    systemTray->show(); 
+    systemTray->show();
 
 
 
@@ -698,17 +698,17 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
             this->raise();
         }
     }
-    break;
+        break;
     case STIDT_SystemMessage:
     {
 
     }
-    break;
+        break;
     case STIDT_ServerAnnouncement:
     {
 
     }
-    break;
+        break;
     case STIDT_FriendshipApplicationResult:
     {
         if(reason == QSystemTrayIcon::DoubleClick){
@@ -720,7 +720,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
         }
 
     }
-    break;
+        break;
     case STIDT_FriendshipApplicationFromContact:
     {
         if(reason == QSystemTrayIcon::DoubleClick){
@@ -735,7 +735,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
         }
 
     }
-    break;
+        break;
     case STIDT_ContactChatMessage:
     {
         QString contactID = data.getID();
@@ -752,7 +752,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
 
 
     }
-    break;
+        break;
 
     case STIDT_InterestGroupChatMessage:
     {
@@ -1157,7 +1157,7 @@ void MainWindow::slotUserVerified(){
         ui.labelUserNickName->setText(imUser->getNickName());
         ui.labelUserID->setText(userID);
         
-//        clientPacketsParser->startHeartbeat();
+        //        clientPacketsParser->startHeartbeat();
 
         //contactsManager = ContactsManager::instance();
         
@@ -1207,7 +1207,7 @@ void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name,
     if(contextMenu){
         contextMenu->addSeparator();
         QAction actionRenameGroupName(tr("Rename Group"), contextMenu);
-        QAction actionDeleteGroup(tr("Delete Group"), contextMenu);       
+        QAction actionDeleteGroup(tr("Delete Group"), contextMenu);
         QAction actionCreateNewGroup(tr("Create New Group"), contextMenu);
         
         
@@ -1408,9 +1408,9 @@ void MainWindow::slotTooltipEventOnObjectItemOccurs(const QString &contactID, co
         x = p.x() + ui.contactsToolBox->width();
     }
 
-//    qDebug()<<"global_item_topLeft_pos:x:"<<global_item_topLeft_pos.x()<<" y:"<<global_item_topLeft_pos.y();
-//    qDebug()<<"global_mouse_pos:x:"<<global_mouse_pos.x()<<" y:"<<global_mouse_pos.y();
-//    qDebug()<<"x:"<<x<<" y:"<<global_item_topLeft_pos.y();
+    //    qDebug()<<"global_item_topLeft_pos:x:"<<global_item_topLeft_pos.x()<<" y:"<<global_item_topLeft_pos.y();
+    //    qDebug()<<"global_mouse_pos:x:"<<global_mouse_pos.x()<<" y:"<<global_mouse_pos.y();
+    //    qDebug()<<"x:"<<x<<" y:"<<global_item_topLeft_pos.y();
 
     m_userInfoTipWindow->showUserInfoTip(contact, mapTo(this, QPoint(x, global_item_topLeft_pos.y())) );
 
@@ -1568,13 +1568,13 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
     {
         systemTray->showMessage(QString(APP_NAME), tr("%1 is online!").arg(nickname), QSystemTrayIcon::Information);
     }
-    break;
+        break;
     case IM::ONLINESTATE_INVISIBLE:
     case IM::ONLINESTATE_OFFLINE:
     {
         systemTray->showMessage(QString(APP_NAME), tr("%1 is offline!").arg(nickname), QSystemTrayIcon::Information);
     }
-    break;
+        break;
     default:
         break;
     }
@@ -1636,7 +1636,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     imUser->setPersonalContactGroupsVersion(personalContactGroupsInfoVersionOnServer);
     
     
-    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = imUser->getPersonalContactGroupsHash();   
+    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = imUser->getPersonalContactGroupsHash();
     QStringList groups = personalContactGroupsHash.keys();
     foreach (QString groupName, groups) {
         int groupID = contactsManager->getPersonalContactGroupID(groupName);
@@ -1698,7 +1698,7 @@ void MainWindow::slotProcessAddContactResult(const QString &userID, const QStrin
 
         if(atuoShowSystemMessage){
             getNewContactSettings(userID);
-        }else{ 
+        }else{
             //TODO
             TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
             data.setToolTip(userID);
@@ -1745,7 +1745,7 @@ void MainWindow::slotProcessAddContactResult(const QString &userID, const QStrin
         
         
     }
-    break;
+        break;
     case IM::ERROR_RequestDenied :
     {
         QString msg = tr("User %1 rejected your request that add (s)he as a contact!)").arg(userID);
@@ -1754,7 +1754,7 @@ void MainWindow::slotProcessAddContactResult(const QString &userID, const QStrin
         }
         QMessageBox::critical(this, tr("Request Rejected"), msg);
     }
-    break;
+        break;
     default:
         QMessageBox::critical(this, tr("Error"), tr("Can not add user %1 as a contact! Error code:%2").arg(userID).arg(errorTypeCode));
         
@@ -1775,7 +1775,7 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     QString existingGroupName = imUser->groupNameThatContactBelongsTo(contactID);
 
     AddContactDialog dlg(contact, false, this);
-    dlg.exec(); 
+    dlg.exec();
     QString groupName = dlg.getGroupname();
     qDebug()<<"---------existingGroupName:"<<existingGroupName<<"  groupName"<<groupName;
     if(existingGroupName == groupName){return;}
@@ -2055,7 +2055,7 @@ void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &m
         quint16 contactHostPort = contact->getLastLoginHostPort();
         clientPacketsParser->sendChatMessageToContact(contactID, message, contactHostAddress, contactHostPort);
         clientPacketsParser->sendImageFileToContact(contactID, imageList, contactHostAddress, contactHostPort);
-    } 
+    }
 
     contactsManager->saveContactChatMessageToDatabase(imUser->getUserID(), contactID, message);
     
@@ -2201,7 +2201,7 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
             contactsManager->slotAddNewContactToDatabase(contact);
         }else{
             if(contactInfoVersion > contact->getPersonalInfoVersion()){
-                clientPacketsParser->requestContactInfo(contactID);           
+                clientPacketsParser->requestContactInfo(contactID);
             }
         }
         
@@ -2258,12 +2258,12 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
 
     QTimer::singleShot(10000, this, SLOT(loginTimeout()));
 
-//    if(!m_loginTimer){
-//        m_loginTimer = new QTimer(this);
-//        m_loginTimer->setSingleShot(true);
-//        connect(m_loginTimer, SIGNAL(timeout()), this, SLOT(loginTimeout()));
-//    }
-//    m_loginTimer->start(10000);
+    //    if(!m_loginTimer){
+    //        m_loginTimer = new QTimer(this);
+    //        m_loginTimer->setSingleShot(true);
+    //        connect(m_loginTimer, SIGNAL(timeout()), this, SLOT(loginTimeout()));
+    //    }
+    //    m_loginTimer->start(10000);
 
 }
 
@@ -2281,11 +2281,11 @@ void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort
     if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
         clientPacketsParser->requestLogin(m_serverHostAddress, m_serverHostPort);
         m_serverConnected = true;
-//        if(m_loginTimer){
-//            m_loginTimer->stop();
-//            delete m_loginTimer;
-//            m_loginTimer = 0;
-//        }
+        //        if(m_loginTimer){
+        //            m_loginTimer->stop();
+        //            delete m_loginTimer;
+        //            m_loginTimer = 0;
+        //        }
         emit signalServerOnlineStateChanged(true);
     }
 
@@ -2307,6 +2307,8 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
         //TODO
         m_serverConnected = false;
         emit signalServerOnlineStateChanged(false);
+        systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
+
         if(!normalClose){
             requestLogin(m_serverHostAddress, m_serverHostPort);
         }

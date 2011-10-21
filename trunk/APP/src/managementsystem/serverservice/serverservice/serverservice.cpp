@@ -240,6 +240,7 @@ void ServerService::sendServerOnlinePacket(){
     qDebug()<<"----ServerService::sendServerOnlinePacket()";
 
     serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT));
+    serverPacketsParser->sendServerDeclarePacket(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
 
     serverPacketsParser->sendServerOnlinePacket();
     
