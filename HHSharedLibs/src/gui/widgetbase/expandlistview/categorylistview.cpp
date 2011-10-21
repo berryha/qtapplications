@@ -259,18 +259,18 @@ QVariant ExpandListViewCategoryModel::data(const QModelIndex &index, int role) c
         return QVariant(categoryEntry.icon);
     case Qt::EditRole:
         return QVariant(categoryEntry.objectItem.name());
-//    case Qt::ToolTipRole: {
-//        if (m_viewMode == QListView::ListMode)
-//            return QVariant(categoryEntry.toolTip);
-//        // Icon mode tooltip should contain the  class name
-//        QString tt =  categoryEntry.objectItem.name();
-//        if (!categoryEntry.toolTip.isEmpty()) {
-//            tt += QLatin1Char('\n');
-//            tt += categoryEntry.toolTip;
-//        }
-//        return QVariant(tt);
+        //    case Qt::ToolTipRole: {
+        //        if (m_viewMode == QListView::ListMode)
+        //            return QVariant(categoryEntry.toolTip);
+        //        // Icon mode tooltip should contain the  class name
+        //        QString tt =  categoryEntry.objectItem.name();
+        //        if (!categoryEntry.toolTip.isEmpty()) {
+        //            tt += QLatin1Char('\n');
+        //            tt += categoryEntry.toolTip;
+        //        }
+        //        return QVariant(tt);
 
-//    }
+        //    }
     case Qt::WhatsThisRole:
         return QVariant(categoryEntry.whatsThis);
     case FilterRole:
@@ -284,8 +284,8 @@ bool ExpandListViewCategoryModel::setData(const QModelIndex &index, const QVaria
     const int row = index.row();
 
     if ( row < 0 || row >=  m_categoryEntries.size() ){
-    	 return false;
-		}
+        return false;
+    }
 
 
     //if (role != Qt::EditRole || row < 0 || row >=  m_categoryEntries.size() || value.type() != QVariant::String)
@@ -297,28 +297,28 @@ bool ExpandListViewCategoryModel::setData(const QModelIndex &index, const QVaria
     ExpandListViewCategoryEntry &categoryEntry = m_categoryEntries[row];
 
     if(role == Qt::DisplayRole && value.type() == QVariant::String){
-    	    const QString newName = value.toString();
-    	    categoryEntry.objectItem.setName(newName);
+        const QString newName = value.toString();
+        categoryEntry.objectItem.setName(newName);
 
-					const QDomDocument doc = stringToDom(CategoryListView::objectItemDomXml(categoryEntry.objectItem));
-					QDomElement widget_elt = doc.firstChildElement(QLatin1String(widgetElementC));
-					if (!widget_elt.isNull()) {
-						widget_elt.setAttribute(QLatin1String(nameAttributeC), newName);
-						categoryEntry.objectItem.setDomXml(domToString(widget_elt));
-						}
-			}
+        const QDomDocument doc = stringToDom(CategoryListView::objectItemDomXml(categoryEntry.objectItem));
+        QDomElement widget_elt = doc.firstChildElement(QLatin1String(widgetElementC));
+        if (!widget_elt.isNull()) {
+            widget_elt.setAttribute(QLatin1String(nameAttributeC), newName);
+            categoryEntry.objectItem.setDomXml(domToString(widget_elt));
+        }
+    }
 
     if(role == Qt::DecorationRole){
-					if( value.type() == QVariant::Icon){
-						  categoryEntry.icon = value.value<QIcon>();
-					}else if(value.type() == QVariant::String){
-						const QString newIconName = value.toString();
-						categoryEntry.objectItem.setIconName(newIconName);
-						categoryEntry.icon = QIcon(newIconName);
-					}
+        if( value.type() == QVariant::Icon){
+            categoryEntry.icon = value.value<QIcon>();
+        }else if(value.type() == QVariant::String){
+            const QString newIconName = value.toString();
+            categoryEntry.objectItem.setIconName(newIconName);
+            categoryEntry.icon = QIcon(newIconName);
+        }
 
 
-			}
+    }
 
 
 
@@ -356,7 +356,7 @@ bool ExpandListViewCategoryModel::removeRows(int row, int count, const QModelInd
         return false;
     beginRemoveRows(parent, row, last);
     for (int r = last; r >= row; r--)
-         m_categoryEntries.removeAt(r);
+        m_categoryEntries.removeAt(r);
     endRemoveRows();
     return true;
 }
@@ -374,54 +374,54 @@ ExpandListViewInterface::ObjectItem ExpandListViewCategoryModel::objectItemAt(in
 }
 
 ExpandListViewInterface::ObjectItem ExpandListViewCategoryModel::objectItem(const QString &id) const{
-	foreach(ExpandListViewCategoryEntry entry, m_categoryEntries){
-		if(entry.objectItem.id() == id){
-			return entry.objectItem;
-		}
-	}
+    foreach(ExpandListViewCategoryEntry entry, m_categoryEntries){
+        if(entry.objectItem.id() == id){
+            return entry.objectItem;
+        }
+    }
 
-	return ExpandListViewInterface::ObjectItem();
+    return ExpandListViewInterface::ObjectItem();
 
 }
 
 bool ExpandListViewCategoryModel::updateObjectItemName(const QString &item_id, const QString &name){
-        qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
 
-        QModelIndex idx = index(indexOfObjectItem(item_id));
-        if(!idx.isValid()){
-                return false;
-        }
+    QModelIndex idx = index(indexOfObjectItem(item_id));
+    if(!idx.isValid()){
+        return false;
+    }
 
-        setData(idx, name, Qt::DisplayRole);
-        return true;
+    setData(idx, name, Qt::DisplayRole);
+    return true;
 
 }
 
 bool ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QIcon &icon){
-	qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
 
-	QModelIndex idx = index(indexOfObjectItem(item_id));
-	if(!idx.isValid()){
-		return false;
-	}
+    QModelIndex idx = index(indexOfObjectItem(item_id));
+    if(!idx.isValid()){
+        return false;
+    }
 
-	setData(idx, icon, Qt::DecorationRole);
+    setData(idx, icon, Qt::DecorationRole);
 
-	return true;
+    return true;
 
 }
 
 bool ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QString &iconName){
-	qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
+    qDebug()<<"----ExpandListViewCategoryModel::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
 
-	QModelIndex idx = index(indexOfObjectItem(item_id));
-	if(!idx.isValid()){
-		return false;
-	}
+    QModelIndex idx = index(indexOfObjectItem(item_id));
+    if(!idx.isValid()){
+        return false;
+    }
 
-        setData(idx, iconName, Qt::DecorationRole);
+    setData(idx, iconName, Qt::DecorationRole);
 
-	return true;
+    return true;
 
 }
 
@@ -442,8 +442,8 @@ public:
 };
 
 QWidget *ExpandListViewCategoryEntryDelegate::createEditor(QWidget *parent,
-                                                const QStyleOptionViewItem &option,
-                                                const QModelIndex &index) const
+                                                           const QStyleOptionViewItem &option,
+                                                           const QModelIndex &index) const
 {
     QWidget *result = QItemDelegate::createEditor(parent, option, index);
     if (QLineEdit *line_edit = qobject_cast<QLineEdit*>(result)) {
@@ -462,8 +462,8 @@ CategoryListView *CategoryListView::lastFocusedCategoryListView = 0;
 
 CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     :QListView(parent), m_core(core),
-    m_proxyModel(new QSortFilterProxyModel(this)),
-    m_model(new ExpandListViewCategoryModel(/*core, */this))
+      m_proxyModel(new QSortFilterProxyModel(this)),
+      m_model(new ExpandListViewCategoryModel(/*core, */this))
 {
     //setFocusPolicy(Qt::NoFocus);
     setFrameShape(QFrame::NoFrame);
@@ -474,7 +474,6 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setResizeMode(QListView::Adjust);
     setUniformItemSizes(true);
-//    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     //setItemDelegate(new ExpandListViewCategoryEntryDelegate(this));
     //setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
@@ -490,7 +489,7 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     m_proxyModel->setSourceModel(m_model);
     m_proxyModel->setFilterRole(FilterRole);
     setModel(m_proxyModel);
-    connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SIGNAL(scratchPadChanged()));
+    //connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SIGNAL(scratchPadChanged()));
 
 
 }
@@ -617,8 +616,8 @@ void CategoryListView::setViewMode(ViewMode vm)
 void CategoryListView::setCurrentItem(AccessMode am, int row)
 {
     const QModelIndex index = am == FilteredAccess ?
-        m_proxyModel->index(row, 0) :
-        m_proxyModel->mapFromSource(m_model->index(row, 0));
+                m_proxyModel->index(row, 0) :
+                m_proxyModel->mapFromSource(m_model->index(row, 0));
 
     if (index.isValid())
         setCurrentIndex(index);
@@ -644,6 +643,7 @@ void CategoryListView::slotPressed(const QModelIndex &index)
     if (item.isNull())
         return;
     emit pressed(item.name(), QCursor::pos());
+
 }
 
 void CategoryListView::removeCurrentItem()
@@ -694,12 +694,12 @@ ExpandListViewInterface::ObjectItem CategoryListView::objectItemAt(AccessMode am
 ExpandListViewInterface::ObjectItem CategoryListView::objectItem(const QString &objectItemID){
     ExpandListViewInterface::ObjectItem item = m_model->objectItem(objectItemID);
     if (item.isNull()){
-    	        return ExpandListViewInterface::ObjectItem();
+        return ExpandListViewInterface::ObjectItem();
     }
 
-//    ExpandListViewInterface::ObjectItem *i = new ExpandListViewInterface::ObjectItem();
-//    i = &item;
-//    return i;
+    //    ExpandListViewInterface::ObjectItem *i = new ExpandListViewInterface::ObjectItem();
+    //    i = &item;
+    //    return i;
 
     return item;
 }
@@ -761,29 +761,29 @@ bool CategoryListView::removeCustomObjectItems()
 }
 
 bool CategoryListView::updateObjectItemName(const QString &item_id, const QString &name){
-        qDebug()<<"----CategoryListView::updateObjectItemName(const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----CategoryListView::updateObjectItemName(const QString &item_id, const QIcon &icon)";
 
-        bool ok = m_model->updateObjectItemName(item_id, name);
-        viewport()->update();
-        return ok;
+    bool ok = m_model->updateObjectItemName(item_id, name);
+    viewport()->update();
+    return ok;
 
 }
 
 bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon){
-	qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
 
-        bool ok =  m_model->updateObjectItemIcon(item_id, icon);
-        viewport()->update();
-        return ok;
+    bool ok =  m_model->updateObjectItemIcon(item_id, icon);
+    viewport()->update();
+    return ok;
 
 }
 
 bool CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName){
-	qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
+    qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
 
-        bool ok = m_model->updateObjectItemIcon(item_id, iconName);
-        viewport()->update();
-        return ok;
+    bool ok = m_model->updateObjectItemIcon(item_id, iconName);
+    viewport()->update();
+    return ok;
 
 }
 

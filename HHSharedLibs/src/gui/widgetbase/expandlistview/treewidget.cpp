@@ -205,7 +205,7 @@ void  TreeWidget::restoreExpandedState()
             QTreeWidgetItem *item = topLevelItem(i);
             if (closedCategories.contains(item->text(0)))
                 item->setExpanded(false);
-            }
+        }
     }
 }
 
@@ -271,7 +271,7 @@ int TreeWidget::ensureScratchpad()
 {
     const int existingIndex = indexOfScratchpad();
     if (existingIndex != -1)
-         return existingIndex;
+        return existingIndex;
 
     QTreeWidgetItem *scratch_item = new QTreeWidgetItem(this);
     scratch_item->setText(0, tr("Scratchpad"));
@@ -289,11 +289,11 @@ CategoryListView *TreeWidget::addCategoryView(QTreeWidgetItem *parent, bool icon
     categoryView->setViewMode(iconMode ? QListView::IconMode : QListView::ListMode);
     categoryView->setFlow(iconMode ? QListView::TopToBottom:QListView::LeftToRight);
 
-//    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
-//    connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
-//    //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
-//    connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
-//    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
+    //    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
+    //    connect(categoryView, SIGNAL(pressed(const QString &, const QPoint &)), this, SIGNAL(pressed(const QString &, const QPoint &)));
+    //    //connect(categoryView, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)), this, SIGNAL(contextMenuEventOnObjectItemOccurs(QString,QPoint)));
+    //    connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
+    //    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
 
     setItemWidget(embed_item, 0, categoryView);
     return categoryView;
@@ -347,9 +347,9 @@ bool TreeWidget::load(ExpandListViewBase::LoadMode loadMode)
 bool TreeWidget::load(CategoryList *cat_list)
 {
 
-	if(!cat_list->size()){
-		return false;
-	}
+    if(!cat_list->size()){
+        return false;
+    }
 
 
     foreach(const Category &cat, *cat_list)
@@ -410,7 +410,7 @@ static inline QString msgXmlError(const QString &fileName, const QXmlStreamReade
 }
 
 bool TreeWidget::readCategories(const QString &fileName, const QString &contents,
-                                       CategoryList *cats, QString *errorMessage)
+                                CategoryList *cats, QString *errorMessage)
 {
     // Read objectItem box XML:
     //
@@ -457,10 +457,10 @@ bool TreeWidget::readCategories(const QString &fileName, const QString &contents
                     const QString widgetName = attr.value(QLatin1String(nameAttributeC)).toString();
                     const QString widgetIcon = attr.value(QLatin1String(iconAttributeC)).toString();
                     const TreeWidget::ObjectItem::Type widgetType =
-                        attr.value(QLatin1String(typeAttributeC)).toString()
+                            attr.value(QLatin1String(typeAttributeC)).toString()
                             == QLatin1String(customValueC) ?
-                        TreeWidget::ObjectItem::Custom :
-                        TreeWidget::ObjectItem::Default;
+                                TreeWidget::ObjectItem::Custom :
+                                TreeWidget::ObjectItem::Default;
 
                     ObjectItem w;
                     w.setID(widgetID);
@@ -485,18 +485,18 @@ bool TreeWidget::readCategories(const QString &fileName, const QString &contents
             break;
         }
         case QXmlStreamReader::EndElement: {
-           const QStringRef tag = reader.name();
-           if (tag == QLatin1String(widgetBoxRootElementC)) {
-               continue;
-           }
-           if (tag == QLatin1String(categoryElementC)) {
-               ignoreEntries = false;
-               continue;
-           }
-           if (tag == QLatin1String(categoryEntryElementC)) {
-               continue;
-           }
-           break;
+            const QStringRef tag = reader.name();
+            if (tag == QLatin1String(widgetBoxRootElementC)) {
+                continue;
+            }
+            if (tag == QLatin1String(categoryElementC)) {
+                ignoreEntries = false;
+                continue;
+            }
+            if (tag == QLatin1String(categoryEntryElementC)) {
+                continue;
+            }
+            break;
         }
         default: break;
         }
@@ -633,7 +633,7 @@ void TreeWidget::writeCategories(QXmlStreamWriter &writer, const CategoryList &c
 
         const int widgetCount = cat.objectItemCount();
         for (int i = 0; i < widgetCount; ++i) {
-           const  ObjectItem wgt = cat.objectItem(i);
+            const  ObjectItem wgt = cat.objectItem(i);
             if (wgt.type() == ObjectItem::Custom)
                 continue;
 
@@ -648,7 +648,7 @@ void TreeWidget::writeCategories(QXmlStreamWriter &writer, const CategoryList &c
             //if (domUI) {
             //    domUI->write(writer);
             //    delete domUI;
-								//}
+            //}
 
             writer.writeEndElement(); // categoryEntry
         }
@@ -682,7 +682,7 @@ static inline bool isValidIcon(const QIcon &icon)
 TreeWidget::CategoryList TreeWidget::loadCustomCategoryList() const
 {
     CategoryList result;
-/*
+    /*
 
     const QDesignerPluginManager *pm = m_core->pluginManager();
     const QDesignerPluginManager::CustomWidgetList customWidgets = pm->registeredCustomWidgets();
@@ -794,9 +794,9 @@ void TreeWidget::addCategory(const Category &cat)
 {
 
 
-//    if (cat.objectItemCount() == 0){
-//        return;
-//    }
+    //    if (cat.objectItemCount() == 0){
+    //        return;
+    //    }
 
 
     const bool isScratchPad = cat.type() == Category::Scratchpad;
@@ -870,8 +870,8 @@ void TreeWidget::updateCategoryName(const QString &old_cat_name, const QString &
     QTreeWidgetItem *cat_item = topLevelItem(cat_idx);
     cat_item->setText(0, new_cat_name);
 
-//    QTreeWidgetItem *embedItem = cat_item->child(0);
-//    embedItem->setText(0, new_cat_name);
+    //    QTreeWidgetItem *embedItem = cat_item->child(0);
+    //    embedItem->setText(0, new_cat_name);
 
 }
 
@@ -1011,20 +1011,20 @@ void TreeWidget::moveObjectItem(int old_cat_idx, int new_cat_idx, const QString 
 
 
 
-//    QTreeWidgetItem *cat_item = topLevelItem(new_cat_idx);
-//    CategoryListView *categoryView = categoryViewAt(new_cat_idx);
+    //    QTreeWidgetItem *cat_item = topLevelItem(new_cat_idx);
+    //    CategoryListView *categoryView = categoryViewAt(new_cat_idx);
 
-//    const bool scratch = topLevelRole(cat_item) == SCRATCHPAD_ITEM;
-//    //const bool scratch = topLevelRole(cat_item) == NORMAL_ITEM;
+    //    const bool scratch = topLevelRole(cat_item) == SCRATCHPAD_ITEM;
+    //    //const bool scratch = topLevelRole(cat_item) == NORMAL_ITEM;
 
-//    // The same categories are read from the file $HOME, avoid duplicates
-//    if (!categoryView->containsObjectItem(objItem.id())){
-//        categoryView->addObjectItem(objItem, iconForObjectItem(objItem.iconName(), objItem.iconMode()), scratch);
-//    }else{
-//        qWarning()<<"ERROR! Item "<<objItem.id()<<" already exists!";
-//    }
+    //    // The same categories are read from the file $HOME, avoid duplicates
+    //    if (!categoryView->containsObjectItem(objItem.id())){
+    //        categoryView->addObjectItem(objItem, iconForObjectItem(objItem.iconName(), objItem.iconMode()), scratch);
+    //    }else{
+    //        qWarning()<<"ERROR! Item "<<objItem.id()<<" already exists!";
+    //    }
 
-//    adjustSubListSize(cat_item);
+    //    adjustSubListSize(cat_item);
 
     updateGeometries();
 
@@ -1113,8 +1113,8 @@ void TreeWidget::resizeEvent(QResizeEvent *e)
 
     QTreeWidget::resizeEvent(e);
     if (const int numTopLevels = topLevelItemCount()) {
-//        for (int i = numTopLevels - 1; i >= 0; --i)
-//            adjustSubListSize(topLevelItem(i));
+        //        for (int i = numTopLevels - 1; i >= 0; --i)
+        //            adjustSubListSize(topLevelItem(i));
 
         for (int i = 0; i < numTopLevels; i++){
             adjustSubListSize(topLevelItem(i));
@@ -1131,8 +1131,8 @@ void TreeWidget::contextMenuEvent(QContextMenuEvent *e)
     QTreeWidgetItem *item = itemAt(e->pos());
 
     const bool scratchpad_menu = item != 0
-                            && item->parent() != 0
-                            && topLevelRole(item->parent()) ==  SCRATCHPAD_ITEM;
+            && item->parent() != 0
+            && topLevelRole(item->parent()) ==  SCRATCHPAD_ITEM;
 
     if(!item || item->parent()){
         return;
@@ -1182,7 +1182,7 @@ void TreeWidget::contextMenuEvent(QContextMenuEvent *e)
 
 void TreeWidget::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list)
 {
-/*
+    /*
     QTreeWidgetItem *scratch_item = 0;
     CategoryListView *categoryView = 0;
     bool added = false;
@@ -1285,20 +1285,20 @@ bool TreeWidget::updateObjectItemName(const QString &cat_name, const QString &it
 }
 
 bool TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon){
-	qDebug()<<"----TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon)";
 
-	CategoryListView *cat = categoryView(cat_name);
+    CategoryListView *cat = categoryView(cat_name);
 
-        return cat->updateObjectItemIcon(item_id, icon);
+    return cat->updateObjectItemIcon(item_id, icon);
 
 }
 
 bool TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName){
-	qDebug()<<"----TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName)";
+    qDebug()<<"----TreeWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName)";
 
-	CategoryListView *cat = categoryView(cat_name);
+    CategoryListView *cat = categoryView(cat_name);
 
-        return cat->updateObjectItemIcon(item_id, iconName);
+    return cat->updateObjectItemIcon(item_id, iconName);
 
 }
 

@@ -80,9 +80,9 @@ ExpandListView::ExpandListView(ExpandListViewManager *core, QWidget *parent, Qt:
     vBoxLayout->addWidget(filterWidget);
     filterWidget->hide();
 
-//    QAction *actionShowFilterWidget = new QAction(tr("Open Filter"), this);
-//    actionShowFilterWidget->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-//		connect(actionShowFilterWidget, SIGNAL(triggered()), filterWidget, SLOT(show()));
+    //    QAction *actionShowFilterWidget = new QAction(tr("Open Filter"), this);
+    //    actionShowFilterWidget->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+    //		connect(actionShowFilterWidget, SIGNAL(triggered()), filterWidget, SLOT(show()));
 
 
     // View
@@ -94,11 +94,11 @@ ExpandListView::ExpandListView(ExpandListViewManager *core, QWidget *parent, Qt:
 
 
 
-//	autoHideTimer = new QTimer(this);
-//	autoHideTimer->setInterval(5000);
-//	autoHideTimer->setSingleShot(true);
-//	QObject::connect(autoHideTimer, SIGNAL(timeout()), filterWidget, SLOT(hide()));
-//	autoHideTimer->start();
+    //	autoHideTimer = new QTimer(this);
+    //	autoHideTimer->setInterval(5000);
+    //	autoHideTimer->setSingleShot(true);
+    //	QObject::connect(autoHideTimer, SIGNAL(timeout()), filterWidget, SLOT(hide()));
+    //	autoHideTimer->start();
 
     installEventFilter(this);
 }
@@ -111,48 +111,48 @@ ExpandListView::~ExpandListView()
 bool ExpandListView::eventFilter(QObject *o, QEvent *e)
 {
 
-	if (e->type() == QEvent::KeyPress) {
-    			QKeyEvent *ke = static_cast<QKeyEvent *>(e);
-    			if ((ke->modifiers() & Qt::ControlModifier) && ke->key() == Qt::Key_F) {
-							if(!filterWidget->isVisible()){
-								filterWidget->show();
-							}
-							filterWidget->setFocusToEditor();
-							//autoHideTimer->start();
-    				//keyPressEvent(ke);
-    				return true;
-					}else if(ke->key() == Qt::Key_Escape){
-						filterWidget->reset();
-							filterWidget->hide();
-							return true;
-					}
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent *>(e);
+        if ((ke->modifiers() & Qt::ControlModifier) && ke->key() == Qt::Key_F) {
+            if(!filterWidget->isVisible()){
+                filterWidget->show();
+            }
+            filterWidget->setFocusToEditor();
+            //autoHideTimer->start();
+            //keyPressEvent(ke);
+            return true;
+        }else if(ke->key() == Qt::Key_Escape){
+            filterWidget->reset();
+            filterWidget->hide();
+            return true;
+        }
 
 
-	}
+    }
 
-	return QWidget::eventFilter(o, e);
+    return QWidget::eventFilter(o, e);
 
 }
 
 
 /*
 void ExpandListView::setInput(QList<QObject *> list){
-	objectList = list;
+ objectList = list;
 
-	ContentProvider *provider = getContentProvider();
-	if(!provider){
-		return;
-	}
+ ContentProvider *provider = getContentProvider();
+ if(!provider){
+  return;
+ }
 
-	CategoryList *cat_list = provider->getCategoryList(list);
-	m_treeWidget->load(cat_list);
+ CategoryList *cat_list = provider->getCategoryList(list);
+ m_treeWidget->load(cat_list);
 
 
 
 }
 
 QList<QObject *> ExpandListView::getInput(){
-	return objectList;
+ return objectList;
 
 }
 */
@@ -207,7 +207,7 @@ void ExpandListView::removeCategory(int cat_idx)
 }
 
 void ExpandListView::removeCategory(const QString &cat_name){
-     m_treeWidget->removeCategory(cat_name);
+    m_treeWidget->removeCategory(cat_name);
 }
 
 void ExpandListView::updateCategoryName(const QString &old_cat_name, const QString &new_cat_name){
@@ -225,7 +225,7 @@ ExpandListViewInterface::ObjectItem ExpandListView::objectItem(int cat_idx, int 
 }
 
 ExpandListViewInterface::ObjectItem ExpandListView::objectItem(const QString &cat_name, const QString &item_id) const{
-	return m_treeWidget->objectItem(cat_name, item_id);
+    return m_treeWidget->objectItem(cat_name, item_id);
 
 }
 
@@ -363,16 +363,16 @@ bool ExpandListView::updateObjectItemName(const QString &cat_name, const QString
 }
 
 bool ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon){
-	qDebug()<<"----ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon)";
+    qDebug()<<"----ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon)";
 
-	return m_treeWidget->updateObjectItemIcon(cat_name, item_id, icon);
+    return m_treeWidget->updateObjectItemIcon(cat_name, item_id, icon);
 
 }
 
 bool ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName){
-	qDebug()<<"----ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName)";
+    qDebug()<<"----ExpandListView::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName)";
 
-	return m_treeWidget->updateObjectItemIcon(cat_name, item_id, iconName);
+    return m_treeWidget->updateObjectItemIcon(cat_name, item_id, iconName);
 
 }
 
