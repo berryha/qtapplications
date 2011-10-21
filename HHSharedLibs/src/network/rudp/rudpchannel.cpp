@@ -45,28 +45,28 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 
     sendACKTimer = new QTimer(this);
     connect(sendACKTimer, SIGNAL(timeout()), this, SLOT(sendACKTimerTimeout()));
-//    sendACKTimer = 0;
-//    startSendACKTimer();
+    //    sendACKTimer = 0;
+    //    startSendACKTimer();
 
     sendNACKTimer = new QTimer(this);
     connect(sendNACKTimer, SIGNAL(timeout()), this, SLOT(sendNACKTimerTimeout()));
-//    sendNACKTimer = 0;
-//    startSendNACKTimer();
+    //    sendNACKTimer = 0;
+    //    startSendNACKTimer();
 
     retransmissionTimer = new QTimer(this);
     connect(retransmissionTimer, SIGNAL(timeout()), this, SLOT(retransmissionTimerTimeout()));
-//    retransmissionTimer = 0;
-//    startRetransmissionTimer();
+    //    retransmissionTimer = 0;
+    //    startRetransmissionTimer();
 
     m_keepAliveTimer = new QTimer(this);
     connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAliveTimerTimeout()));
-//    m_keepAliveTimer = 0;
-//    startKeepAliveTimer();
+    //    m_keepAliveTimer = 0;
+    //    startKeepAliveTimer();
 
     m_checkPeerAliveTimer = new QTimer(this);
     connect(m_checkPeerAliveTimer, SIGNAL(timeout()), this, SLOT(checkPeerAliveTimerTimeout()));
-//    m_checkPeerAliveTimer = 0;
-//    startCheckPeerAliveTimer();
+    //    m_checkPeerAliveTimer = 0;
+    //    startCheckPeerAliveTimer();
 
 
     m_connectToPeerTimer = new QTimer(this);
@@ -132,9 +132,9 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 RUDPChannel::~RUDPChannel(){
     qDebug()<<"--RUDPChannel::~RUDPChannel()"<<" ThreadId:"<<QThread::currentThreadId();
 
-//    if(m_ChannelState != UnconnectedState){
-//        reset();
-//    }
+    //    if(m_ChannelState != UnconnectedState){
+    //        reset();
+    //    }
 
 
     if(m_connectToPeerTimer){
@@ -147,8 +147,8 @@ RUDPChannel::~RUDPChannel(){
 
     //if(sendPacketTimer){
     //    sendPacketTimer->stop();
-        //delete sendPacketTimer;
-        //sendPacketTimer = 0;
+    //delete sendPacketTimer;
+    //sendPacketTimer = 0;
     //}
 
     if(sendACKTimer){
@@ -245,12 +245,12 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
     this->m_peerPort = peerPort;
 
     m_msecConnectToPeerTimeout = msecTimeout;
-//    if(!m_connectToPeerTimer){
-//        m_connectToPeerTimer = new QTimer();
-//        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
+    //    if(!m_connectToPeerTimer){
+    //        m_connectToPeerTimer = new QTimer();
+    //        connect(m_connectToPeerTimer, SIGNAL(timeout()), this, SLOT(connectToPeerTimeout()));
 
-//        //sendResetPacket();
-//    }
+    //        //sendResetPacket();
+    //    }
 
     if(!m_connectToPeerTimer->isActive()){
         m_connectToPeerTimer->setInterval(5000);
@@ -264,27 +264,27 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
         waitForConnected(msecTimeout);
     }
 
-//    //if(m_ChannelState == UnconnectedState){
-//        m_ChannelState = ConnectingState;
-//        //sendResetPacket();
-//        sendHandshakePacket(m_myHandshakeID);
-//    //}
+    //    //if(m_ChannelState == UnconnectedState){
+    //        m_ChannelState = ConnectingState;
+    //        //sendResetPacket();
+    //        sendHandshakePacket(m_myHandshakeID);
+    //    //}
 
 
 
     //QTimer::singleShot(msecTimeout, this, SLOT(connectToPeerTimeout()));
 
 
-//    ba.clear();
-//    out.device()->seek(0);
-//    QVariant v;
-//    v.setValue(*packet);
-//    out << v;
+    //    ba.clear();
+    //    out.device()->seek(0);
+    //    QVariant v;
+    //    v.setValue(*packet);
+    //    out << v;
 
-//    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
-//    if(size != ba.size()){
-//        qCritical()<<"ERROR! Failed to send UDP datagram!";
-//    }
+    //    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
+    //    if(size != ba.size()){
+    //        qCritical()<<"ERROR! Failed to send UDP datagram!";
+    //    }
 
 
 }
@@ -386,7 +386,7 @@ void RUDPChannel::closeChannel(){
     QCoreApplication::sendPostedEvents ();
     //QCoreApplication::processEvents();
 
-//    quit();
+    //    quit();
 
 }
 
@@ -530,13 +530,13 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, quint64 offset, bool fragmen
         return 0;
     }
 
-//    if(waitingForACKPackets.size() > 512){
-//        return 0;
-//    }
+    //    if(waitingForACKPackets.size() > 512){
+    //        return 0;
+    //    }
 
-//    if(EXPCOUNT > 1){
-//        retransmitLostPacket();
-//    }
+    //    if(EXPCOUNT > 1){
+    //        retransmitLostPacket();
+    //    }
 
 
     if(!m_ToBeSentPacketsHash.isEmpty()){
@@ -689,35 +689,35 @@ void RUDPChannel::datagramReceived(QByteArray &block){
     if( temp > quint16(RUDP_MAX_PACKET_SN)){
 
         //if(packetSerialNumber < m_firstReceivedPacketIDInReceiveWindow){
-            //quint16 rightSideID = m_receiveWindowSize - ((quint16(RUDP_MAX_PACKET_SN) - packetSerialNumber));
-            quint16 rightSideID = RUDP_MAX_SEND_WINDOW_SIZE - ((quint16(RUDP_MAX_PACKET_SN) - m_firstReceivedPacketIDInReceiveWindow));
+        //quint16 rightSideID = m_receiveWindowSize - ((quint16(RUDP_MAX_PACKET_SN) - packetSerialNumber));
+        quint16 rightSideID = RUDP_MAX_SEND_WINDOW_SIZE - ((quint16(RUDP_MAX_PACKET_SN) - m_firstReceivedPacketIDInReceiveWindow));
 
-            qDebug()<<"----m_receiveWindowSize:"<<m_receiveWindowSize<<" rightSideID:"<<rightSideID<<" packetSerialNumber:"<<packetSerialNumber;
-            if(packetSerialNumber > rightSideID && (packetSerialNumber < m_firstReceivedPacketIDInReceiveWindow) ){
-                qDebug()<<"Out of window! m_firstReceivedPacketIDInQueue:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_receiveWindowSize:"<<m_receiveWindowSize<<" SN:"<<packetSerialNumber;
-                recylePacket(packet);
-                sendPacketDroppedInfo(packetSerialNumber);
-                return;
-            }else{
-                if( (LRSN + 1) > m_firstReceivedPacketIDInReceiveWindow){
-                    if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID){
-                        addLostPacketsInReceiverSide(LRSN, RUDP_MAX_PACKET_SN);
-                        addLostPacketsInReceiverSide(0, packetSerialNumber-1);
-                        LRSN = packetSerialNumber;
-                    }else if(LRSN < packetSerialNumber){
-                        addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
-                        LRSN = packetSerialNumber;
-                    }
-                }else if((LRSN + 1) < m_firstReceivedPacketIDInReceiveWindow){
-                    if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID && LRSN < packetSerialNumber){
-                        addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
-                        LRSN = packetSerialNumber;
-                    }
-                }else{
+        qDebug()<<"----m_receiveWindowSize:"<<m_receiveWindowSize<<" rightSideID:"<<rightSideID<<" packetSerialNumber:"<<packetSerialNumber;
+        if(packetSerialNumber > rightSideID && (packetSerialNumber < m_firstReceivedPacketIDInReceiveWindow) ){
+            qDebug()<<"Out of window! m_firstReceivedPacketIDInQueue:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_receiveWindowSize:"<<m_receiveWindowSize<<" SN:"<<packetSerialNumber;
+            recylePacket(packet);
+            sendPacketDroppedInfo(packetSerialNumber);
+            return;
+        }else{
+            if( (LRSN + 1) > m_firstReceivedPacketIDInReceiveWindow){
+                if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID){
+                    addLostPacketsInReceiverSide(LRSN, RUDP_MAX_PACKET_SN);
+                    addLostPacketsInReceiverSide(0, packetSerialNumber-1);
+                    LRSN = packetSerialNumber;
+                }else if(LRSN < packetSerialNumber){
+                    addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
                     LRSN = packetSerialNumber;
                 }
-
+            }else if((LRSN + 1) < m_firstReceivedPacketIDInReceiveWindow){
+                if(packetSerialNumber > 0 && packetSerialNumber <= rightSideID && LRSN < packetSerialNumber){
+                    addLostPacketsInReceiverSide(LRSN, packetSerialNumber-1);
+                    LRSN = packetSerialNumber;
+                }
+            }else{
+                LRSN = packetSerialNumber;
             }
+
+        }
 
         //}
 
@@ -868,16 +868,16 @@ void RUDPChannel::sendPacketDroppedInfo(quint16 packetID){
     sendPacket(packet);
 
 
-//    ba.clear();
-//    out.device()->seek(0);
-//    QVariant v;
-//    v.setValue(*packet);
-//    out << v;
+    //    ba.clear();
+    //    out.device()->seek(0);
+    //    QVariant v;
+    //    v.setValue(*packet);
+    //    out << v;
 
-//    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
-//    if(size != ba.size()){
-//        qCritical()<<"ERROR! Failed to send UDP datagram!";
-//    }
+    //    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
+    //    if(size != ba.size()){
+    //        qCritical()<<"ERROR! Failed to send UDP datagram!";
+    //    }
 
 
 }
@@ -995,7 +995,7 @@ void RUDPChannel::sendToBeSentPackets(){
         return;
     }
 
- //////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
 
 
     int temp = m_firstWaitingForACKPacketIDInSendWindow + m_sendWindowSize;
@@ -1044,7 +1044,7 @@ void RUDPChannel::sendToBeSentPackets(){
 
 
 
-////////////////////////////////////
+    ////////////////////////////////////
 
 
 
@@ -1080,7 +1080,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
 
 
 
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
 
 
     quint32 temp = m_firstWaitingForACKPacketIDInSendWindow + m_sendWindowSize;
@@ -1103,7 +1103,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
     }
 
 
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
 
 
     sendPacket(packet);
@@ -1112,7 +1112,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
 
     if(!isUnreliablePacket(packetType)){
         qDebug()<<"OK! RUDPPacket Sent! sn:"<<sn<<" packetType:"<<packetType<<" packetDataSize:"<<packet->packetDataSize()<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow<<" m_peerPort:"<<m_peerPort;
-    //    qWarning()<<"--------------Total Packets Sent:"<<packetsSent;
+        //    qWarning()<<"--------------Total Packets Sent:"<<packetsSent;
 
     }
 
@@ -1141,7 +1141,7 @@ void RUDPChannel::keepAliveTimerTimeout(){
     //qDebug()<<"--RUDPChannel::keepAliveTimerTimeout()";
 
     //if(m_lastPacketSentTime.addMSecs(m_keepAliveTimerInterval+RTT) <= QDateTime::currentDateTime()){
-        sendKeepAlivePacket();
+    sendKeepAlivePacket();
     //}
 
 }
@@ -1200,16 +1200,16 @@ void RUDPChannel::sendACK2(quint16 packetSN){
     sendPacket(packet);
 
 
-//    ba.clear();
-//    out.device()->seek(0);
-//    QVariant v;
-//    v.setValue(*packet);
-//    out << v;
+    //    ba.clear();
+    //    out.device()->seek(0);
+    //    QVariant v;
+    //    v.setValue(*packet);
+    //    out << v;
 
-//    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
-//    if(size != ba.size()){
-//        qCritical()<<"ERROR! Failed to send UDP datagram!";
-//    }
+    //    qint64 size = m_udpSocket->writeDatagram(ba, peerAddress, peerPort);
+    //    if(size != ba.size()){
+    //        qCritical()<<"ERROR! Failed to send UDP datagram!";
+    //    }
 
 
 }
@@ -1298,9 +1298,9 @@ bool RUDPChannel::sendPacket(RUDPPacket *packet){
     }
 
 
-//    quint16 sn = packet->getPacketSerialNumber();
-//    sentPackets.insert(sn, packet);
-//    waitingForACKPackets.append(sn);
+    //    quint16 sn = packet->getPacketSerialNumber();
+    //    sentPackets.insert(sn, packet);
+    //    waitingForACKPackets.append(sn);
 
     qint64 interval = abs(QDateTime::currentDateTime().msecsTo(curTime));
     qint64 timeWait = sendPacketInterval - interval;
@@ -1331,28 +1331,28 @@ void RUDPChannel::sendACKTimerTimeout(){
 
     //qDebug()<<"--RUDPChannel::sendACKTimerTimeout()"<<" sendACKTimerInterval:"<<sendACKTimerInterval;
 
-//    quint16 sn = 0;
-//    if(lostPacketsInReceiverSide.isEmpty()){
-//        sn = LRSN + 1;
-//    }else{
-//        sn = lostPacketsSNInReceiverSide.first();
-//    }
+    //    quint16 sn = 0;
+    //    if(lostPacketsInReceiverSide.isEmpty()){
+    //        sn = LRSN + 1;
+    //    }else{
+    //        sn = lostPacketsSNInReceiverSide.first();
+    //    }
 
-//    if(sn == largestACK2SN){
-//        return;
-//    }
-//    if(ackPacketsSNHistory.size() && sn == ackPacketsSNHistory.last()){
-//        ACKPacketInfo * info = ackPacketsHistory.value(sn);
-//        QDateTime sentTime = info->sentTime;
-//        if(QDateTime::currentDateTime().msecsTo(sentTime) < 2 * RTT){
-//            return;
-//        }
-//    }
+    //    if(sn == largestACK2SN){
+    //        return;
+    //    }
+    //    if(ackPacketsSNHistory.size() && sn == ackPacketsSNHistory.last()){
+    //        ACKPacketInfo * info = ackPacketsHistory.value(sn);
+    //        QDateTime sentTime = info->sentTime;
+    //        if(QDateTime::currentDateTime().msecsTo(sentTime) < 2 * RTT){
+    //            return;
+    //        }
+    //    }
 
     static int count = 0;
 
     if(!ackPacketsSNHistory.isEmpty() ){
-    //if(!ackPacketsSNHistory.isEmpty() && largestACK2SN == ackPacketsSNHistory.last() ){
+        //if(!ackPacketsSNHistory.isEmpty() && largestACK2SN == ackPacketsSNHistory.last() ){
         //ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
         ACKPacketInfo * info = ackPacketsHistory.value(ackPacketsSNHistory.last());
         quint16 sn = info->firstReceivedPacketIDInReceiveWindow;
@@ -1380,11 +1380,11 @@ void RUDPChannel::sendACKTimerTimeout(){
         qDebug()<<"--------------------- No ACK Sent!";
         return;
     }
-//        if((abs(QDateTime::currentDateTime().msecsTo(time)) > 2 * sendACKTimerInterval && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow)) || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1) ){
-//            return;
-//        }
+    //        if((abs(QDateTime::currentDateTime().msecsTo(time)) > 2 * sendACKTimerInterval && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow)) || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1) ){
+    //            return;
+    //        }
 
-        //qDebug()<<"-------------receivedDataPacketsHistory.last():"<<receivedDataPacketsHistory.last().toString("mm:ss:zzz")<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
+    //qDebug()<<"-------------receivedDataPacketsHistory.last():"<<receivedDataPacketsHistory.last().toString("mm:ss:zzz")<<" LRSN:"<<LRSN<<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
 
 
 
@@ -1621,9 +1621,9 @@ void RUDPChannel::startRetransmissionTimer(){
 void RUDPChannel::retransmissionTimerTimeout(){
     //qDebug()<<"--RUDPChannel::retransmissionTimerTimeout()";
 
-//    if(retransmissionTimer->interval() != retransmissionTimerInterval){
-//        startRetransmissionTimer();
-//    }
+    //    if(retransmissionTimer->interval() != retransmissionTimerInterval){
+    //        startRetransmissionTimer();
+    //    }
 
     QDateTime curTime = QDateTime::currentDateTime();
 
@@ -1634,35 +1634,35 @@ void RUDPChannel::retransmissionTimerTimeout(){
         lostPacketsInSenderSide.prepend(sn);
     }
 
-//    if(!lostPacketsInSenderSide.isEmpty()){
-//        qDebug()<<"------------------------lostPacketsInSenderSide:"<<lostPacketsInSenderSide.size()<<" "<<lostPacketsInSenderSide.first()<<"~"<<lostPacketsInSenderSide.last();
-//    }
-//    if(!waitingForACKPackets.isEmpty()){
-//        qDebug()<<"------------------------waitingForACKPackets:"<<waitingForACKPackets.size()<<" "<<waitingForACKPackets.first()<<"~"<<waitingForACKPackets.last();
-//    }
+    //    if(!lostPacketsInSenderSide.isEmpty()){
+    //        qDebug()<<"------------------------lostPacketsInSenderSide:"<<lostPacketsInSenderSide.size()<<" "<<lostPacketsInSenderSide.first()<<"~"<<lostPacketsInSenderSide.last();
+    //    }
+    //    if(!waitingForACKPackets.isEmpty()){
+    //        qDebug()<<"------------------------waitingForACKPackets:"<<waitingForACKPackets.size()<<" "<<waitingForACKPackets.first()<<"~"<<waitingForACKPackets.last();
+    //    }
     if(lostPacketsInSenderSide.isEmpty()){
         EXPCOUNT = 0;
         timeEXPCOUNTReset = curTime;
 
-////////////////////////////////
+        ////////////////////////////////
         if(!m_ToBeSentPacketsHash.isEmpty()){
             QTimer::singleShot(1, this, SLOT(sendToBeSentPackets()));
         }
-////////////////////////////////
+        ////////////////////////////////
 
         return;
     }
 
     //TODO
-//    if( (EXPCOUNT > 16 && timeEXPCOUNTReset.addSecs(3) < curTime) || timeEXPCOUNTReset.addSecs(180) < curTime){
-//        qDebug()<<"------------------------------------0--"<<"EXPCOUNT:"<<EXPCOUNT<<" timeEXPCOUNTReset:"<<timeEXPCOUNTReset<<" curTime:"<<curTime;
-//        disconnectFromPeer();
-//        return;
-//    }
+    //    if( (EXPCOUNT > 16 && timeEXPCOUNTReset.addSecs(3) < curTime) || timeEXPCOUNTReset.addSecs(180) < curTime){
+    //        qDebug()<<"------------------------------------0--"<<"EXPCOUNT:"<<EXPCOUNT<<" timeEXPCOUNTReset:"<<timeEXPCOUNTReset<<" curTime:"<<curTime;
+    //        disconnectFromPeer();
+    //        return;
+    //    }
 
-//    if(lostPacketsInSenderSide.isEmpty()){
-//        sendKeepAlivePacket();
-//    }
+    //    if(lostPacketsInSenderSide.isEmpty()){
+    //        sendKeepAlivePacket();
+    //    }
 
     EXPCOUNT++;
 
@@ -1804,8 +1804,8 @@ void RUDPChannel::reset(){
 
     //if(sendPacketTimer){
     //    sendPacketTimer->stop();
-        //delete sendPacketTimer;
-        //sendPacketTimer = 0;
+    //delete sendPacketTimer;
+    //sendPacketTimer = 0;
     //}
 
     if(sendACKTimer){
@@ -1874,11 +1874,11 @@ void RUDPChannel::reset(){
     }
     //m_receivedFragmentDataPackets.clear();
 
-//    foreach (RUDPPacket *packet, m_unusedPackets) {
-//        delete packet;
-//        packet = 0;
-//    }
-//    m_unusedPackets.clear();
+    //    foreach (RUDPPacket *packet, m_unusedPackets) {
+    //        delete packet;
+    //        packet = 0;
+    //    }
+    //    m_unusedPackets.clear();
 
 
     init();
@@ -1992,10 +1992,10 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
             QMetaObject::invokeMethod(this, "startSendNACKTimer");
             QMetaObject::invokeMethod(this, "startRetransmissionTimer");
             QMetaObject::invokeMethod(this, "startCheckPeerAliveTimer");
-//            startSendACKTimer();
-//            startSendNACKTimer();
-//            startRetransmissionTimer();
-//            startCheckPeerAliveTimer();
+            //            startSendACKTimer();
+            //            startSendNACKTimer();
+            //            startRetransmissionTimer();
+            //            startCheckPeerAliveTimer();
 
             emit peerConnected(m_peerAddress, m_peerPort);
 

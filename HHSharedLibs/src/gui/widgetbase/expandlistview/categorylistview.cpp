@@ -474,6 +474,7 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setResizeMode(QListView::Adjust);
     setUniformItemSizes(true);
+    //    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     //setItemDelegate(new ExpandListViewCategoryEntryDelegate(this));
     //setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
@@ -489,7 +490,7 @@ CategoryListView::CategoryListView(ExpandListViewManager *core, QWidget *parent)
     m_proxyModel->setSourceModel(m_model);
     m_proxyModel->setFilterRole(FilterRole);
     setModel(m_proxyModel);
-    //connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SIGNAL(scratchPadChanged()));
+    connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SIGNAL(scratchPadChanged()));
 
 
 }
@@ -643,7 +644,6 @@ void CategoryListView::slotPressed(const QModelIndex &index)
     if (item.isNull())
         return;
     emit pressed(item.name(), QCursor::pos());
-
 }
 
 void CategoryListView::removeCurrentItem()

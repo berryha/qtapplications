@@ -27,7 +27,7 @@ public:
 
     ~RUDPChannel();
 
-//    void run();
+    //    void run();
 
 
 
@@ -39,7 +39,7 @@ public:
     void setKeepAliveTimerInterval(int msec){this->m_keepAliveTimerInterval = msec;}
     int getKeepAliveTimerInterval(){return m_keepAliveTimerInterval;}
 
-//    bool canSendData(qint64 size);
+    //    bool canSendData(qint64 size);
 
     bool isConnected();
 
@@ -55,7 +55,7 @@ signals:
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
     //void channelClosed();
 
-//    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
+    //    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 public slots:
@@ -70,11 +70,11 @@ public slots:
 
     void datagramReceived(QByteArray &block);
 
-//    bool sendData( QByteArray &data);
+    //    bool sendData( QByteArray &data);
     quint64 sendDatagram(QByteArray *data, bool isReliableDataPacket = true);
 
 private:
-//    void peerConnected();
+    //    void peerConnected();
 
     quint16 beginDataTransmission();
     quint64 sendDatagram(QByteArray *data, quint64 offset, bool fragment);
@@ -97,15 +97,15 @@ private slots:
 
 
     void sendToBeSentPackets();
-//    bool sendToBeSentPacketDirectly(RUDPPacket *packet);
-//    bool sendReTxPacket(RUDPPacket *packet);
+    //    bool sendToBeSentPacketDirectly(RUDPPacket *packet);
+    //    bool sendReTxPacket(RUDPPacket *packet);
 
 
     bool tryingToSendPacket(RUDPPacket *packet);
 
 
-//    void startCheckACKTimer();
-//    void checkACKTimerTimeout();
+    //    void startCheckACKTimer();
+    //    void checkACKTimerTimeout();
 
     void startKeepAliveTimer();
     void keepAliveTimerTimeout();
@@ -113,7 +113,7 @@ private slots:
     void startCheckPeerAliveTimer();
     void checkPeerAliveTimerTimeout();
 
-//    void transmissionTimeout();
+    //    void transmissionTimeout();
 
 
 
@@ -153,7 +153,7 @@ private:
 
     void cacheData(QByteArray *data);
 
-//    RUDPPacket * takedWaitingForACKPacket(quint16 packetID);
+    //    RUDPPacket * takedWaitingForACKPacket(quint16 packetID);
 
     RUDPPacket * takeToBeSentPacket(quint16 packetID);
     void addToBeSentPacket(RUDPPacket *packet);
@@ -217,7 +217,7 @@ private:
     QDateTime timeEXPCOUNTReset;
 
 
-//    QHash<quint16/*Packet SN*/, RUDPPacket*> receivedPackets; //接收历史
+    //    QHash<quint16/*Packet SN*/, RUDPPacket*> receivedPackets; //接收历史
 
 
 
@@ -237,11 +237,11 @@ private:
     QList<quint16/*Packet SN*/> ackPacketsSNHistory;
     quint16 largestACK2SN;
 
-//    struct ReceivedDataPacketInfo{
-//        quint16 packetSN;
-//        QDateTime arrivalTime;
-//    };
-//    QList<ReceivedDataPacketInfo> receivedDataPacketsHistory; //Received Data Packets History Window, 17 items!
+    //    struct ReceivedDataPacketInfo{
+    //        quint16 packetSN;
+    //        QDateTime arrivalTime;
+    //    };
+    //    QList<ReceivedDataPacketInfo> receivedDataPacketsHistory; //Received Data Packets History Window, 17 items!
     QList<QDateTime/*Arrival Time*/> receivedDataPacketsHistory; //Received Data Packets History Window, 17 items!
 
     QList<qint64> probingPacketsInterval; //the time interval between each probing packet pair, 16 items!
