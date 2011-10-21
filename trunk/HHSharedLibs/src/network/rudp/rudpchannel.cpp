@@ -136,6 +136,7 @@ RUDPChannel::~RUDPChannel(){
 //        reset();
 //    }
 
+
     if(m_connectToPeerTimer){
         qDebug()<<"--------01----";
         m_connectToPeerTimer->stop();
@@ -382,7 +383,8 @@ void RUDPChannel::closeChannel(){
 
     QMetaObject::invokeMethod(this, "reset");
 
-//    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+    QCoreApplication::sendPostedEvents ();
+    //QCoreApplication::processEvents();
 
 //    quit();
 
@@ -1166,7 +1168,8 @@ void RUDPChannel::checkPeerAliveTimerTimeout(){
     }
 
     if(m_checkPeerAliveTimes < 1){
-        QMetaObject::invokeMethod(this, "reset");
+        closeChannel();
+        //QMetaObject::invokeMethod(this, "reset");
         //reset();
         qDebug()<<"Error! Peer Offline!";
         emit peerDisconnected(m_peerAddress, m_peerPort, false);
@@ -1361,6 +1364,7 @@ void RUDPChannel::sendACKTimerTimeout(){
                 QMetaObject::invokeMethod(this, "startSendACKTimer");
                 QMetaObject::invokeMethod(this, "startSendNACKTimer");
             }
+            qDebug()<<"--------------------- No ACK Sent!";
             return;
         }
     }
@@ -1373,6 +1377,7 @@ void RUDPChannel::sendACKTimerTimeout(){
             QMetaObject::invokeMethod(this, "startSendACKTimer");
             QMetaObject::invokeMethod(this, "startSendNACKTimer");
         }
+        qDebug()<<"--------------------- No ACK Sent!";
         return;
     }
 //        if((abs(QDateTime::currentDateTime().msecsTo(time)) > 2 * sendACKTimerInterval && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow)) || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1) ){
@@ -1522,6 +1527,7 @@ void RUDPChannel::sendNACKTimerTimeout(){
 
     while (!packetsSN.isEmpty() && ba.size() < (m_MSS -3) ) {
         packLostPacket(&packetsSN, &out);
+        QCoreApplication::processEvents();
     }
 
     packet->setPacketData(ba);
@@ -1553,6 +1559,7 @@ void RUDPChannel::packLostPacket(QList<quint16> *packets, QDataStream *out){
     while (sn < RUDP_MAX_PACKET_SN && packets->contains(sn+1)) {
         sn++;
         packets->removeAll(sn);
+        QCoreApplication::processEvents();
     }
     if(sn > sn0 ){
         *out << QChar('-') << sn;
@@ -2111,6 +2118,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
         while (!in.atEnd()) {
             getLostPacketsFromNACK(&lostPackets, &in);
+            QCoreApplication::processEvents();
         }
 
         qSort(lostPackets.end(), lostPackets.begin());
@@ -2408,7 +2416,7 @@ void RUDPChannel::removeWaitingForACKPackets(quint16 start, quint16 end){
         }else{
             break;
         }
-
+        QCoreApplication::processEvents();
     }
 
 
