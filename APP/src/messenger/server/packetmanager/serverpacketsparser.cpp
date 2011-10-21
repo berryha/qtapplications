@@ -330,6 +330,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                                            userInfo->getPersonalInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
                                            userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion(),
                                            peerAddress, peerPort);
+
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
             sendContactsOnlineInfo(userInfo);
 

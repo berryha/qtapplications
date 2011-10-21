@@ -51,7 +51,9 @@ protected:
 
 
 signals:
-    void signalOnlineStateChanged(quint8 onlineStateCode);
+    void signalMyOnlineStateChanged(quint8 onlineStateCode);
+    void signalContactOnlineStateChanged(const QString &contactID, quint8 onlineStateCode);
+    void signalServerOnlineStateChanged(bool online);
 
 
 public slots:
@@ -123,11 +125,12 @@ private slots:
 
 
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort);
+    void loginTimeout();
+
 
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
-
 
 
 private:
@@ -182,6 +185,10 @@ private:
     //ContactInfoWidget *m_ContactInfoWidget;
 
     RUDPSocket *rudpSocket;
+    QHostAddress m_serverHostAddress;
+    quint16 m_serverHostPort;
+    bool m_serverConnected;
+//    QTimer *m_loginTimer;
 
 };
 

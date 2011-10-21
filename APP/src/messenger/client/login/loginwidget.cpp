@@ -775,7 +775,7 @@ void LoginWidget::verifyUser(){
         switchUI(VERIFYING);
         emit signalRequestLogin(QHostAddress(serverHostAddress), serverPort());
         
-        QTimer::singleShot(30000, this, SLOT(loginTimeout()));
+        //QTimer::singleShot(30000, this, SLOT(loginTimeout()));
     }
 
 
