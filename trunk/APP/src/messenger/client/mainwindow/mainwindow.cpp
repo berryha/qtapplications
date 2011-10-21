@@ -129,6 +129,10 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     //m_ContactInfoWidget = new ContactInfoWidget(this);
 
+    m_serverHostAddress = QHostAddress::Null;
+    m_serverHostPort = 0;
+//    m_loginTimer = 0;
+    m_serverConnected = false;
 
 }
 
@@ -335,7 +339,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
     connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
-    connect(this,SIGNAL(signalOnlineStateChanged(quint8)), clientPacketsParser, SLOT(changeMyOnlineState(quint8)));
+    connect(this,SIGNAL(signalMyOnlineStateChanged(quint8)), clientPacketsParser, SLOT(changeMyOnlineState(quint8)));
     
     connect(clientPacketsParser, SIGNAL(signalUpdatePasswordResultReceived(quint8, const QString&)), this, SLOT(slotProcessUpdatePasswordResult(quint8, const QString&)), Qt::QueuedConnection);
     
@@ -423,6 +427,14 @@ void MainWindow::startNetwork(){
 
 void MainWindow::stopNetwork(){
 
+    m_serverHostAddress = QHostAddress::Null;
+    m_serverHostPort = 0;
+
+//    if(m_loginTimer){
+//        m_loginTimer->stop();
+//        delete m_loginTimer;
+//        m_loginTimer = 0;
+//    }
 
     if(clientPacketsParser){
         clientPacketsParser->logout();
@@ -450,6 +462,9 @@ void MainWindow::stopNetwork(){
             break;
         }
     }
+
+
+    m_serverConnected = false;
 
 
 }
@@ -989,7 +1004,7 @@ void MainWindow::aboutToQuit(){
 
     if(imUser->getOnlineState() != IM::ONLINESTATE_OFFLINE && imUser->getOnlineState() != IM::ONLINESTATE_INVISIBLE){
         imUser->setOnlineState(IM::ONLINESTATE_OFFLINE);
-        emit signalOnlineStateChanged(quint8(IM::ONLINESTATE_OFFLINE));
+        emit signalMyOnlineStateChanged(quint8(IM::ONLINESTATE_OFFLINE));
         qDebug() << "----MainWindow::doWorkbeforeQuit()~~IMUser::OFFLINE";
     }
 
@@ -1162,13 +1177,11 @@ void MainWindow::slotUserVerified(){
             //systemTray->resetTrayIcon(ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Normal));
             systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), imUser->getOnlineState()));
 
-            emit signalOnlineStateChanged(quint8(imUser->getOnlineState()));
+            emit signalMyOnlineStateChanged(quint8(imUser->getOnlineState()));
         }
     }
 
-    
     ui.loginPage->switchUI(LoginWidget::NORMAL);
-    
     
 
 }
@@ -1181,7 +1194,7 @@ void MainWindow::slotLockUI(){
     stateBeforeLocking = imUser->getOnlineState();
     if(stateBeforeLocking != IM::ONLINESTATE_INVISIBLE && stateBeforeLocking != IM::ONLINESTATE_AWAY){
         imUser->setOnlineState(IM::ONLINESTATE_AWAY);
-        emit signalOnlineStateChanged(quint8(IM::ONLINESTATE_AWAY));
+        emit signalMyOnlineStateChanged(quint8(IM::ONLINESTATE_AWAY));
     }
 
 }
@@ -2237,19 +2250,44 @@ void MainWindow::showUserInfo(IMUserBase *user){
 
 void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort){
 
-    rudpSocket->connectToPeer(serverHostAddress, serverHostPort, true, 10000);
-    if(rudpSocket->isConnected(serverHostAddress, serverHostPort)){
-        clientPacketsParser->requestLogin(serverHostAddress, serverHostPort);
-    }else{
-        rudpSocket->connectToPeer(serverHostAddress, serverHostPort, true, 20000);
-        clientPacketsParser->requestLogin(serverHostAddress, serverHostPort);
-        //ui.loginPage->loginTimeout();
+    Q_ASSERT(rudpSocket);
+
+    m_serverHostAddress = serverHostAddress;
+    m_serverHostPort = serverHostPort;
+    rudpSocket->connectToPeer(serverHostAddress, serverHostPort);
+
+    QTimer::singleShot(10000, this, SLOT(loginTimeout()));
+
+//    if(!m_loginTimer){
+//        m_loginTimer = new QTimer(this);
+//        m_loginTimer->setSingleShot(true);
+//        connect(m_loginTimer, SIGNAL(timeout()), this, SLOT(loginTimeout()));
+//    }
+//    m_loginTimer->start(10000);
+
+}
+
+void MainWindow::loginTimeout(){
+
+    if(!m_serverConnected && !m_serverHostAddress.isNull()){
+        ui.loginPage->slotProcessLoginResult(IM::ERROR_Timeout);
     }
 
 }
 
 void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
     qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+    if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
+        clientPacketsParser->requestLogin(m_serverHostAddress, m_serverHostPort);
+        m_serverConnected = true;
+//        if(m_loginTimer){
+//            m_loginTimer->stop();
+//            delete m_loginTimer;
+//            m_loginTimer = 0;
+//        }
+        emit signalServerOnlineStateChanged(true);
+    }
 
 }
 
@@ -2263,6 +2301,15 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
 
     if(!normalClose){
         qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
+    }
+
+    if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
+        //TODO
+        m_serverConnected = false;
+        emit signalServerOnlineStateChanged(false);
+        if(!normalClose){
+            requestLogin(m_serverHostAddress, m_serverHostPort);
+        }
     }
 
 }

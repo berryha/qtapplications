@@ -600,7 +600,7 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
         contactGroupHash.insert(groupID, group);
         
         slotLoadContacts(expandListView, groupID, groupName, list);
-        
+
     }
     
     
@@ -789,7 +789,6 @@ void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int group
 
     foreach(Contact *contact, contactList)
     {
-
         //ObjectItem *objectItem = new ObjectItem();
         ObjectItem objectItem;
         objectItem.setID(contact->getUserID());
@@ -804,7 +803,7 @@ void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int group
         //objectItem.setIconMode(QIcon::Disabled);
         //objectItem.setCategoryID(groupName);
 
-        category.addObjectItem(objectItem);
+//        category.addObjectItem(objectItem);
 
         qApp->processEvents();
     }

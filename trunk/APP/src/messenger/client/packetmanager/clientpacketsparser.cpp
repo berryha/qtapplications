@@ -903,6 +903,11 @@ quint16 ClientPacketsParser::getServerPort() const{
     return m_serverRUDPListeningPort;
 }
 
+void ClientPacketsParser::serverOffline(){
+    this->m_serverAddress = QHostAddress::Null;
+    this->m_serverRUDPListeningPort = quint16(IM_SERVER_RUDP_LISTENING_PORT);
+}
+
 //void ClientPacketsParser::startHeartbeat(int interval){
 //    if(NULL == heartbeatTimer){
 //        heartbeatTimer = new QTimer();

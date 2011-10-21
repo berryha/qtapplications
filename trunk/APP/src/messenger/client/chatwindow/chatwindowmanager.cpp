@@ -73,10 +73,10 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
         ui.mdiArea->setActiveSubWindow(subWindow);
     }
 
-    update();
     showNormal();
     activateWindow();
     raise();
+    qDebug()<<"=================================";
 
 }
 

@@ -77,6 +77,7 @@ public:
     //void setServerPort(quint16 serverPort);
     quint16 getServerPort() const;
 
+    void serverOffline();
 
 //    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
 //    void stopHeartbeat();
