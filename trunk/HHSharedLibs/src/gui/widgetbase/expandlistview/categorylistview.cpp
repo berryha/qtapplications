@@ -508,19 +508,19 @@ bool CategoryListView::event(QEvent *event){
         }
 
     }
-    break;
-//    case QEvent::FocusOut:
-//    {
-//        QPoint cursorpos = QCursor::pos();
-//        QPoint topleft = mapToGlobal(pos());
-//        if(cursorpos.x() < topleft.x() || cursorpos.x() > (topleft.x() + width()) || cursorpos.y() < topleft.y() || cursorpos.y() > (topleft.y() + height()) ){
-//            clearSelection();
-//        }
+        break;
+        //    case QEvent::FocusOut:
+        //    {
+        //        QPoint cursorpos = QCursor::pos();
+        //        QPoint topleft = mapToGlobal(pos());
+        //        if(cursorpos.x() < topleft.x() || cursorpos.x() > (topleft.x() + width()) || cursorpos.y() < topleft.y() || cursorpos.y() > (topleft.y() + height()) ){
+        //            clearSelection();
+        //        }
 
-//        qDebug()<<"--QEvent::FocusOut";
-//        //return true;
-//    }
-//    break;
+        //        qDebug()<<"--QEvent::FocusOut";
+        //        //return true;
+        //    }
+        //    break;
     case QEvent::ContextMenu:
     {
         QContextMenuEvent *e = static_cast<QContextMenuEvent *> (event);
@@ -538,10 +538,9 @@ bool CategoryListView::event(QEvent *event){
         return true;
 
     }
-    break;
+        break;
     case QEvent::ToolTip:
     {
-        qDebug()<<"--QEvent::ToolTip";
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
         if(!helpEvent){return false;}
 
@@ -563,15 +562,12 @@ bool CategoryListView::event(QEvent *event){
             return false;
         }
 
-
         //m_core->slotTooltipEventOnObjectItemOccurs(itemID, helpEvent->globalPos());
         m_core->slotTooltipEventOnObjectItemOccurs(itemID, globalvisualRectTopLeft, globalMousePos);
 
-
-
         return true;
     }
-    break;
+        break;
     case QEvent::Resize:
     {
         QResizeEvent *e = static_cast<QResizeEvent *>(event);
@@ -579,13 +575,14 @@ bool CategoryListView::event(QEvent *event){
         updateGeometries();
     }
 
-    break;
+        break;
     default:
-        return false;
+        break;
 
     }
 
-    return false;
+
+    return QListView::event(event);
 
 }
 
