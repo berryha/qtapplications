@@ -33,8 +33,7 @@ INCLUDEPATH += . \
     about
 
 # Input
-HEADERS += listview/explistview.h \
-    rudp/clientpacketsparser.h \
+HEADERS += rudp/clientpacketsparser.h \
     screenshot/selecttargetimagewidget.h \
     screenshot/screenshot.h \
     rudp/rudp.h \
@@ -42,8 +41,7 @@ HEADERS += listview/explistview.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h
-SOURCES += listview/explistview.cpp \
-    rudp/clientpacketsparser.cpp \
+SOURCES += rudp/clientpacketsparser.cpp \
     screenshot/selecttargetimagewidget.cpp \
     screenshot/screenshot.cpp \
     rudp/rudp.cpp \
@@ -51,8 +49,7 @@ SOURCES += listview/explistview.cpp \
     main.cpp \
     about/aboutdialog.cpp \
     mainwindow/mainwindow.cpp
-FORMS += listview/explistview.ui \
-    screenshot/selecttargetimagewidget.ui \
+FORMS += screenshot/selecttargetimagewidget.ui \
     screenshot/screenshot.ui \
     rudp/rudp.ui \
     about/aboutdialog.ui \
