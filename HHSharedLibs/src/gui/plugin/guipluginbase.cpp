@@ -235,7 +235,8 @@ bool GUIPluginBase::event( QEvent * e ){
         return true;
     }
     
-    return false;
+    //return false;
+    return QObject::event(e);
 }
 
 void GUIPluginBase::slotSetDefaultActionForMenuAction(QAction * action) {

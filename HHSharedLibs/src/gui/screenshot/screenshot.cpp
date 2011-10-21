@@ -124,11 +124,11 @@ bool Screenshot::event(QEvent *e){
     }
     break;
     default:
-        return false;
         break;
     }
 
-    return false;
+    //return false;
+    return QWidget::event(e);
 
 }
 
