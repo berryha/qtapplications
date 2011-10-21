@@ -803,7 +803,7 @@ void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int group
         //objectItem.setIconMode(QIcon::Disabled);
         //objectItem.setCategoryID(groupName);
 
-//        category.addObjectItem(objectItem);
+        category.addObjectItem(objectItem);
 
         qApp->processEvents();
     }

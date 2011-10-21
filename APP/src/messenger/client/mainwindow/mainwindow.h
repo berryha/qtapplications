@@ -164,8 +164,8 @@ private:
 
     ExpandListViewManager *expandListViewManager;
     ExpandListView *friendsListView;
-//    ExpandListView *teamWidgetBox;
-//    ExpandListView *blacklistWidgetBox;
+    //    ExpandListView *teamWidgetBox;
+    //    ExpandListView *blacklistWidgetBox;
 
     ContactsManager *contactsManager;
 
@@ -188,7 +188,7 @@ private:
     QHostAddress m_serverHostAddress;
     quint16 m_serverHostPort;
     bool m_serverConnected;
-//    QTimer *m_loginTimer;
+    //    QTimer *m_loginTimer;
 
 };
 
