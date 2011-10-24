@@ -16,7 +16,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API RUDPChannel : public QObject
+class MYSHAREDLIB_API RUDPChannel : public QThread
 {
     Q_OBJECT
 public:
@@ -27,7 +27,7 @@ public:
 
     ~RUDPChannel();
 
-    //    void run();
+    void run();
 
 
 
@@ -123,9 +123,11 @@ private slots:
     bool sendPacket(RUDPPacket *packet);
 
     void startSendACKTimer();
+    void stopSendACKTimer();
     void sendACKTimerTimeout();
 
     void startSendNACKTimer();
+    void stopSendNACKTimer();
     void sendNACKTimerTimeout();
     void packLostPacket(QList<quint16> *packets, QDataStream *out);
     void addLostPacketsInReceiverSide(quint16 start, quint16 end);
