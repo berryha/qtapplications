@@ -271,6 +271,7 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         clientInfoHash.insert(computerName, info);
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:NO  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
     }
+    qWarning();
     qWarning()<<"Total Clients:"<<clientInfoHash.size();
     qWarning()<<"Total Duplicate Client Info:"<<duplicateInfo;
 
