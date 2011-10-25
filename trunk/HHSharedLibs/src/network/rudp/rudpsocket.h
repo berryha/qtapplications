@@ -62,6 +62,8 @@ public:
 
 //    bool canSendData(quint64 size);
 
+    void run();
+
 signals:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
@@ -121,6 +123,27 @@ private:
 };
 
 typedef RUDPSocket RUDPServer;
+
+
+
+class RUDPSocketThread : public QThread
+{
+    Q_OBJECT
+public:
+    RUDPSocketThread(PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL, QObject *parent = 0);
+    virtual ~RUDPSocketThread();
+
+    void run();
+
+    RUDPSocket * getRUDPSocket();
+
+private:
+    RUDPSocket *m_rudpSocket;
+
+
+};
+
+
 
 } //namespace HEHUI
 

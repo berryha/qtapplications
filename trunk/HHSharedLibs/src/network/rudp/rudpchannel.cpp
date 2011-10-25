@@ -32,7 +32,7 @@ QMutex * RUDPChannel::unusedPacketsMutex = new QMutex();
 int RUDPChannel::m_maxUnusedPacketsCount = 100;
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval, QObject *parent)
-    :QThread(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
+    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
     Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
@@ -82,7 +82,7 @@ RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandler
 }
 
 RUDPChannel::RUDPChannel(QUdpSocket *udpSocket, PacketHandlerBase *packetHandlerBase, const QHostAddress &peerAddress, quint16 peerPort, int keepAliveTimerInterval, QObject *parent)
-    :QThread(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
+    :QObject(parent), m_udpSocket(udpSocket), m_packetHandlerBase(packetHandlerBase), m_keepAliveTimerInterval(keepAliveTimerInterval)
 {
 
     Q_ASSERT_X(m_udpSocket, "RUDPChannel::RUDPChannel(...)", "Invalid UDP Socket!");
@@ -195,10 +195,9 @@ RUDPChannel::~RUDPChannel(){
 
 }
 
-void RUDPChannel::run(){
-
-    exec();
-}
+//void RUDPChannel::run(){
+//    exec();
+//}
 
 bool RUDPChannel::isConnected(){
     QMutexLocker locker(&m_ChannelStateMutex);
@@ -387,7 +386,7 @@ void RUDPChannel::closeChannel(){
     QCoreApplication::sendPostedEvents ();
     //QCoreApplication::processEvents();
 
-    quit();
+    //quit();
 
 }
 
@@ -1373,8 +1372,8 @@ void RUDPChannel::sendACKTimerTimeout(){
         //ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
         ACKPacketInfo * info = ackPacketsHistory.value(ackPacketsSNHistory.last());
         quint16 sn = info->firstReceivedPacketIDInReceiveWindow;
-        qDebug()<<"---------------------------------"<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
-        if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1)) ){
+        qDebug()<<"---------------------------------"<<" ackPacketsSNHistory.last():"<<ackPacketsSNHistory.last()<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
+        if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1)  ) ){
             count++;
             if(count >= 10){
                 //sendACKTimerInterval = sendNACKTimerInterval = RUDP_MAX_SEND_ACK_TIMER_INTERVAL;
@@ -2254,7 +2253,13 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
 
         if(start){
-            qDebug()<<"----------------activeFragmentID:"<<activeFragmentID<<" fragmentDataID:"<<fragmentDataID;
+            qDebug()<<"----------------activeFragmentID:"<<activeFragmentID<<" fragmentDataID:"<<fragmentDataID<<" "<<m_peerAddress.toString();
+//            if(activeFragmentID != 0){
+//                //Fragment ID Conflict!
+//                QMetaObject::invokeMethod(this, "reset");
+//                QCoreApplication::processEvents();
+//                return;
+//            }
             Q_ASSERT_X(activeFragmentID == 0, "RUDPChannel::processPacket(...)", "Fragment ID Conflict!");
             activeFragmentID = fragmentDataID;
             if(packetSerialNumber == RUDP_MAX_PACKET_SN){
