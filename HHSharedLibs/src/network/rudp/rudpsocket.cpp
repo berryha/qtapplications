@@ -276,12 +276,12 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
             //connect(channel, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
-            channel->start();
+            //channel->start();
             peers.insert(channelID, channel);
         }else{
             qDebug()<<"Use idle channel:"<<channelID;
             channel = m_unusedRUDPChannels.takeFirst();
-            channel->start();
+            //channel->start();
         }
 
     }else{
@@ -303,7 +303,7 @@ RUDPChannel * RUDPSocket::getRUDPChannel(const QHostAddress &hostAddress, quint1
 
 inline void RUDPSocket::recyleRUDPChannel(RUDPChannel *channel){
 
-    channel->quit();
+    //channel->quit();
 
     if(m_unusedRUDPChannels.size() >= m_maxCachedUnusedChannelsCount){
         delete channel;
@@ -317,9 +317,31 @@ inline void RUDPSocket::recyleRUDPChannel(RUDPChannel *channel){
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////
 
+RUDPSocketThread::RUDPSocketThread(PacketHandlerBase *packetHandlerBase, int keepAliveTimerInterval, QObject *parent)
+    :QThread(parent)
+{
 
+    m_rudpSocket = new RUDPSocket(packetHandlerBase, keepAliveTimerInterval, parent);
 
+    connect(m_rudpSocket, SIGNAL(destroyed()), this, SLOT(quit()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+
+}
+
+RUDPSocketThread::~RUDPSocketThread() {
+
+}
+
+void RUDPSocketThread::run(){
+    exec();
+}
+
+RUDPSocket * RUDPSocketThread::getRUDPSocket(){
+
+    return m_rudpSocket;
+}
 
 
 
