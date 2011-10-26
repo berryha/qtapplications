@@ -110,6 +110,9 @@ public slots:
 
     void sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort, bool useRUDP = false){
 
+        static int serverInstanceID = qrand();
+        qWarning()<<"Server Instance ID:"<<serverInstanceID;
+
         Packet *packet = 0;
 
         QHostAddress targetAddress = peerAddress;
@@ -139,7 +142,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_serverName << localRUDPListeningAddress.toString() << localRUDPListeningPort << QString(APP_VERSION);
+        out << m_serverName << localRUDPListeningAddress.toString() << localRUDPListeningPort << QString(APP_VERSION) << serverInstanceID;
         packet->setPacketData(ba);
         m_packetHandlerBase->appendOutgoingPacket(packet);
 

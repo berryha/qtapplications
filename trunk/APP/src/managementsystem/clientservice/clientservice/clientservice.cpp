@@ -72,6 +72,7 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverAddress = QHostAddress::Null;
     m_serverRUDPListeningPort = 0;
     m_serverName = "";
+    m_serverInstanceID = 0;
 
 //#if defined(Q_OS_WIN32)
 //    delete wm;
@@ -194,7 +195,7 @@ bool ClientService::startMainService(){
 
 
     clientPacketsParser = new ClientPacketsParser(networkManager, this);
-    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalUpdateClientSoftwarePacketReceived()), this, SLOT(update()), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalServerRequestClientSummaryInfoPacketReceived(const QString &,const QString &,const QString &)), this, SLOT(processServerRequestClientInfoPacket(const QString &,const QString &,const QString &)), Qt::QueuedConnection);
 
@@ -295,7 +296,7 @@ bool ClientService::startMainService(){
 
 }
 
-void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
+void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ClientService::serverFound(...)";
 
 
@@ -310,16 +311,21 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
 //        }
 //    }
 
+    if(!m_serverAddress.isNull() && serverInstanceID != m_serverInstanceID){
+        rudpSocket->disconnectFromPeer(m_serverAddress, m_serverRUDPListeningPort);
+    }
+
 
     m_serverAddress = QHostAddress(serverAddress);
     m_serverRUDPListeningPort = serverRUDPListeningPort;
     m_serverName = serverName;
+    m_serverInstanceID = serverInstanceID;
 
     setServerLastUsed(serverAddress);
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
     qWarning();
 
 
