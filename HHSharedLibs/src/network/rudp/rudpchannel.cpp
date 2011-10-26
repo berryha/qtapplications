@@ -1541,7 +1541,7 @@ void RUDPChannel::sendNACKTimerTimeout(){
 
 
     //qDebug()<<"----------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow;
-    //qDebug()<<"----------------------packetsSN:"<<packetsSN;
+    qDebug()<<"----------------------packetsSN:"<<packetsSN<<" "<<m_peerAddress.toString() ;
 
 
     //Send NACK
@@ -1564,7 +1564,7 @@ void RUDPChannel::sendNACKTimerTimeout(){
 
     sendPacket(packet);
 
-    qDebug()<<"---------------------- NACK Sent! -------------------------";
+    qDebug()<<"-------------- NACK Sent! -------------"<<m_peerAddress.toString();
 
 
     if(sendNACKTimer->interval() != sendNACKTimerInterval){
