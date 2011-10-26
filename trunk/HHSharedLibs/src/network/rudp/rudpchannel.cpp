@@ -1366,14 +1366,15 @@ void RUDPChannel::sendACKTimerTimeout(){
     //    }
 
     static int count = 0;
+    static quint16 lastLRSN = 0;
 
     if(!ackPacketsSNHistory.isEmpty() ){
         //if(!ackPacketsSNHistory.isEmpty() && largestACK2SN == ackPacketsSNHistory.last() ){
         //ACKPacketInfo * info = ackPacketsHistory.value(largestACK2SN);
         ACKPacketInfo * info = ackPacketsHistory.value(ackPacketsSNHistory.last());
         quint16 sn = info->firstReceivedPacketIDInReceiveWindow;
-        qDebug()<<"---------------------------------"<<" ackPacketsSNHistory.last():"<<ackPacketsSNHistory.last()<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
-        if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1)  ) ){
+        qDebug()<<"------------------"<<" ackPacketsSNHistory.last():"<<ackPacketsSNHistory.last()<<" largestACK2SN:"<<largestACK2SN<<" sn:"<<sn <<" m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" LRSN:"<<LRSN <<" m_peerAddress:"<<m_peerAddress.toString()<<":"<<m_peerPort;
+        if(sn == m_firstReceivedPacketIDInReceiveWindow && ( (LRSN + 1) == m_firstReceivedPacketIDInReceiveWindow || (LRSN == RUDP_MAX_PACKET_SN && m_firstReceivedPacketIDInReceiveWindow == 1) || lastLRSN == LRSN ) ){
             count++;
             if(count >= 10){
                 //sendACKTimerInterval = sendNACKTimerInterval = RUDP_MAX_SEND_ACK_TIMER_INTERVAL;
@@ -1478,7 +1479,7 @@ void RUDPChannel::sendACKTimerTimeout(){
 
     sendPacket(packet);
 
-    qDebug()<<"------------------------- ACK Sent! -------------------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_peerAddress:"<<m_peerAddress.toString();
+    qDebug()<<"------------ ACK Sent! -------------m_firstReceivedPacketIDInReceiveWindow:"<<m_firstReceivedPacketIDInReceiveWindow<<" m_peerAddress:"<<m_peerAddress.toString();
 
     //Record the ACK sequence number and the departure time
     ACKPacketInfo * info = new ACKPacketInfo();
@@ -1486,6 +1487,8 @@ void RUDPChannel::sendACKTimerTimeout(){
     info->sentTime = QDateTime::currentDateTime();
     ackPacketsHistory.insert(packetSerialNumber, info);
     ackPacketsSNHistory.append(packetSerialNumber);
+
+    lastLRSN = LRSN;
 
     if(sendACKTimer->interval() != sendACKTimerInterval){
         //sendACKTimer->stop();
