@@ -200,11 +200,12 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         QString address = "";
         quint16 port = 0;
         QString version;
-        in >> address >> port >> version;
+        int serverInstanceID = 0;
+        in >> address >> port >> version >> serverInstanceID;
         serverAddress = peerAddress;
         serverRUDPListeningPort = port;
         serverName = peerName;
-        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version);
+        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version, serverInstanceID);
 
         qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
     }

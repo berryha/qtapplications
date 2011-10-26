@@ -162,6 +162,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 //    localRUDPListeningPort = 0;
     
     rudpSocket = 0;
+
+//    m_serverInstanceID = 0;
     
 }
 
@@ -1004,7 +1006,7 @@ void ControlCenter::networkReady(){
 //            localRUDPListeningPort = port;
         }
 
-        connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)));
+        connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
 
         connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
         
@@ -1031,8 +1033,12 @@ void ControlCenter::networkReady(){
 
 }
 
-void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
+void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ControlCenter::serverFound(...)";
+
+//    if(m_serverInstanceID != 0 && serverInstanceID != m_serverInstanceID){
+//        controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
+//    }
 
     qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
 
