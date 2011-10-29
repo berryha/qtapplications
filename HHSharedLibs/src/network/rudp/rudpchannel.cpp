@@ -1823,6 +1823,8 @@ void RUDPChannel::init(){
     m_packetSerialNumber = 0;
 
     m_fragmentCount = 0;
+    activeFragmentID = 0;
+    firstFragmentDataPacketSN = 0;
 
 }
 
@@ -2095,6 +2097,7 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         if(m_sendWindowSize < RUDP_MAX_SEND_WINDOW_SIZE){
             if(m_sendWindowSize <= RUDP_SLOWSTART_THRESHOLD){
                 m_sendWindowSize *= 2;
+
                 //int rate = (m_sendWindowSize/5);
                 //m_sendWindowSize += (rate?rate:1);
             }else{
@@ -2244,8 +2247,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         break;
     case quint8(RUDP::BeginOrEndDataTransmission):
     {
-        static quint16 activeFragmentID = 0;
-        static quint32 firstFragmentDataPacketSN = 0;
+        //static quint16 activeFragmentID = 0;
+        //static quint32 firstFragmentDataPacketSN = 0;
 
 
         quint16 fragmentDataID = 0;

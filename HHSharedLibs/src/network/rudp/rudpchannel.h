@@ -294,6 +294,8 @@ private:
 
 
     quint32 m_fragmentCount;
+    quint16 activeFragmentID;
+    quint32 firstFragmentDataPacketSN;
 
 
 
