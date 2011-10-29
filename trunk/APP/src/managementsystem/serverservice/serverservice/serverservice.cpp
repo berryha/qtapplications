@@ -383,7 +383,6 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     }
     if(!info->isInstalledSoftwaresInfoSavedTODatabase()){
         updateInstalledSoftwaresInfoStatement = info->getUpdateInstalledSoftwaresInfoStatement();
-        qWarning()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
     }
 
 
