@@ -383,7 +383,7 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     }
     if(!info->isInstalledSoftwaresInfoSavedTODatabase()){
         updateInstalledSoftwaresInfoStatement = info->getUpdateInstalledSoftwaresInfoStatement();
-        //qDebug()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
+        qWarning()<<"-----------------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
     }
 
 
@@ -597,7 +597,7 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
 
     systemInfo.beginGroup("InstalledSoftwareInfo");
     QStringList softwares;
-    for(int k = 0; k < 400; k++){
+    for(int k = 1; k < 400; k++){
         QString info = systemInfo.value(QString::number(k)).toString();
         if(info.isEmpty()){break;}
         softwares << info;
@@ -716,6 +716,7 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
 
         info->setInstalledSoftwaresInfoSavedTODatabase(false);
         info->setUpdateInstalledSoftwaresInfoStatement(updateInstalledSoftwaresInfoStatement);
+        //qWarning()<<"------0------updateInstalledSoftwaresInfoStatement:"<<updateInstalledSoftwaresInfoStatement;
 
     }
 
