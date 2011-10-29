@@ -110,6 +110,7 @@ public slots:
 
     void sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort, bool useRUDP = false){
 
+        qsrand(QDateTime::currentDateTime().toTime_t());
         static int serverInstanceID = qrand();
         qWarning()<<"Server Instance ID:"<<serverInstanceID;
 
