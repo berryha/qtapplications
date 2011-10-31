@@ -250,7 +250,7 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
 
     //        //sendResetPacket();
     //    }
-    qDebug()<<"------------------00";
+
     if(!m_connectToPeerTimer->isActive()){
         m_connectToPeerTimer->setInterval(5000);
         QMetaObject::invokeMethod(m_connectToPeerTimer, "start");
@@ -259,7 +259,6 @@ void RUDPChannel::connectToPeer(const QHostAddress &peerAddress, quint16 peerPor
         sendHandshakePacket(m_myHandshakeID);
 
     }
-qDebug()<<"------------------11";
     if(wait){
         waitForConnected(msecTimeout);
     }
