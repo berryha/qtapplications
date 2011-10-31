@@ -310,11 +310,12 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
 //            return;
 //        }
 //    }
+    qDebug()<<"-----------------------0";
 
     if(!m_serverAddress.isNull() && serverInstanceID != m_serverInstanceID){
         rudpSocket->disconnectFromPeer(m_serverAddress, m_serverRUDPListeningPort);
     }
-
+qDebug()<<"-----------------------1";
 
     m_serverAddress = QHostAddress(serverAddress);
     m_serverRUDPListeningPort = serverRUDPListeningPort;

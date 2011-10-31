@@ -225,7 +225,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
         emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version, serverInstanceID);
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress.toString()<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
     }
     break;
     //    case quint8(MS::ClientOnline):
@@ -244,7 +244,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         serverLastOnlineTime = QDateTime::currentDateTime();
 
         emit signalServerOnlinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
-        qDebug()<<"~~ServerOnline"<<" serverAddress:"<<serverAddress<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
+        qDebug()<<"~~ServerOnline"<<" serverAddress:"<<serverAddress.toString()<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
 
     }
     break;
@@ -255,12 +255,12 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         in >> address >> port;
         serverAddress = QHostAddress::Null;
         serverRUDPListeningPort = 0;
-        serverName = peerName;
+        serverName = "";
 
 //        stopHeartbeat();
 
-        emit signalServerOfflinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
-        qDebug()<<"~~ServerOffline";
+        //emit signalServerOfflinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
+        qDebug()<<"~~ServerOffline"<<" peerAddress:"<<peerAddress.toString()<<" servername:"<<peerName <<" peerPort:"<<peerPort;
     }
     break;
     case quint8(MS::ClientDetailedInfoRequested):
