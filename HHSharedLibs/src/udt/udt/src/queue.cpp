@@ -45,11 +45,11 @@ written by
       #include <wspiapi.h>
    #endif
 #endif
-
 #include <cstring>
+
 #include "common.h"
-#include "queue.h"
 #include "core.h"
+#include "queue.h"
 
 using namespace std;
 
@@ -843,8 +843,7 @@ void CRendezvousQueue::updateConnStatus()
       {
          if (CTimer::getTime() >= i->m_ullTTL)
          {
-            // connection timer expired, set the socket to broken state, and acknowledge app via epoll
-            i->m_pUDT->m_bBroken = true;
+            // connection timer expired, acknowledge app via epoll (UDT send will return error so that apps know this connection has failed)
             i->m_pUDT->m_bConnecting = false;
             CUDT::s_UDTUnited.m_EPoll.enable_write(i->m_iID, i->m_pUDT->m_sPollID);
             continue;
@@ -926,7 +925,7 @@ CRcvQueue::~CRcvQueue()
    delete m_pRendezvousQueue;
 
    // remove all queued messages
-   for (map<int32_t, queue<CPacket*> >::iterator i = m_mBuffer.begin(); i != m_mBuffer.end(); ++ i)
+   for (map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.begin(); i != m_mBuffer.end(); ++ i)
    {
       while (!i->second.empty())
       {
@@ -1108,7 +1107,7 @@ int CRcvQueue::recvfrom(const int32_t& id, CPacket& packet)
 {
    CGuard bufferlock(m_PassLock);
 
-   map<int32_t, queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+   map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
 
    if (i == m_mBuffer.end())
    {
@@ -1190,7 +1189,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 
    CGuard bufferlock(m_PassLock);
 
-   map<int32_t, queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+   map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
    if (i != m_mBuffer.end())
    {
       while (!i->second.empty())
@@ -1231,7 +1230,7 @@ void CRcvQueue::storePkt(const int32_t& id, CPacket* pkt)
 {
    CGuard bufferlock(m_PassLock);   
 
-   map<int32_t, queue<CPacket*> >::iterator i = m_mBuffer.find(id);
+   map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
 
    if (i == m_mBuffer.end())
    {

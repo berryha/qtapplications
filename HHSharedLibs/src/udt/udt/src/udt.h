@@ -97,17 +97,15 @@ written by
 
 #ifdef WIN32
    #ifndef __MINGW__
-      typedef SOCKET UDPSOCKET;
       typedef SOCKET SYSSOCKET;
    #else
-      typedef int UDPSOCKET;
       typedef int SYSSOCKET;
    #endif
 #else
-   typedef int UDPSOCKET;
    typedef int SYSSOCKET;
 #endif
 
+typedef SYSSOCKET UDPSOCKET;
 typedef int UDTSOCKET;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,8 +324,8 @@ UDT_API int selectEx(const std::vector<UDTSOCKET>& fds, std::vector<UDTSOCKET>* 
 UDT_API int epoll_create();
 UDT_API int epoll_add_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
 UDT_API int epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
-UDT_API int epoll_remove_usock(const int eid, const UDTSOCKET u, const int* events = NULL);
-UDT_API int epoll_remove_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
+UDT_API int epoll_remove_usock(const int eid, const UDTSOCKET u);
+UDT_API int epoll_remove_ssock(const int eid, const SYSSOCKET s);
 UDT_API int epoll_wait(const int eid, std::set<UDTSOCKET>* readfds, std::set<UDTSOCKET>* writefds, int64_t msTimeOut, std::set<SYSSOCKET>* lrfds = NULL, std::set<SYSSOCKET>* wrfds = NULL);
 UDT_API int epoll_release(const int eid);
 UDT_API ERRORINFO& getlasterror();
