@@ -515,15 +515,12 @@ void CUDT::open()
 
    m_ullACKInt = m_ullSYNInt;
    m_ullNAKInt = m_ullMinNakInt;
-   m_ullEXPInt = m_ullMinExpInt;
-   m_llLastRspTime = CTimer::getTime();
 
-   CTimer::rdtsc(m_ullNextACKTime);
-   m_ullNextACKTime += m_ullSYNInt;
-   CTimer::rdtsc(m_ullNextNAKTime);
-   m_ullNextNAKTime += m_ullNAKInt;
-   CTimer::rdtsc(m_ullNextEXPTime);
-   m_ullNextEXPTime += m_ullEXPInt;
+   uint64_t currtime;
+   CTimer::rdtsc(currtime);
+   m_ullLastRspTime = currtime;
+   m_ullNextACKTime = currtime + m_ullSYNInt;
+   m_ullNextNAKTime = currtime + m_ullNAKInt;
 
    m_iPktCount = 0;
    m_iLightACKCount = 1;
@@ -944,8 +941,14 @@ void CUDT::close()
       m_pSndQueue->m_pSndUList->remove(this);
 
    // remove itself from all epoll monitoring
-   for (set<int>::iterator i = m_sPollID.begin(); i != m_sPollID.end(); ++ i)
-      s_UDTUnited.m_EPoll.remove_usock(*i, m_SocketID);
+   try
+   {
+      for (set<int>::iterator i = m_sPollID.begin(); i != m_sPollID.end(); ++ i)
+         s_UDTUnited.m_EPoll.remove_usock(*i, m_SocketID);
+   }
+   catch (...)
+   {
+   }
 
    if (!m_bOpened)
       return;
@@ -1014,7 +1017,7 @@ int CUDT::send(const char* data, const int& len)
       // delay the EXP timer to avoid mis-fired timeout
       uint64_t currtime;
       CTimer::rdtsc(currtime);
-      m_ullNextEXPTime = currtime + m_ullEXPInt;
+      m_ullLastRspTime = currtime;
    }
 
    if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -1213,7 +1216,7 @@ int CUDT::sendmsg(const char* data, const int& len, const int& msttl, const bool
       // delay the EXP timer to avoid mis-fired timeout
       uint64_t currtime;
       CTimer::rdtsc(currtime);
-      m_ullNextEXPTime = currtime + m_ullEXPInt;
+      m_ullLastRspTime = currtime;
    }
 
    if ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len)
@@ -1309,13 +1312,15 @@ int CUDT::recvmsg(char* data, const int& len)
    if (m_bBroken || m_bClosing)
    {
       int res = m_pRcvBuffer->readMsg(data, len);
-      if (0 == res)
-      {
-         // read is not available
-         s_UDTUnited.m_EPoll.disable_read(m_SocketID, m_sPollID);
 
-         throw CUDTException(2, 1, 0);
+      if (m_pRcvBuffer->getRcvMsgNum() <= 0)
+      {
+         // read is not available any more
+         s_UDTUnited.m_EPoll.disable_read(m_SocketID, m_sPollID);
       }
+
+      if (0 == res)
+         throw CUDTException(2, 1, 0);
       else
          return res;
    }
@@ -1409,7 +1414,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, const int64_t& size, const
       // delay the EXP timer to avoid mis-fired timeout
       uint64_t currtime;
       CTimer::rdtsc(currtime);
-      m_ullNextEXPTime = currtime + m_ullEXPInt;
+      m_ullLastRspTime = currtime;
    }
 
    int64_t tosend = size;
@@ -1924,17 +1929,9 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 {
    // Just heard from the peer, reset the expiration count.
    m_iEXPCount = 1;
-   m_llLastRspTime = CTimer::getTime();
-
-   if ((CSeqNo::incseq(m_iSndCurrSeqNo) == m_iSndLastAck) || (2 == ctrlpkt.getType()) || (3 == ctrlpkt.getType()))
-   {
-      uint64_t currtime;
-      CTimer::rdtsc(currtime);
-      if (!m_pCC->m_bUserDefinedRTO)
-         m_ullNextEXPTime = currtime + m_ullEXPInt;
-      else
-         m_ullNextEXPTime = currtime + m_pCC->m_iRTO * m_ullCPUFrequency;
-   }
+   uint64_t currtime;
+   CTimer::rdtsc(currtime);
+   m_ullLastRspTime = currtime;
 
    switch (ctrlpkt.getType())
    {
@@ -1960,12 +1957,12 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       // send ACK acknowledgement
       // number of ACK2 can be much less than number of ACK
-      uint64_t currtime = CTimer::getTime();
+      uint64_t now = CTimer::getTime();
       if ((currtime - m_ullSndLastAck2Time > (uint64_t)m_iSYNInterval) || (ack == m_iSndLastAck2))
       {
          sendCtrl(6, &ack);
          m_iSndLastAck2 = ack;
-         m_ullSndLastAck2Time = currtime;
+         m_ullSndLastAck2Time = now;
       }
 
       // Got data ACK
@@ -2037,10 +2034,6 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       m_pCC->setRTT(m_iRTT);
 
-      m_ullEXPInt = (m_iRTT + 4 * m_iRTTVar) * m_ullCPUFrequency + m_ullSYNInt;
-      if (m_ullEXPInt < m_ullMinExpInt)
-         m_ullEXPInt = m_ullMinExpInt;
-
       if (ctrlpkt.getLength() > 16)
       {
          // Update Estimated Bandwidth and packet delivery rate
@@ -2083,10 +2076,6 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       m_iRTT = (m_iRTT * 7 + rtt) >> 3;
 
       m_pCC->setRTT(m_iRTT);
-
-      m_ullEXPInt = (m_iRTT + 4 * m_iRTTVar) * m_ullCPUFrequency + m_ullSYNInt;
-      if (m_ullEXPInt < m_ullMinExpInt)
-         m_ullEXPInt = m_ullMinExpInt;
 
       // update last ACK that has been received by the sender
       if (CSeqNo::seqcmp(ack, m_iRcvLastAckAck) > 0)
@@ -2379,22 +2368,12 @@ int CUDT::processData(CUnit* unit)
 
    // Just heard from the peer, reset the expiration count.
    m_iEXPCount = 1;
-   m_llLastRspTime = CTimer::getTime();
-
-   if (CSeqNo::incseq(m_iSndCurrSeqNo) == m_iSndLastAck)
-   {
-      uint64_t currtime;
-      CTimer::rdtsc(currtime);
-      if (!m_pCC->m_bUserDefinedRTO)
-         m_ullNextEXPTime = currtime + m_ullEXPInt;
-      else
-         m_ullNextEXPTime = currtime + m_pCC->m_iRTO * m_ullCPUFrequency;
-   }
+   uint64_t currtime;
+   CTimer::rdtsc(currtime);
+   m_ullLastRspTime = currtime;
 
    m_pCC->onPktReceived(&packet);
-
    ++ m_iPktCount;
-
    // update time information
    m_pRcvTimeWindow->onPktArrival();
 
@@ -2574,16 +2553,27 @@ void CUDT::checkTimers()
    //   m_ullNextNAKTime = currtime + m_ullNAKInt;
    //}
 
-   if (currtime > m_ullNextEXPTime)
+   uint64_t next_exp_time;
+   if (m_pCC->m_bUserDefinedRTO)
+      next_exp_time = m_ullLastRspTime + m_pCC->m_iRTO * m_ullCPUFrequency;
+   else
+   {
+      uint64_t exp_int = (m_iEXPCount * (m_iRTT + 4 * m_iRTTVar) + m_iSYNInterval) * m_ullCPUFrequency;
+      if (exp_int < m_iEXPCount * m_ullMinExpInt)
+         exp_int = m_iEXPCount * m_ullMinExpInt;
+      next_exp_time = m_ullLastRspTime + exp_int;
+   }
+
+   if (currtime > next_exp_time)
    {
       // Haven't receive any information from the peer, is it dead?!
       // timeout: at least 16 expirations and must be greater than 10 seconds
-      if ((m_iEXPCount > 16) && (CTimer::getTime() - m_llLastRspTime > 10000000))
+      if ((m_iEXPCount > 16) && (currtime - m_ullLastRspTime > 5000000 * m_ullCPUFrequency))
       {
          //
          // Connection is broken. 
          // UDT does not signal any information about this instead of to stop quietly.
-         // Apllication will detect this when it calls any UDT methods next time.
+         // Application will detect this when it calls any UDT methods next time.
          //
          m_bClosing = true;
          m_bBroken = true;
@@ -2630,11 +2620,8 @@ void CUDT::checkTimers()
       }
 
       ++ m_iEXPCount;
-      m_ullEXPInt = (m_iEXPCount * (m_iRTT + 4 * m_iRTTVar) + m_iSYNInterval) * m_ullCPUFrequency;
-      if (m_ullEXPInt < m_iEXPCount * m_ullMinExpInt)
-         m_ullEXPInt = m_iEXPCount * m_ullMinExpInt;
-      CTimer::rdtsc(m_ullNextEXPTime);
-      m_ullNextEXPTime += m_ullEXPInt;
+      // Reset last response time since we just sent a heart-beat.
+      m_ullLastRspTime = currtime;
    }
 }
 
@@ -2652,7 +2639,7 @@ void CUDT::addEPoll(const int eid)
    else if ((UDT_DGRAM == m_iSockType) && (m_pRcvBuffer->getRcvMsgNum() > 0))
       s_UDTUnited.m_EPoll.enable_read(m_SocketID, m_sPollID);
 
-   if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
+   if (m_iSndBufSize > m_pSndBuffer->getCurrBufSize())
       s_UDTUnited.m_EPoll.enable_write(m_SocketID, m_sPollID);
 }
 

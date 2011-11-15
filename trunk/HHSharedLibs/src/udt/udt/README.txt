@@ -1,5 +1,6 @@
 Copyright (c) 2001 - 2011, The Board of Trustees of the University of Illinois.
 All Rights Reserved.
+Copyright (c) 2011, Google, Inc. All Rights Reserved.
 
 UDP-based Data Transfer (UDT) Library - version 4
 Author: Yunhong Gu [yunhong.gu @ gmail.com]
