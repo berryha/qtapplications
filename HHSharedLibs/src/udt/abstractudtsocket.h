@@ -53,7 +53,7 @@ public:
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
-    void dataReceived(const QByteArray &data, bool stream);
+    void disconnected(const QHostAddress &address, quint16 port);
 
 
 
@@ -62,8 +62,10 @@ public slots:
     void close();
 
     bool connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
+    void disconnectFromHost(const QHostAddress &address, quint16 port);
 
-    bool sendUDTData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, bool stream = true);
+    bool sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray);
+    bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, int ttl = -1, bool inorder = true);
 
 private slots:
     void waitForNewConnection(int msec = 0, bool * timedOut = 0);
@@ -84,7 +86,7 @@ private:
     QHostAddress m_serverAddress;
     quint16 m_serverPort;
 
-
+    QHash<QString/*IP:Port*/, UDTSOCKET> socketsHash;
 
 
 
