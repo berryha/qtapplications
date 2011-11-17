@@ -55,7 +55,7 @@ AbstractUDTSocket::~AbstractUDTSocket() {
         close();
     }
 
-    UDT::epoll_release(epollID);
+    //UDT::epoll_release(epollID);
 
     // use this function to release the UDT library
     UDT::cleanup();
@@ -78,10 +78,14 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     //hints.ai_socktype = SOCK_DGRAM;
-    //hints.ai_addr.s_addr = htonl(INADDR_ANY);
-    hints.ai_addr.s_addr = inet_addr(localAddress.toString().toLocal8Bit().data());
 
+    struct sockaddr_in sin;
+    memset(&sin, 0, sizeof(sin));
+    //sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = inet_addr(localAddress.toString().toLocal8Bit().data());
+    sin.sin_port = htons(port);
 
+    hints.ai_addr = (sockaddr *)&sin;
 
 
     if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
@@ -139,20 +143,42 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 
 void AbstractUDTSocket::close(){
 
-    UDT::close(serv);
 
     m_listening = false;
     m_serverAddress = QHostAddress::Null;
     m_serverPort = 0;
 
+
+    foreach (UDTSOCKET socket, socketsHash.values()) {
+        UDT::epoll_remove_usock(epollID, socket);
+    }
+    UDT::epoll_release(epollID);
+    epollID = 0;
+
+    socketsHash.clear();
+
+    UDT::close(serv);
+
+
+
+
 }
 
 bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port, bool sync){
 
+    if(address.isNull() || address == QHostAddress::Any){
+        qCritical()<<"ERROR! Invalid Peer Address!";
+        return false;
+    }
+    if(!port){
+        qCritical()<<"ERROR! Invalid Peer Port!";
+        return false;
+    }
+
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
         qCritical()<<"ERROR! EPOLL Not Initialized!";
-        return;
+        return false;
     }
 
     // use this function to initialize the UDT library
@@ -178,10 +204,10 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
 
     freeaddrinfo(local);
 
-    if (0 != getaddrinfo(targetAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &peer))
+    if (0 != getaddrinfo(address.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &peer))
     {
         //cout << "incorrect server/peer address. " << argv[1] << ":" << argv[2] << endl;
-        qWarning()<< "incorrect server/peer address. " << targetAddress.toString() << ":" << port;
+        qWarning()<< "incorrect server/peer address. " << address.toString() << ":" << port;
         return 0;
     }
 
@@ -214,11 +240,43 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     freeaddrinfo(peer);
 
 
-    UDT::close(client);
+    //UDT::close(client);
 
 
     // use this function to release the UDT library
     //UDT::cleanup();
+
+    return true;
+
+}
+
+void AbstractUDTSocket::disconnectFromHost(const QHostAddress &address, quint16 port){
+
+
+    if(address.isNull() || address == QHostAddress::Any){
+        qCritical()<<"ERROR! Invalid Peer Address!";
+        return;
+    }
+    if(!port){
+        qCritical()<<"ERROR! Invalid Peer Port!";
+        return;
+    }
+
+    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
+    if(!epollID){
+        qCritical()<<"ERROR! EPOLL Not Initialized!";
+        return;
+    }
+
+    UDTSOCKET socket = socketsHash.take(address.toString()+":"+QString::number(port));
+    if(UDT::INVALID_SOCK == socket){
+        qCritical()<<"ERROR! Invalid UDTSOCKET!";
+        return;
+    }
+
+    UDT::close(socket);
+
+
 
 }
 
@@ -243,17 +301,19 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
            continue;
         }
 
-        char clienthost[NI_MAXHOST];
-        char clientservice[NI_MAXSERV];
-        getnameinfo((sockaddr *)&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-        cout << "New Connection: " << clienthost << ":" << clientservice << endl;
+        char peerAddress[NI_MAXHOST];
+        char peerPort[NI_MAXSERV];
+        getnameinfo((sockaddr *)&clientaddr, addrlen, peerAddress, sizeof(peerAddress), peerPort, sizeof(peerPort), NI_NUMERICHOST|NI_NUMERICSERV);
+        cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
 
 
         if(UDT::epoll_add_usock(epollID, peer, NULL) < 0){
             qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
-            fprintf(stderr, "epoll_add_usock error\n");
+            //fprintf(stderr, "epoll_add_usock error\n");
+            UDT::close(peer);
             continue;
         }
+        socketsHash.insert(QString(peerAddress)+":"+QString(peerPort), peer);
 
     }
 
@@ -288,93 +348,95 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
 
 }
 
-bool AbstractUDTSocket::sendUDTData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, bool stream){
-
-    // use this function to initialize the UDT library
-    //UDT::startup();
-
-    struct addrinfo hints, *local, *peer;
-
-    memset(&hints, 0, sizeof(struct addrinfo));
-
-    hints.ai_flags = AI_PASSIVE;
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    //hints.ai_socktype = SOCK_DGRAM;
+bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray){
 
 
-    if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &local))
-    {
-        cout << "incorrect network address.\n" << endl;
-        return 0;
+
+    if(targetAddress.isNull() || targetAddress == QHostAddress::Any){
+        qCritical()<<"ERROR! Invalid Peer Address!";
+        return false;
+    }
+    if(!port){
+        qCritical()<<"ERROR! Invalid Peer Port!";
+        return false;
     }
 
-    UDTSOCKET client = UDT::socket(local->ai_family, local->ai_socktype, local->ai_protocol);
-
-    freeaddrinfo(local);
-
-    if (0 != getaddrinfo(targetAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &peer))
-    {
-        //cout << "incorrect server/peer address. " << argv[1] << ":" << argv[2] << endl;
-        qWarning()<< "incorrect server/peer address. " << targetAddress.toString() << ":" << port;
-        return 0;
+    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
+    if(!epollID){
+        qCritical()<<"ERROR! EPOLL Not Initialized!";
+        return false;
     }
 
-    //non-blocking sending
-    //UDT::setsockopt(client, 0, UDT_SNDSYN, new bool(false), sizeof(bool));
-    //UDT::setsockopt(client, 0, UDT_SNDBUF, new int(10240000), sizeof(int));
-    UDT::setsockopt(client, 0, UDT_SNDBUF, new int(1024000000), sizeof(int));
-
-
-
-    // connect to the server, implict bind
-    if (UDT::ERROR == UDT::connect(client, peer->ai_addr, peer->ai_addrlen))
-    {
-        cout << "connect: " << UDT::getlasterror().getErrorMessage() << endl;
-        return 0;
+    UDTSOCKET socket = socketsHash.value(targetAddress.toString()+":"+QString::number(port));
+    if(UDT::INVALID_SOCK == socket){
+        qCritical()<<"ERROR! Invalid UDTSOCKET!";
+        return false;
     }
-
-    freeaddrinfo(peer);
-
-
 
     int size = byteArray.size();
-    //char* data = new char[size];
     const char* data = byteArray.constData();
 
-    //		   #ifndef WIN32
-    //		      pthread_create(new pthread_t, NULL, monitor, &client);
-    //		   #else
-    //		      CreateThread(NULL, 0, monitor, &client, 0, NULL);
-    //		   #endif
-
-        int ssize = 0;
-        int ss;
-        while (ssize < size)
+    int ssize = 0;
+    int ss;
+    while (ssize < size)
+    {
+        if (UDT::ERROR == (ss = UDT::send(socket, data + ssize, size - ssize, 0)))
         {
-            if (UDT::ERROR == (ss = UDT::send(client, data + ssize, size - ssize, 0)))
-            {
-                cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-                break;
-            }
-
-            ssize += ss;
-            //msleep(1000);
-            QCoreApplication::processEvents();
+            cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+            break;
         }
 
-        if (ssize < size){
-            qCritical()<<"Data sent failed!"<<"   Data Size:"<<size<<"   Sent size:"<<ssize;
-            return false;
-        }
+        ssize += ss;
+        //QCoreApplication::processEvents();
+    }
 
-    UDT::close(client);
+    if (ssize < size){
+        qCritical()<<"Data sent failed!"<<"   Data Size:"<<size<<"   Sent size:"<<ssize;
+        return false;
+    }
 
-
-    // use this function to release the UDT library
-    //UDT::cleanup();
 
     return true;
+
+}
+
+bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, int ttl, bool inorder){
+
+    if(targetAddress.isNull() || targetAddress == QHostAddress::Any){
+        qCritical()<<"ERROR! Invalid Peer Address!";
+        return false;
+    }
+    if(!port){
+        qCritical()<<"ERROR! Invalid Peer Port!";
+        return false;
+    }
+
+    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
+    if(!epollID){
+        qCritical()<<"ERROR! EPOLL Not Initialized!";
+        return false;
+    }
+
+    UDTSOCKET socket = socketsHash.value(targetAddress.toString()+":"+QString::number(port));
+    if(UDT::INVALID_SOCK == socket){
+        qCritical()<<"ERROR! Invalid UDTSOCKET!";
+        return false;
+    }
+
+    int size = byteArray.size();
+    const char* data = byteArray.constData();
+
+    int ss = UDT::sendmsg(socket, data, size, ttl, inorder);
+
+    if (UDT::ERROR == ss || 0 == ss)
+    {
+        qCritical()<<"ERROR! Failed to send data! "<<UDT::getlasterror().getErrorMessage();
+        //cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+        return false;
+    }
+
+    return true;
+
 
 }
 
@@ -424,7 +486,7 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
        int rs = 0;
        while (rsize < size)
        {
-          if (UDT::ERROR == (rs = UDT::recv(recver, data + rsize, size - rsize, 0)))
+          if (UDT::ERROR == (rs = UDT::recv(socket, data + rsize, size - rsize, 0)))
           {
              cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
              break;
@@ -438,7 +500,35 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
 
     }
 
-    dataReceived(QByteArray(data), true);
+
+//    sockaddr* addr = NULL;
+//    int size = 0;
+//    addr = (sockaddr*)new sockaddr_in;
+//    size = sizeof(sockaddr_in);
+//    UDT::getsockname(socket, addr, &size);
+//    char sharedport[NI_MAXSERV];
+//    getnameinfo(addr, size, NULL, 0, sharedport, sizeof(sharedport), NI_NUMERICSERV);
+
+
+//    sockaddr_storage clientaddr;
+//    int addrlen = sizeof(clientaddr);
+//    UDT::getsockname(socket, (sockaddr*)&clientaddr, &addrlen);
+//    char clienthost[NI_MAXHOST];
+//    char clientservice[NI_MAXSERV];
+//    getnameinfo((sockaddr*)&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
+//    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
+
+
+
+    sockaddr clientaddr;
+    int addrlen = sizeof(clientaddr);
+    UDT::getsockname(socket, &clientaddr, &addrlen);
+    char clienthost[NI_MAXHOST];
+    char clientservice[NI_MAXSERV];
+    getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
+    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
+
+    dataReceived(QHostAddress(&clientaddr), QString::fromLocal8Bit(clientservice).toUInt(), data, true);
 
     delete [] data;
 
