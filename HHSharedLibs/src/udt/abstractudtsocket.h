@@ -41,35 +41,50 @@ using namespace std;
 
 namespace HEHUI {
 
+
 class MYSHAREDLIB_API AbstractUDTSocket :public QObject{
     Q_OBJECT
 public:
-        AbstractUDTSocket(QObject *parent = 0);
-	virtual ~AbstractUDTSocket();
+    AbstractUDTSocket(QObject *parent = 0);
+    virtual ~AbstractUDTSocket();
+
+    virtual void dataReceived(const QHostAddress &address, quint16 port, char *data, bool stream) = 0;
 
 
 signals:
+    void connected(const QHostAddress &address, quint16 port);
+    void dataReceived(const QByteArray &data, bool stream);
+
 
 
 public slots:
-        bool listen(const QHostAddress &localAddress= QHostAddress::Any, quint16 port = 0);
-        void close();
+    bool listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
+    void close();
 
-        bool sendUDTData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray);
+    bool connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
+
+    bool sendUDTData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, bool stream = true);
 
 private slots:
-        void waitForNewConnection(int msec = 0, bool * timedOut = 0);
+    void waitForNewConnection(int msec = 0, bool * timedOut = 0);
+    void waitForIO(int msecTimeout = 0);
+
+    void readDataFromSocket(UDTSOCKET socket);
+    void writeDataToSocket(UDTSOCKET socket);
 
 
 
 
 
 private:
-        UDTSOCKET serv;
+    int epollID;
+    UDTSOCKET serv;
 
-        bool m_listening;
-        QHostAddress m_serverAddress;
-        quint16 m_serverPort;
+    bool m_listening;
+    QHostAddress m_serverAddress;
+    quint16 m_serverPort;
+
+
 
 
 
