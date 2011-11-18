@@ -30,20 +30,23 @@
 
 namespace HEHUI {
 
-AbstractUDTSocket::AbstractUDTSocket(QObject *parent)
-    :QObject(parent)
+AbstractUDTSocket::AbstractUDTSocket(bool stream, const SocketOptions *options, QObject *parent)
+    :QObject(parent), m_stream(stream)
 {
 
     // use this function to initialize the UDT library
     UDT::startup();
 
     epollID = 0;
-    serv = UDT::INVALID_SOCK;
+    serverSocket = UDT::INVALID_SOCK;
 
     m_listening = false;
     m_serverAddress = QHostAddress::Null;
     m_serverPort = 0;
 
+    if(options){
+        m_socketOptions = *options;
+    }
 
 
 
@@ -62,6 +65,21 @@ AbstractUDTSocket::~AbstractUDTSocket() {
 
 }
 
+//void AbstractUDTSocket::setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen){
+
+//}
+
+void AbstractUDTSocket::setSocketOptions(const SocketOptions *options){
+
+    this->m_socketOptions = *options;
+}
+
+AbstractUDTSocket::SocketOptions AbstractUDTSocket::getSocketOptions() const{
+
+    return m_socketOptions;
+
+}
+
 bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 
     if(m_listening){
@@ -71,12 +89,11 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 
     addrinfo hints;
     addrinfo* res;
-
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_flags = AI_PASSIVE;
     hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
     //hints.ai_socktype = SOCK_DGRAM;
 
     struct sockaddr_in sin;
@@ -94,20 +111,31 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
        return 0;
     }
 
-    serv = UDT::socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    serverSocket = UDT::socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
 
     // UDT Options
-    //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
-    //UDT::setsockopt(serv, 0, UDT_MSS, new int(9000), sizeof(int));
-    //UDT::setsockopt(serv, 0, UDT_RCVBUF, new int(10000000), sizeof(int));
-    //UDT::setsockopt(serv, 0, UDP_RCVBUF, new int(10000000), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &(m_socketOptions.UDT_SNDSYN), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &(m_socketOptions.UDT_RCVSYN), sizeof(bool));
+    if(m_socketOptions.UDT_CC){
+        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
+        //UDT::setsockopt(serv, 0, UDT_CC, &(m_socketOptions.UDT_CC), sizeof(CCC));
+    }
+    UDT::setsockopt(serverSocket, 0, UDT_FC, &(m_socketOptions.UDT_FC), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDBUF, &(m_socketOptions.UDT_SNDBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVBUF, &(m_socketOptions.UDT_RCVBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDP_SNDBUF, &(m_socketOptions.UDP_SNDBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDP_RCVBUF, &(m_socketOptions.UDP_RCVBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_LINGER, &(m_socketOptions.UDT_LINGER), sizeof(linger));
+    UDT::setsockopt(serverSocket, 0, UDT_RENDEZVOUS, &(m_socketOptions.UDT_RENDEZVOUS), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDTIMEO, &(m_socketOptions.UDT_SNDTIMEO), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVTIMEO, &(m_socketOptions.UDT_RCVTIMEO), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
-    //non-blocking receiving
-    //UDT::setsockopt(serv, 0, UDT_RCVSYN, new bool(false), sizeof(bool));
 
-
-    if (UDT::ERROR == UDT::bind(serv, res->ai_addr, res->ai_addrlen))
+    if (UDT::ERROR == UDT::bind(serverSocket, res->ai_addr, res->ai_addrlen))
     {
        cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
        return 0;
@@ -118,14 +146,14 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 
     cout << "server is ready at port: " << port << endl;
 
-    if (UDT::ERROR == UDT::listen(serv, 10))
+    if (UDT::ERROR == UDT::listen(serverSocket, 10))
     {
        cout << "listen: " << UDT::getlasterror().getErrorMessage() << endl;
        return 0;
     }
 
     epollID = UDT::epoll_create();
-    UDT::epoll_add_usock(epollID, serv);
+    UDT::epoll_add_usock(epollID, serverSocket);
 
     m_serverAddress = localAddress;
     m_serverPort = port;
@@ -157,9 +185,18 @@ void AbstractUDTSocket::close(){
 
     socketsHash.clear();
 
-    UDT::close(serv);
+    UDT::close(serverSocket);
 
+    foreach (CachedDataInfo *info, m_cachedDataInfo) {
+        recycleCachedDataInfo(info);
+    }
+    m_cachedDataInfo.clear();
 
+    foreach (CachedDataInfo *info, m_unusedCachedDataInfo) {
+        delete info->data;
+        delete info;
+    }
+    m_unusedCachedDataInfo.clear();
 
 
 }
@@ -175,11 +212,13 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
         return false;
     }
 
-    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
-        qCritical()<<"ERROR! EPOLL Not Initialized!";
-        return false;
+        listen();
+        //qCritical()<<"ERROR! EPOLL Not Initialized!";
+        //return false;
     }
+    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
+
 
     // use this function to initialize the UDT library
     //UDT::startup();
@@ -190,7 +229,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
 
     hints.ai_flags = AI_PASSIVE;
     hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
     //hints.ai_socktype = SOCK_DGRAM;
 
 
@@ -222,7 +261,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
         UDT::setsockopt(client, 0, UDT_RCVSYN, &sync, sizeof(bool));
     }
 
-    if (UDT::ERROR == UDT::bind(client, serv))
+    if (UDT::ERROR == UDT::bind(client, serverSocket))
     {
         qCritical()<<"ERROR! Failed to bind! "<<UDT::getlasterror().getErrorMessage();
        //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
@@ -241,8 +280,6 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
 
 
     //UDT::close(client);
-
-
     // use this function to release the UDT library
     //UDT::cleanup();
 
@@ -294,7 +331,7 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
 
     while(true){
 
-        if (UDT::INVALID_SOCK == (peer = UDT::accept(serv, (sockaddr*)&clientaddr, &addrlen)))
+        if (UDT::INVALID_SOCK == (peer = UDT::accept(serverSocket, (sockaddr*)&clientaddr, &addrlen)))
         {
             qWarning()<<"ERROR! Invalid UDTSOCKET! "<< UDT::getlasterror().getErrorMessage();
            //cout << "accept: " << UDT::getlasterror().getErrorMessage() << endl;
@@ -348,7 +385,7 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
 
 }
 
-bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray){
+bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray){
 
 
 
@@ -373,8 +410,12 @@ bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, qui
         return false;
     }
 
-    int size = byteArray.size();
-    const char* data = byteArray.constData();
+    QByteArray block = processStreamDataBeforeSent(*byteArray);
+    int size = block.size();
+    const char* data = block.constData();
+
+//    int size = byteArray.size();
+//    const char* data = byteArray.constData();
 
     int ssize = 0;
     int ss;
@@ -400,7 +441,7 @@ bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, qui
 
 }
 
-bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, int ttl, bool inorder){
+bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl, bool inorder){
 
     if(targetAddress.isNull() || targetAddress == QHostAddress::Any){
         qCritical()<<"ERROR! Invalid Peer Address!";
@@ -423,15 +464,15 @@ bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, qu
         return false;
     }
 
-    int size = byteArray.size();
-    const char* data = byteArray.constData();
+    int size = byteArray->size();
+    const char* data = byteArray->constData();
 
     int ss = UDT::sendmsg(socket, data, size, ttl, inorder);
 
     if (UDT::ERROR == ss || 0 == ss)
     {
         qCritical()<<"ERROR! Failed to send data! "<<UDT::getlasterror().getErrorMessage();
-        //cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+        //cout << "sendmsg:" << UDT::getlasterror().getErrorMessage() << endl;
         return false;
     }
 
@@ -446,7 +487,7 @@ void AbstractUDTSocket::waitForIO(int msecTimeout){
     int count = 0;
 
     while(true){
-        count = UDT::epoll_wait(epollID, &readfds, &writefds, 1000);
+        count = UDT::epoll_wait(epollID, &readfds, &writefds, msecTimeout);
         printf("epoll returned %d sockets ready to IO| %d in set\n", count, readfds.size());
         for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
            //TODO:Process
@@ -476,29 +517,64 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
 //    cout << "new connection: " << peerHostAddress << ":" << peerPort << endl;
 
 
+//    struct addrinfo hints, *local;
+//    memset(&hints, 0, sizeof(struct addrinfo));
+
+//    //hints.ai_flags = AI_PASSIVE;
+//    //hints.ai_family = AF_INET;
+//    hints.ai_socktype = SOCK_STREAM;
+//    //hints.ai_socktype = SOCK_DGRAM;
+//    if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &local))
+//    {
+//        cout << "Not SOCK_STREAM" << endl;
+//        return ;
+//    }
+//    freeaddrinfo(local);
+
+
+
+    //TODO:Size
     char* data;
     int size = 2048;
     data = new char[size];
 
-    while (true)
-    {
-       int rsize = 0;
-       int rs = 0;
-       while (rsize < size)
-       {
-          if (UDT::ERROR == (rs = UDT::recv(socket, data + rsize, size - rsize, 0)))
-          {
-             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-             break;
-          }
+    int rs = 0;
 
-          rsize += rs;
-       }
 
-       if (rsize < size)
-          break;
+    if(m_stream){
+
+        while (true)
+        {
+           int rsize = 0;
+           while (rsize < size)
+           {
+              if (UDT::ERROR == (rs = UDT::recv(socket, data + rsize, size - rsize, 0)))
+              {
+                 cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
+                 break;
+              }
+
+              rsize += rs;
+           }
+
+           if (rsize < size)
+              break;
+
+        }
+
+        processStreamDataAfterReceived(socket, QByteArray(data));
+
+    }else{
+        if (UDT::ERROR == (rs = UDT::recvmsg(socket, data, size)))
+        {
+           cout << "recvmsg:" << UDT::getlasterror().getErrorMessage() << endl;
+        }
+
+        messageDataReceived(socket, QByteArray(data));
 
     }
+
+
 
 
 //    sockaddr* addr = NULL;
@@ -520,15 +596,19 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
 
 
 
-    sockaddr clientaddr;
-    int addrlen = sizeof(clientaddr);
-    UDT::getsockname(socket, &clientaddr, &addrlen);
-    char clienthost[NI_MAXHOST];
-    char clientservice[NI_MAXSERV];
-    getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
+//    sockaddr clientaddr;
+//    int addrlen = sizeof(clientaddr);
+//    //UDT::getsockname(socket, &clientaddr, &addrlen);
+//    UDT::getpeername(socket, &clientaddr, &addrlen);
+//    char clienthost[NI_MAXHOST];
+//    char clientservice[NI_MAXSERV];
+//    getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
+//    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
 
-    dataReceived(QHostAddress(&clientaddr), QString::fromLocal8Bit(clientservice).toUInt(), data, true);
+//    QString str = socketsHash.key(socket);
+//    qDebug()<<"str:"<<str;
+
+
 
     delete [] data;
 
@@ -538,6 +618,139 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
 
 void AbstractUDTSocket::writeDataToSocket(UDTSOCKET socket){
 
+
+}
+
+QByteArray AbstractUDTSocket::processStreamDataBeforeSent(const QByteArray &data){
+
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_7);
+    out << qint32(0) << data;
+
+    out.device()->seek(0);
+    out << qint32(block.size() - sizeof(qint32));
+
+    return block;
+
+}
+
+void AbstractUDTSocket::processStreamDataAfterReceived(UDTSOCKET socket, const QByteArray &data){
+
+
+    QByteArray byteArray(data);
+
+//    QString key = address+":"+QString::number(port);
+//    CachedDataInfo *info = m_cachedDataInfo.value(key);
+
+    CachedDataInfo *info = m_cachedDataInfo.value(socket);
+
+
+    int blockSize = info?info->blockSize:0;
+    QByteArray *cachedData = 0;
+
+    if(0 != blockSize){
+        cachedData = info->data;
+        Q_ASSERT(cachedData);
+
+        byteArray.prepend(*cachedData);
+        cachedData->clear();
+
+        if(-1 == blockSize){
+            blockSize = 0;
+        }
+    }
+
+    QDataStream in(&byteArray, QIODevice::ReadOnly);
+    in.setVersion(QDataStream::Qt_4_7);
+    QIODevice *dev = in.device();
+    //dev->seek(offset);
+
+    QByteArray temp;
+    qint64 readSize = 0;
+    forever{
+
+        if(0 == blockSize){
+            blockSize = sizeof(qint32);
+            temp.clear();
+            temp.resize(blockSize);
+            readSize = dev->read(temp.data(), blockSize);
+            if(readSize == blockSize){
+                blockSize = temp.toInt();
+                //continue;
+            }else{
+                if(!info){
+                    info = getCachedDataInfo();
+                    m_cachedDataInfo.insert(socket, info);
+                }
+                info->blockSize = -1;
+                *(info->data) = temp;
+                break;
+            }
+        }
+
+
+        temp.clear();
+        temp.resize(blockSize);
+        readSize = dev->read(temp.data(), blockSize);
+        if(readSize == blockSize){
+            streamDataReceived(socket, temp);
+            blockSize = 0;
+            continue;
+        }else{
+            if(!info){
+                info = getCachedDataInfo();
+                m_cachedDataInfo.insert(socket, info);
+            }
+            info->blockSize = blockSize;
+            *(info->data) = temp;
+            break;
+        }
+
+    }
+
+
+}
+
+void AbstractUDTSocket::recycleCachedDataInfo(CachedDataInfo* info){
+    if(!info){
+        return;
+    }
+    info->blockSize = 0;
+    info->data->clear();
+}
+
+AbstractUDTSocket::CachedDataInfo * AbstractUDTSocket::getCachedDataInfo(){
+
+    if(m_unusedCachedDataInfo.isEmpty()){
+        return new CachedDataInfo();
+    }
+    return m_unusedCachedDataInfo.takeFirst();
+
+}
+
+void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port){
+
+
+    sockaddr clientaddr;
+    int addrlen = sizeof(clientaddr);
+    //UDT::getsockname(socket, &clientaddr, &addrlen);
+    UDT::getpeername(socket, &clientaddr, &addrlen);
+    char clienthost[NI_MAXHOST];
+    char clientservice[NI_MAXSERV];
+    getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
+    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
+
+    QString str = socketsHash.key(socket);
+    qDebug()<<"str:"<<str;
+
+    if(address){
+        *address = QString::fromLocal8Bit(clienthost);
+    }
+    if(port){
+        *port = QString::fromLocal8Bit(clientservice).toUInt();
+    }
 
 }
 

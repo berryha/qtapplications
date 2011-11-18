@@ -192,49 +192,49 @@ int RUDPSocket::getMaxCachedUnusedPacketsCount() const{
 void RUDPSocket::readPendingDatagrams() {
     //qDebug()<<"----RUDPSocket::readPendingDatagrams()";
 
-        while (hasPendingDatagrams()) {
-                datagram->clear();
-                qint64 datagramSize = pendingDatagramSize();
-                datagram->resize(datagramSize);
-                QHostAddress peerAddress;
-                quint16 peerPort;
+    while (hasPendingDatagrams()) {
+        datagram->clear();
+        qint64 datagramSize = pendingDatagramSize();
+        datagram->resize(datagramSize);
+        QHostAddress peerAddress;
+        quint16 peerPort;
 
-                qint64 readSize = readDatagram(datagram->data(), datagramSize, &peerAddress, &peerPort);
-                if(readSize == -1){
-                        qWarning()<<"Can not read datagram!";
-                        break;
-                }
-
-                //qWarning()<<"Datagram Received From " <<peerAddress.toString()<<" Port:"<<peerPort<<" Size:"<<datagramSize;
-
-                //qDebug()<<"~~datagramSize:"<<datagramSize;
-
-//                QDataStream in(datagram, QIODevice::ReadOnly);
-//                in.setVersion(QDataStream::Qt_4_6);
-//                QVariant v;
-//                in >> v;
-//                if (v.canConvert<Packet>()){
-//                    //Packet *packet = new Packet();
-//                    RUDPSocket *packet = packetHandlerBase->getPacket();
-//                    *packet = v.value<RUDPSocket>();
-//                    packet->setTransmissionProtocol(TP_UDP);
-//                    packet->setPeerHostAddress(peerAddress);
-//                    packet->setPeerHostPort(peerPort);
-//                    packet->setLocalHostAddress(localAddress());
-//                    packet->setLocalHostPort(localPort());
-
-//                }
-
-
-                RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
-                //QtConcurrent::run(channel, &RUDPChannel::datagramReceived, *datagram);
-                channel->datagramReceived(*datagram);
-
+        qint64 readSize = readDatagram(datagram->data(), datagramSize, &peerAddress, &peerPort);
+        if(readSize == -1){
+            qWarning()<<"Can not read datagram!";
+            break;
         }
 
+        //qWarning()<<"Datagram Received From " <<peerAddress.toString()<<" Port:"<<peerPort<<" Size:"<<datagramSize;
 
-        datagram->clear();
-        datagram->resize(0);
+        //qDebug()<<"~~datagramSize:"<<datagramSize;
+
+        //                QDataStream in(datagram, QIODevice::ReadOnly);
+        //                in.setVersion(QDataStream::Qt_4_6);
+        //                QVariant v;
+        //                in >> v;
+        //                if (v.canConvert<Packet>()){
+        //                    //Packet *packet = new Packet();
+        //                    RUDPSocket *packet = packetHandlerBase->getPacket();
+        //                    *packet = v.value<RUDPSocket>();
+        //                    packet->setTransmissionProtocol(TP_UDP);
+        //                    packet->setPeerHostAddress(peerAddress);
+        //                    packet->setPeerHostPort(peerPort);
+        //                    packet->setLocalHostAddress(localAddress());
+        //                    packet->setLocalHostPort(localPort());
+
+        //                }
+
+
+        RUDPChannel *channel = getRUDPChannel(peerAddress, peerPort);
+        //QtConcurrent::run(channel, &RUDPChannel::datagramReceived, *datagram);
+        channel->datagramReceived(*datagram);
+
+    }
+
+
+    datagram->clear();
+    datagram->resize(0);
 
 }
 
