@@ -27,6 +27,7 @@
 
 #include "mysharedlib_global.h"
 #include "./udt/src/udt.h"
+#include "./udt/src/ccc.h"
 
 #include <iostream>
 using namespace std;
@@ -45,16 +46,78 @@ namespace HEHUI {
 class MYSHAREDLIB_API AbstractUDTSocket :public QObject{
     Q_OBJECT
 public:
-    AbstractUDTSocket(QObject *parent = 0);
+
+    struct SocketOptions{
+        SocketOptions(){
+#ifdef WIN32
+            UDT_MSS = 1052;
+#else
+            UDT_MSS = 1500;
+#endif
+
+            UDT_SNDSYN = true;
+            UDT_RCVSYN = true;
+            UDT_CC = 0;
+            UDT_FC = 25600;
+
+            UDT_SNDBUF = 10240000; //10M
+            UDT_RCVBUF = 10240000;
+            UDP_SNDBUF = 1024000; //1M
+            UDP_RCVBUF = 1024000;
+
+            UDT_LINGER.l_linger = 180;
+            UDT_RENDEZVOUS = false;
+
+            UDT_SNDTIMEO = -1;
+            UDT_RCVTIMEO = -1;
+
+            UDT_REUSEADDR = true;
+            UDT_MAXBW = -1;
+
+            UDT_STATE = 0;
+            UDT_EVENT = 0;
+
+        }
+
+        int UDT_MSS;
+        bool UDT_SNDSYN;
+        bool UDT_RCVSYN;
+        CCC* UDT_CC;
+        int UDT_FC;
+
+        int UDT_SNDBUF;
+        int UDT_RCVBUF;
+        int UDP_SNDBUF;
+        int UDP_RCVBUF;
+
+        linger UDT_LINGER;
+        bool UDT_RENDEZVOUS;
+
+        int UDT_SNDTIMEO;
+        int UDT_RCVTIMEO;
+
+        bool UDT_REUSEADDR;
+        int64_t UDT_MAXBW;
+
+        int32_t UDT_STATE; //Read only!
+        int32_t UDT_EVENT; //Read only!
+
+    };
+
+    AbstractUDTSocket(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
     virtual ~AbstractUDTSocket();
 
-    virtual void dataReceived(const QHostAddress &address, quint16 port, char *data, bool stream) = 0;
 
+//    void setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen);
+    void setSocketOptions(const SocketOptions *options);
+    SocketOptions getSocketOptions() const;
+
+    bool isStreamMode(){return m_stream;}
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
-    void disconnected(const QHostAddress &address, quint16 port);
-
+    void disconnected(const QHostAddress &address, quint16 port, bool normalClose);
+    void disconnected(int udtSocketID);
 
 
 public slots:
@@ -64,8 +127,8 @@ public slots:
     bool connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
     void disconnectFromHost(const QHostAddress &address, quint16 port);
 
-    bool sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray);
-    bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray &byteArray, int ttl = -1, bool inorder = true);
+    bool sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray);
+    bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
 private slots:
     void waitForNewConnection(int msec = 0, bool * timedOut = 0);
@@ -74,21 +137,47 @@ private slots:
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
 
+    QByteArray processStreamDataBeforeSent(const QByteArray &data);
+    void processStreamDataAfterReceived(UDTSOCKET socket, const QByteArray &data);
 
+    virtual void streamDataReceived(int udtSocketID, const QByteArray &data) = 0;
+    virtual void messageDataReceived(int udtSocketID, const QByteArray &data) = 0;
 
+private:
+    struct CachedDataInfo;
+    void recycleCachedDataInfo(CachedDataInfo* info);
+    CachedDataInfo * getCachedDataInfo();
+
+    void getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port);
 
 
 private:
     int epollID;
-    UDTSOCKET serv;
+    UDTSOCKET serverSocket;
 
     bool m_listening;
+    bool m_stream;
     QHostAddress m_serverAddress;
     quint16 m_serverPort;
 
     QHash<QString/*IP:Port*/, UDTSOCKET> socketsHash;
 
 
+    SocketOptions m_socketOptions;
+
+
+    struct CachedDataInfo{
+        CachedDataInfo(){
+            blockSize = 0;
+            data = 0;
+        }
+        int blockSize;
+        QByteArray *data;
+
+    };
+    QHash<UDTSOCKET, CachedDataInfo*> m_cachedDataInfo;
+
+    QList<CachedDataInfo*> m_unusedCachedDataInfo;
 
 
 
