@@ -117,7 +117,7 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     }
 
     serverSocket = UDT::socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-
+//UDT::close(serverSocket);
 
     // UDT Options
     UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
@@ -144,6 +144,10 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     {
        cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
        freeaddrinfo(res);
+
+       //TODO:Close the socket
+       //UDT::close(serverSocket);
+       serverSocket = UDT::INVALID_SOCK;
        return 0;
     }
 
@@ -155,6 +159,10 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     if (UDT::ERROR == UDT::listen(serverSocket, 10))
     {
        cout << "listen: " << UDT::getlasterror().getErrorMessage() << endl;
+
+       //TODO:Close the socket
+       //UDT::close(serverSocket);
+       serverSocket = UDT::INVALID_SOCK;
        return 0;
     }
 
@@ -176,6 +184,7 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 }
 
 void AbstractUDTSocket::close(){
+    qDebug()<<"--AbstractUDTSocket::close()";
 
 
     m_listening = false;
@@ -184,6 +193,8 @@ void AbstractUDTSocket::close(){
 
 
     foreach (UDTSOCKET socket, socketsHash.values()) {
+        qDebug()<<"-------------1";
+
         UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
     }
@@ -192,9 +203,9 @@ void AbstractUDTSocket::close(){
     UDT::epoll_release(epollID);
     epollID = 0;
 
-
+qDebug()<<"-------------2";
     UDT::close(serverSocket);
-
+qDebug()<<"-------------3";
     foreach (CachedDataInfo *info, m_cachedDataInfo) {
         recycleCachedDataInfo(info);
     }
@@ -206,10 +217,11 @@ void AbstractUDTSocket::close(){
     }
     m_unusedCachedDataInfo.clear();
 
-
+qDebug()<<"-------------4";
 }
 
 bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port, bool sync){
+    qDebug()<<"--AbstractUDTSocket::connectToHost(...)" <<address.toString()<<":"<<port<<" sync:"<<sync;
 
     if(address.isNull() || address == QHostAddress::Any){
         qCritical()<<"ERROR! Invalid Peer Address!";
@@ -300,6 +312,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
 }
 
 void AbstractUDTSocket::disconnectFromHost(const QHostAddress &address, quint16 port){
+    qDebug()<<"--AbstractUDTSocket::disconnectFromHost(...)" <<address.toString()<<":"<<port;
 
 
     if(address.isNull() || address == QHostAddress::Any){
@@ -330,6 +343,7 @@ void AbstractUDTSocket::disconnectFromHost(const QHostAddress &address, quint16 
 }
 
 void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
+    qDebug()<<"--AbstractUDTSocket::waitForNewConnection(...)";
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
@@ -403,6 +417,7 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
 }
 
 bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray){
+    qDebug()<<"--AbstractUDTSocket::sendUDTStreamData(...)" <<targetAddress.toString()<<":"<<port;
 
 
 
@@ -459,6 +474,7 @@ bool AbstractUDTSocket::sendUDTStreamData(const QHostAddress &targetAddress, qui
 }
 
 bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl, bool inorder){
+    qDebug()<<"--AbstractUDTSocket::sendUDTMessageData(...)" <<targetAddress.toString()<<":"<<port;
 
     if(targetAddress.isNull() || targetAddress == QHostAddress::Any){
         qCritical()<<"ERROR! Invalid Peer Address!";
@@ -499,6 +515,7 @@ bool AbstractUDTSocket::sendUDTMessageData(const QHostAddress &targetAddress, qu
 }
 
 void AbstractUDTSocket::waitForIO(int msecTimeout){
+    qDebug()<<"--AbstractUDTSocket::waitForIO(...)";
 
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
@@ -527,6 +544,7 @@ void AbstractUDTSocket::waitForIO(int msecTimeout){
 }
 
 void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
+    qDebug()<<"--AbstractUDTSocket::readDataFromSocket(..) "<<"socket:"<<socket;
 
 //    char peerHostAddress[NI_MAXHOST];
 //    char peerPort[NI_MAXSERV];
@@ -788,53 +806,6 @@ void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *addr
 
 
 }
-
-
-#ifndef Q_OS_WIN32
-void* recvdata(void* usocket)
-#else
-DWORD WINAPI recvdata(LPVOID usocket)
-#endif
-{
-    qWarning()<<"recvdata(void* usocket)";
-
-   UDTSOCKET recver = *(UDTSOCKET*)usocket;
-   delete (UDTSOCKET*)usocket;
-
-   char* data;
-   int size = 100000;
-   data = new char[size];
-
-   while (true)
-   {
-      int rsize = 0;
-      int rs = 0;
-      while (rsize < size)
-      {
-         if (UDT::ERROR == (rs = UDT::recv(recver, data + rsize, size - rsize, 0)))
-         {
-            cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-            break;
-         }
-
-         rsize += rs;
-      }
-
-      if (rsize < size)
-         break;
-
-
-   }
-
-   delete [] data;
-
-   UDT::close(recver);
-
-
-}
-
-
-
 
 
 
