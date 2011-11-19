@@ -66,7 +66,7 @@ signals:
     //        void signalPacketTransmissionFailed();
 
 public slots:
-    void aboutToQuit();
+    void aboutToQuit(int msecTimeout = 1000);
 
     virtual void parseIncomingPackets();
     virtual void parseIncomingPacketData(Packet *packet) = 0;

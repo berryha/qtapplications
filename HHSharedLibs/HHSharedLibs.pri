@@ -52,6 +52,12 @@ contains(HHSharedLibs, HHSharedService){
     DEPENDPATH += src/service
 }
 
+contains(HHSharedLibs, HHSharedUDT){
+    include(src/udt/udt.pri)
+    INCLUDEPATH += src/udt
+    DEPENDPATH += src/udt
+}
+
 win32{
     contains(HHSharedLibs, HHSharedWindowsManagement){
         include(src/windowsmanagement/windowsmanagement.pri)

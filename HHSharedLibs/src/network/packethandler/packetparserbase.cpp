@@ -135,10 +135,15 @@ bool PacketsParserBase::isAboutToQuit(){
 }
 
 
-void PacketsParserBase::aboutToQuit(){
-    QMutexLocker locker(&aboutToQuitMutex);
-    this->m_aboutToQuit = true;
-    emit signalAboutToQuit();
+void PacketsParserBase::aboutToQuit(int msecTimeout){
+    //{
+        QMutexLocker locker(&aboutToQuitMutex);
+        this->m_aboutToQuit = true;
+        emit signalAboutToQuit();
+    //}
+
+    QCoreApplication::processEvents();
+    //msleep(msecTimeout);
 
 }
 
