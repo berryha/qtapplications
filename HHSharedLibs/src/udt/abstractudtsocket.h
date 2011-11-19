@@ -143,7 +143,7 @@ private:
     CachedDataInfo * getCachedDataInfo();
 
 protected:
-    void getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port);
+    void getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
 
 private:
@@ -152,7 +152,7 @@ private:
 
     bool m_listening;
     bool m_stream;
-    QHostAddress m_serverAddress;
+    QString m_serverAddress;
     quint16 m_serverPort;
 
     QHash<QString/*IP:Port*/, UDTSOCKET> socketsHash;
