@@ -37,7 +37,7 @@ RUDPWidget::RUDPWidget(QWidget *parent)
 ////        //Single Process Thread
 //        QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
 
-udtSocket = 0;
+        udtSocket = 0;
 
         isListening = false;
         isConnected = false;
@@ -146,7 +146,8 @@ bool RUDPWidget::startRUDPServer(quint16 port){
 
     }
 
-    return udtSocket->listen(port, QHostAddress("200.200.200.170"));
+    return udtSocket->listen(port);
+    //return udtSocket->listen(port, QHostAddress("200.200.200.117"));
 
 
 }
