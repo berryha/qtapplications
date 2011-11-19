@@ -116,7 +116,7 @@ public:
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
-    void disconnected(const QHostAddress &address, quint16 port, bool normalClose);
+    void disconnected(const QHostAddress &address, quint16 port);
     void disconnected(int udtSocketID);
 
 
@@ -148,6 +148,7 @@ private:
     void recycleCachedDataInfo(CachedDataInfo* info);
     CachedDataInfo * getCachedDataInfo();
 
+protected:
     void getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port);
 
 

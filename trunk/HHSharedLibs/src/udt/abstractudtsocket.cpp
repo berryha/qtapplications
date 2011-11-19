@@ -48,6 +48,10 @@ AbstractUDTSocket::AbstractUDTSocket(bool stream, const SocketOptions *options, 
         m_socketOptions = *options;
     }
 
+    //IMPORTANT For Multi-thread
+    if(QThreadPool::globalInstance()->maxThreadCount() < 4){}
+    QThreadPool::globalInstance()->setMaxThreadCount(4);
+
 
 
 }
@@ -81,6 +85,7 @@ AbstractUDTSocket::SocketOptions AbstractUDTSocket::getSocketOptions() const{
 }
 
 bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
+    qDebug()<<"--AbstractUDTSocket::listen(...) "<<localAddress.toString()<<":"<<port;
 
     if(m_listening){
         qCritical()<<"Server is already listenning!";
@@ -94,18 +99,17 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     hints.ai_flags = AI_PASSIVE;
     hints.ai_family = AF_INET;
     hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
-    //hints.ai_socktype = SOCK_DGRAM;
-
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    //sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr(localAddress.toString().toLocal8Bit().data());
-    sin.sin_port = htons(port);
-
-    hints.ai_addr = (sockaddr *)&sin;
 
 
-    if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
+//    struct sockaddr_in sin;
+//    memset(&sin, 0, sizeof(sin));
+//    sin.sin_family = AF_INET;
+//    sin.sin_addr.s_addr = inet_addr(localAddress.toString().toLocal8Bit().data());
+//    sin.sin_port = htons(port);
+
+
+    if (0 != getaddrinfo(localAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &res))
+    //if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
     {
        cout << "illegal port number or port is busy.\n" << endl;
        return 0;
@@ -178,12 +182,14 @@ void AbstractUDTSocket::close(){
 
 
     foreach (UDTSOCKET socket, socketsHash.values()) {
+        UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
     }
+    socketsHash.clear();
+
     UDT::epoll_release(epollID);
     epollID = 0;
 
-    socketsHash.clear();
 
     UDT::close(serverSocket);
 
@@ -329,13 +335,18 @@ void AbstractUDTSocket::waitForNewConnection(int msec, bool * timedOut){
     int addrlen = sizeof(clientaddr);
     UDTSOCKET peer;
 
-    while(true){
+    while(m_listening){
 
         if (UDT::INVALID_SOCK == (peer = UDT::accept(serverSocket, (sockaddr*)&clientaddr, &addrlen)))
         {
             qWarning()<<"ERROR! Invalid UDTSOCKET! "<< UDT::getlasterror().getErrorMessage();
            //cout << "accept: " << UDT::getlasterror().getErrorMessage() << endl;
-           continue;
+
+            int errorCode = UDT::getlasterror().getErrorCode();
+            if(errorCode == UDT::ERRORINFO::EINVSOCK || errorCode == UDT::ERRORINFO::ENOLISTEN){
+                return;
+            }
+            continue;
         }
 
         char peerAddress[NI_MAXHOST];
@@ -486,7 +497,7 @@ void AbstractUDTSocket::waitForIO(int msecTimeout){
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
 
-    while(true){
+    while(m_listening){
         count = UDT::epoll_wait(epollID, &readfds, &writefds, msecTimeout);
         printf("epoll returned %d sockets ready to IO| %d in set\n", count, readfds.size());
         for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
