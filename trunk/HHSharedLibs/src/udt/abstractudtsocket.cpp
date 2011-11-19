@@ -41,7 +41,7 @@ AbstractUDTSocket::AbstractUDTSocket(bool stream, const SocketOptions *options, 
     serverSocket = UDT::INVALID_SOCK;
 
     m_listening = false;
-    m_serverAddress = QHostAddress::Null;
+    m_serverAddress = "";
     m_serverPort = 0;
 
     if(options){
@@ -93,7 +93,7 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     }
 
     addrinfo hints;
-    addrinfo* res;
+    addrinfo* localAddressInfo;
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_flags = AI_PASSIVE;
@@ -108,16 +108,15 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
 //    sin.sin_port = htons(port);
 
 
-    if (0 != getaddrinfo(localAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &res))
+    if (0 != getaddrinfo(localAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &localAddressInfo))
     //if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
     {
        cout << "illegal port number or port is busy.\n" << endl;
-       freeaddrinfo(res);
+       freeaddrinfo(localAddressInfo);
        return 0;
     }
 
-    serverSocket = UDT::socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-//UDT::close(serverSocket);
+    serverSocket = UDT::socket(localAddressInfo->ai_family, localAddressInfo->ai_socktype, localAddressInfo->ai_protocol);
 
     // UDT Options
     UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
@@ -140,10 +139,11 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
 
-    if (UDT::ERROR == UDT::bind(serverSocket, res->ai_addr, res->ai_addrlen))
+    if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
     {
-       cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
-       freeaddrinfo(res);
+        qCritical()<<"ERROR! Failed to bind! "<<UDT::getlasterror().getErrorMessage();
+       //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
+       freeaddrinfo(localAddressInfo);
 
        //TODO:Close the socket
        //UDT::close(serverSocket);
@@ -151,10 +151,13 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
        return 0;
     }
 
-    freeaddrinfo(res);
+    getAddressInfoFromSocket(serverSocket, &m_serverAddress, &m_serverPort, false);
+    qDebug()<<QString("Server is ready on %1:%2").arg(m_serverAddress).arg(m_serverPort);
 
 
-    cout << "server is ready at port: " << port << endl;
+    freeaddrinfo(localAddressInfo);
+
+
 
     if (UDT::ERROR == UDT::listen(serverSocket, 10))
     {
@@ -169,8 +172,8 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     epollID = UDT::epoll_create();
     UDT::epoll_add_usock(epollID, serverSocket);
 
-    m_serverAddress = localAddress;
-    m_serverPort = port;
+//    m_serverAddress = localAddress;
+//    m_serverPort = port;
 
 
     QtConcurrent::run(this, &AbstractUDTSocket::waitForNewConnection, 0, new bool(0));
@@ -188,7 +191,7 @@ void AbstractUDTSocket::close(){
 
 
     m_listening = false;
-    m_serverAddress = QHostAddress::Null;
+    m_serverAddress = "";
     m_serverPort = 0;
 
 
@@ -244,25 +247,12 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     //UDT::startup();
 
     struct addrinfo hints, *local, *peer;
-
     memset(&hints, 0, sizeof(struct addrinfo));
 
     hints.ai_flags = AI_PASSIVE;
     hints.ai_family = AF_INET;
     hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
     //hints.ai_socktype = SOCK_DGRAM;
-
-
-    if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &local))
-    {
-        cout << "incorrect network address.\n" << endl;
-        freeaddrinfo(local);
-        return 0;
-    }
-
-    UDTSOCKET client = UDT::socket(local->ai_family, local->ai_socktype, local->ai_protocol);
-
-    freeaddrinfo(local);
 
     if (0 != getaddrinfo(address.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &peer))
     {
@@ -271,6 +261,18 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
         freeaddrinfo(peer);
         return 0;
     }
+
+
+    if (0 != getaddrinfo(m_serverAddress.toStdString().c_str(), QString::number(m_serverPort).toStdString().c_str(), &hints, &local))
+    {
+        cout << "incorrect network address.\n" << endl;
+        freeaddrinfo(local);
+        return 0;
+    }
+
+
+    UDTSOCKET client = UDT::socket(local->ai_family, local->ai_socktype, local->ai_protocol);
+
 
     //non-blocking sending
     //UDT::setsockopt(client, 0, UDT_SNDSYN, new bool(false), sizeof(bool));
@@ -283,13 +285,24 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
         UDT::setsockopt(client, 0, UDT_RCVSYN, &sync, sizeof(bool));
     }
 
-    if (UDT::ERROR == UDT::bind(client, serverSocket))
+    // for rendezvous connection, enable the code below
+    UDT::setsockopt(client, 0, UDT_REUSEADDR, new bool(true), sizeof(bool));
+    UDT::setsockopt(client, 0, UDT_RENDEZVOUS, new bool(true), sizeof(bool));
+
+
+    if (UDT::ERROR == UDT::bind(client, local->ai_addr, local->ai_addrlen))
     {
-        qCritical()<<"ERROR! Failed to bind! "<<UDT::getlasterror().getErrorMessage();
+        qCritical()<<"ERROR! Failed to bind! "<<QString(UDT::getlasterror().getErrorMessage()).toLocal8Bit();
        //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
-       freeaddrinfo(peer);
-        return 0;
+       freeaddrinfo(local);
+
+       //TODO:Close the socket
+       //UDT::close(serverSocket);
+       serverSocket = UDT::INVALID_SOCK;
+       return 0;
     }
+    freeaddrinfo(local);
+
 
 
     if (UDT::ERROR == UDT::connect(client, peer->ai_addr, peer->ai_addrlen))
@@ -299,7 +312,6 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
         freeaddrinfo(peer);
         return 0;
     }
-
     freeaddrinfo(peer);
 
 
@@ -765,17 +777,21 @@ AbstractUDTSocket::CachedDataInfo * AbstractUDTSocket::getCachedDataInfo(){
 
 }
 
-void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port){
+void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo){
 
 
     sockaddr clientaddr;
     int addrlen = sizeof(clientaddr);
-    //UDT::getsockname(socket, &clientaddr, &addrlen);
-    UDT::getpeername(socket, &clientaddr, &addrlen);
+    if(getPeerInfo){
+        UDT::getpeername(socket, &clientaddr, &addrlen);
+    }else{
+        UDT::getsockname(socket, &clientaddr, &addrlen);
+    }
+
     char clienthost[NI_MAXHOST];
     char clientservice[NI_MAXSERV];
     getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
+    cout << "Address Info: " << clienthost << ":" << clientservice << endl;
 
     QString str = socketsHash.key(socket);
     qDebug()<<"str:"<<str;
@@ -788,7 +804,6 @@ void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *addr
     }
 
 }
-
 
 
 
