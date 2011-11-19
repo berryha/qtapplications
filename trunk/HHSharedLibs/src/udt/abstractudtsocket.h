@@ -32,12 +32,6 @@
 #include <iostream>
 using namespace std;
 
-#ifndef Q_OS_WIN32
-    void* recvdata(void*);
-#else
-    DWORD WINAPI recvdata(LPVOID);
-#endif
-
 
 
 namespace HEHUI {
