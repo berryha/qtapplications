@@ -84,15 +84,15 @@ void ClientPacketsParser::run(){
 //    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
 //    processWaitingForReplyPacketsTimer.start();
 
-    while(1){
+    while(!isAboutToQuit()){
 
         QCoreApplication::processEvents();
         parseIncomingPackets();
         processOutgoingPackets();
 
-        if(isAboutToQuit()){
-            break;
-        }
+//        if(isAboutToQuit()){
+//            break;
+//        }
         msleep(500);
     }
 
@@ -146,7 +146,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     QByteArray data;
     in >> peerName >> data;
 
-    emit dataReceived(packet->getPeerHostAddress(), packet->getPeerHostPort(), data);
+    emit dataReceived(packet->getPeerHostAddress().toString(), packet->getPeerHostPort(), data);
 
 
 }

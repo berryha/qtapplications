@@ -85,7 +85,7 @@ public slots:
 
 
 signals:
-    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
+    void dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 

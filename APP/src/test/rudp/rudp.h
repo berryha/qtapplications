@@ -5,9 +5,9 @@
 
 #include "ui_rudp.h"
 
-#include "clientpacketsparser.h"
-#include "HHSharedNetwork/hrudpsocket.h"
-#include "HHSharedNetwork/hnetworkmanagerbase.h"
+
+#include "udtsocket.h"
+
 
 namespace HEHUI {
 
@@ -44,9 +44,9 @@ private slots:
 
     void connected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
-    void disconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+    void disconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
-    void dataReceived(const QHostAddress &peerAddress, quint16 peerPort, const QByteArray &data);
+    void dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 
@@ -55,10 +55,8 @@ private:
 
 
 
-    NetworkManagerBase *networkManager;
-    PacketHandlerBase *m_packetHandlerBase;
-    RUDPSocket *rudpSocket;
-    ClientPacketsParser *clientPacketsParser;
+
+    UDTSocket *udtSocket;
 
     bool isListening;
 
