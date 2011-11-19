@@ -112,6 +112,7 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     //if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
     {
        cout << "illegal port number or port is busy.\n" << endl;
+       freeaddrinfo(res);
        return 0;
     }
 
@@ -142,6 +143,7 @@ bool AbstractUDTSocket::listen(quint16 port, const QHostAddress &localAddress){
     if (UDT::ERROR == UDT::bind(serverSocket, res->ai_addr, res->ai_addrlen))
     {
        cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
+       freeaddrinfo(res);
        return 0;
     }
 
@@ -242,6 +244,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &local))
     {
         cout << "incorrect network address.\n" << endl;
+        freeaddrinfo(local);
         return 0;
     }
 
@@ -253,6 +256,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     {
         //cout << "incorrect server/peer address. " << argv[1] << ":" << argv[2] << endl;
         qWarning()<< "incorrect server/peer address. " << address.toString() << ":" << port;
+        freeaddrinfo(peer);
         return 0;
     }
 
@@ -271,7 +275,8 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     {
         qCritical()<<"ERROR! Failed to bind! "<<UDT::getlasterror().getErrorMessage();
        //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
-       return 0;
+       freeaddrinfo(peer);
+        return 0;
     }
 
 
@@ -279,6 +284,7 @@ bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port,
     {
         qCritical()<<"ERROR! Failed to connect! "<<UDT::getlasterror().getErrorMessage();
         //cout << "connect: " << UDT::getlasterror().getErrorMessage() << endl;
+        freeaddrinfo(peer);
         return 0;
     }
 
