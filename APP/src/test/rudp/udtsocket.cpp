@@ -8,7 +8,7 @@ namespace HEHUI {
 
 
 UDTSocket::UDTSocket(QObject *parent) :
-    AbstractUDTSocket()
+    UDTProtocolBase()
 {
 
 

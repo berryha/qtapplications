@@ -2,7 +2,7 @@
 #define UDTSOCKET_H
 
 #include <QObject>
-#include "HHSharedUDT/habstractudtsocket.h"
+#include "HHSharedUDT/hudtprotocolbase.h"
 
 #include "clientpacketsparser.h"
 #include "HHSharedNetwork/hnetworkmanagerbase.h"
@@ -12,7 +12,7 @@
 namespace HEHUI {
 
 
-class UDTSocket : public AbstractUDTSocket
+class UDTSocket : public UDTProtocolBase
 {
     Q_OBJECT
 public:
