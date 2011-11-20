@@ -125,7 +125,7 @@ public slots:
     bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
 private slots:
-    void waitForNewConnection(int msec = 0, bool * timedOut = 0);
+    void waitForNewConnection(int msec = 0);
     void waitForIO(int msecTimeout = 0);
 
     void readDataFromSocket(UDTSOCKET socket);
