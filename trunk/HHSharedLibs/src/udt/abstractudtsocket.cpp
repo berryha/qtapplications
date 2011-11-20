@@ -200,15 +200,6 @@ void AbstractUDTSocket::close(){
     m_serverAddress = "";
     m_serverPort = 0;
 
-
-    foreach (UDTSOCKET socket, socketsHash.values()) {
-        qDebug()<<"-------------1";
-
-        UDT::close(socket);
-        UDT::epoll_remove_usock(epollID, socket);
-    }
-    socketsHash.clear();
-
     UDT::epoll_release(epollID);
     epollID = 0;
 
@@ -226,7 +217,12 @@ qDebug()<<"-------------3";
     }
     m_unusedCachedDataInfo.clear();
 
-qDebug()<<"-------------4";
+    qDebug()<<"-------------4";
+
+
+    // use this function to release the UDT library
+    UDT::cleanup();
+
 }
 
 bool AbstractUDTSocket::connectToHost(const QHostAddress &address, quint16 port, bool sync){
@@ -361,6 +357,14 @@ void AbstractUDTSocket::disconnectFromHost(const QHostAddress &address, quint16 
     UDT::close(socket);
 
 
+
+}
+
+void AbstractUDTSocket::closeSocket(UDTSOCKET socket){
+    qDebug()<<"--AbstractUDTSocket::closeSocket(...) "<<"socket:"<<socket;
+
+    socketsHash.remove(socketsHash.key(socket));
+    UDT::close(socket);
 
 }
 
@@ -678,7 +682,53 @@ void AbstractUDTSocket::readDataFromSocket(UDTSOCKET socket){
 }
 
 void AbstractUDTSocket::writeDataToSocket(UDTSOCKET socket){
-    qDebug()<<"--AbstractUDTSocket::writeDataToSocket() "<<"socket:"<<socket;
+    //qDebug()<<"--AbstractUDTSocket::writeDataToSocket() "<<"socket:"<<socket;
+
+    QString peerAddress = "";
+    quint16 peerPort = 0;
+    getAddressInfoFromSocket(socket, &peerAddress, &peerPort);
+    qDebug()<<"Peer Address:"<<peerAddress<<" Port:"<<peerPort;
+
+    UDTSTATUS status = UDT::getsockstate(socket);
+    qDebug()<<"status:"<<status;
+
+    switch(status){
+    case INIT:
+        break;
+    case OPENED:
+        break;
+    case LISTENING:
+        break;
+    case CONNECTING:
+        break;
+    case CONNECTED:
+    {
+        qDebug()<<"Connected!";
+
+    }
+        break;
+    case BROKEN:
+    {
+        UDT::epoll_remove_usock(epollID, socket);
+    }
+        break;
+    case CLOSING:
+        break;
+    case CLOSED:
+    {
+        UDT::epoll_remove_usock(epollID, socket);
+    }
+        break;
+    case NONEXIST:
+    {
+        UDT::epoll_remove_usock(epollID, socket);
+    }
+        break;
+    default:
+        break;
+
+
+    }
 
 
 }
@@ -792,24 +842,26 @@ AbstractUDTSocket::CachedDataInfo * AbstractUDTSocket::getCachedDataInfo(){
 
 }
 
-void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo){
+bool AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo){
 
 
     sockaddr clientaddr;
     int addrlen = sizeof(clientaddr);
+    int error;
     if(getPeerInfo){
-        UDT::getpeername(socket, &clientaddr, &addrlen);
+       error = UDT::getpeername(socket, &clientaddr, &addrlen);
     }else{
-        UDT::getsockname(socket, &clientaddr, &addrlen);
+       error = UDT::getsockname(socket, &clientaddr, &addrlen);
+    }
+    if(UDT::ERROR == error){
+        qCritical()<<QString("ERROR! Failed to get %1 address info! %2").arg(getPeerInfo?"peer":"local").arg(UDT::getlasterror().getErrorMessage());
+        return false;
     }
 
     char clienthost[NI_MAXHOST];
     char clientservice[NI_MAXSERV];
     getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    cout << "Address Info: " << clienthost << ":" << clientservice << endl;
-
-    QString str = socketsHash.key(socket);
-    qDebug()<<"str:"<<str;
+    //cout << "Address Info: " << clienthost << ":" << clientservice << endl;
 
     if(address){
         *address = QString::fromLocal8Bit(clienthost);
@@ -817,6 +869,8 @@ void AbstractUDTSocket::getAddressInfoFromSocket(UDTSOCKET socket, QString *addr
     if(port){
         *port = QString::fromLocal8Bit(clientservice).toUInt();
     }
+
+    return true;
 
 }
 

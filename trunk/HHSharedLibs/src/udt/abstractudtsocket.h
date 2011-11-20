@@ -120,6 +120,7 @@ public slots:
 
     bool connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
     void disconnectFromHost(const QHostAddress &address, quint16 port);
+    void closeSocket(UDTSOCKET socket);
 
     bool sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray);
     bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
@@ -143,7 +144,7 @@ private:
     CachedDataInfo * getCachedDataInfo();
 
 protected:
-    void getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
+    bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
 
 private:
@@ -178,6 +179,8 @@ private:
 
 
 };
+
+typedef UDTSOCKETID UDTSOCKET;
 
 }
 
