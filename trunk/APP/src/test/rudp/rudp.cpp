@@ -37,7 +37,7 @@ RUDPWidget::RUDPWidget(QWidget *parent)
 ////        //Single Process Thread
 //        QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
 
-        udtSocket = 0;
+        udtProtocol = 0;
 
         isListening = false;
         isConnected = false;
@@ -74,17 +74,17 @@ RUDPWidget::~RUDPWidget()
 //    delete m_packetHandlerBase;
 //    m_packetHandlerBase = 0;
 
-    if(udtSocket){
-        udtSocket->close();
+    if(udtProtocol){
+        udtProtocol->closeAll();
     }
-    delete udtSocket;
+    delete udtProtocol;
 
 }
 
 void RUDPWidget::listen(){
 
     if(isListening){
-        udtSocket->close();
+        udtProtocol->closeAll();
         ui.toolButtonListen->setText("Listen");
         isListening = false;
         return;
@@ -99,7 +99,8 @@ void RUDPWidget::listen(){
     ui.toolButtonListen->setText("Close");
     isListening = true;
 
-    ui.textBrowser->append("Listening on port:"+QString::number(ui.spinBoxLocalPort->value()));
+
+    //ui.textBrowser->append("Listening on port:"+QString::number(ui.spinBoxLocalPort->value()));
 
 }
 
@@ -117,17 +118,25 @@ void RUDPWidget::connectToPeer(){
 
 
     if(isConnected){
-        udtSocket->disconnectFromHost(m_peerAddress, m_peerPort);
+        udtProtocol->closeSocket(peerSockeet);
         ui.toolButtonConnect->setText("Disconnecting...");
     }else{
 
-        if(!startRUDPServer(0)){
-            ui.toolButtonConnect->setEnabled(true);
-            return;
+        if(!isListening){
+            listen();
         }
-        ui.textBrowser->append("Listening on port:"+QString::number(localPort));
 
-        udtSocket->connectToHost(m_peerAddress, m_peerPort);
+//        if(!startRUDPServer(0)){
+//            ui.toolButtonConnect->setEnabled(true);
+//            return;
+//        }
+
+
+        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort);
+        if(peerSockeet == UDTProtocolBase::INVALID_UDT_SOCK){
+            qDebug()<<"Can not connect to peer!";
+        }
+        qDebug()<<"peerSockeet:"<<peerSockeet;
         ui.toolButtonConnect->setText("Connecting...");
 
     }
@@ -137,16 +146,25 @@ void RUDPWidget::connectToPeer(){
 
 bool RUDPWidget::startRUDPServer(quint16 port){
 
-    if(!udtSocket){
-        udtSocket = new UDTSocket();
-        connect(udtSocket, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
-        connect(udtSocket, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+    if(!udtProtocol){
+        udtProtocol = new UDTSocket();
+        connect(udtProtocol, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+        connect(udtProtocol, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 
-        connect(udtSocket, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
+        connect(udtProtocol, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
 
     }
 
-    return udtSocket->listen(port);
+    serverSocket = udtProtocol->listen(port);
+    if(serverSocket == UDTProtocolBase::INVALID_UDT_SOCK){
+        return false;
+    }
+    qDebug()<<"serverSocket:"<<serverSocket;
+
+    udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
+    ui.textBrowser->append("Listening on port:"+QString::number(localPort));
+
+    return true;
     //return udtSocket->listen(port, QHostAddress("200.200.200.117"));
 
 
@@ -175,7 +193,7 @@ void RUDPWidget::send(){
 
     int i = 0;
     while (i<count) {
-        udtSocket->sendUDTStreamData(m_peerAddress, m_peerPort, &data);
+        udtProtocol->sendUDTStreamData(peerSockeet, &data);
 
         i++;
     }

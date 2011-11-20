@@ -56,7 +56,9 @@ private:
 
 
 
-    UDTSocket *udtSocket;
+    UDTSocket *udtProtocol, ;
+
+    UDTSOCKET serverSocket, peerSockeet;
 
     bool isListening;
 
