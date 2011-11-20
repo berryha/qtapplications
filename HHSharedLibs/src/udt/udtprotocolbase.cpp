@@ -504,6 +504,7 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                //TODO:Process
+                UDT::epoll_remove_usock(epollID, *it);
                 QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
             }
             writefds.clear();
@@ -629,47 +630,71 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     //qDebug()<<"--AbstractUDTSocket::writeDataToSocket() "<<"socket:"<<socket;
 
-
-    QString peerAddress = "";
-    quint16 peerPort = 0;
-    //getAddressInfoFromSocket(socket, &peerAddress, &peerPort);
-    //qDebug()<<"Peer Address:"<<peerAddress<<" Port:"<<peerPort;
+    //UDT::epoll_remove_usock(epollID, socket);
 
     UDTSTATUS status = UDT::getsockstate(socket);
     qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
+    {
+        UDT::epoll_add_usock(epollID, socket);
+        qDebug()<<"INIT";
+    }
         break;
     case OPENED: //2
+    {
+        UDT::epoll_add_usock(epollID, socket);
+        qDebug()<<"OPENED";
+    }
         break;
     case LISTENING: //3
+    {
+        UDT::epoll_add_usock(epollID, socket);
+        qDebug()<<"LISTENING";
+
+    }
         break;
     case CONNECTING: //4
+    {
+        UDT::epoll_add_usock(epollID, socket);
+        qDebug()<<"CONNECTING";
+    }
         break;
     case CONNECTED: //5
     {
+        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"CONNECTED";
 
     }
         break;
     case BROKEN: //6
     {
-        UDT::epoll_remove_usock(epollID, socket);
+        UDT::close(socket);
+
+        //UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"BROKEN";
     }
         break;
     case CLOSING: //7
+    {
+        UDT::epoll_add_usock(epollID, socket);
+        qDebug()<<"CLOSING";
+    }
         break;
     case CLOSED: //8
     {
-        UDT::epoll_remove_usock(epollID, socket);
+        UDT::close(socket);
+
+        //UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"CLOSED";
     }
         break;
     case NONEXIST: //9
     {
-        UDT::epoll_remove_usock(epollID, socket);
+        UDT::close(socket);
+
+        //UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"NONEXIST";
     }
         break;
