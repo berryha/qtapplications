@@ -5,8 +5,8 @@
  *      Author: hehui
  */
 
-#ifndef ABSTRACTUDTSOCKET_H_
-#define ABSTRACTUDTSOCKET_H_
+#ifndef UDTPROCOTOLBASESOCKET_H_
+#define UDTPROCOTOLBASESOCKET_H_
 
 #include <QObject>
 #include <QHostAddress>
@@ -25,6 +25,8 @@
     #include <netdb.h>
 #endif
 
+
+
 #include "mysharedlib_global.h"
 #include "./udt/src/udt.h"
 #include "./udt/src/ccc.h"
@@ -37,9 +39,10 @@ using namespace std;
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API AbstractUDTSocket :public QObject{
+class MYSHAREDLIB_API UDTProtocolBase :public QObject{
     Q_OBJECT
 public:
+
 
     struct SocketOptions{
         SocketOptions(){
@@ -98,8 +101,11 @@ public:
 
     };
 
-    AbstractUDTSocket(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
-    virtual ~AbstractUDTSocket();
+    UDTProtocolBase(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
+    virtual ~UDTProtocolBase();
+
+
+    static const UDTSOCKET INVALID_UDT_SOCK;
 
 
 //    void setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen);
@@ -107,23 +113,26 @@ public:
     SocketOptions getSocketOptions() const;
 
     bool isStreamMode(){return m_stream;}
+    UDTSOCKET getServerSocket(){return serverSocket;}
+
+    bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
+    void connected(UDTSOCKET socket);
     void disconnected(const QHostAddress &address, quint16 port);
-    void disconnected(int udtSocketID);
+    void disconnected(UDTSOCKET socket);
 
 
 public slots:
-    bool listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
-    void close();
+    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
+    void closeAll();
 
-    bool connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
-    void disconnectFromHost(const QHostAddress &address, quint16 port);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
     void closeSocket(UDTSOCKET socket);
 
-    bool sendUDTStreamData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray);
-    bool sendUDTMessageData(const QHostAddress &targetAddress, quint16 port, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
+    bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
+    bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
 private slots:
     void waitForNewConnection(int msec = 0);
@@ -144,7 +153,6 @@ private:
     CachedDataInfo * getCachedDataInfo();
 
 protected:
-    bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
 
 private:
@@ -180,7 +188,6 @@ private:
 
 };
 
-typedef UDTSOCKETID UDTSOCKET;
 
 }
 

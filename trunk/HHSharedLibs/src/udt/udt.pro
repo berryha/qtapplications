@@ -31,9 +31,11 @@ DEPENDPATH += $${INCLUDEPATH}
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
 # Input
-HEADERS += abstractudtsocket.h \
-            mysharedlib_global.h
-SOURCES += abstractudtsocket.cpp
+HEADERS += \
+            mysharedlib_global.h \
+    udtprotocolbase.h
+SOURCES += \
+    udtprotocolbase.cpp
 RESOURCES += 
 
 
@@ -78,3 +80,7 @@ QMAKE_TARGET_PRODUCT = "UDT4"
 QMAKE_TARGET_DESCRIPTION = "UDP-based data transfer protocol"
 QMAKE_TARGET_COPYRIGHT = "Copyright (C) 2001 - 2011 Yunhong Gu. All rights reserved."
 PACKAGE_DOMAIN = "http://udt.sf.net"
+
+
+
+

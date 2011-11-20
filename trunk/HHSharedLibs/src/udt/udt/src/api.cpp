@@ -1100,7 +1100,7 @@ int CUDTUnited::epoll_add_usock(const int eid, const UDTSOCKET u, const int* eve
       throw CUDTException(5, 4);
    }
 
-   return -1;
+   return ret;
 }
 
 int CUDTUnited::epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events)
