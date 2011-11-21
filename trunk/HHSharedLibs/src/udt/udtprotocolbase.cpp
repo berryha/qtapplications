@@ -53,8 +53,9 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
     }
 
     //IMPORTANT For Multi-thread
-    if(QThreadPool::globalInstance()->maxThreadCount() < 4){}
-    QThreadPool::globalInstance()->setMaxThreadCount(4);
+    if(QThreadPool::globalInstance()->maxThreadCount() < MIN_THREAD_COUNT){
+        QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    }
 
 
 
@@ -63,7 +64,7 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
 UDTProtocolBase::~UDTProtocolBase() {
 
     //if(m_listening){
-        closeAll();
+        closeUDTProtocol();
     //}
 
     //UDT::epoll_release(epollID);
@@ -88,8 +89,8 @@ UDTProtocolBase::SocketOptions UDTProtocolBase::getSocketOptions() const{
 
 }
 
-UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress){
-    qDebug()<<"--AbstractUDTSocket::listen(...) "<<localAddress.toString()<<":"<<port;
+UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress, int msecWaitForIOTimeout){
+    qDebug()<<"--UDTProtocolBase::listen(...) "<<localAddress.toString()<<":"<<port;
 
     if(m_listening){
         qCritical()<<"Server is already listenning!";
@@ -142,10 +143,10 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 //    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
 //    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
-    qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
-    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
-    qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
-    qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
+//    qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
+//    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
+//    qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
+//    qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
 
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
@@ -186,7 +187,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
 
     QtConcurrent::run(this, &UDTProtocolBase::waitForNewConnection, 0);
-    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, 0);
+    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
 
 
     m_listening = true;
@@ -196,8 +197,8 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
 }
 
-void UDTProtocolBase::closeAll(){
-    qDebug()<<"--AbstractUDTSocket::closeAll()";
+void UDTProtocolBase::closeUDTProtocol(){
+    qDebug()<<"--UDTProtocolBase::closeUDTProtocol()";
 
 
     m_listening = false;
@@ -207,9 +208,13 @@ void UDTProtocolBase::closeAll(){
     UDT::epoll_release(epollID);
     epollID = 0;
 
-qDebug()<<"-------------2";
-    UDT::close(serverSocket);
-qDebug()<<"-------------3";
+    qDebug()<<"-------------2";
+    //UDT::close(serverSocket);
+
+    // use this function to release the UDT library
+    UDT::cleanup();
+    qDebug()<<"-------------3";
+
     foreach (CachedDataInfo *info, m_cachedDataInfo) {
         recycleCachedDataInfo(info);
     }
@@ -224,13 +229,12 @@ qDebug()<<"-------------3";
     qDebug()<<"-------------4";
 
 
-    // use this function to release the UDT library
-    UDT::cleanup();
+
 
 }
 
 UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, bool sync){
-    qDebug()<<"--AbstractUDTSocket::connectToHost(...)" <<address.toString()<<":"<<port<<" sync:"<<sync;
+    qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port<<" sync:"<<sync;
 
     if(address.isNull() || address == QHostAddress::Any){
         qCritical()<<"ERROR! Invalid Peer Address!";
@@ -335,14 +339,14 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
 
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
-    qDebug()<<"--AbstractUDTSocket::closeSocket(...) "<<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
 
     UDT::close(socket);
 
 }
 
 void UDTProtocolBase::waitForNewConnection(int msec){
-    qDebug()<<"--AbstractUDTSocket::waitForNewConnection(...)";
+    qDebug()<<"--UDTProtocolBase::waitForNewConnection(...)";
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
@@ -380,7 +384,6 @@ void UDTProtocolBase::waitForNewConnection(int msec){
             UDT::close(peer);
             continue;
         }
-        socketsHash.insert(QString(peerAddress)+":"+QString(peerPort), peer);
 
     }
 
@@ -416,7 +419,7 @@ void UDTProtocolBase::waitForNewConnection(int msec){
 }
 
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
-    qDebug()<<"--AbstractUDTSocket::sendUDTStreamData(...) " <<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket;
 
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
@@ -428,6 +431,11 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
 
     QByteArray block = processStreamDataBeforeSent(*byteArray);
     int size = block.size();
+    if(size > MAX_DATA_BLOCK_SIZE){
+        qCritical()<<QString("ERROR! Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(size);
+        return false;
+    }
+
     const char* data = block.constData();
 
 //    int size = byteArray.size();
@@ -458,7 +466,7 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
 }
 
 bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl, bool inorder){
-    qDebug()<<"--AbstractUDTSocket::sendUDTMessageData(...) " <<" socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::sendUDTMessageData(...) " <<" socket:"<<socket;
 
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
@@ -469,6 +477,10 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 
 
     int size = byteArray->size();
+    if(size > MAX_DATA_BLOCK_SIZE){
+        qCritical()<<QString("ERROR! Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(size);
+        return false;
+    }
     const char* data = byteArray->constData();
 
     int ss = UDT::sendmsg(socket, data, size, ttl, inorder);
@@ -486,7 +498,7 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 }
 
 void UDTProtocolBase::waitForIO(int msecTimeout){
-    qDebug()<<"--AbstractUDTSocket::waitForIO(...)";
+    qDebug()<<"--UDTProtocolBase::waitForIO(...)";
 
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
@@ -520,7 +532,7 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
 }
 
 void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
-    qDebug()<<"--AbstractUDTSocket::readDataFromSocket(..) "<<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
 
 //    char peerHostAddress[NI_MAXHOST];
 //    char peerPort[NI_MAXSERV];
@@ -546,7 +558,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 
     //TODO:Size
     char* data;
-    int size = 2048;
+    int size = MAX_DATA_BLOCK_SIZE;
     data = new char[size];
 
     int rs = 0;
@@ -628,8 +640,9 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 }
 
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
-    //qDebug()<<"--AbstractUDTSocket::writeDataToSocket() "<<"socket:"<<socket;
+    //qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
+    return;
     //UDT::epoll_remove_usock(epollID, socket);
 
     UDTSTATUS status = UDT::getsockstate(socket);

@@ -25,6 +25,14 @@
     #include <netdb.h>
 #endif
 
+#ifndef MIN_THREAD_COUNT
+#define MIN_THREAD_COUNT 10
+#endif
+
+#ifndef MAX_DATA_BLOCK_SIZE
+#define MAX_DATA_BLOCK_SIZE 1024000
+#endif
+
 
 
 #include "mysharedlib_global.h"
@@ -125,10 +133,10 @@ signals:
 
 
 public slots:
-    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
-    void closeAll();
+    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = -1);
+    void closeUDTProtocol();
 
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = true);
     void closeSocket(UDTSOCKET socket);
 
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
@@ -144,8 +152,8 @@ private slots:
     QByteArray processStreamDataBeforeSent(const QByteArray &data);
     void processStreamDataAfterReceived(UDTSOCKET socket, const QByteArray &data);
 
-    virtual void streamDataReceived(int udtSocketID, const QByteArray &data) = 0;
-    virtual void messageDataReceived(int udtSocketID, const QByteArray &data) = 0;
+    virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
+    virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
 
 private:
     struct CachedDataInfo;
@@ -163,8 +171,6 @@ private:
     bool m_stream;
     QString m_serverAddress;
     quint16 m_serverPort;
-
-    QHash<QString/*IP:Port*/, UDTSOCKET> socketsHash;
 
 
     SocketOptions m_socketOptions;
