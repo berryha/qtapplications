@@ -12,12 +12,12 @@
 namespace HEHUI {
 
 
-class UDTSocket : public UDTProtocolBase
+class UDTProtocol : public UDTProtocolBase
 {
     Q_OBJECT
 public:
-    explicit UDTSocket(QObject *parent = 0);
-    ~UDTSocket();
+    explicit UDTProtocol(QObject *parent = 0);
+    ~UDTProtocol();
 
 
 signals:
@@ -27,8 +27,8 @@ signals:
 private slots:
 //    void dataReceived(const QString &address, quint16 port, char *data);
 
-    void streamDataReceived(int udtSocketID, const QByteArray &data);
-    void messageDataReceived(int udtSocketID, const QByteArray &data);
+    void streamDataReceived(UDTSOCKET socket, const QByteArray &data);
+    void messageDataReceived(UDTSOCKET socket, const QByteArray &data);
 
 
 

@@ -56,7 +56,7 @@ private:
 
 
 
-    UDTSocket *udtProtocol, ;
+    UDTProtocol *udtProtocol, ;
 
     UDTSOCKET serverSocket, peerSockeet;
 

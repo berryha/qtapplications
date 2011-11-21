@@ -1,4 +1,8 @@
+
+#include <QtConcurrentRun>
+
 #include "udtsocket.h"
+
 
 
 
@@ -7,7 +11,7 @@
 namespace HEHUI {
 
 
-UDTSocket::UDTSocket(QObject *parent) :
+UDTProtocol::UDTProtocol(QObject *parent) :
     UDTProtocolBase()
 {
 
@@ -23,7 +27,7 @@ UDTSocket::UDTSocket(QObject *parent) :
 
 }
 
-UDTSocket::~UDTSocket(){
+UDTProtocol::~UDTProtocol(){
 
     if(clientPacketsParser){
         clientPacketsParser->aboutToQuit();
@@ -41,10 +45,13 @@ UDTSocket::~UDTSocket(){
 
 }
 
-void UDTSocket::streamDataReceived(int udtSocketID, const QByteArray &data){
+void UDTProtocol::streamDataReceived(UDTSOCKET socket, const QByteArray &data){
+
+    qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
+
     QString ip = "";
     quint16 port = 0;
-    getAddressInfoFromSocket(udtSocketID, &ip, &port);
+    getAddressInfoFromSocket(socket, &ip, &port);
 
     emit dataReceived(ip, port, data);
 
@@ -68,11 +75,12 @@ void UDTSocket::streamDataReceived(int udtSocketID, const QByteArray &data){
 
 }
 
-void UDTSocket::messageDataReceived(int udtSocketID, const QByteArray &data){
+void UDTProtocol::messageDataReceived(UDTSOCKET socket, const QByteArray &data){
+    qDebug()<<"--UDTProtocol::messageDataReceived(...) "<<"socket:"<<socket;
 
     QString ip = "";
     quint16 port = 0;
-    getAddressInfoFromSocket(udtSocketID, &ip, &port);
+    getAddressInfoFromSocket(socket, &ip, &port);
 
     emit dataReceived(ip, port, data);
 
