@@ -142,8 +142,8 @@ void RUDPWidget::connectToPeer(){
         }
         qDebug()<<"peerSockeet:"<<peerSockeet;
 
-        UDTSTATUS status = UDT::getsockstate(peerSockeet);
-        qDebug()<<"status:"<<status;
+        //UDTSTATUS status = UDT::getsockstate(peerSockeet);
+        //qDebug()<<"status:"<<status;
         connected(m_peerAddress, m_peerPort);
 
     }
@@ -223,13 +223,13 @@ void RUDPWidget::connected(const QHostAddress &peerAddress, quint16 peerPort){
 
     ui.textBrowser->append("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
-    if(!isListening){
+    //if(!isListening){
         ui.lineEditIP->setEnabled(false);
         ui.spinBoxRemotePort->setEnabled(false);
         ui.toolButtonConnect->setText("Disconnect");
         ui.toolButtonConnect->setEnabled(true);
         ui.toolButtonSend->setEnabled(true);
-    }
+    //}
     isConnected = true;
 
 }
