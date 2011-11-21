@@ -511,13 +511,14 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                //TODO:Process
                 QtConcurrent::run(this, &UDTProtocolBase::readDataFromSocket, *it);
+                //readDataFromSocket(*it);
             }
             //readfds.clear();
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                //TODO:Process
-                UDT::epoll_remove_usock(epollID, *it);
                 QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
+                //writeDataToSocket(*it);
             }
             //writefds.clear();
         }
@@ -534,26 +535,6 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
 void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
 
-//    char peerHostAddress[NI_MAXHOST];
-//    char peerPort[NI_MAXSERV];
-//    getnameinfo((sockaddr *)&socket, addrlen, peerHostAddress, sizeof(clienthost), peerPort, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-//    cout << "new connection: " << peerHostAddress << ":" << peerPort << endl;
-
-
-//    struct addrinfo hints, *local;
-//    memset(&hints, 0, sizeof(struct addrinfo));
-
-//    //hints.ai_flags = AI_PASSIVE;
-//    //hints.ai_family = AF_INET;
-//    hints.ai_socktype = SOCK_STREAM;
-//    //hints.ai_socktype = SOCK_DGRAM;
-//    if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &local))
-//    {
-//        cout << "Not SOCK_STREAM" << endl;
-//        return ;
-//    }
-//    freeaddrinfo(local);
-
 
     QByteArray byteArray;
     byteArray.resize(MAX_DATA_BLOCK_SIZE);
@@ -563,41 +544,46 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     int size = MAX_DATA_BLOCK_SIZE;
     //data = new char[size];
 
-    int rs = 0;
 
+    int receivedSize = 0;
 
     if(m_stream){
-
-        while (true)
-        {
-           int rsize = 0;
-           while (rsize < size)
+        //while (true)
+        //{
+            int totalReceivedSize = 0;
+           while (totalReceivedSize < size)
            {
-              if (UDT::ERROR == (rs = UDT::recv(socket, data + rsize, size - rsize, 0)))
+              if (UDT::ERROR == (receivedSize = UDT::recv(socket, data + totalReceivedSize, size - totalReceivedSize, 0)))
               {
                   qCritical()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
                  //cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
                  break;
               }
+              qDebug()<<"-----0----receivedSize:"<<receivedSize;
 
-              rsize += rs;
+              totalReceivedSize += receivedSize;
            }
 
-           if (rsize < size)
-              break;
+           //if (totalReceivedSize < size)
+          //   break;
 
-        }
+        //}
 
         qDebug()<<"--------1-------byteArray.size(): "<<byteArray.size();
+
+        byteArray.resize(totalReceivedSize);
+        qDebug()<<"--------2-------byteArray.size(): "<<byteArray.size();
         //processStreamDataAfterReceived(socket, QByteArray(data));
         processStreamDataAfterReceived(socket, byteArray);
 
 
     }else{
-        if (UDT::ERROR == (rs = UDT::recvmsg(socket, data, size)))
+        if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
         {
            cout << "recvmsg:" << UDT::getlasterror().getErrorMessage() << endl;
         }
+
+        byteArray.resize(receivedSize);
 
         messageDataReceived(socket, QByteArray(data));
 
