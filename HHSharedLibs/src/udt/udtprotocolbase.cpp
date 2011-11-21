@@ -387,6 +387,8 @@ void UDTProtocolBase::waitForNewConnection(int msec){
             continue;
         }
 
+        QCoreApplication::processEvents();
+
     }
 
 //    sockaddr_storage clientaddr;
