@@ -75,7 +75,7 @@ RUDPWidget::~RUDPWidget()
 //    m_packetHandlerBase = 0;
 
     if(udtProtocol){
-        udtProtocol->closeAll();
+        udtProtocol->closeUDTProtocol();
     }
     delete udtProtocol;
 
@@ -84,7 +84,7 @@ RUDPWidget::~RUDPWidget()
 void RUDPWidget::listen(){
 
     if(isListening){
-        udtProtocol->closeAll();
+        udtProtocol->closeUDTProtocol();
         ui.toolButtonListen->setText("Listen");
         isListening = false;
         return;
@@ -118,8 +118,9 @@ void RUDPWidget::connectToPeer(){
 
 
     if(isConnected){
-        udtProtocol->closeSocket(peerSockeet);
         ui.toolButtonConnect->setText("Disconnecting...");
+        udtProtocol->closeSocket(peerSockeet);
+        disconnected(m_peerAddress, m_peerPort);
     }else{
 
         if(!isListening){
@@ -131,13 +132,19 @@ void RUDPWidget::connectToPeer(){
 //            return;
 //        }
 
+        ui.toolButtonConnect->setText("Connecting...");
 
-        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort);
+        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, true);
         if(peerSockeet == UDTProtocolBase::INVALID_UDT_SOCK){
             qDebug()<<"Can not connect to peer!";
+            disconnected(m_peerAddress, m_peerPort);
+            return;
         }
         qDebug()<<"peerSockeet:"<<peerSockeet;
-        ui.toolButtonConnect->setText("Connecting...");
+
+        UDTSTATUS status = UDT::getsockstate(peerSockeet);
+        qDebug()<<"status:"<<status;
+        connected(m_peerAddress, m_peerPort);
 
     }
 
@@ -147,7 +154,7 @@ void RUDPWidget::connectToPeer(){
 bool RUDPWidget::startRUDPServer(quint16 port){
 
     if(!udtProtocol){
-        udtProtocol = new UDTSocket();
+        udtProtocol = new UDTProtocol();
         connect(udtProtocol, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
         connect(udtProtocol, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 
