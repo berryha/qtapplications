@@ -133,7 +133,7 @@ signals:
 
 
 public slots:
-    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = -1);
+    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = 20);
     void closeUDTProtocol();
 
     UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = true);

@@ -512,14 +512,14 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
                //TODO:Process
                 QtConcurrent::run(this, &UDTProtocolBase::readDataFromSocket, *it);
             }
-            readfds.clear();
+            //readfds.clear();
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                //TODO:Process
                 UDT::epoll_remove_usock(epollID, *it);
                 QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
             }
-            writefds.clear();
+            //writefds.clear();
         }
 
 
@@ -555,11 +555,13 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 //    freeaddrinfo(local);
 
 
+    QByteArray byteArray;
+    byteArray.resize(MAX_DATA_BLOCK_SIZE);
 
     //TODO:Size
-    char* data;
+    char* data = byteArray.data();
     int size = MAX_DATA_BLOCK_SIZE;
-    data = new char[size];
+    //data = new char[size];
 
     int rs = 0;
 
@@ -573,7 +575,8 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
            {
               if (UDT::ERROR == (rs = UDT::recv(socket, data + rsize, size - rsize, 0)))
               {
-                 cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
+                  qCritical()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
+                 //cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
                  break;
               }
 
@@ -585,7 +588,10 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 
         }
 
-        processStreamDataAfterReceived(socket, QByteArray(data));
+        qDebug()<<"--------1-------byteArray.size(): "<<byteArray.size();
+        //processStreamDataAfterReceived(socket, QByteArray(data));
+        processStreamDataAfterReceived(socket, byteArray);
+
 
     }else{
         if (UDT::ERROR == (rs = UDT::recvmsg(socket, data, size)))
@@ -633,7 +639,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 
 
 
-    delete [] data;
+//    delete [] data;
 
 
 
@@ -736,7 +742,7 @@ QByteArray UDTProtocolBase::processStreamDataBeforeSent(const QByteArray &data){
 }
 
 void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, const QByteArray &data){
-
+    qDebug()<<"--UDTProtocolBase::processStreamDataAfterReceived(...) "<<"socket:"<<socket<<" size:"<<data.size();
 
     QByteArray byteArray(data);
 
