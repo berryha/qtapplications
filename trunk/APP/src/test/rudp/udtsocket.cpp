@@ -23,7 +23,7 @@ UDTProtocol::UDTProtocol(QObject *parent) :
     connect(clientPacketsParser, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)));
 
 
-    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
+    //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
 
 }
 
