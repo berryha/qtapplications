@@ -133,7 +133,7 @@ signals:
 
 
 public slots:
-    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = 20);
+    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = 100);
     void closeUDTProtocol();
 
     UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = true);
@@ -142,9 +142,14 @@ public slots:
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
+
+
 private slots:
     void waitForNewConnection(int msec = 0);
     void waitForIO(int msecTimeout = 0);
+    void waitForReading(int msecTimeout = 0);
+    void waitForWriting(int msecTimeout = 0);
+
 
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
