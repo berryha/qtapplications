@@ -60,8 +60,8 @@ public:
             UDT_MSS = 1500;
 #endif
 
-            UDT_SNDSYN = true;
-            UDT_RCVSYN = true;
+            UDT_SNDSYN = false; //UDT Default:true
+            UDT_RCVSYN = false; //UDT Default:true
             UDT_CC = 0;
             UDT_FC = 25600;
 
@@ -73,8 +73,8 @@ public:
             UDT_LINGER.l_linger = 180;
             UDT_RENDEZVOUS = false;
 
-            UDT_SNDTIMEO = -1;
-            UDT_RCVTIMEO = -1;
+            UDT_SNDTIMEO = 1000; //UDT Default:-1
+            UDT_RCVTIMEO = 1000; //UDT Default:-1
 
             UDT_REUSEADDR = true;
             UDT_MAXBW = -1;
@@ -116,7 +116,7 @@ public:
     static const UDTSOCKET INVALID_UDT_SOCK;
 
 
-//    void setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen);
+    //    void setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen);
     void setSocketOptions(const SocketOptions *options);
     SocketOptions getSocketOptions() const;
 
@@ -133,23 +133,27 @@ signals:
 
 
 public slots:
-    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any, int msecWaitForIOTimeout = 1000);
-    void closeUDTProtocol();
+    //Start the server to listen,  implement the virtual function startWaitingForIO()
+    UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = true);
+    //Call this function after server is listening
+    virtual void startWaitingForIO(int msecWaitForIOTimeout = -1);
+
+
+
+    //Connect to peer
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
+    //Close peer socket
     void closeSocket(UDTSOCKET socket);
 
+    //Send data
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
-
+    //Close the server
+    void closeUDTProtocol();
 
 private slots:
-    void waitForNewConnection(int msec = 0);
-    void waitForIO(int msecTimeout = 0);
-    void waitForReading(int msecTimeout = 0);
-    void waitForWriting(int msecTimeout = 0);
-
 
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
@@ -160,12 +164,22 @@ private slots:
     virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
     virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
 
+    //@Unused
+    void waitForNewConnection(int msec = 0);
+    //@Unused
+    void waitForIO(int msecTimeout = 0);
+
+
 private:
     struct CachedDataInfo;
     void recycleCachedDataInfo(CachedDataInfo* info);
     CachedDataInfo * getCachedDataInfo();
 
+
 protected:
+    void waitForReading(int msecTimeout = -1);
+    void waitForWriting(int msecTimeout = -1);
+    UDTSOCKET acceptNewConnection();
 
 
 private:
