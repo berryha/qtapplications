@@ -894,6 +894,7 @@ void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArra
     QIODevice *dev = in.device();
 
     QByteArray temp;
+    qint64 offset = 0;
 
     forever{
         in >> temp;
@@ -902,12 +903,14 @@ void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArra
                 cachedData = new QByteArray();
                 m_cachedDataInfoHash.insert(socket, cachedData);
             }
-            dev->seek(0);
+
+            dev->seek(offset);
             cachedData->append(dev->readAll());
             break;
 
         }else{
             streamDataReceived(socket, temp);
+            offset  = dev->pos();
         }
 
     }
