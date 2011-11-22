@@ -158,7 +158,7 @@ private slots:
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
 
-    QByteArray processStreamDataBeforeSent(const QByteArray *data);
+//    QByteArray processStreamDataBeforeSent(const QByteArray *data);
     void processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray);
 
     virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
@@ -231,6 +231,8 @@ private:
         QByteArray *data;
     };
     QHash<UDTSOCKET, CachedDataInfo*> m_cachedDataInfo;
+    QHash<UDTSOCKET, QByteArray*> m_cachedDataInfoHash;
+
 
     QList<CachedDataInfo*> m_unusedCachedDataInfo;
 
