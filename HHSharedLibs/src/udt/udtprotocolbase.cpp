@@ -26,7 +26,7 @@
 //    //#endif
 //#endif
 
-
+//#include <QDateTime>
 
 namespace HEHUI {
 
@@ -137,22 +137,25 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
 
-    qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
-    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
-    qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
-    qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
-    qDebug()<<"m_socketOptions.UDT_FC:"<<m_socketOptions.UDT_FC;
-    qDebug()<<"m_socketOptions.UDT_SNDBUF:"<<m_socketOptions.UDT_SNDBUF;
-    qDebug()<<"m_socketOptions.UDT_RCVBUF:"<<m_socketOptions.UDT_RCVBUF;
-    qDebug()<<"m_socketOptions.UDP_SNDBUF:"<<m_socketOptions.UDP_SNDBUF;
-    qDebug()<<"m_socketOptions.UDP_RCVBUF:"<<m_socketOptions.UDP_RCVBUF;
-    qDebug()<<"m_socketOptions.UDT_LINGER:"<<m_socketOptions.UDT_LINGER.l_linger;
-    qDebug()<<"m_socketOptions.UDT_RENDEZVOUS:"<<m_socketOptions.UDT_RENDEZVOUS;
-    qDebug()<<"m_socketOptions.UDT_SNDTIMEO:"<<m_socketOptions.UDT_SNDTIMEO;
-    qDebug()<<"m_socketOptions.UDT_RCVTIMEO:"<<m_socketOptions.UDT_RCVTIMEO;
-    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
-    qDebug()<<"m_socketOptions.UDT_MAXBW:"<<m_socketOptions.UDT_MAXBW;
+//    qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
+//    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
+//    qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
+//    qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
+//    qDebug()<<"m_socketOptions.UDT_FC:"<<m_socketOptions.UDT_FC;
+//    qDebug()<<"m_socketOptions.UDT_SNDBUF:"<<m_socketOptions.UDT_SNDBUF;
+//    qDebug()<<"m_socketOptions.UDT_RCVBUF:"<<m_socketOptions.UDT_RCVBUF;
+//    qDebug()<<"m_socketOptions.UDP_SNDBUF:"<<m_socketOptions.UDP_SNDBUF;
+//    qDebug()<<"m_socketOptions.UDP_RCVBUF:"<<m_socketOptions.UDP_RCVBUF;
+//    qDebug()<<"m_socketOptions.UDT_LINGER:"<<m_socketOptions.UDT_LINGER.l_linger;
+//    qDebug()<<"m_socketOptions.UDT_RENDEZVOUS:"<<m_socketOptions.UDT_RENDEZVOUS;
+//    qDebug()<<"m_socketOptions.UDT_SNDTIMEO:"<<m_socketOptions.UDT_SNDTIMEO;
+//    qDebug()<<"m_socketOptions.UDT_RCVTIMEO:"<<m_socketOptions.UDT_RCVTIMEO;
+//    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
+//    qDebug()<<"m_socketOptions.UDT_MAXBW:"<<m_socketOptions.UDT_MAXBW;
 
+//    bool sync = false;
+//    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &sync, sizeof(bool));
+//    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &sync, sizeof(bool));
 
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
@@ -180,7 +183,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     }
 
     epollID = UDT::epoll_create();
-    //UDT::epoll_add_usock(epollID, serverSocket);
+    UDT::epoll_add_usock(epollID, serverSocket);
 
 
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForNewConnection, 0);
@@ -207,7 +210,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 void UDTProtocolBase::startWaitingForIO(int msecWaitForIOTimeout){
     qDebug()<<"--UDTProtocolBase::startWaitingForIO(...) "<<"msecWaitForIOTimeout:"<<msecWaitForIOTimeout;
 
-//    QtConcurrent::run(this, &UDTProtocolBase::waitForNewConnection, msecWaitForIOTimeout);
+
 //    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
 
     QtConcurrent::run(this, &UDTProtocolBase::waitForReading, msecWaitForIOTimeout);
@@ -325,7 +328,7 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
         freeaddrinfo(local);
 
         //TODO:Close the socket
-        UDT::close(client);
+        //UDT::close(client);
         return UDT::INVALID_SOCK;
     }
     freeaddrinfo(local);
@@ -363,83 +366,6 @@ void UDTProtocolBase::closeSocket(UDTSOCKET socket){
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
     recycleCachedData(data);
-
-}
-
-void UDTProtocolBase::waitForNewConnection(int msecSleep){
-    qDebug()<<"--UDTProtocolBase::waitForNewConnection(...)";
-
-    Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
-    if(!epollID){
-        qCritical()<<"ERROR! EPOLL Not Initialized!";
-        return;
-    }
-
-    sockaddr_storage clientaddr;
-    int addrlen = sizeof(clientaddr);
-    UDTSOCKET peer;
-
-    while(m_listening){
-
-        if (UDT::INVALID_SOCK == (peer = UDT::accept(serverSocket, (sockaddr*)&clientaddr, &addrlen)))
-        {
-            //qWarning()<<"ERROR! Invalid UDTSOCKET! "<< UDT::getlasterror().getErrorMessage();
-            //cout << "accept: " << UDT::getlasterror().getErrorMessage() << endl;
-
-            int errorCode = UDT::getlasterror().getErrorCode();
-            if(errorCode == UDT::ERRORINFO::EINVSOCK || errorCode == UDT::ERRORINFO::ENOLISTEN){
-                return;
-            }
-            continue;
-        }
-
-        char peerAddress[NI_MAXHOST];
-        char peerPort[NI_MAXSERV];
-        getnameinfo((sockaddr *)&clientaddr, addrlen, peerAddress, sizeof(peerAddress), peerPort, sizeof(peerPort), NI_NUMERICHOST|NI_NUMERICSERV);
-        cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
-
-
-        if(UDT::epoll_add_usock(epollID, peer, NULL) < 0){
-            qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
-            //fprintf(stderr, "epoll_add_usock error\n");
-            UDT::close(peer);
-            continue;
-        }
-
-        QCoreApplication::processEvents();
-
-
-
-    }
-
-    //    sockaddr_storage clientaddr;
-    //    int addrlen = sizeof(clientaddr);
-    //    //UDTSOCKET recver;
-
-    //    while (true)
-    //    {
-    //       if (UDT::INVALID_SOCK == (peer = UDT::accept(serv, (sockaddr*)&clientaddr, &addrlen)))
-    //       {
-    //          cout << "accept: " << UDT::getlasterror().getErrorMessage() << endl;
-    //          continue;
-    //       }
-
-    //       char clienthost[NI_MAXHOST];
-    //       char clientservice[NI_MAXSERV];
-    //       getnameinfo((sockaddr *)&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    //       cout << "new connection: " << clienthost << ":" << clientservice << endl;
-
-    //       #ifndef Q_OS_WIN32
-    //          pthread_t rcvthread;
-    //          pthread_create(&rcvthread, NULL, recvdata, new UDTSOCKET(recver));
-    //          pthread_detach(rcvthread);
-    //       #else
-    //          CreateThread(NULL, 0, recvdata, new UDTSOCKET(peer), 0, NULL);
-    //          //CreateThread(NULL, 0, recvdata, &recver, 0, NULL);
-    //       #endif
-    //    }
-
-
 
 }
 
@@ -527,31 +453,35 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 }
 
 void UDTProtocolBase::waitForIO(int msecTimeout){
-    qDebug()<<"--UDTProtocolBase::waitForIO(...)";
+    qDebug()<<"--UDTProtocolBase::waitForIO(...) "<<" msecTimeout:"<<msecTimeout<<" Thread Id:"<<QThread::currentThreadId();
 
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
 
     while(m_listening){
+
+        //acceptNewConnection();
+
         count = UDT::epoll_wait(epollID, &readfds, &writefds, msecTimeout);
         if(count > 0){
-            printf("epoll returned %d sockets ready to IO | %d in read set, %d in write set\n", count, readfds.size(), writefds.size());
+            //printf("epoll returned %d sockets ready to IO | %d in read set, %d in write set\n", count, readfds.size(), writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
                 //QtConcurrent::run(this, &UDTProtocolBase::readDataFromSocket, *it);
                 readDataFromSocket(*it);
             }
-            //readfds.clear();
+            readfds.clear();
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                 //TODO:Process
                 //QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
                 writeDataToSocket(*it);
             }
-            //writefds.clear();
+            writefds.clear();
         }
-
+        //qDebug()<<"----------------------------------------1"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
+        //QCoreApplication::processEvents();
 
     }
 
@@ -569,11 +499,9 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
     while(m_listening){
 
-        acceptNewConnection();
-
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
+            //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
@@ -613,13 +541,12 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
             //writefds.clear();
         }
 
-        //acceptNewConnection();
     }
 
 }
 
 UDTSOCKET UDTProtocolBase::acceptNewConnection(){
-    //qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
+    qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
 
     sockaddr_storage clientaddr;
     int addrlen = sizeof(clientaddr);
@@ -676,7 +603,12 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
 }
 
 void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
-    //qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
+
+    if(socket == serverSocket){
+        acceptNewConnection();
+        return;
+    }
 
 
     int size = MAX_DATA_BLOCK_SIZE + 4;
@@ -770,7 +702,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     //qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
-    return;
+    //return;
     //UDT::epoll_remove_usock(epollID, socket);
 
     UDTSTATUS status = UDT::getsockstate(socket);
@@ -779,32 +711,27 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     switch(status){
     case INIT: //1
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"INIT";
     }
         break;
     case OPENED: //2
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"OPENED";
     }
         break;
     case LISTENING: //3
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"LISTENING";
 
     }
         break;
     case CONNECTING: //4
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"CONNECTING";
     }
         break;
     case CONNECTED: //5
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"CONNECTED";
 
     }
@@ -812,14 +739,13 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     case BROKEN: //6
     {
         UDT::close(socket);
-
-        //UDT::epoll_remove_usock(epollID, socket);
+        UDT::epoll_remove_usock(epollID, socket);
+        emit disconnected(socket);
         qDebug()<<"BROKEN";
     }
         break;
     case CLOSING: //7
     {
-        UDT::epoll_add_usock(epollID, socket);
         qDebug()<<"CLOSING";
     }
         break;
@@ -827,7 +753,8 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     {
         UDT::close(socket);
 
-        //UDT::epoll_remove_usock(epollID, socket);
+        UDT::epoll_remove_usock(epollID, socket);
+        emit disconnected(socket);
         qDebug()<<"CLOSED";
     }
         break;
@@ -835,7 +762,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     {
         UDT::close(socket);
 
-        //UDT::epoll_remove_usock(epollID, socket);
+        UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"NONEXIST";
     }
         break;
