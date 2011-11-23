@@ -1,4 +1,4 @@
-/*
+﻿/*
  * abstractudtsocket.cpp
  *
  *  Created on: 2010-12-15
@@ -234,16 +234,15 @@ void UDTProtocolBase::closeUDTProtocol(){
     UDT::cleanup();
     qDebug()<<"-------------3";
 
-    foreach (CachedDataInfo *info, m_cachedDataInfo) {
-        recycleCachedDataInfo(info);
+    foreach (QByteArray *info, m_cachedDataInfoHash) {
+        recycleCachedData(info);
     }
-    m_cachedDataInfo.clear();
+    m_cachedDataInfoHash.clear();
 
-    foreach (CachedDataInfo *info, m_unusedCachedDataInfo) {
-        delete info->data;
+    foreach (QByteArray *info, m_unusedCached) {
         delete info;
     }
-    m_unusedCachedDataInfo.clear();
+    m_unusedCached.clear();
 
     qDebug()<<"-------------4";
 
@@ -362,8 +361,8 @@ void UDTProtocolBase::closeSocket(UDTSOCKET socket){
 
     UDT::close(socket);
 
-    CachedDataInfo *info = m_cachedDataInfo.take(socket);
-    recycleCachedDataInfo(info);
+    QByteArray *data = m_cachedDataInfoHash.take(socket);
+    recycleCachedData(data);
 
 }
 
@@ -679,8 +678,6 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
 void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     //qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
 
-    //qDebug()<<"--1--QThread::currentThreadId():"<<QThread::currentThreadId();
-
 
     int size = MAX_DATA_BLOCK_SIZE + 4;
 
@@ -705,7 +702,6 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
                 //cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
                 break;
             }
-            //qDebug()<<"-----0----receivedSize:"<<receivedSize;
 
             totalReceivedSize += receivedSize;
         }
@@ -714,15 +710,8 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
             return;
         }
 
-        //qDebug()<<"--------1-------byteArray.size(): "<<byteArray.size();
-
         byteArray.resize(totalReceivedSize);
-        qDebug()<<"--------2-------byteArray.size(): "<<byteArray.size();
-        //processStreamDataAfterReceived(socket, QByteArray(data));
-
         processStreamDataAfterReceived(socket, &byteArray);
-
-
 
     }else{
         if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
@@ -859,39 +848,9 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
 }
 
-//inline QByteArray UDTProtocolBase::processStreamDataBeforeSent(const QByteArray *data){
-
-//    QByteArray block;
-//    block.clear();
-//    QDataStream out(&block, QIODevice::WriteOnly);
-//    out.setVersion(QDataStream::Qt_4_7);
-//    out << *data ;
-
-//    return block;
-
-//}
-
 void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray){
     qDebug()<<"--UDTProtocolBase::processStreamDataAfterReceived(...) "<<"socket:"<<socket<<" size:"<<byteArray->size();
 
-    //QByteArray byteArray(data);
-
-//    CachedDataInfo *info = m_cachedDataInfo.value(socket);
-
-//    qint32 blockSize = info?info->blockSize:0;
-//    QByteArray *cachedData = info?info->data:0;
-
-//    if(0 != blockSize){
-//        //cachedData = info->data;
-//        Q_ASSERT(cachedData);
-
-//        byteArray->prepend(*cachedData);
-//        cachedData->clear();
-
-//        if(-1 == blockSize){
-//            blockSize = 0;
-//        }
-//    }
 
     QByteArray *cachedData = m_cachedDataInfoHash.value(socket);
     if(cachedData){
@@ -927,105 +886,22 @@ void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArra
     }
 
 
-
-
-
-//    qint64 readSize = 0;
-//    forever{
-
-//        if(0 == blockSize){
-
-////            blockSize = sizeof(qint32);
-////            temp.clear();
-////            temp.resize(blockSize);
-////            readSize = dev->read(temp.data(), blockSize);
-////            if(readSize == blockSize){
-////                blockSize = temp.toInt();
-////                //continue;
-////            }else{
-////                if(!info){
-////                    info = getCachedDataInfo();
-////                    m_cachedDataInfo.insert(socket, info);
-////                }
-////                info->blockSize = -1;
-////                *(info->data) = temp;
-////                break;
-////            }
-
-//            in >> blockSize;
-//            if(0 == blockSize){
-//                if(in.atEnd()){return;}
-//                if(!info){
-//                    info = getCachedDataInfo();
-//                    m_cachedDataInfo.insert(socket, info);
-//                }
-//                info->blockSize = -1;
-//                *(info->data) = *byteArray;
-//                break;
-//            }
-
-
-//        }
-
-//        in >> temp;
-//        Q_ASSERT_X(temp.size() <= blockSize, "temp.size() > blockSize", "Read Error!");
-//        if(temp.size() == blockSize){
-//            streamDataReceived(socket, temp);
-//            blockSize = 0;
-//            if(in.atEnd()){return;}
-//            continue;
-//        }else if(temp.size() < blockSize){
-//            if(!info){
-//                info = getCachedDataInfo();
-//                m_cachedDataInfo.insert(socket, info);
-//            }
-//            info->blockSize = blockSize;
-//            info->data->append(temp);
-//            Q_ASSERT_X(info->data->size() <= blockSize, "info->data->size() > blockSize", "Read Error!");
-//            break;
-//        }else{
-//            qCritical("ERROR! Read Error!");
-//            return;
-//        }
-
-
-//        temp.clear();
-//        temp.resize(blockSize);
-//        readSize = dev->read(temp.data(), blockSize);
-//        if(readSize == blockSize){
-//            streamDataReceived(socket, temp);
-//            blockSize = 0;
-//            continue;
-//        }else{
-//            if(!info){
-//                info = getCachedDataInfo();
-//                m_cachedDataInfo.insert(socket, info);
-//            }
-//            info->blockSize = blockSize;
-//            *(info->data) = temp;
-//            break;
-//        }
-
-//    }
-
-
 }
 
-void UDTProtocolBase::recycleCachedDataInfo(CachedDataInfo* info){
-    if(!info){
+void UDTProtocolBase::recycleCachedData(QByteArray* data){
+    if(!data){
         return;
     }
-    info->blockSize = 0;
-    info->data->clear();
-    //info->m_data->resize(0);
+    data->clear();
+
 }
 
-UDTProtocolBase::CachedDataInfo * UDTProtocolBase::getCachedDataInfo(){
+QByteArray * UDTProtocolBase::getCachedData(){
 
-    if(m_unusedCachedDataInfo.isEmpty()){
-        return new CachedDataInfo();
+    if(m_unusedCached.isEmpty()){
+        return new QByteArray();
     }
-    return m_unusedCachedDataInfo.takeFirst();
+    return m_unusedCached.takeFirst();
 
 }
 
