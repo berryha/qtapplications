@@ -137,7 +137,7 @@ public slots:
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
     //Call this function after server is listening
-    virtual void startWaitingForIO(int msecWaitForIOTimeout = -1);
+    virtual void startWaitingForIO(int msecWaitForIOTimeout = 1000);
 
 
 
@@ -165,9 +165,9 @@ private slots:
     virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
 
     //@Unused
-    void waitForNewConnection(int msec = 0);
-    //@Unused
+    void waitForNewConnection(int msecSleep = 0);
     void waitForIO(int msecTimeout = 0);
+
 
 
 private:
@@ -175,8 +175,10 @@ private:
     void recycleCachedDataInfo(CachedDataInfo* info);
     CachedDataInfo * getCachedDataInfo();
 
+    UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
 
 protected:
+    //@Unused
     void waitForReading(int msecTimeout = -1);
     void waitForWriting(int msecTimeout = -1);
     UDTSOCKET acceptNewConnection();
@@ -235,7 +237,6 @@ private:
 
 
     QList<CachedDataInfo*> m_unusedCachedDataInfo;
-
 
 
 
