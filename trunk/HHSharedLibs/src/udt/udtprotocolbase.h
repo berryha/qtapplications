@@ -137,7 +137,7 @@ public slots:
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
     //Call this function after server is listening
-    virtual void startWaitingForIO(int msecWaitForIOTimeout = 1000);
+    virtual void startWaitingForIO(int msecWaitForIOTimeout = -1);
 
 
 
@@ -163,9 +163,7 @@ private slots:
     virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
     virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
 
-    //@Unused
-    void waitForNewConnection(int msecSleep = 0);
-    void waitForIO(int msecTimeout = 0);
+    void waitForIO(int msecTimeout = -1);
 
 
 
