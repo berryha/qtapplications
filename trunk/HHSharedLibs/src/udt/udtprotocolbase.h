@@ -1,4 +1,4 @@
-/*
+﻿/*
  * abstractudtsocket.h
  *
  *  Created on: 2010-12-15
@@ -158,7 +158,6 @@ private slots:
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
 
-//    QByteArray processStreamDataBeforeSent(const QByteArray *data);
     void processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray);
 
     virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
@@ -172,8 +171,8 @@ private slots:
 
 private:
     struct CachedDataInfo;
-    void recycleCachedDataInfo(CachedDataInfo* info);
-    CachedDataInfo * getCachedDataInfo();
+    void recycleCachedData(QByteArray *data);
+    QByteArray *getCachedData();
 
     UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
 
@@ -196,47 +195,8 @@ private:
 
     SocketOptions m_socketOptions;
 
-
-    ///////////////
-//    class CachedDataInfo : public QObject{
-//        CachedDataInfo(int blockSize = 0, QByteArray *data = 0, QObject *parent = 0)
-//            :QObject(parent)
-//        {
-//            this->m_blockSize = blockSize;
-//            if(!data){
-//                data = new QByteArray();
-//            }
-//        }
-//        ~CachedDataInfo(){
-//            m_blockSize = 0;
-//            m_data->clear();
-//            delete m_data;
-//        }
-//        int blockSize(){return m_blockSize;}
-//        void setBlockSize(int blockSize){m_blockSize = blockSize;}
-//        QByteArray *data(){return m_data;}
-//    private:
-//        int m_blockSize;
-//        QByteArray *m_data;
-//    };
-    //////////////
-
-
-
-    struct CachedDataInfo{
-        CachedDataInfo(){
-            blockSize = 0;
-            data = new QByteArray();
-            data->resize(0);
-        }
-        qint32 blockSize;
-        QByteArray *data;
-    };
-    QHash<UDTSOCKET, CachedDataInfo*> m_cachedDataInfo;
     QHash<UDTSOCKET, QByteArray*> m_cachedDataInfoHash;
-
-
-    QList<CachedDataInfo*> m_unusedCachedDataInfo;
+    QList<QByteArray*> m_unusedCached;
 
 
 
