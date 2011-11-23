@@ -105,14 +105,6 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     hints.ai_family = AF_INET;
     hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
 
-
-    //    struct sockaddr_in sin;
-    //    memset(&sin, 0, sizeof(sin));
-    //    sin.sin_family = AF_INET;
-    //    sin.sin_addr.s_addr = inet_addr(localAddress.toString().toLocal8Bit().data());
-    //    sin.sin_port = htons(port);
-
-
     if (0 != getaddrinfo(localAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &localAddressInfo))
         //if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
     {
@@ -123,35 +115,45 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
     serverSocket = UDT::socket(localAddressInfo->ai_family, localAddressInfo->ai_socktype, localAddressInfo->ai_protocol);
 
-    //    // UDT Options
-//    UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &(m_socketOptions.UDT_SNDSYN), sizeof(bool));
-//    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &(m_socketOptions.UDT_RCVSYN), sizeof(bool));
-//    if(m_socketOptions.UDT_CC){
-//        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
-//        //UDT::setsockopt(serv, 0, UDT_CC, &(m_socketOptions.UDT_CC), sizeof(CCC));
-//    }
-//    UDT::setsockopt(serverSocket, 0, UDT_FC, &(m_socketOptions.UDT_FC), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_SNDBUF, &(m_socketOptions.UDT_SNDBUF), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_RCVBUF, &(m_socketOptions.UDT_RCVBUF), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDP_SNDBUF, &(m_socketOptions.UDP_SNDBUF), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDP_RCVBUF, &(m_socketOptions.UDP_RCVBUF), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_LINGER, &(m_socketOptions.UDT_LINGER), sizeof(linger));
-//    UDT::setsockopt(serverSocket, 0, UDT_RENDEZVOUS, &(m_socketOptions.UDT_RENDEZVOUS), sizeof(bool));
-//    UDT::setsockopt(serverSocket, 0, UDT_SNDTIMEO, &(m_socketOptions.UDT_SNDTIMEO), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_RCVTIMEO, &(m_socketOptions.UDT_RCVTIMEO), sizeof(int));
-//    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
-//    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
+    // UDT Options
+    //TODO: setup UDT_MSS
+    //UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &(m_socketOptions.UDT_SNDSYN), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &(m_socketOptions.UDT_RCVSYN), sizeof(bool));
+    if(m_socketOptions.UDT_CC){
+        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
+        //UDT::setsockopt(serv, 0, UDT_CC, &(m_socketOptions.UDT_CC), sizeof(CCC));
+    }
+    UDT::setsockopt(serverSocket, 0, UDT_FC, &(m_socketOptions.UDT_FC), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDBUF, &(m_socketOptions.UDT_SNDBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVBUF, &(m_socketOptions.UDT_RCVBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDP_SNDBUF, &(m_socketOptions.UDP_SNDBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDP_RCVBUF, &(m_socketOptions.UDP_RCVBUF), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_LINGER, &(m_socketOptions.UDT_LINGER), sizeof(linger));
+    UDT::setsockopt(serverSocket, 0, UDT_RENDEZVOUS, &(m_socketOptions.UDT_RENDEZVOUS), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_SNDTIMEO, &(m_socketOptions.UDT_SNDTIMEO), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_RCVTIMEO, &(m_socketOptions.UDT_RCVTIMEO), sizeof(int));
+    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
+    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
 
     qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
     qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
     qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
     qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
+    qDebug()<<"m_socketOptions.UDT_FC:"<<m_socketOptions.UDT_FC;
+    qDebug()<<"m_socketOptions.UDT_SNDBUF:"<<m_socketOptions.UDT_SNDBUF;
+    qDebug()<<"m_socketOptions.UDT_RCVBUF:"<<m_socketOptions.UDT_RCVBUF;
+    qDebug()<<"m_socketOptions.UDP_SNDBUF:"<<m_socketOptions.UDP_SNDBUF;
+    qDebug()<<"m_socketOptions.UDP_RCVBUF:"<<m_socketOptions.UDP_RCVBUF;
+    qDebug()<<"m_socketOptions.UDT_LINGER:"<<m_socketOptions.UDT_LINGER.l_linger;
+    qDebug()<<"m_socketOptions.UDT_RENDEZVOUS:"<<m_socketOptions.UDT_RENDEZVOUS;
+    qDebug()<<"m_socketOptions.UDT_SNDTIMEO:"<<m_socketOptions.UDT_SNDTIMEO;
+    qDebug()<<"m_socketOptions.UDT_RCVTIMEO:"<<m_socketOptions.UDT_RCVTIMEO;
+    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
+    qDebug()<<"m_socketOptions.UDT_MAXBW:"<<m_socketOptions.UDT_MAXBW;
 
-    bool sync = false;
-    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &sync, sizeof(bool));
-    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &sync, sizeof(bool));
+
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
     {
@@ -164,13 +166,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
         serverSocket = UDT::INVALID_SOCK;
         return UDT::INVALID_SOCK;
     }
-
-    getAddressInfoFromSocket(serverSocket, &m_serverAddress, &m_serverPort, false);
-    qDebug()<<QString("Server is ready on %1:%2").arg(m_serverAddress).arg(m_serverPort);
-
-
     freeaddrinfo(localAddressInfo);
-
 
 
     if (UDT::ERROR == UDT::listen(serverSocket, 10))
@@ -186,19 +182,18 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     epollID = UDT::epoll_create();
     //UDT::epoll_add_usock(epollID, serverSocket);
 
-    //    m_serverAddress = localAddress;
-    //    m_serverPort = port;
-
 
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForNewConnection, 0);
-    //    Sleep(2000);
-
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForReading, msecWaitForIOTimeout);
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForWriting, msecWaitForIOTimeout);
 
 
     m_listening = true;
+
+    getAddressInfoFromSocket(serverSocket, &m_serverAddress, &m_serverPort, false);
+    qDebug()<<QString("Server is ready on %1:%2").arg(m_serverAddress).arg(m_serverPort);
+
 
     //Call startWaitingForIO() to wait for IO
 
