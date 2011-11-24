@@ -78,74 +78,80 @@ class MYSHAREDLIB_API Packet
 {
 
 public:
-	Packet();
-        Packet(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "0.0.0.0", quint16 localPort = 0);
-        Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0);
-        Packet(const Packet &packet);
-        Packet & operator = (const Packet &packet);
-	virtual ~Packet();
+    Packet();
+    Packet(int socketID);
 
-        void resetPacket();
-	virtual bool isValid();
+    Packet(const QString &peerAddress, quint16 peerPort, const QString &localAddress = "0.0.0.0", quint16 localPort = 0);
+    Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0);
 
-	quint8 getPacketType() const;
-	void setPacketType(quint8 packetType);
+    Packet(const Packet &packet);
+    Packet & operator = (const Packet &packet);
+    virtual ~Packet();
 
-//        static quint16 createSerialNumber();
+    void resetPacket();
+    virtual bool isValid();
 
-//	quint16 getPacketSerialNumber() const;
-//	void setPacketSerialNumber(quint16 packetSerialNumber);
+    quint8 getPacketType() const;
+    void setPacketType(quint8 packetType);
 
-        QByteArray  getPacketData() const;
-	void setPacketData(const QByteArray &data);
+    //        static quint16 createSerialNumber();
 
-        QHostAddress getPeerHostAddress() const;
-        void setPeerHostAddress(const QHostAddress &peerHostAddress);
+    //	quint16 getPacketSerialNumber() const;
+    //	void setPacketSerialNumber(quint16 packetSerialNumber);
 
-        quint16 getPeerHostPort() const;
-        void setPeerHostPort(quint16 peerHostPort);
+    QByteArray  getPacketData() const;
+    void setPacketData(const QByteArray &data);
 
-        QHostAddress getLocalHostAddress() const;
-        void setLocalHostAddress(const QHostAddress &localHostAddress);
+    QHostAddress getPeerHostAddress() const;
+    void setPeerHostAddress(const QHostAddress &peerHostAddress);
 
-        quint16 getLocalHostPort() const;
-        void setLocalHostPort(quint16 localHostPort);
+    quint16 getPeerHostPort() const;
+    void setPeerHostPort(quint16 peerHostPort);
 
-	TransmissionProtocol getTransmissionProtocol() const;
-	void setTransmissionProtocol(TransmissionProtocol transmissionProtocol);
+    QHostAddress getLocalHostAddress() const;
+    void setLocalHostAddress(const QHostAddress &localHostAddress);
 
-        int getRemainingRetransmissionTimes() const;
-        void setRemainingRetransmissionTimes(int remainingRetransmissionTimes);
+    quint16 getLocalHostPort() const;
+    void setLocalHostPort(quint16 localHostPort);
 
-        QDateTime getLastTransmissionTime() const;
-        void setLastTransmissionTime(const QDateTime &time);
+    TransmissionProtocol getTransmissionProtocol() const;
+    void setTransmissionProtocol(TransmissionProtocol transmissionProtocol);
+
+    int getRemainingRetransmissionTimes() const;
+    void setRemainingRetransmissionTimes(int remainingRetransmissionTimes);
+
+    QDateTime getLastTransmissionTime() const;
+    void setLastTransmissionTime(const QDateTime &time);
+
+    int getSocketID() const;
+    void setSocketID(int id);
 
 
-
-
-	void packetTransmissionFailed();
+    void packetTransmissionFailed();
 
 
 private:
 
 
-	quint8 packetType;
-        //quint16 m_packetSerialNumber;
+    quint8 packetType;
+    //quint16 m_packetSerialNumber;
 
 
-	QByteArray packetData;
+    QByteArray packetData;
 
-        QHostAddress peerHostAddress;
-        quint16 peerHostPort;
+    QHostAddress peerHostAddress;
+    quint16 peerHostPort;
 
-        QHostAddress localHostAddress;
-        quint16 localHostPort;
+    QHostAddress localHostAddress;
+    quint16 localHostPort;
 
-	TransmissionProtocol transmissionProtocol;
+    TransmissionProtocol transmissionProtocol;
 
-        int remainingRetransmissionTimes;
+    int remainingRetransmissionTimes;
 
-        QDateTime lastTransmissionTime;
+    QDateTime lastTransmissionTime;
+
+    int socketID;
 
 
 

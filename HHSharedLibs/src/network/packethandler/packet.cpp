@@ -79,9 +79,34 @@ Packet::Packet() {
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
+    this->socketID = 0;
+
         
 
 }
+
+Packet::Packet(int socketID){
+
+    this->packetType = UnKnownPacket;
+    //this->m_packetSerialNumber = 0;
+    this->packetData = QByteArray();
+    this->packetData.resize(0);
+
+    this->peerHostAddress = QHostAddress::Null;;
+    this->peerHostPort = 0;
+    this->localHostAddress = QHostAddress::Null;;
+    this->localHostPort = 0;
+
+    this->transmissionProtocol = TP_UNKNOWN;
+
+    //remainingRetransmissionTimes = int(PACKET_RETRANSMISSION_TIMES);
+    this->remainingRetransmissionTimes = 10;
+    this->lastTransmissionTime = QDateTime();
+
+
+    this->socketID = socketID;
+}
+
 
 Packet::Packet(const QString &peerAddress, quint16 peerPort, const QString &localAddress, quint16 localPort)
 //	:QObject(parent)
@@ -106,6 +131,8 @@ Packet::Packet(const QString &peerAddress, quint16 peerPort, const QString &loca
     //remainingRetransmissionTimes = int(PACKET_RETRANSMISSION_TIMES);
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
+
+    this->socketID = 0;
 
 
 
@@ -135,13 +162,15 @@ Packet::Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAdd
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
+    this->socketID = 0;
+
 
 
 }
 
 Packet::Packet(const Packet &packet){
     *this = packet;
-}
+ }
 
 Packet & Packet::operator = (const Packet &packet){
 
@@ -155,6 +184,8 @@ Packet & Packet::operator = (const Packet &packet){
     this->transmissionProtocol = packet.getTransmissionProtocol();
     this->remainingRetransmissionTimes = packet.getRemainingRetransmissionTimes();
     this->lastTransmissionTime = packet.getLastTransmissionTime();
+
+    this->socketID = packet.getSocketID();
 
     return *this;
 }
@@ -178,12 +209,12 @@ void Packet::resetPacket(){
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
-
+    this->socketID = 0;
     
 }
 
 bool Packet::isValid() {
-        if (peerHostAddress.isNull() || peerHostPort < 1) {
+        if ( (peerHostAddress.isNull() || peerHostPort < 1) && (socketID == 0) ) {
 		return false;
 	}
 
@@ -331,6 +362,14 @@ void Packet::setLastTransmissionTime(const QDateTime &time) {
         //    QMutexLocker locker(&mutex);
         this->lastTransmissionTime = time;
 
+}
+
+int Packet::getSocketID() const{
+    return socketID;
+}
+
+void Packet::setSocketID(int id){
+    this->socketID = id;
 }
 
 void Packet::packetTransmissionFailed() {
