@@ -15,15 +15,21 @@ QT += core \
 
 # include config file
 include(../config.pri)
+
+HHSharedLibs += HHSharedCore \
+    HHSharedNetwork \
+    HHSharedUDT
 include(../../HHSharedLibs.pri)
 
 # Input
 HEADERS += clientinfo.h \
     global_shared.h \
-    networkmanager.h
+    networkmanager.h \
+    udtprotocol.h
 FORMS += 
 SOURCES += clientinfo.cpp \
-    networkmanager.cpp
+    networkmanager.cpp \
+    udtprotocol.cpp
 RESOURCES += resources.qrc
 win32 { 
     # DLLDESTDIR = $${HHSHAREDLIBS_BIN_TARGET_PATH}

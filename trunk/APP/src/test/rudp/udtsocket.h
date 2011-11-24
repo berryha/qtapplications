@@ -27,8 +27,8 @@ signals:
 private slots:
 //    void dataReceived(const QString &address, quint16 port, char *data);
 
-    void streamDataReceived(UDTSOCKET socket, const QByteArray &data);
-    void messageDataReceived(UDTSOCKET socket, const QByteArray &data);
+    void streamDataReceived(UDTSOCKET socket, QByteArray *data);
+    void messageDataReceived(UDTSOCKET socket, QByteArray *data);
 
 
 
