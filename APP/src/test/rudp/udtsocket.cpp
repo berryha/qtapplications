@@ -45,7 +45,7 @@ UDTProtocol::~UDTProtocol(){
 
 }
 
-void UDTProtocol::streamDataReceived(UDTSOCKET socket, const QByteArray &data){
+void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
 
     qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
 
@@ -53,7 +53,7 @@ void UDTProtocol::streamDataReceived(UDTSOCKET socket, const QByteArray &data){
     quint16 port = 0;
     getAddressInfoFromSocket(socket, &ip, &port);
 
-    emit dataReceived(ip, port, data);
+    emit dataReceived(ip, port, *data);
 
     //        QDataStream in(&data, QIODevice::ReadOnly);
     //        in.setVersion(QDataStream::Qt_4_7);
@@ -75,16 +75,17 @@ void UDTProtocol::streamDataReceived(UDTSOCKET socket, const QByteArray &data){
 
 }
 
-void UDTProtocol::messageDataReceived(UDTSOCKET socket, const QByteArray &data){
+void UDTProtocol::messageDataReceived(UDTSOCKET socket, QByteArray *data){
     qDebug()<<"--UDTProtocol::messageDataReceived(...) "<<"socket:"<<socket;
 
     QString ip = "";
     quint16 port = 0;
     getAddressInfoFromSocket(socket, &ip, &port);
 
-    emit dataReceived(ip, port, data);
+    emit dataReceived(ip, port, *data);
 
 }
+
 
 //void UDTSocket::dataReceived(const QString &address, quint16 port, char *data){
 
