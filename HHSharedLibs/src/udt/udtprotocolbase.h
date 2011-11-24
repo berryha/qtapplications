@@ -46,6 +46,7 @@ using namespace std;
 
 namespace HEHUI {
 
+typedef UDTSTATUS UDTSocketStatus;
 
 class MYSHAREDLIB_API UDTProtocolBase :public QObject{
     Q_OBJECT
@@ -125,6 +126,9 @@ public:
 
     bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
+    UDTSocketStatus getUDTSocketStatus(UDTSOCKET socket);
+    QString getLastErrorMessage() const;
+
 signals:
     void connected(const QHostAddress &address, quint16 port);
     void connected(UDTSOCKET socket);
@@ -155,6 +159,8 @@ public slots:
 
 private slots:
 
+    void waitForIO(int msecTimeout = -1);
+
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
 
@@ -163,7 +169,6 @@ private slots:
     virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
     virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
 
-    void waitForIO(int msecTimeout = -1);
 
 
 
@@ -172,10 +177,10 @@ private:
     void recycleCachedData(QByteArray *data);
     QByteArray *getCachedData();
 
-    UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
+    //UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
 
 protected:
-    //@Unused
+
     void waitForReading(int msecTimeout = -1);
     void waitForWriting(int msecTimeout = -1);
     UDTSOCKET acceptNewConnection();
@@ -196,7 +201,7 @@ private:
     QHash<UDTSOCKET, QByteArray*> m_cachedDataInfoHash;
     QList<QByteArray*> m_unusedCached;
 
-
+    QString m_errorMessage;
 
 };
 
