@@ -95,7 +95,6 @@ void RUDPWidget::listen(){
         return;
     }
 
-
     ui.toolButtonListen->setText("Close");
     isListening = true;
 
@@ -134,7 +133,74 @@ void RUDPWidget::connectToPeer(){
 
         ui.toolButtonConnect->setText("Connecting...");
 
-        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, true);
+        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, false);
+        UDTSocketStatus status = udtProtocol->getUDTSocketStatus(peerSockeet);
+        qDebug();
+        qDebug()<<"peerSockeet:"<<peerSockeet<<" status:"<<status;
+        switch(status){
+        case INIT: //1
+        {
+            //qDebug()<<"INIT";
+        }
+            break;
+        case OPENED: //2
+        {
+            //qDebug()<<"OPENED";
+        }
+            break;
+        case LISTENING: //3
+        {
+            //qDebug()<<"LISTENING";
+
+        }
+            break;
+        case CONNECTING: //4
+        {
+            //qDebug()<<"CONNECTING";
+        }
+            break;
+        case CONNECTED: //5
+        {
+            qDebug()<<"CONNECTED";
+
+        }
+            break;
+        case BROKEN: //6
+        {
+            qDebug()<<"BROKEN";
+        }
+            break;
+        case CLOSING: //7
+        {
+            //qDebug()<<"CLOSING";
+        }
+            break;
+        case CLOSED: //8
+        {
+            qDebug()<<"CLOSED";
+        }
+            break;
+        case NONEXIST: //9
+        {
+            qDebug()<<"NONEXIST";
+        }
+            break;
+        default:
+            break;
+
+
+        }
+
+        qDebug();
+
+
+
+
+
+
+
+
+
         if(peerSockeet == UDTProtocolBase::INVALID_UDT_SOCK){
             qDebug()<<"Can not connect to peer!";
             disconnected(m_peerAddress, m_peerPort);
