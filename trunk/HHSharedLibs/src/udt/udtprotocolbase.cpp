@@ -58,6 +58,7 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
     }
 
 
+    m_errorMessage = "";
 
 }
 
@@ -92,8 +93,12 @@ UDTProtocolBase::SocketOptions UDTProtocolBase::getSocketOptions() const{
 UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress){
     qDebug()<<"--UDTProtocolBase::listen(...) "<<localAddress.toString()<<":"<<port;
 
-    if(m_listening){
-        qCritical()<<"Server is already listenning!";
+    m_errorMessage = "";
+
+    if(UDT::getsockstate(serverSocket) == LISTENING){
+        m_listening = true;
+        m_errorMessage = tr("Server is already listenning on %1:%2!").arg(m_serverAddress).arg(m_serverPort);
+        qWarning()<<m_errorMessage;
         return UDT::INVALID_SOCK;
     }
 
@@ -108,7 +113,9 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     if (0 != getaddrinfo(localAddress.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &localAddressInfo))
         //if (0 != getaddrinfo(NULL, QString::number(port).toStdString().c_str(), &hints, &res))
     {
-        cout << "illegal port number or port is busy.\n" << endl;
+        m_errorMessage = tr("Failed to start listening! Illegal port number or port is busy!");
+        qDebug()<<m_errorMessage;
+        //cout << "illegal port number or port is busy.\n" << endl;
         freeaddrinfo(localAddressInfo);
         return UDT::INVALID_SOCK;
     }
@@ -160,7 +167,8 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
     {
-        qCritical()<<"ERROR! Unable to listen! Failed to bind! "<<UDT::getlasterror().getErrorMessage();
+        m_errorMessage = tr("Failed to start listening! Bind error! ") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
         //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
         freeaddrinfo(localAddressInfo);
 
@@ -174,7 +182,9 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
     if (UDT::ERROR == UDT::listen(serverSocket, 10))
     {
-        cout << "listen: " << UDT::getlasterror().getErrorMessage() << endl;
+        m_errorMessage = tr("Failed to start listening! ") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
+        //cout << "listen: " << UDT::getlasterror().getErrorMessage() << endl;
 
         //TODO:Close the socket
         //UDT::close(serverSocket);
@@ -257,19 +267,25 @@ void UDTProtocolBase::closeUDTProtocol(){
 UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, bool sync){
     qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port<<" sync:"<<sync;
 
+    m_errorMessage = "";
+
     if(address.isNull() || address == QHostAddress::Any){
-        qCritical()<<"ERROR! Invalid Peer Address!";
+        m_errorMessage = tr("Can not connect to host! Invalid peer address!");
+        qDebug()<<m_errorMessage;
+
         return UDT::INVALID_SOCK;
     }
     if(!port){
-        qCritical()<<"ERROR! Invalid Peer Port!";
+        m_errorMessage = tr("Can not connect to host! Invalid peer port!");
+        qDebug()<<m_errorMessage;
+
         return UDT::INVALID_SOCK;
     }
 
     if(!epollID){
-        listen();
-        //qCritical()<<"ERROR! EPOLL Not Initialized!";
-        //return false;
+        if(UDT::INVALID_SOCK == listen()){
+            return UDT::INVALID_SOCK;
+        }
     }
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
 
@@ -283,12 +299,12 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
     hints.ai_flags = AI_PASSIVE;
     hints.ai_family = AF_INET;
     hints.ai_socktype = m_stream?SOCK_STREAM:SOCK_DGRAM;
-    //hints.ai_socktype = SOCK_DGRAM;
 
     if (0 != getaddrinfo(address.toString().toStdString().c_str(), QString::number(port).toStdString().c_str(), &hints, &peer))
     {
-        //cout << "incorrect server/peer address. " << argv[1] << ":" << argv[2] << endl;
-        qWarning()<< "incorrect server/peer address. " << address.toString() << ":" << port;
+        m_errorMessage = tr("Can not connect to host! Invalid peer address or port!");
+        qDebug()<<m_errorMessage;
+
         freeaddrinfo(peer);
         return UDT::INVALID_SOCK;
     }
@@ -296,8 +312,12 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
     if (0 != getaddrinfo(m_serverAddress.toStdString().c_str(), QString::number(m_serverPort).toStdString().c_str(), &hints, &local))
     {
-        cout << "incorrect network address.\n" << endl;
+        m_errorMessage = tr("Can not connect to host! Invalid local address or port!!");
+        qDebug()<<m_errorMessage;
+
         freeaddrinfo(local);
+        freeaddrinfo(peer);
+
         return UDT::INVALID_SOCK;
     }
 
@@ -323,9 +343,11 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
     if (UDT::ERROR == UDT::bind(client, local->ai_addr, local->ai_addrlen))
     {
-        qCritical()<<"ERROR! Unable to connect to peer! Failed to bind! "<<QString(UDT::getlasterror().getErrorMessage()).toLocal8Bit();
-        //cout << "bind: " << UDT::getlasterror().getErrorMessage() << endl;
+        m_errorMessage = tr("Can not connect to host! Failed to bind!") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
+
         freeaddrinfo(local);
+        freeaddrinfo(peer);
 
         //TODO:Close the socket
         //UDT::close(client);
@@ -339,8 +361,9 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
     if (UDT::ERROR == UDT::connect(client, peer->ai_addr, peer->ai_addrlen))
     {
-        qCritical()<<"ERROR! Failed to connect! "<<UDT::getlasterror().getErrorMessage();
-        //cout << "connect: " << UDT::getlasterror().getErrorMessage() << endl;
+        m_errorMessage = tr("Can not connect to host! Failed to connect!") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
+
         freeaddrinfo(peer);
 
         //TODO:Close the socket
@@ -372,15 +395,20 @@ void UDTProtocolBase::closeSocket(UDTSOCKET socket){
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
     qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket;
 
+    m_errorMessage = "";
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
-        qCritical()<<"ERROR! EPOLL Not Initialized!";
+        m_errorMessage = tr("EPOLL Not Initialized!");
+        qDebug()<<m_errorMessage;
+
         return false;
     }
 
     if(byteArray->size() > MAX_DATA_BLOCK_SIZE){
-        qCritical()<<QString("ERROR! Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(byteArray->size());
+        m_errorMessage = tr("Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(byteArray->size());
+        qDebug()<<m_errorMessage;
+
         return false;
     }
 
@@ -402,18 +430,27 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
     {
         if (UDT::ERROR == (ss = UDT::send(socket, data + ssize, size - ssize, 0)))
         {
-            cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-            break;
+            m_errorMessage = tr("Data sent failed! Data size:%1, Sent size:%2! %3").arg(size).arg(ssize).arg(UDT::getlasterror().getErrorMessage());
+            qDebug()<<m_errorMessage;
+
+            int errorCode = UDT::getlasterror().getErrorCode();
+            if(errorCode == UDT::ERRORINFO::EASYNCSND){
+                continue;
+            }
+            //break;
+            return false;
         }
 
         ssize += ss;
         //QCoreApplication::processEvents();
     }
 
-    if (ssize < size){
-        qCritical()<<"Data sent failed!"<<"   Data Size:"<<size<<"   Sent size:"<<ssize;
-        return false;
-    }
+//    if (ssize < size){
+//        m_errorMessage = tr("Data sent failed! Data size:%1, Sent size:%2! %3").arg(size).arg(ssize).arg(UDT::getlasterror().getErrorMessage());
+//        qDebug()<<m_errorMessage;
+
+//        return false;
+//    }
 
 
     return true;
@@ -426,14 +463,16 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
-        qCritical()<<"ERROR! EPOLL Not Initialized!";
+        m_errorMessage = tr("EPOLL Not Initialized!");
+        qDebug()<<m_errorMessage;
         return false;
     }
 
 
     int size = byteArray->size();
     if(size > MAX_DATA_BLOCK_SIZE){
-        qCritical()<<QString("ERROR! Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(size);
+        m_errorMessage = tr("Data is too large! Max allowed size:%1, current data size:%2").arg(MAX_DATA_BLOCK_SIZE).arg(size);
+        qDebug()<<m_errorMessage;
         return false;
     }
     const char* data = byteArray->constData();
@@ -442,13 +481,13 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 
     if (UDT::ERROR == ss || 0 == ss)
     {
-        qCritical()<<"ERROR! Failed to send data! "<<UDT::getlasterror().getErrorMessage();
-        //cout << "sendmsg:" << UDT::getlasterror().getErrorMessage() << endl;
+        m_errorMessage = tr("Failed to send message data!") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
+
         return false;
     }
 
     return true;
-
 
 }
 
@@ -501,7 +540,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
+            printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
@@ -527,11 +566,11 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
     while(m_listening){
 
-        acceptNewConnection();
+        //acceptNewConnection();
 
         count = UDT::epoll_wait(epollID, NULL, &writefds, msecTimeout);
         if(count > 0){
-            //printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
+            printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                 //TODO:Process
@@ -562,11 +601,11 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
 //        switch(errorCode){
 //        case UDT::ERRORINFO::EINVSOCK:
 //            //serverSocket is an invalid UDT socket.
-//            qCritical()<<"ERROR! "<<errorMessage;
+//            qDebug()<<"ERROR! "<<errorMessage;
 //            break;
 //        case UDT::ERRORINFO::ENOLISTEN:
 //            //serverSocket is not in the listening state.
-//            qCritical()<<"ERROR! "<<errorMessage;
+//            qDebug()<<"ERROR! "<<errorMessage;
 //            break;
 //        case UDT::ERRORINFO::ERDVNOSERV:
 //            //serverSocket is set up to support rendezvous connection.
@@ -630,7 +669,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         {
             if (UDT::ERROR == (receivedSize = UDT::recv(socket, data + totalReceivedSize, size - totalReceivedSize, 0)))
             {
-                qCritical()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
+                qDebug()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
                 //cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
                 break;
             }
@@ -703,31 +742,31 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     //qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
     //return;
-    //UDT::epoll_remove_usock(epollID, socket);
 
     UDTSTATUS status = UDT::getsockstate(socket);
+
     qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
     {
-        qDebug()<<"INIT";
+        //qDebug()<<"INIT";
     }
         break;
     case OPENED: //2
     {
-        qDebug()<<"OPENED";
+        //qDebug()<<"OPENED";
     }
         break;
     case LISTENING: //3
     {
-        qDebug()<<"LISTENING";
+        //qDebug()<<"LISTENING";
 
     }
         break;
     case CONNECTING: //4
     {
-        qDebug()<<"CONNECTING";
+        //qDebug()<<"CONNECTING";
     }
         break;
     case CONNECTED: //5
@@ -746,7 +785,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case CLOSING: //7
     {
-        qDebug()<<"CLOSING";
+        //qDebug()<<"CLOSING";
     }
         break;
     case CLOSED: //8
@@ -771,6 +810,8 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
 
     }
+
+    qDebug();
 
 
 }
@@ -834,6 +875,7 @@ QByteArray * UDTProtocolBase::getCachedData(){
 
 bool UDTProtocolBase::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo){
 
+    m_errorMessage = "";
 
     sockaddr clientaddr;
     int addrlen = sizeof(clientaddr);
@@ -844,7 +886,8 @@ bool UDTProtocolBase::getAddressInfoFromSocket(UDTSOCKET socket, QString *addres
         error = UDT::getsockname(socket, &clientaddr, &addrlen);
     }
     if(UDT::ERROR == error){
-        qCritical()<<QString("ERROR! Failed to get %1 address info! %2").arg(getPeerInfo?"peer":"local").arg(UDT::getlasterror().getErrorMessage());
+        m_errorMessage = UDT::getlasterror().getErrorMessage();
+        qDebug()<<QString("ERROR! Failed to get %1 address info! %2").arg(getPeerInfo?"peer":"local").arg(m_errorMessage);
         return false;
     }
 
@@ -864,6 +907,17 @@ bool UDTProtocolBase::getAddressInfoFromSocket(UDTSOCKET socket, QString *addres
 
 }
 
+UDTSocketStatus UDTProtocolBase::getUDTSocketStatus(UDTSOCKET socket){
+
+    return UDT::getsockstate(socket);
+
+}
+
+QString UDTProtocolBase::getLastErrorMessage() const{
+
+    return m_errorMessage;
+
+}
 
 
 
