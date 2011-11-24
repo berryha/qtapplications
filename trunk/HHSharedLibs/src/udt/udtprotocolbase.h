@@ -166,8 +166,8 @@ private slots:
 
     void processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray);
 
-    virtual void streamDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
-    virtual void messageDataReceived(UDTSOCKET socket, const QByteArray &data) = 0;
+    virtual void streamDataReceived(UDTSOCKET socket, QByteArray *data) = 0;
+    virtual void messageDataReceived(UDTSOCKET socket, QByteArray *data) = 0;
 
 
 

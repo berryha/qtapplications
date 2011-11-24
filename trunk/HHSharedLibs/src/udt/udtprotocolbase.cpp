@@ -692,7 +692,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 
         byteArray.resize(receivedSize);
 
-        messageDataReceived(socket, QByteArray(data));
+        messageDataReceived(socket, &byteArray);
 
     }
 
@@ -847,7 +847,7 @@ void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArra
             break;
 
         }else{
-            streamDataReceived(socket, temp);
+            streamDataReceived(socket, &temp);
             offset  = dev->pos();
         }
 
