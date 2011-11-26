@@ -56,6 +56,8 @@ contains(HHSharedLibs, HHSharedUDT){
     include(src/udt/udt.pri)
     INCLUDEPATH += src/udt
     DEPENDPATH += src/udt
+
+    win32:win32-g++:DEFINES += __MINGW__
 }
 
 win32{
