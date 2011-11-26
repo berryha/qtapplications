@@ -13,7 +13,8 @@ QT += core \
 include( ../../config.pri )
 HHSharedLibs += HHSharedCore \
     HHSharedGUI \
-    HHSharedNetwork
+    HHSharedNetwork \
+    HHSharedUDT
 win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
