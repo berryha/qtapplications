@@ -16,7 +16,7 @@ class UDTProtocol : public UDTProtocolBase
 {
     Q_OBJECT
 public:
-    explicit UDTProtocol(QObject *parent = 0);
+    explicit UDTProtocol(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
     ~UDTProtocol();
 
 

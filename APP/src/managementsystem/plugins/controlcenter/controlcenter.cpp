@@ -107,29 +107,19 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     running = true;
 
 
-    m_packetHandler = 0;
-    networkManager = NetworkManagerInstance::instance();
+    resourcesManager = ResourcesManagerInstance::instance();
     controlCenterPacketsParser = 0;
 
     m_networkReady = false;
+    m_udpServer = 0;
+    m_udtProtocol = 0;
+    m_udtListeningPort = UDT_LISTENING_PORT + 10;
 
-    if(networkManager->isNetworkReady()){
-        qDebug()<<"Network Ready!";
-        networkReady();
-
-    }else{
-        qWarning()<<"Can not find valid IP address!";
-
-        connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(networkReady()));
-        networkManager->startWaitingNetworkReady();
-    }
+    startNetwork();
 
     m_administrators = "";
 
-
     vncProcess = 0;
-    
-
     
     searchClientsMenu = new QMenu();
     searchClientsMenu->addAction(ui.actionQueryDatabase);
@@ -161,7 +151,6 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 //    localUDPListeningPort = 0;
 //    localRUDPListeningPort = 0;
     
-    rudpSocket = 0;
 
 //    m_serverInstanceID = 0;
     
@@ -193,22 +182,15 @@ ControlCenter::~ControlCenter()
     QSqlDatabase::removeDatabase(databaseConnectionName);
 
 
-    //networkManager->closeRUDPServer(rudpSocket->localPort());
-    networkManager->closeRUDPServerInstance(rudpSocket);
-
-
     delete controlCenterPacketsParser;
     controlCenterPacketsParser = 0;
 
     //networkManager->closeAllServers();
     //delete networkManager;
-    networkManager->cleanInstance();
-    networkManager = 0;
+    resourcesManager->cleanInstance();
+    resourcesManager = 0;
 
-    m_packetHandler->clean();
-    delete m_packetHandler;
-    m_packetHandler = 0;
-
+    PacketHandlerBase::clean();
 
     running = false;
     
@@ -282,8 +264,7 @@ void ControlCenter::languageChange() {
 void ControlCenter::closeEvent(QCloseEvent *e) {
 
     if(controlCenterPacketsParser){
-        controlCenterPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
-        controlCenterPacketsParser->aboutToQuit();
+
     }
 
     //关闭所有相关的TabPage
@@ -431,10 +412,10 @@ void ControlCenter::slotcloseTab(){
 
 void ControlCenter::slotRemoteManagement(){
 
-    if(!m_networkReady && (computerName() != localComputerName)){
-        QMessageBox::critical(this, tr("Error"), tr("The Network is not available! Remote Management is not available!"));
-        return;
-    }
+//    if(!m_networkReady && (computerName() != localComputerName)){
+//        QMessageBox::critical(this, tr("Error"), tr("The Network is not available! Remote Management is not available!"));
+//        return;
+//    }
 
 
     QString targetComputerName = computerName();
@@ -963,72 +944,41 @@ void ControlCenter::updateActions() {
 
 }
 
-void ControlCenter::networkReady(){
+void ControlCenter::startNetwork(){
 
-    disconnect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(networkReady()));
-
-    if(m_networkReady){
-        return;
-    }
-
-    if(!m_packetHandler){
-        m_packetHandler = new PacketHandlerBase(this);
-        networkManager->setPacketHandler(m_packetHandler);
-    }
-
-    int port = 0;
-    //port = networkManager->startUDPServer();
-//    localUDPListeningPort = networkManager->startUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT+20));
-//    qWarning()<<QString("UDP listening on port %1! (ControlCenter)").arg(localUDPListeningPort);
-
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (IP_MULTICAST_GROUP_PORT + 20));
-    if(!rudpSocket){
-        QMessageBox::critical(this, tr("Error"), QString("Can not start RUDP listening!"));
-        return;
+    QString errorMessage = "";
+    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    if(!m_udpServer){
+        QMessageBox::critical(this, tr("Error"), tr("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage));
+        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
     }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2! (ControlCenter)").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
-    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
 
-    port = rudpSocket->localPort();
-    if(port == 0){
-        QString msg = tr("Can not start UDP listening!");
-        //QMessageBox::critical(this, tr("Error"), msg);
-        qCritical()<<msg;
+    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, m_udtListeningPort, true, &errorMessage);
+    if(!m_udtProtocol){
+        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_udtListeningPort).arg(errorMessage);
+        QMessageBox::critical(this, tr("Error"), error);
         return;
-    }else{
-        if(!controlCenterPacketsParser){
-            controlCenterPacketsParser = new ControlCenterPacketsParser(networkManager, this);
-//            controlCenterPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
-//            controlCenterPacketsParser->setLocalUDPListeningPort(port);
-//            localRUDPListeningPort = port;
-        }
-
-        connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
-
-        connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
-        
-        
-        //IMPORTANT For Multi-thread
-        QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-        QtConcurrent::run(controlCenterPacketsParser, &ControlCenterPacketsParser::run);
-        //controlCenterPacketsParser->sendClientLookForServerPacket(QHostAddress::Any, localUDPListeningPort);
-        controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
-
-        
-        m_networkReady = true;
-
-        if(localSystemManagementWidget){
-            localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
-        }
-
-        //qWarning()<<QString("UDP listening on port %1! (ControlCenter)").arg(port);
+    }
+    m_udtListeningPort = m_udtProtocol->getUDTListeningPort();
+    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+    m_udtProtocol->startWaitingForIO(1);
 
 
+    if(!controlCenterPacketsParser){
+        controlCenterPacketsParser = new ControlCenterPacketsParser(m_udpServer, m_udtProtocol, this);
     }
 
+    connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
+
+    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
+
+    if(localSystemManagementWidget){
+        localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
+    }
+
+    m_networkReady = true;
 
 
 }

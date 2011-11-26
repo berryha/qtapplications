@@ -50,8 +50,12 @@
 #define IP_MULTICAST_GROUP_ADDRESS "224.224.224.1" //"239.255.255.255"
 #endif
 
-#ifndef RUDP_LISTENING_PORT
-#define RUDP_LISTENING_PORT	12346
+//#ifndef RUDP_LISTENING_PORT
+//#define RUDP_LISTENING_PORT	12346
+//#endif
+
+#ifndef UDT_LISTENING_PORT
+#define UDT_LISTENING_PORT	12346
 #endif
 
 #ifndef IP_MULTICAST_GROUP_PORT
@@ -139,11 +143,9 @@ namespace HEHUI {
             InformUserNewPassword,
             NewPasswordRetrevedByUser,
             
-            ClientLookForLocalServiceServer,
             LocalServiceServerDeclare,
-            UserOnline,
-            UserOffline,
-            UserHeartbeat,
+            LocalUserOnline,
+            LocalUserOffline,
             
 
             

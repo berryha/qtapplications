@@ -264,24 +264,38 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     ui.toolButtonVerify->setEnabled(false);
 
-    //    QHostAddress address = QHostAddress(peerAddress);
-    //    if(localComputer){
-    //        address = QHostAddress(QHostAddress::LocalHost);
-    //    }
+
+    m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT);
+    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        ui.toolButtonVerify->setEnabled(true);
+
+        return;
+    }
+
+    if(!m_udtProtocol->isSocketConnected(m_peerSocket)){
+        m_udtProtocol->closeSocket(m_peerSocket);
+        m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
+
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        ui.toolButtonVerify->setEnabled(true);
+
+        return;
+    }
 
 
-    controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerIPAddress, RUDP_LISTENING_PORT, this->m_computerName, this->m_users);
+    bool ok = controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerSocket, this->m_computerName, this->m_users);
+    if(!ok){
+        m_udtProtocol->closeSocket(m_peerSocket);
+        m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        ui.toolButtonVerify->setEnabled(true);
 
-    //    if(!requestConnectionToClientTimer){
-    //        requestConnectionToClientTimer =new QTimer(this);
-    //        requestConnectionToClientTimer->setInterval(5000);
-    //        requestConnectionToClientTimer->setSingleShot(true);
-    //        connect(requestConnectionToClientTimer, SIGNAL(timeout()), this, SLOT(requestConnectionToClientTimeout()));
-    //    }
-    //    requestConnectionToClientTimer->start();
+        return;
+    }
 
-    QTimer::singleShot(30000, this, SLOT(requestConnectionToClientTimeout()));
+    //QTimer::singleShot(30000, this, SLOT(requestConnectionToClientTimeout()));
 
 
 }
@@ -310,8 +324,11 @@ void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
         m_temporarilyAllowed = temporarilyAllowed();
     }
 
-    controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
-
+    bool ok = controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerSocket, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
     ui.pushButtonUSBSD->setEnabled(false);
 
 }
@@ -341,20 +358,22 @@ void SystemManagementWidget::on_pushButtonPrograms_clicked(){
         m_temporarilyAllowed = temporarilyAllowed();
     }
 
-    controlCenterPacketsParser->sendSetupProgramesPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
-
+    bool ok = controlCenterPacketsParser->sendSetupProgramesPacket(m_peerSocket, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
     ui.pushButtonPrograms->setEnabled(false);
 
 }
 
 void SystemManagementWidget::on_pushButtonShowAdmin_clicked(){
 
-    //    QHostAddress address = QHostAddress(peerAddress);
-    //    if(localComputer){
-    //        address = QHostAddress(QHostAddress::LocalHost);
-    //    }
-
-    controlCenterPacketsParser->sendShowAdminPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_users, true);
+    bool ok = controlCenterPacketsParser->sendShowAdminPacket(m_peerSocket, m_computerName, m_users, true);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
     ui.pushButtonShowAdmin->setEnabled(false);
 
@@ -369,8 +388,11 @@ void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
     //ui.pushButtonRemoteAssistance->setEnabled(false);
     emit requestRemoteAssistance();
     
-    controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, m_adminName);
-    
+    bool ok = controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerSocket, m_computerName, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
 }
 
@@ -394,14 +416,13 @@ void SystemManagementWidget::on_actionAddAdmin_triggered(){
         return;
     }
 
-    //    QHostAddress address = QHostAddress(peerAddress);
-    //    if(localComputer){
-    //        address = QHostAddress(QHostAddress::LocalHost);
-    //    }
+    ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, true, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
-    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, item, true, m_adminName);
     ui.pushButtonAdminsManagement->setEnabled(false);
-
 
 }
 
@@ -430,9 +451,13 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
     //        address = QHostAddress(QHostAddress::LocalHost);
     //    }
 
-    controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, item, false, m_adminName);
-    ui.pushButtonAdminsManagement->setEnabled(false);
+    ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, false, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
+    ui.pushButtonAdminsManagement->setEnabled(false);
 
 }
 
@@ -596,12 +621,11 @@ void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
         return;
     }
 
-    //    QHostAddress address = QHostAddress(peerAddress);
-    //    if(localComputer){
-    //        address = QHostAddress(QHostAddress::LocalHost);
-    //    }
-
-    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, false);
+    bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, false);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
     QTimer::singleShot(60000, this, SLOT(requestClientInfoTimeout()));
 
@@ -620,13 +644,12 @@ void SystemManagementWidget::on_toolButtonRescanSystemInfo_clicked(){
         return;
     }
 
-    //    QHostAddress address = QHostAddress(peerAddress);
-    //    if(localComputer){
-    //        address = QHostAddress(QHostAddress::LocalHost);
-    //    }
 
-    controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, true);
-
+    bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, true);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
     QTimer::singleShot(60000, this, SLOT(requestClientInfoTimeout()));
 
@@ -673,14 +696,22 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
     if(remoteConsoleRunning){
         int rep = QMessageBox::question(this, tr("Confirm"), tr("Do you really want to terminate the process?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if(rep == QMessageBox::Yes){
-            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, "", m_adminName, false);
+            bool ok = controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerSocket, m_computerName, "", m_adminName, false);
+            if(!ok){
+                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+                return;
+            }
             //ui.toolButtonRunRemoteApplication->setEnabled(false);
         }
 
     }else{
         QString remoteAPPPath = ui.comboBoxRemoteApplicationPath->currentText();
         if(!remoteAPPPath.trimmed().isEmpty()){
-            controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, remoteAPPPath, m_adminName, true);
+            bool ok = controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerSocket, m_computerName, remoteAPPPath, m_adminName, true);
+            if(!ok){
+                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+                return;
+            }
         }
 
         ui.comboBoxRemoteApplicationPath->setEnabled(false);
@@ -707,7 +738,11 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
     }
 
     QString cmd = ui.comboBoxCommand->currentText();
-    controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerIPAddress, RUDP_LISTENING_PORT, m_computerName, cmd);
+    bool ok = controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerSocket, m_computerName, cmd);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
 
     ui.comboBoxCommand->insertItem(0, cmd);
 

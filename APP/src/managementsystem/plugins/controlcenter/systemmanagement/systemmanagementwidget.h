@@ -115,15 +115,14 @@ private:
 
     bool remoteConsoleRunning;
 
-    //    QTimer *requestConnectionToClientTimer;
-
-    //    ClientInfo *clientInfo;
 
     QString m_winDirPath;
 
     QSqlQueryModel *queryModel;
 
-
+    UDPServer *m_udpServer;
+    UDTProtocol *m_udtProtocol;
+    UDTSOCKET m_peerSocket;
 
 
 };

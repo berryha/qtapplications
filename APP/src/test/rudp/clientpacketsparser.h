@@ -56,11 +56,8 @@ public:
     virtual ~ClientPacketsParser();
 
 
-    void run();
     void parseIncomingPacketData(Packet *packet);
 
-    void startparseIncomingPackets();
-    void startprocessOutgoingPackets();
 
 
 

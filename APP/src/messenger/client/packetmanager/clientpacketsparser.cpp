@@ -46,7 +46,7 @@
 namespace HEHUI {
 
 
-ClientPacketsParser::ClientPacketsParser(ClientNetworkManager *networkManager, QObject *parent)
+ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *networkManager, QObject *parent)
     :PacketsParserBase(networkManager, parent)
 {
 

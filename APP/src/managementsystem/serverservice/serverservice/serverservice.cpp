@@ -56,9 +56,12 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
     //    databaseUtility = new DatabaseUtility(this);
     //    mainServiceStarted = false;
 
-    m_packetHandler = 0;
-    networkManager = 0;
+    resourcesManager = 0;
     serverPacketsParser = 0;
+
+    m_udpServer = 0;
+    m_udtProtocol = 0;
+
     databaseUtility = 0;
     query = 0;
     mainServiceStarted = false;
@@ -67,7 +70,6 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 
     onlineAdminsCount = 0;
 
-    rudpSocket = 0;
 
 
 }
@@ -75,8 +77,8 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 ServerService::~ServerService(){
     qDebug()<<"ServerService::~ServerService()";
 
-    if(networkManager){
-        networkManager->closeAllServers();
+    if(resourcesManager){
+        //resourcesManager->closeAllServers();
     }
 
     if(serverPacketsParser){
@@ -84,14 +86,13 @@ ServerService::~ServerService(){
         serverPacketsParser = 0;
     }
 
-    NetworkManagerInstance::cleanInstance();
-    networkManager = 0;
+    ResourcesManagerInstance::cleanInstance();
+    resourcesManager = 0;
 
-    if(m_packetHandler){
-        m_packetHandler->clean();
-        delete m_packetHandler;
-        m_packetHandler = 0;
-    }
+    delete m_udpServer;
+    delete m_udtProtocol;
+
+    PacketHandlerBase::clean();
 
 
     QList<ClientInfo*> clientInfoList = clientInfoHash.values();
@@ -119,51 +120,54 @@ bool ServerService::startMainService(){
         return true;
     }
 
-    if(!m_packetHandler){
-        m_packetHandler = new PacketHandlerBase(this);
-        networkManager->setPacketHandler(m_packetHandler);
-    }
 
     if(openDatabase()){
         getRecordsInDatabase();
     }
 
-    bool result = false;
-    result = networkManager->startIPMCServer();
-    if(result == false){
-        QString msg = QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
-        logMessage(msg, QtServiceBase::Error);
-        qCritical()<<msg;
-        networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
-        //return false;
+//    m_udpServer = resourcesManager->startIPMCServer();
+//    if(!m_udpServer){
+//        QString msg = QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
+//        logMessage(msg, QtServiceBase::Error);
+//        qCritical()<<msg;
+//        resourcesManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
+//        //return false;
+//    }else{
+//        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
+//    }
+
+    QString errorMessage = "";
+    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    if(!m_udpServer){
+        logMessage(QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
+        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
     }else{
+        //logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
         qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
 
-//    result = networkManager->startTCPServer();
-
-//    if(result == false){
-//        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
-//        //        return false;
+//    m_udtProtocol = resourcesManager->startUDTServer(QHostAddress::Any, UDT_LISTENING_PORT);
+//    if(!m_udtProtocol){
+//        QString msg = QString("Can not start UDT listening on port '%1'!").arg(UDT_LISTENING_PORT);
+//        logMessage(msg, QtServiceBase::Error);
+//        qCritical()<<msg;
+//        return false;
 //    }else{
-//        logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
+//        //qWarning()<<QString("UDT listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
 //    }
+//    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+//    m_udtProtocol->startWaitingForIO(1);
 
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, RUDP_LISTENING_PORT);
-    if(!rudpSocket){
-        QString msg = QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString());
-        logMessage(msg, QtServiceBase::Error);
-        qCritical()<<msg;
+    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
+    if(!m_udtProtocol){
+        QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
+        logMessage(error, QtServiceBase::Error);
         return false;
-    }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
     }
-    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+    m_udtProtocol->startWaitingForIO(1);
 
-
-    serverPacketsParser = new ServerPacketsParser(networkManager, this);
+    serverPacketsParser = new ServerPacketsParser(m_udpServer, m_udtProtocol, this);
     connect(serverPacketsParser, SIGNAL(signalClientLogReceived(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), this, SLOT(saveClientLog(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), Qt::QueuedConnection);
     connect(serverPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientSummaryInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
     connect(serverPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
@@ -172,7 +176,7 @@ bool ServerService::startMainService(){
     connect(serverPacketsParser, SIGNAL(signalClientOnlineStatusChanged(const QString&, quint16, const QString&, bool, bool)), this, SLOT(processClientOnlineStatusChangedPacket(const QString&, quint16, const QString&, bool, bool)), Qt::QueuedConnection);
 
     //Single Process Thread
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
+    //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
 
     //IMPORTANT For Multi-thread
     //QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
@@ -784,7 +788,7 @@ void ServerService::processHeartbeatPacket(const QString &clientAddress, const Q
         info->setOnline(true);
         //qWarning()<<"Heartbeat Packet From:"<<computerName;
     }else{
-        serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", computerName, "", clientAddress);
+        //serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", computerName, "", clientAddress);
         qWarning()<<QString("Unknown Heartbeat Packet From Computer '%1'! IP:%2").arg(computerName).arg(clientAddress);
     }
 
@@ -792,19 +796,14 @@ void ServerService::processHeartbeatPacket(const QString &clientAddress, const Q
 
 }
 
-void ServerService::processClientOnlineStatusChangedPacket(const QString &clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool online, bool isAdmin){
+void ServerService::processClientOnlineStatusChangedPacket(const QString &clientUDPListeningAddress, quint16 clientUDPListeningPort, const QString &clientName, bool online, bool isAdmin){
 
     if(isAdmin){
         if(online){
             onlineAdminsCount ++;
             updateOrSaveAllClientsInfoToDatabase();
             getRecordsInDatabase();
-
-            rudpSocket->connectToPeer(clientRUDPListeningAddress, clientRUDPListeningPort, true);
-            if(rudpSocket->isConnected(clientRUDPListeningAddress, clientRUDPListeningPort)){
-                serverPacketsParser->sendServerDeclarePacket(QHostAddress(clientRUDPListeningAddress), clientRUDPListeningPort, true);
-            }
-
+            serverPacketsParser->sendServerDeclarePacket(QHostAddress(clientUDPListeningAddress), clientUDPListeningPort);
         }else{
             onlineAdminsCount --;
             if(onlineAdminsCount < 0){
@@ -818,13 +817,13 @@ void ServerService::processClientOnlineStatusChangedPacket(const QString &client
             info = clientInfoHash.value(clientName);
             info->setOnline(online);
             if(online){
-                info->setClientRUDPListeningAddress(clientRUDPListeningAddress);
-                info->setClientRUDPListeningPort(clientRUDPListeningPort);
+                info->setClientRUDPListeningAddress(clientUDPListeningAddress);
+                info->setClientRUDPListeningPort(clientUDPListeningPort);
             }
             qWarning()<<QString("Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         }else{
             if(online){
-                serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", clientName, "", clientRUDPListeningAddress);
+                serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", clientName, "", clientUDPListeningAddress);
             }
             qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         }
@@ -852,6 +851,18 @@ void ServerService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
         qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
     }
 
+
+}
+
+void ServerService::peerDisconnected(int socketID){
+
+    QString ip = "";
+    quint16 port = 0;
+    m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port);
+
+    qWarning()<<tr("Client %1:%2 offline!").arg(ip).arg(port);
+
+    m_udtProtocol->closeSocket(socketID);
 
 }
 
@@ -969,30 +980,14 @@ void ServerService::start()
 
     qDebug()<<"----ServerService::start()";
 
-    m_packetHandler = 0;
-    networkManager = NetworkManagerInstance::instance();
+    resourcesManager = ResourcesManagerInstance::instance();
     serverPacketsParser = 0;
 
     databaseUtility = new DatabaseUtility(this);
 
     mainServiceStarted = false;
 
-
-    if(networkManager->isNetworkReady()){
-        qDebug()<<"Network Ready!";
-        startMainService();
-
-    }else{
-        logMessage(QString("Can not find valid IP address! Service startup failed!"), QtServiceBase::Error);
-        qWarning()<<"Can not find valid IP address! Service startup failed!";
-
-        connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(startMainService()));
-        networkManager->startWaitingNetworkReady();
-
-    }
-
-
-
+    startMainService();
 
 }
 
@@ -1001,12 +996,18 @@ void ServerService::stop()
 
     if(serverPacketsParser){
         serverPacketsParser->sendServerOfflinePacket();
-        serverPacketsParser->aboutToQuit();
     }
 
     updateOrSaveAllClientsInfoToDatabase();
 
     databaseUtility->closeAllDBConnections();
+
+    if(m_udpServer){
+        m_udpServer->close();
+    }
+    if(m_udtProtocol){
+        m_udtProtocol->closeUDTProtocol();
+    }
 
 }
 

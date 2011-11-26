@@ -124,7 +124,7 @@ quint16 NetworkManager::localRUDPListeningPort(){
 //}
 
 
-bool NetworkManager::startIPMCServer(){
+UDPServer * NetworkManager::startIPMCServer(){
     //    if(!isNetworkReady()){
     //        startWaitingNetworkReady();
     //        return false;

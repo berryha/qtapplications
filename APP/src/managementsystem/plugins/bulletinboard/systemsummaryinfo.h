@@ -10,7 +10,7 @@
 
 #include "ui_systemsummaryinfo.h"
 #include "networkmanager/bulletinboardpacketsparser.h"
-#include "../../sharedms/networkmanager.h"
+//#include "../../sharedms/networkmanager.h"
 #include "bulletinboard/bulletinboardwidget.h"
 
 

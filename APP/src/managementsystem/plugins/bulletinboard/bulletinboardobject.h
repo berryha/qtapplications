@@ -10,7 +10,8 @@
 
 
 #include "networkmanager/bulletinboardpacketsparser.h"
-#include "../../sharedms/networkmanager.h"
+//#include "../../sharedms/networkmanager.h"
+#include "networkmanager/resourcesmanagerinstance.h"
 
 
 
@@ -31,35 +32,39 @@ signals:
 public slots:
     
 private slots:
-    void networkReady();
+    void startNetwork();
 
     void adminRequestRemoteAssistancePacketReceived(const QString &adminAddress, quint16 adminPort, const QString &adminName);
     void AdminInformUserNewPasswordPacketReceived(const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword );
     void serverAnnouncementPacketReceived(const QString &adminName, quint32 announcementID, const QString &announcement);
     
-    void newPasswordRetreved(const QString &adminAddress, quint16 adminPort);
+    void newPasswordRetreved();
     
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
 
+    void peerDisconnected(int socketID);
+    void connectToLocalServer();
     
 private:
 
     bool m_networkReady;
 
-    PacketHandlerBase *m_packetHandler;
-    NetworkManagerInstance *networkManager;
+    ResourcesManagerInstance *resourcesManager;
     BulletinBoardPacketsParser *bulletinBoardPacketsParser;
     
     RemoteAssistance *remoteAssistance;
     BulletinBoardWidget *bulletinBoardWidget;
     UpdatePasswordWidget *updatePasswordWidget;
     
-    quint16 localUDPListeningPort;
+    quint16 localUDTListeningPort;
 
-    RUDPSocket *rudpSocket;
-    
+    UDTProtocol *m_udtProtocol;
+    UDTSOCKET m_socketConnectedToLocalServer;
+//    UDTSOCKET m_socketConnectedToAdmin;
+
+
 };
 
 } //namespace HEHUI 

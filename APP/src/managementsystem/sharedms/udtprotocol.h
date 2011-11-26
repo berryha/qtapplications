@@ -12,9 +12,10 @@ class UDTProtocol : public UDTProtocolBase
 {
     Q_OBJECT
 public:
-    explicit UDTProtocol(PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
+    explicit UDTProtocol(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
     
 signals:
+    void packetReceived(Packet *packet);
     
 public slots:
 
@@ -24,9 +25,10 @@ private slots:
 
     void convertDataToPacket(UDTSOCKET socket, QByteArray *data);
 
+
 private:
 
-    PacketHandlerBase *m_packetHandlerBase;
+    QString m_errorMessage;
 
 
 

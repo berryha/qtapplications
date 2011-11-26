@@ -48,36 +48,25 @@
 namespace HEHUI {
 
 
-ControlCenterPacketsParser::ControlCenterPacketsParser(NetworkManagerInstance *networkManager, QObject *parent)
-    :PacketsParserBase(networkManager, parent)
+ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent)
+    :QObject(parent), m_udpServer(udpServer), m_udtProtocol(m_udtProtocol)
 {
 
-    Q_ASSERT_X(networkManager, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid NetworkManagerInstance!");
-
-    m_packetHandlerBase = networkManager->getPacketHandler();
-    Q_ASSERT_X(m_packetHandlerBase, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid PacketHandlerBase!");
+    Q_ASSERT_X(m_udpServer, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDPServer!");
+    Q_ASSERT_X(m_udtProtocol, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDTProtocol!");
 
     serverAddress = QHostAddress::Null;
     serverRUDPListeningPort = 0;
     serverName = "";
 
     heartbeatTimer = 0;
-    //    processWaitingForReplyPacketsTimer = 0;
-    //    processWaitingForReplyPacketsTimer = new QTimer();
 
-    //packetHandlerBase = new PacketHandlerBase(this);
 
-    networkManager = NetworkManagerInstance::instance();
+    ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
+    ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
 
-    ipmcGroupAddress = networkManager->ipMCGroupAddress();
-    ipmcListeningPort = networkManager->localIPMCListeningPort();
 
-    //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
-    //    localUDPListeningPort = networkManager->localUDPListeningPort();
-//    localRUDPListeningAddress = QHostAddress::Any;
-//    localRUDPListeningPort = 0;
-    localRUDPListeningAddress = networkManager->localRUDPListeningAddress();
-    localRUDPListeningPort = networkManager->localRUDPListeningPort();
+    localRUDPListeningPort = m_udtProtocol->getUDTListeningPort();
 
 
     m_localComputerName = QHostInfo::localHostName().toLower();
@@ -100,69 +89,14 @@ ControlCenterPacketsParser::~ControlCenterPacketsParser() {
     delete heartbeatTimer;
     heartbeatTimer = 0;
 
-    //    if(processWaitingForReplyPacketsTimer){
-    //        processWaitingForReplyPacketsTimer->stop();
-    //    }
-    //    delete processWaitingForReplyPacketsTimer;
-    //    processWaitingForReplyPacketsTimer = 0;
-
-
 
 
 }
 
-//void ControlCenterPacketsParser::setLocalUDPListeningAddress(const QHostAddress &address){
-
-//    this->localUDPListeningAddress = address;
-//}
-//void ControlCenterPacketsParser::setLocalUDPListeningPort(quint16 port){
-
-//    this->localUDPListeningPort = port;
-//}
-
-void ControlCenterPacketsParser::run(){
-    QMutexLocker locker(&mutex);
-
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        parseIncomingPackets();
-        processOutgoingPackets();
-        //processWaitingForReplyPackets();
-        msleep(500);
-        qApp->processEvents();
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-
-}
 
 void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     qDebug()<<"----ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet)";
 
-    //    if((packet->getTransmissionProtocol() == TP_UDP)
-    //        && (networkManager->isLocalAddress(packet->getPeerHostAddress()))
-    //        && (packet->getPeerHostPort() == localIPMCListeningPort)){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }else if((packet->getTransmissionProtocol() == TP_TCP)
-    //        && (packet->getPeerHostAddress() == networkManager->localTCPListeningAddress())
-    //        && (packet->getPeerHostPort() == networkManager->localTCPListeningPort())){
-    //        qDebug()<<"~~Packet is been discarded!";
-    //        return;
-    //    }
-
-    //qDebug()<<"~~networkManager->localAddress():"<<networkManager->localTCPListeningAddress().toString();
-    //qDebug()<<"~~packet->getPeerHostAddress():"<<packet->getPeerHostAddress().toString();
 
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
@@ -367,138 +301,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
 }
 
-//void PacketsParser::fillOutgoingPacketData(Packet *packet){
-//    QByteArray packetData = packet->getPacketData();
-//    QDataStream out(&packetData, QIODevice::ReadOnly);
-//    out.setVersion(QDataStream::Qt_4_6);
-
-//    switch(packet->getPacketType()){
-//    case quint8(HeartbeatPacket):
-//        {
-//        QString computerName;
-//        out >> computerName;
-//        emit signalHeartbeatPacketReceived(computerName);
-//        }
-//        break;
-//    default:
-//        break;
-
-//    }
-
-//}
-
-//void PacketsParser::parseIncomingPackets(){
-
-
-//    while(1){
-//        Packet *packet = PacketHandlerBase::takeIncomingPacket();
-//            if (!packet) {
-//                    //continue;
-//                    break;
-//            }
-//            if (!packet->isValid()) {
-//                    delete packet;
-//                    packet = 0;
-//                    continue;
-//            }
-
-//            qWarning()<<"PacketType:"<<packet->getPacketType();
-//            qWarning()<<"SerialNumber:"<<packet->getPacketSerialNumber();
-
-//            TransmissionProtocol transmissionProtocol = packet->getTransmissionProtocol();
-//            quint8 packetType = packet->getPacketType();
-
-//            if(transmissionProtocol == TP_UDP){
-//                if(packetType == quint8(HeartbeatPacket)){
-
-//                }
-//            }else{
-
-//            }
-
-//    }
-
-
-//}
-
-
-//void ControlCenterPacketsParser::startHeartbeat(int interval){
-//    if(NULL == heartbeatTimer){
-//        heartbeatTimer = new QTimer(this);
-//        heartbeatTimer->setSingleShot(false);
-//        heartbeatTimer->setInterval(interval);
-//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
-//    }else{
-//        heartbeatTimer->stop();
-//        heartbeatTimer->setInterval(interval);
-
-//    }
-
-//    heartbeatTimer->start();
-
-
-//}
-
-//void ControlCenterPacketsParser::heartbeat(){
-
-//    qDebug()<<"----sendHeartbeatPacket()";
-
-//    static QString computerName = "";
-//    if(computerName.isEmpty()){
-//        computerName = QHostInfo::localHostName().toLower() ;
-//    }
-
-//    if(serverAddress.isNull()){
-//        serverAddress = QHostAddress::Broadcast;
-//    }
-
-//    Packet *packet = new Packet(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
-//    packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
-//    QByteArray ba;
-//    QDataStream out(&ba, QIODevice::WriteOnly);
-//    out.setVersion(QDataStream::Qt_4_6);
-//    out << computerName;
-//    packet->setPacketData(ba);
-//    m_packetHandlerBase->appendOutgoingPacket(packet);
-
-
-//}
-
-//void ControlCenterPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
-
-//}
-
-
-
-quint16 ControlCenterPacketsParser::getLastReceivedPacketSN(const QString &peerID){
-    quint16 lastpacketSN = 0;
-
-    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
-    if(list.isEmpty()){
-        return lastpacketSN;
-    }
-
-    QDateTime lastpacketTime(QDate(1970, 1, 1));
-    for(int i=0; i<list.size(); i++){
-        QPair<quint16, QDateTime> pair = list.at(i);
-        QDateTime time = pair.second;
-        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-            m_receivedPacketsHash.remove(peerID, pair);
-        }else{
-            if(time > lastpacketTime){
-                lastpacketTime = time;
-                lastpacketSN = pair.first;
-            }
-        }
-    }
-
-
-    //TODO:TX Rate
-
-    return lastpacketSN;
-
-
-}
 
 
 

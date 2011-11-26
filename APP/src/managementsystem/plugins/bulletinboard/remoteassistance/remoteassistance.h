@@ -6,6 +6,11 @@
 #include <QCloseEvent>
 
 #include "ui_remoteassistance.h"
+//#include "../networkmanager/bulletinboardpacketsparser.h"
+
+
+
+namespace HEHUI {
 
 
 class RemoteAssistance : public QWidget
@@ -19,6 +24,7 @@ public:
     
     void requestRemoteAssistance(const QString &adminAddress, quint16 adminPort, const QString &adminName);
     
+
 signals:
     void signalUserResponseRemoteAssistance(const QString &adminAddress, quint16 adminPort, bool accept);
     
@@ -41,7 +47,8 @@ private:
     QTimer *timer;
     
     
-    
 };
+
+} //namespace HEHUI
 
 #endif // REMOTEASSISTANCE_H

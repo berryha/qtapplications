@@ -48,25 +48,20 @@
 namespace HEHUI {
 
 
-ServerPacketsParser::ServerPacketsParser(NetworkManagerInstance *networkManager, QObject *parent)
-    :PacketsParserBase(networkManager, parent), m_networkManager(networkManager)
+ServerPacketsParser::ServerPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent)
+    :QObject(parent), m_udpServer(udpServer), m_udtProtocol(udtProtocol)
 {
 
-    Q_ASSERT_X(m_networkManager, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid NetworkManagerInstance!");
-
-    m_packetHandlerBase = m_networkManager->getPacketHandler();
-    Q_ASSERT_X(m_packetHandlerBase, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid PacketHandlerBase!");
+    Q_ASSERT_X(m_udpServer, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
+    Q_ASSERT_X(m_udtProtocol, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
 
 
-//    heartbeatTimer = 0;
 
-    localRUDPListeningAddress = m_networkManager->localRUDPListeningAddress();
-    localRUDPListeningPort = m_networkManager->localRUDPListeningPort();
-    //m_serverName = m_networkManager->hostName();
+    localUDTListeningAddress = m_udtProtocol->getUDTListeningAddress();
+    localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
     m_serverName = QHostInfo::localHostName().toLower();
 
-    localIPMCListeningAddress = m_networkManager->localIPMCListeningAddress();
-    localIPMCListeningPort = m_networkManager->localIPMCListeningPort();
+    localIPMCListeningPort = m_udpServer->localPort();
 
 
 
@@ -75,73 +70,12 @@ ServerPacketsParser::ServerPacketsParser(NetworkManagerInstance *networkManager,
 ServerPacketsParser::~ServerPacketsParser() {
     // TODO Auto-generated destructor stub
 
-    QMutexLocker locker(&mutex);
 
 
 
 
 }
 
-
-
-void ServerPacketsParser::run(){
-
-    QMutexLocker locker(&mutex);
-
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        //QCoreApplication::processEvents();
-        parseIncomingPackets();
-        processOutgoingPackets();
-        msleep(1);
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-
-
-}
-
-void ServerPacketsParser::startparseIncomingPackets(){
-
-    while(!isAboutToQuit()){
-        //QCoreApplication::processEvents();
-        parseIncomingPackets();
-        msleep(10);
-    }
-
-}
-
-void ServerPacketsParser::startprocessOutgoingPackets(){
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    //processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        //QCoreApplication::processEvents();
-        processOutgoingPackets();
-        msleep(10);
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-}
 
 
 void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
@@ -161,6 +95,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     quint16 peerPort = packet->getPeerHostPort();
 //    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
+    int socketID = packet->getSocketID();
 //    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
@@ -325,69 +260,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
-//void ServerPacketsParser::startHeartbeat(int interval){
-//    if(NULL == heartbeatTimer){
-//        heartbeatTimer = new QTimer();
-//        heartbeatTimer->setSingleShot(false);
-//        heartbeatTimer->setInterval(interval);
-//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
 
-//    }else{
-//        heartbeatTimer->stop();
-//        heartbeatTimer->setInterval(interval);
-
-//    }
-
-//    heartbeatTimer->start();
-
-
-//}
-
-//void ServerPacketsParser::stopHeartbeat(){
-
-//    heartbeatTimer->stop();
-//}
-
-quint16 ServerPacketsParser::getLastReceivedPacketSN(const QString &peerID){
-    quint16 lastpacketSN = 0;
-
-    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
-    if(list.isEmpty()){
-        return lastpacketSN;
-    }
-
-    QDateTime lastpacketTime(QDate(1970, 1, 1));
-    for(int i=0; i<list.size(); i++){
-        QPair<quint16, QDateTime> pair = list.at(i);
-        QDateTime time = pair.second;
-        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-            m_receivedPacketsHash.remove(peerID, pair);
-        }else{
-            if(time > lastpacketTime){
-                lastpacketTime = time;
-                lastpacketSN = pair.first;
-            }
-        }
-    }
-    //    foreach ( QPair<quint16, QDateTime> pair, list) {
-    //        QDateTime time = pair.second;
-    //        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-    //            m_receivedPacketsHash.remove(peerID, pair);
-    //            list.removeOne(pair);
-    //        }else{
-    //            if(time > lastpacketTime){
-    //                lastpacketTime = time;
-    //                lastpacketSN = pair.first;
-    //            }
-    //        }
-    //    }
-
-    //TODO:TX Rate
-
-    return lastpacketSN;
-
-
-}
 
 
 

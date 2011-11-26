@@ -263,7 +263,7 @@ void MainWindow::initUI(){
 void MainWindow::checkNetwork(){
 
     m_packetHandler = 0;
-    networkManager = ClientNetworkManager::instance();
+    networkManager = ClientResourcesManager::instance();
     clientPacketsParser = 0;
     networkStarted = false;
 

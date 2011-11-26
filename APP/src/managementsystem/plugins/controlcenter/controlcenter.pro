@@ -25,7 +25,7 @@ INCLUDEPATH += $$UI_DIR \
 UI_DIR = ./ui
 
 # Input
-HEADERS += networkmanager/networkmanagerinstance.h \
+HEADERS += \
     networkmanager/controlcenterpacketsparser.h \
     taskmanagement/taskinfoviewwidget.h \
     taskmanagement/taskmanagement.h \
@@ -34,13 +34,14 @@ HEADERS += networkmanager/networkmanagerinstance.h \
     systemmanagement/systemmanagementwidget.h \
     controlcenter.h \
     controlcenterplugin.h \
-    constants.h
+    constants.h \
+    networkmanager/resourcesmanagerinstance.h
 FORMS += taskmanagement/taskinfoviewwidget.ui \
     taskmanagement/taskmanagement.ui \
     announcement/announcement.ui \
     systemmanagement/systemmanagementwidget.ui \
     controlcenter.ui
-SOURCES += networkmanager/networkmanagerinstance.cpp \
+SOURCES += \
     networkmanager/controlcenterpacketsparser.cpp \
     taskmanagement/taskinfoviewwidget.cpp \
     taskmanagement/taskmanagement.cpp \
@@ -48,7 +49,8 @@ SOURCES += networkmanager/networkmanagerinstance.cpp \
     clientinfomodel/clientinfomodel.cpp \
     systemmanagement/systemmanagementwidget.cpp \
     controlcenter.cpp \
-    controlcenterplugin.cpp
+    controlcenterplugin.cpp \
+    networkmanager/resourcesmanagerinstance.cpp
 RESOURCES += controlcenter.qrc
 
 # define some usefull values

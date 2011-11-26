@@ -50,7 +50,7 @@ ServerManagerWindow::ServerManagerWindow(QWidget *parent)
         connect(ui.tableViewServers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotServerSelected(const QModelIndex &)));
 
 
-	clientNetworkManager = ClientNetworkManager::instance();
+	clientNetworkManager = ClientResourcesManager::instance();
         //connect(clientNetworkManager, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
         
 

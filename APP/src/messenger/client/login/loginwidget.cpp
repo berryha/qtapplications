@@ -463,10 +463,10 @@ void LoginWidget::on_comboBoxNetworkType_currentIndexChanged ( int index )
     uint networkType = ui.comboBoxNetworkType->itemData(index).toUInt();
     switch (networkType) {
     case NetworkManagerBase::LAN :
-        ClientNetworkManager::instance()->setNetworkType(NetworkManagerBase::LAN);
+        ClientResourcesManager::instance()->setNetworkType(NetworkManagerBase::LAN);
         break;
     case NetworkManagerBase::INTERNET :
-        ClientNetworkManager::instance()->setNetworkType(NetworkManagerBase::INTERNET);
+        ClientResourcesManager::instance()->setNetworkType(NetworkManagerBase::INTERNET);
         break;
     default:
         break;

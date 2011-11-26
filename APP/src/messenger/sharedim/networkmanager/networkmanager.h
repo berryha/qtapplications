@@ -45,7 +45,7 @@ public:
     //QString hardwareAddress() const;
 
 
-    bool startIPMCServer();
+    UDPServer *startIPMCServer();
     quint16 startUDPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true);
 
     RUDPSocket * startRUDPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true);

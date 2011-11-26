@@ -25,26 +25,28 @@ INCLUDEPATH += $$UI_DIR \
 UI_DIR = ./ui
 
 # Input
-HEADERS += networkmanager/networkmanagerinstance.h \
+HEADERS += \
     networkmanager/bulletinboardpacketsparser.h \
     remoteassistance/remoteassistance.h \
     updatepassword/updatepasswordwidget.h \
     bulletinboard/bulletinboardwidget.h \
     bulletinboardplugin.h \
     systemsummaryinfo.h \
-    bulletinboardobject.h
+    bulletinboardobject.h \
+    networkmanager/resourcesmanagerinstance.h
 FORMS += remoteassistance/remoteassistance.ui \
     updatepassword/updatepasswordwidget.ui \
     bulletinboard/bulletinboardwidget.ui \
     systemsummaryinfo.ui
-SOURCES += networkmanager/networkmanagerinstance.cpp \
+SOURCES += \
     networkmanager/bulletinboardpacketsparser.cpp \
     remoteassistance/remoteassistance.cpp \
     updatepassword/updatepasswordwidget.cpp \
     bulletinboard/bulletinboardwidget.cpp \
     bulletinboardplugin.cpp \
     systemsummaryinfo.cpp \
-    bulletinboardobject.cpp
+    bulletinboardobject.cpp \
+    networkmanager/resourcesmanagerinstance.cpp
 RESOURCES += bulletinboard.qrc
 
 # define some usefull values

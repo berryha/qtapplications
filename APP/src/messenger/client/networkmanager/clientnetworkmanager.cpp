@@ -23,7 +23,7 @@
 namespace HEHUI {
 
 
-ClientNetworkManager::ClientNetworkManager(PacketHandlerBase *packetHandlerBase, NetworkType type, CommunicationMode mode, QObject *parent)
+ClientResourcesManager::ClientResourcesManager(PacketHandlerBase *packetHandlerBase, NetworkType type, CommunicationMode mode, QObject *parent)
     :NetworkManager(packetHandlerBase, type, mode, parent)//, mainWindow(mainWindow)
 {
 
@@ -31,7 +31,7 @@ ClientNetworkManager::ClientNetworkManager(PacketHandlerBase *packetHandlerBase,
 
 }
 
-ClientNetworkManager::~ClientNetworkManager() {
+ClientResourcesManager::~ClientResourcesManager() {
     // TODO Auto-generated destructor stub
 }
 
