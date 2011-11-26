@@ -11,7 +11,8 @@ QT -= gui
 include( ../config.pri )
 HHSharedLibs += HHSharedCore \
     HHSharedNetwork \
-    HHSharedService
+    HHSharedService \
+    HHSharedUDT
 include(../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
 include(../sharedms/sharedms.pri)
@@ -19,16 +20,18 @@ include(../sharedms/sharedms.pri)
 # ###
 DEPENDPATH += 
 INCLUDEPATH += 
-SOURCES += networkmanagerinstance.cpp \
+SOURCES += \
     settings.cpp \
     packetmanager/serverpacketsparser.cpp \
     main.cpp \
-    serverservice/serverservice.cpp
-HEADERS += networkmanagerinstance.h \
+    serverservice/serverservice.cpp \
+    resourcesmanagerinstance.cpp
+HEADERS += \
     app_constants.h \
     settings.h \
     packetmanager/serverpacketsparser.h \
-    serverservice/serverservice.h
+    serverservice/serverservice.h \
+    resourcesmanagerinstance.h
 
 # ##
 # unix:target.path += ../bin

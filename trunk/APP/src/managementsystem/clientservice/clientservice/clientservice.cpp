@@ -32,9 +32,14 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     //    mainServiceStarted = false;
 
 
-    m_packetHandler = 0;
-    networkManager = 0;
+    resourcesManager = 0;
     clientPacketsParser = 0;
+
+    m_udpServer = 0;
+    m_udtProtocol = 0;
+    m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
+
     databaseUtility = 0;
     mainServiceStarted = false;
 
@@ -64,7 +69,7 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     peerAddressThatRequiresDetailedInfo = "";
     peerPortThatRequiresDetailedInfo = 0;
 
-    rudpSocket = 0;
+    //rudpSocket = 0;
 
     lookForServerTimer = 0;
 
@@ -90,8 +95,8 @@ ClientService::~ClientService(){
         process = 0;
     }
 
-    if(networkManager){
-        networkManager->closeAllServers();
+    if(resourcesManager){
+        //resourcesManager->closeAllServers();
     }
 
     if(clientPacketsParser){
@@ -99,15 +104,15 @@ ClientService::~ClientService(){
         clientPacketsParser = 0;
     }
 
-    ClientNetworkManager::cleanInstance();
-    delete networkManager;
-    networkManager = 0;
+    ClientResourcesManager::cleanInstance();
+    delete resourcesManager;
+    resourcesManager = 0;
 
-    if(m_packetHandler){
-        m_packetHandler->clean();
-        delete m_packetHandler;
-        m_packetHandler = 0;
-    }
+    delete m_udpServer;
+    delete m_udtProtocol;
+
+    PacketHandlerBase::clean();
+
 
     delete databaseUtility;
     databaseUtility = 0;
@@ -158,43 +163,26 @@ bool ClientService::startMainService(){
         return true;
     }
 
-    if(!m_packetHandler){
-        m_packetHandler = new PacketHandlerBase(this);
-        networkManager->setPacketHandler(m_packetHandler);
-    }
-
-
-    bool result = false;
-    result = networkManager->startIPMCServer();
-    if(result == false){
-        logMessage(QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Error);
-        networkManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
+    QString errorMessage = "";
+    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    if(!m_udpServer){
+        logMessage(QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
+        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
     }else{
         //logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
         qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
 
-//    result = networkManager->startTCPServer();
-//    if(result == false){
-//        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
-//    }else{
-//        //logMessage(QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Information);
-//        qWarning()<<QString("TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT);
-//    }
-
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, RUDP_LISTENING_PORT);
-    if(!rudpSocket){
-        logMessage(QString("Can not start RUDP listening on address '%1'!").arg(rudpSocket->localAddress().toString()), QtServiceBase::Error);
+    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
+    if(!m_udtProtocol){
+        QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
+        logMessage(error, QtServiceBase::Error);
         return false;
-    }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
     }
-    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+    m_udtProtocol->startWaitingForIO(1);
 
-
-    clientPacketsParser = new ClientPacketsParser(networkManager, this);
+    clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalUpdateClientSoftwarePacketReceived()), this, SLOT(update()), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalServerRequestClientSummaryInfoPacketReceived(const QString &,const QString &,const QString &)), this, SLOT(processServerRequestClientInfoPacket(const QString &,const QString &,const QString &)), Qt::QueuedConnection);
@@ -203,7 +191,7 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalSetupProgramesPacketReceived(const QString &, const QString &, bool, bool, const QString &, const QString &, quint16 )), this, SLOT(processSetupProgramesPacket(const QString &, const QString &, bool, bool, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalShowAdminPacketReceived(const QString &, const QString &, bool)), this, SLOT(processShowAdminPacket(const QString &,const QString &, bool)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalModifyAdminGroupUserPacketReceived(const QString &, const QString &, bool, const QString &, const QString &, quint16 )), this, SLOT(processModifyAdminGroupUserPacket(const QString &, const QString &, bool, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalAdminRequestConnectionToClientPacketReceived(const QString &, quint16 , const QString &, const QString &)), this, SLOT(processAdminRequestConnectionToClientPacket(const QString &, quint16 , const QString &, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestConnectionToClientPacketReceived(int, const QString &, const QString &)), this, SLOT(processAdminRequestConnectionToClientPacket(int, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminSearchClientPacketReceived(const QString &, quint16 , const QString &, const QString &, const QString &, const QString &, const QString &, const QString &, const QString &)), this, SLOT(processAdminSearchClientPacket(const QString &, quint16 , const QString &, const QString &, const QString &, const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     
     connect(clientPacketsParser, SIGNAL(signalAdminRequestRemoteAssistancePacketReceived(const QString &, const QString &, const QString &, quint16 )), this, SLOT(processAdminRequestRemoteAssistancePacket(const QString &, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
@@ -217,10 +205,11 @@ bool ClientService::startMainService(){
     
     connect(clientPacketsParser, SIGNAL(signalServerAnnouncementPacketReceived(const QString &,const QString &, quint32, const QString &,const QString &,bool)), this, SLOT(processServerAnnouncementPacket(const QString &, const QString &, quint32, const QString &, const QString &, bool)), Qt::QueuedConnection);
 
-    
+    connect(clientPacketsParser, SIGNAL(signalLocalUserOnlineStatusChanged(int, const QString &, bool)), this, SLOT(processLocalUserOnlineStatusChanged(int, const QString &, bool)), Qt::QueuedConnection);
+
     
     //Single Process Thread
-    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
+    //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
     
     //IMPORTANT For Multi-thread
     //QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
@@ -296,27 +285,25 @@ bool ClientService::startMainService(){
 
 }
 
-void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
+void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ClientService::serverFound(...)";
 
-
-    rudpSocket->connectToPeer(serverAddress, serverRUDPListeningPort, true, 30000);
-//    QDateTime startTime = QDateTime::currentDateTime();
-//    while (!rudpSocket->isConnected(serverAddress, serverRUDPListeningPort)) {
-//        QCoreApplication::processEvents();
-//        //msleep(50);
-//        if(startTime.addMSecs(30000) < QDateTime::currentDateTime()){
-//            qDebug()<<"----------------------------Timeout";
-//            return;
-//        }
-//    }
-
     if(!m_serverAddress.isNull() && serverInstanceID != m_serverInstanceID){
-        rudpSocket->disconnectFromPeer(m_serverAddress, m_serverRUDPListeningPort);
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+        m_serverAddress = QHostAddress::Null;
+        m_serverRUDPListeningPort = 0;
+        m_serverName = "";
+        m_serverInstanceID = 0;
+    }
+
+    m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
+    if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
+        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        return;
     }
 
     m_serverAddress = QHostAddress(serverAddress);
-    m_serverRUDPListeningPort = serverRUDPListeningPort;
+    m_serverRUDPListeningPort = serverUDTListeningPort;
     m_serverName = serverName;
     m_serverInstanceID = serverInstanceID;
 
@@ -324,7 +311,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverRUDP
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverUDTListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
     qWarning();
 
 
@@ -644,7 +631,9 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
 
 }
 
-void ClientService::processAdminRequestConnectionToClientPacket(const QString &adminAddress, quint16 adminPort, const QString &computerName, const QString &users){
+void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketID, const QString &computerName, const QString &users){
+
+    int previousSocketConnectedToAdmin = m_socketConnectedToAdmin;
 
 #ifdef Q_OS_WIN
     bool result =false;
@@ -693,10 +682,22 @@ void ClientService::processAdminRequestConnectionToClientPacket(const QString &a
         uploadClientSummaryInfo(m_adminAddress, adminPort);
     }
 
-    clientPacketsParser->sendClientResponseAdminConnectionResultPacket(QHostAddress(adminAddress), adminPort, result, message);
+    bool ok = clientPacketsParser->sendClientResponseAdminConnectionResultPacket(adminSocketID, result, message);
     //    qWarning()<<"ClientService::processAdminRequestVerifyClientInfoPacket:"<<adminAddress<< " "<<adminPort;
 
+    if(ok && result){
+        m_socketConnectedToAdmin = adminSocketID;
+    }
+
+#else
+
 #endif
+
+    if(previousSocketConnectedToAdmin != m_socketConnectedToAdmin){
+        clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
+        m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
+    }
+
 
 }
 
@@ -1023,7 +1024,7 @@ void ClientService::processAdminRequestRemoteConsolePacket(const QString &comput
         qWarning()<<"m_adminAddress:"<<m_adminAddress;
         qWarning()<<"adminAddress:"<<adminAddress;
         //clientPacketsParser->sendClientMessagePacket(QHostAddress(adminAddress), adminPort, localComputerName, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
-        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(QHostAddress(adminAddress), adminPort, false, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
+        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
 
         return;
     }
@@ -1060,17 +1061,8 @@ void ClientService::processRemoteConsoleCMDFromServerPacket(const QString &compu
         return;
     }
 
-    if(!m_adminAddress.isEmpty() && m_adminAddress != adminAddress){
-        qWarning()<<"m_adminAddress:"<<m_adminAddress;
-        qWarning()<<"adminAddress:"<<adminAddress;
-        //clientPacketsParser->sendClientMessagePacket(QHostAddress(adminAddress), adminPort, localComputerName, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
-        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(QHostAddress(adminAddress), adminPort, false, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
-
-        return;
-    }
-
     if((!process) || (!process->isRunning())){
-        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(QHostAddress(adminAddress), adminPort, false, "The Process is not running!");
+        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, "The Process is not running!");
         return;
     }
 
@@ -1081,15 +1073,27 @@ void ClientService::processRemoteConsoleCMDFromServerPacket(const QString &compu
 
 
 void ClientService::consoleProcessStateChanged(bool running, const QString &message){
-    clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(QHostAddress(m_adminAddress), m_adminPort, running, message);
+    clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, running, message);
 
 }
 
 void ClientService::consoleProcessOutputRead(const QString &output){
-    clientPacketsParser->sendRemoteConsoleCMDResultFromClientPacket(QHostAddress(m_adminAddress), m_adminPort, output);
+    clientPacketsParser->sendRemoteConsoleCMDResultFromClientPacket(m_socketConnectedToAdmin, output);
 }
 
+void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online){
 
+//    if(online){
+//        m_localUserSocketsHash.insert(socketID, userName);
+//        qWarning()<<tr("Local user '%1' online!").arg(userName);
+//    }else{
+//        m_localUserSocketsHash.remove(socketID);
+//        qWarning()<<tr("Local user '%1' offline!").arg(userName);
+//    }
+
+    clientPacketsParser->localUserOffline(socketID);
+
+}
 
 void ClientService::uploadClientSummaryInfo(const QString &targetAddress, quint16 targetPort){
     qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
@@ -1670,7 +1674,7 @@ void ClientService::setServerLastUsed(const QString &serverAddress){
 void ClientService::checkHasAnyServerBeenFound(){
 
 
-    if(clientPacketsParser->getServerAddress().isNull()){
+    if(!m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
         qWarning()<<"No server found!";
         clientPacketsParser->sendClientLookForServerPacket();
 
@@ -1729,7 +1733,22 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 
 }
 
+void ClientService::peerDisconnected(int socketID){
 
+    if(socketID == m_socketConnectedToServer){
+        qWarning()<<"Server Offline!";
+    }else{
+//        QString userName = m_localUserSocketsHash.take(socketID);
+//        if(!userName.isEmpty()){
+//            qWarning()<<tr("Local user %1 offine!").arg(userName);
+//        }
+
+        clientPacketsParser->localUserOffline(socketID);
+
+    }
+
+
+}
 
 
 void ClientService::update(){
@@ -1782,29 +1801,13 @@ void ClientService::start()
 {
     //qWarning()<<"----ClientService::start()";
 
-
-
-    m_packetHandler = 0;
-    networkManager = ClientNetworkManager::instance();
+    resourcesManager = ClientResourcesManager::instance();
     clientPacketsParser = 0;
     mainServiceStarted = false;
 
     settings = new QSettings("HKEY_LOCAL_MACHINE\\SECURITY\\System", QSettings::NativeFormat, this);
 
-
-    if(networkManager->isNetworkReady()){
-        qDebug()<<"Network Ready!";
-        startMainService();
-
-    }else{
-        logMessage(QString("Can not find valid IP address! Service startup failed!"), QtServiceBase::Error);
-        qWarning()<<"Can not find valid IP address! Service startup failed!";
-
-        connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(startMainService()));
-        networkManager->startWaitingNetworkReady();
-
-    }
-    
+    startMainService();
 
 }
 
@@ -1818,9 +1821,17 @@ void ClientService::stop()
         systemInfo->stopProcess();
     }
 
+    if(m_udpServer){
+        m_udpServer->close();
+    }
+
+    if(m_udtProtocol){
+        m_udtProtocol->closeUDTProtocol();
+    }
+
     if(clientPacketsParser){
-        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
-        clientPacketsParser->aboutToQuit();
+//        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
+//        clientPacketsParser->aboutToQuit();
         //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));
     }
 

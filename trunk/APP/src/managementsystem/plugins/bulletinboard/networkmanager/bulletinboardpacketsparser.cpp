@@ -48,14 +48,11 @@
 namespace HEHUI {
 
 
-BulletinBoardPacketsParser::BulletinBoardPacketsParser(NetworkManagerInstance *networkManager, QObject *parent)
-    :PacketsParserBase(networkManager, parent)
+BulletinBoardPacketsParser::BulletinBoardPacketsParser(UDTProtocol *udtProtocol, QObject *parent)
+    :QObject(parent), m_udtProtocol(udtProtocol)
 {
 
-    Q_ASSERT_X(networkManager, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid NetworkManagerInstance!");
-
-    m_packetHandlerBase = networkManager->getPacketHandler();
-    Q_ASSERT_X(m_packetHandlerBase, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid PacketHandlerBase!");
+    Q_ASSERT_X(m_udtProtocol, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid UDTProtocol!");
 
 
     //serverAddress = QHostAddress::Null;
@@ -63,18 +60,8 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(NetworkManagerInstance *n
     //serverName = "";
 
     heartbeatTimer = 0;
-    //    processWaitingForReplyPacketsTimer = 0;
-    //    processWaitingForReplyPacketsTimer = new QTimer();
 
-    //m_packetHandlerBase = new PacketHandlerBase(this);
 
-    networkManager = NetworkManagerInstance::instance();
-
-    //ipmcGroupAddress = networkManager->ipMCGroupAddress();
-    ipmcListeningPort = networkManager->localIPMCListeningPort();
-
-    //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
-    //    localUDPListeningPort = networkManager->localUDPListeningPort();
 
     localRUDPListeningAddress = QHostAddress::Any;
     localRUDPListeningPort = 0;
@@ -121,33 +108,6 @@ void BulletinBoardPacketsParser::setLocalRUDPListeningPort(quint16 port){
     this->localRUDPListeningPort = port;
 }
 
-
-void BulletinBoardPacketsParser::run(){
-    QMutexLocker locker(&mutex);
-
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT + 2000);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        parseIncomingPackets();
-        processOutgoingPackets();
-        //processWaitingForReplyPackets();
-        msleep(500);
-        qApp->processEvents();
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-
-}
-
 void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     qDebug()<<"----BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet)";
     
@@ -159,27 +119,12 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     QString peerID = "";
     in >> peerID;
 
-//    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
-//    qDebug()<<"--BulletinBoardPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+    int socketID = packet->getSocketID();
+    PacketHandlerBase::recylePacket(packet);
 
     switch(packetType){
-//    case quint8(HEHUI::HeartbeatPacket):
-//    {
-//        QString computerName;
-//        in >> computerName;
-//        emit signalHeartbeatPacketReceived(computerName);
-//    }
-//    break;
-//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-//    {
-//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-//        in >> packetSerialNumber1 >> packetSerialNumber2;
-//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-//        qDebug()<<"~~ConfirmationOfReceiptPacket--"<<packetSerialNumber1<<" "<<packetSerialNumber2;
-//    }
-//    break;
+
     case quint8(MS::LocalServiceServerDeclare):
     {
 //        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
@@ -251,83 +196,6 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 }
 
 
-
-//void BulletinBoardPacketsParser::startHeartbeat(int interval){
-//    if(NULL == heartbeatTimer){
-//        heartbeatTimer = new QTimer(this);
-//        heartbeatTimer->setSingleShot(false);
-//        heartbeatTimer->setInterval(interval);
-//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
-//    }else{
-//        heartbeatTimer->stop();
-//        heartbeatTimer->setInterval(interval);
-
-//    }
-
-//    heartbeatTimer->start();
-
-
-//}
-
-//void BulletinBoardPacketsParser::heartbeat(){
-
-//    static QString computerName = "";
-//    if(computerName.isEmpty()){
-//        computerName = QHostInfo::localHostName().toLower() ;
-//    }
-
-//    if(serverAddress.isNull()){
-//        serverAddress = QHostAddress::Broadcast;
-//    }
-
-//    //UDPPacket *packet = new UDPPacket(serverAddress.toString(), serverTCPListeningPort, localUDPListeningAddress.toString(), localUDPListeningPort);
-//    Packet *packet = m_packetHandlerBase->getPacket(QHostAddress::LocalHost, ipmcListeningPort, localUDPListeningAddress, localUDPListeningPort);
-
-//    packet->setPacketType(quint8(MS::UserHeartbeat));
-//    QByteArray ba;
-//    QDataStream out(&ba, QIODevice::WriteOnly);
-//    out.setVersion(QDataStream::Qt_4_6);
-//    out << computerName;
-//    packet->setPacketData(ba);
-//    m_packetHandlerBase->appendOutgoingPacket(packet);
-
-
-//}
-
-//void BulletinBoardPacketsParser::confirmPacketReceipt(quint16 packetSerialNumber){
-
-//}
-
-
-quint16 BulletinBoardPacketsParser::getLastReceivedPacketSN(const QString &peerID){
-    quint16 lastpacketSN = 0;
-
-    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
-    if(list.isEmpty()){
-        return lastpacketSN;
-    }
-
-    QDateTime lastpacketTime(QDate(1970, 1, 1));
-    for(int i=0; i<list.size(); i++){
-        QPair<quint16, QDateTime> pair = list.at(i);
-        QDateTime time = pair.second;
-        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-            m_receivedPacketsHash.remove(peerID, pair);
-        }else{
-            if(time > lastpacketTime){
-                lastpacketTime = time;
-                lastpacketSN = pair.first;
-            }
-        }
-    }
-
-
-    //TODO:TX Rate
-
-    return lastpacketSN;
-
-
-}
 
 
 

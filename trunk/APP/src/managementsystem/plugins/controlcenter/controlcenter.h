@@ -11,7 +11,7 @@
 
 #include "ui_controlcenter.h"
 #include "networkmanager/controlcenterpacketsparser.h"
-#include "networkmanager/networkmanagerinstance.h"
+#include "networkmanager/resourcesmanagerinstance.h"
 
 #include"clientinfomodel/clientinfomodel.h"
 
@@ -81,7 +81,7 @@ private slots:
 
     void slotShowCustomContextMenu(const QPoint & pos);
 
-    void networkReady();
+    void startNetwork();
 
     void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
@@ -132,11 +132,9 @@ private:
     QProgressBar *progressBar;
 
 
-    PacketHandlerBase *m_packetHandler;
-    NetworkManagerInstance *networkManager;
+    ResourcesManagerInstance *resourcesManager;
     ControlCenterPacketsParser *controlCenterPacketsParser;
 
-    bool m_networkReady;
 
     QString m_adminName;
 
@@ -158,9 +156,13 @@ private:
 //    quint16 localUDPListeningPort;
 //    quint16 localRUDPListeningPort;
     
-    RUDPSocket *rudpSocket;
 
-//    int m_serverInstanceID;
+    bool m_networkReady;
+
+    UDPServer *m_udpServer;
+    UDTProtocol *m_udtProtocol;
+    quint16 m_udtListeningPort;
+    //UDTSOCKET m_socketConnectedToServer;
     
 };
 

@@ -11,7 +11,8 @@ QT -= gui
 include( ../config.pri )
 HHSharedLibs += HHSharedCore \
     HHSharedNetwork \
-    HHSharedService
+    HHSharedService \
+    HHSharedUDT
 win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
@@ -21,20 +22,22 @@ include(../sharedms/sharedms.pri)
 DEPENDPATH += .
 INCLUDEPATH += .
 RESOURCES += resources.qrc
-SOURCES += clientnetworkmanager.cpp \
+SOURCES += \
     systeminfo.cpp \
     process.cpp \
     settings.cpp \
     packetmanager/clientpacketsparser.cpp \
     main.cpp \
-    clientservice/clientservice.cpp
-HEADERS += clientnetworkmanager.h \
+    clientservice/clientservice.cpp \
+    clientresourcesmanager.cpp
+HEADERS += \
     systeminfo.h \
     process.h \
     settings.h \
     app_constants.h \
     packetmanager/clientpacketsparser.h \
-    clientservice/clientservice.h
+    clientservice/clientservice.h \
+    clientresourcesmanager.h
 
 # win32:RC_FILE = iconresource.rc
 win32:APP_ICON = resources/images/app.ico

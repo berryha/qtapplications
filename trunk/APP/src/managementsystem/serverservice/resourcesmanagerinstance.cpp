@@ -11,7 +11,7 @@
 #include <QNetworkInterface>
 #include <QHostAddress>
 
-#include "networkmanagerinstance.h"
+#include "resourcesmanagerinstance.h"
 
 
 #include "HHSharedCore/huser.h"
@@ -21,15 +21,14 @@
 namespace HEHUI {
 
 
-NetworkManagerInstance::NetworkManagerInstance(PacketHandlerBase *packetHandlerBase, NetworkType type, CommunicationMode mode, QObject *parent)
-    :NetworkManager(packetHandlerBase, type, mode, parent)//, mainWindow(mainWindow)
+ResourcesManagerInstance::ResourcesManagerInstance(QObject *parent)
+    :ResourcesManager(parent)
 {
 
-    setParent(parent);
 
 }
 
-NetworkManagerInstance::~NetworkManagerInstance() {
+ResourcesManagerInstance::~ResourcesManagerInstance() {
     // TODO Auto-generated destructor stub
 }
 

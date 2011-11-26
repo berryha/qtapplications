@@ -5,13 +5,13 @@
 namespace HEHUI {
 
 
-UDTProtocol::UDTProtocol(PacketHandlerBase *packetHandlerBase, QObject *parent) :
-    UDTProtocolBase(parent), m_packetHandlerBase(packetHandlerBase)
+UDTProtocol::UDTProtocol(bool stream, const SocketOptions *options, QObject *parent) :
+    UDTProtocolBase(stream, options, parent)
 {
 
-    Q_ASSERT(m_packetHandlerBase);
 
 }
+
 
 void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
     qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
@@ -38,10 +38,10 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
     QVariant v;
     in >> v;
     if (v.canConvert<Packet>()){
-        Packet *packet = m_packetHandlerBase->getPacket();
+        Packet *packet = PacketHandlerBase::getPacket(socket);
         *packet = v.value<Packet>();
-        packet->setTransmissionProtocol(TP_RUDP);
-        packet->setSocketID(socket);
+        packet->setTransmissionProtocol(TP_UDT);
+        //packet->setSocketID(socket);
 
 
 //        packet->setPeerHostAddress(m_peerAddress);
@@ -49,7 +49,9 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
 //        packet->setLocalHostAddress(m_udpSocket->localAddress());
 //        packet->setLocalHostPort(m_udpSocket->localPort());
 
-        m_packetHandlerBase->appendIncomingPacket(packet);
+//        m_packetHandlerBase->appendIncomingPacket(packet);
+
+        emit packetReceived(packet);
     }
 
 }

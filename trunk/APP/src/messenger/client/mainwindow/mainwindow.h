@@ -172,7 +172,7 @@ private:
     ChatWindowManager *chatWindowManager;
 
     PacketHandlerBase *m_packetHandler;
-    ClientNetworkManager *networkManager;
+    ClientResourcesManager *networkManager;
     ClientPacketsParser *clientPacketsParser;
     bool networkStarted;
 

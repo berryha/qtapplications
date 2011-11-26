@@ -56,7 +56,7 @@ namespace HEHUI {
 class ClientPacketsParser : public PacketsParserBase{
     Q_OBJECT
 public:
-    ClientPacketsParser(ClientNetworkManager *networkManager, QObject *parent = 0);
+    ClientPacketsParser(ClientResourcesManager *networkManager, QObject *parent = 0);
     virtual ~ClientPacketsParser();
 
     void setLocalUDPListeningAddress(const QHostAddress &address = QHostAddress::Any);

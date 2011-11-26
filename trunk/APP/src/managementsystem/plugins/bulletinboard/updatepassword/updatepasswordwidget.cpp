@@ -131,7 +131,7 @@ void UpdatePasswordWidget::on_pushButtonRetrieve_clicked(){
     
     m_newPasswordRetreved = true;
     
-    emit newPasswordRetreved(m_adminAddress, m_adminPort);
+    emit newPasswordRetreved();
     
      
 }

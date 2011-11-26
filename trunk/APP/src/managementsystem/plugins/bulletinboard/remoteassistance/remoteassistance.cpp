@@ -6,35 +6,40 @@
 
 #include "remoteassistance.h"
 
+
+namespace HEHUI {
+
+
 RemoteAssistance::RemoteAssistance(const QString &adminAddress, quint16 adminPort, const QString &adminName, QWidget *parent)
     : QWidget(parent)
 {
-	ui.setupUi(this);
-        
-        setWindowFlags(Qt::WindowStaysOnTopHint);
-        
-        // Get the size of screen
-        QDesktopWidget* desktop = QApplication::desktop();
-        QRect rect = desktop->availableGeometry(this);
-        int desktopWidth = rect.width();
-        int desktopHeight = rect.height();
-        int windowWidth = frameGeometry().width();
-        int windowHeight = frameGeometry().height();
-        //move the window
-        move((desktopWidth - windowWidth) / 2, (desktopHeight - windowHeight) / 2);
-//        move((desktopWidth - windowWidth), (desktopHeight - windowHeight));
-        
-        
-        
-        requestRemoteAssistance(adminAddress, adminPort, adminName);
-        
-//        updateTimeInfo();
-        
-//        timer = new QTimer(this);
-//        timer->setInterval(1000);
-//        connect(timer, SIGNAL(timeout()), this, SLOT(updateTimeInfo()));
-//        timer->start();
-        
+
+
+    ui.setupUi(this);
+
+    setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    // Get the size of screen
+    QDesktopWidget* desktop = QApplication::desktop();
+    QRect rect = desktop->availableGeometry(this);
+//    int desktopWidth = rect.width();
+//    int desktopHeight = rect.height();
+//    int windowWidth = frameGeometry().width();
+//    int windowHeight = frameGeometry().height();
+//    //move the window
+//    move((desktopWidth - windowWidth) / 2, (desktopHeight - windowHeight) / 2);
+
+    move(rect.center());
+
+    requestRemoteAssistance(adminAddress, adminPort, adminName);
+
+    //        updateTimeInfo();
+
+    //        timer = new QTimer(this);
+    //        timer->setInterval(1000);
+    //        connect(timer, SIGNAL(timeout()), this, SLOT(updateTimeInfo()));
+    //        timer->start();
+
 }
 
 RemoteAssistance::~RemoteAssistance()
@@ -58,7 +63,7 @@ void RemoteAssistance::closeEvent(QCloseEvent *event){
     
     
     //deleteLater();
- 
+
 }
 
 void RemoteAssistance::requestRemoteAssistance(const QString &adminAddress, quint16 adminPort, const QString &adminName){
@@ -106,7 +111,7 @@ void RemoteAssistance::startVNC(){
     
     QProcess process;
     process.startDetached(QString("tvnserver.exe -controlapp -connect %1").arg(m_adminAddress));
-            
+
     
     this->close();
     
@@ -114,7 +119,7 @@ void RemoteAssistance::startVNC(){
 
 void RemoteAssistance::on_pushButtonAccept_clicked(){
     
-    startVNC();   
+    startVNC();
 }
 
 void RemoteAssistance::on_pushButtonReject_clicked(){
@@ -123,4 +128,25 @@ void RemoteAssistance::on_pushButtonReject_clicked(){
     this->close();
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
 

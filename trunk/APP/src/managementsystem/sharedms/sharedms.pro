@@ -24,12 +24,12 @@ include(../../HHSharedLibs.pri)
 # Input
 HEADERS += clientinfo.h \
     global_shared.h \
-    networkmanager.h \
-    udtprotocol.h
+    udtprotocol.h \
+    resourcesmanager.h
 FORMS += 
 SOURCES += clientinfo.cpp \
-    networkmanager.cpp \
-    udtprotocol.cpp
+    udtprotocol.cpp \
+    resourcesmanager.cpp
 RESOURCES += resources.qrc
 win32 { 
     #DEFINES += WIN32 __MINGW__ _WIN32_WINNT=0x0501

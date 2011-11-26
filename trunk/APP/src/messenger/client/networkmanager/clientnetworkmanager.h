@@ -21,16 +21,16 @@
 namespace HEHUI {
 
 
-class ClientNetworkManager: public NetworkManager, public Singleton<ClientNetworkManager>
+class ClientResourcesManager: public NetworkManager, public Singleton<ClientResourcesManager>
 {
     Q_OBJECT
 
-    friend class Singleton<ClientNetworkManager> ;
+    friend class Singleton<ClientResourcesManager> ;
 
 public:
 
-    ClientNetworkManager(PacketHandlerBase *packetHandlerBase = 0, NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
-    virtual ~ClientNetworkManager();
+    ClientResourcesManager(PacketHandlerBase *packetHandlerBase = 0, NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
+    virtual ~ClientResourcesManager();
 
 
 

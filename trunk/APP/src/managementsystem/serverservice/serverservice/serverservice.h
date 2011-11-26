@@ -32,19 +32,16 @@
 #ifndef SERVERSERVICE_H
 #define SERVERSERVICE_H
 
+#include <QTimer>
 
 #include "../../sharedms/global_shared.h"
-#include "../../sharedms/networkmanager.h"
 #include "../../sharedms/clientinfo.h"
 
 #include "packetmanager/serverpacketsparser.h"
-
-//#include "../../../shared/service/service/service.h"
-//#include "../../../shared/network/networkmanagerbase.h"
+#include "../resourcesmanagerinstance.h"
 
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedService/hservice.h"
-#include "HHSharedNetwork/hnetworkmanagerbase.h"
 
 
 
@@ -77,11 +74,12 @@ private slots:
     void getRecordsInDatabase();
 
     void processHeartbeatPacket(const QString &clientAddress, const QString &computerName);
-    void processClientOnlineStatusChangedPacket(const QString &clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool online, bool isAdmin);
+    void processClientOnlineStatusChangedPacket(const QString &clientUDPListeningAddress, quint16 clientUDPListeningPort, const QString &clientName, bool online, bool isAdmin);
 
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+    void peerDisconnected(int socketID);
 
 
 private:
@@ -99,9 +97,12 @@ protected:
 
 private:
 
-    PacketHandlerBase *m_packetHandler;
-    NetworkManagerInstance *networkManager;
+    ResourcesManagerInstance *resourcesManager;
     ServerPacketsParser *serverPacketsParser;
+
+    UDPServer *m_udpServer;
+    UDTProtocol *m_udtProtocol;
+    //UDTSOCKET m_socketConnectedToAdmin;
 
     bool mainServiceStarted;
 
@@ -118,7 +119,6 @@ private:
 
     QStringList logs;
 
-    RUDPSocket *rudpSocket;
 
 };
 

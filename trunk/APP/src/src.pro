@@ -5,8 +5,8 @@ CONFIG += ordered \
     debug_and_release
 
 SUBDIRS += managementsystem \
-    plugins \
-    messenger \
+    #plugins \
+    #messenger \
     test
 
 TRANSLATIONS += ts_zh_CN.ts \

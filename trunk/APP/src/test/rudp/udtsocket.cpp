@@ -11,8 +11,8 @@
 namespace HEHUI {
 
 
-UDTProtocol::UDTProtocol(QObject *parent) :
-    UDTProtocolBase()
+UDTProtocol::UDTProtocol(bool stream, const SocketOptions *options, QObject *parent) :
+    UDTProtocolBase(stream, options, parent)
 {
 
 

@@ -23,7 +23,7 @@ private:
     void init();    
     
 signals:
-    void newPasswordRetreved(const QString &adminAddress, quint16 adminPort);
+    void newPasswordRetreved();
     
 private slots:
     void on_pushButtonRetrieve_clicked();

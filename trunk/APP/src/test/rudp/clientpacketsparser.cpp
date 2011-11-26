@@ -73,67 +73,8 @@ ClientPacketsParser::~ClientPacketsParser() {
 
 }
 
-void ClientPacketsParser::run(){
-
-    QMutexLocker locker(&mutex);
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-
-        QCoreApplication::processEvents();
-        parseIncomingPackets();
-        processOutgoingPackets();
-
-//        if(isAboutToQuit()){
-//            break;
-//        }
-        msleep(500);
-    }
 
 
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-
-}
-
-void ClientPacketsParser::startparseIncomingPackets(){
-
-    while(!isAboutToQuit()){
-        QCoreApplication::processEvents();
-        parseIncomingPackets();
-        msleep(500);
-    }
-
-}
-
-void ClientPacketsParser::startprocessOutgoingPackets(){
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        //QCoreApplication::processEvents();
-        processOutgoingPackets();
-        msleep(500);
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-}
 
 void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     qDebug()<<"--ClientPacketsParser::parseIncomingPacketData(Packet *packet)";

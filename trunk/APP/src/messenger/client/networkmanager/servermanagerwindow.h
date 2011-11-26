@@ -96,7 +96,7 @@ private:
     Ui::ServerManagerWindowClass ui;
 
 
-    ClientNetworkManager *clientNetworkManager;
+    ClientResourcesManager *clientNetworkManager;
     ServerInfoModel *model;
 
     QHash<QString/*Server Address*/, ServerInfo *> serversHash;

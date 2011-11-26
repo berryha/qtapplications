@@ -8,8 +8,9 @@
 #include <QSettings>
 
 #include "../../sharedms/global_shared.h"
-#include "../../sharedms/networkmanager.h"
+//#include "../../sharedms/networkmanager.h"
 #include "packetmanager/clientpacketsparser.h"
+#include "../clientresourcesmanager.h"
 #include "process.h"
 #include "systeminfo.h"
 
@@ -59,7 +60,7 @@ private slots:
     void processSetupProgramesPacket(const QString &computerName, const QString &users, bool enable, bool temporarilyAllowed, const QString &adminName, const QString &adminAddress, quint16 adminPort);
     void processShowAdminPacket(const QString &computerName, const QString &users, bool show);
     void processModifyAdminGroupUserPacket(const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName, const QString &adminAddress, quint16 adminPort);
-    void processAdminRequestConnectionToClientPacket(const QString &adminAddress, quint16 adminPort, const QString &computerName, const QString &users);
+    void processAdminRequestConnectionToClientPacket(int adminSocketID, const QString &computerName, const QString &users);
     void processAdminSearchClientPacket(const QString &adminAddress, quint16 adminPort, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName);
     
     
@@ -74,6 +75,7 @@ private slots:
     void consoleProcessStateChanged(bool running, const QString &message);
     void consoleProcessOutputRead(const QString &output);
 
+    void processLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online);
 
 
     void uploadClientSummaryInfo(const QString &targetAddress = "", quint16 targetPort = 0);
@@ -110,6 +112,7 @@ private slots:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+    void peerDisconnected(int socketID);
 
 
 
@@ -125,9 +128,15 @@ protected:
 
 private:
 
-    PacketHandlerBase *m_packetHandler;
-    ClientNetworkManager *networkManager;
+    ClientResourcesManager *resourcesManager;
     ClientPacketsParser *clientPacketsParser;
+
+    UDPServer *m_udpServer;
+    UDTProtocol *m_udtProtocol;
+    UDTSOCKET m_socketConnectedToServer;
+    UDTSOCKET m_socketConnectedToAdmin;
+
+//    QHash<int /*UDT Socket ID*/, QString /*User Name*/> m_localUserSocketsHash;
 
     bool mainServiceStarted;
 
@@ -157,7 +166,6 @@ private:
     QString peerAddressThatRequiresDetailedInfo;
     quint16 peerPortThatRequiresDetailedInfo;
 
-    RUDPSocket *rudpSocket;
 
     QTimer *lookForServerTimer;
 

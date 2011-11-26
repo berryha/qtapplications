@@ -10,23 +10,23 @@
 
 #include <QObject>
 
-#include "../../../sharedms/networkmanager.h"
+#include "../../../sharedms/resourcesmanager.h"
 
 #include "HHSharedCore/hsingleton.h"
 
 namespace HEHUI {
 
 
-class NetworkManagerInstance: public NetworkManager, public Singleton<NetworkManagerInstance>
+class ResourcesManagerInstance: public ResourcesManager, public Singleton<ResourcesManagerInstance>
 {
     Q_OBJECT
 
-    friend class Singleton<NetworkManagerInstance> ;
+    friend class Singleton<ResourcesManagerInstance> ;
 
 public:
 
-    NetworkManagerInstance(PacketHandlerBase *packetHandlerBase = 0, NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
-    virtual ~NetworkManagerInstance();
+    ResourcesManagerInstance(QObject *parent = 0);
+    virtual ~ResourcesManagerInstance();
 
 
 
