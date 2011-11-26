@@ -57,8 +57,9 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
         QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
     }
 
-
     m_errorMessage = "";
+
+
 
 }
 
@@ -386,6 +387,7 @@ void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
 
     UDT::close(socket);
+    UDT::epoll_remove_usock(epollID, socket);
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
     recycleCachedData(data);
@@ -777,7 +779,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        UDT::close(socket);
+        //UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
         emit disconnected(socket);
         qDebug()<<"BROKEN";
@@ -790,7 +792,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case CLOSED: //8
     {
-        UDT::close(socket);
+        //UDT::close(socket);
 
         UDT::epoll_remove_usock(epollID, socket);
         emit disconnected(socket);
@@ -799,7 +801,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
-        UDT::close(socket);
+        //UDT::close(socket);
 
         UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"NONEXIST";
@@ -911,6 +913,26 @@ UDTSocketStatus UDTProtocolBase::getUDTSocketStatus(UDTSOCKET socket){
 
     return UDT::getsockstate(socket);
 
+}
+
+bool UDTProtocolBase::isSocketListening(UDTSOCKET socket){
+    return UDT::getsockstate(socket) == LISTENING;
+}
+
+bool UDTProtocolBase::isSocketConnected(UDTSOCKET socket){
+    return UDT::getsockstate(socket) == CONNECTED;
+}
+
+bool UDTProtocolBase::isSocketBroken(UDTSOCKET socket){
+    return (UDT::getsockstate(socket) == BROKEN) || (UDT::getsockstate(socket) == NONEXIST);
+}
+
+QString UDTProtocolBase::getUDTListeningAddress(){
+    return m_serverAddress;
+}
+
+quint16 UDTProtocolBase::getUDTListeningPort(){
+    return m_serverPort;
 }
 
 QString UDTProtocolBase::getLastErrorMessage() const{

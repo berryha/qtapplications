@@ -34,16 +34,15 @@
 
 #include "udpsocket.h"
 
+#include "./packethandler/packetstreamoperator.h"
+
 
 namespace HEHUI {
 
 
-UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)
-    :QUdpSocket(parent), m_packetHandlerBase(packetHandlerBase)
+UDPSocket::UDPSocket(QObject *parent)
+    :QUdpSocket(parent)
 {
-
-    Q_ASSERT_X(m_packetHandlerBase, "UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)", "Invalid PacketHandlerBase!");
-    //m_packetHandlerBase = new PacketHandlerBase(this);
 
     datagram = new QByteArray();
     datagram->resize(0);
@@ -53,6 +52,10 @@ UDPSocket::UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent)
     ipMulticastSocket = 0;
 
     listeningState = NotListening;
+
+    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+
 
 }
 
@@ -84,6 +87,11 @@ UDPSocket::ListeningState UDPSocket::getListeningState() const{
 bool UDPSocket::startSimpleListening(const QHostAddress &localAddress, quint16 localPort){
 
     if(ipMulticastSocket){
+        if((ipMulticastSocket->getUdpSocket()->localAddress() == localAddress) && (ipMulticastSocket->getPort() == localPort)){
+            qWarning("Server already started!");
+            return true;
+        }
+
         if(ipMulticastSocket->isBound()){
             ipMulticastSocket->leaveGroup();
         }
@@ -175,7 +183,7 @@ void UDPSocket::readPendingDatagrams() {
         in >> v;
         if (v.canConvert<Packet>()){
             //Packet *packet = new Packet();
-            Packet *packet = m_packetHandlerBase->getPacket();
+            Packet *packet = PacketHandlerBase::getPacket();
             *packet = v.value<Packet>();
             packet->setTransmissionProtocol(TP_UDP);
             packet->setPeerHostAddress(peerAddress);
@@ -191,9 +199,8 @@ void UDPSocket::readPendingDatagrams() {
 //            qWarning()<<"~~localPort():"<<localPort();
 //            qWarning()<<"";
 
-            m_packetHandlerBase->appendIncomingPacket(packet);
 
-            //                    emit signalNewUDPPacketReceived(packet);
+            emit signalNewUDPPacketReceived(packet);
 
         }
 
