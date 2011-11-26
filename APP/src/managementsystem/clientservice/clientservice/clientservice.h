@@ -53,7 +53,7 @@ private slots:
     void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
     void processServerRequestClientInfoPacket(const QString &groupName, const QString &computerName, const QString &userName/*, const QString &address*/);
 
-    void processClientDetailedInfoRequestedPacket(const QString &computerName, bool rescan, const QString &peerAddress, quint16 peerPort);
+    void processClientDetailedInfoRequestedPacket(const QString &computerName, bool rescan, int socketID);
     void scanFinished(bool ok, const QString &message);
 
     void processSetupUSBSDPacket(const QString &computerName, const QString &users, bool enable, bool temporarilyAllowed, const QString &adminName, const QString &adminAddress, quint16 adminPort);
@@ -78,7 +78,7 @@ private slots:
     void processLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online);
 
 
-    void uploadClientSummaryInfo(const QString &targetAddress = "", quint16 targetPort = 0);
+    void uploadClientSummaryInfo(int socketID);
 //    void uploadClientDetailedInfoToServer();
 
     void update();
@@ -135,6 +135,7 @@ private:
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_socketConnectedToServer;
     UDTSOCKET m_socketConnectedToAdmin;
+    UDTSOCKET peerSocketThatRequiresDetailedInfo;
 
 //    QHash<int /*UDT Socket ID*/, QString /*User Name*/> m_localUserSocketsHash;
 
@@ -163,14 +164,13 @@ private:
     
     QHash<QString/*User Name*/, QString/*Password*/> userPasswordsHash;
 
-    QString peerAddressThatRequiresDetailedInfo;
-    quint16 peerPortThatRequiresDetailedInfo;
+
 
 
     QTimer *lookForServerTimer;
 
     QHostAddress m_serverAddress;
-    quint16 m_serverRUDPListeningPort;
+    quint16 m_serverUDTListeningPort;
     QString m_serverName;
     int m_serverInstanceID;
 

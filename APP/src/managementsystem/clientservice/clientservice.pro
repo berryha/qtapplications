@@ -39,6 +39,7 @@ HEADERS += \
     clientservice/clientservice.h \
     clientresourcesmanager.h
 
+
 # win32:RC_FILE = iconresource.rc
 win32:APP_ICON = resources/images/app.ico
 mac:ICON = ./resources/images/app.icns
@@ -48,3 +49,4 @@ mac:ICON = ./resources/images/app.icns
 QMAKE_TARGET_PRODUCT = "Client Service Application For Management System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Service Application Based On Qt"
 DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""
+

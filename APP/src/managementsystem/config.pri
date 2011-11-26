@@ -10,6 +10,8 @@ VER_CMP = 1
 
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}.$${VER_CMP}
 
+#For UDT
+win32:win32-g++:DEFINES += __MINGW__
 
 # define some usefull values
 QMAKE_TARGET_COMPANY	= "He Hui"

@@ -339,11 +339,18 @@ public slots:
         return m_udtProtocol->sendUDTMessageData(userSocketID, &ba);
     }
 
-    bool sendInformUpdatePasswordPacket(int userSocketID, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
+
+    bool sendInformUpdatePasswordPacket(const QString &userName, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
         //qWarning()<<"sendInformUpdatePasswordPacket(...)"<<" userName:"<<userName<<" Port:"<<localUsersHash.value(userName) << " newPassword:"<<newPassword;
         
+        int socketID = UDTProtocol::INVALID_UDT_SOCK;
+        if(!m_localUserSocketsHash.values().contains(userName)){
+            return false;
+        }
+        socketID = m_localUserSocketsHash.key(userName);
 
-        Packet *packet = PacketHandlerBase::getPacket(userSocketID);
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
         
         packet->setPacketType(quint8(MS::InformUserNewPassword));
         packet->setTransmissionProtocol(TP_UDT);
@@ -359,7 +366,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(userSocketID, &ba);
+        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
     }
     
     void sendAnnouncement(const QString &adminName, quint32 announcementID, const QString &announcement){
@@ -407,7 +414,7 @@ signals:
     void signalServerOnlinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
     void signalServerOfflinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
 
-    void signalClientDetailedInfoRequestedPacketReceived(const QString &computerName, bool rescan, const QString &adminAddress, quint16 adminPort);
+    void signalClientDetailedInfoRequestedPacketReceived(const QString &computerName, bool rescan, int socketID);
     void signalAdminRequestRemoteConsolePacketReceived(const QString &computerName, const QString &applicationPath, const QString &adminID, bool startProcess, const QString &adminAddress, quint16 adminPort);
     void signalRemoteConsoleCMDFromServerPacketReceived(const QString &computerName, const QString &command, const QString &adminAddress, quint16 adminPort);
 
