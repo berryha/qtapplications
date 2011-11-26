@@ -169,7 +169,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
             }
         }
 
-        emit signalClientDetailedInfoRequestedPacketReceived(computerName, rescan, peerAddress.toString(), peerRUDPListeningPort);
+        emit signalClientDetailedInfoRequestedPacketReceived(computerName, rescan, socketID);
         qDebug()<<"~~ClientDetailedInfoRequested";
     }
     break;
