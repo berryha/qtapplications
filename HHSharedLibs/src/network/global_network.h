@@ -93,7 +93,7 @@
 namespace HEHUI {
 
 
-enum TransmissionProtocol {TP_TCP = 1, TP_UDP = 2, TP_RUDP = 3, TP_UNKNOWN = 4};
+enum TransmissionProtocol {TP_UNKNOWN = 0, TP_TCP, TP_UDP, TP_UDT, TP_RUDP};
 
 enum UDPTransmissionMode {UDP_TM_MULTICAST = 1, UDP_TM_BROADCAST = 2, UDP_TM_DIRECT = 3};
 

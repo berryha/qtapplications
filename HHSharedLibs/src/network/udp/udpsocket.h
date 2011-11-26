@@ -44,7 +44,7 @@ class UDPSocket : public QUdpSocket {
 public:
     enum ListeningState{NotListening = 1, SimpleListening = 2, IPMulticastListening = 3};
 
-    UDPSocket(PacketHandlerBase *packetHandlerBase, QObject *parent);
+    UDPSocket(QObject *parent);
     virtual ~UDPSocket();
 
     const IPMulticastSocket * getIPMulticastSocket() const;
@@ -59,14 +59,12 @@ public:
 
 
 signals:
-    //    void signalNewUDPPacketReceived(Packet *packet);
+        void signalNewUDPPacketReceived(Packet *packet);
 
 private slots:
     virtual void readPendingDatagrams();
 
 private:
-
-    PacketHandlerBase *m_packetHandlerBase;
 
     QByteArray *datagram;
 

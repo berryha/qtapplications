@@ -50,39 +50,39 @@
 
 
 class IPMulticastLinux: public IPMulticastSocketBase {
-	Q_OBJECT
+    Q_OBJECT
 public:
-        IPMulticastLinux(QObject *parent);
-        virtual ~IPMulticastLinux();
+    IPMulticastLinux(QObject *parent);
+    virtual ~IPMulticastLinux();
 
 
 public slots:
-        bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
-	void leaveGroup();
-        bool slotSendUDPDatagramViaBoundSocket(const QString &ip, quint16 port, const QByteArray &data);
+    bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
+    void leaveGroup();
+    bool slotSendUDPDatagramViaBoundSocket(const QString &ip, quint16 port, const QByteArray &data);
 
 
 
 
 private slots:
-//	void readPendingDatagrams();
+    //	void readPendingDatagrams();
 
-	void joinGroup();
-	void slotDataReceived();
+    void joinGroup();
+    void slotDataReceived();
 
 
 private:
-//	QUdpSocket * udpSocket;
-	long count,Receivedpackets;
+    //	QUdpSocket * udpSocket;
+    long count,Receivedpackets;
 
 
 
-	char* ip;
-	int listenPort;
-	int socket_descriptor;
-	struct ip_mreq command;
+    char* ip;
+    int listenPort;
+    int socket_descriptor;
+    struct ip_mreq command;
 
-	int i;
+    int i;
 
 };
 

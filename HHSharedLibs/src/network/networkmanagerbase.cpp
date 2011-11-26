@@ -261,7 +261,7 @@ UDPServer * NetworkManagerBase::startUDPServerListening(const QHostAddress &loca
         qWarning() << m_errorString;
         return udpServer;
     }else{
-        udpServer = new UDPServer(m_packetHandlerBase, this);
+        udpServer = new UDPServer(this);
     }
 
     QHostAddress address = localAddress;
@@ -286,7 +286,7 @@ UDPServer * NetworkManagerBase::startUDPServerListening(const QHostAddress &loca
 
 }
 
-bool NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort) {
+UDPServer * NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort) {
     //    qDebug()<< "----NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &localAddress, quint16 localPort)";
 
     m_errorString = "";
@@ -294,14 +294,14 @@ bool NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &ipM
     UDPServer *udpServer = getUDPServer(ipMulticastGroupPort, QHostAddress::Any);
     if(udpServer){
         qWarning("IP Multicast Server has already started!");
-        return true;
+        return udpServer;
     }else{
-        udpServer = new UDPServer(m_packetHandlerBase, this);
+        udpServer = new UDPServer(this);
 
         if (udpServer->startIPMulticastListening(ipMulticastGroupAddress, ipMulticastGroupPort)) {
             QMutexLocker locker(&udpMutex);
             udpServers.insert(ipMulticastGroupPort, udpServer);
-            return true;
+            return udpServer;
         }else{
             m_errorString = udpServer->errorString();
             qCritical()<<QString("ERROR! Failed to start IPMulticastServer Listening! Multicast Group Address:%1, Port:%2. %3").arg(ipMulticastGroupAddress.toString()).arg(ipMulticastGroupPort).arg(m_errorString);
@@ -309,13 +309,13 @@ bool NetworkManagerBase::startIPMulticastServerListening(const QHostAddress &ipM
             delete udpServer;
             udpServer = 0;
 
-            return false;
+            return 0;
         }
 
     }
 
 
-    return false;
+    return udpServer;
 
 }
 

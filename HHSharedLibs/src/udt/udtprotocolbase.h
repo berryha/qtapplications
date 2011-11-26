@@ -127,13 +127,19 @@ public:
     bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
     UDTSocketStatus getUDTSocketStatus(UDTSOCKET socket);
-    QString getLastErrorMessage() const;
+    bool isSocketListening(UDTSOCKET socket);
+    bool isSocketConnected(UDTSOCKET socket);
+    bool isSocketBroken(UDTSOCKET socket);
+
+    QString getUDTListeningAddress();
+    quint16 getUDTListeningPort();
+    virtual QString getLastErrorMessage() const;
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
     void connected(UDTSOCKET socket);
     void disconnected(const QHostAddress &address, quint16 port);
-    void disconnected(UDTSOCKET socket);
+    void disconnected(int socket);
 
 
 public slots:

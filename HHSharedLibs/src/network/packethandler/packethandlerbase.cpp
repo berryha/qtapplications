@@ -205,14 +205,15 @@ int PacketHandlerBase::outgoingPacketsCount(){
 
 
 
-Packet * PacketHandlerBase::getPacket(){
+Packet * PacketHandlerBase::getPacket(int socketID){
     QMutexLocker locker(unusedPacketsMutex);
     
     Packet *packet = 0;
     if(unusedPackets->isEmpty()){
-        packet = new Packet();
+        packet = new Packet(socketID);
     }else{
         packet = unusedPackets->takeFirst();
+        packet->setSocketID(socketID);
     }
     
     return packet;
