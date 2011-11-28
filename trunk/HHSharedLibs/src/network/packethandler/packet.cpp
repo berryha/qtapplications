@@ -27,7 +27,10 @@
  ***************************************************************************
  */
 
+
 #include "packet.h"
+
+#include "packetstreamoperator.h"
 
 namespace HEHUI {
 
@@ -194,6 +197,19 @@ Packet::~Packet() {
 
 
     
+}
+
+void Packet::registerMetaTypeStreamOperators(){
+
+    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+
+    int type = QMetaType::type("HEHUI::Packet");
+    if(!type){
+        qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    }else if(!QMetaType::isRegistered(type)){
+        qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    }
+
 }
 
 void Packet::resetPacket(){

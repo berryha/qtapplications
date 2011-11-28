@@ -88,6 +88,9 @@ public:
     Packet & operator = (const Packet &packet);
     virtual ~Packet();
 
+    static void registerMetaTypeStreamOperators();
+
+
     void resetPacket();
     virtual bool isValid();
 

@@ -40,10 +40,12 @@
 #include "packet.h"
 #include "../global_network.h"
 
+#include "../mysharedlib_global.h"
+
 ////////////////////////////////  重载操作符  //////////////////////////////////////////////////////
 
-QDataStream &operator<<(QDataStream &out, const HEHUI::Packet &packet);
-QDataStream &operator>>(QDataStream &in, HEHUI::Packet &packet);
+MYSHAREDLIB_API QDataStream &operator<<(QDataStream &out, const HEHUI::Packet &packet);
+MYSHAREDLIB_API QDataStream &operator>>(QDataStream &in, HEHUI::Packet &packet);
 
 
 
