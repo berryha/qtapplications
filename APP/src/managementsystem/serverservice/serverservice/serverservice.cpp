@@ -168,12 +168,16 @@ bool ServerService::startMainService(){
     m_udtProtocol->startWaitingForIO(1);
 
     serverPacketsParser = new ServerPacketsParser(m_udpServer, m_udtProtocol, this);
+    //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
+    //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
+
     connect(serverPacketsParser, SIGNAL(signalClientLogReceived(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), this, SLOT(saveClientLog(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), Qt::QueuedConnection);
     connect(serverPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientSummaryInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
     connect(serverPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
 
-    connect(serverPacketsParser, SIGNAL(signalHeartbeatPacketReceived(const QString &, const QString&)), this, SLOT(processHeartbeatPacket(const QString &, const QString&)), Qt::QueuedConnection);
-    connect(serverPacketsParser, SIGNAL(signalClientOnlineStatusChanged(const QString&, quint16, const QString&, bool, bool)), this, SLOT(processClientOnlineStatusChangedPacket(const QString&, quint16, const QString&, bool, bool)), Qt::QueuedConnection);
+//    connect(serverPacketsParser, SIGNAL(signalHeartbeatPacketReceived(const QString &, const QString&)), this, SLOT(processHeartbeatPacket(const QString &, const QString&)), Qt::QueuedConnection);
+    connect(serverPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
+    connect(serverPacketsParser, SIGNAL(signalAdminOnlineStatusChanged(int, const QString&, const QString&, bool)), this, SLOT(processAdminOnlineStatusChangedPacket(int, const QString&, const QString&, bool)), Qt::QueuedConnection);
 
     //Single Process Thread
     //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
@@ -779,58 +783,79 @@ void ServerService::getRecordsInDatabase(){
 
 }
 
-void ServerService::processHeartbeatPacket(const QString &clientAddress, const QString &computerName){
+//void ServerService::processHeartbeatPacket(const QString &clientAddress, const QString &computerName){
 
-    ClientInfo *info = 0;
-    if(clientInfoHash.contains(computerName)){
-        info = clientInfoHash.value(computerName);
-        info->setLastHeartbeatTime(QDateTime::currentDateTime());
-        info->setOnline(true);
-        //qWarning()<<"Heartbeat Packet From:"<<computerName;
-    }else{
-        //serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", computerName, "", clientAddress);
-        qWarning()<<QString("Unknown Heartbeat Packet From Computer '%1'! IP:%2").arg(computerName).arg(clientAddress);
+//    ClientInfo *info = 0;
+//    if(clientInfoHash.contains(computerName)){
+//        info = clientInfoHash.value(computerName);
+//        info->setLastHeartbeatTime(QDateTime::currentDateTime());
+//        info->setOnline(true);
+//        //qWarning()<<"Heartbeat Packet From:"<<computerName;
+//    }else{
+//        //serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", computerName, "", clientAddress);
+//        qWarning()<<QString("Unknown Heartbeat Packet From Computer '%1'! IP:%2").arg(computerName).arg(clientAddress);
+//    }
+
+//}
+
+void ServerService::processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
+
+    QString ip = "";
+    quint16 port = 0;
+
+    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
+        qCritical()<<m_udtProtocol->getLastErrorMessage();
+        return;
     }
 
+    qWarning()<<QString("Client %1 %2!").arg(clientName).arg(online?"Online":"Offline");
+
+
+    ClientInfo *info = 0;
+
+    if(clientInfoHash.contains(clientName)){
+        info = clientInfoHash.value(clientName);
+        info->setOnline(online);
+        if(online){
+            info->setClientUDTListeningAddress(ip);
+            info->setClientUDTListeningPort(port);
+        }
+        qWarning()<<QString("Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+    }else{
+        if(online){
+            serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
+        }
+        qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+    }
+
+    if(online){
+        clientSocketsHash.insert(socketID, clientName);
+
+    }else{
+        clientSocketsHash.remove(socketID);
+    }
 
 
 }
 
-void ServerService::processClientOnlineStatusChangedPacket(const QString &clientUDPListeningAddress, quint16 clientUDPListeningPort, const QString &clientName, bool online, bool isAdmin){
+void ServerService::processAdminOnlineStatusChangedPacket(int socketID, const QString &clientName, const QString &adminName, bool online){
 
-    if(isAdmin){
-        if(online){
-            onlineAdminsCount ++;
-            updateOrSaveAllClientsInfoToDatabase();
-            getRecordsInDatabase();
-            serverPacketsParser->sendServerDeclarePacket(QHostAddress(clientUDPListeningAddress), clientUDPListeningPort);
-        }else{
-            onlineAdminsCount --;
-            if(onlineAdminsCount < 0){
-                onlineAdminsCount = 0;
-            }
-        }
-        qWarning()<<QString("Admin '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-    }else{
-        ClientInfo *info = 0;
-        if(clientInfoHash.contains(clientName)){
-            info = clientInfoHash.value(clientName);
-            info->setOnline(online);
-            if(online){
-                info->setClientRUDPListeningAddress(clientUDPListeningAddress);
-                info->setClientRUDPListeningPort(clientUDPListeningPort);
-            }
-            qWarning()<<QString("Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-        }else{
-            if(online){
-                serverPacketsParser->sendServerRequestClientSummaryInfoPacket("", clientName, "", clientUDPListeningAddress);
-            }
-            qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-        }
+    QString ip = "";
+    quint16 port = 0;
 
+    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
+        qCritical()<<m_udtProtocol->getLastErrorMessage();
+
+        return;
     }
 
+    qWarning()<<QString(" Admin %1@%2 %3! %4").arg(adminName).arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
 
+    if(online){
+        adminSocketsHash.insert(socketID, adminName);
+    }else{
+        adminSocketsHash.remove(socketID);
+    }
 
 }
 
@@ -856,19 +881,26 @@ void ServerService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 
 void ServerService::peerDisconnected(int socketID){
 
-    QString ip = "";
-    quint16 port = 0;
-    m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port);
-
-    qWarning()<<tr("Client %1:%2 offline!").arg(ip).arg(port);
-
     m_udtProtocol->closeSocket(socketID);
+
+    if(clientSocketsHash.contains(socketID)){
+        qCritical()<<QString("ERROR! Client %1 Closed Connection Unexpectedly!").arg(clientSocketsHash.value(socketID));
+        clientSocketsHash.remove(socketID);
+    }
+
+    if(adminSocketsHash.contains(socketID)){
+        qCritical()<<QString("ERROR! Admin %1 Closed Connection Unexpectedly!").arg(adminSocketsHash.value(socketID));
+        adminSocketsHash.remove(socketID);
+    }
+
 
 }
 
+
+
 bool ServerService::openDatabase(bool reopen){
 
-    if(reopen){       
+    if(reopen){
         if(query){
             query->clear();
             delete query;

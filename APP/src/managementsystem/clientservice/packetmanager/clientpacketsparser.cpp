@@ -56,6 +56,9 @@ ClientPacketsParser::ClientPacketsParser(UDPServer *udpServer, UDTProtocol *udtP
 
     Q_ASSERT_X(m_udtProtocol, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDTProtocol!");
 
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
 
     serverAddress = QHostAddress::Null;

@@ -275,13 +275,14 @@ private slots:
 
 
 signals:
-    void  signalHeartbeatPacketReceived(const QString &clientAddress, const QString &computerName);
-    void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber, quint16 packetSerialNumbe2);
+    //void  signalHeartbeatPacketReceived(const QString &clientAddress, const QString &computerName);
+    //void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber, quint16 packetSerialNumbe2);
 
     void signalClientLookForServerPacketReceived(const QHostAddress &clientAddress, quint16 clientTCPListeningPort, const QString &clientName);
+    void signalClientDeclarePacketReceived(int socketID, const QString &clientName, bool isAdmin);
 
-    void signalClientOnlinePacketReceived(const QHostAddress &clientAddress, quint16 clientPort, const QString &clientName);
-    void signalClientOfflinePacketReceived(const QHostAddress &clientAddress, quint16 clientPort, const QString &clientName);
+    //void signalClientOnlinePacketReceived(const QHostAddress &clientAddress, quint16 clientPort, const QString &clientName);
+    //void signalClientOfflinePacketReceived(const QHostAddress &clientAddress, quint16 clientPort, const QString &clientName);
 
     void signalClientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
     void signalClientResponseClientDetailedInfoPacketReceived(const QString &computerName, const QString &clientInfo);
@@ -291,8 +292,9 @@ signals:
 
     void signalClientLogReceived(const QString &computerName, const QString &users, const QString &clientAddress, quint8 logType, const QString &log, const QString &clientTime);
 
-    void signalClientOnlineStatusChanged(const QString &clientRUDPListeningAddress, quint16 clientRUDPListeningPort, const QString &clientName, bool online, bool isAdmin);
+    void signalClientOnlineStatusChanged(int socketID, const QString &clientName, bool online);
 
+    void signalAdminOnlineStatusChanged(int socketID, const QString &clientName, const QString &adminName, bool online);
 
 private:
 
