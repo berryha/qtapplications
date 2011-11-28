@@ -60,23 +60,14 @@ ClientPacketsParser::ClientPacketsParser(UDPServer *udpServer, UDTProtocol *udtP
     connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
-
     serverAddress = QHostAddress::Null;
     serverUDTListeningPort = 0;
     serverName = "";
 
-
-
-
     m_localUDTServerListeningPort = m_udtProtocol->getUDTListeningPort();
-
-
 
     m_localComputerName = QHostInfo::localHostName().toLower();
     
-
-
-
 }
 
 ClientPacketsParser::~ClientPacketsParser() {

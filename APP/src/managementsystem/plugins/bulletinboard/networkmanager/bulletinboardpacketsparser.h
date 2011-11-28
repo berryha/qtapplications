@@ -40,9 +40,9 @@
 
 
 #include "HHSharedCore/hcryptography.h"
-#include "HHSharedNetwork/hpacketparserbase.h"
+//#include "HHSharedNetwork/hpacketparserbase.h"
 #include "HHSharedCore/hutilities.h"
-
+#include "HHSharedNetwork/hpackethandlerbase.h"
 
 namespace HEHUI {
 
@@ -62,8 +62,8 @@ public slots:
     void parseIncomingPacketData(Packet *packet);
 
 
-    bool sendUserOnlinePacket(int socketID){
-        //qWarning()<<"----sendUserOnlinePacket(...)";
+    bool sendLocalUserOnlinePacket(int socketID){
+        qWarning()<<"----sendLocalUserOnlinePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 

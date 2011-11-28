@@ -14,6 +14,7 @@
 
 
 #include "HHSharedNetwork/hnetworkutilities.h"
+//#include "HHSharedNetwork/hpacketstreamoperator.h"
 
 
 namespace HEHUI {
@@ -29,10 +30,10 @@ ResourcesManager::ResourcesManager(QObject *parent)
     udtProtocol = 0;
 
 
-
     //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
-    //qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
-
+    //if(!QMetaType::isRegistered(QMetaType::type("HEHUI::Packet"))){
+    //    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    //}
 
 }
 

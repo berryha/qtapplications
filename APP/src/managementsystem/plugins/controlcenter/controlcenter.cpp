@@ -973,13 +973,15 @@ void ControlCenter::startNetwork(){
     m_udtProtocol->startWaitingForIO(1);
 
 
-    if(!controlCenterPacketsParser){
-        controlCenterPacketsParser = new ControlCenterPacketsParser(m_udpServer, m_udtProtocol, this);
-    }
+    controlCenterPacketsParser = new ControlCenterPacketsParser(m_udpServer, m_udtProtocol, this);
 
     connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
-
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
+    connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
+
+    //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), controlCenterPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), controlCenterPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
     if(localSystemManagementWidget){
         localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
@@ -1079,6 +1081,41 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
 
 }
 
+void ControlCenter::processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
+
+    QString ip = "";
+    quint16 port = 0;
+
+    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
+        qCritical()<<m_udtProtocol->getLastErrorMessage();
+        return;
+    }
+
+    qWarning()<<QString("Client %1 %2!").arg(clientName).arg(online?"Online":"Offline");
+
+
+    if(online){
+        clientSocketsHash.insert(socketID, QHostAddress(ip));
+    }else{
+
+        int tabPages = ui.tabWidget->count();
+        for(int i = tabPages; i >= 0; --i){
+            SystemManagementWidget *widget = qobject_cast<SystemManagementWidget *>(ui.tabWidget->widget(i));
+            if(!widget){continue;}
+            if(widget->peerIPAddress() == clientSocketsHash.value(socketID)){
+                widget->peerDisconnected(true);
+            }
+
+        }
+
+        clientSocketsHash.remove(socketID);
+
+    }
+
+
+
+}
+
 void ControlCenter::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
     qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
@@ -1105,6 +1142,26 @@ void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
         }
 
     }
+
+}
+
+void ControlCenter::peerDisconnected(int socketID){
+
+    if(clientSocketsHash.contains(socketID)){
+        qCritical()<<QString("ERROR! Peer %1 Closed Unexpectedly!").arg(clientSocketsHash.value(socketID).toString());
+
+        int tabPages = ui.tabWidget->count();
+        for(int i = tabPages; i >= 0; --i){
+            SystemManagementWidget *widget = qobject_cast<SystemManagementWidget *>(ui.tabWidget->widget(i));
+            if(!widget){continue;}
+            if(widget->peerIPAddress() == clientSocketsHash.value(socketID)){
+                widget->peerDisconnected(false);
+            }
+        }
+
+        clientSocketsHash.remove(socketID);
+    }
+
 
 }
 

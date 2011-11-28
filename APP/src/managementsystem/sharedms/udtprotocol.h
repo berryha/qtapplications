@@ -1,9 +1,8 @@
 #ifndef UDTPROTOCOL_H
 #define UDTPROTOCOL_H
 
-#include "HHSharedNetwork/hpackethandlerbase.h"
 #include "HHSharedUDT/hudtprotocolbase.h"
-
+#include "HHSharedNetwork/hpacket.h"
 
 namespace HEHUI {
 

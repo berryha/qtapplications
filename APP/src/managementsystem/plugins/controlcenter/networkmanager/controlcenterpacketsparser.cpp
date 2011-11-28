@@ -49,14 +49,14 @@ namespace HEHUI {
 
 
 ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent)
-    :QObject(parent), m_udpServer(udpServer), m_udtProtocol(m_udtProtocol)
+    :QObject(parent), m_udpServer(udpServer), m_udtProtocol(udtProtocol)
 {
 
     Q_ASSERT_X(m_udpServer, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDPServer!");
     Q_ASSERT_X(m_udtProtocol, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDTProtocol!");
 
-    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
-    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
     serverAddress = QHostAddress::Null;
     serverUDTListeningPort = 0;
@@ -112,6 +112,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     quint16 peerPort = packet->getPeerHostPort();
 //    quint16 packetSerialNumber = packet->getPacketSerialNumber();
     quint8 packetType = packet->getPacketType();
+    int socketID = packet->getSocketID();
+
+    PacketHandlerBase::recylePacket(packet);
 //    qDebug()<<"--ControlCenterPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
 
     switch(packetType){
@@ -171,6 +174,23 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         serverUDTListeningPort = 0;
         serverName = peerName;
         emit signalServerOfflinePacketReceived(serverAddress, serverUDTListeningPort, serverName);
+    }
+    break;
+    case quint8(MS::ClientOnline):
+    {
+        QString peerName;
+        in >> peerName;
+        emit signalClientOnlineStatusChanged(socketID, peerName, true);
+
+        qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerAddress<<"   peerName:"<<peerName;
+    }
+    break;
+    case quint8(MS::ClientOffline):
+    {
+        QString peerName;
+        in >> peerName;
+        emit signalClientOnlineStatusChanged(socketID, peerName, false);
+        qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerAddress.toString()<<"   peerName:"<<peerName;;
     }
     break;
     case quint8(MS::ClientResponseClientDetailedInfo):
@@ -248,7 +268,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         QString message = "";
         bool result = false;
         in >> result >> message;
-        emit signalClientResponseAdminConnectionResultPacketReceived(peerName, result, message);
+        emit signalClientResponseAdminConnectionResultPacketReceived(socketID, peerName, result, message);
         qWarning()<<"~~ClientResponseAdminConnectionResult";
     }
     break;
