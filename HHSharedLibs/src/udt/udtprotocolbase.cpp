@@ -60,7 +60,6 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
     m_errorMessage = "";
 
 
-
 }
 
 UDTProtocolBase::~UDTProtocolBase() {
@@ -542,7 +541,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
+            //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
@@ -570,7 +569,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, NULL, &writefds, msecTimeout);
         if(count > 0){
-            printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
+            //printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
                 //TODO:Process
@@ -690,6 +689,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
         {
             cout << "recvmsg:" << UDT::getlasterror().getErrorMessage() << endl;
+            return;
         }
 
         byteArray.resize(receivedSize);
@@ -747,7 +747,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
     UDTSTATUS status = UDT::getsockstate(socket);
 
-    qDebug()<<"socket:"<<socket<<" status:"<<status;
+    //qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
@@ -773,7 +773,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case CONNECTED: //5
     {
-        qDebug()<<"CONNECTED";
+        //qDebug()<<"CONNECTED";
 
     }
         break;
@@ -814,7 +814,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
     }
 
-    qDebug();
+    //qDebug();
 
 
 }
