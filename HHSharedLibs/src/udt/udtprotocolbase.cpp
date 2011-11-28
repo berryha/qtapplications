@@ -546,8 +546,6 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
-                qDebug()<<"--0--QThread::currentThreadId():"<<QThread::currentThreadId();
-
                 //QtConcurrent::run(this, &UDTProtocolBase::readDataFromSocket, *it);
                 readDataFromSocket(*it);
             }
@@ -638,6 +636,8 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
         UDT::close(peer);
         return UDT::INVALID_SOCK;
     }
+
+    emit connected(peer);
 
     return peer;
 
@@ -781,6 +781,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     {
         //UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
+
         emit disconnected(socket);
         qDebug()<<"BROKEN";
     }
@@ -792,8 +793,8 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case CLOSED: //8
     {
-        //UDT::close(socket);
 
+        //UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
         emit disconnected(socket);
         qDebug()<<"CLOSED";
