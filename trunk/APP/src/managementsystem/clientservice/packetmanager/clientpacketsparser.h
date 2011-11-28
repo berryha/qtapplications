@@ -84,7 +84,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << m_localUDTServerListeningPort;
+        out << m_localComputerName << m_udpServer->localPort();
         packet->setPacketData(ba);
 
         ba.clear();
@@ -94,6 +94,29 @@ public slots:
         out << v;
 
         return m_udpServer->sendUDPDatagram(address, IP_MULTICAST_GROUP_PORT, ba);
+
+    }
+
+    bool sendClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
+        qDebug()<<"----sendClientOnlineStatusChangedPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(online?quint8(MS::ClientOnline):quint8(MS::ClientOffline));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
+        out << m_localComputerName << clientName;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
 
     }
 

@@ -55,8 +55,11 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDT
     Q_ASSERT_X(m_udpServer, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDPServer!");
     Q_ASSERT_X(m_udtProtocol, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDTProtocol!");
 
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+
     serverAddress = QHostAddress::Null;
-    serverRUDPListeningPort = 0;
+    serverUDTListeningPort = 0;
     serverName = "";
 
     heartbeatTimer = 0;
@@ -137,11 +140,11 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         int serverInstanceID = 0;
         in >> address >> port >> version >> serverInstanceID;
         serverAddress = peerAddress;
-        serverRUDPListeningPort = port;
+        serverUDTListeningPort = port;
         serverName = peerName;
-        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverRUDPListeningPort, serverName, version, serverInstanceID);
+        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverUDTListeningPort, serverName, version, serverInstanceID);
 
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverUDTListeningPort;
     }
     break;
     //    case quint8(MS::ClientOnline):
@@ -154,9 +157,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         quint16 port;
         in >> address >> port;
         serverAddress = peerAddress;
-        serverRUDPListeningPort = port;
+        serverUDTListeningPort = port;
         serverName = peerName;
-        emit signalServerOnlinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
+        emit signalServerOnlinePacketReceived(serverAddress, serverUDTListeningPort, serverName);
     }
     break;
     case quint8(MS::ServerOffline):
@@ -165,9 +168,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         quint16 port = 0;
         in >> address >> port;
         serverAddress = QHostAddress::Null;
-        serverRUDPListeningPort = 0;
+        serverUDTListeningPort = 0;
         serverName = peerName;
-        emit signalServerOfflinePacketReceived(serverAddress, serverRUDPListeningPort, serverName);
+        emit signalServerOfflinePacketReceived(serverAddress, serverUDTListeningPort, serverName);
     }
     break;
     case quint8(MS::ClientResponseClientDetailedInfo):

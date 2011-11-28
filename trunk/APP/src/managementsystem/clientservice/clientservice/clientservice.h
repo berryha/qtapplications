@@ -51,6 +51,7 @@ private slots:
     bool startMainService();
 
     void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+
     void processServerRequestClientInfoPacket(const QString &groupName, const QString &computerName, const QString &userName/*, const QString &address*/);
 
     void processClientDetailedInfoRequestedPacket(const QString &computerName, bool rescan, int socketID);

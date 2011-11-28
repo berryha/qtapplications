@@ -112,8 +112,9 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 
     m_networkReady = false;
     m_udpServer = 0;
+    m_localUDPListeningPort = IP_MULTICAST_GROUP_PORT + 10;
     m_udtProtocol = 0;
-    m_udtListeningPort = UDT_LISTENING_PORT + 10;
+    m_localUDTListeningPort = UDT_LISTENING_PORT + 10;
 
     startNetwork();
 
@@ -164,6 +165,11 @@ ControlCenter::~ControlCenter()
     //            progressDlg = 0;
     //        }
     
+
+
+    controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
+
+
     if(vncProcess){
         vncProcess->terminate();
     }
@@ -947,7 +953,8 @@ void ControlCenter::updateActions() {
 void ControlCenter::startNetwork(){
 
     QString errorMessage = "";
-    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    //m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, m_localUDPListeningPort, true, &errorMessage);
     if(!m_udpServer){
         QMessageBox::critical(this, tr("Error"), tr("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage));
         m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
@@ -955,13 +962,13 @@ void ControlCenter::startNetwork(){
         qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
 
-    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, m_udtListeningPort, true, &errorMessage);
+    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, m_localUDTListeningPort, true, &errorMessage);
     if(!m_udtProtocol){
-        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_udtListeningPort).arg(errorMessage);
+        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
         QMessageBox::critical(this, tr("Error"), error);
         return;
     }
-    m_udtListeningPort = m_udtProtocol->getUDTListeningPort();
+    m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIO(1);
 
@@ -983,19 +990,39 @@ void ControlCenter::startNetwork(){
 
 }
 
-void ControlCenter::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
+void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ControlCenter::serverFound(...)";
+
+
+
+    m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
+    if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
+        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        return;
+    }
+    controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, true);
+
+
+
+
+
+
+
+
+
+
+
 
 //    if(m_serverInstanceID != 0 && serverInstanceID != m_serverInstanceID){
 //        controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 //    }
 
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<serverRUDPListeningPort<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" UDT Port:"<<serverUDTListeningPort<<" Name:"<<serverName;
 
     //controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 
 
-    QString msg = tr("IP: %1<br>Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverRUDPListeningPort).arg(serverName).arg(version);
+    QString msg = tr("IP: %1<br>UDT Port: %2<br>Name: %3<br>Version: %4").arg(serverAddress).arg(serverUDTListeningPort).arg(serverName).arg(version);
 
 #ifdef Q_OS_WIN
 

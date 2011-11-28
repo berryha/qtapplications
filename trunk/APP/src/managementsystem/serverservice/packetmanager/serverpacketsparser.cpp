@@ -55,6 +55,8 @@ ServerPacketsParser::ServerPacketsParser(UDPServer *udpServer, UDTProtocol *udtP
     Q_ASSERT_X(m_udpServer, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
     Q_ASSERT_X(m_udtProtocol, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
 
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
     localUDTListeningAddress = m_udtProtocol->getUDTListeningAddress();
@@ -117,41 +119,54 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::ClientLookForServer):
     {
 
-        quint16 peerRUDPListeningPort;
-        in >> peerRUDPListeningPort;
+        quint16 peerUDPListeningPort;
+        in >> peerUDPListeningPort;
 
-        sendServerDeclarePacket(peerAddress, peerRUDPListeningPort );
+        sendServerDeclarePacket(peerAddress, peerUDPListeningPort );
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerRUDPListeningPort:"<<peerRUDPListeningPort;
+        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerUDPListeningPort:"<<peerUDPListeningPort;
     }
     break;
-    //    case quint8(MS::ServerDeclare):
-    //        break;
     case quint8(MS::ClientOnline):
     {
-        QString peerRUDPListeningAddress;
-        quint16 peerRUDPListeningPort;
         QString peerName;
-        bool isAdmin;
-        in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
-        //emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, true, isAdmin);
-        emit signalClientOnlineStatusChanged(peerAddress.toString(), peerRUDPListeningPort, peerName, true, isAdmin);
+        in >> peerName;
+        emit signalClientOnlineStatusChanged(socketID, peerName, true);
 
         qDebug()<<"~~ClientOnline--"<<" peerAddress:"<<peerAddress<<"   peerName:"<<peerName;
     }
     break;
     case quint8(MS::ClientOffline):
     {
-        QString peerRUDPListeningAddress;
-        quint16 peerRUDPListeningPort;
         QString peerName;
-        bool isAdmin;
-        in >> peerRUDPListeningAddress >> peerRUDPListeningPort >> peerName >> isAdmin;
-        //emit signalClientOnlineStatusChanged(peerRUDPListeningAddress, peerRUDPListeningPort, peerName, false, isAdmin);
-        emit signalClientOnlineStatusChanged(peerAddress.toString(), peerRUDPListeningPort, peerName, false, isAdmin);
+        in >> peerName;
+        emit signalClientOnlineStatusChanged(socketID, peerName, false);
         qDebug()<<"~~ClientOffline--"<<" peerAddress:"<<peerAddress.toString()<<"   peerName:"<<peerName;;
     }
     break;
+
+
+    case quint8(MS::AdminOnline):
+    {
+        QString peerName = "", adminName = "";
+        in >> peerName >> adminName;
+        emit signalAdminOnlineStatusChanged(socketID, peerName, adminName, true);
+
+        qDebug()<<"~~AdminOnline--"<<" peerAddress:"<<peerAddress<<"   peerName:"<<peerName <<" adminName:"<<adminName;
+
+    }
+    break;
+    case quint8(MS::AdminOffline):
+    {
+        QString peerName = "", adminName = "";
+        in >> peerName >> adminName;
+        emit signalAdminOnlineStatusChanged(socketID, peerName, adminName, false);
+
+        qDebug()<<"~~AdminOffline--"<<" peerAddress:"<<peerAddress<<"   peerName:"<<peerName <<" adminName:"<<adminName;
+
+    }
+    break;
+
     //    case quint8(MS::ServerOnline):
     //        break;
     //    case quint8(MS::ServerOffline):

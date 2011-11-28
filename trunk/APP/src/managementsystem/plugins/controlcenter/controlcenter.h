@@ -83,7 +83,7 @@ private slots:
 
     void startNetwork();
 
-    void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     void updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
     
@@ -153,16 +153,15 @@ private:
     ClientInfoModel *clientInfoModel;
     QSortFilterProxyModel *proxyModel;
     
-//    quint16 localUDPListeningPort;
-//    quint16 localRUDPListeningPort;
-    
 
     bool m_networkReady;
 
     UDPServer *m_udpServer;
+    quint16 m_localUDPListeningPort;
+
     UDTProtocol *m_udtProtocol;
-    quint16 m_udtListeningPort;
-    //UDTSOCKET m_socketConnectedToServer;
+    quint16 m_localUDTListeningPort;
+    UDTSOCKET m_socketConnectedToServer;
     
 };
 

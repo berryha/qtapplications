@@ -73,12 +73,16 @@ private slots:
 
     void getRecordsInDatabase();
 
-    void processHeartbeatPacket(const QString &clientAddress, const QString &computerName);
-    void processClientOnlineStatusChangedPacket(const QString &clientUDPListeningAddress, quint16 clientUDPListeningPort, const QString &clientName, bool online, bool isAdmin);
+//    void processHeartbeatPacket(const QString &clientAddress, const QString &computerName);
+
+    void processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online);
+    void processAdminOnlineStatusChangedPacket(int socketID, const QString &clientName, const QString &adminName, bool online);
+
 
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+
     void peerDisconnected(int socketID);
 
 
@@ -111,7 +115,10 @@ private:
 
     QTimer *sendServerOnlinePacketTimer;
 
-    QHash<QString, ClientInfo *> clientInfoHash;
+    QHash<QString/*Client Name*/, ClientInfo *> clientInfoHash;
+    QHash<int /*Socket ID*/, QString/*Client Name*/> clientSocketsHash;
+    QHash<int /*Socket ID*/, QString/*Admin Name*/> adminSocketsHash;
+
 
     int onlineAdminsCount;
 

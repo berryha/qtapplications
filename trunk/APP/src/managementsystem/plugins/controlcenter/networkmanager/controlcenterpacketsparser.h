@@ -59,22 +59,22 @@ public slots:
 
 
 
-    bool sendClientOnlinePacket(const QHostAddress clientUDTListeningAddress, quint16 clientUDTListeningPort, const QString &clientName, bool isAdmin){
-        qDebug()<<"----sendClientOnlinePacket(...)";
+    bool sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
+        qDebug()<<"----sendClientLookForServerPacket(...)";
 
-        QHostAddress targetAddress = serverAddress;
-        if(targetAddress.isNull()){
-            targetAddress = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
+        QHostAddress address = QHostAddress(targetAddress);
+        if(address.isNull()){
+            address = QHostAddress(QString(IP_MULTICAST_GROUP_ADDRESS));
         }
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(MS::ClientOnline));
+        packet->setPacketType(quint8(MS::ClientLookForServer));
         packet->setTransmissionProtocol(TP_UDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << clientUDTListeningAddress.toString() << clientUDTListeningPort <<clientName << isAdmin;
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << m_udpServer->localPort();
         packet->setPacketData(ba);
 
         ba.clear();
@@ -83,12 +83,35 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, IP_MULTICAST_GROUP_PORT, ba);
+        return m_udpServer->sendUDPDatagram(address, IP_MULTICAST_GROUP_PORT, ba);
+
+    }
+
+    bool sendAdminOnlineStatusChangedPacket(int socketID, const QString &clientName, const QString &adminName, bool online){
+        qDebug()<<"----sendAdminOnlineStatusChangedPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(online?quint8(MS::AdminOnline):quint8(MS::AdminOffline));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
+        out << m_localID << clientName << adminName;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
 
     }
 
 
-    /////////////////////////////////////////////////////
+
 
     bool sendRequestClientDetailedInfoPacket(int socketID, const QString &computerName, bool rescan){
 
@@ -453,7 +476,7 @@ signals:
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
     //    void signalClientLookForServerPacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
-    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     //    void signalClientOnlinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
     //    void signalClientOfflinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
@@ -498,7 +521,7 @@ private:
 
 private:
     QHostAddress serverAddress;
-    quint16 serverRUDPListeningPort;
+    quint16 serverUDTListeningPort;
     QString serverName;
 
     QHostAddress ipmcGroupAddress;

@@ -162,6 +162,8 @@ bool ClientService::startMainService(){
 
     QString errorMessage = "";
     m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+    //m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
+
     if(!m_udpServer){
         logMessage(QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
         m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
@@ -179,7 +181,11 @@ bool ClientService::startMainService(){
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIO(1);
 
+
     clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
+    //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalUpdateClientSoftwarePacketReceived()), this, SLOT(update()), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalServerRequestClientSummaryInfoPacketReceived(const QString &,const QString &,const QString &)), this, SLOT(processServerRequestClientInfoPacket(const QString &,const QString &,const QString &)), Qt::QueuedConnection);
@@ -195,7 +201,7 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalAdminRequestUpdateMSUserPasswordPacketReceived(const QString &, const QString &, const QString &, quint16 )), this, SLOT(processAdminRequestUpdateMSUserPasswordPacket(const QString &, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminRequestInformUserNewPasswordPacketReceived(const QString &, const QString &, const QString &, quint16 )), this, SLOT(processAdminRequestInformUserNewPasswordPacket(const QString &, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
 
-    connect(clientPacketsParser, SIGNAL(signalClientDetailedInfoRequestedPacketReceived(const QString &, bool, int )), this, SLOT(processClientDetailedInfoRequestedPacket(const QString &, bool, const QString &, quint16 )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalClientDetailedInfoRequestedPacketReceived(const QString &, bool, int )), this, SLOT(processClientDetailedInfoRequestedPacket(const QString &, bool, int )), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalAdminRequestRemoteConsolePacketReceived(const QString &, const QString &, const QString &, bool, const QString &, quint16)), this, SLOT(processAdminRequestRemoteConsolePacket(const QString &, const QString &, const QString &, bool, const QString &, quint16)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalRemoteConsoleCMDFromServerPacketReceived(const QString &, const QString &, const QString &, quint16)), this, SLOT(processRemoteConsoleCMDFromServerPacket(const QString &, const QString &, const QString &, quint16)), Qt::QueuedConnection);
@@ -298,6 +304,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         return;
     }
+    clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, true);
 
     m_serverAddress = QHostAddress(serverAddress);
     m_serverUDTListeningPort = serverUDTListeningPort;
@@ -1668,6 +1675,7 @@ void ClientService::checkHasAnyServerBeenFound(){
         interval *= 2;
         if(interval > 300000){
             interval = 300000;
+            clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
         }
         lookForServerTimer->start(interval);
     }else{
@@ -1802,6 +1810,14 @@ void ClientService::stop()
 
     qDebug()<<"ClientService::stop()";
 
+    if(clientPacketsParser){
+        clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, false);
+
+//        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
+//        clientPacketsParser->aboutToQuit();
+        //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));
+    }
+
 
     if(systemInfo){
         systemInfo->stopProcess();
@@ -1815,11 +1831,6 @@ void ClientService::stop()
         m_udtProtocol->closeUDTProtocol();
     }
 
-    if(clientPacketsParser){
-//        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
-//        clientPacketsParser->aboutToQuit();
-        //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));
-    }
 
 
 

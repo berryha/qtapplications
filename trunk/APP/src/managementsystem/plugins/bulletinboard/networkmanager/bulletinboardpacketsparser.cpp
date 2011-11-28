@@ -54,6 +54,8 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(UDTProtocol *udtProtocol,
 
     Q_ASSERT_X(m_udtProtocol, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid UDTProtocol!");
 
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+
 
     //serverAddress = QHostAddress::Null;
     localServerRUDPListeningPort = 0;

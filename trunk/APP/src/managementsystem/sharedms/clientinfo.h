@@ -221,12 +221,12 @@ public:
         this->chipset = chipset;
     }
 
-    void setClientRUDPListeningAddress(QString clientRUDPListeningAddress)
+    void setClientUDTListeningAddress(QString clientRUDPListeningAddress)
     {
         this->clientRUDPListeningAddress = clientRUDPListeningAddress;
     }
 
-    void setClientRUDPListeningPort(quint16 clientRUDPListeningPort)
+    void setClientUDTListeningPort(quint16 clientRUDPListeningPort)
     {
         this->clientRUDPListeningPort = clientRUDPListeningPort;
     }

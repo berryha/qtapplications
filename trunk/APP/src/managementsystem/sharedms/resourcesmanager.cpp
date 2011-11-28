@@ -68,21 +68,19 @@ UDPServer * ResourcesManager::startIPMCServer(const QHostAddress &ipmcGroupAddre
 
     if(!ipmcServer){
         ipmcServer = new UDPServer(this);
+    }
+
+    if (ipmcServer->startIPMulticastListening(ipmcGroupAddress, ipmcGroupPort)) {
+        return ipmcServer;
     }else{
-
-        if (ipmcServer->startIPMulticastListening(ipmcGroupAddress, ipmcGroupPort)) {
-            return ipmcServer;
-        }else{
-            if(errorMessage){
-                *errorMessage = ipmcServer->errorString();
-            }
-
-            delete ipmcServer;
-            ipmcServer = 0;
-
-            return 0;
+        if(errorMessage){
+            *errorMessage = ipmcServer->errorString();
         }
 
+        delete ipmcServer;
+        ipmcServer = 0;
+
+        return 0;
     }
 
     return ipmcServer;
@@ -93,35 +91,31 @@ UDPServer * ResourcesManager::startUDPServer(const QHostAddress &address, quint1
 
     if(!udpServer){
         udpServer = new UDPServer(this);
+    }
+
+    if(udpServer->localPort() == startPort){
+        return udpServer;
+    }
+
+    if (udpServer->startSimpleListening(address, startPort)) {
+        return udpServer;
     }else{
-
-        if(udpServer->localPort() == startPort){
-            return udpServer;
+        if(tryOtherPort){
+            if (udpServer->startSimpleListening(address, 0)) {
+                return udpServer;
+            }
         }
 
-        if (udpServer->startSimpleListening(address, startPort)) {
-            return udpServer;
-        }else{
-            if(tryOtherPort){
-                if (udpServer->startSimpleListening(address, 0)) {
-                    return udpServer;
-                }
-            }
-
-            if(errorMessage){
-                *errorMessage = udpServer->errorString();
-            }
-
-            delete udpServer;
-            udpServer = 0;
-
-            return 0;
+        if(errorMessage){
+            *errorMessage = udpServer->errorString();
         }
+        delete udpServer;
+        udpServer = 0;
 
+        return 0;
     }
 
     return udpServer;
-
 
 }
 

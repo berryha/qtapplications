@@ -110,6 +110,9 @@ namespace HEHUI {
             ClientDetailedInfoRequested,
             ClientResponseClientDetailedInfo,
 
+            AdminOnline,
+            AdminOffline,
+
             AdminRequestRemoteConsole,
             ClientResponseRemoteConsoleStatus,
             RemoteConsoleCMDFromAdmin,
