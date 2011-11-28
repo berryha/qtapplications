@@ -34,7 +34,7 @@
 
 #include "udpsocket.h"
 
-#include "./packethandler/packetstreamoperator.h"
+//#include "./packethandler/packetstreamoperator.h"
 
 
 namespace HEHUI {
@@ -54,8 +54,8 @@ UDPSocket::UDPSocket(QObject *parent)
     listeningState = NotListening;
 
     //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
-    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
-
+    //qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    Packet::registerMetaTypeStreamOperators();
 
 }
 
