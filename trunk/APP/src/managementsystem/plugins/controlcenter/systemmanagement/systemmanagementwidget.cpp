@@ -220,7 +220,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     }
 
     this->controlCenterPacketsParser = parser;
-    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(const QString &, bool, const QString &)));
+    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(int, const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(int, const QString &, bool, const QString &)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)));
 
@@ -754,10 +754,10 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 }
 
 
-void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(const QString &computerName, bool result, const QString &message){
+void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message){
     //    qWarning()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
 
-    if(computerName != this->m_computerName){
+    if(socketID != m_peerSocket || computerName != this->m_computerName){
         return;
     }
 

@@ -1,6 +1,6 @@
 #include "udtprotocol.h"
 
-
+#include "HHSharedNetwork/hpackethandlerbase.h"
 
 namespace HEHUI {
 
@@ -9,6 +9,10 @@ UDTProtocol::UDTProtocol(bool stream, const SocketOptions *options, QObject *par
     UDTProtocolBase(stream, options, parent)
 {
 
+
+    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+    //qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    Packet::registerMetaTypeStreamOperators();
 
 }
 

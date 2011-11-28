@@ -693,6 +693,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
 
     if(previousSocketConnectedToAdmin != m_socketConnectedToAdmin){
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
+        clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_localWorkgroupName, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
     }
 
@@ -1087,7 +1088,7 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 //        qWarning()<<tr("Local user '%1' offline!").arg(userName);
 //    }
 
-    clientPacketsParser->localUserOffline(socketID);
+//    clientPacketsParser->localUserOffline(socketID);
 
 }
 
@@ -1731,14 +1732,13 @@ void ClientService::peerDisconnected(int socketID){
 
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";
+        m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+
+    }else if(socketID == m_socketConnectedToAdmin){
+        qWarning()<<"Admin Offline!";
+        m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
     }else{
-//        QString userName = m_localUserSocketsHash.take(socketID);
-//        if(!userName.isEmpty()){
-//            qWarning()<<tr("Local user %1 offine!").arg(userName);
-//        }
-
         clientPacketsParser->localUserOffline(socketID);
-
     }
 
 

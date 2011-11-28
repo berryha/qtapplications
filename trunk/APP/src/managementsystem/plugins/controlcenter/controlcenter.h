@@ -87,10 +87,12 @@ private slots:
 
     void updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
     
+    void processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online);
+
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
-
+    void peerDisconnected(int socketID);
 
 private:
     void updateActions();
@@ -149,7 +151,7 @@ private:
     QMenu *searchClientsMenu;
     QMenu *updatePasswordMenu;
 
-    QHash<QString, ClientInfo *> clientInfoHash;
+    QHash<QString/*Computer Name*/, ClientInfo *> clientInfoHash;
     ClientInfoModel *clientInfoModel;
     QSortFilterProxyModel *proxyModel;
     
@@ -162,6 +164,9 @@ private:
     UDTProtocol *m_udtProtocol;
     quint16 m_localUDTListeningPort;
     UDTSOCKET m_socketConnectedToServer;
+
+    QHash<int/*Socket ID*/, QHostAddress/*IP*/> clientSocketsHash;
+
     
 };
 

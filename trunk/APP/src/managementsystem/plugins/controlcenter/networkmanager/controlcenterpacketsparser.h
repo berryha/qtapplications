@@ -484,6 +484,8 @@ signals:
     void signalServerOnlinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
     void signalServerOfflinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
 
+    void signalClientOnlineStatusChanged(int socketID, const QString &clientName, bool online);
+
     //    void signalAdminLoggedOnToServerRequestPacketReceived(const QHostAddress adminAddress, quint16 adminPort, const QString &adminID);
     //    void signalServerRequestRemoteConsolePacketReceived(const QString &adminID);
     void signalClientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool accept, const QString &extraMessage);
@@ -500,7 +502,7 @@ signals:
     //    void  signalServerAnnouncementPacketReceived(const QString &groupName, const QString &computerName, const QString &announcement, bool mustRead = true);
 
 
-    void signalClientResponseAdminConnectionResultPacketReceived(const QString &computerName, bool result, const QString &message);
+    void signalClientResponseAdminConnectionResultPacketReceived(int socketID, const QString &computerName, bool result, const QString &message);
     void signalClientMessagePacketReceived(const QString &computerName, const QString &message);
 
     void signalUserResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);

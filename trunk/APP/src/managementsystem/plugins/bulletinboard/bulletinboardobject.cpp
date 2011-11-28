@@ -23,16 +23,14 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
 //    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
 
-    startNetwork();
-
-    
     remoteAssistance = 0;
     bulletinBoardWidget = 0;
     updatePasswordWidget = 0;
     
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
 
-    
+    startNetwork();
+
     
 }
 
@@ -90,12 +88,6 @@ void BulletinBoardObject::startNetwork(){
         m_udtProtocol->startWaitingForIO(1);
     }
 
-    connectToLocalServer();
-
-
-
-
-
     if(!bulletinBoardPacketsParser){
         bulletinBoardPacketsParser = new BulletinBoardPacketsParser(m_udtProtocol, this);
 
@@ -105,9 +97,10 @@ void BulletinBoardObject::startNetwork(){
 
     }
 
+    connectToLocalServer();
+
 
     m_networkReady = true;
-
 
 }
 
@@ -204,7 +197,7 @@ void BulletinBoardObject::connectToLocalServer(){
     }else{
         qDebug()<<"m_socketConnectedToLocalServer:"<<m_socketConnectedToLocalServer;
 
-        bool ok = bulletinBoardPacketsParser->sendUserOnlinePacket(m_socketConnectedToLocalServer);
+        bool ok = bulletinBoardPacketsParser->sendLocalUserOnlinePacket(m_socketConnectedToLocalServer);
         if(!ok){
             qCritical()<<m_udtProtocol->getLastErrorMessage();
         }

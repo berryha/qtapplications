@@ -65,7 +65,7 @@ private slots:
     void on_toolButtonSendCommand_clicked();
 
 
-    void processClientResponseAdminConnectionResultPacket(const QString &computerName, bool result, const QString &message);
+    void processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message);
 
     void requestConnectionToClientTimeout();
 
