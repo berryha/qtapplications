@@ -340,7 +340,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::AdminRequestConnectionToClient):
     {
-//        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
 
         QString computerName = "", users = "" ;
         in >> computerName >> users ;

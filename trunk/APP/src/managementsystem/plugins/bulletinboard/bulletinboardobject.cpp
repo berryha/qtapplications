@@ -29,7 +29,9 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
 
-    startNetwork();
+
+
+    QTimer::singleShot(1000, this, SLOT(startNetwork()));
 
     
 }

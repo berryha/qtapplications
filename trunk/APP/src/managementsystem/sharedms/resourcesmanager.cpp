@@ -123,7 +123,7 @@ UDPServer * ResourcesManager::startUDPServer(const QHostAddress &address, quint1
 UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddress, quint16 localPort, bool tryOtherPort, QString *errorMessage){
 
     if(!udtProtocol){
-        udtProtocol = new UDTProtocol(this);
+        udtProtocol = new UDTProtocol(false, 0, this);
     }
 
     UDTSOCKET socket = udtProtocol->listen(localPort, localAddress);
