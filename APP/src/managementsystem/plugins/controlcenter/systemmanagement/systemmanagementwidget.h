@@ -21,7 +21,7 @@ class SystemManagementWidget : public QWidget
     Q_OBJECT
 
 public:
-    SystemManagementWidget(const QString &adminName, ControlCenterPacketsParser *parser, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", QWidget *parent = 0);
+    SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", QWidget *parent = 0);
     ~SystemManagementWidget();
 
 
@@ -33,6 +33,8 @@ signals:
     void requestRemoteAssistance();
 
 public slots:
+    void setUDTProtocol(UDTProtocol *udtProtocol);
+
     void setControlCenterPacketsParser(ControlCenterPacketsParser *parser);
 
     void peerDisconnected(bool normalClose);
@@ -120,7 +122,7 @@ private:
 
     QSqlQueryModel *queryModel;
 
-    UDPServer *m_udpServer;
+    //UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
 

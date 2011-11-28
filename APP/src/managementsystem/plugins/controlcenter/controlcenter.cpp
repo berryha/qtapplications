@@ -352,7 +352,7 @@ void ControlCenter::slotInitTabWidget(){
 
 
 
-    localSystemManagementWidget = new SystemManagementWidget(m_adminName, 0, localComputerName, "", "127.0.0.1", "");
+    localSystemManagementWidget = new SystemManagementWidget(0, 0, m_adminName, localComputerName, "", "127.0.0.1", "");
     localSystemManagementWidget->setParent(this);
     ui.tabWidget->addTab(localSystemManagementWidget, tr("Local Computer"));
 
@@ -442,7 +442,7 @@ void ControlCenter::slotRemoteManagement(){
     }
 
 
-    SystemManagementWidget *systemManagementWidget = new SystemManagementWidget(m_adminName, controlCenterPacketsParser, targetComputerName, userName(), ipAddress(), macAddress(), (usbsdEnabled() == "1"?true:false), (programesEnabled() == "1"?true:false), m_administrators, this);
+    SystemManagementWidget *systemManagementWidget = new SystemManagementWidget(m_udtProtocol, controlCenterPacketsParser, m_adminName, targetComputerName, userName(), ipAddress(), macAddress(), (usbsdEnabled() == "1"?true:false), (programesEnabled() == "1"?true:false), m_administrators, this);
     connect(systemManagementWidget, SIGNAL(requestRemoteAssistance()), this, SLOT(slotVNC()));
     
     ui.tabWidget->addTab(systemManagementWidget, targetComputerName);
@@ -984,6 +984,7 @@ void ControlCenter::startNetwork(){
 
 
     if(localSystemManagementWidget){
+        localSystemManagementWidget->setUDTProtocol(m_udtProtocol);
         localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
     }
 

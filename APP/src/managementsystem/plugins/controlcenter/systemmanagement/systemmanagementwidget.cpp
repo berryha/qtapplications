@@ -22,7 +22,7 @@
 namespace HEHUI {
 
 
-SystemManagementWidget::SystemManagementWidget(const QString &adminName, ControlCenterPacketsParser *parser, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, QWidget *parent)
+SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, QWidget *parent)
     : QWidget(parent), m_adminName(adminName), m_computerName(computerName), m_users(users), m_peerIPAddress(QHostAddress(peerIPAddress)), m_peerMACAddress(peerMACAddress), m_usbsdEnabled(usbsdEnabled), m_programesEnabled(programesEnabled)
 {
     ui.setupUi(this);
@@ -124,6 +124,7 @@ SystemManagementWidget::SystemManagementWidget(const QString &adminName, Control
     ui.tabRemoteManagement->setEnabled(false);
 
 
+    setUDTProtocol(udtProtocol);
     setControlCenterPacketsParser(parser);
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(const QString &, bool, const QString &)));
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
@@ -212,6 +213,16 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
 
 }
 
+void SystemManagementWidget::setUDTProtocol(UDTProtocol *udtProtocol){
+
+    if(!udtProtocol){
+        ui.toolButtonVerify->setEnabled(false);
+        return;
+    }
+
+    this->m_udtProtocol = udtProtocol;
+}
+
 void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsParser *parser){
 
     if(!parser){
@@ -267,7 +278,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT);
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host! \n%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
 
         return;
@@ -755,7 +766,7 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 
 
 void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message){
-    //    qWarning()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
+        qWarning()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
 
     if(socketID != m_peerSocket || computerName != this->m_computerName){
         return;
@@ -765,6 +776,10 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
 
     if(result == true){
         //ui.tabSystemInfo->setEnabled(true);
+        ui.tabRemoteManagement->setEnabled(true);
+        ui.groupBoxSettings->setEnabled(true);
+        ui.groupBoxRemoteConsole->setEnabled(true);
+
         ui.toolButtonRequestSystemInfo->setEnabled(true);
         ui.toolButtonRescanSystemInfo->setEnabled(true);
 
@@ -774,6 +789,11 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
     }else{
         //ui.tabSystemInfo->setEnabled(false);
         ui.tabRemoteManagement->setEnabled(false);
+        ui.groupBoxSettings->setEnabled(false);
+        ui.groupBoxRemoteConsole->setEnabled(false);
+
+        ui.toolButtonRequestSystemInfo->setEnabled(false);
+        ui.toolButtonRescanSystemInfo->setEnabled(false);
         ui.toolButtonVerify->setEnabled(true);
 
         QMessageBox::critical(this, tr("Connection Error"), message);

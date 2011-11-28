@@ -45,7 +45,7 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
         Packet *packet = PacketHandlerBase::getPacket(socket);
         *packet = v.value<Packet>();
         packet->setTransmissionProtocol(TP_UDT);
-        //packet->setSocketID(socket);
+        packet->setSocketID(socket);
 
 
 //        packet->setPeerHostAddress(m_peerAddress);
