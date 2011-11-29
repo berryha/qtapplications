@@ -116,7 +116,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -139,7 +139,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
+        return m_udtProtocol->sendData(adminSocketID, &ba);
 
     }
 
@@ -163,7 +163,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
+        return m_udtProtocol->sendData(adminSocketID, &ba);
 
     }
 
@@ -187,7 +187,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID ,&ba);
+        return m_udtProtocol->sendData(socketID ,&ba);
 
     }
 
@@ -233,7 +233,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendClientLogPacket(int socketID, const QString &users, quint8 logType, const QString &log){
@@ -255,7 +255,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendClientResponseClientDetailedInfoPacket(int socketID, const QString &systemInfoFilePath){
@@ -285,12 +285,12 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
     bool sendClientResponseAdminConnectionResultPacket(int socketID, bool result, const QString &message){
-        //qWarning()<<"----sendClientResponseVerifyInfoResultPacket(...):"<<adminAddress.toString()<<" "<<adminPort;
+        //qWarning()<<"----sendClientResponseAdminConnectionResultPacket(...):"<<adminAddress.toString()<<" "<<adminPort;
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
         
@@ -308,7 +308,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendClientMessagePacket(int adminSocketID, const QString &message){
@@ -330,7 +330,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
+        return m_udtProtocol->sendData(adminSocketID, &ba);
     }
 
     bool sendClientResponseUSBInfoPacket(int socketID, const QString &info){
@@ -352,7 +352,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendClientResponseProgramesInfoPacket(int socketID, const QString &info){
@@ -374,7 +374,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
 
@@ -398,7 +398,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(userSocketID, &ba);
+        return m_udtProtocol->sendData(userSocketID, &ba);
     }
     
     void requestRemoteAssistance(const QString &adminAddress, quint16 adminPort, const QString &adminName){
@@ -428,7 +428,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(userSocketID, &ba);
+        return m_udtProtocol->sendData(userSocketID, &ba);
     }
 
 
@@ -458,7 +458,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
     
     void sendAnnouncement(const QString &adminName, quint32 announcementID, const QString &announcement){
@@ -489,7 +489,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(userSocketID, &ba);
+        return m_udtProtocol->sendData(userSocketID, &ba);
     }
     
     

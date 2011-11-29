@@ -17,6 +17,8 @@ signals:
     void packetReceived(Packet *packet);
     
 public slots:
+    bool sendData(UDTSOCKET socket, const QByteArray *byteArray);
+
 
 private slots:
     void streamDataReceived(UDTSOCKET socket, QByteArray *data) ;

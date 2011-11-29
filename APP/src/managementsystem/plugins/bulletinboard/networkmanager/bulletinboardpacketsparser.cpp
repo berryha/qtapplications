@@ -57,16 +57,6 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(UDTProtocol *udtProtocol,
     connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
 
 
-    //serverAddress = QHostAddress::Null;
-    localServerRUDPListeningPort = 0;
-    //serverName = "";
-
-    heartbeatTimer = 0;
-
-
-
-    localRUDPListeningAddress = QHostAddress::Any;
-    localRUDPListeningPort = 0;
 
     m_userName = Utilities::currentUserNameOfOS();
     m_localComputerName = QHostInfo::localHostName().toLower();
@@ -85,11 +75,6 @@ BulletinBoardPacketsParser::~BulletinBoardPacketsParser() {
     QMutexLocker locker(&mutex);
 
 
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
-    delete heartbeatTimer;
-    heartbeatTimer = 0;
 
     //    if(processWaitingForReplyPacketsTimer){
     //        processWaitingForReplyPacketsTimer->stop();
@@ -99,15 +84,6 @@ BulletinBoardPacketsParser::~BulletinBoardPacketsParser() {
 
 
 
-}
-
-void BulletinBoardPacketsParser::setLocalRUDPListeningAddress(const QHostAddress &address){
-
-    this->localRUDPListeningAddress = address;
-}
-void BulletinBoardPacketsParser::setLocalRUDPListeningPort(quint16 port){
-
-    this->localRUDPListeningPort = port;
 }
 
 void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
@@ -128,9 +104,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     switch(packetType){
 
     case quint8(MS::LocalServiceServerDeclare):
-    {
-//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
-        
+    {        
         //QString localComputerName = "";
         //in >> localComputerName;
 
@@ -154,10 +128,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
 
     case quint8(MS::InformUserNewPassword):
-    {
-
-//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
-        
+    {        
         QString adminAddress = "", adminName = "",  oldPassword = "",  newPassword = "";
         quint16 adminPort = 0;
         in >> adminAddress >> adminPort >> adminName >> oldPassword >> newPassword;
@@ -169,9 +140,7 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     
     case quint8(MS::ServerAnnouncement):
-    {
-//        sendConfirmationOfReceiptPacket(QHostAddress::LocalHost, ipmcListeningPort, packetSerialNumber, peerID);
-        
+    {        
         QString adminName = "", serverAnnouncement = "";
         quint32 announcementID = 0;
         in >> adminName >> announcementID >> serverAnnouncement;
@@ -183,11 +152,11 @@ void BulletinBoardPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
     default:
-        qWarning()<<"BulletinBoardPacketsParser! Unknown Packet Type:"<<packetType
-//                 <<" Serial Number:"<<packetSerialNumber
-                <<" From:"<<packet->getPeerHostAddress().toString()
-               <<":"<<packet->getPeerHostPort()
-              <<" Local Port:"<<localRUDPListeningPort;
+        qWarning()<<"BulletinBoardPacketsParser! Unknown Packet Type:"<<packetType;
+                //<<" Serial Number:"<<packetSerialNumber
+                //<<" From:"<<packet->getPeerHostAddress().toString()
+               //<<":"<<packet->getPeerHostPort()
+              //<<" Local Port:"<<localRUDPListeningPort;
 
         break;
 

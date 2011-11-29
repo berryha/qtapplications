@@ -54,9 +54,6 @@ public:
     BulletinBoardPacketsParser(UDTProtocol *udtProtocol, QObject *parent = 0);
     virtual ~BulletinBoardPacketsParser();
 
-    void setLocalRUDPListeningAddress(const QHostAddress &address = QHostAddress::Any);
-    void setLocalRUDPListeningPort(quint16 port);
-
 
 public slots:
     void parseIncomingPacketData(Packet *packet);
@@ -81,7 +78,8 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        //return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
 //    void sendUserOfflinePacket(){
@@ -119,7 +117,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
+        return m_udtProtocol->sendData(adminSocketID, &ba);
     }
 
     bool sendNewPasswordRetrevedByUserPacket(int adminSocketID){
@@ -140,7 +138,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
+        return m_udtProtocol->sendData(adminSocketID, &ba);
     }
 
     
@@ -177,14 +175,9 @@ private:
     quint16 getLastReceivedPacketSN(const QString &peerID);
 
 private:
-    //QHostAddress serverAddress;
-    quint16 localServerRUDPListeningPort;
-    //QString serverName;
 
-    QHostAddress localRUDPListeningAddress;
     quint16 localRUDPListeningPort;
 
-    QTimer *heartbeatTimer;
 
     PacketHandlerBase *m_packetHandlerBase;
     //NetworkManagerInstance *networkManager;

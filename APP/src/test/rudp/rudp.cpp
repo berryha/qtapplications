@@ -234,7 +234,7 @@ bool RUDPWidget::startRUDPServer(quint16 port){
     }
     qDebug()<<"serverSocket:"<<serverSocket;
 
-    udtProtocol->startWaitingForIO();
+    udtProtocol->startWaitingForIOInSeparateThread();
 
     udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
     ui.textBrowser->append("Listening on port:"+QString::number(localPort));

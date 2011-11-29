@@ -106,7 +106,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -130,7 +130,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -152,7 +152,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendRemoteConsoleCMDFromAdminPacket(int socketID, const QString &computerName, const QString &command){
@@ -174,7 +174,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendSetupUSBSDPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
@@ -195,7 +195,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendSetupProgramesPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
@@ -216,7 +216,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendShowAdminPacket(int socketID, const QString &computerName, const QString &userName, bool show){
@@ -236,7 +236,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendModifyAdminGroupUserPacket(int socketID, const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName){
@@ -256,7 +256,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendAdminRequestConnectionToClientPacket(int socketID, const QString &computerName, const QString &users){
@@ -276,7 +276,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
     
     bool sendAdminSearchClientPacket(const QHostAddress &targetAddress, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName){
@@ -318,7 +318,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
     bool sendUpdateMSUserPasswordPacket(const QString &peerAddress, quint16 peerPort, const QString &workgroupName, const QString &adminName){
@@ -365,7 +365,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -414,7 +414,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -463,7 +463,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 

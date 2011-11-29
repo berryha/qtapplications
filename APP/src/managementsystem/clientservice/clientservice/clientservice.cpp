@@ -181,7 +181,7 @@ bool ClientService::startMainService(){
         qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIO(1);
+    m_udtProtocol->startWaitingForIOInOneThread(500);
 
 
     clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
@@ -703,7 +703,8 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
     }
 
 #else
-
+    clientPacketsParser->sendClientResponseAdminConnectionResultPacket(adminSocketID, false, "It's NOT M$ Windows!");
+    m_udtProtocol->closeSocket(adminSocketID);
 #endif
 
     if(previousSocketConnectedToAdmin != m_socketConnectedToAdmin){

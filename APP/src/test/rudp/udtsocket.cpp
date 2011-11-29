@@ -45,6 +45,16 @@ UDTProtocol::~UDTProtocol(){
 
 }
 
+//bool UDTProtocol::sendData(UDTSOCKET socket, const QByteArray *byteArray){
+
+//    if(isStreamMode()){
+//        return sendUDTStreamData(socket, byteArray);
+//    }else{
+//        return sendUDTMessageData(socket, byteArray);
+//    }
+
+//}
+
 void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
 
     qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
