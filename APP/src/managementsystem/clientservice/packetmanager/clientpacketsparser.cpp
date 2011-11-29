@@ -269,7 +269,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalUpdateClientSoftwarePacketReceived();
         qDebug()<<"~~Update";
         break;
-    case quint8(MS::SetupUSBSD):
+    case quint8(MS::AdminRequestSetupUSBSD):
     {
 
 //        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
@@ -287,7 +287,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~SetupUSBSD";
     }
     break;
-    case quint8(MS::SetupProgrames):
+    case quint8(MS::AdminRequestSetupProgrames):
     {
 
 //        sendConfirmationOfReceiptPacket(peerAddress, peerPort, packetSerialNumber, peerName);
@@ -355,11 +355,9 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::AdminSearchClient):
     {
-        //sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
 
-        quint16 peerRUDPListeningPort = 0;
         QString computerName = "", userName = "", workgroup = "", macAddress = "", ipAddress = "", osVersion = "", adminName = "" ;
-        in >> peerRUDPListeningPort >> computerName >> userName >> workgroup >> macAddress >> ipAddress >> osVersion >> adminName;
+        in >> computerName >> userName >> workgroup >> macAddress >> ipAddress >> osVersion >> adminName;
 
         if(!computerName.isEmpty()){
             if(computerName.toLower() != m_localComputerName){
@@ -367,9 +365,9 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
             }
         }
 
-        emit signalAdminSearchClientPacketReceived(peerAddress.toString(), peerRUDPListeningPort, computerName, userName, workgroup, macAddress, ipAddress, osVersion, adminName);
+        emit signalAdminSearchClientPacketReceived(peerAddress.toString(), peerPort, computerName, userName, workgroup, macAddress, ipAddress, osVersion, adminName);
 
-        qDebug()<<"~~AdminSearchClient";
+        qDebug()<<"~~AdminSearchClient "<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort;
     }
     break;
 

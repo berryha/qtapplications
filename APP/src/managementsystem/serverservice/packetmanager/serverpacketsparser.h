@@ -80,7 +80,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(peerAddress, peerPort, ba);
+        return m_udpServer->sendDatagram(ba, peerAddress, peerPort);
 
     }
 
@@ -103,7 +103,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), ba);
+        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
 
     }
 
@@ -126,7 +126,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), ba);
+        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
 
     }
 
@@ -151,7 +151,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, clientPort, ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, clientPort);
 
     }
 
@@ -197,7 +197,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, clientPort, ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, clientPort);
 
     }
 
@@ -265,7 +265,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), ba);
+        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
 
     }
 

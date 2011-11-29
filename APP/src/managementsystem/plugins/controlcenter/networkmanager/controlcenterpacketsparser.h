@@ -83,7 +83,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(address, IP_MULTICAST_GROUP_PORT, ba);
+        return m_udpServer->sendDatagram(ba, address, IP_MULTICAST_GROUP_PORT);
 
     }
 
@@ -180,7 +180,7 @@ public slots:
     bool sendSetupUSBSDPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
-        packet->setPacketType(quint8(MS::SetupUSBSD));
+        packet->setPacketType(quint8(MS::AdminRequestSetupUSBSD));
         packet->setTransmissionProtocol(TP_RUDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -201,7 +201,7 @@ public slots:
     bool sendSetupProgramesPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
-        packet->setPacketType(quint8(MS::SetupProgrames));
+        packet->setPacketType(quint8(MS::AdminRequestSetupProgrames));
         packet->setTransmissionProtocol(TP_RUDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
@@ -288,7 +288,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << localRUDPListeningPort << computerName << userName << workgroup << macAddress << ipAddress << osVersion << adminName;
+        out << m_localID << computerName << userName << workgroup << macAddress << ipAddress << osVersion << adminName;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -297,7 +297,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, quint16(IP_MULTICAST_GROUP_PORT), ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, quint16(IP_MULTICAST_GROUP_PORT));
     }
     
     bool sendRemoteAssistancePacket(int socketID, const QString &computerName, const QString &adminName){
@@ -343,7 +343,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, peerPort, ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, peerPort);
 
     }
     
@@ -392,7 +392,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, peerPort, ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, peerPort);
 
     }
     
@@ -441,7 +441,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(targetAddress, peerPort, ba);
+        return m_udpServer->sendDatagram(ba, targetAddress, peerPort);
 
     }
 
@@ -495,6 +495,10 @@ signals:
 
 
     void signalClientResponseClientDetailedInfoPacketReceived(const QString &computerName, const QString &clientInfo);
+    void signalClientResponseUSBInfoPacketReceived(int socketID, const QString &computerName, const QString &usbInfo);
+    void signalClientResponseProgramesInfoPacketReceived(int socketID, const QString &computerName, const QString &usbInfo);
+
+
 
     void signalClientRequestSoftwareVersionPacketReceived(const QString &softwareName);
     void signalServerResponseSoftwareVersionPacketReceived(const QString &softwareName, const QString &version);
