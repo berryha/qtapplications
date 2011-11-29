@@ -688,7 +688,8 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     }else{
         if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
         {
-            cout << "recvmsg:" << UDT::getlasterror().getErrorMessage() << endl;
+            qDebug()<<"ERROR! Failed to receive message! "<<UDT::getlasterror().getErrorMessage();
+            //cout << "recvmsg:" << UDT::getlasterror().getErrorMessage() << endl;
             return;
         }
 
