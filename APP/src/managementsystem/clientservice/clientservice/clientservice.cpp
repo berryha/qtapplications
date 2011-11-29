@@ -315,7 +315,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RUDP Port:"<<serverUDTListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" UDT Port:"<<serverUDTListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
     qWarning();
 
 
@@ -1760,8 +1760,8 @@ void ClientService::checkHasAnyServerBeenFound(){
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
-        if(interval > 300000){
-            interval = 300000;
+        if(interval > 30000){
+            interval = 30000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
         }
         lookForServerTimer->start(interval);
