@@ -484,8 +484,8 @@ bool NetworkManagerBase::slotSendNewTCPDatagram(const QHostAddress &targetAddres
             slotCreateTCPConnection(targetAddress.toString(), targetPort);
         }
 
-        //TODO:同步！
-        TcpSocketConnection *connection = getConnection(targetAddress.toString(), targetPort);
+        //TODO:   
+				TcpSocketConnection *connection = getConnection(targetAddress.toString(), targetPort);
         if (connection) {
             result = connection->sendTCPDatagram(data);
             m_errorString = connection->errorString();
@@ -543,7 +543,7 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
 
     }else{
         if(localPort == 0){
-            result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
+            result = UDPSocket::sendUDPDatagramWithAnyPort(targetAddress, targetPort, *data, &m_errorString);
         }else{
             UDPServer *udpServer = getUDPServer(localPort, QHostAddress::Any);
             if (udpServer) {
@@ -553,7 +553,7 @@ bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddres
                 m_errorString = udpServer->errorString();
 
             } else {
-                result = UDPSocket::sendUDPDatagram(targetAddress, targetPort, *data, &m_errorString);
+                result = UDPSocket::sendUDPDatagramWithAnyPort(targetAddress, targetPort, *data, &m_errorString);
             }
 
 

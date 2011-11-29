@@ -142,7 +142,29 @@ bool UDPSocket::startIPMulticastListening(const QHostAddress &ipMulticastGroupAd
 
 }
 
-bool UDPSocket::sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, QString *errorString){
+bool UDPSocket::sendDatagram(const QByteArray &data, const QHostAddress &targetAddress, quint16 targetPort, QString *errorString){
+    qDebug()<<"UDPSocket::sendDatagram(...)-targetAddress:"<<targetAddress.toString()<<" targetPort:"<<targetPort;
+
+    qint64 size = writeDatagram(data, targetAddress, targetPort);
+    if(errorString){
+        *errorString = this->errorString();
+    }
+
+    if(size == -1){
+        qCritical()<<QString("UDP Datagram Sent Failed! Target Address:%1, Port:%2, %3").arg(targetAddress.toString()).arg(targetPort).arg(this->errorString());
+        return false;
+    }
+
+    return (size == data.size())?true:false;;
+
+}
+
+
+bool UDPSocket::sendUDPDatagramWithAnyPort(const QString &targetAddress, quint16 targetPort, const QByteArray &data, QString *errorString){
+    return sendUDPDatagramWithAnyPort(QHostAddress(targetAddress), targetPort, data, errorString);
+}
+
+bool UDPSocket::sendUDPDatagramWithAnyPort(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data, QString *errorString){
     qDebug()<<"UDPSocket::sendUDPDatagram(...)-targetAddress:"<<targetAddress.toString()<<" targetPort:"<<targetPort;
 
     QUdpSocket udpSocket;
@@ -152,7 +174,7 @@ bool UDPSocket::sendUDPDatagram(const QHostAddress &targetAddress, quint16 targe
     }
 
     if(size == -1){
-        qCritical()<<QString("UDP Datagram Sent Failed! Target Address:%1, Port:%2, Error Code:%3").arg(targetAddress.toString()).arg(targetPort).arg(udpSocket.error());
+        qCritical()<<QString("UDP Datagram Sent Failed! Target Address:%1, Port:%2, %3").arg(targetAddress.toString()).arg(targetPort).arg(udpSocket.errorString());
         return false;
     } 
 
