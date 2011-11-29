@@ -124,6 +124,8 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     ui.tabRemoteManagement->setEnabled(false);
 
 
+    m_udtProtocol = 0;
+    m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
     setUDTProtocol(udtProtocol);
     setControlCenterPacketsParser(parser);
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(const QString &, bool, const QString &)));
