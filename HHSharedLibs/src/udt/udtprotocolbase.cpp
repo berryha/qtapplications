@@ -205,7 +205,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     m_listening = true;
 
     getAddressInfoFromSocket(serverSocket, &m_serverAddress, &m_serverPort, false);
-    qDebug()<<QString("Server is ready on %1:%2").arg(m_serverAddress).arg(m_serverPort);
+    qDebug()<<QString("Server is ready on %1:%2. Listening socket ID:%3").arg(m_serverAddress).arg(m_serverPort).arg(serverSocket);
 
 
     //Call startWaitingForIO() to wait for IO
@@ -217,15 +217,17 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 }
 
 //
-void UDTProtocolBase::startWaitingForIO(int msecWaitForIOTimeout){
-    qDebug()<<"--UDTProtocolBase::startWaitingForIO(...) "<<"msecWaitForIOTimeout:"<<msecWaitForIOTimeout;
+void UDTProtocolBase::startWaitingForIOInSeparateThread(int msecWaitForInputTimeout, int msecWaitForOutputTimeout){
+    qDebug()<<"--UDTProtocolBase::startWaitingForIOInSeparateThread(...) "<<" msecWaitForInputTimeout:"<<msecWaitForInputTimeout<<" msecWaitForOutputTimeout:"<<msecWaitForOutputTimeout;
 
+    QtConcurrent::run(this, &UDTProtocolBase::waitForReading, msecWaitForInputTimeout);
+    QtConcurrent::run(this, &UDTProtocolBase::waitForWriting, msecWaitForOutputTimeout);
 
-//    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
+}
 
-    QtConcurrent::run(this, &UDTProtocolBase::waitForReading, msecWaitForIOTimeout);
-    QtConcurrent::run(this, &UDTProtocolBase::waitForWriting, msecWaitForIOTimeout);
+void UDTProtocolBase::startWaitingForIOInOneThread(int msecWaitForIOTimeout){
 
+    QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
 
 }
 
@@ -393,6 +395,16 @@ void UDTProtocolBase::closeSocket(UDTSOCKET socket){
 
 }
 
+bool UDTProtocolBase::sendData(UDTSOCKET socket, const QByteArray *byteArray){
+
+    if(isStreamMode()){
+        return sendUDTStreamData(socket, byteArray);
+    }else{
+        return sendUDTMessageData(socket, byteArray);
+    }
+
+}
+
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
     qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket;
 
@@ -492,18 +504,17 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 
 }
 
-void UDTProtocolBase::waitForIO(int msecTimeout){
-    qDebug()<<"--UDTProtocolBase::waitForIO(...) "<<" msecTimeout:"<<msecTimeout<<" Thread Id:"<<QThread::currentThreadId();
+void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
+    qDebug()<<"--UDTProtocolBase::waitForIO(...) "<<" msecWaitForIOTimeout:"<<msecWaitForIOTimeout<<" Thread Id:"<<QThread::currentThreadId();
 
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
 
     while(m_listening){
-
         //acceptNewConnection();
-
-        count = UDT::epoll_wait(epollID, &readfds, &writefds, msecTimeout);
+        count = UDT::epoll_wait(epollID, &readfds, &writefds, msecWaitForIOTimeout);
         if(count > 0){
+            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
             //printf("epoll returned %d sockets ready to IO | %d in read set, %d in write set\n", count, readfds.size(), writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
@@ -520,8 +531,7 @@ void UDTProtocolBase::waitForIO(int msecTimeout){
             }
             writefds.clear();
         }
-        //qDebug()<<"----------------------------------------1"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
-        //QCoreApplication::processEvents();
+        QCoreApplication::processEvents();
 
     }
 
@@ -541,6 +551,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
+            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set").arg(count).arg(readfds.size());
             //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
@@ -548,11 +559,11 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
                 //QtConcurrent::run(this, &UDTProtocolBase::readDataFromSocket, *it);
                 readDataFromSocket(*it);
             }
-            //readfds.clear();
+            readfds.clear();
 
         }
 
-        //acceptNewConnection();
+        QCoreApplication::processEvents();
     }
 
 }
@@ -569,6 +580,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, NULL, &writefds, msecTimeout);
         if(count > 0){
+            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in write set").arg(count).arg(writefds.size());
             //printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
@@ -576,9 +588,10 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
                 //QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
                 writeDataToSocket(*it);
             }
-            //writefds.clear();
+            writefds.clear();
         }
 
+        QCoreApplication::processEvents();
     }
 
 }
@@ -714,7 +727,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
     UDTSTATUS status = UDT::getsockstate(socket);
 
-    //qDebug()<<"socket:"<<socket<<" status:"<<status;
+    qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1

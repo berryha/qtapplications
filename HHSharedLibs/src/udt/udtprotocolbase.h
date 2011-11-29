@@ -139,8 +139,7 @@ public:
 
 signals:
     void connected(const QHostAddress &address, quint16 port);
-    void connected(UDTSOCKET socket);
-    void disconnected(const QHostAddress &address, quint16 port);
+    void connected(int socket);
     void disconnected(int socket);
 
 
@@ -149,7 +148,8 @@ public slots:
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
     //Call this function after server is listening
-    virtual void startWaitingForIO(int msecWaitForIOTimeout = -1);
+    void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = -1, int msecWaitForOutputTimeout = -1);
+    void startWaitingForIOInOneThread(int msecWaitForIOTimeout = -1);
 
 
 
@@ -159,6 +159,7 @@ public slots:
     void closeSocket(UDTSOCKET socket);
 
     //Send data
+    virtual bool sendData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
@@ -167,7 +168,6 @@ public slots:
 
 private slots:
 
-    void waitForIO(int msecTimeout = -1);
 
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
@@ -188,7 +188,7 @@ private:
     //UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
 
 protected:
-
+    void waitForIO(int msecTimeout = -1);
     void waitForReading(int msecTimeout = -1);
     void waitForWriting(int msecTimeout = -1);
     UDTSOCKET acceptNewConnection();
