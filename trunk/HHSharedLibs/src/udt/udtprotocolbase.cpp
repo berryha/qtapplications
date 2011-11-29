@@ -541,7 +541,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
+            printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
@@ -697,40 +697,6 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         messageDataReceived(socket, &byteArray);
 
     }
-
-
-
-
-    //    sockaddr* addr = NULL;
-    //    int size = 0;
-    //    addr = (sockaddr*)new sockaddr_in;
-    //    size = sizeof(sockaddr_in);
-    //    UDT::getsockname(socket, addr, &size);
-    //    char sharedport[NI_MAXSERV];
-    //    getnameinfo(addr, size, NULL, 0, sharedport, sizeof(sharedport), NI_NUMERICSERV);
-
-
-    //    sockaddr_storage clientaddr;
-    //    int addrlen = sizeof(clientaddr);
-    //    UDT::getsockname(socket, (sockaddr*)&clientaddr, &addrlen);
-    //    char clienthost[NI_MAXHOST];
-    //    char clientservice[NI_MAXSERV];
-    //    getnameinfo((sockaddr*)&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    //    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
-
-
-
-    //    sockaddr clientaddr;
-    //    int addrlen = sizeof(clientaddr);
-    //    //UDT::getsockname(socket, &clientaddr, &addrlen);
-    //    UDT::getpeername(socket, &clientaddr, &addrlen);
-    //    char clienthost[NI_MAXHOST];
-    //    char clientservice[NI_MAXSERV];
-    //    getnameinfo(&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
-    //    cout << "Data Received From: " << clienthost << ":" << clientservice << endl;
-
-    //    QString str = socketsHash.key(socket);
-    //    qDebug()<<"str:"<<str;
 
 
 
