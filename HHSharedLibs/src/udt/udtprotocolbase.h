@@ -34,6 +34,8 @@
 #endif
 
 
+#include <QObject>
+#include <QHash>
 
 #include "mysharedlib_global.h"
 #include "./udt/src/udt.h"

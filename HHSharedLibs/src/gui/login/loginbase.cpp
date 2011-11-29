@@ -234,8 +234,8 @@ bool LoginBase::verifyUser() {
 	}
 
         QString userID = QVariant(model.record(0).value("UserID")).toString();
-        qWarning()<<"rowCount:"<<model.rowCount();
-        qWarning()<<"userID:"<<userID;
+        qDebug()<<"rowCount:"<<model.rowCount();
+        qDebug()<<"userID:"<<userID;
 
 	//从数据库取回经Base64编码后的SHA-1加密过的密码,将其还原
 	//Fetch the Base64 encoded password which is already encrypted by SHA-1, then decode it and convert it to QCryptographicHash

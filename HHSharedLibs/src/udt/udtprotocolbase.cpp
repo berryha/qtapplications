@@ -541,7 +541,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
+            //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
                 //TODO:Process
