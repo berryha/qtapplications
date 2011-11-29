@@ -493,6 +493,7 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
         enableUSBSD(temporarilyAllowed);
     }
 
+
     uploadClientSummaryInfo(m_socketConnectedToServer);
     uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
@@ -508,15 +509,17 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
     }
 
     QString log = QString("USB SD %1! Admin:%2").arg(ret).arg(adminName);
-    bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupUSBSD), log);
-    if(!ok){
+    bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupUSBSD), log);
+    if(!sent){
         qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
     }
 
-    ok = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
-    if(!ok){
+    sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+    //sent = clientPacketsParser->sendClientResponseUSBInfoPacket(m_socketConnectedToAdmin, ok, log);
+    if(!sent){
         qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
     }
+
 
 #endif
 
@@ -685,6 +688,9 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
         m_socketConnectedToAdmin = adminSocketID;
         m_udtProtocol->getAddressInfoFromSocket(m_socketConnectedToAdmin, &m_adminAddress, &m_adminPort);
         qWarning()<<QString("Admin connected form %1:%2!").arg(m_adminAddress).arg(m_adminPort);
+
+        uploadClientSummaryInfo(m_socketConnectedToAdmin);
+
     }
 
 #else
@@ -771,9 +777,23 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
         }
     }
 
+    uploadClientSummaryInfo(adminAddress, adminPort);
 
-    
-    uploadClientSummaryInfo(m_socketConnectedToAdmin);
+//    m_socketConnectedToAdmin = m_udtProtocol->connectToHost(QHostAddress(adminAddress), adminPort);
+//    if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
+//        qCritical()<<tr("ERROR! Can not connect to Admin %1:%2! %3").arg(adminAddress).arg(adminPort).arg(m_udtProtocol->getLastErrorMessage());
+//        return;
+//    }
+//    if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
+//        uploadClientSummaryInfo(m_socketConnectedToAdmin);
+
+//    }else{
+//        //TODO:wait
+
+//    }
+
+
+
 
 
 
@@ -1150,6 +1170,72 @@ void ClientService::uploadClientSummaryInfo(int socketID){
 
 
     clientPacketsParser->sendClientResponseClientSummaryInfoPacket(socketID, m_localWorkgroupName, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers);
+
+    wm->freeMemory();
+
+#endif
+
+
+}
+
+void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16 adminPort){
+    qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
+
+
+#ifdef Q_OS_WIN
+
+    //WindowsManagement wm;
+    QString computerName = localComputerName;
+    //QString workgroupName = wm->getWorkgroup();
+
+    QStringList users = wm->localUsers();
+    users.removeAll("system$");
+    users.removeAll("administrator");
+    users.removeAll("guest");
+    users.removeAll("helpassistant");
+    users.removeAll("support_388945a0");
+    users.removeAll("aspnet");
+    users.removeAll("homegroupuser$");
+    QString usersInfo = users.join(",");
+
+    QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();
+    QString networkInfo = "";
+    QStringList networkInfoList;
+    foreach(QHostAddress ip, ips){
+        //networkInfo += ip.toString() + "/" + NetworkUtilities::hardwareAddress(ip) + ",";
+        networkInfoList.append(ip.toString() + "/" + NetworkUtilities::hardwareAddress(ip));
+    }
+    networkInfo = networkInfoList.join(",");
+
+    QString osInfo = "";
+    switch(QSysInfo::windowsVersion()){
+    case QSysInfo::WV_2000:
+        osInfo = "WIN_2000";
+        break;
+    case QSysInfo::WV_XP:
+        osInfo = "WIN_XP";
+        break;
+    case QSysInfo::WV_2003:
+        osInfo = "WIN_2003";
+        break;
+    case QSysInfo::WV_VISTA:
+        osInfo = "WIN_VISTA";
+        break;
+    case QSysInfo::WV_WINDOWS7:
+        osInfo = "WIN_7";
+        break;
+    default:
+        osInfo = "WIN";
+        break;
+    }
+
+
+    bool usbsdEnabled = isUSBSDEnabled();
+    bool programesEnabled = isProgramesEnabled();
+    QString storedAdminGroupUsers = administrators().join(",");
+
+
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminAddress, adminPort, m_localWorkgroupName, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers);
 
     wm->freeMemory();
 

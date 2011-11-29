@@ -203,6 +203,27 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     }
     break;
+
+    case quint8(MS::ClientResponseUSBInfo):
+    {
+        qDebug()<<"ClientResponseUSBInfo";
+
+        QString info = "";
+        in >> info;
+        emit signalClientResponseUSBInfoPacketReceived(socketID, peerName, info);
+
+    }
+    break;
+    case quint8(MS::ClientResponseProgramesInfo):
+    {
+        qDebug()<<"ClientResponseUSBInfo";
+
+        QString info = "";
+        in >> info;
+        emit signalClientResponseProgramesInfoPacketReceived(socketID, peerName, info);
+
+    }
+    break;
     //    case quint8(MS::ServerResponseAdminLoggedOnToServerRequest):
     //        break;
     //    case quint8(MS::AdminRequestRemoteConsole):

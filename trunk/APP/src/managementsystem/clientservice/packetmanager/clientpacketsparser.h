@@ -93,7 +93,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendUDPDatagram(address, IP_MULTICAST_GROUP_PORT, ba);
+        return m_udpServer->sendDatagram(ba, address, IP_MULTICAST_GROUP_PORT);
 
     }
 
@@ -168,7 +168,7 @@ public slots:
     }
 
     bool sendClientResponseClientSummaryInfoPacket(int socketID, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins){
-        //qWarning()<<"----sendClientResponseClientInfoPacket(...)"<<" targetAddress:"<<targetAddress<<" targetPort:"<<targetPort;
+        //qWarning()<<"----sendClientResponseClientInfoPacket(...)"<<" socketID:"<<socketID;
 
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
@@ -188,6 +188,29 @@ public slots:
         out << v;
 
         return m_udtProtocol->sendUDTMessageData(socketID ,&ba);
+
+    }
+
+    bool sendClientResponseClientSummaryInfoPacket(const QString &targetAddress, quint16 targetPort, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins){
+        //qWarning()<<"----sendClientResponseClientInfoPacket(...)"<<" targetAddress:"<<targetAddress<<" targetPort:"<<targetPort;
+
+        Packet *packet = PacketHandlerBase::getPacket();
+
+        packet->setPacketType(quint8(MS::ClientResponseClientSummaryInfo));
+        packet->setTransmissionProtocol(TP_UDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << workgroupName << networkInfo << usersInfo << osInfo <<usbsdEnabled << programesEnabled << admins << QString(APP_VERSION);
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udpServer->sendDatagram(ba, QHostAddress(targetAddress), targetPort);
 
     }
 
@@ -309,6 +332,52 @@ public slots:
 
         return m_udtProtocol->sendUDTMessageData(adminSocketID, &ba);
     }
+
+    bool sendClientResponseUSBInfoPacket(int socketID, const QString &info){
+        //qWarning()<<"----sendClientResponseSetupUSBInfoPacket(...):"<<adminAddress.toString()<<" "<<adminPort;
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::ClientResponseUSBInfo));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << info;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+    }
+
+    bool sendClientResponseProgramesInfoPacket(int socketID, const QString &info){
+        //qWarning()<<"----ClientResponseProgramesInfo(...):"<<adminAddress.toString()<<" "<<adminPort;
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::ClientResponseProgramesInfo));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << info;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+    }
+
+
 
     bool sendLocalServiceServerDeclarePacket(int userSocketID){
 

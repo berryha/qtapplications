@@ -80,6 +80,8 @@ private slots:
 
 
     void uploadClientSummaryInfo(int socketID);
+    void uploadClientSummaryInfo(const QString &adminAddress, quint16 adminPort);
+
 //    void uploadClientDetailedInfoToServer();
 
     void update();
@@ -164,8 +166,6 @@ private:
     quint16 m_adminPort;
     
     QHash<QString/*User Name*/, QString/*Password*/> userPasswordsHash;
-
-
 
 
     QTimer *lookForServerTimer;

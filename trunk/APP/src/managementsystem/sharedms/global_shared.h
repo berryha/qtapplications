@@ -100,6 +100,7 @@ namespace HEHUI {
 
             ClientLookForServer = UserDefinedPacket + 1, //6
             ServerDeclare,
+            Update,
 
             ClientOnline,
             ClientOffline,
@@ -124,13 +125,14 @@ namespace HEHUI {
             ClientRequestSoftwareVersion,
             ServerResponseSoftwareVersion,
 
-            ServerAnnouncement, //22
+            ServerAnnouncement,
 
             ClientLog,
-            Update,
 
-            SetupUSBSD,
-            SetupProgrames,
+            AdminRequestSetupUSBSD,
+            ClientResponseUSBInfo,
+            AdminRequestSetupProgrames,
+            ClientResponseProgramesInfo,
             ShowAdmin,
             ModifyAdminGroupUser,
             AdminRequestConnectionToClient,
@@ -138,7 +140,7 @@ namespace HEHUI {
             
             ClientMessage,
            
-            AdminSearchClient, //32
+            AdminSearchClient,
             AdminRequestRemoteAssistance,
             UserResponseRemoteAssistance,
             
@@ -150,11 +152,6 @@ namespace HEHUI {
             LocalUserOnline,
             LocalUserOffline,
             
-
-            
-
-
-
 
         };
 
