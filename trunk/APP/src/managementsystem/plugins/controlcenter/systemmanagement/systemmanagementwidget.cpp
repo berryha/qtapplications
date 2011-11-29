@@ -275,8 +275,9 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     ui.toolButtonVerify->setEnabled(false);
 
-
-    m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT);
+    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+        m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT);
+    }
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
         QMessageBox::critical(this, tr("Error"), tr("Can not connect to host! \n%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
@@ -306,7 +307,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
         return;
     }
 
-    //QTimer::singleShot(30000, this, SLOT(requestConnectionToClientTimeout()));
+    QTimer::singleShot(5000, this, SLOT(requestConnectionToClientTimeout()));
 
 
 }

@@ -23,6 +23,9 @@ public:
 signals:
     void dataReceived(const QString &address, quint16 peerPort, const QByteArray &data);
 
+public slots:
+//    bool sendData(UDTSOCKET socket, const QByteArray *byteArray);
+
 
 private slots:
 //    void dataReceived(const QString &address, quint16 port, char *data);

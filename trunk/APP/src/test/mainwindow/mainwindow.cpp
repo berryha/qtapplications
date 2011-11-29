@@ -354,9 +354,7 @@ QSystemTrayIcon* MainWindow::SystemTrayIcon() {
 	return systemTray;
 }
 
-void MainWindow::setTrayIconVisible(bool visible) {
-	visible = true;
-}
+
 
 void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
  {

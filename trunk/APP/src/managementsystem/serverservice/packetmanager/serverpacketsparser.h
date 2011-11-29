@@ -174,7 +174,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 
@@ -219,7 +219,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
     }
 
 
@@ -242,7 +242,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendUDTMessageData(socketID, &ba);
+        return m_udtProtocol->sendData(socketID, &ba);
 
     }
 

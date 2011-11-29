@@ -58,7 +58,6 @@ public:
 
 	void retranslateUi();
 
-	void setTrayIconVisible(bool visible);
 
 private:
 	//void createActions();

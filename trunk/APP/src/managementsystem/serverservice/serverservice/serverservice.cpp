@@ -167,7 +167,7 @@ bool ServerService::startMainService(){
         qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIO(1);
+    m_udtProtocol->startWaitingForIOInSeparateThread(1);
 
     serverPacketsParser = new ServerPacketsParser(m_udpServer, m_udtProtocol, this);
     //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
