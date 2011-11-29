@@ -63,7 +63,7 @@ public slots:
 
 
     bool sendLocalUserOnlinePacket(int socketID){
-        qWarning()<<"----sendLocalUserOnlinePacket(...)";
+        qDebug()<<"--sendLocalUserOnlinePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 

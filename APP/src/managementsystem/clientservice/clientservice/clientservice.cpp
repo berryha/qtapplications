@@ -177,6 +177,8 @@ bool ClientService::startMainService(){
         QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
         logMessage(error, QtServiceBase::Error);
         return false;
+    }else{
+        qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIO(1);
@@ -330,8 +332,9 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
 #endif
 
     //clientPacketsParser->sendClientOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), QHostInfo::localHostName(), false);
-    QTimer::singleShot(60*msec, this, SLOT(uploadClientSummaryInfo()));
+    //QTimer::singleShot(60*msec, this, SLOT(uploadClientSummaryInfo()));
     //uploadClientInfo();
+    uploadClientSummaryInfo(m_socketConnectedToServer);
 
 
     QString section = serviceName() + "/LastUpdateSystemDetailedInfo";
@@ -340,7 +343,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     if(time.isNull() || (time.addDays(7) < QDateTime::currentDateTime())){
         processClientDetailedInfoRequestedPacket("", true, m_socketConnectedToServer);
         settings.setValue(section, QDateTime::currentDateTime());
-
     }
 
 }
@@ -636,14 +638,21 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
     }
 
     QString log = QString("User '%1' %2 Administrators Group! Admin:%3").arg(userName).arg(ret).arg(adminName);
-    bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, users.join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
-    if(!ok){
-        qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+    bool sent = false;
+    if(m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, users.join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
     }
-    ok = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
-    if(!ok){
-        qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
+
+    if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
+        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
     }
+
 
 #endif
 
@@ -1760,8 +1769,8 @@ void ClientService::checkHasAnyServerBeenFound(){
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
-        if(interval > 30000){
-            interval = 30000;
+        if(interval > 300000){
+            interval = 300000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
         }
         lookForServerTimer->start(interval);

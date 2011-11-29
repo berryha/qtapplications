@@ -163,6 +163,8 @@ bool ServerService::startMainService(){
         QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
         logMessage(error, QtServiceBase::Error);
         return false;
+    }else{
+        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIO(1);
