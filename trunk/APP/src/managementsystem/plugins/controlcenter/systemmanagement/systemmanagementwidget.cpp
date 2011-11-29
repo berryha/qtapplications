@@ -766,7 +766,7 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 
 
 void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message){
-        qWarning()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
+        qDebug()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
 
     if(socketID != m_peerSocket || computerName != this->m_computerName){
         return;

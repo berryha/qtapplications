@@ -1046,7 +1046,7 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTL
 
 void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion){
 
-    qWarning()<<"updateOrSaveClientInfo(...) "<<computerName<<" "<<workgroupName<<" "<<networkInfo<<" "<<usersInfo;
+    qDebug()<<"updateOrSaveClientInfo(...) "<<computerName<<" "<<workgroupName<<" "<<networkInfo<<" "<<usersInfo;
     
     if(computerName.trimmed().isEmpty()){
         qCritical()<<"Invalid Computer Name!";
