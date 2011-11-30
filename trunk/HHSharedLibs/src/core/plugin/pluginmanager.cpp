@@ -116,7 +116,7 @@ void PluginManager::loadPlugins(const QString &pluginsDirPath) {
 
 }
 
-bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorString) {
+AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorString) {
     qDebug("----PluginManager::loadPlugin(const QString &pluginFilePath)");
     //Q_ASSERT(QFileInfo(pluginFilePath).exists());
 
@@ -129,7 +129,7 @@ bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorStri
         if(errorString){
             *errorString = error;
         }
-        return false;
+        return 0;
     }
 
     if (pluginsHash.contains(pluginFilePath)) {
@@ -138,7 +138,7 @@ bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorStri
         if(errorString){
             *errorString = error;
         }
-        return false;
+        return 0;
     }
 
     qDebug() << QString("~~ Testing library %1").arg(pluginFilePath);
@@ -167,7 +167,7 @@ bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorStri
             if(errorString){
                 *errorString = error;
             }
-            return true;
+            return plugin;
 
         } else {
             error = tr("Unknown Plug-in: %1").arg(pluginFilePath);
@@ -175,7 +175,7 @@ bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorStri
             if(errorString){
                 *errorString = error;
             }
-            return false;
+            return 0;
         }
 
     } else {
@@ -189,7 +189,7 @@ bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorStri
         if(errorString){
             *errorString = error;
         }
-        return false;
+        return 0;
 
     }
 
@@ -231,9 +231,9 @@ bool PluginManager::unloadPlugin(AbstractPluginInterface *plugin) {
         //delete plugin;
         //plugin = 0;
 
-        QPluginLoader *pluginLoader = pluginLoadersHash.take(pluginFilePath);
+        QPluginLoader *pluginLoader = pluginLoadersHash.value(pluginFilePath);
         if (pluginLoader && pluginLoader->unload()) {
-            //pluginLoadersHash.remove(pluginFilePath);
+            pluginLoadersHash.remove(pluginFilePath);
             delete pluginLoader;
             pluginLoader = 0;
         }
@@ -257,8 +257,7 @@ bool PluginManager::unloadPlugin(const QString &pluginFilePath) {
             delete plugin;
             plugin = 0;
 
-            QPluginLoader *pluginLoader = pluginLoadersHash.value(
-                        pluginFilePath);
+            QPluginLoader *pluginLoader = pluginLoadersHash.value(pluginFilePath);
             if (pluginLoader && pluginLoader->unload()) {
                 pluginLoadersHash.remove(pluginFilePath);
                 delete pluginLoader;

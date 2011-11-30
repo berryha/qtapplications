@@ -78,6 +78,8 @@ PluginManagerWindow::PluginManagerWindow(QWidget *parent)
 }
 
 PluginManagerWindow::~PluginManagerWindow(){
+
+    pluginInfoModel->clear();
     delete pluginInfoModel;
     pluginInfoModel = 0;
 
@@ -134,16 +136,20 @@ void PluginManagerWindow::on_toolButtonLoad_clicked(){
         }
 
         QString errorString = "";
-        if(!PluginManager::instance()->loadPlugin(file, &errorString)){
+        AbstractPluginInterface *plugin = PluginManager::instance()->loadPlugin(file, &errorString);
+        if(!plugin){
             QMessageBox::critical(this, tr("Error"), tr("Can not load plugin '%1'!\n%2").arg(QFileInfo(file).fileName()).arg(errorString));
-            break;
+            continue;
         }
+
+        pluginInfoModel->addPluginInfo(file, plugin);
+
 
         //TODO:Init
 
     }
 
-    pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
+    //pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
 
     ui.tableView->selectRow(0);
 
@@ -171,7 +177,8 @@ void PluginManagerWindow::on_toolButtonUnload_clicked(){
         return;
     }
 
-    pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
+    pluginInfoModel->removePluginInfo(plugin);
+//    pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
 
     slotUpdateUI(ui.tableView->currentIndex());
 

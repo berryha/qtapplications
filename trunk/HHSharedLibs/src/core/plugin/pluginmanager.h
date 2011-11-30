@@ -65,7 +65,7 @@ public:
     //Load plugins
     virtual void loadPlugins(const QString &pluginsDirPath = QCoreApplication::applicationDirPath() + QDir::separator()
             + QString(PLUGINS_MAIN_DIR) + QDir::separator() + QString(PLUGINS_MYPLUGINS_DIR));
-    virtual bool loadPlugin(const QString &pluginFilePath, QString *errorString = 0);
+    virtual AbstractPluginInterface * loadPlugin(const QString &pluginFilePath, QString *errorString = 0);
     virtual bool reloadPlugin(const QString &pluginFilePath);
     virtual bool unloadPlugins();
 
