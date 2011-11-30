@@ -48,38 +48,8 @@ BulletinBoardPlugin::BulletinBoardPlugin() {
         
         actionMain = 0;
         //QTimer::singleShot(2000, this, SLOT(slotRun()));
-        
-        
-        
-//        networkManager = NetworkManager::instance();
-//        bulletinBoardPacketsParser = 0;
-        
-//        m_networkReady = false;
+               
 
-//        if(networkManager->isNetworkReady()){
-//            qWarning()<<"Network Ready!";
-//            networkReady();
-
-//        }else{
-//            qWarning()<<"Can not find valid IP address! Service startup failed!";
-
-//            connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(networkReady()));
-//            networkManager->startWaitingNetworkReady();
-//        }
-        
-//        remoteAssistance = 0;
-//        bulletinBoardWidget = 0;
-//        updatePasswordWidget = 0;
-        
-//        adminRequestUpdateMSUserPasswordPacketReceived("hehui", "aa", "BBBBBBBB");
-//        qWarning()<<"A";
-//        serverAnnouncementPacketReceived("HEHUI", "TTTTTTTTTTTTTTTt");
-//        qWarning()<<"B";
-//        adminRequestRemoteAssistancePacketReceived("hehui", "200.200.200.17");
-//        qWarning()<<"C";
-        
-//        serverAnnouncementPacketReceived("ADMIN", "TEST~~");
-        
         bulletinBoardObject = new BulletinBoardObject(this);
 
 }
@@ -182,19 +152,22 @@ bool BulletinBoardPlugin::unload(){
 //    }
 //    remoteAssistance = 0;
     
-
     emit signalPluginToBeUnloaded();
+
+    delete bulletinBoardObject;
+    bulletinBoardObject = 0;
+
 
     if(systemSummaryInfoWidgetList.isEmpty()){
         return true;
     }
 
-    foreach(SystemSummaryInfo *controlCenter, systemSummaryInfoWidgetList){
-        if(!controlCenter){break;}
-        if(controlCenter->close()){
-            systemSummaryInfoWidgetList.removeAll(controlCenter);
-            delete controlCenter;
-            controlCenter = 0;
+    foreach(SystemSummaryInfo *systemSummaryInfo, systemSummaryInfoWidgetList){
+        if(!systemSummaryInfo){continue;}
+        if(systemSummaryInfo->close()){
+            systemSummaryInfoWidgetList.removeAll(systemSummaryInfo);
+            delete systemSummaryInfo;
+            systemSummaryInfo = 0;
         }
     }
 
@@ -223,7 +196,6 @@ void BulletinBoardPlugin::slotMainActionForMenuTriggered(){
                          connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
                         //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-
 		}
 	}
 

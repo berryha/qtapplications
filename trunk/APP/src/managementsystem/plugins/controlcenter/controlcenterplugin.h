@@ -45,31 +45,32 @@
 
 namespace HEHUI {
 
+
 class ControlCenterPlugin : public GUIPluginBase/*, public QObject*/   {
-	Q_OBJECT
+    Q_OBJECT
 
 
 public:
-        ControlCenterPlugin();
-        virtual ~ControlCenterPlugin();
+    ControlCenterPlugin();
+    virtual ~ControlCenterPlugin();
 
-	bool isSingle();
-	QString name () const;
-        QString version() const;
-        QString description() const;
+    bool isSingle();
+    QString name () const;
+    QString version() const;
+    QString description() const;
 
-	QIcon icon () const;
-	QString whatsThis () const;
-	QString toolTip () const;
+    QIcon icon () const;
+    QString whatsThis () const;
+    QString toolTip () const;
 
-        bool unload();
+    bool unload();
 
 public slots:
-	void slotMainActionForMenuTriggered();
-        void slotControlCenterWidgetDestoryed(QObject * obj);
+    void slotMainActionForMenuTriggered();
+    void slotControlCenterWidgetDestoryed(QObject * obj);
 
 private:
-        QList<ControlCenter *> controlCenterWidgetList;
+    QList<ControlCenter *> controlCenterWidgetList;
 
 
 

@@ -41,61 +41,62 @@
 
 namespace HEHUI {
 
+
 ControlCenterPlugin::ControlCenterPlugin() {
 
-        controlCenterWidgetList = QList<ControlCenter *> ();
+    controlCenterWidgetList = QList<ControlCenter *> ();
 
 }
 
 ControlCenterPlugin::~ControlCenterPlugin() {
-        unload();
+    unload();
 }
 
 
 /*
 bool SystemInfoPlugin::init( QWidget * parentWidget, QMenu *menu, QToolBar *toolBar, QSystemTrayIcon *systemTrayIcon, const QString& pName, const QString& pVersion  ){
-	setParent(parentWidget);
-	this->parentWidget = parentWidget;
-	this->systemTrayIcon = systemTrayIcon;
-	QAction *action = new QAction(icon(), name(), parentWidget);
-	action->setToolTip(toolTip());
-	action->setStatusTip(toolTip());
-	action->setWhatsThis(whatsThis());
-	connect(action, SIGNAL(triggered()), this, SLOT(slotRun()));
+    setParent(parentWidget);
+    this->parentWidget = parentWidget;
+    this->systemTrayIcon = systemTrayIcon;
+    QAction *action = new QAction(icon(), name(), parentWidget);
+    action->setToolTip(toolTip());
+    action->setStatusTip(toolTip());
+    action->setWhatsThis(whatsThis());
+    connect(action, SIGNAL(triggered()), this, SLOT(slotRun()));
 
-	if(menu){
-		menu->addAction(action);
-	}
+    if(menu){
+        menu->addAction(action);
+    }
 
-	if(toolBar){
-		toolBar->addAction(action);
-	}
+    if(toolBar){
+        toolBar->addAction(action);
+    }
 
-	if(systemTrayIcon){
-		//TODO:
-		//systemTrayMenu->addAction(action);
-	}
+    if(systemTrayIcon){
+        //TODO:
+        //systemTrayMenu->addAction(action);
+    }
 
-	return true;
+    return true;
 
 }
 
 
 QWidget * SystemInfoPlugin::parentWidgetOfPlugin(){
 
-	return parentWidget;
+    return parentWidget;
 }
 
 */
 
 bool ControlCenterPlugin::isSingle(){
 
-	return true;
+    return true;
 
 }
 
 QString ControlCenterPlugin::name () const{
-        return QString(tr("Control Center"));
+    return QString(tr("Control Center"));
 }
 
 QString ControlCenterPlugin::version() const{
@@ -107,16 +108,16 @@ QString ControlCenterPlugin::description() const{
 }
 
 QIcon ControlCenterPlugin::icon () const{
-        return QIcon(":/icon/resources/images/controlcenter.png");
+    return QIcon(":/icon/resources/images/controlcenter.png");
 
 }
 
 QString ControlCenterPlugin::whatsThis () const{
-        return QString(tr("Control Center"));
+    return QString(tr("Control Center"));
 }
 
 QString ControlCenterPlugin::toolTip () const{
-        return QString(tr("Control Center"));
+    return QString(tr("Control Center"));
 }
 
 bool ControlCenterPlugin::unload(){
@@ -142,37 +143,37 @@ bool ControlCenterPlugin::unload(){
 }
 
 void ControlCenterPlugin::slotMainActionForMenuTriggered(){
-        if(isSingle() && ControlCenter::isRunning()){
-		//TODO: Activate the widget
-		return;
+    if(isSingle() && ControlCenter::isRunning()){
+        //TODO: Activate the widget
+        return;
+    }
+
+    QWidget *parentWidget = qobject_cast<QWidget *> (parent());
+
+    HEHUI::User user;
+    HEHUI::LoginBase login(&user, name(), parentWidget);
+    if (!login.isVerified()) {
+        return ;
+    }
+
+    ControlCenter *controlCenter = new ControlCenter(user.getUserID(), parentWidget);
+    connect(controlCenter, SIGNAL(destroyed(QObject *)), SLOT(slotControlCenterWidgetDestoryed(QObject *)));
+
+    if(parentWidget){
+        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+            QMdiSubWindow *subWindow = new QMdiSubWindow;
+            subWindow->setWidget(controlCenter);
+            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+            mdiArea->addSubWindow(subWindow);
+            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+
+            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
+
         }
+    }
 
-        QWidget *parentWidget = qobject_cast<QWidget *> (parent());
-
-        HEHUI::User user;
-        HEHUI::LoginBase login(&user, name(), parentWidget);
-        if (!login.isVerified()) {
-                return ;
-        }
-
-        ControlCenter *controlCenter = new ControlCenter(user.getUserID(), parentWidget);
-        connect(controlCenter, SIGNAL(destroyed(QObject *)), SLOT(slotControlCenterWidgetDestoryed(QObject *)));
-
-	if(parentWidget){
-		if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-                    QMdiSubWindow *subWindow = new QMdiSubWindow;
-                         subWindow->setWidget(controlCenter);
-                         subWindow->setAttribute(Qt::WA_DeleteOnClose);
-                         mdiArea->addSubWindow(subWindow);
-                         connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
-
-                        //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-
-		}
-	}
-
-        controlCenter->show();
-        controlCenterWidgetList.append(controlCenter);
+    controlCenter->show();
+    controlCenterWidgetList.append(controlCenter);
 }
 
 void ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj){
