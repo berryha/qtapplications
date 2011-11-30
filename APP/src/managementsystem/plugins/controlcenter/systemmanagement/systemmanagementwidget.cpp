@@ -211,6 +211,8 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
         queryModel = 0;
     }
 
+    m_udtProtocol->closeSocket(m_peerSocket);
+
     event->accept();
 
 }

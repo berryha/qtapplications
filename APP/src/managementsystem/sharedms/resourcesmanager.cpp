@@ -47,6 +47,7 @@ ResourcesManager::~ResourcesManager() {
         ipmcServer = 0;
     }
 
+
     if(udpServer){
         udpServer->close();
         delete udpServer;

@@ -167,8 +167,10 @@ ControlCenter::~ControlCenter()
     //        }
     
 
-
-    controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
+    if(controlCenterPacketsParser){
+        controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+    }
 
 
     if(vncProcess){
