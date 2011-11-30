@@ -40,31 +40,32 @@
 
 namespace HEHUI {
 
+
 class MYSHAREDLIB_API PluginManagerWindow: public QWidget {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	PluginManagerWindow(QWidget *parent = 0);
-	~PluginManagerWindow();
+    PluginManagerWindow(QWidget *parent = 0);
+    ~PluginManagerWindow();
 
 public slots:
-        void on_toolButtonDetails_clicked(bool checked);
-        void on_toolButtonLoad_clicked();
-        void on_toolButtonUnload_clicked();
+    void on_toolButtonDetails_clicked(bool checked);
+    void on_toolButtonLoad_clicked();
+    void on_toolButtonUnload_clicked();
 
 private slots:
-        void slotUpdateUI(const QModelIndex &index);
+    void slotUpdateUI(const QModelIndex &index);
 
 
 protected:
-//	bool eventFilter(QObject *object, QEvent *event);
+    //	bool eventFilter(QObject *object, QEvent *event);
 
 private:
-	Ui::PluginManagerWindowUI ui;
+    Ui::PluginManagerWindowUI ui;
 
-	PluginInfoModel *pluginInfoModel;
+    PluginInfoModel *pluginInfoModel;
 
-	//        QDataWidgetMapper *dataWidgetMapper;
+    //QDataWidgetMapper *dataWidgetMapper;
 
 };
 

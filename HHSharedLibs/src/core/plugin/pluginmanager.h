@@ -44,55 +44,52 @@
 
 namespace HEHUI {
 
+
 class MYSHAREDLIB_API PluginManager: public QObject {
-Q_OBJECT
-	;
+    Q_OBJECT
+
 public:
 
-	virtual ~PluginManager();
+    virtual ~PluginManager();
 
-	static PluginManager* instance();
+    static PluginManager* instance();
 
-	//只读Hash
-	//Read only
-	const QHash<QString, AbstractPluginInterface *> & getPluginsHash() const;
+    //Read only
+    const QHash<QString, AbstractPluginInterface *> & getPluginsHash() const;
 
-	//插件列表
-	//Plugins list
-	QList<AbstractPluginInterface *> pluginsList() const;
+    //Plugins list
+    QList<AbstractPluginInterface *> pluginsList() const;
 
-	QString pluginFilePath(AbstractPluginInterface *plugin) const;
+    QString pluginFilePath(AbstractPluginInterface *plugin) const;
 
-	//载入插件
-	//Load plugins
-        virtual void loadPlugins(const QString &pluginsDirPath = QCoreApplication::applicationDirPath() + QDir::separator()
-					+ QString(PLUGINS_MAIN_DIR) + QDir::separator() + QString(PLUGINS_MYPLUGINS_DIR));
-        virtual bool loadPlugin(const QString &pluginFilePath, QString *errorString = 0);
-	virtual bool reloadPlugin(const QString &pluginFilePath);
+    //Load plugins
+    virtual void loadPlugins(const QString &pluginsDirPath = QCoreApplication::applicationDirPath() + QDir::separator()
+            + QString(PLUGINS_MAIN_DIR) + QDir::separator() + QString(PLUGINS_MYPLUGINS_DIR));
+    virtual bool loadPlugin(const QString &pluginFilePath, QString *errorString = 0);
+    virtual bool reloadPlugin(const QString &pluginFilePath);
+    virtual bool unloadPlugins();
 
 private:
-	PluginManager(QObject *parent = 0);
+    PluginManager(QObject *parent = 0);
 
 signals:
-	void signalPluginLoaded(const QString &pluginFilePath);
-	void signalPluginLoaded(AbstractPluginInterface *plugin);
-	void signalPluginUnloaded(const QString &pluginFilePath);
+    void signalPluginLoaded(const QString &pluginFilePath);
+    void signalPluginLoaded(AbstractPluginInterface *plugin);
+    void signalPluginUnloaded(const QString &pluginFilePath);
 
 public slots:
-	//卸载插件
-	//Unload plugin
-	bool unloadPlugin(AbstractPluginInterface *plugin);
-	bool unloadPlugin(const QString &pluginFilePath);
+    //Unload plugin
+    bool unloadPlugin(AbstractPluginInterface *plugin);
+    bool unloadPlugin(const QString &pluginFilePath);
 
 private:
-	static PluginManager *pluginManager;
+    static PluginManager *pluginManager;
 
-	QHash<QString, AbstractPluginInterface *> pluginsHash;
-	QHash<QString, QPluginLoader *> pluginLoadersHash;
+    QHash<QString, AbstractPluginInterface *> pluginsHash;
+    QHash<QString, QPluginLoader *> pluginLoadersHash;
 
-	//TODO:提高安全性！
-	//TODO:Enhance the security!
-	//QHash<QString, AbstractPluginInterface **> pluginsHash;
+    //TODO:Enhance the security!
+    //QHash<QString, AbstractPluginInterface **> pluginsHash;
 
 
 };

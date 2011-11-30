@@ -80,6 +80,7 @@ public:
 //    QList<HEHUI::GUIInterface *> guiPluginsList() const;
 
     virtual void loadPlugins(const QString &pluginsDirPath = QApplication::applicationDirPath() + QDir::separator () + QString(PLUGINS_MAIN_DIR) + QDir::separator () + QString(PLUGINS_MYPLUGINS_DIR));
+    void unloadPlugins();
 
     bool useStylePalette();
     QString preferedStyle();

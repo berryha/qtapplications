@@ -33,239 +33,256 @@
 
 namespace HEHUI {
 
+
 PluginManager* PluginManager::pluginManager = 0;
 
 PluginManager* PluginManager::instance() {
-	qDebug("----PluginManager::instance()");
+    qDebug("----PluginManager::instance()");
 
-	if (!pluginManager) {
-		pluginManager = new PluginManager();
-	}
+    if (!pluginManager) {
+        pluginManager = new PluginManager();
+    }
 
-	return pluginManager;
+    return pluginManager;
 
 }
 
 PluginManager::PluginManager(QObject *parent) :
-	QObject(parent) {
+    QObject(parent) {
 
-	//loadPlugins();
+    //loadPlugins();
 
 }
 
 PluginManager::~PluginManager() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 const QHash<QString, AbstractPluginInterface *> & PluginManager::getPluginsHash() const {
-	return pluginsHash;
+    return pluginsHash;
 
 }
 
 QList<AbstractPluginInterface *> PluginManager::pluginsList() const {
-	return pluginsHash.values();
+    return pluginsHash.values();
 
 }
 
 QString PluginManager::pluginFilePath(AbstractPluginInterface *plugin) const {
 
-	return pluginsHash.key(plugin);
+    return pluginsHash.key(plugin);
 }
 
 void PluginManager::loadPlugins(const QString &pluginsDirPath) {
-	qDebug() << "----PluginManager::loadPlugins(...)";
-	qDebug() << "~~ Plug-ins Dir:" << pluginsDirPath;
+    qDebug() << "----PluginManager::loadPlugins(...)";
+    qDebug() << "~~ Plug-ins Dir:" << pluginsDirPath;
 
-	QDir pluginsDir(pluginsDirPath);
-	foreach(QString fileName, pluginsDir.entryList(QDir::Files))
-		{
-			QString absoluteFilePath = pluginsDir.absoluteFilePath(fileName);
-			loadPlugin(absoluteFilePath);
+    QDir pluginsDir(pluginsDirPath);
+    foreach(QString fileName, pluginsDir.entryList(QDir::Files))
+    {
+        QString absoluteFilePath = pluginsDir.absoluteFilePath(fileName);
+        loadPlugin(absoluteFilePath);
 
-			//			if (pluginsHash.contains(absoluteFilePath)) {
-			//				qDebug()<<QString("Plugin '%1' has already been loaded!").arg(absoluteFilePath);
-			//				break;
-			//			}
-			//
-			//			qDebug() << QString("~~ Testing library %1").arg(absoluteFilePath);
-			//
-			//			QPluginLoader pluginLoader(absoluteFilePath);
-			//                        QObject *pluginInstance = pluginLoader.instance();
-			//                        if (pluginInstance) {
-			//                                AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (
-			//                                                pluginInstance);
-			//                                if (plugin) {
-			//                                        pluginsHash.insert(absoluteFilePath, plugin);
-			//					//corePlugins.append(coreInterface);
-			//                                        qDebug() << QString("~~ Loading Plugin %1").arg(
-			//							fileName);
-			//
-			//				} else {
-			//                                    qCritical() << QString("XX Unknown Plugin: %1").arg(absoluteFilePath);
-			//					break;
-			//				}
-			//
-			//			} else {
-			//				qDebug() << QString(
-			//						"XX An error occurred while loading plugin : %1").arg(
-			//						pluginLoader.errorString());
-			//			}
+        //			if (pluginsHash.contains(absoluteFilePath)) {
+        //				qDebug()<<QString("Plugin '%1' has already been loaded!").arg(absoluteFilePath);
+        //				break;
+        //			}
+        //
+        //			qDebug() << QString("~~ Testing library %1").arg(absoluteFilePath);
+        //
+        //			QPluginLoader pluginLoader(absoluteFilePath);
+        //                        QObject *pluginInstance = pluginLoader.instance();
+        //                        if (pluginInstance) {
+        //                                AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (
+        //                                                pluginInstance);
+        //                                if (plugin) {
+        //                                        pluginsHash.insert(absoluteFilePath, plugin);
+        //					//corePlugins.append(coreInterface);
+        //                                        qDebug() << QString("~~ Loading Plugin %1").arg(
+        //							fileName);
+        //
+        //				} else {
+        //                                    qCritical() << QString("XX Unknown Plugin: %1").arg(absoluteFilePath);
+        //					break;
+        //				}
+        //
+        //			} else {
+        //				qDebug() << QString(
+        //						"XX An error occurred while loading plugin : %1").arg(
+        //						pluginLoader.errorString());
+        //			}
 
-		}
+    }
 
 }
 
 bool PluginManager::loadPlugin(const QString &pluginFilePath, QString *errorString) {
-	qDebug("----PluginManager::loadPlugin(const QString &pluginFilePath)");
-	//Q_ASSERT(QFileInfo(pluginFilePath).exists());
+    qDebug("----PluginManager::loadPlugin(const QString &pluginFilePath)");
+    //Q_ASSERT(QFileInfo(pluginFilePath).exists());
 
-        QString error = "";
+    QString error = "";
 
-	if (!QFileInfo(pluginFilePath).exists()) {
-            error = tr("File '%1' does not exist!").arg(pluginFilePath);
-            //qCritical("File '%s' does not exist!", qPrintable(pluginFilePath));
+    if (!QFileInfo(pluginFilePath).exists()) {
+        error = tr("File '%1' does not exist!").arg(pluginFilePath);
+        //qCritical("File '%s' does not exist!", qPrintable(pluginFilePath));
+        qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
+        if(errorString){
+            *errorString = error;
+        }
+        return false;
+    }
+
+    if (pluginsHash.contains(pluginFilePath)) {
+        error = tr("Plugin '%1' has already been loaded!").arg(pluginFilePath);
+        qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
+        if(errorString){
+            *errorString = error;
+        }
+        return false;
+    }
+
+    qDebug() << QString("~~ Testing library %1").arg(pluginFilePath);
+
+    QPluginLoader *pluginLoader;
+    if (pluginLoadersHash.contains(pluginFilePath)) {
+        pluginLoader = pluginLoadersHash.value(pluginFilePath);
+    } else {
+        pluginLoader = new QPluginLoader(pluginFilePath);
+    }
+
+    Q_ASSERT(pluginLoader);
+
+    QObject *pluginInstance = pluginLoader->instance();
+    if (pluginInstance) {
+        AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (pluginInstance);
+        if (plugin) {
+            pluginLoadersHash[pluginFilePath] = pluginLoader;
+            pluginsHash[pluginFilePath] = plugin;
+
+            emit signalPluginLoaded(plugin);
+            emit signalPluginLoaded(pluginFilePath);
+
+            error = tr("OK! Plug-in '%1' loaded!").arg(pluginFilePath);
+            qWarning() << error;
+            if(errorString){
+                *errorString = error;
+            }
+            return true;
+
+        } else {
+            error = tr("Unknown Plug-in: %1").arg(pluginFilePath);
             qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
             if(errorString){
                 *errorString = error;
             }
             return false;
-	}
+        }
 
-	if (pluginsHash.contains(pluginFilePath)) {
-            error = tr("Plugin '%1' has already been loaded!").arg(pluginFilePath);
-            qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
-            if(errorString){
-                *errorString = error;
-            }
-            return false;
-	}
+    } else {
 
-	qDebug() << QString("~~ Testing library %1").arg(pluginFilePath);
+        pluginLoader->unload();
+        delete pluginLoader;
+        pluginLoader = 0;
 
-	QPluginLoader *pluginLoader;
-	if (pluginLoadersHash.contains(pluginFilePath)) {
-		pluginLoader = pluginLoadersHash.value(pluginFilePath);
-	} else {
-		pluginLoader = new QPluginLoader(pluginFilePath);
-	}
+        error = tr("Error: %1").arg(pluginLoader->errorString());
+        qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
+        if(errorString){
+            *errorString = error;
+        }
+        return false;
 
-	Q_ASSERT(pluginLoader);
-
-	QObject *pluginInstance = pluginLoader->instance();
-	if (pluginInstance) {
-		AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (pluginInstance);
-		if (plugin) {
-			pluginLoadersHash[pluginFilePath] = pluginLoader;
-			pluginsHash[pluginFilePath] = plugin;
-
-			emit signalPluginLoaded(plugin);
-			emit signalPluginLoaded(pluginFilePath);
-
-                        error = tr("OK! Plug-in '%1' loaded!").arg(pluginFilePath);
-                        qWarning() << error;
-                        if(errorString){
-                            *errorString = error;
-                        }
-			return true;
-
-		} else {
-                    error = tr("Unknown Plug-in: %1").arg(pluginFilePath);
-                    qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
-                    if(errorString){
-                        *errorString = error;
-                    }
-                    return false;
-		}
-
-	} else {
-
-		pluginLoader->unload();
-		delete pluginLoader;
-		pluginLoader = 0;
-
-                error = tr("Error: %1").arg(pluginLoader->errorString());
-                qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
-                if(errorString){
-                    *errorString = error;
-                }
-                return false;
-
-	}
+    }
 
 }
 
 bool PluginManager::reloadPlugin(const QString &pluginFilePath) {
-	qDebug("----PluginManager::reloadPlugin(const QString &pluginFilePath)");
-	Q_ASSERT(QFileInfo(pluginFilePath).exists());
+    qDebug("----PluginManager::reloadPlugin(const QString &pluginFilePath)");
+    Q_ASSERT(QFileInfo(pluginFilePath).exists());
 
-	if (!unloadPlugin(pluginFilePath)) {
-		return false;
-	}
+    if (!unloadPlugin(pluginFilePath)) {
+        return false;
+    }
 
-	if (!loadPlugin(pluginFilePath)) {
-		return false;
-	}
+    if (!loadPlugin(pluginFilePath)) {
+        return false;
+    }
 
-	return true;
+    return true;
+
+}
+
+bool PluginManager::unloadPlugins(){
+
+    foreach (AbstractPluginInterface *plugin, pluginsHash.values()) {
+        unloadPlugin(plugin);
+    }
+
+    return pluginsHash.isEmpty();
 
 }
 
 bool PluginManager::unloadPlugin(AbstractPluginInterface *plugin) {
-	qDebug("----PluginManager::unloadPlugin(AbstractPluginInterface *plugin)");
-	Q_ASSERT(plugin);
+    qDebug("----PluginManager::unloadPlugin(AbstractPluginInterface *plugin)");
+    Q_ASSERT(plugin);
 
-	if (plugin && plugin->unload()) {
-		QString pluginFilePath = pluginsHash.key(plugin);
-		pluginsHash.remove(pluginFilePath);
-		delete plugin;
-		plugin = 0;
+    if (plugin && plugin->unload() ) {
+        QString pluginFilePath = pluginsHash.key(plugin);
+        pluginsHash.remove(pluginFilePath);
+        //delete plugin;
+        //plugin = 0;
 
-		QPluginLoader *pluginLoader = pluginLoadersHash.value(pluginFilePath);
-		if (pluginLoader && pluginLoader->unload()) {
-			pluginLoadersHash.remove(pluginFilePath);
-			delete pluginLoader;
-			pluginLoader = 0;
-		}
+        QPluginLoader *pluginLoader = pluginLoadersHash.take(pluginFilePath);
+        if (pluginLoader && pluginLoader->unload()) {
+            //pluginLoadersHash.remove(pluginFilePath);
+            delete pluginLoader;
+            pluginLoader = 0;
+        }
 
-		emit
-		signalPluginUnloaded(pluginsHash.key(plugin));
-		return true;
-	} else {
-		return false;
-	}
+        emit signalPluginUnloaded(pluginsHash.key(plugin));
+        return true;
+    } else {
+        return false;
+    }
 
 }
 
 bool PluginManager::unloadPlugin(const QString &pluginFilePath) {
-	qDebug("----PluginManager::unloadPlugin(const QString &pluginFilePath)");
+    qDebug("----PluginManager::unloadPlugin(const QString &pluginFilePath)");
 
-	if (pluginsHash.contains(pluginFilePath)) {
-		//TODO:提高安全性！
-		//TODO:Enhance the security!
-		AbstractPluginInterface *plugin = static_cast<AbstractPluginInterface *> (pluginsHash.value(pluginFilePath));
-		if (plugin && plugin->unload()) {
-			pluginsHash.remove(pluginFilePath);
-			delete plugin;
-			plugin = 0;
+    if (pluginsHash.contains(pluginFilePath)) {
+        //TODO:Enhance the security!
+        AbstractPluginInterface *plugin = static_cast<AbstractPluginInterface *> (pluginsHash.value(pluginFilePath));
+        if (plugin && plugin->unload()) {
+            pluginsHash.remove(pluginFilePath);
+            delete plugin;
+            plugin = 0;
 
-			QPluginLoader *pluginLoader = pluginLoadersHash.value(
-					pluginFilePath);
-			if (pluginLoader && pluginLoader->unload()) {
-				pluginLoadersHash.remove(pluginFilePath);
-				delete pluginLoader;
-				pluginLoader = 0;
-			}
+            QPluginLoader *pluginLoader = pluginLoadersHash.value(
+                        pluginFilePath);
+            if (pluginLoader && pluginLoader->unload()) {
+                pluginLoadersHash.remove(pluginFilePath);
+                delete pluginLoader;
+                pluginLoader = 0;
+            }
 
-			emit signalPluginUnloaded(pluginFilePath);
-			return true;
-		} else {
-			return false;
-		}
+            emit signalPluginUnloaded(pluginFilePath);
+            return true;
+        } else {
+            return false;
+        }
 
-	}
+    }
 
-	return true;
+    return true;
 
 }
+
+
+
+
+
+
+
+
 
 } //namespace HEHUI
