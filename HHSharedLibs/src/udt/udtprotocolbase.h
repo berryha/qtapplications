@@ -115,13 +115,11 @@ public:
     UDTProtocolBase(bool stream = true, const SocketOptions *options = 0, QObject *parent = 0);
     virtual ~UDTProtocolBase();
 
-
     static const UDTSOCKET INVALID_UDT_SOCK;
 
-
     //    void setSocketOption(UDT::SOCKOPT optname, const char* optval, int optlen);
-    void setSocketOptions(const SocketOptions *options);
-    SocketOptions getSocketOptions() const;
+    void setDefaultSocketOptions(const SocketOptions *options);
+    SocketOptions getDefaultSocketOptions() const;
 
     bool isStreamMode(){return m_stream;}
     UDTSOCKET getServerSocket(){return serverSocket;}
@@ -130,6 +128,7 @@ public:
 
     UDTSocketStatus getUDTSocketStatus(UDTSOCKET socket);
     bool isSocketListening(UDTSOCKET socket);
+    bool isConnecting(UDTSOCKET socket);
     bool isSocketConnected(UDTSOCKET socket);
     bool isSocketBroken(UDTSOCKET socket);
 
@@ -154,7 +153,7 @@ public slots:
 
 
     //Connect to peer
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, bool sync = false);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true);
     //Close peer socket
     void closeSocket(UDTSOCKET socket);
 
@@ -166,6 +165,13 @@ public slots:
     //Close the server
     void closeUDTProtocol();
 
+
+protected:
+    void waitForIO(int msecTimeout = -1);
+    void waitForReading(int msecTimeout = -1);
+    void waitForWriting(int msecTimeout = -1);
+    UDTSOCKET acceptNewConnection();
+
 private slots:
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
@@ -175,21 +181,15 @@ private slots:
     virtual void streamDataReceived(UDTSOCKET socket, QByteArray *data) = 0;
     virtual void messageDataReceived(UDTSOCKET socket, QByteArray *data) = 0;
 
-
-
-
 private:
     struct CachedDataInfo;
     void recycleCachedData(QByteArray *data);
     QByteArray *getCachedData();
 
     //UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
+    void setSocketOptions(UDTSOCKET socket, SocketOptions *options = 0);
 
-protected:
-    void waitForIO(int msecTimeout = -1);
-    void waitForReading(int msecTimeout = -1);
-    void waitForWriting(int msecTimeout = -1);
-    UDTSOCKET acceptNewConnection();
+
 
 
 private:
