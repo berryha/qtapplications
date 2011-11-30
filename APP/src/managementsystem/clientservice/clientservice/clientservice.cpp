@@ -181,7 +181,8 @@ bool ClientService::startMainService(){
         qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(500);
+    //m_udtProtocol->startWaitingForIOInOneThread(1);
+    m_udtProtocol->startWaitingForIOInSeparateThread(1, 100);
 
 
     clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
@@ -700,6 +701,9 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
 
         uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
+    }else{
+        m_udtProtocol->closeSocket(adminSocketID);
+        return;
     }
 
 #else
@@ -707,7 +711,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
     m_udtProtocol->closeSocket(adminSocketID);
 #endif
 
-    if(previousSocketConnectedToAdmin != m_socketConnectedToAdmin){
+    if( (previousSocketConnectedToAdmin != UDTProtocol::INVALID_UDT_SOCK) && (previousSocketConnectedToAdmin != m_socketConnectedToAdmin) ){
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
         clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_localWorkgroupName, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);

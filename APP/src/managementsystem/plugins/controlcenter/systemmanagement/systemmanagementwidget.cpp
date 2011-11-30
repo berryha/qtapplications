@@ -283,9 +283,11 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
         QMessageBox::critical(this, tr("Error"), tr("Can not connect to host! \n%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
-
         return;
     }
+
+    //TODO:wait
+    //Sleep(5000);
 
     if(!m_udtProtocol->isSocketConnected(m_peerSocket)){
         m_udtProtocol->closeSocket(m_peerSocket);
@@ -303,13 +305,13 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
         m_udtProtocol->closeSocket(m_peerSocket);
         m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send connection request to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
 
         return;
     }
 
-    QTimer::singleShot(5000, this, SLOT(requestConnectionToClientTimeout()));
+    QTimer::singleShot(60000, this, SLOT(requestConnectionToClientTimeout()));
 
 
 }
@@ -808,6 +810,37 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
 }
 
 void SystemManagementWidget::requestConnectionToClientTimeout(){
+
+//    static int count = 0;
+
+//    if(!m_udtProtocol->isSocketConnected(m_peerSocket)){
+
+//        count++;
+
+//        if(count >= 5){
+//            m_udtProtocol->closeSocket(m_peerSocket);
+//            m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
+//            ui.toolButtonVerify->setEnabled(true);
+
+//            QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+//        }
+
+//        QTimer::singleShot(1000, this, SLOT(requestConnectionToClientTimeout()));
+
+//        return;
+//    }
+
+
+//    bool ok = controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerSocket, this->m_computerName, this->m_users);
+//    if(!ok){
+//        m_udtProtocol->closeSocket(m_peerSocket);
+//        m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
+
+//        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+//        ui.toolButtonVerify->setEnabled(true);
+
+//        return;
+//    }
 
     if(!clientResponseAdminConnectionResultPacketReceived){
         QMessageBox::critical(this, tr("Error"), tr("Timeout! No response from client!"));
