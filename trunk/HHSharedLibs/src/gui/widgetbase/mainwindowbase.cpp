@@ -78,6 +78,8 @@ MainWindowBase::~MainWindowBase() {
         m_pluginsMenu->deleteLater();
     }
 
+    unloadPlugins();
+
 }
 
 void MainWindowBase::languageChange() {
@@ -123,8 +125,7 @@ void MainWindowBase::createActions() {
 //}
 
 void MainWindowBase::loadPlugins(const QString &pluginsDirPath) {
-    qDebug() << "----MainWindowBase::loadPlugins(...)~~Plugins Path:"
-             << pluginsDirPath;
+    qDebug() << "----MainWindowBase::loadPlugins(...)~~Plugins Path:"<< pluginsDirPath;
 
     PluginManager *pluginManager = PluginManager::instance();
     connect(pluginManager, SIGNAL(signalPluginLoaded(AbstractPluginInterface*)), this, SLOT(slotInitPlugin(AbstractPluginInterface*)));
@@ -176,6 +177,16 @@ void MainWindowBase::loadPlugins(const QString &pluginsDirPath) {
   }
 
   */
+
+}
+
+void MainWindowBase::unloadPlugins(){
+    qDebug()<<"--MainWindowBase::unloadPlugins()";
+
+    PluginManager *pluginManager = PluginManager::instance();
+    pluginManager->unloadPlugins();
+
+    //delete pluginManager();
 
 }
 

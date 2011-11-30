@@ -56,56 +56,56 @@ PluginManagerWindow::PluginManagerWindow(QWidget *parent)
 
     ui.tableView->setModel(pluginInfoModel);
 
-//    dataWidgetMapper = new QDataWidgetMapper(this);
-//    dataWidgetMapper->setOrientation(Qt::Horizontal);
-//    dataWidgetMapper->setModel(pluginInfoModel);
-//    dataWidgetMapper->addMapping(ui.labelAuthor, 5, "text");
-//    dataWidgetMapper->addMapping(ui.labelURL, 6, "text");
-//    dataWidgetMapper->addMapping(ui.textBrowserDescription, 7);
-//    dataWidgetMapper->addMapping(ui.textBrowserLicense, 8, "html");
-//    dataWidgetMapper->toFirst();
+    //    dataWidgetMapper = new QDataWidgetMapper(this);
+    //    dataWidgetMapper->setOrientation(Qt::Horizontal);
+    //    dataWidgetMapper->setModel(pluginInfoModel);
+    //    dataWidgetMapper->addMapping(ui.labelAuthor, 5, "text");
+    //    dataWidgetMapper->addMapping(ui.labelURL, 6, "text");
+    //    dataWidgetMapper->addMapping(ui.textBrowserDescription, 7);
+    //    dataWidgetMapper->addMapping(ui.textBrowserLicense, 8, "html");
+    //    dataWidgetMapper->toFirst();
 
-//    connect(ui.tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-//            dataWidgetMapper, SLOT(setCurrentModelIndex(const QModelIndex &)));
-//    connect(ui.tableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotShowPluginDetails(const QModelIndex &)));
-//dataWidgetMapper->toNext();
+    //    connect(ui.tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
+    //            dataWidgetMapper, SLOT(setCurrentModelIndex(const QModelIndex &)));
+    //    connect(ui.tableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotShowPluginDetails(const QModelIndex &)));
+    //dataWidgetMapper->toNext();
 
-        connect(ui.tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-                this, SLOT(slotUpdateUI(const QModelIndex &)));
+    connect(ui.tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
+            this, SLOT(slotUpdateUI(const QModelIndex &)));
 
-        ui.tableView->selectRow(0);
+    ui.tableView->selectRow(0);
 
 }
 
 PluginManagerWindow::~PluginManagerWindow(){
-	delete pluginInfoModel;
-	pluginInfoModel = 0;
+    delete pluginInfoModel;
+    pluginInfoModel = 0;
 
 }
 
 /*
 bool PluginManagerWindow::eventFilter(QObject *object, QEvent *event){
-	if((object == ui.tableView) && (event->type() == QEvent::KeyRelease)){
-		QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
-		if((keyEvent->key() == Qt::Key_Up) || (keyEvent->key() == Qt::Key_Down)){
+    if((object == ui.tableView) && (event->type() == QEvent::KeyRelease)){
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
+        if((keyEvent->key() == Qt::Key_Up) || (keyEvent->key() == Qt::Key_Down)){
                         slotShowPluginDetails(ui.tableView->currentIndex());
                         return true;
-		}
+        }
 
         }
 
-	return QObject::eventFilter(object, event);
+    return QObject::eventFilter(object, event);
 
 }
 */
 
 void PluginManagerWindow::on_toolButtonDetails_clicked(bool checked) {
-        if (checked) {
-                ui.groupBoxDetails->show();
-                slotUpdateUI(ui.tableView->currentIndex());
-        } else {
-                ui.groupBoxDetails->hide();
-        }
+    if (checked) {
+        ui.groupBoxDetails->show();
+        slotUpdateUI(ui.tableView->currentIndex());
+    } else {
+        ui.groupBoxDetails->hide();
+    }
 
 }
 
@@ -120,8 +120,8 @@ void PluginManagerWindow::on_toolButtonLoad_clicked(){
 #endif
 
     QString pluginsDirPath = QCoreApplication::applicationDirPath() + QDir::separator()
-                                            + QString(PLUGINS_MAIN_DIR) + QDir::separator() + QString(
-                                            PLUGINS_MYPLUGINS_DIR);
+            + QString(PLUGINS_MAIN_DIR) + QDir::separator() + QString(
+                PLUGINS_MYPLUGINS_DIR);
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select one or more plugin files to load"), pluginsDirPath, filterString);
     if(files.isEmpty()){
         return;
@@ -161,13 +161,13 @@ void PluginManagerWindow::on_toolButtonUnload_clicked(){
     HEHUI::AbstractPluginInterface *plugin = PluginManager::instance()->getPluginsHash().values().at(index.row());
     if(!plugin){
         QMessageBox::critical(this, tr("Error"), tr("Invalid plug-in instance or plug-in has already been unloaded!"));
-        qCritical("XX Invalid plug-in instance or plug-in has already been unloaded!");
+        qCritical("ERROR! Invalid plug-in instance or plug-in has already been unloaded!");
         return;
     }
 
     if(!PluginManager::instance()->unloadPlugin(plugin)){
         QMessageBox::critical(this, tr("Error"), tr("Can not unload the plug-in '%1'!").arg(plugin->name()));
-        qCritical("XX Can not unload the plug-in '%s'!", qPrintable(plugin->name()));
+        qCritical("ERROR! Can not unload the plug-in '%s'!", qPrintable(plugin->name()));
         return;
     }
 
@@ -178,25 +178,30 @@ void PluginManagerWindow::on_toolButtonUnload_clicked(){
 }
 
 void PluginManagerWindow::slotUpdateUI(const QModelIndex &index){
-	qDebug("----PluginManagerWindow::slotShowPluginDetails(const QModelIndex &index)");
+    qDebug("----PluginManagerWindow::slotUpdateUI(const QModelIndex &index)");
 
-        ui.toolButtonUnload->setEnabled(index.isValid());
+    ui.toolButtonUnload->setEnabled(index.isValid());
 
-        if((!index.isValid()) || ui.groupBoxDetails->isHidden()){
-            ui.labelAuthor->clear();
-            ui.labelURL->clear();
-            ui.textBrowserDescription->clear();
-            ui.textBrowserLicense->clear();
-            return;
-	}
+    if((!index.isValid()) || ui.groupBoxDetails->isHidden()){
+        ui.labelAuthor->clear();
+        ui.labelURL->clear();
+        ui.textBrowserDescription->clear();
+        ui.textBrowserLicense->clear();
+        return;
+    }
 
-	HEHUI::AbstractPluginInterface *plugin = PluginManager::instance()->getPluginsHash().values().at(index.row());
-	ui.labelAuthor->setText(plugin->author());
-	ui.labelURL->setText(QString("<a href = \"%1\">%1</a>").arg(QUrl::fromUserInput(plugin->url()).toString()));
-	ui.textBrowserDescription->setHtml(plugin->description());
-	ui.textBrowserLicense->setHtml(plugin->license());
+    HEHUI::AbstractPluginInterface *plugin = PluginManager::instance()->getPluginsHash().values().at(index.row());
+    ui.labelAuthor->setText(plugin->author());
+    ui.labelURL->setText(QString("<a href = \"%1\">%1</a>").arg(QUrl::fromUserInput(plugin->url()).toString()));
+    ui.textBrowserDescription->setHtml(plugin->description());
+    ui.textBrowserLicense->setHtml(plugin->license());
 
 }
+
+
+
+
+
 
 
 

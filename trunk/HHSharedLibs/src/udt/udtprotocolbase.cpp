@@ -714,12 +714,12 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 }
 
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
-    qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
+//    qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
     //return;
 
     UDTSTATUS status = UDT::getsockstate(socket);
-    qDebug()<<"socket:"<<socket<<" status:"<<status;
+//    qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
