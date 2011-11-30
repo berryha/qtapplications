@@ -75,7 +75,7 @@ signals:
 
     
 public slots:
-    void slotControlCenterWidgetDestoryed(QObject * obj);
+    void sloSystemSummaryInfoWidgetDestoryed(QObject * obj);
     
 private slots:
     void retranslateUi();

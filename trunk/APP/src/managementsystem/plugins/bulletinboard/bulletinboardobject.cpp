@@ -13,23 +13,19 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     QObject(parent)
 {
     
-    
+    m_networkReady = false;
+
     resourcesManager = ResourcesManagerInstance::instance();
     bulletinBoardPacketsParser = 0;
     
-    m_networkReady = false;
-
-    m_udtProtocol = 0;
-    m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
-//    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
-
     remoteAssistance = 0;
     bulletinBoardWidget = 0;
     updatePasswordWidget = 0;
     
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
-
-
+    m_udtProtocol = 0;
+    m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
+//    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
 
     QTimer::singleShot(1000, this, SLOT(startNetwork()));
 
@@ -38,11 +34,6 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
 
 BulletinBoardObject::~BulletinBoardObject(){
 
-    if(bulletinBoardPacketsParser){
-        //bulletinBoardPacketsParser->sendUserOfflinePacket();
-
-    }
-    
     if(remoteAssistance){
         remoteAssistance->close();
         delete remoteAssistance;
@@ -64,7 +55,7 @@ BulletinBoardObject::~BulletinBoardObject(){
     
     delete bulletinBoardPacketsParser;
     bulletinBoardPacketsParser = 0;
-    
+
     //NetworkManager::freeInstance();
     resourcesManager->cleanInstance();
     resourcesManager = 0;
