@@ -68,9 +68,9 @@ public:
             UDT_CC = 0;
             UDT_FC = 25600;
 
-            UDT_SNDBUF = 10240000; //10M
+            UDT_SNDBUF = 10240000; //UDT Default:10M
             UDT_RCVBUF = 10240000;
-            UDP_SNDBUF = 1024000; //1M
+            UDP_SNDBUF = 1024000; //UDT Default:1M
             UDP_RCVBUF = 1024000;
 
             UDT_LINGER.l_linger = 180;
@@ -167,8 +167,6 @@ public slots:
     void closeUDTProtocol();
 
 private slots:
-
-
     void readDataFromSocket(UDTSOCKET socket);
     void writeDataToSocket(UDTSOCKET socket);
 
