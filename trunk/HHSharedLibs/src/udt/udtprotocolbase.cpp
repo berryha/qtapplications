@@ -161,8 +161,17 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 //    qDebug()<<"m_socketOptions.UDT_MAXBW:"<<m_socketOptions.UDT_MAXBW;
 
 //    bool sync = false;
-//    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &sync, sizeof(bool));
-//    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &sync, sizeof(bool));
+//    int size = 0;
+//    UDT::getsockopt(serverSocket, 0, UDT_SNDSYN, &sync, &size);
+//    qDebug()<<"---------UDT_SNDSYN:"<<sync;
+//    UDT::getsockopt(serverSocket, 0, UDT_RCVSYN, &sync, &size);
+//    qDebug()<<"---------UDT_RCVSYN:"<<sync;
+
+//    int time = 0;
+//    UDT::getsockopt(serverSocket, 0, UDT_RCVTIMEO, &time, &size);
+//    qDebug()<<"---------UDT_RCVTIMEO:"<<time;
+//    UDT::getsockopt(serverSocket, 0, UDT_SNDTIMEO, &time, &size);
+//    qDebug()<<"---------UDT_SNDTIMEO:"<<time;
 
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
@@ -193,7 +202,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     }
 
     epollID = UDT::epoll_create();
-    UDT::epoll_add_usock(epollID, serverSocket);
+    //UDT::epoll_add_usock(epollID, serverSocket);
 
 
     //    QtConcurrent::run(this, &UDTProtocolBase::waitForNewConnection, 0);
@@ -406,7 +415,7 @@ bool UDTProtocolBase::sendData(UDTSOCKET socket, const QByteArray *byteArray){
 }
 
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
-    qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
 
     m_errorMessage = "";
 
@@ -455,6 +464,7 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
         }
 
         ssize += ss;
+        qDebug()<<"---ssize:"<<ssize;
         //QCoreApplication::processEvents();
     }
 
@@ -465,13 +475,13 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
 //        return false;
 //    }
 
-
+    qDebug()<<"--UDT Stream Data Sent!"<<" Size:"<<ssize;
     return true;
 
 }
 
 bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl, bool inorder){
-    qDebug()<<"--UDTProtocolBase::sendUDTMessageData(...) " <<" socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::sendUDTMessageData(...) " <<" socket:"<<socket<<" szie:"<<byteArray->size();
 
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
@@ -500,6 +510,9 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
         return false;
     }
 
+    qDebug()<<"--UDT Message Data Sent!"<<" Size:"<<ss;
+
+
     return true;
 
 }
@@ -511,10 +524,12 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
     int count = 0;
 
     while(m_listening){
-        //acceptNewConnection();
+
+        acceptNewConnection();
+
         count = UDT::epoll_wait(epollID, &readfds, &writefds, msecWaitForIOTimeout);
         if(count > 0){
-            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
+            //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
             //printf("epoll returned %d sockets ready to IO | %d in read set, %d in write set\n", count, readfds.size(), writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
@@ -531,7 +546,7 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             }
             writefds.clear();
         }
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
 
     }
 
@@ -549,6 +564,8 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
     while(m_listening){
 
+        acceptNewConnection();
+
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
             qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set").arg(count).arg(readfds.size());
@@ -563,7 +580,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         }
 
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
     }
 
 }
@@ -580,7 +597,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, NULL, &writefds, msecTimeout);
         if(count > 0){
-            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in write set").arg(count).arg(writefds.size());
+            //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in write set").arg(count).arg(writefds.size());
             //printf("epoll returned %d sockets ready to IO | %d in write set\n", count, writefds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
@@ -591,7 +608,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
             writefds.clear();
         }
 
-        QCoreApplication::processEvents();
+        //QCoreApplication::processEvents();
     }
 
 }
@@ -689,15 +706,17 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
             }
 
             totalReceivedSize += receivedSize;
+            qDebug()<<"totalReceivedSize:"<<totalReceivedSize;
         }
-
+        qDebug()<<"--------------11";
         if (0 == totalReceivedSize){
+            qDebug()<<"No data received!";
             return;
         }
 
         byteArray.resize(totalReceivedSize);
         processStreamDataAfterReceived(socket, &byteArray);
-
+qDebug()<<"--------------12";
     }else{
         if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
         {
@@ -727,7 +746,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 
     UDTSTATUS status = UDT::getsockstate(socket);
 
-    qDebug()<<"socket:"<<socket<<" status:"<<status;
+    //qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
