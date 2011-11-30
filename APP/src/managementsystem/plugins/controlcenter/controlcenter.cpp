@@ -971,7 +971,7 @@ void ControlCenter::startNetwork(){
     }
     m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(1);
+    m_udtProtocol->startWaitingForIOInOneThread(500);
     //m_udtProtocol->startWaitingForIOInSeparateThread();
 
     controlCenterPacketsParser = new ControlCenterPacketsParser(m_udpServer, m_udtProtocol, this);
