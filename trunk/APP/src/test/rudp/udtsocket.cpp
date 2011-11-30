@@ -1,63 +1,49 @@
 
-#include <QtConcurrentRun>
+#include <QDebug>
 
 #include "udtsocket.h"
 
-
-
-
-
+#include "HHSharedNetwork/hpackethandlerbase.h"
 
 namespace HEHUI {
 
 
-UDTProtocol::UDTProtocol(bool stream, const SocketOptions *options, QObject *parent) :
+UDTProtocolTest::UDTProtocolTest(bool stream, const SocketOptions *options, QObject *parent) :
     UDTProtocolBase(stream, options, parent)
 {
 
 
-    m_packetHandlerBase = new PacketHandlerBase(this);
-    networkManager = new NetworkManagerBase(m_packetHandlerBase);
-    clientPacketsParser = new ClientPacketsParser(networkManager, this);
-
-    connect(clientPacketsParser, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)));
-
-
-    //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
+    //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
+    //qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
+    Packet::registerMetaTypeStreamOperators();
 
 }
 
-UDTProtocol::~UDTProtocol(){
+bool UDTProtocolTest::sendData(UDTSOCKET socket, const QByteArray *byteArray){
 
-    if(clientPacketsParser){
-        clientPacketsParser->aboutToQuit();
+    if(isStreamMode()){
+        return sendUDTStreamData(socket, byteArray);
+    }else{
+        return sendUDTMessageData(socket, byteArray);
     }
 
-    delete clientPacketsParser;
-    clientPacketsParser = 0;
+}
 
-    delete networkManager;
-    networkManager = 0;
+void UDTProtocolTest::streamDataReceived(UDTSOCKET socket, QByteArray *data){
+    qDebug()<<"--UDTProtocolTest::streamDataReceived(...) "<<"socket:"<<socket;
 
-    m_packetHandlerBase->clean();
-    delete m_packetHandlerBase;
-    m_packetHandlerBase = 0;
+    convertDataToPacket(socket, data);
 
 }
 
-//bool UDTProtocol::sendData(UDTSOCKET socket, const QByteArray *byteArray){
+void UDTProtocolTest::messageDataReceived(UDTSOCKET socket, QByteArray *data){
+    qDebug()<<"--UDTProtocolTest::messageDataReceived(...) "<<"socket:"<<socket;
 
-//    if(isStreamMode()){
-//        return sendUDTStreamData(socket, byteArray);
-//    }else{
-//        return sendUDTMessageData(socket, byteArray);
-//    }
+    convertDataToPacket(socket, data);
 
-//}
+}
 
-void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
-
-    qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
+inline void UDTProtocolTest::convertDataToPacket(UDTSOCKET socket, QByteArray *data){
 
     QString ip = "";
     quint16 port = 0;
@@ -65,126 +51,9 @@ void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
 
     emit dataReceived(ip, port, *data);
 
-    //        QDataStream in(&data, QIODevice::ReadOnly);
-    //        in.setVersion(QDataStream::Qt_4_7);
-    ////    QVariant v;
-    ////    in >> v;
-    ////    if (v.canConvert<Packet>()){
-    ////        Packet *packet = m_packetHandlerBase->getPacket();
-    ////        *packet = v.value<Packet>();
-    ////        packet->setTransmissionProtocol(TP_RUDP);
-    ////        packet->setPeerHostAddress(m_peerAddress);
-    ////        packet->setPeerHostPort(m_peerPort);
-    ////        packet->setLocalHostAddress(m_udpSocket->localAddress());
-    ////        packet->setLocalHostPort(m_udpSocket->localPort());
-
-    ////        m_packetHandlerBase->appendIncomingPacket(packet);
-    ////    }
-
 
 
 }
-
-void UDTProtocol::messageDataReceived(UDTSOCKET socket, QByteArray *data){
-    qDebug()<<"--UDTProtocol::messageDataReceived(...) "<<"socket:"<<socket;
-
-    QString ip = "";
-    quint16 port = 0;
-    getAddressInfoFromSocket(socket, &ip, &port);
-
-    emit dataReceived(ip, port, *data);
-
-}
-
-
-//void UDTSocket::dataReceived(const QString &address, quint16 port, char *data){
-
-//    QByteArray byteArray(data);
-
-//    if(isStreamMode()){
-
-//        QString key = address+":"+QString::number(port);
-//        CachedDataInfo *info = m_cachedDataInfo.value(key);
-//        int blockSize = info?info->blockSize:0;
-//        QByteArray *cachedData = 0;
-
-//        if(0 != blockSize){
-//            cachedData = info->data;
-//            Q_ASSERT(cachedData);
-
-//            byteArray.prepend(cachedData);
-//            cachedData->clear();
-
-//            if(-1 == blockSize){
-//                blockSize = 0;
-//            }
-//        }
-
-//        QDataStream in(&byteArray, QIODevice::ReadOnly);
-//        in.setVersion(QDataStream::Qt_4_7);
-//        QIODevice *dev = in.device();
-//        //dev->seek(offset);
-
-//        QByteArray temp;
-//        qint64 readSize = 0;
-//        forever{
-
-//            if(0 == blockSize){
-//                blockSize = sizeof(int);
-//                temp.clear();
-//                temp.resize(blockSize);
-//                readSize = dev->read(temp.data(), blockSize);
-//                if(readSize == blockSize){
-//                    blockSize = temp.toInt();
-//                    //continue;
-//                }else{
-//                    info->blockSize = -1;
-//                    info->data = temp;
-//                    break;
-//                }
-//            }
-
-
-//            temp.clear();
-//            temp.resize(blockSize);
-//            readSize = dev->read(temp.data(), blockSize);
-//            if(readSize == blockSize){
-//                emit dataReceived(address, port, temp);
-//                blockSize = 0;
-//                continue;
-//            }else{
-//                info->blockSize = blockSize;
-//                info->data = temp;
-//                break;
-//            }
-
-//        }
-
-//    }else{
-//        emit dataReceived(address, port, byteArray);
-//    }
-
-
-
-
-////    QVariant v;
-////    in >> v;
-////    if (v.canConvert<Packet>()){
-////        Packet *packet = m_packetHandlerBase->getPacket();
-////        *packet = v.value<Packet>();
-////        packet->setTransmissionProtocol(TP_RUDP);
-////        packet->setPeerHostAddress(m_peerAddress);
-////        packet->setPeerHostPort(m_peerPort);
-////        packet->setLocalHostAddress(m_udpSocket->localAddress());
-////        packet->setLocalHostPort(m_udpSocket->localPort());
-
-////        m_packetHandlerBase->appendIncomingPacket(packet);
-////    }
-
-
-
-
-//}
 
 
 

@@ -128,10 +128,10 @@ private:
     QSqlQueryModel *queryModel;
 
 
-    QWidget *m_progressWidget;
-    QLayout* hlayout;
-    QLabel *label;
-    QProgressBar *progressBar;
+    //QWidget *m_progressWidget;
+    //QLayout* hlayout;
+    //QLabel *label;
+    //QProgressBar *progressBar;
 
 
     ResourcesManagerInstance *resourcesManager;

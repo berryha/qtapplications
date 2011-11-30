@@ -207,6 +207,9 @@ void RUDPWidget::connectToPeer(){
             return;
         }
         qDebug()<<"peerSockeet:"<<peerSockeet;
+        udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
+        ui.textBrowser->append("Listening on port:"+QString::number(localPort));
+        ui.spinBoxLocalPort->setValue(localPort);
 
         //UDTSTATUS status = UDT::getsockstate(peerSockeet);
         //qDebug()<<"status:"<<status;
@@ -220,7 +223,7 @@ void RUDPWidget::connectToPeer(){
 bool RUDPWidget::startRUDPServer(quint16 port){
 
     if(!udtProtocol){
-        udtProtocol = new UDTProtocol();
+        udtProtocol = new UDTProtocolTest(true, 0, this);
         connect(udtProtocol, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
         connect(udtProtocol, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 
@@ -238,6 +241,7 @@ bool RUDPWidget::startRUDPServer(quint16 port){
 
     udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
     ui.textBrowser->append("Listening on port:"+QString::number(localPort));
+    ui.spinBoxLocalPort->setValue(localPort);
 
     return true;
     //return udtSocket->listen(port, QHostAddress("200.200.200.117"));
