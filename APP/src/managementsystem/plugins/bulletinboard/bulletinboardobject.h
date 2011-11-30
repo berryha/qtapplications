@@ -59,7 +59,6 @@ private:
     UpdatePasswordWidget *updatePasswordWidget;
     
     quint16 localUDTListeningPort;
-
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_socketConnectedToLocalServer;
 //    UDTSOCKET m_socketConnectedToAdmin;

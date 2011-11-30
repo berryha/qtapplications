@@ -49,7 +49,7 @@ ControlCenterPlugin::ControlCenterPlugin() {
 }
 
 ControlCenterPlugin::~ControlCenterPlugin() {
-    unload();
+    //unload();
 }
 
 
@@ -177,7 +177,7 @@ void ControlCenterPlugin::slotMainActionForMenuTriggered(){
 }
 
 void ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj){
-    qDebug("----ControlCenterPlugin::slotSysteminfoWidgetDestoryed(QObject * obj)");
+    qDebug("----ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj)");
 
     ControlCenter *controlCenter = static_cast<ControlCenter *> (sender());
     if(controlCenter){

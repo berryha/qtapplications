@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 }
 
 MainWindow::~MainWindow() {
+    qDebug()<<"--MainWindow::~MainWindow()";
 
     if(Settings::instance()->getRestoreWindowStateOnStartup()){
         Settings::instance()->saveState(this);

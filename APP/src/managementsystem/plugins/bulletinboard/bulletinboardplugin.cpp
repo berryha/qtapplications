@@ -56,7 +56,7 @@ BulletinBoardPlugin::BulletinBoardPlugin() {
 
 BulletinBoardPlugin::~BulletinBoardPlugin() {
     
-    unload();
+    //unload();
     
     
 //    delete bulletinBoardPacketsParser;
@@ -184,13 +184,13 @@ void BulletinBoardPlugin::slotMainActionForMenuTriggered(){
         QWidget *parentWidget = qobject_cast<QWidget *> (parent());
 
 
-        SystemSummaryInfo *controlCenter = new SystemSummaryInfo(parentWidget);
-        connect(controlCenter, SIGNAL(destroyed(QObject *)), SLOT(slotControlCenterWidgetDestoryed(QObject *)));
+        SystemSummaryInfo *systemSummaryInfo = new SystemSummaryInfo(parentWidget);
+        connect(systemSummaryInfo, SIGNAL(destroyed(QObject *)), SLOT(sloSystemSummaryInfoWidgetDestoryed(QObject *)));
 
 	if(parentWidget){
 		if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
                     QMdiSubWindow *subWindow = new QMdiSubWindow;
-                         subWindow->setWidget(controlCenter);
+                         subWindow->setWidget(systemSummaryInfo);
                          subWindow->setAttribute(Qt::WA_DeleteOnClose);
                          mdiArea->addSubWindow(subWindow);
                          connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
@@ -199,12 +199,12 @@ void BulletinBoardPlugin::slotMainActionForMenuTriggered(){
 		}
 	}
 
-        controlCenter->show();
-        systemSummaryInfoWidgetList.append(controlCenter);
+        systemSummaryInfo->show();
+        systemSummaryInfoWidgetList.append(systemSummaryInfo);
 }
 
-void BulletinBoardPlugin::slotControlCenterWidgetDestoryed(QObject * obj){
-    qDebug("----ControlCenterPlugin::slotSysteminfoWidgetDestoryed(QObject * obj)");
+void BulletinBoardPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj){
+    qDebug("----ControlCenterPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj)");
 
     SystemSummaryInfo *controlCenter = static_cast<SystemSummaryInfo *> (sender());
     if(controlCenter){
