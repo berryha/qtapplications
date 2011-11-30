@@ -44,13 +44,18 @@ class PluginInfoModel : public QAbstractTableModel{
     Q_OBJECT
 
 public:
-     PluginInfoModel(QObject *parent = 0);
-     PluginInfoModel(QHash<QString, AbstractPluginInterface *> pluginsHash, QObject *parent = 0);
-//     PluginInfoModel(QList<HEHUI::AbstractPluginInterface *> plugins, QObject *parent = 0);
+    PluginInfoModel(QObject *parent = 0);
+    PluginInfoModel(QHash<QString, AbstractPluginInterface *> pluginsHash, QObject *parent = 0);
+    //     PluginInfoModel(QList<HEHUI::AbstractPluginInterface *> plugins, QObject *parent = 0);
 
-     virtual ~PluginInfoModel();
+    virtual ~PluginInfoModel();
 
-     void setPluginsHash(const QHash<QString, AbstractPluginInterface *> &pluginsHash);
+    void setPluginsHash(const QHash<QString, AbstractPluginInterface *> &pluginsHash);
+    void clear();
+    void removePluginInfo(const QString &path);
+    void removePluginInfo(AbstractPluginInterface *plugin);
+    void addPluginInfo(const QString &path, AbstractPluginInterface *plugin);
+
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount( const QModelIndex & parent = QModelIndex() ) const;
@@ -60,7 +65,7 @@ public:
 
 private:
     QHash<QString, AbstractPluginInterface *> pluginsHash;
-//    QList<HEHUI::AbstractPluginInterface *> plugins;
+    //    QList<HEHUI::AbstractPluginInterface *> plugins;
 
 };
 
