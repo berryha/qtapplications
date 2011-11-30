@@ -88,6 +88,8 @@ void BulletinBoardObject::startNetwork(){
         localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
         connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
         m_udtProtocol->startWaitingForIOInOneThread(1000);
+        //m_udtProtocol->startWaitingForIOInSeparateThread(1, 500);
+
     }
 
     if(!bulletinBoardPacketsParser){
