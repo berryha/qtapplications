@@ -79,12 +79,12 @@ UDTProtocolBase::~UDTProtocolBase() {
 
 //}
 
-void UDTProtocolBase::setSocketOptions(const SocketOptions *options){
+void UDTProtocolBase::setDefaultSocketOptions(const SocketOptions *options){
 
     this->m_socketOptions = *options;
 }
 
-UDTProtocolBase::SocketOptions UDTProtocolBase::getSocketOptions() const{
+UDTProtocolBase::SocketOptions UDTProtocolBase::getDefaultSocketOptions() const{
 
     return m_socketOptions;
 
@@ -124,54 +124,39 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
     // UDT Options
     //TODO: setup UDT_MSS
-    //UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &(m_socketOptions.UDT_SNDSYN), sizeof(bool));
-    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &(m_socketOptions.UDT_RCVSYN), sizeof(bool));
-    if(m_socketOptions.UDT_CC){
-        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
-        //UDT::setsockopt(serv, 0, UDT_CC, &(m_socketOptions.UDT_CC), sizeof(CCC));
-    }
-    UDT::setsockopt(serverSocket, 0, UDT_FC, &(m_socketOptions.UDT_FC), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_SNDBUF, &(m_socketOptions.UDT_SNDBUF), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_RCVBUF, &(m_socketOptions.UDT_RCVBUF), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDP_SNDBUF, &(m_socketOptions.UDP_SNDBUF), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDP_RCVBUF, &(m_socketOptions.UDP_RCVBUF), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_LINGER, &(m_socketOptions.UDT_LINGER), sizeof(linger));
-    UDT::setsockopt(serverSocket, 0, UDT_RENDEZVOUS, &(m_socketOptions.UDT_RENDEZVOUS), sizeof(bool));
-    UDT::setsockopt(serverSocket, 0, UDT_SNDTIMEO, &(m_socketOptions.UDT_SNDTIMEO), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_RCVTIMEO, &(m_socketOptions.UDT_RCVTIMEO), sizeof(int));
-    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
-    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
+//    UDT::setsockopt(serverSocket, 0, UDT_MSS, &(m_socketOptions.UDT_MSS), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_SNDSYN, &(m_socketOptions.UDT_SNDSYN), sizeof(bool));
+//    UDT::setsockopt(serverSocket, 0, UDT_RCVSYN, &(m_socketOptions.UDT_RCVSYN), sizeof(bool));
+//    if(m_socketOptions.UDT_CC){
+//        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
+//        //UDT::setsockopt(serv, 0, UDT_CC, &(m_socketOptions.UDT_CC), sizeof(CCC));
+//    }
+//    UDT::setsockopt(serverSocket, 0, UDT_FC, &(m_socketOptions.UDT_FC), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_SNDBUF, &(m_socketOptions.UDT_SNDBUF), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_RCVBUF, &(m_socketOptions.UDT_RCVBUF), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDP_SNDBUF, &(m_socketOptions.UDP_SNDBUF), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDP_RCVBUF, &(m_socketOptions.UDP_RCVBUF), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_LINGER, &(m_socketOptions.UDT_LINGER), sizeof(linger));
+//    UDT::setsockopt(serverSocket, 0, UDT_RENDEZVOUS, &(m_socketOptions.UDT_RENDEZVOUS), sizeof(bool));
+//    UDT::setsockopt(serverSocket, 0, UDT_SNDTIMEO, &(m_socketOptions.UDT_SNDTIMEO), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_RCVTIMEO, &(m_socketOptions.UDT_RCVTIMEO), sizeof(int));
+//    UDT::setsockopt(serverSocket, 0, UDT_REUSEADDR, &(m_socketOptions.UDT_REUSEADDR), sizeof(bool));
+//    UDT::setsockopt(serverSocket, 0, UDT_MAXBW, &(m_socketOptions.UDT_MAXBW), sizeof(int64_t));
 
+    // Setup UDT Options
+    setSocketOptions(serverSocket, &m_socketOptions);
 
-//    qDebug()<<"m_socketOptions.UDT_MSS:"<<m_socketOptions.UDT_MSS;
-//    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
-//    qDebug()<<"m_socketOptions.UDT_SNDSYN:"<<m_socketOptions.UDT_SNDSYN;
-//    qDebug()<<"m_socketOptions.UDT_RCVSYN:"<<m_socketOptions.UDT_RCVSYN;
-//    qDebug()<<"m_socketOptions.UDT_FC:"<<m_socketOptions.UDT_FC;
-//    qDebug()<<"m_socketOptions.UDT_SNDBUF:"<<m_socketOptions.UDT_SNDBUF;
-//    qDebug()<<"m_socketOptions.UDT_RCVBUF:"<<m_socketOptions.UDT_RCVBUF;
-//    qDebug()<<"m_socketOptions.UDP_SNDBUF:"<<m_socketOptions.UDP_SNDBUF;
-//    qDebug()<<"m_socketOptions.UDP_RCVBUF:"<<m_socketOptions.UDP_RCVBUF;
-//    qDebug()<<"m_socketOptions.UDT_LINGER:"<<m_socketOptions.UDT_LINGER.l_linger;
-//    qDebug()<<"m_socketOptions.UDT_RENDEZVOUS:"<<m_socketOptions.UDT_RENDEZVOUS;
-//    qDebug()<<"m_socketOptions.UDT_SNDTIMEO:"<<m_socketOptions.UDT_SNDTIMEO;
-//    qDebug()<<"m_socketOptions.UDT_RCVTIMEO:"<<m_socketOptions.UDT_RCVTIMEO;
-//    qDebug()<<"m_socketOptions.UDT_REUSEADDR:"<<m_socketOptions.UDT_REUSEADDR;
-//    qDebug()<<"m_socketOptions.UDT_MAXBW:"<<m_socketOptions.UDT_MAXBW;
-
-//    bool sync = false;
+//    bool sync = true;
 //    int size = 0;
 //    UDT::getsockopt(serverSocket, 0, UDT_SNDSYN, &sync, &size);
 //    qDebug()<<"---------UDT_SNDSYN:"<<sync;
 //    UDT::getsockopt(serverSocket, 0, UDT_RCVSYN, &sync, &size);
 //    qDebug()<<"---------UDT_RCVSYN:"<<sync;
-
 //    int time = 0;
 //    UDT::getsockopt(serverSocket, 0, UDT_RCVTIMEO, &time, &size);
-//    qDebug()<<"---------UDT_RCVTIMEO:"<<time;
-//    UDT::getsockopt(serverSocket, 0, UDT_SNDTIMEO, &time, &size);
-//    qDebug()<<"---------UDT_SNDTIMEO:"<<time;
+//        qDebug()<<"---------UDT_RCVTIMEO:"<<time;
+//        UDT::getsockopt(serverSocket, 0, UDT_SNDTIMEO, &time, &size);
+//        qDebug()<<"---------UDT_SNDTIMEO:"<<time;
 
 
     if (UDT::ERROR == UDT::bind(serverSocket, localAddressInfo->ai_addr, localAddressInfo->ai_addrlen))
@@ -275,8 +260,8 @@ void UDTProtocolBase::closeUDTProtocol(){
 
 }
 
-UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, bool sync){
-    qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port<<" sync:"<<sync;
+UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting){
+    qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port;
 
     m_errorMessage = "";
 
@@ -335,22 +320,8 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
     UDTSOCKET client = UDT::socket(local->ai_family, local->ai_socktype, local->ai_protocol);
 
-
-    //non-blocking sending
-    //UDT::setsockopt(client, 0, UDT_SNDSYN, new bool(false), sizeof(bool));
-    //UDT::setsockopt(client, 0, UDT_SNDBUF, new int(10240000), sizeof(int));
-    //UDT::setsockopt(client, 0, UDT_SNDBUF, new int(1024000000), sizeof(int));
-//    if(!sync){
-//        //non-blocking sending
-//        UDT::setsockopt(client, 0, UDT_SNDSYN, &sync, sizeof(bool));
-//        //non-blocking receiving
-//        UDT::setsockopt(client, 0, UDT_RCVSYN, &sync, sizeof(bool));
-//    }
-
-    // for rendezvous connection, enable the code below
-    //UDT::setsockopt(client, 0, UDT_RENDEZVOUS, new bool(true), sizeof(bool));
-    //UDT::setsockopt(client, 0, UDT_REUSEADDR, new bool(true), sizeof(bool));
-
+    // Setup UDT Options
+    setSocketOptions(client, options);
 
     if (UDT::ERROR == UDT::bind(client, local->ai_addr, local->ai_addrlen))
     {
@@ -383,6 +354,11 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
     }
     freeaddrinfo(peer);
 
+    if(waitWhileConnecting){
+        while (UDT::getsockstate(client) == CONNECTING) {
+            QCoreApplication::processEvents();
+        }
+    }
 
     //UDT::close(client);
     // use this function to release the UDT library
@@ -464,7 +440,7 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
         }
 
         ssize += ss;
-        qDebug()<<"---ssize:"<<ssize;
+
         //QCoreApplication::processEvents();
     }
 
@@ -546,8 +522,8 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             }
             writefds.clear();
         }
-        //QCoreApplication::processEvents();
 
+        //QCoreApplication::processEvents();
     }
 
 
@@ -614,7 +590,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 }
 
 UDTSOCKET UDTProtocolBase::acceptNewConnection(){
-    qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
+    //qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
 
     sockaddr_storage clientaddr;
     int addrlen = sizeof(clientaddr);
@@ -708,7 +684,6 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
             totalReceivedSize += receivedSize;
             qDebug()<<"totalReceivedSize:"<<totalReceivedSize;
         }
-        qDebug()<<"--------------11";
         if (0 == totalReceivedSize){
             qDebug()<<"No data received!";
             return;
@@ -716,7 +691,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 
         byteArray.resize(totalReceivedSize);
         processStreamDataAfterReceived(socket, &byteArray);
-qDebug()<<"--------------12";
+
     }else{
         if (UDT::ERROR == (receivedSize = UDT::recvmsg(socket, data, size)))
         {
@@ -726,7 +701,6 @@ qDebug()<<"--------------12";
         }
 
         byteArray.resize(receivedSize);
-
         messageDataReceived(socket, &byteArray);
 
     }
@@ -740,13 +714,12 @@ qDebug()<<"--------------12";
 }
 
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
-    //qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
     //return;
 
     UDTSTATUS status = UDT::getsockstate(socket);
-
-    //qDebug()<<"socket:"<<socket<<" status:"<<status;
+    qDebug()<<"socket:"<<socket<<" status:"<<status;
 
     switch(status){
     case INIT: //1
@@ -875,6 +848,41 @@ QByteArray * UDTProtocolBase::getCachedData(){
 
 }
 
+void UDTProtocolBase::setSocketOptions(UDTSOCKET socket, SocketOptions *options){
+    if(socket == INVALID_UDT_SOCK){
+        return;
+    }
+
+    // UDT Options
+    struct SocketOptions *opts = options;
+    if(!opts){
+        opts = &m_socketOptions;
+    }
+    //TODO: setup UDT_MSS
+    //UDT::setsockopt(socket, 0, UDT_MSS, &(opts->UDT_MSS), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_SNDSYN, &(opts->UDT_SNDSYN), sizeof(bool));
+    UDT::setsockopt(socket, 0, UDT_RCVSYN, &(opts->UDT_RCVSYN), sizeof(bool));
+    if(opts->UDT_CC){
+        //UDT::setsockopt(serv, 0, UDT_CC, new CCCFactory<CUDPBlast>, sizeof(CCCFactory<CUDPBlast>));
+        //UDT::setsockopt(serv, 0, UDT_CC, &(opts->UDT_CC), sizeof(CCC));
+    }
+    UDT::setsockopt(socket, 0, UDT_FC, &(opts->UDT_FC), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_SNDBUF, &(opts->UDT_SNDBUF), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_RCVBUF, &(opts->UDT_RCVBUF), sizeof(int));
+    UDT::setsockopt(socket, 0, UDP_SNDBUF, &(opts->UDP_SNDBUF), sizeof(int));
+    UDT::setsockopt(socket, 0, UDP_RCVBUF, &(opts->UDP_RCVBUF), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_LINGER, &(opts->UDT_LINGER), sizeof(linger));
+    UDT::setsockopt(socket, 0, UDT_RENDEZVOUS, &(opts->UDT_RENDEZVOUS), sizeof(bool));
+    UDT::setsockopt(socket, 0, UDT_SNDTIMEO, &(opts->UDT_SNDTIMEO), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_RCVTIMEO, &(opts->UDT_RCVTIMEO), sizeof(int));
+    UDT::setsockopt(socket, 0, UDT_REUSEADDR, &(opts->UDT_REUSEADDR), sizeof(bool));
+    UDT::setsockopt(socket, 0, UDT_MAXBW, &(opts->UDT_MAXBW), sizeof(int64_t));
+
+
+
+
+}
+
 bool UDTProtocolBase::getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo){
 
     m_errorMessage = "";
@@ -917,6 +925,10 @@ UDTSocketStatus UDTProtocolBase::getUDTSocketStatus(UDTSOCKET socket){
 
 bool UDTProtocolBase::isSocketListening(UDTSOCKET socket){
     return UDT::getsockstate(socket) == LISTENING;
+}
+
+bool UDTProtocolBase::isConnecting(UDTSOCKET socket){
+    return UDT::getsockstate(socket) == CONNECTING;
 }
 
 bool UDTProtocolBase::isSocketConnected(UDTSOCKET socket){
