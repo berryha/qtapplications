@@ -34,6 +34,11 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
 
 BulletinBoardObject::~BulletinBoardObject(){
 
+
+    if(m_udtProtocol){
+        m_udtProtocol->closeSocket(m_socketConnectedToLocalServer);
+    }
+
     if(remoteAssistance){
         remoteAssistance->close();
         delete remoteAssistance;
