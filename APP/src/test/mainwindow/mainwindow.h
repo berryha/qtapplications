@@ -47,64 +47,65 @@
 
 namespace HEHUI {
 
+
 class MainWindow: public MainWindowBase  {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-        MainWindow(QWidget *parent = 0, HEHUI::WindowPosition positon = HEHUI::Center)	;
-        ~MainWindow();
+    MainWindow(QWidget *parent = 0, HEHUI::WindowPosition positon = HEHUI::Center)	;
+    ~MainWindow();
 
-	QSystemTrayIcon *SystemTrayIcon();
+    QSystemTrayIcon *SystemTrayIcon();
 
-	void retranslateUi();
+    void retranslateUi();
 
 
 private:
-	//void createActions();
+    //void createActions();
 
-	void setupSystemTray();
+    void setupSystemTray();
 
-	void initUI();
+    void initUI();
 
-	bool hasActiveMDIChild();
+    bool hasActiveMDIChild();
 
 
 public slots:
-	void slotIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void slotIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-	void slotSystemConfig();
-	void slotBugReport();
-	void slotHelp();
-	void slotAbout();
+    void slotSystemConfig();
+    void slotBugReport();
+    void slotHelp();
+    void slotAbout();
 
-	void slotQuit();
+    void slotQuit();
 
-        void savePreferedStyle(const QString &preferedStyle, bool useStylePalette);
-        void savePreferedLanguage(const QString &preferedLanguage);
+    void savePreferedStyle(const QString &preferedStyle, bool useStylePalette);
+    void savePreferedLanguage(const QString &preferedLanguage);
 
 
 private slots:
-        void slotInitPlugin(AbstractPluginInterface *plugin);
-        void slotUpdateWindowActions();
+    void slotInitPlugin(AbstractPluginInterface *plugin);
+    void slotUpdateWindowActions();
 
 
 
 protected:
-	void closeEvent ( QCloseEvent * event );
-        void changeEvent ( QEvent * event ) ;
+    void closeEvent ( QCloseEvent * event );
+    void changeEvent ( QEvent * event ) ;
 
 private:
-	Ui::MainWindowUIClass ui;
+    Ui::MainWindowUIClass ui;
 
 
-	QPalette originalPalette;
-	QString preferedStyle;
-	QString preferedLanguage;
+    QPalette originalPalette;
+    QString preferedStyle;
+    QString preferedLanguage;
 
-	QSystemTrayIcon *systemTray;
-	QMenu *trayMenu;
+    QSystemTrayIcon *systemTray;
+    QMenu *trayMenu;
 
-        QMenu *pluginsMenu;
+    QMenu *pluginsMenu;
 
 
     RUDPWidget *rudpWidger;
