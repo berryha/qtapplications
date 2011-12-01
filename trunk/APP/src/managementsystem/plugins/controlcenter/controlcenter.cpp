@@ -290,6 +290,7 @@ void ControlCenter::closeEvent(QCloseEvent *e) {
     clientInfoModel->setClientList(QList<ClientInfo*>());
     clientInfoHash.clear();
     
+    clientSocketsHash.clear();
 
 
     e->accept();
