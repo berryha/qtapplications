@@ -163,9 +163,8 @@ bool ClientService::startMainService(){
     }
 
     QString errorMessage = "";
-//    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
-    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
-
+    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
+//    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
     if(!m_udpServer){
         logMessage(QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
         m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
@@ -244,9 +243,12 @@ bool ClientService::startMainService(){
     }
 
     checkUsersAccount();
+    qWarning()<<"Check User Account!";
 
     checkUSBSD();
+    qWarning()<<"Check USB SD!";
     checkProgrames();
+    qWarning()<<"Check Programes!";
 
 //    setupStartupWithSafeMode(true);
 
@@ -262,6 +264,7 @@ bool ClientService::startMainService(){
         
         update();
         settings.setValue(section, QDateTime::currentDateTime());
+        qWarning()<<"Update!";
     }
     //update();
 
@@ -281,6 +284,7 @@ bool ClientService::startMainService(){
         settings.setValue(section, QDateTime::currentDateTime());
     }
 
+    qWarning()<<"Clean Temporary Files!";
 
     wm->freeMemory();
 #endif
@@ -1877,9 +1881,9 @@ void ClientService::update(){
     QString parameters = "-quiet";
     bool result = wm->runAs("administrator", administratorPassword, msUpdateExeFilename, parameters);
     if(!result){
+        qWarning()<<wm->lastError();
         //logMessage(wm->lastError(), QtServiceBase::Error);
         clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
-        qWarning()<<wm->lastError();
     }else{
         //        stop();
         //        qApp->quit();
