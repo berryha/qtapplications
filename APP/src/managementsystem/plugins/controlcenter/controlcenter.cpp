@@ -161,16 +161,7 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 ControlCenter::~ControlCenter()
 {
 
-    disconnect();
-
-    clientSocketsHash.clear();
-
-
-    if(controlCenterPacketsParser){
-        controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
-        m_udtProtocol->closeSocket(m_socketConnectedToServer);
-    }
-
+    qDebug()<<"--ControlCenter::~ControlCenter()";
 
     if(vncProcess){
         vncProcess->terminate();
@@ -272,9 +263,7 @@ void ControlCenter::languageChange() {
 
 void ControlCenter::closeEvent(QCloseEvent *e) {
 
-    if(controlCenterPacketsParser){
 
-    }
 
     //关闭所有相关的TabPage
     //Close all related TabPage
@@ -292,12 +281,19 @@ void ControlCenter::closeEvent(QCloseEvent *e) {
         //systemManagementWidget->deleteLater();
     }
 
+
+    if(controlCenterPacketsParser){
+        controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+    }
     
     clientInfoModel->setClientList(QList<ClientInfo*>());
     clientInfoHash.clear();
     
+
+
     e->accept();
-    deleteLater();
+    //deleteLater();
 
 }
 
