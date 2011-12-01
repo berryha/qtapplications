@@ -133,6 +133,7 @@ bool ControlCenterPlugin::unload(){
         if(!controlCenter){break;}
         if(controlCenter->close()){
             controlCenterWidgetList.removeAll(controlCenter);
+            controlCenter->close();
             delete controlCenter;
             controlCenter = 0;
         }
