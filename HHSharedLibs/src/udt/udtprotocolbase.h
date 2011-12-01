@@ -153,7 +153,8 @@ public slots:
 
 
     //Connect to peer
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, int msecTimeout = 5000);
+
     //Close peer socket
     void closeSocket(UDTSOCKET socket);
 
@@ -209,8 +210,10 @@ private:
 
     QString m_errorMessage;
 
-};
+    int m_threadCount;
 
+
+};
 
 }
 

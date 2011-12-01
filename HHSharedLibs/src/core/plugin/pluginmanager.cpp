@@ -238,7 +238,7 @@ bool PluginManager::unloadPlugin(AbstractPluginInterface *plugin) {
             pluginLoader = 0;
         }
 
-        emit signalPluginUnloaded(pluginsHash.key(plugin));
+        //emit signalPluginUnloaded(pluginsHash.key(plugin));
         return true;
     } else {
         return false;
@@ -264,7 +264,7 @@ bool PluginManager::unloadPlugin(const QString &pluginFilePath) {
                 pluginLoader = 0;
             }
 
-            emit signalPluginUnloaded(pluginFilePath);
+            //emit signalPluginUnloaded(pluginFilePath);
             return true;
         } else {
             return false;
