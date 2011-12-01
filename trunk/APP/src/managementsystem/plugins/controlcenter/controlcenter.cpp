@@ -161,11 +161,10 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 ControlCenter::~ControlCenter()
 {
 
-    //        if(progressDlg){
-    //            delete progressDlg;
-    //            progressDlg = 0;
-    //        }
-    
+    disconnect();
+
+    clientSocketsHash.clear();
+
 
     if(controlCenterPacketsParser){
         controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
@@ -198,6 +197,7 @@ ControlCenter::~ControlCenter()
     //delete networkManager;
     resourcesManager->cleanInstance();
     resourcesManager = 0;
+
 
     PacketHandlerBase::clean();
 
@@ -1086,6 +1086,7 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
 }
 
 void ControlCenter::processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
+    qDebug()<<"--ControlCenter::processClientOnlineStatusChangedPacket(...)";
 
     QString ip = "";
     quint16 port = 0;
@@ -1150,6 +1151,7 @@ void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 }
 
 void ControlCenter::peerDisconnected(int socketID){
+    qDebug()<<"--ControlCenter::peerDisconnected(...)";
 
     if(clientSocketsHash.contains(socketID)){
         qCritical()<<QString("ERROR! Peer %1 Closed Unexpectedly!").arg(clientSocketsHash.value(socketID).toString());

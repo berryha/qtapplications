@@ -86,6 +86,8 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
 ClientService::~ClientService(){
     //    logMessage("~ClientService()-1:"+QDateTime::currentDateTime().toString("ss.zzz"), QtServiceBase::Information);
 
+    disconnect();
+
     if(process){
         process->stopProcess();
         delete process;

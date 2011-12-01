@@ -13,7 +13,7 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     QObject(parent)
 {
     
-    m_networkReady = false;
+    //m_networkReady = false;
 
     resourcesManager = ResourcesManagerInstance::instance();
     bulletinBoardPacketsParser = 0;
@@ -27,13 +27,28 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
 //    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
 
-    QTimer::singleShot(1000, this, SLOT(startNetwork()));
+
+    m_connectToLocalServerTimer = new QTimer(this);
+    connect(m_connectToLocalServerTimer, SIGNAL(timeout()), this, SLOT(connectToLocalServer()));
+    m_connectToLocalServerTimer->start(60000);
+
+    QTimer::singleShot(5000, this, SLOT(startNetwork()));
+    //startNetwork();
+
+
 
     
 }
 
 BulletinBoardObject::~BulletinBoardObject(){
 
+    disconnect();
+
+    if(m_connectToLocalServerTimer){
+        m_connectToLocalServerTimer->stop();
+        delete m_connectToLocalServerTimer;
+        m_connectToLocalServerTimer = 0;
+    }
 
     if(m_udtProtocol){
         m_udtProtocol->closeSocket(m_socketConnectedToLocalServer);
@@ -61,6 +76,8 @@ BulletinBoardObject::~BulletinBoardObject(){
     delete bulletinBoardPacketsParser;
     bulletinBoardPacketsParser = 0;
 
+    //m_udtProtocol->closeUDTProtocol();
+
     //NetworkManager::freeInstance();
     resourcesManager->cleanInstance();
     resourcesManager = 0;
@@ -72,6 +89,7 @@ BulletinBoardObject::~BulletinBoardObject(){
 
 
 void BulletinBoardObject::startNetwork(){
+    qDebug()<<"--BulletinBoardObject::startNetwork()";
 
     if(!m_udtProtocol){
         QString errorMessage = "";
@@ -97,10 +115,15 @@ void BulletinBoardObject::startNetwork(){
 
     }
 
+//    if(!m_connectToLocalServerTimer){
+//        m_connectToLocalServerTimer = new QTimer(this);
+//        connect(m_connectToLocalServerTimer, SIGNAL(timeout()), this, SLOT(connectToLocalServer()));
+//    }
+//    m_connectToLocalServerTimer->start(1000);
+
     connectToLocalServer();
 
-
-    m_networkReady = true;
+    //m_networkReady = true;
 
 }
 
@@ -156,25 +179,19 @@ void BulletinBoardObject::newPasswordRetreved(){
     bulletinBoardPacketsParser->sendNewPasswordRetrevedByUserPacket(m_socketConnectedToLocalServer);
 }
 
-void BulletinBoardObject::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
-
-}
-
-void BulletinBoardObject::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
-    qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
-
-}
-
-void BulletinBoardObject::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
-    qDebug()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
-
-    if(!normalClose){
-        qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
-    }
+//void BulletinBoardObject::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+//    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+//}
 
 
-}
+//void BulletinBoardObject::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
+//    qDebug()<<QString("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+//    if(!normalClose){
+//        qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
+//    }
+
+//}
 
 void BulletinBoardObject::peerDisconnected(int socketID){
     qDebug()<<"--BulletinBoardObject::peerDisconnected(...) "<<"socketID:"<<socketID;
@@ -182,24 +199,35 @@ void BulletinBoardObject::peerDisconnected(int socketID){
     m_udtProtocol->closeSocket(socketID);
     m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
 
-    QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
+    //QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
 
+    if(m_connectToLocalServerTimer){
+        m_connectToLocalServerTimer->start();
+    }
 
 }
 
 void BulletinBoardObject::connectToLocalServer(){
+    qDebug()<<"--BulletinBoardObject::connectToLocalServer()";
+
 
     if(m_socketConnectedToLocalServer == UDTProtocol::INVALID_UDT_SOCK){
         m_socketConnectedToLocalServer = m_udtProtocol->connectToHost(QHostAddress::LocalHost, UDT_LISTENING_PORT);
     }
+
     if(!m_udtProtocol->isSocketConnected(m_socketConnectedToLocalServer)){
-        QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
+        //QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
+        m_udtProtocol->closeSocket(m_socketConnectedToLocalServer);
+        m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
+        m_connectToLocalServerTimer->start();
     }else{
         qDebug()<<"m_socketConnectedToLocalServer:"<<m_socketConnectedToLocalServer;
 
         bool ok = bulletinBoardPacketsParser->sendLocalUserOnlinePacket(m_socketConnectedToLocalServer);
         if(!ok){
             qCritical()<<m_udtProtocol->getLastErrorMessage();
+        }else{
+            m_connectToLocalServerTimer->stop();
         }
 
     }

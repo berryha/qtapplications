@@ -72,8 +72,6 @@ BulletinBoardPacketsParser::~BulletinBoardPacketsParser() {
     // TODO Auto-generated destructor stub
     qDebug()<<"~BulletinBoardPacketsParser()";
 
-    QMutexLocker locker(&mutex);
-
 
 
     //    if(processWaitingForReplyPacketsTimer){
@@ -82,6 +80,7 @@ BulletinBoardPacketsParser::~BulletinBoardPacketsParser() {
     //    delete processWaitingForReplyPacketsTimer;
     //    processWaitingForReplyPacketsTimer = 0;
 
+    disconnect();
 
 
 }

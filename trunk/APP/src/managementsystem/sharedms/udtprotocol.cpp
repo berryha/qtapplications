@@ -60,8 +60,8 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
         packet->setSocketID(socket);
 
 
-//        packet->setPeerHostAddress(m_peerAddress);
-//        packet->setPeerHostPort(m_peerPort);
+        packet->setPeerHostAddress(QHostAddress(ip));
+        packet->setPeerHostPort(port);
 //        packet->setLocalHostAddress(m_udpSocket->localAddress());
 //        packet->setLocalHostPort(m_udpSocket->localPort());
 
