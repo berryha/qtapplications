@@ -535,12 +535,10 @@ private:
 
     quint16 localRUDPListeningPort;
 
-    QTimer *heartbeatTimer;
 
     PacketHandlerBase *m_packetHandlerBase;
     //NetworkManagerInstance *networkManager;
 
-    QMutex mutex;
 
     QString m_localComputerName;
     QString m_localID;

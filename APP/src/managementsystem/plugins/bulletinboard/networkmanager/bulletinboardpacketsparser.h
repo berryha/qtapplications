@@ -149,10 +149,6 @@ public slots:
 
 
 
-
-
-
-
 signals:
     void  signalHeartbeatPacketReceived(const QString &computerName);
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
@@ -164,25 +160,13 @@ signals:
     void signalAnnouncementPacketReceived(const QString &adminName, quint32 announcementID, const QString &announcement);
 
 
-
-
-
-
-public slots:
-
-
-private:
-    quint16 getLastReceivedPacketSN(const QString &peerID);
-
 private:
 
-    quint16 localRUDPListeningPort;
 
 
     PacketHandlerBase *m_packetHandlerBase;
     //NetworkManagerInstance *networkManager;
 
-    QMutex mutex;
 
     QString m_userName;
     QString m_localComputerName;

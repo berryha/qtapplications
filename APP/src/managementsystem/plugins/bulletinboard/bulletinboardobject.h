@@ -40,16 +40,15 @@ private slots:
     
     void newPasswordRetreved();
     
-    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
-    void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
-    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+//    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+//    void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
 
     void peerDisconnected(int socketID);
     void connectToLocalServer();
     
 private:
 
-    bool m_networkReady;
+    //bool m_networkReady;
 
     ResourcesManagerInstance *resourcesManager;
     BulletinBoardPacketsParser *bulletinBoardPacketsParser;
@@ -62,6 +61,8 @@ private:
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_socketConnectedToLocalServer;
 //    UDTSOCKET m_socketConnectedToAdmin;
+
+    QTimer *m_connectToLocalServerTimer;
 
 
 };

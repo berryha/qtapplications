@@ -5,7 +5,7 @@ CONFIG += ordered \
     debug_and_release
 
 SUBDIRS += managementsystem \
-    #plugins \
+    plugins \
     #messenger \
     test
 

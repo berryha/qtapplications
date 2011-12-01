@@ -62,7 +62,6 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDT
     serverUDTListeningPort = 0;
     serverName = "";
 
-    heartbeatTimer = 0;
 
 
     ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
@@ -83,16 +82,7 @@ ControlCenterPacketsParser::~ControlCenterPacketsParser() {
     // TODO Auto-generated destructor stub
     qDebug()<<"~ControlCenterPacketsParser()";
 
-    QMutexLocker locker(&mutex);
-
-
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
-    delete heartbeatTimer;
-    heartbeatTimer = 0;
-
-
+    disconnect();
 
 }
 
