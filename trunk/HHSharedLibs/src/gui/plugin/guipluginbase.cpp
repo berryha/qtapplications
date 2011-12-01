@@ -44,7 +44,7 @@ GUIPluginBase::GUIPluginBase() {
 GUIPluginBase::~GUIPluginBase() {
     qDebug("----GUIPluginBase::~GUIPluginBase()");
 
-    unload();
+    //unload();
 
     if (m_menu) {
         QAction *action = m_menu->menuAction();

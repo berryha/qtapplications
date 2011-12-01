@@ -75,7 +75,7 @@ private:
 signals:
     void signalPluginLoaded(const QString &pluginFilePath);
     void signalPluginLoaded(AbstractPluginInterface *plugin);
-    void signalPluginUnloaded(const QString &pluginFilePath);
+    //void signalPluginUnloaded(const QString &pluginFilePath);
 
 public slots:
     //Unload plugin

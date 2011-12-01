@@ -26,7 +26,7 @@
 //    //#endif
 //#endif
 
-//#include <QDateTime>
+#include <QDateTime>
 
 namespace HEHUI {
 
@@ -58,6 +58,8 @@ UDTProtocolBase::UDTProtocolBase(bool stream, const SocketOptions *options, QObj
     }
 
     m_errorMessage = "";
+
+    m_threadCount = 0;
 
 
 }
@@ -228,8 +230,17 @@ void UDTProtocolBase::startWaitingForIOInOneThread(int msecWaitForIOTimeout){
 void UDTProtocolBase::closeUDTProtocol(){
     qDebug()<<"--UDTProtocolBase::closeUDTProtocol()";
 
+    disconnect();
+
 
     m_listening = false;
+    while (m_threadCount) {
+        //wait for other threads!
+        QCoreApplication::processEvents();
+        qDebug()<<"Waiting for threads to quit ...";
+    }
+
+
     m_serverAddress = "";
     m_serverPort = 0;
 
@@ -260,7 +271,7 @@ void UDTProtocolBase::closeUDTProtocol(){
 
 }
 
-UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting){
+UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting, int msecTimeout){
     qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port;
 
     m_errorMessage = "";
@@ -355,19 +366,26 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
     freeaddrinfo(peer);
 
     if(waitWhileConnecting){
+        QDateTime time = QDateTime::currentDateTime();
         while (UDT::getsockstate(client) == CONNECTING) {
+
+//            UDTSTATUS state = NONEXIST;
+//            int size = 0;
+//            UDT::getsockopt(client, 0, UDT_STATE, &state, &size);
+
+            if(time.addMSecs(msecTimeout) < QDateTime::currentDateTime()){
+                break;
+            }
+
             QCoreApplication::processEvents();
+            qDebug()<<QString("Connecting to %1:%2 ...").arg(address.toString()).arg(port);
         }
     }
 
-    //UDT::close(client);
-    // use this function to release the UDT library
-    //UDT::cleanup();
 
     return client;
 
 }
-
 
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
@@ -499,6 +517,7 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
 
+    m_threadCount++;
     while(m_listening){
 
         acceptNewConnection();
@@ -525,6 +544,7 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
 
         //QCoreApplication::processEvents();
     }
+    m_threadCount--;
 
 
 
@@ -538,6 +558,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
     set<UDTSOCKET> readfds;
     int count = 0;
 
+    m_threadCount++;
     while(m_listening){
 
         acceptNewConnection();
@@ -558,6 +579,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         //QCoreApplication::processEvents();
     }
+    m_threadCount--;
 
 }
 
@@ -567,6 +589,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
     set<UDTSOCKET> writefds;
     int count = 0;
 
+    m_threadCount++;
     while(m_listening){
 
         //acceptNewConnection();
@@ -586,6 +609,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
         //QCoreApplication::processEvents();
     }
+    m_threadCount--;
 
 }
 
