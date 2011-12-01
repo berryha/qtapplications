@@ -247,12 +247,10 @@ void UDTProtocolBase::closeUDTProtocol(){
     UDT::epoll_release(epollID);
     epollID = 0;
 
-    qDebug()<<"-------------2";
     //UDT::close(serverSocket);
 
     // use this function to release the UDT library
     UDT::cleanup();
-    qDebug()<<"-------------3";
 
     foreach (QByteArray *info, m_cachedDataInfoHash) {
         recycleCachedData(info);
@@ -263,10 +261,6 @@ void UDTProtocolBase::closeUDTProtocol(){
         delete info;
     }
     m_unusedCached.clear();
-
-    qDebug()<<"-------------4";
-
-
 
 
 }
