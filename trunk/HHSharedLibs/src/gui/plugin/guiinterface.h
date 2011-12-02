@@ -42,7 +42,7 @@ class MYSHAREDLIB_API GUIInterface: public AbstractPluginInterface {
 
 public:
 
-    virtual ~GUIInterface() {};
+    virtual ~GUIInterface() {}
 
     //        virtual QString name() const = 0;
     //        virtual QString version() const = 0;
@@ -73,7 +73,7 @@ public:
 
 } //namespace HEHUI
 
-Q_DECLARE_INTERFACE(HEHUI::GUIInterface, "org.hehui.Interface.GUIInterface/2011.3");
+Q_DECLARE_INTERFACE(HEHUI::GUIInterface, "org.hehui.Interface.GUIInterface/2011.12")
 
 #endif /* GUIINTERFACE_H_ */
 
