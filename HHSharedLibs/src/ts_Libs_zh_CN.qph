@@ -1110,4 +1110,167 @@ An error occured while connecting to network printer &apos;%1&apos;! Error code:
     <source>Privilege Required</source>
     <target>要求提供授权</target>
 </phrase>
+<phrase>
+    <source>UDP Server has already started!</source>
+    <target>UDP服务器已经启动！</target>
+</phrase>
+<phrase>
+    <source>Data is empty!</source>
+    <target>数据为空！</target>
+</phrase>
+<phrase>
+    <source>Server is already listenning on %1:%2!</source>
+    <target>服务器正在监听 %1:%2 ！</target>
+</phrase>
+<phrase>
+    <source>Failed to start listening! Illegal port number or port is busy!</source>
+    <target>无法监听！非法的端口或端口正忙！</target>
+</phrase>
+<phrase>
+    <source>Failed to start listening! Bind error! </source>
+    <target>无法监听！绑定时发生错误！</target>
+</phrase>
+<phrase>
+    <source>Failed to start listening! </source>
+    <target>无法监听！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! Invalid peer address!</source>
+    <target>无法连接到主机！无效的地址！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! Invalid peer port!</source>
+    <target>无法连接到主机！无效的端口！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! Invalid peer address or port!</source>
+    <target>无法连接到主机！无效的地址或端口！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! Failed to bind!</source>
+    <target>无法连接到主机！绑定失败！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! Failed to connect!</source>
+    <target>无法连接到主机！连接失败！</target>
+</phrase>
+<phrase>
+    <source>EPOLL Not Initialized!</source>
+    <target>EPOLL未初始化！</target>
+</phrase>
+<phrase>
+    <source>Data is too large! Max allowed size:%1, current data size:%2</source>
+    <target>数据太大！允许的最大尺寸：%1，当前数据尺寸：%2</target>
+</phrase>
+<phrase>
+    <source>Data sent failed! Data size:%1, Sent size:%2! %3</source>
+    <target>数据发送失败！数据尺寸：%1，已发送尺寸：%2！ %3</target>
+</phrase>
+<phrase>
+    <source>Failed to send message data!</source>
+    <target>无法发送消息数据！</target>
+</phrase>
+<phrase>
+    <source>Can not retrieve the name of the user associated with the current thread! Code:%1 </source>
+    <target>无法获取当前线程的用户名！错误代码：%1</target>
+</phrase>
+<phrase>
+    <source>Can not start UDT listening on port %1! %2</source>
+    <target>无法在端口%1上启动UDT监听！ %2</target>
+</phrase>
+<phrase>
+    <source>Local user %1 offine!</source>
+    <target>本地用户%1离线！</target>
+</phrase>
+<phrase>
+    <source>ERROR! Can not connect to server %1:%2! %3</source>
+    <target>错误！无法连接到服务器 %1:%2！%3</target>
+</phrase>
+<phrase>
+    <source>ERROR! Can not upload system info to server %1:%2! %3</source>
+    <target>错误！无法上传系统信息到服务器 %1:%2!%3</target>
+</phrase>
+<phrase>
+    <source>ERROR! Can not send log to server %1:%2! %3</source>
+    <target>错误！无法发送日志到服务器 %1:%2!%3</target>
+</phrase>
+<phrase>
+    <source>ERROR! Can not send message to admin from %1:%2! %3</source>
+    <target>错误！无法发送消息到来自%1:%2的管理员！%3</target>
+</phrase>
+<phrase>
+    <source>Can not start IP Multicast listening on address &apos;%1&apos;, port %2! %3</source>
+    <target>无法在地址‘%1’，端口 %2 上启动多播监听！ %3</target>
+</phrase>
+<phrase>
+    <source>IP: %1&lt;br&gt;UDT Port: %2&lt;br&gt;Name: %3&lt;br&gt;Version: %4</source>
+    <target>IP：%1&lt;br&gt;UDT端口：%2&lt;br&gt;名称：%3&lt;br&gt;版本：%4</target>
+</phrase>
+<phrase>
+    <source>&lt;p&gt;&lt;font color = &apos;red&apos;&gt;&lt;b&gt;New version available! Please check for update!&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;</source>
+    <target>&lt;p&gt;&lt;font color = &apos;red&apos;&gt;&lt;b&gt;有新版本可用！请检查升级！&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;</target>
+</phrase>
+<phrase>
+    <source>Administrator %1@%2 request to control your computer remotely!</source>
+    <target>管理员 %1@%2 请求远程控制你的电脑！</target>
+</phrase>
+<phrase>
+    <source>Timeout! Automatically Accept!</source>
+    <target>超时！自动接受！</target>
+</phrase>
+<phrase>
+    <source>Automatically accept after &lt;font color=red&gt;%1&lt;/font&gt; seconds!</source>
+    <target>&lt;font color=red&gt;%1&lt;/font&gt;秒后自动接受请求！</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host! 
+%1</source>
+    <target>无法连接到主机！\n%1</target>
+</phrase>
+<phrase>
+    <source>Can not send connection request to host!
+%1</source>
+    <target>无法发送连接请求到主机！ %1</target>
+</phrase>
+<phrase>
+    <source>Can not send data to peer!
+%1</source>
+    <target>无法发送数据到对方！%1</target>
+</phrase>
+<phrase>
+    <source>No Record Found!</source>
+    <target>没有找到记录！</target>
+</phrase>
+<phrase>
+    <source>Last Update Time: %1</source>
+    <target>最后更新时间：%1</target>
+</phrase>
+<phrase>
+    <source>&amp;OS</source>
+    <target>操作系统[&amp;O]</target>
+</phrase>
+<phrase>
+    <source>Disk Drives:</source>
+    <target>磁盘驱动器：</target>
+</phrase>
+<phrase>
+    <source>&amp;Devices</source>
+    <target>设备(&amp;D)</target>
+</phrase>
+<phrase>
+    <source>&amp;Software</source>
+    <target>软件(&amp;S)</target>
+</phrase>
+<phrase>
+    <source>Size</source>
+    <target>大小</target>
+</phrase>
+<phrase>
+    <source>Date</source>
+    <target>日期</target>
+</phrase>
+<phrase>
+    <source>Publisher</source>
+    <target>发行商</target>
+</phrase>
 </QPH>
