@@ -50,7 +50,8 @@ ClientInfo::ClientInfo(const QString &computerName, QObject *parent)
         updateDetailedInfoStatement = "";
         detailedInfoSavedTODatabase = false;
 
-        installedSoftwaresInfo.clear();
+        //installedSoftwaresInfo.clear();
+        installedSoftwaresCount = 0;
         updateInstalledSoftwaresInfoStatement = "";
         installedSoftwaresInfoSavedTODatabase = false;
 

@@ -20,6 +20,11 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(resources);
 
+//    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+//    QTextCodec::setCodecForCStrings(codec);
+//    QTextCodec::setCodecForLocale(codec);
+//    QTextCodec::setCodecForTr(codec);
+
     QApplication a(argc, argv);
 
     for(int i = 0; i < argc; i++){
@@ -28,7 +33,6 @@ int main(int argc, char *argv[])
             qAddPostRoutine(closeDebugLog);
         }
     }
-
 
 
     QDate date = QDate::currentDate();
@@ -42,7 +46,7 @@ int main(int argc, char *argv[])
     //a.addLibraryPath(QCoreApplication::applicationDirPath());
     a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(PLUGINS_MAIN_DIR));
     a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(MYLIBS_DIR));
-    qDebug()<<"----main(....)~~Library Paths"<<a.libraryPaths ();
+    qWarning()<<"----main(....)~~Library Paths"<<a.libraryPaths ();
 
 
     //创建Splash Screen

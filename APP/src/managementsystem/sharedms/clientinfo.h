@@ -351,12 +351,20 @@ public:
         this->workgroup = workgroup;
     }
 
-    QStringList getInstalledSoftwaresInfo(){
-        return installedSoftwaresInfo;
+//    QStringList getInstalledSoftwaresInfo(){
+//        return installedSoftwaresInfo;
+//    }
+//    void setInstalledSoftwaresInfo(const QStringList &list){
+//        this->installedSoftwaresInfo = list;
+//    }
+
+    int getinstalledSoftwaresCount(){
+        return installedSoftwaresCount;
     }
-    void setInstalledSoftwaresInfo(const QStringList &list){
-        this->installedSoftwaresInfo = list;
+    void setInstalledSoftwaresCount(int count){
+        this->installedSoftwaresCount = count;
     }
+
     QString getUpdateInstalledSoftwaresInfoStatement(){
         return updateInstalledSoftwaresInfoStatement;
     }
@@ -412,7 +420,8 @@ private:
 
     /////////////////////////////////////////////////
 
-    QStringList installedSoftwaresInfo;
+//    QStringList installedSoftwaresInfo;
+    int installedSoftwaresCount;
     QString updateInstalledSoftwaresInfoStatement;
     bool installedSoftwaresInfoSavedTODatabase;
 

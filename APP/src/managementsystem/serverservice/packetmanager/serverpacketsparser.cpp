@@ -124,7 +124,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         sendServerDeclarePacket(peerAddress, peerUDPListeningPort );
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerUDPListeningPort:"<<peerUDPListeningPort;
+        qWarning()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerUDPListeningPort:"<<peerUDPListeningPort;
     }
     break;
     case quint8(MS::ClientOnline):
