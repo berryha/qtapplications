@@ -143,7 +143,7 @@ bool UDPSocket::startIPMulticastListening(const QHostAddress &ipMulticastGroupAd
 }
 
 bool UDPSocket::sendDatagram(const QByteArray &data, const QHostAddress &targetAddress, quint16 targetPort, QString *errorString){
-    qDebug()<<"UDPSocket::sendDatagram(...)-targetAddress:"<<targetAddress.toString()<<" targetPort:"<<targetPort;
+    //qWarning()<<"UDPSocket::sendDatagram(...)-targetAddress:"<<targetAddress.toString()<<" targetPort:"<<targetPort;
 
     qint64 size = writeDatagram(data, targetAddress, targetPort);
     if(errorString){

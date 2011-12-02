@@ -694,8 +694,8 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
     char peerAddress[NI_MAXHOST];
     char peerPort[NI_MAXSERV];
     getnameinfo((sockaddr *)&clientaddr, addrlen, peerAddress, sizeof(peerAddress), peerPort, sizeof(peerPort), NI_NUMERICHOST|NI_NUMERICSERV);
-    cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
-
+    //cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
+    qDebug()<<QString("New Connection:%1:%2, UDTSOCKET:%3").arg(peerAddress).arg(peerPort).arg(peer);
 
     if(UDT::epoll_add_usock(epollID, peer, NULL) < 0){
         qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
