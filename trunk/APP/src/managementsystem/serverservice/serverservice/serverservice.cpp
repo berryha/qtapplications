@@ -269,22 +269,19 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
     //qWarning()<<"Computer Name:"<<computerName;
     //qWarning()<<"isRecordExistInDB:"<<isRecordExistInDB(computerName);
 
-    static quint32 duplicateInfo = 0;
 
     QString statement = "";
     ClientInfo *info = 0;
     if(clientInfoHash.contains(computerName)){
         info = clientInfoHash.value(computerName);
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:YES  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
-        duplicateInfo++;
     }else{
         info = new ClientInfo(computerName, this);
         clientInfoHash.insert(computerName, info);
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:NO  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
     }
     qWarning();
-    qWarning()<<"Total Clients:"<<clientInfoHash.size();
-    qWarning()<<"Total Duplicate Client Info:"<<duplicateInfo;
+    qWarning()<<"Total Online Clients:"<<clientSocketsHash.size();
 
 
     if(isRecordExistInDB(computerName)){
@@ -702,20 +699,20 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
 
 
 
-    QStringList installedSoftwaresInfo = info->getInstalledSoftwaresInfo();
-    bool changed = false;
-    if(softwares.size() == installedSoftwaresInfo.size()){
-        foreach (QString info, softwares) {
-            if(!installedSoftwaresInfo.contains(info)){
-                changed = true;
-                break;
-            }
-        }
-    }else{
-        changed = true;
-    }
+//    QStringList installedSoftwaresInfo = info->getInstalledSoftwaresInfo();
+//    bool changed = false;
+//    if(softwares.size() == installedSoftwaresInfo.size()){
+//        foreach (QString info, softwares) {
+//            if(!installedSoftwaresInfo.contains(info)){
+//                changed = true;
+//                break;
+//            }
+//        }
+//    }else{
+//        changed = true;
+//    }
 
-    if(changed){
+    if(softwares.size() != info->getinstalledSoftwaresCount()){
         QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from installedsoftware where ComputerName = '%1'; ").arg(computerName);
         foreach (QString info, softwares) {
             QStringList values = info.split(" | ");
@@ -752,7 +749,8 @@ void ServerService::clientDetailedInfoPacketReceived(const QString &computerName
             info->setNic1Info(nic1Info);
             info->setNic2Info(nic2Info);
 
-            info->setInstalledSoftwaresInfo(softwares);
+//            info->setInstalledSoftwaresInfo(softwares);
+            info->setInstalledSoftwaresCount(softwares.size());
         }
     }
 
@@ -810,8 +808,6 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
         qCritical()<<m_udtProtocol->getLastErrorMessage();
         return;
     }
-
-    qWarning()<<QString("Client %1 %2!").arg(clientName).arg(online?"Online":"Offline");
 
 
     ClientInfo *info = 0;

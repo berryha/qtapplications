@@ -953,19 +953,18 @@ void ControlCenter::updateActions() {
 void ControlCenter::startNetwork(){
 
     QString errorMessage = "";
-    //m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
     m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, m_localUDPListeningPort, true, &errorMessage);
     if(!m_udpServer){
-        QMessageBox::critical(this, tr("Error"), tr("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage));
-        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
+        QMessageBox::critical(this, tr("Error"), tr("Can not start UDP listening on port %1! %2").arg(m_localUDPListeningPort).arg(errorMessage));
     }else{
-        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
+        qWarning()<<QString("UDP listening on port %1!").arg(m_localUDPListeningPort);
     }
 
     m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, m_localUDTListeningPort, true, &errorMessage);
     if(!m_udtProtocol){
         QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
         QMessageBox::critical(this, tr("Error"), error);
+        close();
         return;
     }
     m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
@@ -989,6 +988,8 @@ void ControlCenter::startNetwork(){
     }
 
     m_networkReady = true;
+
+    controlCenterPacketsParser->sendClientLookForServerPacket();
 
 
 }

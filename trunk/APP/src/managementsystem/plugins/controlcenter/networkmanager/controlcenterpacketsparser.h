@@ -60,7 +60,7 @@ public slots:
 
 
     bool sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
-        qDebug()<<"----sendClientLookForServerPacket(...)";
+        qDebug()<<"----sendClientLookForServerPacket(...) "<<" targetAddress:"<<targetAddress;
 
         QHostAddress address = QHostAddress(targetAddress);
         if(address.isNull()){
@@ -83,7 +83,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendDatagram(ba, address, IP_MULTICAST_GROUP_PORT);
+        return m_udpServer->sendDatagram(ba, address, quint16(IP_MULTICAST_GROUP_PORT));
 
     }
 
