@@ -284,7 +284,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
     }
 
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host! \n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
         return;
     }
@@ -297,7 +297,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
         m_udtProtocol->closeSocket(m_peerSocket);
         m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
 
         return;
@@ -309,7 +309,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
         m_udtProtocol->closeSocket(m_peerSocket);
         m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 
-        QMessageBox::critical(this, tr("Error"), tr("Can not send connection request to host!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send connection request to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         ui.toolButtonVerify->setEnabled(true);
 
         return;
@@ -345,7 +345,7 @@ void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
 
     bool ok = controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerSocket, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
     ui.pushButtonUSBSD->setEnabled(false);
@@ -379,7 +379,7 @@ void SystemManagementWidget::on_pushButtonPrograms_clicked(){
 
     bool ok = controlCenterPacketsParser->sendSetupProgramesPacket(m_peerSocket, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
     ui.pushButtonPrograms->setEnabled(false);
@@ -390,7 +390,7 @@ void SystemManagementWidget::on_pushButtonShowAdmin_clicked(){
 
     bool ok = controlCenterPacketsParser->sendShowAdminPacket(m_peerSocket, m_computerName, m_users, true);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
 
@@ -409,7 +409,7 @@ void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
     
     bool ok = controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerSocket, m_computerName, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
 
@@ -437,7 +437,7 @@ void SystemManagementWidget::on_actionAddAdmin_triggered(){
 
     ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, true, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
 
@@ -472,7 +472,7 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
 
     ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, false, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
 
