@@ -162,7 +162,7 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
             emit signalPluginLoaded(plugin);
             emit signalPluginLoaded(pluginFilePath);
 
-            error = tr("OK! Plug-in '%1' loaded!").arg(pluginFilePath);
+            error = tr("Plug-in '%1' loaded!").arg(pluginFilePath);
             qWarning() << error;
             if(errorString){
                 *errorString = error;
