@@ -31,16 +31,16 @@
 
 #include "clientpacketsparser.h"
 
-#ifdef Q_CC_MSVC
-#include <windows.h>
-//#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-#define msleep(x) Sleep(x)
-#endif
+//#ifdef Q_CC_MSVC
+//#include <windows.h>
+////#include "HHSharedWindowsManagement/hwindowsmanagement.h"
+//#define msleep(x) Sleep(x)
+//#endif
 
-#ifdef Q_CC_GNU
-#include <unistd.h>
-#define msleep(x) usleep(x*1000)
-#endif
+//#ifdef Q_CC_GNU
+//#include <unistd.h>
+//#define msleep(x) usleep(x*1000)
+//#endif
 
 //#include "HHSharedCore/hutilities.h"
 
