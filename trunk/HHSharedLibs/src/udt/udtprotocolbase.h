@@ -147,8 +147,8 @@ public slots:
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
     //Call this function after server is listening
-    void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = -1, int msecWaitForOutputTimeout = -1);
-    void startWaitingForIOInOneThread(int msecWaitForIOTimeout = -1);
+    void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = 1, int msecWaitForOutputTimeout = 1);
+    void startWaitingForIOInOneThread(int msecWaitForIOTimeout = 1);
 
 
 
@@ -168,9 +168,9 @@ public slots:
 
 
 protected:
-    void waitForIO(int msecTimeout = -1);
-    void waitForReading(int msecTimeout = -1);
-    void waitForWriting(int msecTimeout = -1);
+    void waitForIO(int msecTimeout = 1);
+    void waitForReading(int msecTimeout = 1);
+    void waitForWriting(int msecTimeout = 1);
     UDTSOCKET acceptNewConnection();
 
 private slots:
@@ -190,7 +190,7 @@ private:
     //UDT::ERRORINFO getLastErrorInfo(){return UDT::getlasterror();}
     void setSocketOptions(UDTSOCKET socket, SocketOptions *options = 0);
 
-
+    void msleep(int msec);
 
 
 private:

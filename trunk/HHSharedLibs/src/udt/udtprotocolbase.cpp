@@ -26,6 +26,17 @@
 //    //#endif
 //#endif
 
+//#ifdef Q_CC_MSVC
+//#include <windows.h>
+//#define msleep(x) Sleep(x)
+//#endif
+
+//#ifdef Q_CC_GNU
+//#include <unistd.h>
+//#define msleep(x) usleep(x*1000)
+//#endif
+
+
 #include <QDateTime>
 
 namespace HEHUI {
@@ -508,6 +519,8 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
     qDebug()<<"--UDTProtocolBase::waitForIO(...) "<<" msecWaitForIOTimeout:"<<msecWaitForIOTimeout<<" Thread Id:"<<QThread::currentThreadId();
 
+    QDateTime beginTime, curTime;
+    int interval = 0;
     set<UDTSOCKET> readfds, writefds;
     int count = 0;
 
@@ -516,6 +529,7 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
 
         acceptNewConnection();
 
+        beginTime = QDateTime::currentDateTime();
         count = UDT::epoll_wait(epollID, &readfds, &writefds, msecWaitForIOTimeout);
         if(count > 0){
             //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
@@ -536,6 +550,20 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             writefds.clear();
         }
 
+        curTime = QDateTime::currentDateTime();
+        interval = beginTime.msecsTo(curTime);
+        if(interval < msecWaitForIOTimeout){
+            msleep(msecWaitForIOTimeout - interval);
+
+            //#ifndef Q_OS_WIN32
+            //   timespec ts;
+            //   ts.tv_sec = 0;
+            //   ts.tv_nsec = 1000000; //1 ms
+            //   nanosleep(&ts, NULL);
+            //#else
+            //   Sleep(1);
+            //#endif
+        }
         //QCoreApplication::processEvents();
     }
     m_threadCount--;
@@ -549,6 +577,8 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
 void UDTProtocolBase::waitForReading(int msecTimeout){
     qDebug()<<"--UDTProtocolBase::waitForReading(...)";
 
+    QDateTime beginTime, curTime;
+    int interval = 0;
     set<UDTSOCKET> readfds;
     int count = 0;
 
@@ -556,6 +586,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
     while(m_listening){
 
         acceptNewConnection();
+        beginTime = QDateTime::currentDateTime();
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
@@ -571,6 +602,11 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         }
 
+        curTime = QDateTime::currentDateTime();
+        interval = beginTime.msecsTo(curTime);
+        if(interval < msecTimeout){
+            msleep(msecTimeout - interval);
+        }
         //QCoreApplication::processEvents();
     }
     m_threadCount--;
@@ -580,6 +616,8 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 void UDTProtocolBase::waitForWriting(int msecTimeout){
     qDebug()<<"--UDTProtocolBase::waitForWriting(...)";
 
+    QDateTime beginTime, curTime;
+    int interval = 0;
     set<UDTSOCKET> writefds;
     int count = 0;
 
@@ -587,6 +625,7 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
     while(m_listening){
 
         //acceptNewConnection();
+        beginTime = QDateTime::currentDateTime();
 
         count = UDT::epoll_wait(epollID, NULL, &writefds, msecTimeout);
         if(count > 0){
@@ -601,6 +640,11 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
             writefds.clear();
         }
 
+        curTime = QDateTime::currentDateTime();
+        interval = beginTime.msecsTo(curTime);
+        if(interval < msecTimeout){
+            msleep(msecTimeout - interval);
+        }
         //QCoreApplication::processEvents();
     }
     m_threadCount--;
@@ -898,6 +942,16 @@ void UDTProtocolBase::setSocketOptions(UDTSOCKET socket, SocketOptions *options)
 
 
 
+
+}
+
+inline void UDTProtocolBase::msleep(int msec){
+
+#ifdef Q_OS_WIN32
+    Sleep(msec);
+#else
+    usleep(msec*1000);
+#endif
 
 }
 
