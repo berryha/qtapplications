@@ -281,7 +281,7 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:NO  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
     }
     qWarning();
-    qWarning()<<"Total Online Clients:"<<clientSocketsHash.size();
+    qWarning()<<QString("Total Clients:%1, Online:%2").arg(clientInfoHash.size()).arg(clientSocketsHash.size());
 
 
     if(isRecordExistInDB(computerName)){
