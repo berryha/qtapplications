@@ -281,7 +281,7 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:NO  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
     }
     qWarning();
-    qWarning()<<QString("Total Clients:%1, Online:%2").arg(clientInfoHash.size()).arg(clientSocketsHash.size());
+    qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 
     if(isRecordExistInDB(computerName)){
@@ -819,12 +819,13 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
             info->setClientUDTListeningAddress(ip);
             info->setClientUDTListeningPort(port);
         }
-        qWarning()<<QString("Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+        qWarning()<<QString("Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
     }else{
         if(online){
             serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
         }
-        qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+        //qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+        qWarning()<<QString("Unknown Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
     }
 
     if(online){
