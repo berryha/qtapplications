@@ -231,7 +231,7 @@ bool ClientService::startMainService(){
     lookForServerTimer = new QTimer(this);
     lookForServerTimer->setSingleShot(true);
     connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
-    lookForServerTimer->start(15000);
+    lookForServerTimer->start(30000);
 
 
     mainServiceStarted = true;
@@ -1782,8 +1782,8 @@ void ClientService::checkHasAnyServerBeenFound(){
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
-        if(interval > 300000){
-            interval = 300000;
+        if(interval > 600000){
+            interval = 600000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
         }
         lookForServerTimer->start(interval);
@@ -1818,12 +1818,12 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
         m_serverUDTListeningPort = 0;
         m_serverName = "";
 
-        if(!lookForServerTimer){
-            lookForServerTimer = new QTimer(this);
-            lookForServerTimer->setSingleShot(true);
-            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
-        }
-        lookForServerTimer->start(15000);
+//        if(!lookForServerTimer){
+//            lookForServerTimer = new QTimer(this);
+//            lookForServerTimer->setSingleShot(true);
+//            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
+//        }
+        lookForServerTimer->start(60000);
 
     }else if(peerAddress.toString() == m_adminAddress && peerPort == m_adminPort){
 
@@ -1841,6 +1841,13 @@ void ClientService::peerDisconnected(int socketID){
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";
         m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+
+//        if(!lookForServerTimer){
+//            lookForServerTimer = new QTimer(this);
+//            lookForServerTimer->setSingleShot(true);
+//            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
+//        }
+        lookForServerTimer->start(60000);
 
     }else if(socketID == m_socketConnectedToAdmin){
         qWarning()<<"Admin Offline!";
