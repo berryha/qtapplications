@@ -383,6 +383,7 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
             }
 
             QCoreApplication::processEvents();
+            msleep(1);
             qDebug()<<QString("Connecting to %1:%2 ...").arg(address.toString()).arg(port);
         }
     }
