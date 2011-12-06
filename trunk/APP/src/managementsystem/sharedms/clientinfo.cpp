@@ -60,8 +60,8 @@ ClientInfo::ClientInfo(const QString &computerName, QObject *parent)
 
         online = false;
 
-        clientRUDPListeningAddress = "";
-        clientRUDPListeningPort = 0;
+        clientUDTListeningAddress = "";
+        clientUDTListeningPort = 0;
 
 }
 

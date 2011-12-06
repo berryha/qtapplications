@@ -76,14 +76,14 @@ public:
         return chipset;
     }
 
-    QString getClientTCPListeningAddress() const
+    QString getClientUDTListeningAddress() const
     {
-        return clientRUDPListeningAddress;
+        return clientUDTListeningAddress;
     }
 
-    quint16 getClientTCPListeningPort() const
+    quint16 getClientUDTListeningPort() const
     {
-        return clientRUDPListeningPort;
+        return clientUDTListeningPort;
     }
 
     QString getClientVersion() const
@@ -221,14 +221,14 @@ public:
         this->chipset = chipset;
     }
 
-    void setClientUDTListeningAddress(QString clientRUDPListeningAddress)
+    void setClientUDTListeningAddress(QString clientUDTListeningAddress)
     {
-        this->clientRUDPListeningAddress = clientRUDPListeningAddress;
+        this->clientUDTListeningAddress = clientUDTListeningAddress;
     }
 
-    void setClientUDTListeningPort(quint16 clientRUDPListeningPort)
+    void setClientUDTListeningPort(quint16 clientUDTListeningPort)
     {
-        this->clientRUDPListeningPort = clientRUDPListeningPort;
+        this->clientUDTListeningPort = clientUDTListeningPort;
     }
 
     void setClientVersion(QString clientVersion)
@@ -434,8 +434,8 @@ private:
 
     bool online;
 
-    QString clientRUDPListeningAddress;
-    quint16 clientRUDPListeningPort;
+    QString clientUDTListeningAddress;
+    quint16 clientUDTListeningPort;
 
 
 

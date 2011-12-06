@@ -801,39 +801,54 @@ void ServerService::getRecordsInDatabase(){
 
 void ServerService::processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
 
+
     QString ip = "";
     quint16 port = 0;
 
-    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
-        qCritical()<<m_udtProtocol->getLastErrorMessage();
-        return;
-    }
-
-
-    ClientInfo *info = 0;
-
-    if(clientInfoHash.contains(clientName)){
-        info = clientInfoHash.value(clientName);
-        info->setOnline(online);
-        if(online){
-            info->setClientUDTListeningAddress(ip);
-            info->setClientUDTListeningPort(port);
-        }
-        qWarning()<<QString("Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-    }else{
-        if(online){
-            serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
-        }
-        //qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-        qWarning()<<QString("Unknown Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-    }
-
     if(online){
+
+        if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
+            qCritical()<<m_udtProtocol->getLastErrorMessage();
+            return;
+        }
+
+        if(clientSocketsHash.values().contains(clientName)){
+            int preSocketID = clientSocketsHash.key(clientName);
+            peerDisconnected(preSocketID);
+//            clientSocketsHash.remove(preSocketID);
+//            m_udtProtocol->closeSocket(preSocketID);
+        }
         clientSocketsHash.insert(socketID, clientName);
 
     }else{
         clientSocketsHash.remove(socketID);
+        m_udtProtocol->closeSocket(socketID);
     }
+
+    ClientInfo *info = 0;
+    if(clientInfoHash.contains(clientName)){
+        info = clientInfoHash.value(clientName);
+        if(!online){
+            ip = info->getClientUDTListeningAddress();
+            port = info->getClientUDTListeningPort();
+        }
+    }else{
+        info =  new ClientInfo(clientName, this);
+        clientInfoHash.insert(clientName, info);
+
+        if(online){
+            serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
+        }
+        //qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+        //qWarning()<<QString("Unknown Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+    }
+
+    info->setOnline(online);
+    if(online){
+        info->setClientUDTListeningAddress(ip);
+        info->setClientUDTListeningPort(port);
+    }
+    qWarning()<<QString("Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
 
 
 }
@@ -884,12 +899,17 @@ void ServerService::peerDisconnected(int socketID){
     m_udtProtocol->closeSocket(socketID);
 
     if(clientSocketsHash.contains(socketID)){
-        qCritical()<<QString("ERROR! Client %1 Closed Connection Unexpectedly!").arg(clientSocketsHash.value(socketID));
+        QString address = "Unknown Address";
+        ClientInfo *info = clientInfoHash.value(clientSocketsHash.value(socketID));
+        if(info){
+            address = info->getClientUDTListeningAddress() + ":" + QString::number(info->getClientUDTListeningPort());
+        }
+        qCritical()<<QString("ERROR! Client '%1' From %2 Closed Connection Unexpectedly! %3").arg(clientSocketsHash.value(socketID)).arg(address).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         clientSocketsHash.remove(socketID);
     }
 
     if(adminSocketsHash.contains(socketID)){
-        qCritical()<<QString("ERROR! Admin %1 Closed Connection Unexpectedly!").arg(adminSocketsHash.value(socketID));
+        qCritical()<<QString("ERROR! Admin '%1' Closed Connection Unexpectedly! %2").arg(adminSocketsHash.value(socketID)).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         adminSocketsHash.remove(socketID);
     }
 
