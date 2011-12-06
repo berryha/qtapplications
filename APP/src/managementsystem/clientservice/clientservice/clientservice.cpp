@@ -300,13 +300,15 @@ bool ClientService::startMainService(){
 void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ClientService::serverFound(...)";
 
-    if(!m_serverAddress.isNull() && serverInstanceID != m_serverInstanceID){
-        m_udtProtocol->closeSocket(m_socketConnectedToServer);
-        m_serverAddress = QHostAddress::Null;
-        m_serverUDTListeningPort = 0;
-        m_serverName = "";
-        m_serverInstanceID = 0;
+    if(/*!m_serverAddress.isNull() && */serverInstanceID == m_serverInstanceID){
+        return;
     }
+    m_udtProtocol->closeSocket(m_socketConnectedToServer);
+    m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_serverAddress = QHostAddress::Null;
+    m_serverUDTListeningPort = 0;
+    m_serverName = "";
+    m_serverInstanceID = 0;
 
     m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
     if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
@@ -1778,13 +1780,16 @@ void ClientService::checkHasAnyServerBeenFound(){
 
     if(!m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
         qWarning()<<"No server found!";
-        clientPacketsParser->sendClientLookForServerPacket();
+        //clientPacketsParser->sendClientLookForServerPacket();
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
         if(interval > 600000){
             interval = 600000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
+        }else{
+            clientPacketsParser->sendClientLookForServerPacket(getServerLastUsed());
+            clientPacketsParser->sendClientLookForServerPacket();
         }
         lookForServerTimer->start(interval);
     }else{
@@ -1840,7 +1845,12 @@ void ClientService::peerDisconnected(int socketID){
 
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
         m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+        m_serverAddress = QHostAddress::Null;
+        m_serverUDTListeningPort = 0;
+        m_serverName = "";
+        m_serverInstanceID = 0;
 
 //        if(!lookForServerTimer){
 //            lookForServerTimer = new QTimer(this);
@@ -1852,6 +1862,8 @@ void ClientService::peerDisconnected(int socketID){
     }else if(socketID == m_socketConnectedToAdmin){
         qWarning()<<"Admin Offline!";
         m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
+        m_adminAddress = "";
+        m_adminPort = 0;
     }else{
         clientPacketsParser->localUserOffline(socketID);
     }
