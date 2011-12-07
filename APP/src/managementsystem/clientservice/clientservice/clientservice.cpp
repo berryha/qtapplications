@@ -127,6 +127,9 @@ ClientService::~ClientService(){
     wm = 0;
 #endif
 
+    delete lookForServerTimer;
+    lookForServerTimer = 0;
+
     mainServiceStarted = false;
 
 }
@@ -1794,8 +1797,8 @@ void ClientService::checkHasAnyServerBeenFound(){
         lookForServerTimer->start(interval);
     }else{
         lookForServerTimer->stop();
-        delete lookForServerTimer;
-        lookForServerTimer = 0;
+        //delete lookForServerTimer;
+        //lookForServerTimer = 0;
     }
 
 }
@@ -1928,7 +1931,8 @@ void ClientService::start()
 
     settings = new QSettings("HKEY_LOCAL_MACHINE\\SECURITY\\System", QSettings::NativeFormat, this);
 
-    startMainService();
+    QTimer::singleShot(1000, this, SLOT(startMainService()));
+    //startMainService();
 
 }
 
@@ -1936,6 +1940,8 @@ void ClientService::stop()
 {
 
     qDebug()<<"ClientService::stop()";
+
+    lookForServerTimer->stop();
 
     if(clientPacketsParser){
         clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, false);

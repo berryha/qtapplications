@@ -25,11 +25,13 @@ include(../../HHSharedLibs.pri)
 HEADERS += clientinfo.h \
     global_shared.h \
     udtprotocol.h \
-    resourcesmanager.h
+    resourcesmanager.h \
+    filemanager.h
 FORMS += 
 SOURCES += clientinfo.cpp \
     udtprotocol.cpp \
-    resourcesmanager.cpp
+    resourcesmanager.cpp \
+    filemanager.cpp
 RESOURCES += resources.qrc
 win32 { 
     #DEFINES += WIN32 __MINGW__ _WIN32_WINNT=0x0501
@@ -57,3 +59,5 @@ INSTALLS += target
 # QMAKE_TARGET_COMPANY	= "He Hui Team"
 QMAKE_TARGET_PRODUCT = "Shared Library For Management System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Library Based On Qt"
+
+
