@@ -12,12 +12,12 @@ class UDTProtocol : public UDTProtocolBase
     Q_OBJECT
 public:
     explicit UDTProtocol(bool stream = false, const SocketOptions *options = 0, QObject *parent = 0);
-    
+
 signals:
     void packetReceived(Packet *packet);
-    
+
 public slots:
-    bool sendData(UDTSOCKET socket, const QByteArray *byteArray);
+//    bool sendData(UDTSOCKET socket, const QByteArray *byteArray);
 
 
 private slots:
