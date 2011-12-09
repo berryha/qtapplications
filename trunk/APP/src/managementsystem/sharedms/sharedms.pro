@@ -26,12 +26,12 @@ HEADERS += clientinfo.h \
     global_shared.h \
     udtprotocol.h \
     resourcesmanager.h \
-    filemanager.h
+    udtprotocolforfiletx.h
 FORMS += 
 SOURCES += clientinfo.cpp \
     udtprotocol.cpp \
     resourcesmanager.cpp \
-    filemanager.cpp
+    udtprotocolforfiletx.cpp
 RESOURCES += resources.qrc
 win32 { 
     #DEFINES += WIN32 __MINGW__ _WIN32_WINNT=0x0501
