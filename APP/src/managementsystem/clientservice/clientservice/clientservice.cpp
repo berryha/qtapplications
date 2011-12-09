@@ -1787,12 +1787,13 @@ void ClientService::checkHasAnyServerBeenFound(){
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
-        if(interval > 600000){
-            interval = 600000;
+        if(interval > 300000){
+            interval = 300000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
+            //clientPacketsParser->sendClientLookForServerPacket();
         }else{
             clientPacketsParser->sendClientLookForServerPacket(getServerLastUsed());
-            clientPacketsParser->sendClientLookForServerPacket();
+            //clientPacketsParser->sendClientLookForServerPacket();
         }
         lookForServerTimer->start(interval);
     }else{

@@ -868,6 +868,7 @@ void ServerService::processAdminOnlineStatusChangedPacket(int socketID, const QS
 
     if(online){
         adminSocketsHash.insert(socketID, adminName);
+        updateOrSaveAllClientsInfoToDatabase();
     }else{
         adminSocketsHash.remove(socketID);
     }
