@@ -141,7 +141,6 @@ signals:
     void connected(int socket);
     void disconnected(int socket);
 
-
 public slots:
     //Start the server to listen,  implement the virtual function startWaitingForIO()
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
