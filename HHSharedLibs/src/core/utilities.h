@@ -43,7 +43,12 @@
 #include "mysharedlib_global.h"
 
 
+
+namespace HEHUI {
+
+
 class MYSHAREDLIB_API Utilities {
+
 public:
 	Utilities();
 	virtual ~Utilities();
@@ -58,12 +63,17 @@ public:
 
     static int versionCompare(const QString &exeFile1Version, const QString &exeFile2Version);
 
+    static void msleep(int msec);
 
 private:
     static QList<QTranslator *>translators;
     static QMutex *translatorsMutex;
 
 
+
+
 };
+
+} //namespace HEHUI
 
 #endif /* UTILITIES_H_ */
