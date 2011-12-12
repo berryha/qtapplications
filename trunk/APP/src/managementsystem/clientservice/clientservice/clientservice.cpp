@@ -313,6 +313,9 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     m_serverName = "";
     m_serverInstanceID = 0;
 
+    int msec = QDateTime::currentDateTime().toString("z").toUInt();
+    Utilities::msleep(10*msec);
+
     m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
     if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
         qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
@@ -333,7 +336,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     qWarning();
 
 
-    int msec = QDateTime::currentDateTime().toString("z").toUInt();
 
 #ifdef Q_OS_WIN
     if(Utilities::versionCompare(version, QString(APP_VERSION)) == 1){       
@@ -997,7 +999,7 @@ void ClientService::processAdminRequestInformUserNewPasswordPacket(const QString
                                             REMOTE_SITOY_SQLSERVER_DB_NAME,
                                             HEHUI::M$SQLSERVER);
         if (err.type() != QSqlError::NoError) {
-            logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST).arg(err.text()), QtServiceBase::Error);
+            logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME).arg(err.text()), QtServiceBase::Error);
             qCritical() << QString("XX An error occurred when opening the database: %1").arg(err.text());
             return;
         }
@@ -1401,7 +1403,7 @@ bool ClientService::checkUsersAccount(){
                                             REMOTE_SITOY_SQLSERVER_DB_NAME,
                                             HEHUI::M$SQLSERVER);
         if (err.type() != QSqlError::NoError) {
-            logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST).arg(err.text()), QtServiceBase::Error);
+            logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME).arg(err.text()), QtServiceBase::Error);
             qCritical() << QString("XX An error occurred when opening the database: %1").arg(err.text());
             return false;
         }
