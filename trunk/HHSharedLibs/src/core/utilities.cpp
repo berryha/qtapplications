@@ -39,6 +39,16 @@
 
 #include "utilities.h"
 
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+
+
+namespace HEHUI {
+
 
 QList<QTranslator *> Utilities::translators = QList<QTranslator *>();
 QMutex * Utilities::translatorsMutex = new QMutex();
@@ -193,5 +203,38 @@ int Utilities::versionCompare(const QString &exeFile1Version, const QString &exe
 
 }
 
+void Utilities::msleep(int msec){
+
+#ifdef Q_OS_WIN32
+    Sleep(msec);
+#else
+    usleep(msec*1000);
+#endif
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
 
 
