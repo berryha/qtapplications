@@ -458,40 +458,69 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
+    case quint8(MS::RequestUploadFile):
+    {
+        QString fileName = "";
+        quint64 size = 0;
+        QString remoteFileSaveDir = "";
+        in >> fileName >> size >> remoteFileSaveDir ;
+
+        emit signalAdminRequestUploadFile(socketID, fileName, size, remoteFileSaveDir);
+
+        qDebug()<<"~~RequestUploadFile";
+    }
+    break;
+    case quint8(MS::RequestDownloadFile):
+    {
+        QString filePath = "";
+        in >> filePath ;
+
+        emit signalAdminRequestDownloadFile(socketID, filePath);
+
+        qDebug()<<"~~RequestDownloadFile";
+    }
+    break;
+    case quint8(MS::RequestFileData):
+    {
+        quint64 offset = 0, length = 0;
+        in >> offset >> length ;
+
+        emit signalFileDataRequested(socketID, offset, length);
+
+        qDebug()<<"~~RequestFileData";
+    }
+    break;
+    case quint8(MS::FileData):
+    {
+        int size = 0;
+        quint64 offset = 0;
+        QByteArray data, sha1;
+        in >> size >> offset >> data >>sha1;
+
+        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
+            qCritical()<<"ERROR! Data Verification Failed!";
+            requestFileData(socketID, offset, size);
+            return;
+        }
+
+        emit signalFileDataReceived(socketID, offset, data);
+
+        qDebug()<<"~~FileData";
+    }
+    break;
+    case quint8(MS::FileTXStatusChanged):
+    {
+        quint8 status;
+        in >> status;
+
+        emit signalFileTXStatusChanged(socketID, status);
+
+        qDebug()<<"~~FileTXStatusChanged";
+    }
+    break;
 
 
 
-    //    case quint8(MS::RemoteAssistanceRejectedByUser):
-    //    {
-    //        QHostAddress userAddress = packet->getPeerHostAddress();
-    //        quint16 userPort = packet->getPeerHostPort();
-    //        sendConfirmationOfReceiptPacket(userAddress, userPort, packet->getPacketSerialNumber());
-
-    //        QString userName = "", computerName = "";
-    //        in >> userName >> computerName;
-
-    //        if(computerName.toLower() != m_localComputerName){
-    //            return;
-    //        }
-    //        //sendLocalServiceServerDeclarePacket(userAddress, userPort, m_localComputerName);
-    //        localUsersHash.insert(userName, 0);
-
-    //    }
-    //        break;
-
-
-    //    case quint8(MS::AdminLookForClient):
-    //        {
-    //            //sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
-
-    //            QString clientComputerName, workgroupName, macAddress, usersInfo, osInfo, clientVersion;
-    //            in >> computerName >> users ;
-    //            in >> clientComputerName >> workgroupName >> macAddress >> usersInfo >> osInfo >> usbsdEnabled >> programesEnabled >> clientVersion ;
-
-    //            emit signalAdminLookForClientPacketReceived(packet->getPeerHostAddress().toString(), packet->getPeerHostPort(), computerName, users);
-    //            qDebug()<<"~~VerifyClientInfo:"<<"packet->getPeerHostAddress():"<<packet->getPeerHostAddress().toString()<<" packet->getPeerHostPort():"<<packet->getPeerHostPort();
-    //        }
-    //        break;
 
 
     default:
