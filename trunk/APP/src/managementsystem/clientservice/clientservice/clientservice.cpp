@@ -1157,7 +1157,7 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 }
 
 void ClientService::uploadClientSummaryInfo(int socketID){
-    qDebug()<<"--ClientService::uploadClientSummaryInfo(...)";
+    qWarning()<<"--ClientService::uploadClientSummaryInfo(...)";
 
 
 #ifdef Q_OS_WIN
