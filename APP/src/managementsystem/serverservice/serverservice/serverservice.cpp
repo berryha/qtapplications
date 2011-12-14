@@ -362,8 +362,8 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         }
     } 
 
-    //qWarning();
-    //qWarning()<<QString(" '%1' Exists In:  Memory:%2  DB:%3 Version:%4").arg(computerName).arg(clientInfoHash.contains(computerName)?"YES":"NO").arg(isRecordExistInDB(computerName)?"YES":"NO").arg(clientVersion);
+    qWarning();
+    qWarning()<<QString(" '%1' Exists In:  Memory:%2  DB:%3 Version:%4").arg(computerName).arg(clientInfoHash.contains(computerName)?"YES":"NO").arg(isRecordExistInDB(computerName)?"YES":"NO").arg(clientVersion);
 
 
 }
@@ -836,9 +836,9 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
         info =  new ClientInfo(clientName, this);
         clientInfoHash.insert(clientName, info);
 
-        if(online){
-            serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
-        }
+//        if(online){
+//            serverPacketsParser->sendServerRequestClientSummaryInfoPacket(socketID, "", clientName, "");
+//        }
         //qWarning()<<QString("Unknown Client '%1' %2 ! %3").arg(clientName).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
         //qWarning()<<QString("Unknown Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
     }
@@ -850,7 +850,7 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
     }
 
     qWarning();
-    qWarning()<<QString("Client '%1' From %2:%3 %4 ! Time:%5 Version:%6").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss")).arg(info->getClientVersion());
+    qWarning()<<QString("Client '%1' From %2:%3 %4 ! Time:%5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
     qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 
