@@ -36,7 +36,7 @@
 #include <QHostInfo>
 #include <QDebug>
 #include <QFile>
-
+#include <QCryptographicHash>
 
 #include "../../sharedms/global_shared.h"
 #include "../../sharedms/udtprotocol.h"
@@ -491,8 +491,130 @@ public slots:
 
         return m_udtProtocol->sendData(userSocketID, &ba);
     }
+
+
+
+//////////////////////////////
+    bool requestUploadFile(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir = ""){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::RequestUploadFile));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << fileName << size << remoteFileSaveDir;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+    bool requestDownloadFile(int socketID, const QString &remoteFilePath){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::RequestDownloadFile));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << remoteFilePath;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+    bool responseFileTX(int socketID, bool accepted, quint8 errorCode, const QString &message){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::ResponseFileTX));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << accepted << errorCode << message;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+
+    bool requestFileData(int socketID, quint64 offset, quint64 length){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::RequestFileData));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << offset << length ;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+    bool sendFileData(int socketID, quint64 offset, QByteArray *data){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::FileData));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << data->size() << offset << *data << QCryptographicHash::hash(*data, QCryptographicHash::Sha1) ;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
     
-    
+    bool fileTXStatusChanged(int socketID, quint8 status){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::FileTXStatusChanged));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << status ;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
     
 private slots:
 
@@ -531,6 +653,14 @@ signals:
     void signalAdminRequestInformUserNewPasswordPacketReceived(const QString &workgroup, const QString &adminName, const QString &adminAddress, quint16 adminPort);
 
     void signalLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online);
+
+
+    void signalAdminRequestUploadFile(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
+    void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
+    void signalFileDataRequested(int socketID, quint64 offset, quint64 length);
+    void signalFileDataReceived(int socketID, quint64 offset, const QByteArray &data);
+    void signalFileTXStatusChanged(int socketID, quint8 status);
+
 
 private:
 

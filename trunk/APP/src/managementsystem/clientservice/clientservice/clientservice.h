@@ -117,8 +117,15 @@ private slots:
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
     void peerDisconnected(int socketID);
 
+///////////////////
+    //File TX
+    void processAdminRequestUploadFilePacket(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
+    void processAdminRequestDownloadFilePacket(int socketID, const QString &filePath);
+    void processFileDataRequestPacket(int socketID, quint64 offset, quint64 length);
+    void processFileDataReceivedPacket(int socketID, quint64 offset, const QByteArray &data);
+    void processFileTXStatusChangedPacket(int socketID, quint8 status);
 
-
+    void closeFileTXWithAdmin();
 
 protected:
     void start();
@@ -175,6 +182,8 @@ private:
     QString m_serverName;
     int m_serverInstanceID;
 
+    QFile *fileTXWithAdmin;
+    MS::FileTXStatus fileTXWithAdminStatus;
 
 };
 

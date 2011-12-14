@@ -76,6 +76,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverName = "";
     m_serverInstanceID = 0;
 
+    fileTXWithAdmin = 0;
+    fileTXWithAdminStatus = MS::File_TX_Done;
+
 //#if defined(Q_OS_WIN32)
 //    delete wm;
 //    wm = 0;
@@ -218,6 +221,17 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalLocalUserOnlineStatusChanged(int, const QString &, bool)), this, SLOT(processLocalUserOnlineStatusChanged(int, const QString &, bool)), Qt::QueuedConnection);
 
     
+    ////////////////////
+    //File TX
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int,QString,quint64,QString)), this, SLOT(processAdminRequestUploadFilePacket(int,QString,quint64,QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int,quint64,quint64)), this, SLOT(processFileDataRequestPacket(int,quint64,quint64)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int,quint64,QByteArray)), this, SLOT(processFileDataReceivedPacket(int,quint64,QByteArray)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
+
+
+
+
     //Single Process Thread
     //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
     
@@ -730,6 +744,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
         clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_localWorkgroupName, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
+        closeFileTXWithAdmin();
     }
 
 
@@ -1870,10 +1885,145 @@ void ClientService::peerDisconnected(int socketID){
         m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
         m_adminAddress = "";
         m_adminPort = 0;
+
+        closeFileTXWithAdmin();
     }else{
         clientPacketsParser->localUserOffline(socketID);
     }
 
+
+}
+
+
+void ClientService::processAdminRequestUploadFilePacket(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
+
+    QString localPath = remoteFileSaveDir + "/" + fileName;
+    if(QFile::exists(localPath)){
+        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Exist_Error), tr("File '%1' Already Exists!").arg(localPath));
+        return;
+    }else{
+        QDir dir;
+        if(!dir.mkpath(remoteFileSaveDir)){
+            clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create directory '%1'!").arg(remoteFileSaveDir));
+            return;
+        }
+    }
+
+    Q_ASSERT(!fileTXWithAdmin);
+    fileTXWithAdmin = new QFile(localPath);
+    if(!fileTXWithAdmin->open(QIODevice::WriteOnly)){
+        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
+        closeFileTXWithAdmin();
+        return;
+    }
+
+    if (!fileTXWithAdmin->resize(size)) {
+        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to resize file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
+        closeFileTXWithAdmin();
+        return;
+    }
+
+    fileTXWithAdminStatus = MS::File_TX_Receiving;
+    clientPacketsParser->responseFileTX(socketID, true, quint8(MS::FileTX_NO_Error), "");
+
+
+}
+
+void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QString &filePath){
+
+    Q_ASSERT(!fileTXWithAdmin);
+    fileTXWithAdmin = new QFile(filePath);
+    if(!fileTXWithAdmin->open(QIODevice::ReadOnly)){
+        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Read_Error), tr("Failed to open file '%1':%2!").arg(filePath).arg(fileTXWithAdmin->errorString()));
+        closeFileTXWithAdmin();
+        return;
+    }
+
+    fileTXWithAdminStatus = MS::File_TX_Sending;
+    clientPacketsParser->responseFileTX(socketID, true, quint8(MS::FileTX_NO_Error), "");
+
+}
+
+void ClientService::processFileDataRequestPacket(int socketID, quint64 offset, quint64 length){
+
+    fileTXWithAdmin->seek(offset);
+    QByteArray chunk = fileTXWithAdmin->read(qMin<qint64>(length, fileTXWithAdmin->size() - fileTXWithAdmin->pos()));
+
+    clientPacketsParser->sendFileData(socketID, offset, &chunk);
+
+}
+
+void ClientService::processFileDataReceivedPacket(int socketID, quint64 offset, const QByteArray &data){
+
+    if(!fileTXWithAdmin){
+        clientPacketsParser->fileTXStatusChanged(socketID, quint8(MS::File_TX_Aborted));
+        return;
+    }
+
+    fileTXWithAdmin->seek(offset);
+    qint64 bytesWritten = fileTXWithAdmin->write(data.constData(), qMin<qint64>(data.size(), fileTXWithAdmin->size() - fileTXWithAdmin->pos()));
+    if(bytesWritten == -1){
+        clientPacketsParser->fileTXStatusChanged(socketID, quint8(MS::File_TX_Aborted));
+        clientPacketsParser->sendClientMessagePacket(socketID, tr("Failed to write file '%1':%2!").arg(fileTXWithAdmin->fileName()).arg(fileTXWithAdmin->errorString()));
+        closeFileTXWithAdmin();
+    }
+
+    if(fileTXWithAdmin->pos() != fileTXWithAdmin->size() && fileTXWithAdminStatus != MS::File_TX_Paused && fileTXWithAdminStatus != MS::File_TX_Aborted){
+        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_BLOCK_SIZE);
+    }
+
+}
+
+void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status){
+
+    //MS::FileTXStatus status = MS::FileTXStatus(status);
+    switch(status){
+    case quint8(MS::File_TX_Preparing):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Receiving):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Sending):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Paused):
+    {
+
+        fileTXWithAdminStatus = MS::File_TX_Paused;
+    }
+        break;
+    case quint8(MS::File_TX_Aborted):
+    {
+        closeFileTXWithAdmin();
+
+    }
+        break;
+    case quint8(MS::File_TX_Done):
+    {
+
+    }
+        break;
+    default:
+        break;
+    }
+
+}
+
+inline void ClientService::closeFileTXWithAdmin(){
+
+    if(fileTXWithAdmin){
+        fileTXWithAdmin->close();
+        delete fileTXWithAdmin;
+        fileTXWithAdmin = 0;
+    }
+    fileTXWithAdminStatus = MS::File_TX_Done;
 
 }
 
@@ -1968,6 +2118,7 @@ void ClientService::stop()
     }
 
 
+    closeFileTXWithAdmin();
 
 
 }

@@ -199,7 +199,7 @@ bool ServerService::startMainService(){
 
     sendServerOnlinePacketTimer = new QTimer(this);
     sendServerOnlinePacketTimer->setSingleShot(false);
-    sendServerOnlinePacketTimer->setInterval(30*60000);
+    sendServerOnlinePacketTimer->setInterval(15*60000);
     connect(sendServerOnlinePacketTimer, SIGNAL(timeout()), this, SLOT(sendServerOnlinePacket()));
     sendServerOnlinePacketTimer->start();
 
@@ -280,8 +280,8 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         clientInfoHash.insert(computerName, info);
         //qWarning()<<QString("Client Info of '%1' Exists In:  Memory:NO  DB:%2").arg(computerName).arg(isRecordExistInDB(computerName)?"YES":"NO")<<"\n";
     }
-    qWarning();
-    qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
+    //qWarning();
+    //qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 
     if(isRecordExistInDB(computerName)){
@@ -362,8 +362,8 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         }
     } 
 
-    qWarning();
-    qWarning()<<QString(" '%1' Exists In:  Memory:%2  DB:%3 Version:%4").arg(computerName).arg(clientInfoHash.contains(computerName)?"YES":"NO").arg(isRecordExistInDB(computerName)?"YES":"NO").arg(clientVersion);
+    //qWarning();
+    //qWarning()<<QString(" '%1' Exists In:  Memory:%2  DB:%3 Version:%4").arg(computerName).arg(clientInfoHash.contains(computerName)?"YES":"NO").arg(isRecordExistInDB(computerName)?"YES":"NO").arg(clientVersion);
 
 
 }
@@ -848,7 +848,10 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
         info->setClientUDTListeningAddress(ip);
         info->setClientUDTListeningPort(port);
     }
-    qWarning()<<QString("Client '%1' From %2:%3 %4 ! %5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+
+    qWarning();
+    qWarning()<<QString("Client '%1' From %2:%3 %4 ! Time:%5 Version:%6").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss")).arg(info->getClientVersion());
+    qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 
 }

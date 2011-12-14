@@ -87,6 +87,10 @@
 #endif
 
 
+#ifndef FILE_BLOCK_SIZE
+#define FILE_BLOCK_SIZE 8192 //8KB
+#endif
+
 #include "HHSharedNetwork/hglobal_network.h"
 
 
@@ -106,7 +110,7 @@ namespace HEHUI {
             ClientOffline,
 
             ServerOnline,
-            ServerOffline, //11
+            ServerOffline, //12
 
             ClientDetailedInfoRequested,
             ClientResponseClientDetailedInfo,
@@ -151,7 +155,41 @@ namespace HEHUI {
             LocalServiceServerDeclare,
             LocalUserOnline,
             LocalUserOffline,
+
+            RequestDownloadFile,
+            RequestUploadFile,
+            //RequestFileTX,
+            ResponseFileTX,
+            FileInfo,
+            RequestFileData,
+            FileData,
+            FileTXStatusChanged,
+
+
+
             
+
+        };
+
+        enum FileTXStatus{
+            File_TX_Preparing,
+            File_TX_Receiving,
+            File_TX_Sending,
+            //File_TX_Transferring,
+            File_TX_Paused,
+            File_TX_Aborted,
+            File_TX_Done
+        };
+
+        enum FileTXError{
+            FileTX_NO_Error = 0,
+            FileTX_Exist_Error,
+            FileTX_Not_Exist_Error,
+            FileTX_Read_Error,
+            FileTX_Write_Error,
+            FileTX_Network_Error,
+            FileTX_Checksum_Error,
+            FileTX_Unknown_Error = 0,
 
         };
 
