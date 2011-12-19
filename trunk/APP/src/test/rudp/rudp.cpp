@@ -335,10 +335,15 @@ void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort)
 
 void RUDPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data){
 
+
+
     m_receivedDataCount++;
     QString md5 = Cryptography::MD5(data).toBase64();
 
     ui.textBrowser->append(QString::number(m_receivedDataCount)+" Data Received From "+peerAddress+":"+QString::number(peerPort)+" MD5:"+md5+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
+
+
+
 
 }
 
