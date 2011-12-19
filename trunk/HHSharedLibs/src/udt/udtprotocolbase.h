@@ -162,6 +162,10 @@ public slots:
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
+    //Send & Receive File
+    qint64 sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize = 8192);
+    qint64 receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size);
+
     //Close the server
     void closeUDTProtocol();
 

@@ -11,6 +11,8 @@
 #include <QCoreApplication>
 #include <QtConcurrentRun>
 #include <QDebug>
+#include <QFile>
+
 
 //#ifndef Q_OS_WIN32
 //   #include <unistd.h>
@@ -237,6 +239,67 @@ void UDTProtocolBase::startWaitingForIOInOneThread(int msecWaitForIOTimeout){
     QtConcurrent::run(this, &UDTProtocolBase::waitForIO, msecWaitForIOTimeout);
 
 }
+
+qint64 UDTProtocolBase::sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize){
+
+    if(!QFile::exists(filePath)){
+        m_errorMessage = tr("File '%1' does not exist").arg(filePath);
+        qCritical()<<m_errorMessage;
+        return -1;
+    }
+
+    // open the file
+    fstream ifs(filePath.toStdString().c_str(), ios::in | ios::binary);
+
+    //ifs.seekg(0, ios::end);
+    //int64_t size = ifs.tellg();
+    ifs.seekg(0, ios::beg);
+
+    UDT::TRACEINFO trace;
+    UDT::perfmon(socket, &trace);
+
+    // send the file
+    //int64_t offset = 0;
+    qint64 sentSize = -1;
+    if (UDT::ERROR == (sentSize = UDT::sendfile(socket, ifs, offset, size, blockSize)) )
+    {
+        m_errorMessage = tr("Failed to send file! ") + UDT::getlasterror().getErrorMessage();
+        qCritical()<<m_errorMessage;
+       //cout << "sendfile: " << UDT::getlasterror().getErrorMessage() << endl;
+       return -1;
+    }
+
+    UDT::perfmon(socket, &trace);
+    cout << "speed = " << trace.mbpsSendRate/8 << "MB/sec" << endl;
+
+    ifs.close();
+
+    return sentSize;
+
+}
+
+qint64 UDTProtocolBase::receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size){
+
+
+    // receive the file
+    fstream ofs(fileSavePath.toStdString().c_str(), ios::out | ios::binary | ios::trunc);
+    int64_t recvsize;
+    //int64_t offset = 0;
+
+    if (UDT::ERROR == (recvsize = UDT::recvfile(socket, ofs, offset, size)))
+    {
+        m_errorMessage = tr("Failed to receive file! ") + UDT::getlasterror().getErrorMessage();
+        qCritical()<<m_errorMessage;
+       //cout << "recvfile: " << UDT::getlasterror().getErrorMessage() << endl;
+       return -1;
+    }
+
+    ofs.close();
+
+    return recvsize;
+
+}
+
 
 void UDTProtocolBase::closeUDTProtocol(){
     qDebug()<<"--UDTProtocolBase::closeUDTProtocol()";
