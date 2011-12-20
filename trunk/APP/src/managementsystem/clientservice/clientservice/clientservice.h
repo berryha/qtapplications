@@ -119,13 +119,16 @@ private slots:
 
 ///////////////////
     //File TX
-    void processAdminRequestUploadFilePacket(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
+    void startFileManager();
+    void processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
     void processAdminRequestDownloadFilePacket(int socketID, const QString &filePath);
-    void processFileDataRequestPacket(int socketID, quint64 offset, quint64 length);
-    void processFileDataReceivedPacket(int socketID, quint64 offset, const QByteArray &data);
+    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex);
+    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void processFileTXStatusChangedPacket(int socketID, quint8 status);
 
-    void closeFileTXWithAdmin();
+    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+    void fileTXError(int requestID, const QByteArray &fileMD5, FileManager::Error error, const QString &errorString);
+    void pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 protected:
     void start();
@@ -182,8 +185,13 @@ private:
     QString m_serverName;
     int m_serverInstanceID;
 
-    QFile *fileTXWithAdmin;
-    MS::FileTXStatus fileTXWithAdminStatus;
+    FileManager *m_fileManager;
+
+//    QFile *fileTXWithAdmin;
+//    MS::FileTXStatus fileTXWithAdminStatus;
+
+    QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
+    QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
 
 };
 

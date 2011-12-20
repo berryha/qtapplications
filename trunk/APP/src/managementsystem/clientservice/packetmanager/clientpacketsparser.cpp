@@ -460,12 +460,13 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::RequestUploadFile):
     {
+        QByteArray fileMD5Sum;
         QString fileName = "";
         quint64 size = 0;
         QString remoteFileSaveDir = "";
-        in >> fileName >> size >> remoteFileSaveDir ;
+        in >> fileMD5Sum >> fileName >> size >> remoteFileSaveDir ;
 
-        emit signalAdminRequestUploadFile(socketID, fileName, size, remoteFileSaveDir);
+        emit signalAdminRequestUploadFile(socketID, fileMD5Sum, fileName, size, remoteFileSaveDir);
 
         qDebug()<<"~~RequestUploadFile";
     }
@@ -482,28 +483,30 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::RequestFileData):
     {
-        quint64 offset = 0, length = 0;
-        in >> offset >> length ;
+        QByteArray fileMD5;
+        int pieceIndex = 0;
+        in >> fileMD5 >> pieceIndex ;
 
-        emit signalFileDataRequested(socketID, offset, length);
+        emit signalFileDataRequested(socketID, fileMD5, pieceIndex);
 
         qDebug()<<"~~RequestFileData";
     }
     break;
     case quint8(MS::FileData):
     {
-        int size = 0;
-        quint64 offset = 0;
-        QByteArray data, sha1;
-        in >> size >> offset >> data >>sha1;
+        QByteArray fileMD5, data, sha1;;
+        int pieceIndex = 0;
 
-        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
-            qCritical()<<"ERROR! Data Verification Failed!";
-            requestFileData(socketID, offset, size);
-            return;
-        }
 
-        emit signalFileDataReceived(socketID, offset, data);
+        in >> fileMD5 >> pieceIndex >> data >>sha1;
+
+//        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
+//            qCritical()<<"ERROR! Data Verification Failed!";
+//            requestFileData(socketID, offset, size);
+//            return;
+//        }
+
+        emit signalFileDataReceived(socketID, fileMD5, pieceIndex, data, sha1);
 
         qDebug()<<"~~FileData";
     }
@@ -518,8 +521,17 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~FileTXStatusChanged";
     }
     break;
+    case quint8(MS::FileTXError):
+    {
+        quint8 errorCode;
+        QString message;
+        in >> errorCode >> message;
 
+        emit signalFileTXError(errorCode, message);
 
+        qDebug()<<"~~FileTXStatusChanged";
+    }
+    break;
 
 
 

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #include <QHostInfo>
+#include <QByteArray>
 
 #include "clientservice.h"
 //#include "sharedms/global_shared.h"
@@ -76,8 +77,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverName = "";
     m_serverInstanceID = 0;
 
-    fileTXWithAdmin = 0;
-    fileTXWithAdminStatus = MS::File_TX_Done;
+    m_fileManager = 0;
+//    fileTXWithAdmin = 0;
+//    fileTXWithAdminStatus = MS::File_TX_Done;
 
 //#if defined(Q_OS_WIN32)
 //    delete wm;
@@ -223,11 +225,12 @@ bool ClientService::startMainService(){
     
     ////////////////////
     //File TX
-    connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int,QString,quint64,QString)), this, SLOT(processAdminRequestUploadFilePacket(int,QString,quint64,QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int,quint64,quint64)), this, SLOT(processFileDataRequestPacket(int,quint64,quint64)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int,quint64,QByteArray)), this, SLOT(processFileDataReceivedPacket(int,quint64,QByteArray)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
+
 
 
 
@@ -744,7 +747,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
         clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_localWorkgroupName, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
-        closeFileTXWithAdmin();
+//        closeFileTXWithAdmin();
     }
 
 
@@ -1886,91 +1889,130 @@ void ClientService::peerDisconnected(int socketID){
         m_adminAddress = "";
         m_adminPort = 0;
 
-        closeFileTXWithAdmin();
+//        closeFileTXWithAdmin();
     }else{
         clientPacketsParser->localUserOffline(socketID);
+    }
+
+    QList<QByteArray> files = fileTXSocketHash.values(socketID);
+    fileTXSocketHash.remove(socketID);
+    QList<QByteArray> allFiles = fileTXSocketHash.values();
+
+    foreach (QByteArray fileMD5, files) {
+        if(!allFiles.contains(fileMD5)){
+            m_fileManager->closeFile(fileMD5);
+        }
     }
 
 
 }
 
 
-void ClientService::processAdminRequestUploadFilePacket(int socketID, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
+void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
+
+    startFileManager();
 
     QString localPath = remoteFileSaveDir + "/" + fileName;
-    if(QFile::exists(localPath)){
-        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Exist_Error), tr("File '%1' Already Exists!").arg(localPath));
-        return;
+
+    QString errorString;
+    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
+    if(!info){
+        clientPacketsParser->responseFileUploadRequest(socketID, false, errorString);
+    }
+
+
+
+
+
+//    if(QFile::exists(localPath)){
+//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Exist_Error), tr("File '%1' Already Exists!").arg(localPath));
+//        return;
+//    }else{
+//        QDir dir;
+//        if(!dir.mkpath(remoteFileSaveDir)){
+//            clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create directory '%1'!").arg(remoteFileSaveDir));
+//            return;
+//        }
+//    }
+
+//    Q_ASSERT(!fileTXWithAdmin);
+//    fileTXWithAdmin = new QFile(localPath);
+//    if(!fileTXWithAdmin->open(QIODevice::WriteOnly)){
+//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
+//        closeFileTXWithAdmin();
+//        return;
+//    }
+
+//    if (!fileTXWithAdmin->resize(size)) {
+//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to resize file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
+//        closeFileTXWithAdmin();
+//        return;
+//    }
+
+//    fileTXWithAdminStatus = MS::File_TX_Receiving;
+
+    if(clientPacketsParser->responseFileUploadRequest(socketID, true, "")){
+        fileTXSocketHash.insertMulti(socketID, fileMD5Sum);
+
     }else{
-        QDir dir;
-        if(!dir.mkpath(remoteFileSaveDir)){
-            clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create directory '%1'!").arg(remoteFileSaveDir));
-            return;
-        }
+        m_fileManager->closeFile(fileMD5Sum);
     }
 
-    Q_ASSERT(!fileTXWithAdmin);
-    fileTXWithAdmin = new QFile(localPath);
-    if(!fileTXWithAdmin->open(QIODevice::WriteOnly)){
-        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
-        closeFileTXWithAdmin();
-        return;
-    }
 
-    if (!fileTXWithAdmin->resize(size)) {
-        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to resize file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
-        closeFileTXWithAdmin();
-        return;
-    }
-
-    fileTXWithAdminStatus = MS::File_TX_Receiving;
-    clientPacketsParser->responseFileTX(socketID, true, quint8(MS::FileTX_NO_Error), "");
 
 
 }
 
 void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QString &filePath){
 
-    Q_ASSERT(!fileTXWithAdmin);
-    fileTXWithAdmin = new QFile(filePath);
-    if(!fileTXWithAdmin->open(QIODevice::ReadOnly)){
-        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Read_Error), tr("Failed to open file '%1':%2!").arg(filePath).arg(fileTXWithAdmin->errorString()));
-        closeFileTXWithAdmin();
-        return;
+    startFileManager();
+
+    QString errorString;
+    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
+    if(!info){
+        clientPacketsParser->denyFileDownloadRequest(socketID, false, errorString);
     }
 
-    fileTXWithAdminStatus = MS::File_TX_Sending;
-    clientPacketsParser->responseFileTX(socketID, true, quint8(MS::FileTX_NO_Error), "");
+
+
+
+//    Q_ASSERT(!fileTXWithAdmin);
+//    fileTXWithAdmin = new QFile(filePath);
+//    if(!fileTXWithAdmin->open(QIODevice::ReadOnly)){
+//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Read_Error), tr("Failed to open file '%1':%2!").arg(filePath).arg(fileTXWithAdmin->errorString()));
+//        closeFileTXWithAdmin();
+//        return;
+//    }
+
+//    fileTXWithAdminStatus = MS::File_TX_Sending;
+
+    if(clientPacketsParser->acceptFileDownloadRequest(socketID, true, info->md5sum, info->size)){
+        fileTXSocketHash.insertMulti(socketID, info->md5sum);
+    }else{
+        m_fileManager->closeFile(info->md5sum);
+    }
+
+
 
 }
 
-void ClientService::processFileDataRequestPacket(int socketID, quint64 offset, quint64 length){
+void ClientService::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex){
 
-    fileTXWithAdmin->seek(offset);
-    QByteArray chunk = fileTXWithAdmin->read(qMin<qint64>(length, fileTXWithAdmin->size() - fileTXWithAdmin->pos()));
+    Q_ASSERT(m_fileManager);
 
-    clientPacketsParser->sendFileData(socketID, offset, &chunk);
+    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
+    fileTXRequestHash.insert(id, socketID);
 
 }
 
-void ClientService::processFileDataReceivedPacket(int socketID, quint64 offset, const QByteArray &data){
+void ClientService::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
 
-    if(!fileTXWithAdmin){
-        clientPacketsParser->fileTXStatusChanged(socketID, quint8(MS::File_TX_Aborted));
-        return;
-    }
+    Q_ASSERT(m_fileManager);
+    m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
 
-    fileTXWithAdmin->seek(offset);
-    qint64 bytesWritten = fileTXWithAdmin->write(data.constData(), qMin<qint64>(data.size(), fileTXWithAdmin->size() - fileTXWithAdmin->pos()));
-    if(bytesWritten == -1){
-        clientPacketsParser->fileTXStatusChanged(socketID, quint8(MS::File_TX_Aborted));
-        clientPacketsParser->sendClientMessagePacket(socketID, tr("Failed to write file '%1':%2!").arg(fileTXWithAdmin->fileName()).arg(fileTXWithAdmin->errorString()));
-        closeFileTXWithAdmin();
-    }
 
-    if(fileTXWithAdmin->pos() != fileTXWithAdmin->size() && fileTXWithAdminStatus != MS::File_TX_Paused && fileTXWithAdminStatus != MS::File_TX_Aborted){
-        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_BLOCK_SIZE);
-    }
+//        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_PIECE_LENGTH);
+
 
 }
 
@@ -1996,12 +2038,12 @@ void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status
     case quint8(MS::File_TX_Paused):
     {
 
-        fileTXWithAdminStatus = MS::File_TX_Paused;
+//        fileTXWithAdminStatus = MS::File_TX_Paused;
     }
         break;
     case quint8(MS::File_TX_Aborted):
     {
-        closeFileTXWithAdmin();
+//        closeFileTXWithAdmin();
 
     }
         break;
@@ -2016,16 +2058,62 @@ void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status
 
 }
 
-inline void ClientService::closeFileTXWithAdmin(){
+void ClientService::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
 
-    if(fileTXWithAdmin){
-        fileTXWithAdmin->close();
-        delete fileTXWithAdmin;
-        fileTXWithAdmin = 0;
-    }
-    fileTXWithAdminStatus = MS::File_TX_Done;
+    int socketID = fileTXRequestHash.take(requestID);
+    clientPacketsParser->sendFileData(socketID, fileMD5, pieceIndex, &data, &dataSHA1SUM);
 
 }
+
+void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, FileManager::Error error, const QString &errorString){
+    qCritical()<<errorString;
+
+    if(requestID){
+        int socketID = fileTXRequestHash.take(requestID);
+        clientPacketsParser->fileTXError(socketID, fileMD5, quint8(error), errorString);
+    }else{
+        //TODO:
+    }
+
+
+}
+
+void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
+
+    QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+    if(sockets.isEmpty()){
+        //TODO:
+        //m_fileManager->closeFile(fileMD5);
+    }
+
+    if(verified){
+        int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+        if(uncompletedPieceIndex < 0){
+            return;
+        }
+
+        clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+
+    }else{
+
+        clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex);
+    }
+
+}
+
+void ClientService::startFileManager(){
+
+    if(!m_fileManager){
+        m_fileManager = ClientResourcesManager::instance()->getFileManager();
+        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, FileManager::Error , const QString &)), this, SLOT(fileTXError(int, const QByteArray &, FileManager::Error , const QString &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(), this, SLOT(), Qt::QueuedConnection);
+
+    }
+
+}
+
 
 
 void ClientService::update(){
@@ -2118,7 +2206,7 @@ void ClientService::stop()
     }
 
 
-    closeFileTXWithAdmin();
+//    closeFileTXWithAdmin();
 
 
 }
