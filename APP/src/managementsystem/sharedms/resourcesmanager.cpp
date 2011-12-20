@@ -29,6 +29,8 @@ ResourcesManager::ResourcesManager(QObject *parent)
     udpServer = 0;
     udtProtocol = 0;
 
+    m_fileManager = 0;
+
 
     //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
     //if(!QMetaType::isRegistered(QMetaType::type("HEHUI::Packet"))){
@@ -58,6 +60,12 @@ ResourcesManager::~ResourcesManager() {
         udtProtocol->closeUDTProtocol();
         delete udtProtocol;
         udtProtocol = 0;
+    }
+
+    if(m_fileManager){
+        m_fileManager->exit();
+        delete m_fileManager;
+        m_fileManager = 0;
     }
 
 
@@ -142,6 +150,16 @@ UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddres
     }
 
     return udtProtocol;
+
+}
+
+FileManager *ResourcesManager::getFileManager(){
+    if(!m_fileManager){
+        m_fileManager = new FileManager(this);
+        m_fileManager->start();
+    }
+
+    return m_fileManager;
 
 }
 

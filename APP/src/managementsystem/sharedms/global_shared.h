@@ -87,9 +87,6 @@
 #endif
 
 
-#ifndef FILE_BLOCK_SIZE
-#define FILE_BLOCK_SIZE 8192 //8KB
-#endif
 
 #include "HHSharedNetwork/hglobal_network.h"
 
@@ -158,12 +155,12 @@ namespace HEHUI {
 
             RequestDownloadFile,
             RequestUploadFile,
-            //RequestFileTX,
-            ResponseFileTX,
-            FileInfo,
+            ResponseFileDownloadRequest,
+            ResponseFileUploadRequest,
             RequestFileData,
             FileData,
             FileTXStatusChanged,
+            FileTXError,
 
 
 
@@ -181,17 +178,7 @@ namespace HEHUI {
             File_TX_Done
         };
 
-        enum FileTXError{
-            FileTX_NO_Error = 0,
-            FileTX_Exist_Error,
-            FileTX_Not_Exist_Error,
-            FileTX_Read_Error,
-            FileTX_Write_Error,
-            FileTX_Network_Error,
-            FileTX_Checksum_Error,
-            FileTX_Unknown_Error = 0,
 
-        };
 
         enum Log{
             LOG_Unknown = 0,

@@ -11,9 +11,12 @@
 #include <QObject>
 #include <QCoreApplication>
 
-#include "udtprotocol.h"
-
 #include "global_shared.h"
+#include "udtprotocol.h"
+#include "filemanager.h"
+
+
+
 #include "HHSharedCore/hmysharedlib_global.h"
 #include "HHSharedNetwork/hudpsocket.h"
 
@@ -38,6 +41,7 @@ public:
     UDTProtocol * getUDTProtocol(){return udtProtocol;}
     UDTProtocol * startUDTProtocol(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
+    FileManager *getFileManager();
 
 private:
 
@@ -45,6 +49,8 @@ private:
     UDPServer *ipmcServer;
     UDPServer *udpServer;
     UDTProtocol *udtProtocol;
+
+    FileManager *m_fileManager;
     
     
 
