@@ -470,6 +470,189 @@ public slots:
 
 
 
+    //////////////////////////////
+        bool requestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir = "./"){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::RequestUploadFile));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileMD5Sum << fileName << size << remoteFileSaveDir;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool requestDownloadFile(int socketID, const QString &remoteFilePath){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::RequestDownloadFile));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << remoteFilePath;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool acceptFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QByteArray &fileMD5Sum, quint64 size){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::ResponseFileDownloadRequest));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileName << accepted << fileMD5Sum << size;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+        bool denyFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QString &message){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::ResponseFileDownloadRequest));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileName << accepted << message;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool responseFileUploadRequest(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::ResponseFileUploadRequest));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileMD5Sum << accepted << message;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool requestFileData(int socketID, const QByteArray &fileMD5, int pieceIndex){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::RequestFileData));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileMD5 << pieceIndex ;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool sendFileData(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray *data, const QByteArray *sha1){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::FileData));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileMD5 << pieceIndex << *data << *sha1 ;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool fileTXStatusChanged(int socketID, quint8 status){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::FileTXStatusChanged));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << status ;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+        bool fileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
+            Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+            packet->setPacketType(quint8(MS::FileTXError));
+            packet->setTransmissionProtocol(TP_UDT);
+            QByteArray ba;
+            QDataStream out(&ba, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_4_7);
+            out << m_localComputerName << fileMD5 << errorCode << errorString ;
+            packet->setPacketData(ba);
+
+            ba.clear();
+            out.device()->seek(0);
+            QVariant v;
+            v.setValue(*packet);
+            out << v;
+
+            return m_udtProtocol->sendData(socketID, &ba);
+        }
+
+
+
+
 
 signals:
     void  signalHeartbeatPacketReceived(const QString &computerName);
@@ -514,6 +697,19 @@ signals:
     
     void signalClientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
 
+
+///////////////////////////
+    void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
+    void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
+
+    void signalFileDownloadRequestAccepted(int socketID, const QString &fileName, const QByteArray &fileMD5Sum, quint64 size);
+    void signalFileDownloadRequestDenied(int socketID, const QString &fileName, const QString &message);
+    void signalFileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+
+    void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int pieceIndex);
+    void signalFileDataReceived(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+    void signalFileTXStatusChanged(int socketID, quint8 status);
+    void signalFileTXError(quint8 errorCode, const QString &errorString);
 
 
 public slots:

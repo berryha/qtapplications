@@ -321,6 +321,116 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
+///////////////////////////////////////////////
+    case quint8(MS::RequestUploadFile):
+    {
+        QByteArray fileMD5Sum;
+        QString fileName = "";
+        quint64 size = 0;
+        QString remoteFileSaveDir = "";
+        in >> fileMD5Sum >> fileName >> size >> remoteFileSaveDir ;
+
+        emit signalAdminRequestUploadFile(socketID, fileMD5Sum, fileName, size, remoteFileSaveDir);
+
+        qDebug()<<"~~RequestUploadFile";
+    }
+    break;
+    case quint8(MS::RequestDownloadFile):
+    {
+        QString filePath = "";
+        in >> filePath ;
+
+        emit signalAdminRequestDownloadFile(socketID, filePath);
+
+        qDebug()<<"~~RequestDownloadFile";
+    }
+    break;
+
+    case quint8(MS::ResponseFileDownloadRequest):
+    {
+        QString fileName = "";
+        bool accepted = false;
+        in >> fileName >> accepted;
+
+        if(accepted){
+            QByteArray fileMD5Sum;
+            quint64 size = 0;
+            in >> fileMD5Sum >> size;
+            emit signalFileDownloadRequestAccepted(socketID, fileName, fileMD5Sum, size);
+        }else{
+            QString message;
+            in >> message;
+            emit signalFileDownloadRequestDenied(socketID, fileName, message);
+
+        }
+
+        qDebug()<<"~~ResponseFileDownloadRequest";
+    }
+    break;
+    case quint8(MS::ResponseFileUploadRequest):
+    {
+
+        QByteArray fileMD5Sum;
+        QString message = "";
+        bool accepted = false;
+        in >> fileMD5Sum >> accepted >> message;
+        emit signalFileUploadRequestResponsed(socketID, fileMD5Sum, accepted, message);
+
+        qDebug()<<"~~ResponseFileUploadRequest";
+    }
+    break;
+
+    case quint8(MS::RequestFileData):
+    {
+        QByteArray fileMD5;
+        int pieceIndex = 0;
+        in >> fileMD5 >> pieceIndex ;
+
+        emit signalFileDataRequested(socketID, fileMD5, pieceIndex);
+
+        qDebug()<<"~~RequestFileData";
+    }
+    break;
+    case quint8(MS::FileData):
+    {
+        QByteArray fileMD5, data, sha1;;
+        int pieceIndex = 0;
+
+
+        in >> fileMD5 >> pieceIndex >> data >>sha1;
+
+//        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
+//            qCritical()<<"ERROR! Data Verification Failed!";
+//            requestFileData(socketID, offset, size);
+//            return;
+//        }
+
+        emit signalFileDataReceived(socketID, fileMD5, pieceIndex, data, sha1);
+
+        qDebug()<<"~~FileData";
+    }
+    break;
+    case quint8(MS::FileTXStatusChanged):
+    {
+        quint8 status;
+        in >> status;
+
+        emit signalFileTXStatusChanged(socketID, status);
+
+        qDebug()<<"~~FileTXStatusChanged";
+    }
+    break;
+    case quint8(MS::FileTXError):
+    {
+        quint8 errorCode;
+        QString message;
+        in >> errorCode >> message;
+
+        emit signalFileTXError(errorCode, message);
+
+        qDebug()<<"~~FileTXStatusChanged";
+    }
+    break;
 
     default:
         qWarning()<<"ControlCenterPacketsParser! Unknown Packet Type: "<<packetType

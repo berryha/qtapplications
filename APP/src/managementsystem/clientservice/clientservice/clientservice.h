@@ -125,10 +125,12 @@ private slots:
     void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex);
     void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void processFileTXStatusChangedPacket(int socketID, quint8 status);
+    void processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString);
 
     void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-    void fileTXError(int requestID, const QByteArray &fileMD5, FileManager::Error error, const QString &errorString);
+    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
     void pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress);
+
 
 protected:
     void start();

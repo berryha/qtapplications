@@ -88,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
         //使窗口居中
         //Center the window
         moveWindow(positon);
-        showMaximized();
+        //showMaximized();
     }
 
 
@@ -165,8 +165,6 @@ void MainWindow::changeEvent ( QEvent * event ){
     event->ignore();
 
 }
-
-
 
 void MainWindow::initUI(){
 
