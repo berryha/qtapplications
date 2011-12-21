@@ -42,6 +42,10 @@ public slots:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+
 
 private slots:
     void on_toolButtonVerify_clicked();
@@ -85,7 +89,26 @@ private slots:
 
     void userResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
 
+///////////////////
+    //File TX
+    void startFileManager();
+    void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
+    void processPeerRequestDownloadFilePacket(int socketID, const QString &filePath);
 
+    void fileDownloadRequestAccepted(int socketID, const QString &fileName, const QByteArray &fileMD5Sum, quint64 size);
+    void fileDownloadRequestDenied(int socketID, const QString &fileName, const QString &message);
+    void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+
+    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex);
+    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+    void processFileTXStatusChangedPacket(int socketID, quint8 status);
+    void processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString);
+
+    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+    void pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress);
+
+    void filesDropped(const QStringList &localFiles);
 private:
     bool verifyPrivilege();
     bool temporarilyAllowed();
@@ -125,6 +148,10 @@ private:
     //UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
+
+    FileManager *m_fileManager;
+    QList<int/*File TX Request ID*/> fileTXRequestList;
+    QList<QByteArray/*File MD5*/> filesList;
 
 
 };

@@ -174,6 +174,7 @@ void MainWindow::changeEvent ( QEvent * event ){
 
 
 
+
 void MainWindow::initUI(){
 
     ui.menuView->addSeparator();

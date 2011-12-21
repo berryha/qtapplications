@@ -125,7 +125,7 @@ public slots:
 
 signals:
     void dataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-    void error(int requestID, const QByteArray &fileMD5, Error error, const QString &errorString);
+    void error(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
 //    void verificationProgress(QByteArray fileMD5, int percent);
 //    void verificationDone(QByteArray fileMD5);
     void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);

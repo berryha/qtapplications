@@ -67,7 +67,7 @@ FileManager::FileManager(QObject *parent)
 
     //qsrand(QDateTime::currentDateTime().toTime_t());
 
-    qRegisterMetaType<FileManager::Error>("FileManager::Error");
+//    qRegisterMetaType<FileManager::Error>("FileManager::Error");
 }
 
 FileManager::~FileManager()
@@ -578,7 +578,7 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
 
     if(!info){
         QString errString = tr("Failed to read file info!");
-        emit error(requestID, info->md5sum, ERROR_UNKNOWN, errString);
+        emit error(requestID, info->md5sum, quint8(ERROR_UNKNOWN), errString);
         return block;
     }
 
@@ -590,7 +590,7 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
     if (!file->isOpen()) {
         if (!file->open(QFile::ReadWrite)) {
             QString errString = tr("Failed to read data from file '%1'! %2").arg(file->fileName()).arg(file->errorString());
-            emit error(requestID, info->md5sum, FILE_READ_ERROR, errString);
+            emit error(requestID, info->md5sum, quint8(FILE_READ_ERROR), errString);
             return block;
         }
     }
@@ -602,7 +602,7 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
 
     if (block.size() != sizeToRead) {
         QString errString = tr("Failed to read data from file '%1'! %2").arg(file->fileName()).arg(file->errorString());
-        emit error(requestID, info->md5sum, FILE_READ_ERROR, errString);
+        emit error(requestID, info->md5sum, quint8(FILE_READ_ERROR), errString);
         return QByteArray();
     }
 
@@ -614,7 +614,7 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
 
     if(!info){
         QString errString = tr("Failed to read file info!");
-        emit error(0, info->md5sum, ERROR_UNKNOWN, errString);
+        emit error(0, info->md5sum, quint8(ERROR_UNKNOWN), errString);
         return false;
     }
 
@@ -628,7 +628,7 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
     if (!file->isOpen()) {
         if (!file->open(QFile::ReadWrite)) {
             QString errString = tr("Failed to open file '%1'! %2").arg(file->fileName()).arg(file->errorString());
-            emit error(0, info->md5sum, FILE_READ_ERROR, errString);
+            emit error(0, info->md5sum, quint8(FILE_READ_ERROR), errString);
             return false;
         }
     }
@@ -639,7 +639,7 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
 
     if (bytesWritten <= 0) {
         QString errString = tr("Failed to write data to file '%1'! %2").arg(file->fileName()).arg(file->errorString());
-        emit error(0, info->md5sum, FILE_WRITE_ERROR, errString);
+        emit error(0, info->md5sum, quint8(FILE_WRITE_ERROR), errString);
         return false;
     }
 

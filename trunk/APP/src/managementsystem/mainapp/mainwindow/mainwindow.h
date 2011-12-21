@@ -92,6 +92,7 @@ protected:
     void closeEvent ( QCloseEvent * event );
     void changeEvent ( QEvent * event ) ;
 
+
 private:
     Ui::MainWindowUIClass ui;
 

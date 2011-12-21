@@ -527,7 +527,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString message;
         in >> errorCode >> message;
 
-        emit signalFileTXError(errorCode, message);
+        emit signalFileTXError(socketID, errorCode, message);
 
         qDebug()<<"~~FileTXStatusChanged";
     }

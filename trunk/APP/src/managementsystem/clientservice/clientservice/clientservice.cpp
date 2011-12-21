@@ -230,6 +230,7 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXError(int , quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , quint8 , const QString &)), Qt::QueuedConnection);
 
 
 
@@ -262,13 +263,14 @@ bool ClientService::startMainService(){
         updateAdministratorPassword("trousetrouse");
     }
 
-    checkUsersAccount();
     qWarning()<<"Check User Account!";
+    checkUsersAccount();
 
-    checkUSBSD();
     qWarning()<<"Check USB SD!";
-    checkProgrames();
+    checkUSBSD();
+
     qWarning()<<"Check Programes!";
+    checkProgrames();
 
 //    setupStartupWithSafeMode(true);
 
@@ -281,10 +283,10 @@ bool ClientService::startMainService(){
         wm->modifySystemSettings();
 
 #endif
-        
+
+        qWarning()<<"Update!";
         update();
         settings.setValue(section, QDateTime::currentDateTime());
-        qWarning()<<"Update!";
     }
     //update();
 
@@ -1374,17 +1376,17 @@ bool ClientService::checkUsersAccount(){
     //qDebug()<<"--ClientService::checkUsersAccount()";
 
 #ifdef Q_OS_WIN
-    
+qWarning()<<"--------------10";
     //WindowsManagement wm;
     QStringList users = wm->localUsers();
-    
+qWarning()<<"--------------11";
     if(users.contains(localComputerName, Qt::CaseInsensitive)){
         qWarning()<<QString("Computer name  '%1' is the same as user name!").arg(localComputerName);
         
         QString newComputerName = localComputerName + "-" +QDateTime::currentDateTime().toString("zzz");
         wm->setComputerName(newComputerName.toStdWString().c_str());
     }
-    
+qWarning()<<"--------------12";
     users.removeAll("system$");
     users.removeAll("administrator");
     users.removeAll("guest");
@@ -1397,10 +1399,10 @@ bool ClientService::checkUsersAccount(){
             users.removeAll(user);
         }
     }
-
+qWarning()<<"--------------13";
 
     //if(wm.isAdmin("guest")){
-    wm->deleteUserFromLocalGroup("guest", "Administrators");
+    //wm->deleteUserFromLocalGroup("guest", "Administrators");
     //    logMessage("Guest Is In Administrators Group", QtServiceBase::Information);
     //}
 
@@ -1458,6 +1460,7 @@ bool ClientService::checkUsersAccount(){
     bool needReboot = false;
 
     foreach(QString userName, users){
+        qWarning()<<"userName:"<<userName;
         QString queryString = QString("select cgroup as Department, cpassword as Password, Loc as Location from users where userid = '%1'  ") .arg(userName);
 
         if(!query.exec(queryString)){
@@ -1467,14 +1470,14 @@ bool ClientService::checkUsersAccount(){
 
         QPair<QDateTime, QDateTime> pair = wm->getUserLastLogonAndLogoffTime(userName);
         QDateTime lastLogonTime = pair.first;
-
+qWarning()<<"--------------1";
         if(query.first()){
             QString dept = query.value(0).toString().trimmed();
             QString pswd = query.value(1).toString().trimmed();
             QString loc = query.value(2).toString().trimmed();
             //qWarning()<<"old:"<<userPasswordsHash.value(userName);
             //qWarning()<<"new:"<<pswd;
-
+qWarning()<<"--------------2";
             if(!wm->updateUserPassword(userName, pswd)){
                 logs.append(wm->lastError());
                 qCritical()<<QString("Can not update password! User:%1, %2").arg(userName).arg(wm->lastError());
@@ -1490,7 +1493,7 @@ bool ClientService::checkUsersAccount(){
                 }
                 userPasswordsHash.insert(userName, pswd);
             }
-            
+qWarning()<<"--------------3";
             if(loc.toUpper() != "HK" && dept != "PDS" && dept != "Sample" ){
                 //                if(!wm->updateUserPassword(userName, pswd)){
                 //                    logs.append(wm->lastError());
@@ -1508,13 +1511,14 @@ bool ClientService::checkUsersAccount(){
                 }
 
             }
+qWarning()<<"--------------4";
             //Update workgroup
             if(m_localWorkgroupName != dept.toLower()){
                 wm->joinWorkgroup(dept.toStdWString().c_str());
             }
-            
+qWarning()<<"--------------5";
         }else{
-            if(userName != "hui" && userName != "hehui" && userName != "psayan"){
+            if(userName != "hui" && userName != "hehui" ){
 
                 //wm->setupUserAccountState(userName, false);
                 //qWarning()<<"User Disabled:"<<userName;
@@ -1522,7 +1526,7 @@ bool ClientService::checkUsersAccount(){
                 logs.append(tr("Unknown Account '%1'").arg(userName));
                 //logMessage(log, QtServiceBase::Information);
             }
-
+qWarning()<<"--------------6";
         }
         query.clear();
 
@@ -1544,7 +1548,7 @@ bool ClientService::checkUsersAccount(){
             //qWarning()<<userName<<" lastLogoffTime:"<<lastLogoffTime.toString("yyyy-MM-dd hh:mm:ss");
 
         }
-
+qWarning()<<"--------------7";
 
     }
 
@@ -1564,7 +1568,7 @@ bool ClientService::checkUsersAccount(){
         wm->runAs("administrator", getWinAdminPassword(), "shutdown.exe", QString("-r -t 600 -c \"%1\"").arg(comment), false);
     }
     
-    
+qWarning()<<"--------------8";
 
     return true;
 
@@ -1894,6 +1898,12 @@ void ClientService::peerDisconnected(int socketID){
         clientPacketsParser->localUserOffline(socketID);
     }
 
+    QList<int> requests = fileTXRequestHash.keys(socketID);
+    foreach (int request, requests) {
+        fileTXRequestHash.remove(request);
+
+    }
+
     QList<QByteArray> files = fileTXSocketHash.values(socketID);
     fileTXSocketHash.remove(socketID);
     QList<QByteArray> allFiles = fileTXSocketHash.values();
@@ -1907,6 +1917,18 @@ void ClientService::peerDisconnected(int socketID){
 
 }
 
+///////////////////////////////////////////////////////
+void ClientService::startFileManager(){
+
+    if(!m_fileManager){
+        m_fileManager = ClientResourcesManager::instance()->getFileManager();
+        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(error(int , const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int , const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
+
+    }
+
+}
 
 void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
 
@@ -1917,7 +1939,7 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
     QString errorString;
     const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
     if(!info){
-        clientPacketsParser->responseFileUploadRequest(socketID, false, errorString);
+        clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, false, errorString);
     }
 
 
@@ -1951,7 +1973,7 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
 
 //    fileTXWithAdminStatus = MS::File_TX_Receiving;
 
-    if(clientPacketsParser->responseFileUploadRequest(socketID, true, "")){
+    if(clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, true, "")){
         fileTXSocketHash.insertMulti(socketID, fileMD5Sum);
 
     }else{
@@ -1970,7 +1992,7 @@ void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QS
     QString errorString;
     const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
     if(!info){
-        clientPacketsParser->denyFileDownloadRequest(socketID, false, errorString);
+        clientPacketsParser->denyFileDownloadRequest(socketID, filePath, false, errorString);
     }
 
 
@@ -1986,7 +2008,7 @@ void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QS
 
 //    fileTXWithAdminStatus = MS::File_TX_Sending;
 
-    if(clientPacketsParser->acceptFileDownloadRequest(socketID, true, info->md5sum, info->size)){
+    if(clientPacketsParser->acceptFileDownloadRequest(socketID, filePath, true, info->md5sum, info->size)){
         fileTXSocketHash.insertMulti(socketID, info->md5sum);
     }else{
         m_fileManager->closeFile(info->md5sum);
@@ -2058,6 +2080,12 @@ void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status
 
 }
 
+void ClientService::processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString){
+    qDebug()<<"--ClientService::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
+    qCritical()<<errorString;
+
+}
+
 void ClientService::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
 
     int socketID = fileTXRequestHash.take(requestID);
@@ -2065,12 +2093,12 @@ void ClientService::fileDataRead(int requestID, const QByteArray &fileMD5, int p
 
 }
 
-void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, FileManager::Error error, const QString &errorString){
+void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
     qCritical()<<errorString;
 
     if(requestID){
         int socketID = fileTXRequestHash.take(requestID);
-        clientPacketsParser->fileTXError(socketID, fileMD5, quint8(error), errorString);
+        clientPacketsParser->fileTXError(socketID, fileMD5, errorCode, errorString);
     }else{
         //TODO:
     }
@@ -2101,18 +2129,7 @@ void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verif
 
 }
 
-void ClientService::startFileManager(){
 
-    if(!m_fileManager){
-        m_fileManager = ClientResourcesManager::instance()->getFileManager();
-        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, FileManager::Error , const QString &)), this, SLOT(fileTXError(int, const QByteArray &, FileManager::Error , const QString &)), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(), this, SLOT(), Qt::QueuedConnection);
-
-    }
-
-}
 
 
 
