@@ -523,11 +523,12 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::FileTXError):
     {
+        QByteArray fileMD5;
         quint8 errorCode;
         QString message;
-        in >> errorCode >> message;
+        in >> fileMD5 >> errorCode >> message;
 
-        emit signalFileTXError(socketID, errorCode, message);
+        emit signalFileTXError(socketID, fileMD5, errorCode, message);
 
         qDebug()<<"~~FileTXStatusChanged";
     }

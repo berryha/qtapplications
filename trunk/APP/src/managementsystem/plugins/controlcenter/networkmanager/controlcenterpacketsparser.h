@@ -709,7 +709,7 @@ signals:
     void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int pieceIndex);
     void signalFileDataReceived(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void signalFileTXStatusChanged(int socketID, quint8 status);
-    void signalFileTXError(quint8 errorCode, const QString &errorString);
+    void signalFileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
 
 
 public slots:

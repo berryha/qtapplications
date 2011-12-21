@@ -359,7 +359,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int )), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , quint8 , const QString &)), Qt::QueuedConnection);
+    connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
 
     ui.toolButtonVerify->setEnabled(true);
@@ -1476,9 +1476,9 @@ void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, quin
 
 }
 
-void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString){
+void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage){
     qDebug()<<"--SystemManagementWidget::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
-    qCritical()<<errorString;
+    qCritical()<<errorMessage;
 
 }
 

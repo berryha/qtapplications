@@ -102,7 +102,7 @@ private slots:
     void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex);
     void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void processFileTXStatusChangedPacket(int socketID, quint8 status);
-    void processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString);
+    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);
 
     void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
