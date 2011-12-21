@@ -47,9 +47,11 @@
 #include <QTimerEvent>
 #include <QCryptographicHash>
 #include <QSettings>
+#include <QDebug>
 
-#define SUFFIX_TEMP_FILE "tf"
-#define SUFFIX_INFO_FILE "fi"
+
+#define SUFFIX_TEMP_FILE ".tf"
+#define SUFFIX_INFO_FILE ".fi"
 
 
 
@@ -358,6 +360,7 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
     {
         QMutexLocker locker(&mutex);
         fileMetaInfoHash.insert(fileMD5Sum, info);
+        cond.wakeOne();
     }
 
     return info;
@@ -368,8 +371,8 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
 
     Q_ASSERT(errorString);
 
-    QString tempFilePath = localSavePath + "." + SUFFIX_TEMP_FILE;
-    QString infoFilePath = localSavePath + "." + SUFFIX_INFO_FILE;
+    QString tempFilePath = localSavePath + SUFFIX_TEMP_FILE;
+    QString infoFilePath = localSavePath + SUFFIX_INFO_FILE;
     if(QFile::exists(localSavePath)){
         *errorString = tr("File '%1' already exists!").arg(localSavePath);
         //emit error(ERROR_FILE_EXIST, errString);
@@ -400,7 +403,7 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
     }
 
 
-    QSettings settings(infoFilePath);
+    QSettings settings(infoFilePath, QSettings::IniFormat);
     QByteArray oldMD5 = settings.value("MD5", QByteArray()).toByteArray();
     quint64 oldSize = settings.value("size", 0).toULongLong();
     if(oldMD5 != fileMD5Sum || oldSize != size || file->size() == 0){
@@ -445,6 +448,7 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
 //            info->fileID = qrand();
 //        }
         fileMetaInfoHash.insert(fileMD5Sum, info);
+        cond.wakeOne();
     }
 
     return info;
@@ -571,8 +575,8 @@ void FileManager::closeFile(const QByteArray &fileMD5){
 //    return file;
 //}
 
-QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIndex)
-{
+QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIndex){
+    qDebug()<<"--FileManager::readBlock(...) "<<" pieceIndex:"<<pieceIndex;
 
     QByteArray block;
 
@@ -609,8 +613,8 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
     return block;
 }
 
-bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data)
-{
+bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data){
+    qDebug()<<"--FileManager::writeBlock(...) "<<"pieceIndex:"<<pieceIndex<<" data size:"<<data.size();
 
     if(!info){
         QString errString = tr("Failed to read file info!");
@@ -727,6 +731,19 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
 
     int verificationProgress = (info->verifiedPieces.count(true) * 100) / info->verifiedPieces.size();
     Q_ASSERT(verificationProgress >= 0 && verificationProgress <= 100);
+
+    if(verificationProgress == 100){
+        QString name = info->file->fileName();
+        Q_ASSERT(name.endsWith(SUFFIX_TEMP_FILE));
+        name.remove(SUFFIX_TEMP_FILE);
+        if(!info->file->rename(name)){
+            qCritical()<<"ERROR! Failed to rename file!";
+        }else{
+            QString cfgFile = name + SUFFIX_INFO_FILE;
+            QFile::remove(cfgFile);
+            qWarning()<<"File Received!";
+        }
+    }
 
     emit pieceVerified(info->md5sum, pieceIndex, verified, verificationProgress);
 

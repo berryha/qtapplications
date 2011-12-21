@@ -1411,6 +1411,7 @@ qWarning()<<"--------------13";
 
 
     QSqlDatabase db = QSqlDatabase::database(SITOY_USERS_DB_CONNECTION_NAME);
+ qWarning()<<"--------------131";
     if(!db.isValid()){
         QSqlError err;
         if(!databaseUtility){databaseUtility = new DatabaseUtility(this);}
@@ -1422,6 +1423,7 @@ qWarning()<<"--------------13";
                                             REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
                                             REMOTE_SITOY_SQLSERVER_DB_NAME,
                                             HEHUI::M$SQLSERVER);
+qWarning()<<"--------------132";
         if (err.type() != QSqlError::NoError) {
             logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME).arg(err.text()), QtServiceBase::Error);
             qCritical() << QString("XX An error occurred when opening the database: %1").arg(err.text());
@@ -1429,14 +1431,14 @@ qWarning()<<"--------------13";
         }
 
     }
-
+qWarning()<<"--------------14";
     db = QSqlDatabase::database(SITOY_USERS_DB_CONNECTION_NAME);
     if(!db.isOpen()){
         logMessage(QString("Can not open database! %1").arg(db.lastError().text()), QtServiceBase::Error);
         return false;
     }
     QSqlQuery query(db);
-
+qWarning()<<"--------------15";
     QStringList logs;
     QDateTime appCompiledTime = QDateTime::fromString(QString(APP_VERSION), "yyyy.M.d.h");
     if(!appCompiledTime.isValid()){
@@ -1458,7 +1460,7 @@ qWarning()<<"--------------13";
     //    qWarning()<<"markerTime:"<<markerTime.toString("yyyy-MM-dd hh:mm:ss");
     
     bool needReboot = false;
-
+qWarning()<<"--------------16";
     foreach(QString userName, users){
         qWarning()<<"userName:"<<userName;
         QString queryString = QString("select cgroup as Department, cpassword as Password, Loc as Location from users where userid = '%1'  ") .arg(userName);
@@ -1928,6 +1930,8 @@ void ClientService::startFileManager(){
 
     }
 
+
+
 }
 
 void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
@@ -2107,6 +2111,7 @@ void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, quint8
 }
 
 void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
+    qDebug()<<"--ClientService::pieceVerified(...)";
 
     QList<int> sockets = fileTXSocketHash.keys(fileMD5);
     if(sockets.isEmpty()){
@@ -2115,12 +2120,18 @@ void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verif
     }
 
     if(verified){
-        int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-        if(uncompletedPieceIndex < 0){
-            return;
+
+
+        if(verificationProgress == 100){
+            qWarning()<<"Done!";
+        }else{
+            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+            if(uncompletedPieceIndex < 0){
+                return;
+            }
+            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
         }
 
-        clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
 
     }else{
 

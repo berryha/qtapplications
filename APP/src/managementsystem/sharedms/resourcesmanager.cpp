@@ -156,7 +156,7 @@ UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddres
 FileManager *ResourcesManager::getFileManager(){
     if(!m_fileManager){
         m_fileManager = new FileManager(this);
-        m_fileManager->start();
+        m_fileManager->start(QThread::LowestPriority);
     }
 
     return m_fileManager;
