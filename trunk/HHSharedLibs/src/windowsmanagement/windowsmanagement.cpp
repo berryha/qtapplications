@@ -440,7 +440,7 @@ QString WindowsManagement::getExeFileVersion(const QString &exeFileName){
 
 
 QStringList WindowsManagement::localUsers() {
-    //qDebug()<<"--WindowsManagement::localUsers()";
+    qDebug()<<"--WindowsManagement::localUsers()";
 
     lastErrorString = "";
 
@@ -799,7 +799,7 @@ bool WindowsManagement::isAdmin(const QString &userName){
 }
 
 bool WindowsManagement::updateUserPassword(const QString &userName, const QString &password, bool activeIfAccountDisabled){
-
+    qDebug()<<"--WindowsManagement::updateUserPassword(...) "<<"userName:"<<userName;
     lastErrorString = "";
 
     QString name = userName.trimmed();
