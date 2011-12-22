@@ -79,12 +79,12 @@ QSqlError DatabaseUtility::openDatabase(const QString &connectionNameString, con
                                         const QString &databaseName, HEHUI::DatabaseType databaseType)
 {
 
-    //qDebug()<<"--DatabaseUtility::DatabaseUtility::openDatabase(...)";
+    qDebug()<<"--DatabaseUtility::openDatabase(...)";
 
     Q_ASSERT_X(!driver.isEmpty(), "DatabaseUtility::openDatabase(...)", "'driver' is empty!");
     Q_ASSERT_X(!databaseName.isEmpty(), "DatabaseUtility::openDatabase(...)", "'databaseName' is empty!");
 
-    QCoreApplication::processEvents();
+    //QCoreApplication::processEvents();
 
     QString connectionName = connectionNameString;
     if(connectionName.isEmpty()){
