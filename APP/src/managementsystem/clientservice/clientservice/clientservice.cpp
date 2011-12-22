@@ -1981,7 +1981,8 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
     if(clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, true, "")){
         fileTXSocketHash.insertMulti(socketID, fileMD5Sum);
 
-        clientPacketsParser->requestFileData(socketID, fileMD5Sum, -1, -1);
+        //clientPacketsParser->requestFileData(socketID, fileMD5Sum, -1, -1);
+        clientPacketsParser->requestFileData(socketID, fileMD5Sum, 0, 0);
 
 
     }else{
@@ -2031,15 +2032,17 @@ void ClientService::processFileDataRequestPacket(int socketID, const QByteArray 
     Q_ASSERT(m_fileManager);
 
     if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
-        QList<int> uncompletedPieces = m_fileManager->uncompletedPieces(fileMD5);
-        foreach (int pieceIndex, uncompletedPieces) {
+        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
+        foreach (int pieceIndex, completedPieces) {
             fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, pieceIndex), socketID);
+            //QCoreApplication::processEvents();
         }
 
     }else{
         Q_ASSERT(endPieceIndex >= startPieceIndex);
         for(int i=startPieceIndex; i<=endPieceIndex; i++){
             fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, i), socketID);
+            //QCoreApplication::processEvents();
         }
 
     }
@@ -2129,7 +2132,7 @@ void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, quint8
 
 }
 
-void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
+void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
     qDebug()<<"--ClientService::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verified:"<<verified<< "verificationProgress:"<<verificationProgress;
 
     QList<int> sockets = fileTXSocketHash.keys(fileMD5);
@@ -2151,6 +2154,11 @@ void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verif
 //                return;
 //            }
 //            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+
+            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+                qDebug()<<"----0----pieceIndex:"<<pieceIndex;
+                clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+            }
 
         }
 

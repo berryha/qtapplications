@@ -595,6 +595,8 @@ public slots:
     }
 
     bool requestFileData(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
+        qDebug()<<"--requestFileData(...) "<<" startPieceIndex:"<<startPieceIndex<<" endPieceIndex:"<<endPieceIndex;
+
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 
         packet->setPacketType(quint8(MS::RequestFileData));

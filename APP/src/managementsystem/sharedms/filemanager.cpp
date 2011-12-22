@@ -49,6 +49,7 @@
 #include <QSettings>
 #include <QDebug>
 #include <QDateTime>
+#include <QCoreApplication>
 
 #define SUFFIX_TEMP_FILE ".tf"
 #define SUFFIX_INFO_FILE ".fi"
@@ -179,6 +180,26 @@ void FileManager::writePiece(const QByteArray &fileMD5, int pieceIndex, const QB
 
 //}
 
+QList<int/*Piece Index*/> FileManager::completedPieces(const QByteArray &fileMD5){
+
+    QMutexLocker locker(&mutex);
+
+    QList<int> ret;
+    FileMetaInfo * info = fileMetaInfoHash.value(fileMD5);
+    if(!info){
+        return ret;
+    }
+
+    for(int i=0; i< info->verifiedPieces.size(); i++){
+        if(info->verifiedPieces.testBit(i)){
+            ret << i;
+        }
+    }
+
+    return ret;
+
+}
+
 QList<int/*Piece Index*/> FileManager::uncompletedPieces(const QByteArray &fileMD5){
 
     QMutexLocker locker(&mutex);
@@ -247,6 +268,7 @@ void FileManager::run()
             ReadRequest request = newReadRequests.takeFirst();
             FileMetaInfo *info = fileMetaInfoHash.value(request.fileMD5) ;
             if(!info){continue;}
+            if(request.id > info->sha1Sums.size()){continue;}
             QByteArray block = readBlock(request.id, info, request.pieceIndex);
             if(block.isEmpty()){continue;}
             QByteArray dataSHA1SUM = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
@@ -349,6 +371,8 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
         sha1Sums.insert(pieceIndex, QCryptographicHash::hash(block, QCryptographicHash::Sha1));
         qDebug()<<"----pieceIndex:"<<pieceIndex<<" size:"<<block.size()/*<<" sha1:"<<sha1Sums.value(pieceIndex)*/;
         pieceIndex++;
+
+        QCoreApplication::processEvents();
     }
 
     FileMetaInfo *info = new FileMetaInfo();
@@ -446,6 +470,7 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
     info->verifiedPieces = ba;
     //info->newFile = true;
     info->file = file;
+    info->infoFileName = infoFilePath;
 
     {
         QMutexLocker locker(&mutex);
@@ -627,6 +652,12 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
         return false;
     }
 
+    QByteArray sha1Sum = QCryptographicHash::hash(data, QCryptographicHash::Sha1);
+    if(sha1Sum != dataSHA1SUM){
+        emit pieceVerified(info->md5sum, pieceIndex, false, 0);
+        return false;
+    }
+
 
     qint64 startWriteIndex = (qint64(pieceIndex) * FILE_PIECE_LENGTH);
     int bytesToWrite = data.size();
@@ -654,7 +685,45 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
 
     info->sha1Sums.insert(pieceIndex, dataSHA1SUM);
 
-    return verifySinglePiece(info, pieceIndex);
+
+
+////////////////////////////////////////
+
+    info->verifiedPieces.setBit(pieceIndex);
+
+    int verificationProgress = (info->verifiedPieces.count(true) * 100) / info->verifiedPieces.size();
+    Q_ASSERT(verificationProgress >= 0 && verificationProgress <= 100);
+
+    if(verificationProgress == 100){
+        QString name = info->file->fileName();
+        Q_ASSERT(name.endsWith(SUFFIX_TEMP_FILE));
+        name.remove(SUFFIX_TEMP_FILE);
+        if(!info->file->rename(name)){
+            qCritical()<<"ERROR! Failed to rename file!";
+        }else{
+            //QString cfgFile = name + SUFFIX_INFO_FILE;
+            QFile::remove(info->infoFileName);
+            qWarning()<<"File Received!";
+        }
+    }
+
+    emit pieceVerified(info->md5sum, pieceIndex, true, verificationProgress);
+
+
+    if((pieceIndex % 10) == 0){
+        QSettings settings(info->infoFileName, QSettings::IniFormat);
+        settings.setValue("Pieces", info->verifiedPieces);
+        settings.sync();
+    }
+
+
+
+
+
+    return true;
+
+
+    //return verifySinglePiece(info, pieceIndex);
 
 
 }
@@ -746,13 +815,21 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
         if(!info->file->rename(name)){
             qCritical()<<"ERROR! Failed to rename file!";
         }else{
-            QString cfgFile = name + SUFFIX_INFO_FILE;
-            QFile::remove(cfgFile);
+            //QString cfgFile = name + SUFFIX_INFO_FILE;
+            QFile::remove(info->infoFileName);
             qWarning()<<"File Received!";
         }
     }
 
     emit pieceVerified(info->md5sum, pieceIndex, verified, verificationProgress);
+
+
+    if((pieceIndex % 10) == 0){
+        QSettings settings(info->infoFileName, QSettings::IniFormat);
+        settings.setValue("Pieces", info->verifiedPieces);
+        settings.sync();
+    }
+
 
     return verified;
 }

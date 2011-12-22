@@ -129,7 +129,7 @@ private slots:
 
     void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
-    void pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress);
+    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 
 protected:
