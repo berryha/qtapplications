@@ -939,7 +939,7 @@ bool WindowsManagement::setupUserAccountState(const QString &userName,  bool ena
 }
 
 WindowsManagement::UserAccountState WindowsManagement::getUserAccountState(const QString &userName){
-
+    qDebug()<<"--WindowsManagement::getUserAccountState(...) "<<" userName:"<<userName;
     UserAccountState result = UAS_Unknown;
     lastErrorString = "";
 
