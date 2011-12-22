@@ -227,10 +227,10 @@ bool ClientService::startMainService(){
     //File TX
     connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileTXError(int , quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , quint8 , const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
 
 
@@ -1300,7 +1300,7 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
 bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
 #ifdef Q_OS_WIN
-
+qDebug()<<"--------------21";
     QString administratorPassword = newPassword.trimmed();
 
     if(administratorPassword.isEmpty()){
@@ -1308,14 +1308,14 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
     }else{
         setWinAdminPassword(administratorPassword);
     }
-
+qDebug()<<"--------------22";
     if(!wm->updateUserPassword("administrator", administratorPassword, true)){
         QString error = wm->lastError();
         clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
         return false;
     }
     clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), QString("Administrator's password updated to '%1'!").arg(administratorPassword));
-
+qDebug()<<"--------------23";
     //wm.setupUserAccountState("administrator", true);
 
     //    wm->modifySystemSettings();
@@ -1327,12 +1327,12 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
     //        wm->showAdministratorAccountInLogonUI(true);
     //    }
 
-
+qDebug()<<"--------------24";
     if(!wm->hiddenAdmiAccountExists()){
         wm->createHiddenAdmiAccount();
     }
 
-
+qDebug()<<"--------------25";
     return true;
 
 #else
@@ -1373,9 +1373,9 @@ QString ClientService::getWinAdminPassword() const{
 }
 
 bool ClientService::checkUsersAccount(){
-    //qDebug()<<"--ClientService::checkUsersAccount()";
+    qDebug()<<"--ClientService::checkUsersAccount()";
 
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN32
 qWarning()<<"--------------10";
     //WindowsManagement wm;
     QStringList users = wm->localUsers();
@@ -1410,20 +1410,21 @@ qWarning()<<"--------------13";
     qWarning()<<QString("Permitted Administrators: %1").arg(storedAdminGroupUsers.join(","));
 
 
-    QSqlDatabase db = QSqlDatabase::database(SITOY_USERS_DB_CONNECTION_NAME);
+    QSqlDatabase db = QSqlDatabase::database(QString(SITOY_USERS_DB_CONNECTION_NAME));
  qWarning()<<"--------------131";
     if(!db.isValid()){
         QSqlError err;
         if(!databaseUtility){databaseUtility = new DatabaseUtility(this);}
-        err = databaseUtility->openDatabase(SITOY_USERS_DB_CONNECTION_NAME,
-                                            REMOTE_SITOY_SQLSERVER_DB_DRIVER,
-                                            REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
-                                            REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
-                                            REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
-                                            REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
-                                            REMOTE_SITOY_SQLSERVER_DB_NAME,
+        qWarning()<<"--------------132";
+        err = databaseUtility->openDatabase(QString(SITOY_USERS_DB_CONNECTION_NAME),
+                                            QString(REMOTE_SITOY_SQLSERVER_DB_DRIVER),
+                                            QString(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME),
+                                            quint16(REMOTE_SITOY_SQLSERVER_DB_HOST_PORT),
+                                            QString(REMOTE_SITOY_SQLSERVER_DB_USER_NAME),
+                                            QString(REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD),
+                                            QString(REMOTE_SITOY_SQLSERVER_DB_NAME),
                                             HEHUI::M$SQLSERVER);
-qWarning()<<"--------------132";
+qWarning()<<"--------------133";
         if (err.type() != QSqlError::NoError) {
             logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME).arg(err.text()), QtServiceBase::Error);
             qCritical() << QString("XX An error occurred when opening the database: %1").arg(err.text());
@@ -1980,6 +1981,9 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
     if(clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, true, "")){
         fileTXSocketHash.insertMulti(socketID, fileMD5Sum);
 
+        clientPacketsParser->requestFileData(socketID, fileMD5Sum, -1, -1);
+
+
     }else{
         m_fileManager->closeFile(fileMD5Sum);
     }
@@ -2022,12 +2026,26 @@ void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QS
 
 }
 
-void ClientService::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex){
+void ClientService::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
 
     Q_ASSERT(m_fileManager);
 
-    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
-    fileTXRequestHash.insert(id, socketID);
+    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
+        QList<int> uncompletedPieces = m_fileManager->uncompletedPieces(fileMD5);
+        foreach (int pieceIndex, uncompletedPieces) {
+            fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, pieceIndex), socketID);
+        }
+
+    }else{
+        Q_ASSERT(endPieceIndex >= startPieceIndex);
+        for(int i=startPieceIndex; i<=endPieceIndex; i++){
+            fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, i), socketID);
+        }
+
+    }
+
+//    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
+//    fileTXRequestHash.insert(id, socketID);
 
 }
 
@@ -2084,13 +2102,14 @@ void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status
 
 }
 
-void ClientService::processFileTXErrorFromPeer(int socketID, quint8 errorCode, const QString &errorString){
+void ClientService::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
     qDebug()<<"--ClientService::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
     qCritical()<<errorString;
 
 }
 
 void ClientService::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
+    qDebug()<<"--ClientService::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data;
 
     int socketID = fileTXRequestHash.take(requestID);
     clientPacketsParser->sendFileData(socketID, fileMD5, pieceIndex, &data, &dataSHA1SUM);
@@ -2111,7 +2130,7 @@ void ClientService::fileTXError(int requestID, const QByteArray &fileMD5, quint8
 }
 
 void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
-    qDebug()<<"--ClientService::pieceVerified(...)";
+    qDebug()<<"--ClientService::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verified:"<<verified<< "verificationProgress:"<<verificationProgress;
 
     QList<int> sockets = fileTXSocketHash.keys(fileMD5);
     if(sockets.isEmpty()){
@@ -2125,17 +2144,20 @@ void ClientService::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verif
         if(verificationProgress == 100){
             qWarning()<<"Done!";
         }else{
-            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-            if(uncompletedPieceIndex < 0){
-                return;
-            }
-            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+            //TODO:
+//            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+//            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
+//            if(uncompletedPieceIndex < 0){
+//                return;
+//            }
+//            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+
         }
 
 
     }else{
 
-        clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex);
+        clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex, pieceIndex);
     }
 
 }
@@ -2267,7 +2289,7 @@ void ClientService::processCommand(int code)
     case 2:
     {
         //WindowsManagement wm;
-        wm->showAdministratorAccountInLogonUI(true);
+        //wm->showAdministratorAccountInLogonUI(true);
     }
     break;
     case 1000:

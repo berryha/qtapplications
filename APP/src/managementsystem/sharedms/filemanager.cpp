@@ -48,7 +48,7 @@
 #include <QCryptographicHash>
 #include <QSettings>
 #include <QDebug>
-
+#include <QDateTime>
 
 #define SUFFIX_TEMP_FILE ".tf"
 #define SUFFIX_INFO_FILE ".fi"
@@ -214,6 +214,8 @@ int FileManager::getOneUncompletedPiece(const QByteArray &fileMD5){
         }
     }
 
+    return -1;
+
 }
 
 
@@ -240,6 +242,7 @@ void FileManager::run()
         QList<ReadRequest> newReadRequests = readRequests;
         readRequests.clear();
         mutex.unlock();
+
         while (!newReadRequests.isEmpty()) {
             ReadRequest request = newReadRequests.takeFirst();
             FileMetaInfo *info = fileMetaInfoHash.value(request.fileMD5) ;
@@ -247,6 +250,7 @@ void FileManager::run()
             QByteArray block = readBlock(request.id, info, request.pieceIndex);
             if(block.isEmpty()){continue;}
             QByteArray dataSHA1SUM = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
+
             emit dataRead(request.id, request.fileMD5, request.pieceIndex, block, dataSHA1SUM);
         }
 
@@ -258,7 +262,7 @@ void FileManager::run()
             WriteRequest request = newWriteRequests.takeFirst();
             FileMetaInfo *info = fileMetaInfoHash.value(request.fileMD5) ;
             if(!info){continue;}
-            writeBlock(info, request.pieceIndex, request.data);
+            writeBlock(info, request.pieceIndex, request.data, request.dataSHA1SUM);
         }
 
         // Process pending verification requests
@@ -283,7 +287,7 @@ void FileManager::run()
         WriteRequest request = newWriteRequests.takeFirst();
         FileMetaInfo *info = fileMetaInfoHash.value(request.fileMD5) ;
         if(!info){continue;}
-        writeBlock(info, request.pieceIndex, request.data);
+        writeBlock(info, request.pieceIndex, request.data, request.dataSHA1SUM);
     }
 }
 
@@ -343,6 +347,7 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
             return 0;
         }
         sha1Sums.insert(pieceIndex, QCryptographicHash::hash(block, QCryptographicHash::Sha1));
+        qDebug()<<"----pieceIndex:"<<pieceIndex<<" size:"<<block.size()/*<<" sha1:"<<sha1Sums.value(pieceIndex)*/;
         pieceIndex++;
     }
 
@@ -613,7 +618,7 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
     return block;
 }
 
-bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data){
+bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
     qDebug()<<"--FileManager::writeBlock(...) "<<"pieceIndex:"<<pieceIndex<<" data size:"<<data.size();
 
     if(!info){
@@ -646,6 +651,8 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
         emit error(0, info->md5sum, quint8(FILE_WRITE_ERROR), errString);
         return false;
     }
+
+    info->sha1Sums.insert(pieceIndex, dataSHA1SUM);
 
     return verifySinglePiece(info, pieceIndex);
 

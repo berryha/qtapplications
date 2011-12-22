@@ -143,7 +143,7 @@ private:
 
 
     QByteArray readBlock(int requestID, FileMetaInfo *info, int pieceIndex);
-    bool writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data);
+    bool writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     bool verifySinglePiece(FileMetaInfo *info, int pieceIndex);
 //    void verifyFileContents(FileMetaInfo *info);
 //    void VerifyAllPendingFiles();

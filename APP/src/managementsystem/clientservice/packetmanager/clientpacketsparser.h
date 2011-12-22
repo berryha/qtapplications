@@ -594,7 +594,7 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
-    bool requestFileData(int socketID, const QByteArray &fileMD5, int pieceIndex){
+    bool requestFileData(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 
         packet->setPacketType(quint8(MS::RequestFileData));
@@ -602,7 +602,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << fileMD5 << pieceIndex ;
+        out << m_localComputerName << fileMD5 << startPieceIndex << endPieceIndex;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -715,7 +715,7 @@ signals:
 ///////////////////////////
     void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
     void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
-    void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int pieceIndex);
+    void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void signalFileDataReceived(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void signalFileTXStatusChanged(int socketID, quint8 status);
     void signalFileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
