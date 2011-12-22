@@ -99,7 +99,7 @@ private slots:
     void fileDownloadRequestDenied(int socketID, const QString &fileName, const QString &message);
     void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
 
-    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex);
+    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void processFileTXStatusChangedPacket(int socketID, quint8 status);
     void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);

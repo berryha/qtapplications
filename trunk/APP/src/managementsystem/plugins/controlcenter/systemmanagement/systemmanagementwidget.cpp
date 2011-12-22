@@ -356,7 +356,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     connect(controlCenterPacketsParser, SIGNAL(signalFileDownloadRequestDenied(int , const QString &, const QString &)), this, SLOT(fileDownloadRequestDenied(int , const QString &, const QString &)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), this, SLOT(fileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), Qt::QueuedConnection);
 
-    connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int )), Qt::QueuedConnection);
+    connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
@@ -367,6 +367,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 }
 
 void SystemManagementWidget::peerDisconnected(bool normalClose){
+    qDebug()<<"--SystemManagementWidget::peerDisconnected(...) "<<" normalClose:"<<normalClose;
 
     //ui.tabSystemInfo->setEnabled(false);
     ui.toolButtonRequestSystemInfo->setEnabled(false);
@@ -1304,7 +1305,7 @@ void SystemManagementWidget::startFileManager(){
     if(!m_fileManager){
         m_fileManager = ResourcesManagerInstance::instance()->getFileManager();
         connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, FileManager::Error , const QString &)), this, SLOT(fileTXError(int, const QByteArray &, FileManager::Error , const QString &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int, const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
         connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
 
     }
@@ -1329,10 +1330,10 @@ void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, co
 
 
     if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
-
         if(!filesList.contains(fileMD5Sum)){
             filesList.append(fileMD5Sum);
         }
+        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
 
     }else{
         m_fileManager->closeFile(fileMD5Sum);
@@ -1372,6 +1373,7 @@ void SystemManagementWidget::fileDownloadRequestAccepted(int socketID, const QSt
     if(socketID != m_peerSocket){
         return;
     }
+    //TODO:
 
 }
 
@@ -1380,6 +1382,7 @@ void SystemManagementWidget::fileDownloadRequestDenied(int socketID, const QStri
     if(socketID != m_peerSocket){
         return;
     }
+    //TODO:
 
 }
 
@@ -1389,8 +1392,9 @@ void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByt
         return;
     }
 
+    Q_ASSERT(m_fileManager);
     if(accepted){
-        m_fileManager->readPiece(fileMD5Sum, 0);
+        fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
         m_fileManager->closeFile(fileMD5Sum);
@@ -1399,8 +1403,7 @@ void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByt
 
 }
 
-
-void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int pieceIndex){
+void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
 
     if(socketID != m_peerSocket){
         return;
@@ -1411,8 +1414,20 @@ void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QB
 
     Q_ASSERT(m_fileManager);
 
-    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
-    fileTXRequestList.append(id);
+    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
+        QList<int> uncompletedPieces = m_fileManager->uncompletedPieces(fileMD5);
+        foreach (int pieceIndex, uncompletedPieces) {
+            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, pieceIndex));
+        }
+
+    }else{
+        Q_ASSERT(endPieceIndex >= startPieceIndex);
+        for(int i=startPieceIndex; i<=endPieceIndex; i++){
+            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, i));
+        }
+
+    }
+
 
 }
 
@@ -1483,6 +1498,8 @@ void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, const QByt
 }
 
 void SystemManagementWidget::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
+    qDebug()<<"--SystemManagementWidget::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
+
 
     if(!fileTXRequestList.contains(requestID)){
         return;
@@ -1519,24 +1536,30 @@ void SystemManagementWidget::fileTXError(int requestID, const QByteArray &fileMD
 }
 
 void SystemManagementWidget::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
+    qDebug()<<"--SystemManagementWidget::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verificationProgress:"<<verificationProgress;
 
     if(!filesList.contains(fileMD5)){
         return;
     }
 
-
     if(verified){
-        int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-        if(uncompletedPieceIndex < 0){
-            return;
-        }
 
-        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, uncompletedPieceIndex);
-        //TODO:Update Progress
+        if(verificationProgress == 100){
+            qWarning()<<"Done!";
+        }else{
+            //TODO:
+//            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+//            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
+//            if(uncompletedPieceIndex < 0){
+//                return;
+//            }
+//            controlCenterPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+
+        }
 
     }else{
 
-        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex);
+        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex, pieceIndex);
     }
 
 }

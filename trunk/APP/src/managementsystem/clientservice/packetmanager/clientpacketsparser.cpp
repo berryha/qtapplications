@@ -484,10 +484,10 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(MS::RequestFileData):
     {
         QByteArray fileMD5;
-        int pieceIndex = 0;
-        in >> fileMD5 >> pieceIndex ;
+        int startPieceIndex = 0, endPieceIndex = 0;
+        in >> fileMD5 >> startPieceIndex >> endPieceIndex;
 
-        emit signalFileDataRequested(socketID, fileMD5, pieceIndex);
+        emit signalFileDataRequested(socketID, fileMD5, startPieceIndex, endPieceIndex);
 
         qDebug()<<"~~RequestFileData";
     }
