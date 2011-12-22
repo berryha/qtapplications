@@ -48,7 +48,7 @@
 #include <QWaitCondition>
 
 #ifndef FILE_PIECE_LENGTH
-#define FILE_PIECE_LENGTH 8192 //8KB
+#define FILE_PIECE_LENGTH 32768 //32 KB
 #endif
 
 #include "HHSharedCore/hmysharedlib_global.h"
@@ -78,6 +78,7 @@ public:
             sha1Sums.clear();
             //verifiedPieces.fill(false);
             file = 0;
+            infoFileName = "";
             //pendingVerificationPieces.clear();
         }
 
@@ -91,6 +92,7 @@ public:
         QBitArray verifiedPieces;
 
         QFile *file;
+        QString infoFileName;
         //QString destinationPath;
         //QList<int/*Piece index*/> pendingVerificationPieces;
     };
@@ -108,6 +110,7 @@ public:
 //    QBitArray completedPieces(const QByteArray &fileMD5) const;
 //    void setCompletedPieces(const QByteArray &fileMD5, const QBitArray &pieces);
 
+    QList<int/*Piece Index*/> completedPieces(const QByteArray &fileMD5);
     QList<int/*Piece Index*/> uncompletedPieces(const QByteArray &fileMD5);
     int getOneUncompletedPiece(const QByteArray &fileMD5);
 

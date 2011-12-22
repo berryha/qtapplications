@@ -508,7 +508,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalFileDataReceived(socketID, fileMD5, pieceIndex, data, sha1);
 
-        qDebug()<<"~~FileData";
+        //qDebug()<<"~~FileData";
     }
     break;
     case quint8(MS::FileTXStatusChanged):

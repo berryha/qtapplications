@@ -86,6 +86,10 @@
 #define MS_RUDP_KEEPALIVE_TIMER_INTERVAL 30000 //1 minute
 #endif
 
+#ifndef FILE_PIECES_IN_ONE_REQUEST
+#define FILE_PIECES_IN_ONE_REQUEST 100 //100 Pieces
+#endif
+
 
 
 #include "HHSharedNetwork/hglobal_network.h"

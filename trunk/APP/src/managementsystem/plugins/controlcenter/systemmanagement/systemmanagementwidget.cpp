@@ -1333,7 +1333,8 @@ void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, co
         if(!filesList.contains(fileMD5Sum)){
             filesList.append(fileMD5Sum);
         }
-        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
+        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
+        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
 
     }else{
         m_fileManager->closeFile(fileMD5Sum);
@@ -1394,7 +1395,7 @@ void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByt
 
     Q_ASSERT(m_fileManager);
     if(accepted){
-        fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
+        //fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
         m_fileManager->closeFile(fileMD5Sum);
@@ -1404,6 +1405,7 @@ void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByt
 }
 
 void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
+    qDebug()<<"--SystemManagementWidget::processFileDataRequestPacket(...) "<<" startPieceIndex:"<<startPieceIndex<<" endPieceIndex:"<<endPieceIndex;
 
     if(socketID != m_peerSocket){
         return;
@@ -1415,15 +1417,19 @@ void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QB
     Q_ASSERT(m_fileManager);
 
     if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
-        QList<int> uncompletedPieces = m_fileManager->uncompletedPieces(fileMD5);
-        foreach (int pieceIndex, uncompletedPieces) {
+        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
+        qDebug()<<"completedPieces:"<<completedPieces;
+
+        foreach (int pieceIndex, completedPieces) {
             fileTXRequestList.append(m_fileManager->readPiece(fileMD5, pieceIndex));
+            //qApp->processEvents();
         }
 
     }else{
         Q_ASSERT(endPieceIndex >= startPieceIndex);
         for(int i=startPieceIndex; i<=endPieceIndex; i++){
             fileTXRequestList.append(m_fileManager->readPiece(fileMD5, i));
+            //qApp->processEvents();
         }
 
     }
@@ -1535,7 +1541,7 @@ void SystemManagementWidget::fileTXError(int requestID, const QByteArray &fileMD
 
 }
 
-void SystemManagementWidget::pieceVerified(QByteArray fileMD5, int pieceIndex, bool verified, int verificationProgress){
+void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
     qDebug()<<"--SystemManagementWidget::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verificationProgress:"<<verificationProgress;
 
     if(!filesList.contains(fileMD5)){
@@ -1555,6 +1561,9 @@ void SystemManagementWidget::pieceVerified(QByteArray fileMD5, int pieceIndex, b
 //            }
 //            controlCenterPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
 
+            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+                controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+            }
         }
 
     }else{
