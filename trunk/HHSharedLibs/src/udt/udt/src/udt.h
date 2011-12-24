@@ -149,7 +149,9 @@ enum UDTOpt
    UDT_REUSEADDR,	// reuse an existing port or create a new one
    UDT_MAXBW,		// maximum bandwidth (bytes per second) that the connection can use
    UDT_STATE,		// current socket state, see UDTSTATUS, read only
-   UDT_EVENT		// current avalable events associated with the socket
+   UDT_EVENT,		// current avalable events associated with the socket
+   UDT_SNDDATA,		// size of data in the sending buffer
+   UDT_RCVDATA		// size of data available for recv
 };
 
 ////////////////////////////////////////////////////////////////////////////////

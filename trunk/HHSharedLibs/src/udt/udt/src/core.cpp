@@ -452,15 +452,31 @@ void CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
          event |= UDT_EPOLL_ERR;
       else
       {
-         if (m_pRcvBuffer->getRcvDataSize() > 0)
+         if (m_pRcvBuffer && (m_pRcvBuffer->getRcvDataSize() > 0))
             event |= UDT_EPOLL_IN;
-         if (m_iSndBufSize > m_pSndBuffer->getCurrBufSize())
+         if (m_pSndBuffer && (m_iSndBufSize > m_pSndBuffer->getCurrBufSize()))
             event |= UDT_EPOLL_OUT;
       }
       *(int32_t*)optval = event;
       optlen = sizeof(int32_t);
       break;
    }
+
+   case UDT_SNDDATA:
+      if (m_pSndBuffer)
+         *(int32_t*)optval = m_pSndBuffer->getCurrBufSize();
+      else
+         *(int32_t*)optval = 0;
+      optlen = sizeof(int32_t);
+      break;
+
+   case UDT_RCVDATA:
+      if (m_pRcvBuffer)
+         *(int32_t*)optval = m_pRcvBuffer->getRcvDataSize();
+      else
+         *(int32_t*)optval = 0;
+      optlen = sizeof(int32_t);
+      break;
 
    default:
       throw CUDTException(5, 0, 0);

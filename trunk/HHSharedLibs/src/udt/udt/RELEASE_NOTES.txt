@@ -1,5 +1,6 @@
 version 4.10
 
+added UDT_SNDDATA and UDT_RCVDATA options
 fixed a bug that causes unnecessary connection timeout
 improved epoll UDT event handling
 
