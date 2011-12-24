@@ -23,6 +23,8 @@
 #include "HHSharedCore/hdatabaseutility.h"
 //#include "HHSharedNetwork/hnetworkmanagerbase.h"
 
+#include "HHSharedUDT/hudtprotocolforfiletransmission.h"
+
 #ifdef Q_OS_WIN32
     #include "HHSharedWindowsManagement/hwindowsmanagement.h"
     #ifndef SITOY_USERS_DB_CONNECTION_NAME
@@ -151,6 +153,8 @@ private:
     UDTSOCKET m_socketConnectedToServer;
     UDTSOCKET m_socketConnectedToAdmin;
     UDTSOCKET peerSocketThatRequiresDetailedInfo;
+
+    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
 
 //    QHash<int /*UDT Socket ID*/, QString /*User Name*/> m_localUserSocketsHash;
 

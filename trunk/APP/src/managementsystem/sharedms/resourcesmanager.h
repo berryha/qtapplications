@@ -19,7 +19,7 @@
 
 #include "HHSharedCore/hmysharedlib_global.h"
 #include "HHSharedNetwork/hudpsocket.h"
-
+#include "HHSharedUDT/hudtprotocolforfiletransmission.h"
 
 namespace HEHUI {
 
@@ -43,6 +43,10 @@ public:
 
     FileManager *getFileManager();
 
+    UDTProtocolForFileTransmission * getUDTProtocolForFileTransmission();
+
+
+
 private:
 
 
@@ -51,6 +55,8 @@ private:
     UDTProtocol *udtProtocol;
 
     FileManager *m_fileManager;
+
+    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
     
     
 

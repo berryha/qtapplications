@@ -135,6 +135,8 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientInfoPacketReceived(const QString &, const QString &)));
 
 
+    m_udtProtocolForFileTransmission = 0;
+    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
 
     clientResponseAdminConnectionResultPacketReceived = false;
 
@@ -258,11 +260,11 @@ void SystemManagementWidget::dropEvent(QDropEvent *event)
 
     }
 
+    event->acceptProposedAction();
+
     if (!files.isEmpty()){
         filesDropped(files);
     }
-
-    event->acceptProposedAction();
 
 }
 
@@ -275,6 +277,20 @@ void SystemManagementWidget::filesDropped(const QStringList &localFiles){
         QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
         return;
     }
+
+//    if(!m_udtProtocolForFileTransmission){
+//        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
+//    }
+//    if(m_peerFileTransmissionSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        UDTProtocolBase::SocketOptions options;
+//        options.UDT_SNDSYN = true;
+//        options.UDT_RCVSYN = true;
+//        m_peerFileTransmissionSocket = m_udtProtocolForFileTransmission->connectToPeer(m_peerIPAddress, UDT_FILE_LISTENING_PORT, &options);
+//    }
+//    if(m_peerFileTransmissionSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        QMessageBox::critical(this, tr("Error"), tr("File Transmission Connection is not made!<br>Please connect to peer first!") );
+//        return;
+//    }
 
 
     int ret = QMessageBox::question(this, tr("Question"), tr("Send file(s) to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
@@ -1310,6 +1326,10 @@ void SystemManagementWidget::startFileManager(){
 
     }
 
+    if(!m_udtProtocolForFileTransmission){
+        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
+    }
+
 }
 
 void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
@@ -1396,6 +1416,11 @@ void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByt
     Q_ASSERT(m_fileManager);
     if(accepted){
         //fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
+
+//        QFileInfo fi("C:/3.dxf");
+//        m_udtProtocolForFileTransmission->sendFileToPeer(m_peerFileTransmissionSocket, fi.absoluteFilePath(), 0, fi.size());
+//        qDebug()<<"------------------------------------------1";
+
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
         m_fileManager->closeFile(fileMD5Sum);
@@ -1561,9 +1586,19 @@ void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceI
 //            }
 //            controlCenterPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
 
+            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+            //    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+            //}
+
             if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-                controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+                if(pieceIndex == 0 ){
+                        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }else{
+                    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }
             }
+
+
         }
 
     }else{

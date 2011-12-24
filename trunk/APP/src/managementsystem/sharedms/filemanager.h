@@ -47,9 +47,7 @@
 #include <QThread>
 #include <QWaitCondition>
 
-#ifndef FILE_PIECE_LENGTH
-#define FILE_PIECE_LENGTH 32768 //32 KB
-#endif
+
 
 #include "HHSharedCore/hmysharedlib_global.h"
 
