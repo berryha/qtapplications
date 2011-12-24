@@ -278,7 +278,7 @@ void FileManager::run()
             if(!info->sha1Sums.contains(request.pieceIndex)){
                 QByteArray dataSHA1SUM = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
                 info->sha1Sums.insert(request.pieceIndex, dataSHA1SUM);
-                qDebug()<<"-------------pieceIndex:"<<request.pieceIndex<<" MD5:"<<dataSHA1SUM.toBase64();
+//                qDebug()<<"-------------pieceIndex:"<<request.pieceIndex<<" MD5:"<<dataSHA1SUM.toBase64();
             }
 //                Q_ASSERT(dataSHA1SUM == info->sha1Sums.value(request.pieceIndex));
 
@@ -388,7 +388,7 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
     if(fileSize % FILE_PIECE_LENGTH){
         pieceCount++;
     }
-    qDebug()<<"----------------pieceCount:"<<pieceCount;
+    //qDebug()<<"----------------pieceCount:"<<pieceCount;
 
     FileMetaInfo *info = new FileMetaInfo();
     info->md5sum = fileMD5Sum;
@@ -645,10 +645,8 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
     }
 
     file->seek(startReadIndex);
-    qDebug()<<"----0----pos:"<<file->pos()<<" pieceIndex:"<<pieceIndex;
     qint64 sizeToRead = qMin<qint64>(FILE_PIECE_LENGTH, currentFileSize - file->pos());
     block = file->read(sizeToRead);
-    qDebug()<<"----1----pos:"<<file->pos()<<" pieceIndex:"<<pieceIndex;
     file->close();
 
     if (block.size() != sizeToRead) {
@@ -692,10 +690,7 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
     }
 
     file->seek(startWriteIndex);
-    qDebug()<<"----0----pos:"<<file->pos()<<" pieceIndex:"<<pieceIndex;
     qint64 bytesWritten = file->write(data.constData(), bytesToWrite);
-    qDebug()<<"----1----pos:"<<file->pos()<<" pieceIndex:"<<pieceIndex;
-
     file->flush();
     file->close();
 
@@ -707,9 +702,9 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
 
     info->sha1Sums.insert(pieceIndex, dataSHA1SUM);
 
-    QByteArray block = readBlock(0, info, pieceIndex);
-    QByteArray su = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
-    qDebug()<<"-------------pieceIndex:"<<pieceIndex<<" MD5:"<<su.toBase64()<<" ==?"<<(sha1Sum==su);
+//    QByteArray block = readBlock(0, info, pieceIndex);
+//    QByteArray su = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
+//    qDebug()<<"-------------pieceIndex:"<<pieceIndex<<" MD5:"<<su.toBase64()<<" ==?"<<(sha1Sum==su);
 
 ////////////////////////////////////////
 
