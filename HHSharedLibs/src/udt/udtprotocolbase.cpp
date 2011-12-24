@@ -225,7 +225,12 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
 
 }
 
-//
+void UDTProtocolBase::startWaitingForNewConnectionInOneThread(int msecWaitForNewConnectionTimeout){
+
+    QtConcurrent::run(this, &UDTProtocolBase::waitingForNewConnection, msecWaitForNewConnectionTimeout);
+
+}
+
 void UDTProtocolBase::startWaitingForIOInSeparateThread(int msecWaitForInputTimeout, int msecWaitForOutputTimeout){
     qDebug()<<"--UDTProtocolBase::startWaitingForIOInSeparateThread(...) "<<" msecWaitForInputTimeout:"<<msecWaitForInputTimeout<<" msecWaitForOutputTimeout:"<<msecWaitForOutputTimeout;
 
@@ -240,65 +245,75 @@ void UDTProtocolBase::startWaitingForIOInOneThread(int msecWaitForIOTimeout){
 
 }
 
-qint64 UDTProtocolBase::sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize){
+//qint64 UDTProtocolBase::sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize){
 
-    if(!QFile::exists(filePath)){
-        m_errorMessage = tr("File '%1' does not exist").arg(filePath);
-        qCritical()<<m_errorMessage;
-        return -1;
-    }
+////    if(!QFile::exists(filePath)){
+////        m_errorMessage = tr("File '%1' does not exist").arg(filePath);
+////        qCritical()<<m_errorMessage;
 
-    // open the file
-    fstream ifs(filePath.toStdString().c_str(), ios::in | ios::binary);
+////        emit fileDataSent(socket, filePath, offset, -1, m_errorMessage);
+////        return -1;
+////    }
 
-    //ifs.seekg(0, ios::end);
-    //int64_t size = ifs.tellg();
-    ifs.seekg(0, ios::beg);
+//    // open the file
+//    fstream ifs(filePath.toStdString().c_str(), ios::in | ios::binary);
 
-    UDT::TRACEINFO trace;
-    UDT::perfmon(socket, &trace);
+//    //ifs.seekg(0, ios::end);
+//    //int64_t size = ifs.tellg();
+//    ifs.seekg(0, ios::beg);
 
-    // send the file
-    //int64_t offset = 0;
-    qint64 sentSize = -1;
-    if (UDT::ERROR == (sentSize = UDT::sendfile(socket, ifs, offset, size, blockSize)) )
-    {
-        m_errorMessage = tr("Failed to send file! ") + UDT::getlasterror().getErrorMessage();
-        qCritical()<<m_errorMessage;
-       //cout << "sendfile: " << UDT::getlasterror().getErrorMessage() << endl;
-       return -1;
-    }
+//    UDT::TRACEINFO trace;
+//    UDT::perfmon(socket, &trace);
 
-    UDT::perfmon(socket, &trace);
-    cout << "speed = " << trace.mbpsSendRate/8 << "MB/sec" << endl;
+//    // send the file
+//    //int64_t offset = 0;
+//    qint64 sentSize = -1;
+//    if (UDT::ERROR == (sentSize = UDT::sendfile(socket, ifs, offset, size, blockSize)) )
+//    {
+//        m_errorMessage = tr("Failed to send file! ") + UDT::getlasterror().getErrorMessage();
+//        qCritical()<<m_errorMessage;
+//        //cout << "sendfile: " << UDT::getlasterror().getErrorMessage() << endl;
 
-    ifs.close();
+//        emit fileDataSent(socket, filePath, offset, sentSize, m_errorMessage);
+//        return sentSize;
+//    }
 
-    return sentSize;
+//    UDT::perfmon(socket, &trace);
+//    cout << "speed = " << trace.mbpsSendRate/8 << "MB/sec" << endl;
 
-}
+//    ifs.close();
 
-qint64 UDTProtocolBase::receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size){
+//    emit fileDataSent(socket, filePath, offset, sentSize, "");
+
+//    return sentSize;
+
+//}
+
+//qint64 UDTProtocolBase::receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size, int blockSize){
 
 
-    // receive the file
-    fstream ofs(fileSavePath.toStdString().c_str(), ios::out | ios::binary | ios::trunc);
-    int64_t recvsize;
-    //int64_t offset = 0;
+//    // receive the file
+//    fstream ofs(fileSavePath.toStdString().c_str(), ios::out | ios::binary | ios::trunc);
+//    int64_t recvsize = -1;
+//    //int64_t offset = 0;
 
-    if (UDT::ERROR == (recvsize = UDT::recvfile(socket, ofs, offset, size)))
-    {
-        m_errorMessage = tr("Failed to receive file! ") + UDT::getlasterror().getErrorMessage();
-        qCritical()<<m_errorMessage;
-       //cout << "recvfile: " << UDT::getlasterror().getErrorMessage() << endl;
-       return -1;
-    }
+//    if (UDT::ERROR == (recvsize = UDT::recvfile(socket, ofs, offset, size, blockSize)))
+//    {
+//        m_errorMessage = tr("Failed to receive file! ") + UDT::getlasterror().getErrorMessage();
+//        qCritical()<<m_errorMessage;
+//        //cout << "recvfile: " << UDT::getlasterror().getErrorMessage() << endl;
 
-    ofs.close();
+//        emit fileDataReceived(socket, fileSavePath, offset, recvsize, m_errorMessage);
+//        return recvsize;
+//    }
 
-    return recvsize;
+//    ofs.close();
 
-}
+//    emit fileDataReceived(socket, fileSavePath, offset, recvsize, "");
+
+//    return recvsize;
+
+//}
 
 
 void UDTProtocolBase::closeUDTProtocol(){
@@ -339,7 +354,7 @@ void UDTProtocolBase::closeUDTProtocol(){
 
 }
 
-UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting, int msecTimeout){
+UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting, bool monitor, int msecTimeout){
     qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port;
 
     m_errorMessage = "";
@@ -417,7 +432,9 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
     freeaddrinfo(local);
 
 
-    UDT::epoll_add_usock(epollID, client);
+    if(monitor){
+        UDT::epoll_add_usock(epollID, client);
+    }
 
 
     if (UDT::ERROR == UDT::connect(client, peer->ai_addr, peer->ai_addrlen))
@@ -447,7 +464,7 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
             QCoreApplication::processEvents();
             msleep(1);
-            qDebug()<<QString("Connecting to %1:%2 ...").arg(address.toString()).arg(port);
+            //qDebug()<<QString("Connecting to %1:%2 ...").arg(address.toString()).arg(port);
         }
     }
 
@@ -516,7 +533,7 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
         if (UDT::ERROR == (ss = UDT::send(socket, data + ssize, size - ssize, 0)))
         {
             m_errorMessage = tr("Data sent failed! Data size:%1, Sent size:%2! %3").arg(size).arg(ssize).arg(UDT::getlasterror().getErrorMessage());
-            qDebug()<<m_errorMessage;
+            //qDebug()<<m_errorMessage;
 
             int errorCode = UDT::getlasterror().getErrorCode();
             if(errorCode == UDT::ERRORINFO::EASYNCSND){
@@ -715,6 +732,32 @@ void UDTProtocolBase::waitForWriting(int msecTimeout){
 
 }
 
+void UDTProtocolBase::waitingForNewConnection(int msecTimeout){
+
+    QDateTime beginTime, curTime;
+    int interval = 0;
+
+
+    m_threadCount++;
+    while(m_listening){
+
+        //acceptNewConnection();
+        beginTime = QDateTime::currentDateTime();
+
+        acceptNewConnection();
+
+        curTime = QDateTime::currentDateTime();
+        interval = beginTime.msecsTo(curTime);
+        if(interval < msecTimeout){
+            msleep(msecTimeout - interval);
+        }
+        //QCoreApplication::processEvents();
+    }
+    m_threadCount--;
+
+
+}
+
 UDTSOCKET UDTProtocolBase::acceptNewConnection(){
     //qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
 
@@ -775,7 +818,7 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
 }
 
 void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
-    qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
+    //qDebug()<<"--UDTProtocolBase::readDataFromSocket(..) "<<"socket:"<<socket;
 
     if(socket == serverSocket){
         acceptNewConnection();
@@ -802,13 +845,13 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         {
             if (UDT::ERROR == (receivedSize = UDT::recv(socket, data + totalReceivedSize, size - totalReceivedSize, 0)))
             {
-                qDebug()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
+                //qDebug()<<"ERROR! Failed to receive data! "<< UDT::getlasterror().getErrorMessage();
                 //cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
                 break;
             }
 
             totalReceivedSize += receivedSize;
-            qDebug()<<"totalReceivedSize:"<<totalReceivedSize;
+            //qDebug()<<"totalReceivedSize:"<<totalReceivedSize;
         }
         if (0 == totalReceivedSize){
             qDebug()<<"No data received!";
@@ -918,7 +961,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 }
 
 void UDTProtocolBase::processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray){
-    qDebug()<<"--UDTProtocolBase::processStreamDataAfterReceived(...) "<<"socket:"<<socket<<" size:"<<byteArray->size();
+    //qDebug()<<"--UDTProtocolBase::processStreamDataAfterReceived(...) "<<"socket:"<<socket<<" size:"<<byteArray->size();
 
 
     QByteArray *cachedData = m_cachedDataInfoHash.value(socket);

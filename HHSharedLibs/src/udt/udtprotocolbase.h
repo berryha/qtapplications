@@ -141,18 +141,23 @@ signals:
     void connected(int socket);
     void disconnected(int socket);
 
+    void fileDataSent(int socket, const QString &filePath, qint64 offset, qint64 sizeSent, const QString &errorMessage);
+    void fileDataReceived(int socket, const QString &fileSavePath, qint64 offset, qint64 sizeReceived, const QString &errorMessage);
+
+
 public slots:
     //Start the server to listen,  implement the virtual function startWaitingForIO()
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
     //Call this function after server is listening
+    void startWaitingForNewConnectionInOneThread(int msecWaitForNewConnectionTimeout = 1);
     void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = 1, int msecWaitForOutputTimeout = 1);
     void startWaitingForIOInOneThread(int msecWaitForIOTimeout = 1);
 
 
 
     //Connect to peer
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, int msecTimeout = 5000);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, bool monitor = true, int msecTimeout = 5000);
 
     //Close peer socket
     void closeSocket(UDTSOCKET socket);
@@ -162,9 +167,6 @@ public slots:
     bool sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray);
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
-    //Send & Receive File
-    qint64 sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize = 8192);
-    qint64 receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size);
 
     //Close the server
     void closeUDTProtocol();
@@ -174,7 +176,13 @@ protected:
     void waitForIO(int msecTimeout = 1);
     void waitForReading(int msecTimeout = 1);
     void waitForWriting(int msecTimeout = 1);
+    void waitingForNewConnection(int msecTimeout = 1);
     UDTSOCKET acceptNewConnection();
+
+    //Send & Receive File
+//    qint64 sendFile(UDTSOCKET socket, const QString &filePath, qint64 offset, qint64 size, int blockSize = 8192);
+//    qint64 receiveFile(UDTSOCKET socket, const QString &fileSavePath, qint64 offset, qint64 size, int blockSize = 8192);
+
 
 private slots:
     void readDataFromSocket(UDTSOCKET socket);

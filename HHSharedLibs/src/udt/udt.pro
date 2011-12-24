@@ -33,9 +33,11 @@ DEPENDPATH += $${INCLUDEPATH}
 # Input
 HEADERS += \
             mysharedlib_global.h \
-    udtprotocolbase.h
+    udtprotocolbase.h \
+    udtprotocolforfiletransmission.h
 SOURCES += \
-    udtprotocolbase.cpp
+    udtprotocolbase.cpp \
+    udtprotocolforfiletransmission.cpp
 RESOURCES += 
 
 
