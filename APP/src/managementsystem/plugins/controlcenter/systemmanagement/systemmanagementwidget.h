@@ -149,6 +149,9 @@ private:
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
 
+    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+    UDTSOCKET m_peerFileTransmissionSocket;
+
     FileManager *m_fileManager;
     QList<int/*File TX Request ID*/> fileTXRequestList;
     QList<QByteArray/*File MD5*/> filesList;

@@ -15,7 +15,6 @@
 
 
 
-
 namespace HEHUI {
 
 
@@ -41,6 +40,8 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
     m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
     peerSocketThatRequiresDetailedInfo = UDTProtocol::INVALID_UDT_SOCK;
+
+    m_udtProtocolForFileTransmission = 0;
 
     databaseUtility = 0;
     mainServiceStarted = false;
@@ -190,9 +191,11 @@ bool ClientService::startMainService(){
         qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(50);
+    m_udtProtocol->startWaitingForIOInOneThread(1);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
+
+//    m_udtProtocolForFileTransmission = resourcesManager->getUDTProtocolForFileTransmission();
 
     clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
     //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
@@ -1947,36 +1950,15 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
         clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, false, errorString);
     }
 
+    clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, true, errorString);
+
+
+//    m_udtProtocolForFileTransmission->receiveFileFromPeer(socketID, localPath, 0, size);
+//    qDebug()<<"------------------------------------------0";
+//    return;
 
 
 
-
-//    if(QFile::exists(localPath)){
-//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Exist_Error), tr("File '%1' Already Exists!").arg(localPath));
-//        return;
-//    }else{
-//        QDir dir;
-//        if(!dir.mkpath(remoteFileSaveDir)){
-//            clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create directory '%1'!").arg(remoteFileSaveDir));
-//            return;
-//        }
-//    }
-
-//    Q_ASSERT(!fileTXWithAdmin);
-//    fileTXWithAdmin = new QFile(localPath);
-//    if(!fileTXWithAdmin->open(QIODevice::WriteOnly)){
-//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to create file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
-//        closeFileTXWithAdmin();
-//        return;
-//    }
-
-//    if (!fileTXWithAdmin->resize(size)) {
-//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Write_Error), tr("Failed to resize file '%1':%2!").arg(localPath).arg(fileTXWithAdmin->errorString()));
-//        closeFileTXWithAdmin();
-//        return;
-//    }
-
-//    fileTXWithAdminStatus = MS::File_TX_Receiving;
 
     if(clientPacketsParser->responseFileUploadRequest(socketID, fileMD5Sum, true, "")){
         fileTXSocketHash.insertMulti(socketID, fileMD5Sum);
@@ -2155,16 +2137,25 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
 //            }
 //            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
 
+
+            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+            //    qDebug()<<"----0----pieceIndex:"<<pieceIndex;
+            //    clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+            //}
+
             if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-                qDebug()<<"----0----pieceIndex:"<<pieceIndex;
-                clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+                if(pieceIndex == 0 ){
+                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }else{
+                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }
             }
 
         }
 
 
     }else{
-
+        qCritical()<<"ERROR! Verification Failed! Piece:"<<pieceIndex;
         clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex, pieceIndex);
     }
 

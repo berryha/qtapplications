@@ -54,6 +54,10 @@
 //#define RUDP_LISTENING_PORT	12346
 //#endif
 
+#ifndef UDT_FILE_LISTENING_PORT
+#define UDT_FILE_LISTENING_PORT	12347
+#endif
+
 #ifndef UDT_LISTENING_PORT
 #define UDT_LISTENING_PORT	12346
 #endif
@@ -87,7 +91,7 @@
 #endif
 
 #ifndef FILE_PIECES_IN_ONE_REQUEST
-#define FILE_PIECES_IN_ONE_REQUEST 100 //100 Pieces
+#define FILE_PIECES_IN_ONE_REQUEST 20 //20 Pieces
 #endif
 
 
