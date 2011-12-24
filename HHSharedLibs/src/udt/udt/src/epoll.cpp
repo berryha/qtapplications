@@ -274,7 +274,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                   lrfds->insert(*i);
                   ++ total;
                }
-               if (lwfds && (FD_ISSET(*i, &writefds)))
+               if (lwfds && FD_ISSET(*i, &writefds))
                {
                   lwfds->insert(*i);
                   ++ total;
