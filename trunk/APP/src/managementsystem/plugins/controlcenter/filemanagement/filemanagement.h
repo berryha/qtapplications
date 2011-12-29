@@ -3,6 +3,7 @@
 
 
 #include <QFileSystemModel>
+#include <QCompleter>
 
 #include "ui_filemanagement.h"
 
@@ -26,13 +27,13 @@ signals:
 private slots:
 
     void on_groupBoxLocal_toggled( bool on );
+    void on_toolButtonShowLocalFiles_clicked();
     void localFileItemDoubleClicked(const QModelIndex &index);
 
 
     void on_groupBoxRemote_toggled( bool on );
 
 
-    void on_toolButtonShowLocalFiles_clicked();
 
 
 
@@ -41,6 +42,8 @@ private:
 
 
     QFileSystemModel *localFileSystemModel;
+
+    QCompleter *localFilesCompleter;
 
 
 
