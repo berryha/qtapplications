@@ -20,7 +20,7 @@ include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
 include(../../sharedms/sharedms.pri)
 INCLUDEPATH += $$UI_DIR \
-    $$PWD
+                $$PWD
 
 # ##
 UI_DIR = ./ui
@@ -36,12 +36,14 @@ HEADERS += \
     controlcenter.h \
     controlcenterplugin.h \
     constants.h \
-    networkmanager/resourcesmanagerinstance.h
+    networkmanager/resourcesmanagerinstance.h \
+    filemanagement/filemanagement.h
 FORMS += taskmanagement/taskinfoviewwidget.ui \
     taskmanagement/taskmanagement.ui \
     announcement/announcement.ui \
     systemmanagement/systemmanagementwidget.ui \
-    controlcenter.ui
+    controlcenter.ui \
+    filemanagement/filemanagement.ui
 SOURCES += \
     networkmanager/controlcenterpacketsparser.cpp \
     taskmanagement/taskinfoviewwidget.cpp \
@@ -51,7 +53,8 @@ SOURCES += \
     systemmanagement/systemmanagementwidget.cpp \
     controlcenter.cpp \
     controlcenterplugin.cpp \
-    networkmanager/resourcesmanagerinstance.cpp
+    networkmanager/resourcesmanagerinstance.cpp \
+    filemanagement/filemanagement.cpp
 RESOURCES += controlcenter.qrc
 
 # define some usefull values

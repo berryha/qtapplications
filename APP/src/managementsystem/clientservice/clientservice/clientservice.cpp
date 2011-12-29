@@ -232,7 +232,7 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &,quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
 
@@ -2045,7 +2045,7 @@ void ClientService::processFileDataReceivedPacket(int socketID, const QByteArray
 
 }
 
-void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status){
+void ClientService::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
 
     //MS::FileTXStatus status = MS::FileTXStatus(status);
     switch(status){
@@ -2064,20 +2064,30 @@ void ClientService::processFileTXStatusChangedPacket(int socketID, quint8 status
 
     }
         break;
+    case quint8(MS::File_TX_Progress):
+    {
+
+    }
+        break;
     case quint8(MS::File_TX_Paused):
     {
 
-//        fileTXWithAdminStatus = MS::File_TX_Paused;
     }
         break;
     case quint8(MS::File_TX_Aborted):
     {
-//        closeFileTXWithAdmin();
-
+        QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+        if(sockets.contains(socketID) && sockets.size() <= 1){
+            m_fileManager->closeFile(fileMD5);
+        }
     }
         break;
     case quint8(MS::File_TX_Done):
     {
+        QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+        if(sockets.contains(socketID) && sockets.size() <= 1){
+            m_fileManager->closeFile(fileMD5);
+        }
 
     }
         break;
@@ -2128,6 +2138,7 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
 
         if(verificationProgress == 100){
             qWarning()<<"Done!";
+            clientPacketsParser->fileTXStatusChanged(sockets.first(), fileMD5, quint8(MS::File_TX_Done));
         }else{
             //TODO:
 //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);

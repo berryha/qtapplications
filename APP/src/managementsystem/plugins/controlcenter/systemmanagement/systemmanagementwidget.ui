@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>785</width>
-    <height>536</height>
+    <width>860</width>
+    <height>592</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -115,7 +115,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabSystemInfo">
       <attribute name="title">
@@ -922,6 +922,12 @@
        </item>
       </layout>
      </widget>
+     <widget class="HEHUI::FileManagement" name="tabFileManagement">
+      <attribute name="title">
+       <string>File Management</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_12"/>
+     </widget>
      <widget class="QWidget" name="tabLocalManagement">
       <attribute name="title">
        <string>Local Management</string>
@@ -1000,6 +1006,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>HEHUI::FileManagement</class>
+   <extends>QWidget</extends>
+   <header location="global">filemanagement.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>lineEditComputerName</tabstop>
   <tabstop>lineEditUsers</tabstop>

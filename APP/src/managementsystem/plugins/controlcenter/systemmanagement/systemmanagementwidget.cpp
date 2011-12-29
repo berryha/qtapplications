@@ -270,6 +270,11 @@ void SystemManagementWidget::dropEvent(QDropEvent *event)
 
 void SystemManagementWidget::filesDropped(const QStringList &localFiles){
 
+//    if(localFiles.size() != 1){
+//        QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
+//        return;
+//    }
+
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
         on_toolButtonVerify_clicked();
     }
@@ -305,6 +310,7 @@ void SystemManagementWidget::filesDropped(const QStringList &localFiles){
 
         QFileInfo fi(localFileName);
         if(fi.isDir()){
+            QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
             continue;
         }
 
@@ -374,7 +380,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 
     connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int,quint8)), this, SLOT(processFileTXStatusChangedPacket(int,quint8)), Qt::QueuedConnection);
+    connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &, quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
 
@@ -1476,7 +1482,7 @@ void SystemManagementWidget::processFileDataReceivedPacket(int socketID, const Q
 
 }
 
-void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, quint8 status){
+void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
 
     if(socketID != m_peerSocket){
         return;
@@ -1499,6 +1505,11 @@ void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, quin
 
     }
         break;
+    case quint8(MS::File_TX_Progress):
+    {
+
+    }
+        break;
     case quint8(MS::File_TX_Paused):
     {
 
@@ -1513,7 +1524,7 @@ void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, quin
         break;
     case quint8(MS::File_TX_Done):
     {
-
+        m_fileManager->closeFile(fileMD5);
     }
         break;
     default:
@@ -1577,6 +1588,8 @@ void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceI
 
         if(verificationProgress == 100){
             qWarning()<<"Done!";
+            controlCenterPacketsParser->fileTXStatusChanged(m_peerSocket, fileMD5, quint8(MS::File_TX_Done));
+
         }else{
             //TODO:
 //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
@@ -1584,7 +1597,7 @@ void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceI
 //            if(uncompletedPieceIndex < 0){
 //                return;
 //            }
-//            controlCenterPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+//            controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, uncompletedPieceIndex);
 
             //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
             //    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
