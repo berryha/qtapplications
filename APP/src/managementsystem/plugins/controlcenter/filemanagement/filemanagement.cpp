@@ -28,11 +28,11 @@ void FileManagement::on_groupBoxLocal_toggled( bool on ){
         if(!localFileSystemModel){
             localFileSystemModel = new QFileSystemModel(this);
             localFileSystemModel->setFilter(QDir::AllEntries | QDir::NoDot);
-//            localFileSystemModel->setRootPath(QDir::currentPath());
+            //localFileSystemModel->setRootPath(QDir::currentPath());
             localFileSystemModel->setRootPath("");
 
             ui.tableViewLocalFiles->setModel(localFileSystemModel);
-//            ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(QDir::currentPath()));
+            //ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(QDir::currentPath()));
 
             localFilesCompleter = new QCompleter(this);
             localFilesCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
@@ -73,6 +73,10 @@ void FileManagement::localFileItemDoubleClicked(const QModelIndex &index){
 }
 
 void FileManagement::on_groupBoxRemote_toggled( bool on ){
+
+    if(on){
+        emit signalShowRemoteFiles("");
+    }
 
 }
 
