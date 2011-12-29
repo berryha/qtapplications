@@ -33,6 +33,8 @@
 #define PROGRESSDLG_H
 
 #include <QtGui/QWidget>
+#include <QCloseEvent>
+
 #include "../ui/ui_progressdlg.h"
 
 #include "HHSharedCore/hmysharedlib_global.h"
@@ -51,12 +53,25 @@ public:
     void setProgressMessage(const QString &message);
     void setJobProgress(int progressValue);
 
+
+protected:
+//    void closeEvent(QCloseEvent *event);
+
+
+signals:
+    void widgetClosed();
+
+
 public slots:
-	void slotUpdateProgress(const QString &progressMessage, int progressValue = -1);
-        void slotUpdateProcessOutput(const QString &message);
+    void slotUpdateProgress(const QString &progressMessage, int progressValue = -1);
+    void slotUpdateProcessOutput(const QString &message);
+
+    void showDetails(bool show);
+    void closeWidget();
+
 
 private slots:
-	void on_toolButtonShowDetails_toggled ( bool checked );
+    void on_toolButtonShowDetails_toggled ( bool checked );
 
 
 private:

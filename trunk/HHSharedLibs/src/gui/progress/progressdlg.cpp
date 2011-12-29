@@ -42,9 +42,11 @@ ProgressDlg::ProgressDlg(const QString &jobName, QWidget *parent)
 
     //ui.toolButtonShowDetails->setChecked(false);
     //ui.textBrowserDetails->hide();
-    on_toolButtonShowDetails_toggled(true);
+    //on_toolButtonShowDetails_toggled(true);
 
     setJobName(jobName);
+
+    connect(ui.pushButtonClose, SIGNAL(clicked()), this, SIGNAL(widgetClosed()));
 
 }
 
@@ -71,6 +73,12 @@ void ProgressDlg::setJobProgress(int progressValue)
 
 }
 
+//void ProgressDlg::closeEvent(QCloseEvent *event){
+
+//    hide();
+//    emit widgetClosed();
+//    event->accept();
+//}
 
 void ProgressDlg::slotUpdateProgress(const QString &progressMessage, int progressValue)
 {
@@ -90,6 +98,26 @@ void ProgressDlg::slotUpdateProcessOutput(const QString &message){
     ui.textBrowserDetails->append(message);
 
 }
+
+void ProgressDlg::showDetails(bool show){
+
+    on_toolButtonShowDetails_toggled(show);
+
+}
+
+void ProgressDlg::closeWidget(){
+
+    ui.labelDescription->clear();
+    ui.progressBar->setValue(0);
+    ui.textBrowserDetails->clear();
+
+    hide();
+    //showMinimized();
+
+    emit widgetClosed();
+
+}
+
 
 
 void ProgressDlg::on_toolButtonShowDetails_toggled ( bool checked )
