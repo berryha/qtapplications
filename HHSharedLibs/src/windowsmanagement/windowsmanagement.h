@@ -56,19 +56,12 @@
 
 #endif
 
-#include <string.h>
-
-
-
-
-
 
 #include "mysharedlib_global.h"
 
-using namespace std;
+
 
 namespace HEHUI {
-
 
 
 class MYSHAREDLIB_API WindowsManagement : public QObject

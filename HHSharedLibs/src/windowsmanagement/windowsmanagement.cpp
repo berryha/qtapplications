@@ -476,9 +476,8 @@ QStringList WindowsManagement::localUsers() {
 
                 }
             }
-        }
-        else {
-            //
+        } else {
+            fprintf(stderr, "A system error has occurred: %d\n", nStatus);
         }
 
         if (pBuf != NULL) {
