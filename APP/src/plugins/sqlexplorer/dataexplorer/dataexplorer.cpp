@@ -123,8 +123,7 @@ quint32 DataExplorer::recordCountInTable(const QSqlDatabase & database, const QS
 }
 
 void DataExplorer::slotInsertRow() {
-	QSqlTableModel *model =
-			qobject_cast<QSqlTableModel *>(ui.dataViewTable->model());
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(ui.dataViewTable->model());
 	if (!model)
 		return;
 
