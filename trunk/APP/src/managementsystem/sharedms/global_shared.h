@@ -181,6 +181,7 @@ namespace HEHUI {
             File_TX_Receiving,
             File_TX_Sending,
             //File_TX_Transferring,
+            File_TX_Progress,
             File_TX_Paused,
             File_TX_Aborted,
             File_TX_Done

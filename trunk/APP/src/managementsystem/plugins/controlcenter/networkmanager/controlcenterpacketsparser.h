@@ -612,7 +612,7 @@ public slots:
             return m_udtProtocol->sendData(socketID, &ba);
         }
 
-        bool fileTXStatusChanged(int socketID, quint8 status){
+        bool fileTXStatusChanged(int socketID, const QByteArray &fileMD5, quint8 status){
             Packet *packet = PacketHandlerBase::getPacket(socketID);
 
             packet->setPacketType(quint8(MS::FileTXStatusChanged));
@@ -620,7 +620,7 @@ public slots:
             QByteArray ba;
             QDataStream out(&ba, QIODevice::WriteOnly);
             out.setVersion(QDataStream::Qt_4_7);
-            out << m_localComputerName << status ;
+            out << m_localComputerName << fileMD5 << status ;
             packet->setPacketData(ba);
 
             ba.clear();
@@ -710,7 +710,7 @@ signals:
 
     void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void signalFileDataReceived(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
-    void signalFileTXStatusChanged(int socketID, quint8 status);
+    void signalFileTXStatusChanged(int socketID, const QByteArray &fileMD5, quint8 status);
     void signalFileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
 
 
