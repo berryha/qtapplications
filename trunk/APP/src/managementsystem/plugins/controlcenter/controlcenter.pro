@@ -20,7 +20,8 @@ include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
 include(../../sharedms/sharedms.pri)
 INCLUDEPATH += $$UI_DIR \
-                $$PWD
+               $$PWD \
+               filemanagement
 
 # ##
 UI_DIR = ./ui

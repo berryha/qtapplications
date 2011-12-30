@@ -1,10 +1,11 @@
 #ifndef FILEMANAGEMENT_H
 #define FILEMANAGEMENT_H
 
-
+#include <QObject>
 #include <QFileSystemModel>
 #include <QCompleter>
 #include <QFileIconProvider>
+#include <QList>
 
 #include "ui_filemanagement.h"
 
@@ -21,9 +22,10 @@ public:
     FileSystemModel(QFileIconProvider *fileIconProvider, QObject *parent = 0);
     virtual ~FileSystemModel();
 
-    void setFileItems(QList<FileItemInfo> fileItems);
-    void addFileItem(const QString &name, const QString &size, const QString &type, const QString &dateModified);
+//    void setFileItems(QList<FileItemInfo> fileItems);
+    void addFileItem(const QString &name, const QString &size, quint8 type, const QString &dateModified);
     void deleteFileItem(const QString &name);
+    void deleteFileItem(const QModelIndex & index);
 
 
     int rowCount ( const QModelIndex & parent = QModelIndex() ) const ;
@@ -31,17 +33,23 @@ public:
     QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const ;
     QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
+    bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
+
+    bool isDir(const QModelIndex &index);
+    QString absoluteFilePath(const QModelIndex &index);
+
+    void changePath(const QString &newPath);
 
 private:
     struct FileItemInfo{
         QString name;
         QString size;
-        QString type;
+        quint8 type;
         QString dateModified;
 
     };
 
-    QList<FileItemInfo> fileItems;
+    QList<FileItemInfo *> fileItems;
 
     QString currentDirPath;
 
@@ -84,8 +92,9 @@ private:
 
 
     QFileSystemModel *localFileSystemModel;
-
     QCompleter *localFilesCompleter;
+
+    FileSystemModel *remoteFileSystemModel;
 
 
 

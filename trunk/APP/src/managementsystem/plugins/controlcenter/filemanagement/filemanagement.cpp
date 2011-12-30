@@ -2,6 +2,7 @@
 
 
 #include <QMessageBox>
+#include <QDateTime>
 
 
 namespace HEHUI {
@@ -22,39 +23,73 @@ FileSystemModel::~FileSystemModel() {
     fileItems.clear();
 }
 
-void FileSystemModel::setFileItems(QList<FileItemInfo> fileItems)
-{
-    beginResetModel();
-    this->fileItems = fileItems;
-    endResetModel();
+//void FileSystemModel::setFileItems(QList<FileItemInfo> fileItems)
+//{
+//    beginResetModel();
+//    this->fileItems = fileItems;
+//    endResetModel();
 
-}
+//}
 
-void FileSystemModel::addFileItem(const QString &name, const QString &size, const QString &type, const QString &dateModified){
+void FileSystemModel::addFileItem(const QString &name, const QString &size, quint8 type, const QString &dateModified){
 
-    FileItemInfo info;
-    info.name = name;
-    info.size = size;
-    info.type = type;
-    info.dateModified = dateModified;
-
-    if(!fileItems.contains(info)){
-        beginResetModel();
-        this->fileItems.append(clientInfo);
-        endResetModel();
+    foreach (FileItemInfo *info, fileItems) {
+        if(info->name == name){
+            return;
+        }
     }
+
+    FileItemInfo *info = new FileItemInfo();
+    info->name = name;
+    info->size = size;
+    info->type = type;
+    info->dateModified = dateModified;
+
+    beginResetModel();
+    this->fileItems.append(info);
+    endResetModel();
 
 }
 
 void FileSystemModel::deleteFileItem(const QString &name){
 
-    foreach (FileItemInfo info, fileItems) {
-        if(info.name == name){
+//    for(int i=0; i<fileItems.size(); i++){
+//        FileItemInfo *info = fileItems.at(i);
+//        if(info->name == name){
+//            beginResetModel();
+//            fileItems.removeAll(info);
+//            endResetModel();
+//        }
+//    }
+
+    foreach (FileItemInfo *info, fileItems) {
+        if(info->name == name){
             beginResetModel();
-            this->fileItems.removeAll(info);
+            delete info;
+            fileItems.removeAll(info);
             endResetModel();
         }
     }
+
+}
+void FileSystemModel::deleteFileItem(const QModelIndex &index){
+
+    if(!index.isValid()){
+        return;
+    }
+
+    int row = index.row();
+    if((row < 0) || (row >= fileItems.size())){
+        return;
+    }
+
+    FileItemInfo *info = fileItems.at(row);
+
+    beginResetModel();
+    delete info;
+    this->fileItems.removeAll(info);
+    endResetModel();
+
 
 }
 
@@ -86,20 +121,30 @@ QVariant FileSystemModel::data ( const QModelIndex & index, int role) const{
         return QVariant();
     }
 
-    FileItemInfo info = static_cast<FileItemInfo> (fileItems.at(row));
+    FileItemInfo *info = fileItems.at(row);
+    //FileItemInfo *info = static_cast<FileItemInfo *> (fileItems.at(row));
     if(role == Qt::DisplayRole || role == Qt::EditRole){
             switch (index.column()) {
             case 0:
-                return info.name;
+                return info->name;
                 break;
             case 1:
-                return info.size;
+                return info->size;
                 break;
             case 2:
-                return info.type;
+            {
+                quint8 type = info->type;
+                if(type == quint8(DRIVE)){
+                    return tr("Drive");
+                }else if(type == quint8(FOLDER)){
+                    return tr("Folder");
+                }else{
+                    return tr("File");
+                }
+            }
                 break;
             case 3:
-                return info.dateModified;
+                return info->dateModified;
                 break;
 
             default:
@@ -107,17 +152,18 @@ QVariant FileSystemModel::data ( const QModelIndex & index, int role) const{
                 break;
             }
     }else if(role == Qt::DecorationRole){
-        QIcon icon;
-        QString type = info.type;
-        if(type == "Drive"){
-            icon = m_fileIconProvider->icon(QFileIconProvider::Drive);
-        }else if(type == "File Folder"){
-            icon = m_fileIconProvider->icon(QFileIconProvider::Folder);
-        }else{
-            icon = m_fileIconProvider->icon(QFileIconProvider::File);
+        if(index.column() == 0){
+            QIcon icon;
+            quint8 type = info->type;
+            if(type == quint8(DRIVE)){
+                icon = m_fileIconProvider->icon(QFileIconProvider::Drive);
+            }else if(type == quint8(FOLDER)){
+                icon = m_fileIconProvider->icon(QFileIconProvider::Folder);
+            }else{
+                icon = m_fileIconProvider->icon(QFileIconProvider::File);
+            }
+            return icon;
         }
-        reurrn icon;
-
     }
 
     return QVariant();
@@ -154,6 +200,130 @@ QVariant FileSystemModel::headerData ( int section, Qt::Orientation orientation,
 
 }
 
+bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data){
+
+    if(currentDirPath != remoteParentDirPath){
+        return false;
+    }
+
+    QList<FileItemInfo *> items;
+
+    QDataStream in(data);
+    in.setVersion(QDataStream::Qt_4_8);
+
+    QString parentDirPath = "";
+    QString name = "";
+    qint64 size = 0;
+    quint8 type = quint8(FILE);
+    uint lastModified = 0;
+
+    in >> parentDirPath;
+
+    while (!in.atEnd()) {
+        in >> name >> size >> type >> lastModified;
+        if(name.isEmpty()){
+            continue;
+        }
+        FileItemInfo *info = new FileItemInfo();
+        info->name = name;
+
+        QString sizeString = QString::number(size);
+        if(size < 1024){
+            sizeString = QString::number(size) + "Byte";
+        }else if(size < 1024*1024){
+            sizeString = QString::number(size/1024) + "KB";
+        }else{
+            sizeString = QString::number(size/1024*1024) + "MB";
+        }
+        info->size = sizeString;
+
+//        if(type == quint8(DRIVE)){
+//            info.type = tr("Drive");
+//        }else if(type == quint8(FOLDER)){
+//            info.type = tr("Folder");
+//        }else{
+//            info.type = tr("File");
+//        }
+        info->type = type;
+
+        QDateTime time = QDateTime::fromTime_t(lastModified);
+        info->dateModified = time.toString("yyyy/MM/dd hh:mm:ss");
+
+        items.append(info);
+    }
+
+//    setFileItems(items);
+
+    beginResetModel();
+    foreach (FileItemInfo *info, fileItems) {
+        delete info;
+    }
+    this->fileItems.clear();
+    this->fileItems = items;
+    endResetModel();
+
+
+    return true;
+}
+
+bool FileSystemModel::isDir(const QModelIndex & index){
+
+    if(!index.isValid()){
+        return false;
+    }
+
+    int row = index.row();
+    if((row < 0) || (row >= fileItems.size())){
+        return false;
+    }
+
+    FileItemInfo *info = fileItems.at(row);
+    //FileItemInfo *info = static_cast<FileItemInfo *> (fileItems.at(row));
+
+
+    return (info->type != quint8(FILE));
+
+//    int column = index.column();
+//    if(column != 0){
+//        QModelIndex idx = index.sibling(index.row(), 0);
+//    }
+
+}
+
+QString FileSystemModel::absoluteFilePath(const QModelIndex &index){
+
+    if(!index.isValid()){
+        return "";
+    }
+
+    int row = index.row();
+    if((row < 0) || (row >= fileItems.size())){
+        return "";
+    }
+
+    FileItemInfo *info = fileItems.at(row);
+    if(!info){
+        return "";
+    }
+
+    return currentDirPath + "/" + info->name;
+
+}
+
+void FileSystemModel::changePath(const QString &newPath){
+
+    currentDirPath = newPath;
+
+    beginResetModel();
+    this->fileItems.clear();
+    endResetModel();
+
+}
+
+
+
+
+
 
 /////////////////////////////////////////////
 FileManagement::FileManagement(QWidget *parent) :
@@ -164,6 +334,8 @@ FileManagement::FileManagement(QWidget *parent) :
 
     localFileSystemModel = 0;
     localFilesCompleter = 0;
+
+    remoteFileSystemModel = 0;
 
 
     connect(ui.tableViewLocalFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(localFileItemDoubleClicked(const QModelIndex &)));
@@ -224,6 +396,11 @@ void FileManagement::localFileItemDoubleClicked(const QModelIndex &index){
 void FileManagement::on_groupBoxRemote_toggled( bool on ){
 
     if(on){
+        if(!remoteFileSystemModel){
+            remoteFileSystemModel = new FileSystemModel(localFileSystemModel->iconProvider(), this);
+            ui.tableViewRemoteFiles->setModel(remoteFileSystemModel);
+        }
+
         emit signalShowRemoteFiles("");
     }
 
@@ -240,13 +417,17 @@ void FileManagement::tableViewRemoteFileItemDoubleClicked(const QModelIndex &ind
     }
     //TODO:
 
-//    if(!localFileSystemModel->isDir(index)){
-//        return;
-//    }
-//    QString newPath = localFileSystemModel->fileInfo(index).absoluteFilePath();
-//    ui.comboBoxRemotePath->setEditText(newPath);
+    if(!remoteFileSystemModel->isDir(index)){
+        return;
+    }
 
-//    ui.tableViewRemoteFiles->setRootIndex(localFileSystemModel->index(newPath));
+    QString newPath = remoteFileSystemModel->absoluteFilePath(index);
+
+    emit signalShowRemoteFiles(newPath);
+
+    ui.comboBoxRemotePath->setEditText(newPath);
+
+    remoteFileSystemModel->changePath(newPath);
 
 }
 
@@ -282,7 +463,7 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
     }
 
     result->clear();
-    QDataStream out(result);
+    QDataStream out(result, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_8);
     out << parentDirPath;
 
@@ -297,7 +478,7 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
                 type = quint8(FOLDER);
             }
         }
-        uint lastModified = info.lastModified();
+        uint lastModified = info.lastModified().toTime_t();
 
         out << name << size << type << lastModified;
 
@@ -311,27 +492,10 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
 
 bool FileManagement::parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data){
 
-    QDataStream in(&data);
-    in.setVersion(QDataStream::Qt_4_8);
-
-    QString parentDirPath = "";
-    QString name = "";
-    qint64 size = 0;
-    quint8 type = quint8(FILE);
-    uint lastModified = 0;
-
-    in >> parentDirPath;
-
-    while (!in.atEnd()) {
-        in >> name >> size >> type >> lastModified;
-        if(name.isEmpty()){
-            continue;
-        }
-
-    }
-
-
+    return remoteFileSystemModel->parseRemoteFilesInfo(remoteParentDirPath, data);
 }
+
+
 
 
 
