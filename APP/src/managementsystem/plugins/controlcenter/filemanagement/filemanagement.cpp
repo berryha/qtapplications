@@ -17,10 +17,21 @@ FileSystemModel::FileSystemModel(QFileIconProvider *fileIconProvider, QObject *p
 
     currentDirPath = "";
 
+//    setHeaderData(1, Qt::Horizontal, Qt::AlignRight, Qt::TextAlignmentRole);
+
+
+
 }
 
 FileSystemModel::~FileSystemModel() {
-    fileItems.clear();
+
+    beginResetModel();
+    foreach (FileItemInfo *info, fileItems) {
+        delete info;
+    }
+    this->fileItems.clear();
+    endResetModel();
+
 }
 
 //void FileSystemModel::setFileItems(QList<FileItemInfo> fileItems)
@@ -171,6 +182,7 @@ QVariant FileSystemModel::data ( const QModelIndex & index, int role) const{
 }
 
 QVariant FileSystemModel::headerData ( int section, Qt::Orientation orientation, int role) const{
+
     if(role != Qt::DisplayRole){
         return QVariant();
     }
@@ -193,8 +205,43 @@ QVariant FileSystemModel::headerData ( int section, Qt::Orientation orientation,
                 return QVariant();
                 break;
             }
-
     }
+
+
+//    if(role == Qt::DisplayRole){
+//        if(orientation ==  Qt::Horizontal){
+//                switch (section) {
+//                case 0:
+//                    return QString(tr("Name"));
+//                    break;
+//                case 1:
+//                    return QString(tr("Size"));
+//                    break;
+//                case 2:
+//                    return QString(tr("Type"));
+//                    break;
+//                case 3:
+//                    return QString(tr("Date Modified"));
+//                    break;
+//                default:
+//                    return QVariant();
+//                    break;
+//                }
+//        }
+//    }else if(role == Qt::TextAlignmentRole){
+//        if(orientation ==  Qt::Horizontal){
+//                switch (section) {
+//                case 0:
+//                    return Qt::AlignRight;
+//                    break;
+//                default:
+//                    return Qt::AlignLeft;
+//                    break;
+//                }
+//        }
+
+//    }
+
 
     return QVariant();
 
@@ -260,6 +307,7 @@ bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, c
 
 //    setFileItems(items);
 
+
     beginResetModel();
     foreach (FileItemInfo *info, fileItems) {
         delete info;
@@ -312,14 +360,16 @@ QString FileSystemModel::absoluteFilePath(const QModelIndex &index){
         return "";
     }
 
-    QDir dir(currentDirPath);
-    dir.cd(info->name);
-    return dir.absolutePath();
 
-//    if(currentDirPath.endsWith("/") || currentDirPath.endsWith("\\")){
-//        return currentDirPath + info->name;
-//    }
-//    return currentDirPath + "/" + info->name;
+
+    QString path;
+    if(currentDirPath.isEmpty() || currentDirPath.endsWith("/") || currentDirPath.endsWith("\\")){
+        path = currentDirPath + info->name;
+    }else{
+        path = currentDirPath + "/" + info->name;
+    }
+    QDir dir(path);
+    return dir.absolutePath();
 
 }
 
@@ -350,9 +400,11 @@ FileManagement::FileManagement(QWidget *parent) :
 
     remoteFileSystemModel = 0;
 
-
     connect(ui.tableViewLocalFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(localFileItemDoubleClicked(const QModelIndex &)));
     connect(ui.tableViewRemoteFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tableViewRemoteFileItemDoubleClicked(const QModelIndex &)));
+
+//    QHeaderView *header = ui.tableViewRemoteFiles->horizontalHeader();
+
 
 }
 
