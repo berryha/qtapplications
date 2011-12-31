@@ -90,6 +90,8 @@ private slots:
     void userResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
 
 ///////////////////
+    void requestFileSystemInfo(const QString &parentDirPath);
+    void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
     //File TX
     void startFileManager();
     void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
@@ -155,6 +157,8 @@ private:
     FileManager *m_fileManager;
     QList<int/*File TX Request ID*/> fileTXRequestList;
     QList<QByteArray/*File MD5*/> filesList;
+
+    FileManagement *m_fileManagementWidget;
 
 
 };

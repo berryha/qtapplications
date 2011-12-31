@@ -154,6 +154,12 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     m_fileManager = 0;
 
+
+    m_fileManagementWidget = qobject_cast<FileManagement *>(ui.tabFileManagement);
+    Q_ASSERT(m_fileManagementWidget);
+
+    connect(m_fileManagementWidget, SIGNAL(signalShowRemoteFiles(const QString &)), this, SLOT(requestFileSystemInfo(const QString &)));
+
 }
 
 SystemManagementWidget::~SystemManagementWidget()
@@ -370,6 +376,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     connect(controlCenterPacketsParser, SIGNAL(signalUserResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)), this, SLOT(userResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)));
     
     ////////////////////
+    connect(controlCenterPacketsParser, SIGNAL(signalFileSystemInfoReceived(int, const QString &, const QByteArray &)), this, SLOT(fileSystemInfoReceived(int, const QString &, const QByteArray &)));
     //File TX
     connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processPeerRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processPeerRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
@@ -400,6 +407,8 @@ void SystemManagementWidget::peerDisconnected(bool normalClose){
 
     ui.tabRemoteManagement->setEnabled(false);
     ui.toolButtonVerify->setEnabled(true);
+
+    ui.tabFileManagement->setEnabled(false);
 
     if(!normalClose){
         QMessageBox::critical(this, tr("Error"), QString("ERROR! Peer %1 Closed Unexpectedly!").arg(m_peerIPAddress.toString()));
@@ -938,6 +947,8 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
         ui.toolButtonRequestSystemInfo->setEnabled(true);
         ui.toolButtonRescanSystemInfo->setEnabled(true);
 
+        ui.tabFileManagement->setEnabled(true);
+
         if(!message.trimmed().isEmpty()){
             QMessageBox::warning(this, tr("Warning"), message);
         }
@@ -950,6 +961,8 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
         ui.toolButtonRequestSystemInfo->setEnabled(false);
         ui.toolButtonRescanSystemInfo->setEnabled(false);
         ui.toolButtonVerify->setEnabled(true);
+
+        ui.tabFileManagement->setEnabled(false);
 
         QMessageBox::critical(this, tr("Connection Error"), message);
     }
@@ -1322,6 +1335,28 @@ void SystemManagementWidget::userResponseRemoteAssistancePacketReceived(const QS
 
 
 ///////////////////////////////////////////////////////
+
+void SystemManagementWidget::requestFileSystemInfo(const QString &parentDirPath){
+
+    controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath);
+
+}
+
+void SystemManagementWidget::fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData){
+
+    if(socketID != m_peerSocket){
+        return;
+    }
+
+//    FileManagement *fm = qobject_cast<FileManagement *>(ui.tabFileManagement);
+//    if(!fm){return;}
+
+    m_fileManagementWidget->parseRemoteFilesInfo(parentDirPath, fileSystemInfoData);
+
+
+
+}
+
 void SystemManagementWidget::startFileManager(){
 
     if(!m_fileManager){

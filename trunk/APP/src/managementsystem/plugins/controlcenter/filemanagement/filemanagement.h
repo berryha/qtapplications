@@ -9,10 +9,12 @@
 
 #include "ui_filemanagement.h"
 
+#include "../../sharedms/global_shared.h"
+
+
 
 namespace HEHUI {
 
-enum FileType{FILE = 0, DRIVE, FOLDER };
 
 class FileSystemModel : public QAbstractTableModel
 {
@@ -71,6 +73,9 @@ signals:
     void signalShowRemoteFiles(const QString &path);
 
 
+public slots:
+    bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
+
 
 private slots:
 
@@ -84,7 +89,6 @@ private slots:
     void tableViewRemoteFileItemDoubleClicked(const QModelIndex &index);
 
     bool getLocalFilesInfo(const QString &parentDirPath, QByteArray *result, QString *errorMessage);
-    bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
 
 
 private:

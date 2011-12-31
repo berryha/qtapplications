@@ -457,7 +457,16 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
 
 
+    case quint8(MS::RequestFileSystemInfo):
+    {
+        QString parentDirPath = "";
+        in >> parentDirPath;
 
+        emit signalFileSystemInfoRequested(socketID, parentDirPath);
+
+        qDebug()<<"~~RequestFileSystemInfo";
+    }
+    break;
     case quint8(MS::RequestUploadFile):
     {
         QByteArray fileMD5Sum;
@@ -534,6 +543,8 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~FileTXStatusChanged";
     }
     break;
+
+
 
 
 

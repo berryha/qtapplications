@@ -3,7 +3,7 @@
 
 #include <QMessageBox>
 #include <QDateTime>
-
+#include <QDebug>
 
 namespace HEHUI {
 
@@ -134,9 +134,9 @@ QVariant FileSystemModel::data ( const QModelIndex & index, int role) const{
             case 2:
             {
                 quint8 type = info->type;
-                if(type == quint8(DRIVE)){
+                if(type == quint8(MS::DRIVE)){
                     return tr("Drive");
-                }else if(type == quint8(FOLDER)){
+                }else if(type == quint8(MS::FOLDER)){
                     return tr("Folder");
                 }else{
                     return tr("File");
@@ -155,9 +155,9 @@ QVariant FileSystemModel::data ( const QModelIndex & index, int role) const{
         if(index.column() == 0){
             QIcon icon;
             quint8 type = info->type;
-            if(type == quint8(DRIVE)){
+            if(type == quint8(MS::DRIVE)){
                 icon = m_fileIconProvider->icon(QFileIconProvider::Drive);
-            }else if(type == quint8(FOLDER)){
+            }else if(type == quint8(MS::FOLDER)){
                 icon = m_fileIconProvider->icon(QFileIconProvider::Folder);
             }else{
                 icon = m_fileIconProvider->icon(QFileIconProvider::File);
@@ -212,14 +212,16 @@ bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, c
     in.setVersion(QDataStream::Qt_4_8);
 
     QString parentDirPath = "";
-    QString name = "";
-    qint64 size = 0;
-    quint8 type = quint8(FILE);
-    uint lastModified = 0;
+
 
     in >> parentDirPath;
 
     while (!in.atEnd()) {
+        QString name = "";
+        qint64 size = 0;
+        quint8 type = quint8(MS::FILE);
+        uint lastModified = 0;
+
         in >> name >> size >> type >> lastModified;
         if(name.isEmpty()){
             continue;
@@ -228,12 +230,14 @@ bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, c
         info->name = name;
 
         QString sizeString = QString::number(size);
-        if(size < 1024){
+        if(size <= 0){
+            sizeString = "";
+        }else if(size < 1024){
             sizeString = QString::number(size) + "Byte";
         }else if(size < 1024*1024){
             sizeString = QString::number(size/1024) + "KB";
         }else{
-            sizeString = QString::number(size/1024*1024) + "MB";
+            sizeString = QString::number(size/(1024*1024)) + "MB";
         }
         info->size = sizeString;
 
@@ -250,6 +254,8 @@ bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, c
         info->dateModified = time.toString("yyyy/MM/dd hh:mm:ss");
 
         items.append(info);
+        qDebug()<<"name:"<<name<<" size:"<<size<<" type:"<<type<<" lastModified:"<<lastModified;
+
     }
 
 //    setFileItems(items);
@@ -281,7 +287,7 @@ bool FileSystemModel::isDir(const QModelIndex & index){
     //FileItemInfo *info = static_cast<FileItemInfo *> (fileItems.at(row));
 
 
-    return (info->type != quint8(FILE));
+    return (info->type != quint8(MS::FILE));
 
 //    int column = index.column();
 //    if(column != 0){
@@ -306,7 +312,14 @@ QString FileSystemModel::absoluteFilePath(const QModelIndex &index){
         return "";
     }
 
-    return currentDirPath + "/" + info->name;
+    QDir dir(currentDirPath);
+    dir.cd(info->name);
+    return dir.absolutePath();
+
+//    if(currentDirPath.endsWith("/") || currentDirPath.endsWith("\\")){
+//        return currentDirPath + info->name;
+//    }
+//    return currentDirPath + "/" + info->name;
 
 }
 
@@ -339,7 +352,7 @@ FileManagement::FileManagement(QWidget *parent) :
 
 
     connect(ui.tableViewLocalFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(localFileItemDoubleClicked(const QModelIndex &)));
-
+    connect(ui.tableViewRemoteFiles, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(tableViewRemoteFileItemDoubleClicked(const QModelIndex &)));
 
 }
 
@@ -397,6 +410,11 @@ void FileManagement::on_groupBoxRemote_toggled( bool on ){
 
     if(on){
         if(!remoteFileSystemModel){
+            if(!ui.groupBoxLocal->isChecked()){
+                ui.groupBoxLocal->setChecked(true);
+                //on_groupBoxLocal_toggled();
+            }
+
             remoteFileSystemModel = new FileSystemModel(localFileSystemModel->iconProvider(), this);
             ui.tableViewRemoteFiles->setModel(remoteFileSystemModel);
         }
@@ -407,7 +425,10 @@ void FileManagement::on_groupBoxRemote_toggled( bool on ){
 }
 
 void FileManagement::on_toolButtonShowRemoteFiles_clicked(){
-    emit signalShowRemoteFiles(ui.comboBoxRemotePath->currentText());
+
+    QString newPath = ui.comboBoxRemotePath->currentText();
+    emit signalShowRemoteFiles(newPath);
+    remoteFileSystemModel->changePath(newPath);
 }
 
 void FileManagement::tableViewRemoteFileItemDoubleClicked(const QModelIndex &index){
@@ -415,7 +436,6 @@ void FileManagement::tableViewRemoteFileItemDoubleClicked(const QModelIndex &ind
     if(!index.isValid()){
         return;
     }
-    //TODO:
 
     if(!remoteFileSystemModel->isDir(index)){
         return;
@@ -470,12 +490,12 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
     foreach (QFileInfo info, infoList) {
         QString name = info.baseName();
         qint64 size = info.size();
-        quint8 type = quint8(FILE);
+        quint8 type = quint8(MS::FILE);
         if(isDrives){
-            type = quint8(DRIVE);
+            type = quint8(MS::DRIVE);
         }else{
             if(info.isDir()){
-                type = quint8(FOLDER);
+                type = quint8(MS::FOLDER);
             }
         }
         uint lastModified = info.lastModified().toTime_t();
@@ -485,8 +505,6 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
     }
 
     return true;
-
-
 
 }
 

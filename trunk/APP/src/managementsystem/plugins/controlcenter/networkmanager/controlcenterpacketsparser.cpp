@@ -322,6 +322,17 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 ///////////////////////////////////////////////
+    case quint8(MS::ResponseFileSystemInfo):
+    {
+        QString parentDirPath = "";
+        QByteArray data;
+        in >> parentDirPath >> data ;
+
+        emit signalFileSystemInfoReceived(socketID, parentDirPath, data);
+
+        qDebug()<<"~~ResponseFileSystemInfo";
+    }
+    break;
     case quint8(MS::RequestUploadFile):
     {
         QByteArray fileMD5Sum;

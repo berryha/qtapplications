@@ -120,6 +120,7 @@ private slots:
     void peerDisconnected(int socketID);
 
 ///////////////////
+    void fileSystemInfoRequested(int socketID, const QString &parentDirPath);
     //File TX
     void startFileManager();
     void processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
@@ -132,6 +133,10 @@ private slots:
     void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
     void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
+
+
+private:
+    bool getLocalFilesInfo(const QString &parentDirPath, QByteArray *result, QString *errorMessage);
 
 
 protected:
