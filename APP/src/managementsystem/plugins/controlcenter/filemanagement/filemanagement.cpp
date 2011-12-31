@@ -425,7 +425,17 @@ void FileManagement::on_groupBoxLocal_toggled( bool on ){
             localFilesCompleter->setModel(localFileSystemModel);
             ui.comboBoxLocalPath->setCompleter(localFilesCompleter);
         }
+
+        if(ui.groupBoxRemote->isChecked()){
+            ui.pushButtonDownloadToLocal->setEnabled(true);
+            ui.pushButtonUploadToRemote->setEnabled(true);
+        }
+
+    }else{
+        ui.pushButtonDownloadToLocal->setEnabled(false);
+        ui.pushButtonUploadToRemote->setEnabled(false);
     }
+
 }
 
 void FileManagement::on_toolButtonShowLocalFiles_clicked(){
@@ -472,6 +482,15 @@ void FileManagement::on_groupBoxRemote_toggled( bool on ){
         }
 
         emit signalShowRemoteFiles("");
+
+        if(ui.groupBoxLocal->isChecked()){
+            ui.pushButtonDownloadToLocal->setEnabled(true);
+            ui.pushButtonUploadToRemote->setEnabled(true);
+        }
+
+    }else{
+        ui.pushButtonDownloadToLocal->setEnabled(false);
+        ui.pushButtonUploadToRemote->setEnabled(false);
     }
 
 }

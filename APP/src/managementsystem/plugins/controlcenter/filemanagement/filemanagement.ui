@@ -121,6 +121,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButtonUploadToRemote">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
             <string>Upload To Remote</string>
            </property>
@@ -153,6 +156,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButtonDownloadToLocal">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
             <string>Download To Local</string>
            </property>
