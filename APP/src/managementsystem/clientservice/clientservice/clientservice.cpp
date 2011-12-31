@@ -227,6 +227,7 @@ bool ClientService::startMainService(){
 
     
     ////////////////////
+    connect(clientPacketsParser, SIGNAL(signalFileSystemInfoRequested(int, const QString &)), this, SLOT(fileSystemInfoRequested(int, const QString &)));
     //File TX
     connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
@@ -1924,6 +1925,20 @@ void ClientService::peerDisconnected(int socketID){
 }
 
 ///////////////////////////////////////////////////////
+void ClientService::fileSystemInfoRequested(int socketID, const QString &parentDirPath){
+
+    QByteArray data;
+    QString errorMessage;
+
+    if(getLocalFilesInfo(parentDirPath, &data, &errorMessage)){
+        clientPacketsParser->responseFileSystemInfo(socketID, parentDirPath, data);
+    }else{
+        qCritical()<<"ERROR! "<<errorMessage;
+    }
+
+
+}
+
 void ClientService::startFileManager(){
 
     if(!m_fileManager){
@@ -2172,7 +2187,65 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
 
 }
 
+bool ClientService::getLocalFilesInfo(const QString &parentDirPath, QByteArray *result, QString *errorMessage){
 
+    Q_ASSERT(result);
+    Q_ASSERT(errorMessage);
+
+    QFileInfoList infoList;
+    bool isDrives = false;
+
+    if(parentDirPath.isEmpty()){
+        infoList = QDir::drives();
+        isDrives = true;
+    }else{
+        QFileInfo fi(parentDirPath);
+        if(!fi.isDir()){
+            *errorMessage = tr("'%1' is not a directorie!").arg(parentDirPath);
+            return false;
+        }
+        QDir dir(parentDirPath);
+        if(!dir.exists()){
+            *errorMessage = tr("Directorie '%1' does not exist!").arg(parentDirPath);
+            return false;
+        }
+        dir.setFilter(QDir::AllEntries | QDir::NoDot | QDir::Hidden | QDir::NoSymLinks);
+        infoList = dir.entryInfoList();
+    }
+
+    if(infoList.isEmpty()){
+        //TODO
+        return false;
+    }
+
+    result->clear();
+    QDataStream out(result, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_8);
+    out << parentDirPath;
+
+    foreach (QFileInfo info, infoList) {
+        QString name = info.fileName();
+        qint64 size = info.size();
+        quint8 type = quint8(MS::FILE);
+        if(isDrives){
+            name = info.absoluteFilePath();
+            type = quint8(MS::DRIVE);
+        }else{
+            if(info.isDir()){
+                type = quint8(MS::FOLDER);
+            }
+        }
+        uint lastModified = info.lastModified().toTime_t();
+
+        out << name << size << type << lastModified;
+        qDebug()<<"name:"<<name<<" size:"<<size<<" type:"<<type<<" lastModified:"<<lastModified;
+    }
+
+    return true;
+
+
+
+}
 
 
 

@@ -923,6 +923,9 @@
       </layout>
      </widget>
      <widget class="HEHUI::FileManagement" name="tabFileManagement">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>File Management</string>
       </attribute>

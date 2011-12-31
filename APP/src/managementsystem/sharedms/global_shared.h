@@ -163,6 +163,8 @@ namespace HEHUI {
             LocalUserOnline,
             LocalUserOffline,
 
+            RequestFileSystemInfo,
+            ResponseFileSystemInfo,
             RequestDownloadFile,
             RequestUploadFile,
             ResponseFileDownloadRequest,
@@ -171,7 +173,6 @@ namespace HEHUI {
             FileData,
             FileTXStatusChanged,
             FileTXError,
-
 
 
             
@@ -188,6 +189,8 @@ namespace HEHUI {
             File_TX_Aborted,
             File_TX_Done
         };
+
+        enum FileType{FILE = 0, DRIVE, FOLDER };
 
 
 

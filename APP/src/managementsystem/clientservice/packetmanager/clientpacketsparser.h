@@ -495,6 +495,26 @@ public slots:
 
 
 //////////////////////////////
+    bool responseFileSystemInfo(int socketID, QString parentDirPath, const QByteArray &fileSystemInfoData){
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+
+        packet->setPacketType(quint8(MS::ResponseFileSystemInfo));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_7);
+        out << m_localComputerName << parentDirPath << fileSystemInfoData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
     bool requestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir = ""){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 
@@ -715,6 +735,8 @@ signals:
     void signalLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online);
 
 ///////////////////////////
+    void signalFileSystemInfoRequested(int socketID, const QString &parentDirPath);
+
     void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
     void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
     void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
