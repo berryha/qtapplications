@@ -433,9 +433,9 @@
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
-          <attribute name="horizontalHeaderStretchLastSection">
+          <property name="sortingEnabled">
            <bool>true</bool>
-          </attribute>
+          </property>
           <attribute name="horizontalHeaderStretchLastSection">
            <bool>true</bool>
           </attribute>
@@ -453,7 +453,7 @@
      <x>0</x>
      <y>0</y>
      <width>948</width>
-     <height>17</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
