@@ -487,10 +487,18 @@ void ClientService::scanFinished(bool ok, const QString &message){
         return;
     }
 
+
     //TODO:
     bool ret = clientPacketsParser->sendClientResponseClientDetailedInfoPacket(peerSocketThatRequiresDetailedInfo, systemInfoFile);
     if(!ret){
-        qCritical()<<tr("ERROR! Can not upload system info to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        qCritical()<<tr("ERROR! Can not upload system info to peer! %3").arg(m_udtProtocol->getLastErrorMessage());
+    }
+
+    if(m_socketConnectedToServer != UDTProtocol::INVALID_UDT_SOCK && peerSocketThatRequiresDetailedInfo != m_socketConnectedToServer){
+        bool ret = clientPacketsParser->sendClientResponseClientDetailedInfoPacket(m_socketConnectedToServer, systemInfoFile);
+        if(!ret){
+            qCritical()<<tr("ERROR! Can not upload system info to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
     }
 
     systemInfo->stopProcess();
