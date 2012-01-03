@@ -69,7 +69,7 @@ class MYSHAREDLIB_API CoreInterface : public AbstractPluginInterface{
 
 }
 
-Q_DECLARE_INTERFACE(HEHUI::CoreInterface, "org.hehui.Interface.CoreInterface/2011.12")
+Q_DECLARE_INTERFACE(HEHUI::CoreInterface, "org.hehui.Interface.CoreInterface/2012.1")
 
 
 
