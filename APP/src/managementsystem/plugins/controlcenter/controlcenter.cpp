@@ -52,9 +52,11 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 
     clientInfoModel = new ClientInfoModel(this);
     proxyModel = new QSortFilterProxyModel(this);
-    proxyModel->setSourceModel(clientInfoModel);
+//    proxyModel->setSourceModel(clientInfoModel);
+    proxyModel->setSourceModel(queryModel);
 
-    ui.tableViewClientList->setModel(queryModel);
+//    ui.tableViewClientList->setModel(queryModel);
+    ui.tableViewClientList->setModel(proxyModel);
 
 
     //        connect(ui.toolButtonQuery, SIGNAL(clicked()), this, SLOT(slotQueryButtonClicked()));
@@ -544,8 +546,9 @@ QString ControlCenter::programesEnabled() const{
 void ControlCenter::slotQueryDatabase() {
     
     ui.toolButtonQuery->setDefaultAction(ui.actionQueryDatabase);  
-    ui.tableViewClientList->setModel(queryModel);
-    
+//    ui.tableViewClientList->setModel(queryModel);
+    proxyModel->setSourceModel(queryModel);
+
     
     slotQueryClient(computerName(), userName(), workgroup(), macAddress(), ipAddress(), osVersion(), usbsdEnabled(), programesEnabled());
     
@@ -557,6 +560,8 @@ void ControlCenter::slotSearchNetwork() {
 
     ui.toolButtonQuery->setDefaultAction(ui.actionSearchNetwork);
     
+    proxyModel->setSourceModel(clientInfoModel);
+
     
     QString filterString = computerName();
     if(!filterString.trimmed().isEmpty()){
@@ -594,7 +599,8 @@ void ControlCenter::slotSearchNetwork() {
     }
     
 
-    ui.tableViewClientList->setModel(proxyModel);           
+//    ui.tableViewClientList->setModel(proxyModel);
+
     
     //Broadcast
     QList<QHostAddress> broadcastAddresses = NetworkUtilities::broadcastAddresses();
