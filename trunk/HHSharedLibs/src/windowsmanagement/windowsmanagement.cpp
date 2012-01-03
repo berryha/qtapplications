@@ -360,7 +360,7 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
         ZeroMemory(&si, sizeof(STARTUPINFO));
         si.cb= sizeof(STARTUPINFO);
         //si.lpDesktop = NULL;
-        si.lpDesktop = L"WinSta0\Default";  
+        si.lpDesktop = L"WinSta0\\Default";
         si.dwFlags = STARTF_USESHOWWINDOW;
         if(show){
             si.wShowWindow = SW_SHOW;
