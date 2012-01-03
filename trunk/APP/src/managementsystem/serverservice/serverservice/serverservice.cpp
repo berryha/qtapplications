@@ -437,6 +437,7 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
 
             return false;
         }
+//        qWarning()<<" Summary Statement For "<<computerName<<": "<<summaryStatement;
 
         info->setSummaryInfoSavedTODatabase(true);
         info->setUpdateSummaryInfoStatement("");
@@ -462,6 +463,8 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
 
             return false;
         }
+//        qWarning()<<" Detailed Statement For "<<computerName<<": "<<detailedStatement;
+
         info->setDetailedInfoSavedTODatabase(true);
         info->setUpdateDetailedInfoStatement("");
         qWarning()<<"Client detailed info from "<<computerName<<" has been saved!";
@@ -489,6 +492,8 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
 
             return false;
         }
+//        qWarning()<<" Installed Softwares Statement For "<<computerName<<": "<<updateInstalledSoftwaresInfoStatement;
+
         info->setInstalledSoftwaresInfoSavedTODatabase(true);
         info->setUpdateInstalledSoftwaresInfoStatement("");
         qWarning()<<"Client installed softwares info from "<<computerName<<" has been saved!";
