@@ -70,7 +70,7 @@ namespace HEHUI {
 
 
 WindowsManagement::WindowsManagement(QObject *parent) :
-        QObject(parent)
+    QObject(parent)
 {
 
     lastErrorString = "";
@@ -159,26 +159,26 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
     if(!m_newComputerNameToBeUsed.isEmpty()){
         emit signalProgressUpdate(QString(tr("Update computer name ...")), 45);
         QCoreApplication::processEvents();
-    //    QString time = QDateTime::currentDateTime ().toString("zzz");
-    //    QString computerName = QString(userName+"-"+time).left(15);
-    //    QString computerName;
-    //    switch(location){
-    //    case No1_Branch_Factory:
-    //        computerName = QString(userName+"-DGLP").left(15);
-    //        break;
-    //    case No2_Branch_Factory:
-    //        computerName = QString(userName+"-DGHB").left(15);
-    //        break;
-    //    case No3_Branch_Factory:
-    //        computerName = QString(userName+"-DGBF3").left(15);
-    //        break;
-    //    case LEATHER_PRODUCTS_FACTORY_YD:
-    //        computerName = QString(userName+"-YD").left(15);
-    //        break;
-    //    default:
-    //        computerName = userName.left(15);
-    //        break;
-    //    }
+        //    QString time = QDateTime::currentDateTime ().toString("zzz");
+        //    QString computerName = QString(userName+"-"+time).left(15);
+        //    QString computerName;
+        //    switch(location){
+        //    case No1_Branch_Factory:
+        //        computerName = QString(userName+"-DGLP").left(15);
+        //        break;
+        //    case No2_Branch_Factory:
+        //        computerName = QString(userName+"-DGHB").left(15);
+        //        break;
+        //    case No3_Branch_Factory:
+        //        computerName = QString(userName+"-DGBF3").left(15);
+        //        break;
+        //    case LEATHER_PRODUCTS_FACTORY_YD:
+        //        computerName = QString(userName+"-YD").left(15);
+        //        break;
+        //    default:
+        //        computerName = userName.left(15);
+        //        break;
+        //    }
 
 
         ok = setComputerName(m_newComputerNameToBeUsed.replace("_", "-").toStdWString().c_str());
@@ -318,26 +318,26 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
     qDebug()<<"----WindowsManagement::runAs(...)";
     qDebug()<<"User Name Of CurrentThread:"<<getUserNameOfCurrentThread();
 
-     lastErrorString = "";
+    lastErrorString = "";
 
-     if(userName.simplified().isEmpty()){
-         lastErrorString = tr("Invalid user name!");
-         return false;
-     }
+    if(userName.simplified().isEmpty()){
+        lastErrorString = tr("Invalid user name!");
+        return false;
+    }
 
-//     if(!QFileInfo(exeFilePath).exists()){
-//         error = tr("Can not find file '%1'!").arg(exeFilePath);
-//         return false;
-//     }
+    //     if(!QFileInfo(exeFilePath).exists()){
+    //         error = tr("Can not find file '%1'!").arg(exeFilePath);
+    //         return false;
+    //     }
 
-     wchar_t name[userName.size()*sizeof(wchar_t)+1];
-     wcscpy(name, userName.toStdWString().c_str());
+    wchar_t name[userName.size()*sizeof(wchar_t)+1];
+    wcscpy(name, userName.toStdWString().c_str());
 
-     wchar_t domain[4];
-     wcscpy(domain, L".");
+    wchar_t domain[4];
+    wcscpy(domain, L".");
 
-     wchar_t pwd[password.size()*sizeof(wchar_t)+1];
-     wcscpy(pwd, password.toStdWString().c_str());
+    wchar_t pwd[password.size()*sizeof(wchar_t)+1];
+    wcscpy(pwd, password.toStdWString().c_str());
 
 
     //服务程序以"SYSTEM"身份运行，无法调用CreateProcessWithLogonW，必须用LogonUser和CreateProcessAsUser
@@ -360,13 +360,16 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
         ZeroMemory(&si, sizeof(STARTUPINFO));
         si.cb= sizeof(STARTUPINFO);
         //si.lpDesktop = NULL;
-        si.lpDesktop = L"WinSta0\\Default";
+
+        wchar_t desktop[64];
+        wcscpy(desktop, L"WinSta0\\Default");
+        si.lpDesktop = desktop;
         si.dwFlags = STARTF_USESHOWWINDOW;
         if(show){
             si.wShowWindow = SW_SHOW;
         }else{
             si.wShowWindow = SW_HIDE;
-        }  
+        }
 
 
         bool ok = CreateProcessAsUserW(hToken, exeFilePath.toStdWString().c_str(), cmdLine, NULL, NULL, false, NORMAL_PRIORITY_CLASS, NULL,workingDir.toStdWString().c_str(), &si,&pi);
@@ -384,7 +387,7 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
 
 
     LPCWSTR cmd = QString(exeFilePath + " " +parameters).toStdWString().c_str();
-    AU3_RunAsSet(userName.toStdWString().c_str(), L"", password.toStdWString().c_str(), 0);
+    AU3_RunAsSet(userName.toStdWString().c_str(), QString("").toStdWString().c_str(), password.toStdWString().c_str(), 0);
 
     if(wait){
         AU3_RunWait(cmd, workingDir.toStdWString().c_str(), show?SW_SHOW:SW_HIDE);
@@ -411,27 +414,29 @@ QString WindowsManagement::getExeFileVersion(const QString &exeFileName){
         return versionString;
     }
 
-     VS_FIXEDFILEINFO *VInfo;
+    VS_FIXEDFILEINFO *VInfo;
     unsigned int i=GetFileVersionInfoSizeW(exeFileName.toStdWString().c_str() ,0);
     if (i)
     {
-            wchar_t *ver=new wchar_t [i+1];
-            int ok= GetFileVersionInfoW(exeFileName.toStdWString().c_str(), 0, i, ver);
+        wchar_t *ver=new wchar_t [i+1];
+        int ok= GetFileVersionInfoW(exeFileName.toStdWString().c_str(), 0, i, ver);
 
-            if (ok)
+        if (ok)
+        {
+            wchar_t nameBuffer[4];
+            wcscpy(nameBuffer, L"\\");
+            if (VerQueryValueW(ver, nameBuffer, (LPVOID*)&VInfo, &i))
             {
-                    if (VerQueryValueW(ver, L"\\", (LPVOID*)&VInfo, &i))
-                    {
-                      QStringList versionStrings;
-                      versionStrings.append(QString::number(VInfo->dwFileVersionMS >> 16));
-                      versionStrings.append(QString::number(VInfo->dwFileVersionMS & 0x00ff));
-                      versionStrings.append(QString::number(VInfo->dwFileVersionLS >> 16));
-                      versionStrings.append(QString::number(VInfo->dwFileVersionLS & 0x00ff));
-                      versionString = versionStrings.join(".");
-                     }
+                QStringList versionStrings;
+                versionStrings.append(QString::number(VInfo->dwFileVersionMS >> 16));
+                versionStrings.append(QString::number(VInfo->dwFileVersionMS & 0x00ff));
+                versionStrings.append(QString::number(VInfo->dwFileVersionLS >> 16));
+                versionStrings.append(QString::number(VInfo->dwFileVersionLS & 0x00ff));
+                versionString = versionStrings.join(".");
             }
+        }
 
-}
+    }
 
     return versionString;
 
@@ -477,7 +482,8 @@ QStringList WindowsManagement::localUsers() {
                 }
             }
         } else {
-            fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+            //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+            qCritical()<<"A system error has occurred:"<<nStatus;
         }
 
         if (pBuf != NULL) {
@@ -577,7 +583,7 @@ bool WindowsManagement::setUserAutoLogin(LPCWSTR userName, LPCWSTR password, boo
 }
 
 bool WindowsManagement::initNewSitoyUser(){
-     QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
 
     qApp->processEvents();
     lastErrorString = "";
@@ -604,8 +610,8 @@ bool WindowsManagement::initNewSitoyUser(){
     this->location = Location(userLocation);
 
     int userNameArraySize = userName.size() * sizeof(wchar_t) + 1;
-//    wchar_t * userNameArray = new wchar_t[userNameArraySize];
-//    userName.toWCharArray(userNameArray);
+    //    wchar_t * userNameArray = new wchar_t[userNameArraySize];
+    //    userName.toWCharArray(userNameArray);
     wchar_t userNameArray[userNameArraySize];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
@@ -633,7 +639,7 @@ bool WindowsManagement::initNewSitoyUser(){
         }
 
         //}
-    //    qDebug()<<"storeRoot:"<<storeRoot;
+        //    qDebug()<<"storeRoot:"<<storeRoot;
         CreateDirectoryW(storeRoot.toStdWString().c_str(), NULL);
 
         emit signalProcessOutputUpdated(tr("Email Store Root:'%1'").arg(storeRoot));
@@ -699,10 +705,10 @@ bool WindowsManagement::initNewSitoyUser(){
     }
 
     emit signalProgressUpdate(tr("Connecting to network printers ..."), 70);
-//    if (!addPrinterConnections(dept)) {
-//        //m_outputMsgs.append(tr("Can not connect to network printers!"));
-//        m_outputMsgs.append(error);
-//    }
+    //    if (!addPrinterConnections(dept)) {
+    //        //m_outputMsgs.append(tr("Can not connect to network printers!"));
+    //        m_outputMsgs.append(error);
+    //    }
 
     emit signalProgressUpdate(tr("Disable Application Starting with M$ windows ..."), 80);
     setStartupWithWin(QCoreApplication::applicationFilePath(), "", "", false);
@@ -861,8 +867,9 @@ bool WindowsManagement::updateUserPassword(const QString &userName, const QStrin
             result = true;
 
         }else {
-            printf("Error %d occurred.  Parm Error %d returned.\n", netRet, dwParmError);
+            //printf("Error %d occurred.  Parm Error %d returned.\n", netRet, dwParmError);
             lastErrorString = tr("Error %1 occurred while updating the password. Parm Error %2 returned.").arg(netRet).arg(dwParmError);
+            qCritical()<<lastErrorString;
             result = false;
         }
         //
@@ -870,9 +877,9 @@ bool WindowsManagement::updateUserPassword(const QString &userName, const QStrin
         //
         NetApiBufferFree( pUsr);
     }else{
-        printf("NetUserGetInfo failed: %d\n",netRet);
+        //printf("NetUserGetInfo failed: %d\n",netRet);
         lastErrorString = tr("An error occurred while updating the password. NetUserGetInfo failed: %1").arg(netRet);
-
+        qCritical()<<lastErrorString;
         result = false;
     }
 
@@ -920,16 +927,17 @@ bool WindowsManagement::setupUserAccountState(const QString &userName,  bool ena
             result = true;
 
         }else {
-            printf("Error %d occurred.  Parm Error %d returned.\n", netRet, dwParmError);
+            //printf("Error %d occurred.  Parm Error %d returned.\n", netRet, dwParmError);
             lastErrorString = tr("Error %1 occurred while setting up the account. Parm Error %2 returned.").arg(netRet).arg(dwParmError);
+            qCritical()<<lastErrorString;
             result = false;
         }
 
         NetApiBufferFree( pUsr);
     }else{
-        printf("NetUserGetInfo failed: %d\n",netRet);
+        //printf("NetUserGetInfo failed: %d\n",netRet);
         lastErrorString = tr("An error occurred while setting up the account. NetUserGetInfo failed: %1").arg(netRet);
-
+        qCritical()<<lastErrorString;
         result = false;
     }
 
@@ -965,9 +973,9 @@ WindowsManagement::UserAccountState WindowsManagement::getUserAccountState(const
         }
 
     }else{
-        printf("NetUserGetInfo failed: %d\n",netRet);
+        //printf("NetUserGetInfo failed: %d\n",netRet);
         lastErrorString = tr("An error occurred while setting up the account. NetUserGetInfo failed: %1").arg(netRet);
-
+        qCritical()<<lastErrorString;
     }
 
     return result;
@@ -998,34 +1006,34 @@ QPair<QDateTime, QDateTime> WindowsManagement::getUserLastLogonAndLogoffTime(con
 
 
     netRet = NetUserGetInfo( NULL, name.toStdWString().c_str(), dwLevel, (LPBYTE *)&pUsr);
-if( netRet == NERR_Success )
-{
+    if( netRet == NERR_Success )
+    {
 
-    DWORD lastLogon = 0, lastLogoff = 0;
-    lastLogon = pUsr->usri2_last_logon;
-    lastLogoff = pUsr->usri2_last_logoff;
-    //qWarning()<<"On:"<<lastLogon<<" Off:"<<lastLogoff;
+        DWORD lastLogon = 0, lastLogoff = 0;
+        lastLogon = pUsr->usri2_last_logon;
+        lastLogoff = pUsr->usri2_last_logoff;
+        //qWarning()<<"On:"<<lastLogon<<" Off:"<<lastLogoff;
 
 
-    if(lastLogon){
-        lastLogonTime = QDateTime::fromTime_t(lastLogon);
+        if(lastLogon){
+            lastLogonTime = QDateTime::fromTime_t(lastLogon);
+        }
+        if(lastLogoff){
+            lastLogoffTime = QDateTime::fromTime_t(lastLogoff);
+        }
+
+
+        //qWarning()<<"On:"<<lastLogonTime.toString("yyyy.MM.dd hh:mm:ss")<<" Off:"<<lastLogoffTime.toString("yyyy.MM.dd hh:mm:ss");
+
+
+
+        NetApiBufferFree( pUsr);
+
+    }else{
+        //printf("NetUserGetInfo failed: %d\n",netRet);
+        lastErrorString = tr("An error occurred while getting the last logon/logoff time. NetUserGetInfo failed: %1").arg(netRet);
+        qCritical()<<lastErrorString;
     }
-    if(lastLogoff){
-        lastLogoffTime = QDateTime::fromTime_t(lastLogoff);
-    }
-
-
-    //qWarning()<<"On:"<<lastLogonTime.toString("yyyy.MM.dd hh:mm:ss")<<" Off:"<<lastLogoffTime.toString("yyyy.MM.dd hh:mm:ss");
-
-
-
-    NetApiBufferFree( pUsr);
-
-}else{
-    printf("NetUserGetInfo failed: %d\n",netRet);
-    lastErrorString = tr("An error occurred while getting the last logon/logoff time. NetUserGetInfo failed: %1").arg(netRet);
-
-}
 
     pair.first = lastLogonTime;
     pair.second = lastLogoffTime;
@@ -1086,10 +1094,10 @@ QDateTime WindowsManagement::currentDateTimeOnServer(const QString &server){
 
             dateTime = QDateTime::fromTime_t( pBuf->tod_elapsedt);
 
-//            fprintf(stderr, "\nThe current date is: %d/%d/%d\n",
-//                    pBuf->tod_month, pBuf->tod_day, pBuf->tod_year);
-//            fprintf(stderr, "The current time is: %d:%d:%d\n",
-//                    pBuf->tod_hours, pBuf->tod_mins, pBuf->tod_secs);
+            //            fprintf(stderr, "\nThe current date is: %d/%d/%d\n",
+            //                    pBuf->tod_month, pBuf->tod_day, pBuf->tod_year);
+            //            fprintf(stderr, "The current time is: %d:%d:%d\n",
+            //                    pBuf->tod_hours, pBuf->tod_mins, pBuf->tod_secs);
         }
 
 
@@ -1152,93 +1160,97 @@ QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userN
         return QStringList();
     }
 
-//    if(!localUsers().contains(name, Qt::CaseInsensitive)){
-//        error = tr("User '%1' does not exist!").arg(name);
-//        qCritical()<<error;
-//        return QStringList();
-//    }
+    //    if(!localUsers().contains(name, Qt::CaseInsensitive)){
+    //        error = tr("User '%1' does not exist!").arg(name);
+    //        qCritical()<<error;
+    //        return QStringList();
+    //    }
 
 
-        QStringList groups;
+    QStringList groups;
 
-       LPLOCALGROUP_USERS_INFO_0 pBuf = NULL;
-          DWORD dwLevel = 0;
-          DWORD dwFlags = LG_INCLUDE_INDIRECT ;
-          DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
-          DWORD dwEntriesRead = 0;
-          DWORD dwTotalEntries = 0;
-          NET_API_STATUS nStatus;
+    LPLOCALGROUP_USERS_INFO_0 pBuf = NULL;
+    DWORD dwLevel = 0;
+    DWORD dwFlags = LG_INCLUDE_INDIRECT ;
+    DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
+    DWORD dwEntriesRead = 0;
+    DWORD dwTotalEntries = 0;
+    NET_API_STATUS nStatus;
 
-          //
-          // Call the NetUserGetLocalGroups function
-          //  specifying information level 0.
-          //
-          //  The LG_INCLUDE_INDIRECT flag specifies that the
-          //   function should also return the names of the local
-          //   groups in which the user is indirectly a member.
-          //
-          nStatus = NetUserGetLocalGroups(NULL,
-                                          name.toStdWString().c_str(),
-                                          dwLevel,
-                                          dwFlags,
-                                          (LPBYTE *) &pBuf,
-                                          dwPrefMaxLen,
-                                          &dwEntriesRead,
-                                          &dwTotalEntries);
-          //
-          // If the call succeeds,
-          //
-          if (nStatus == NERR_Success)
-          {
-             LPLOCALGROUP_USERS_INFO_0 pTmpBuf;
-             DWORD i;
-             DWORD dwTotalCount = 0;
+    //
+    // Call the NetUserGetLocalGroups function
+    //  specifying information level 0.
+    //
+    //  The LG_INCLUDE_INDIRECT flag specifies that the
+    //   function should also return the names of the local
+    //   groups in which the user is indirectly a member.
+    //
+    nStatus = NetUserGetLocalGroups(NULL,
+                                    name.toStdWString().c_str(),
+                                    dwLevel,
+                                    dwFlags,
+                                    (LPBYTE *) &pBuf,
+                                    dwPrefMaxLen,
+                                    &dwEntriesRead,
+                                    &dwTotalEntries);
+    //
+    // If the call succeeds,
+    //
+    if (nStatus == NERR_Success)
+    {
+        LPLOCALGROUP_USERS_INFO_0 pTmpBuf;
+        DWORD i;
+        DWORD dwTotalCount = 0;
 
-             if ((pTmpBuf = pBuf) != NULL)
-             {
-//                fprintf(stderr, "\nLocal group(s):\n");
-                //
-                // Loop through the entries and
-                //  print the names of the local groups
-                //  to which the user belongs.
-                //
-                for (i = 0; i < dwEntriesRead; i++)
+        if ((pTmpBuf = pBuf) != NULL)
+        {
+            //                fprintf(stderr, "\nLocal group(s):\n");
+            //
+            // Loop through the entries and
+            //  print the names of the local groups
+            //  to which the user belongs.
+            //
+            for (i = 0; i < dwEntriesRead; i++)
+            {
+                Q_ASSERT(pTmpBuf != NULL);
+
+                if (pTmpBuf == NULL)
                 {
-                   Q_ASSERT(pTmpBuf != NULL);
-
-                   if (pTmpBuf == NULL)
-                   {
-                      fprintf(stderr, "An access violation has occurred\n");
-                      break;
-                   }
-
-//                   wprintf(L"\t-- %s\n", pTmpBuf->lgrui0_name);
-                   groups.append(QString::fromWCharArray(pTmpBuf->lgrui0_name));
-
-                   pTmpBuf++;
-                   dwTotalCount++;
+                    fprintf(stderr, "An access violation has occurred\n");
+                    break;
                 }
-             }
-                //
-                // If all available entries were
-                //  not enumerated, print the number actually
-                //  enumerated and the total number available.
-                //
-             if (dwEntriesRead < dwTotalEntries)
-                fprintf(stderr, "\nTotal entries: %d", dwTotalEntries);
-             //
-             // Otherwise, just print the total.
-             //
-             //printf("\nEntries enumerated: %d\n", dwTotalCount);
-         }else{
-             fprintf(stderr, "A system error has occurred: %d\n", nStatus);
-             lastErrorString = tr("A system error has occurred: %1").arg(nStatus);
-         }
-          //
-          // Free the allocated memory.
-          //
-          if (pBuf != NULL)
-             NetApiBufferFree(pBuf);
+
+                //                   wprintf(L"\t-- %s\n", pTmpBuf->lgrui0_name);
+                groups.append(QString::fromWCharArray(pTmpBuf->lgrui0_name));
+
+                pTmpBuf++;
+                dwTotalCount++;
+            }
+        }
+        //
+        // If all available entries were
+        //  not enumerated, print the number actually
+        //  enumerated and the total number available.
+        //
+        if (dwEntriesRead < dwTotalEntries){
+            //fprintf(stderr, "\nTotal entries: %d", dwTotalEntries);
+            qDebug()<<"Total entries:"<<dwTotalEntries;
+        }
+
+        //
+        // Otherwise, just print the total.
+        //
+        //printf("\nEntries enumerated: %d\n", dwTotalCount);
+    }else{
+        //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+        qCritical()<<"A system error has occurred:"<<nStatus;
+        lastErrorString = tr("A system error has occurred: %1").arg(nStatus);
+    }
+    //
+    // Free the allocated memory.
+    //
+    if (pBuf != NULL)
+        NetApiBufferFree(pBuf);
 
 
     return groups;
@@ -1284,13 +1296,13 @@ QStringList WindowsManagement::localGroups() {
     {
         //
         nStatus = NetLocalGroupEnum(
-                NULL,
-                0,
-                (LPBYTE*)&pBuf,
-                dwPrefMaxLen,
-                &dwEntriesRead,
-                &dwTotalEntries,
-                &dwResumeHandle);
+                    NULL,
+                    0,
+                    (LPBYTE*)&pBuf,
+                    dwPrefMaxLen,
+                    &dwEntriesRead,
+                    &dwTotalEntries,
+                    &dwResumeHandle);
         //
         if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA))
         {
@@ -1485,7 +1497,7 @@ bool WindowsManagement::addUserToLocalGroup(LPWSTR userName,  LPCWSTR groupName)
         break;
     }
 
-//    return( err );
+    //    return( err );
 
 
 }
@@ -1545,7 +1557,7 @@ bool WindowsManagement::deleteUserFromLocalGroup(LPWSTR userName,  LPCWSTR group
         break;
     }
 
-//    return( err );
+    //    return( err );
 
 }
 
@@ -1641,8 +1653,8 @@ QString WindowsManagement::getWorkgroup(){
     }else{
         lastErrorString = tr("Can not get workgroup information!");
     }
-//    qWarning()<<"workgroupName:"<<workgroupName;
-//    qWarning()<<"error:"<<error;
+    //    qWarning()<<"workgroupName:"<<workgroupName;
+    //    qWarning()<<"error:"<<error;
 
     NetApiBufferFree(lpNameBuffer);
     delete [] lpNameBuffer;
@@ -1674,13 +1686,13 @@ bool WindowsManagement::addConnectionToNetDrive(){
         break;
     }
 
-//           QString labelStr = QString("S:");
-           wchar_t label[labelStr.size()*sizeof(wchar_t)+1];
-           wcscpy(label, labelStr.toStdWString().c_str());
+    //           QString labelStr = QString("S:");
+    wchar_t label[labelStr.size()*sizeof(wchar_t)+1];
+    wcscpy(label, labelStr.toStdWString().c_str());
 
-//           QString pathStr = QString("\\\\200.200.200.21\\Sys");
-           wchar_t path[pathStr.size()*sizeof(wchar_t)+1];
-           wcscpy(path, pathStr.toStdWString().c_str());
+    //           QString pathStr = QString("\\\\200.200.200.21\\Sys");
+    wchar_t path[pathStr.size()*sizeof(wchar_t)+1];
+    wcscpy(path, pathStr.toStdWString().c_str());
 
 
     DWORD err;
@@ -1694,33 +1706,33 @@ bool WindowsManagement::addConnectionToNetDrive(){
 
     switch(err) {
     case NO_ERROR:
-        printf("Net Drive successfully connected.\n");
+        //printf("Net Drive successfully connected.\n");
         lastErrorString = "";
         return true;
         // break;
     case ERROR_ACCESS_DENIED:
-        printf("ACCESS DENIED.\n");
+        //printf("ACCESS DENIED.\n");
         qDebug()<<"ACCESS DENIED";
         lastErrorString = tr("ACCESS DENIED");
         return false;
         // break;
     case ERROR_NO_NETWORK:
-        printf("NO NETWORK.\n");
+        //printf("NO NETWORK.\n");
         qDebug()<<"NO NETWORK";
         lastErrorString = tr("NO NETWORK");
         return false;
     case ERROR_NO_NET_OR_BAD_PATH:
-        printf("NO NET OR BAD PATH.\n");
+        //printf("NO NET OR BAD PATH.\n");
         qDebug()<<"NO NET OR BAD PATH";
         lastErrorString = tr("NO NET OR BAD PATH");
         return false;
     case ERROR_BAD_NET_NAME:
-        printf("BAD NET NAME.\n");
+        //printf("BAD NET NAME.\n");
         qDebug()<<"BAD NET NAME";
         lastErrorString = tr("BAD NET NAME");
         return false;
     default:
-        printf("An error occured while connecting to network drive: %d\n", err);
+        //printf("An error occured while connecting to network drive: %d\n", err);
         qDebug()<<"An error occured while connecting to network drive: " <<err;
 
         lastErrorString = tr("An error occured while connecting to network drive! Error code: %1").arg(err);
@@ -1740,43 +1752,43 @@ bool WindowsManagement::addPrinterConnections(const QString &department){
 
     if(location == LEATHER_PRODUCTS_FACTORY_YD){
         printerServer = QString("\\\\193.168.2.1\\");
-    }else{  
+    }else{
         printerServer = QString("\\\\200.200.200.3\\");
     }
 
     switch(location){
     case No1_Branch_Factory:
-        {
-            if(department.toLower() == "sales"){
-                printer1 = "RICOHAfi2F01";
-                printer2 = "RICOHAfi2F02";
-            }else{
-                QString deptPrefix = department.left(3).toLower();
-                if(deptPrefix == "pmc" || deptPrefix == "acc" || deptPrefix == "pla" || deptPrefix == "pur"){
-                    printer1 = "RICOHA1045(3F)";
-                }
-                if(deptPrefix == "adm"){
-                    printer1 = "RICOHAfi(1f)";
-                    printer2 = "RICOHA2238c";
-                }
-
+    {
+        if(department.toLower() == "sales"){
+            printer1 = "RICOHAfi2F01";
+            printer2 = "RICOHAfi2F02";
+        }else{
+            QString deptPrefix = department.left(3).toLower();
+            if(deptPrefix == "pmc" || deptPrefix == "acc" || deptPrefix == "pla" || deptPrefix == "pur"){
+                printer1 = "RICOHA1045(3F)";
             }
+            if(deptPrefix == "adm"){
+                printer1 = "RICOHAfi(1f)";
+                printer2 = "RICOHA2238c";
+            }
+
         }
+    }
         break;
     case No2_Branch_Factory:
-        {
-            printer1 = "RICOHAfi(new)";
-//            if(deptPrefix == "acc"){
-//              printer2 = "RICOHA2238c";
-//            }
-        }
+    {
+        printer1 = "RICOHAfi(new)";
+        //            if(deptPrefix == "acc"){
+        //              printer2 = "RICOHA2238c";
+        //            }
+    }
         break;
     case No3_Branch_Factory:
         printer1 = "RICOHAfiYQ";
         break;
-    //case No4_Branch_Factory:
-    //    printer1 = "RICOHAfiYQ";
-    //    break;
+        //case No4_Branch_Factory:
+        //    printer1 = "RICOHAfiYQ";
+        //    break;
     case LEATHER_PRODUCTS_FACTORY_YD:
         printer1 = "ar-350";
         break;
@@ -1784,7 +1796,7 @@ bool WindowsManagement::addPrinterConnections(const QString &department){
         break;
     }
 
-//    qDebug()<<"printerServer:"<<printerServer<<" printer1:"<<printer1;
+    //    qDebug()<<"printerServer:"<<printerServer<<" printer1:"<<printer1;
 
     bool ok = false;
     if(!printer1.isEmpty()){
@@ -1806,7 +1818,7 @@ bool WindowsManagement::addPrinterConnections(const QString &department){
         wcscpy(printer, printerStr.toStdWString().c_str());
         ok = AddPrinterConnectionW(printer);
         if(!ok){
-           //printf("An error occured while connecting to network printer '%s'! %d\n", printer, GetLastError());
+            //printf("An error occured while connecting to network printer '%s'! %d\n", printer, GetLastError());
             qDebug()<< QString("An error occured while connecting to network printer '%1'! Error code:%2").arg(printer2).arg(GetLastError());
             lastErrorString += tr("\nAn error occured while connecting to network printer '%1'! Error code: %2").arg(printer2).arg(GetLastError());
         }
@@ -1848,9 +1860,9 @@ bool WindowsManagement::setupIME(){
         QString imeKey2 = keyName + "\\" + imeKey;
         AU3_RegRead(imeKey2.toStdWString().c_str(), imeFileKey.toStdWString().c_str(), imeFileValue, nBufSize);
         if(QString::fromWCharArray(imeFileValue) == QString("WB.IME")){
-                wbID = imeKey;
-                qDebug()<<"wbID:"<<wbID;
-                break;
+            wbID = imeKey;
+            qDebug()<<"wbID:"<<wbID;
+            break;
         }
 
     }
@@ -1868,7 +1880,7 @@ bool WindowsManagement::setupIME(){
     AU3_RegWrite(L"HKEY_CURRENT_USER\\Keyboard Layout\\Preload", L"1", L"REG_SZ", L"00000404");
     AU3_RegWrite(L"HKEY_CURRENT_USER\\Keyboard Layout\\Preload", L"2", L"REG_SZ", wbID.toStdWString().c_str());
 
-   LoadKeyboardLayoutW(wbID.toStdWString().c_str(), 0x1);
+    LoadKeyboardLayoutW(wbID.toStdWString().c_str(), 0x1);
 
 
     return true;
@@ -1882,11 +1894,11 @@ bool WindowsManagement::isStartupWithWin(const QString &applicationFilePath, con
     LPCWSTR key = QString("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run").toStdWString().c_str();
     LPCWSTR valueName = L"";
     if(valueNameString.trimmed().isEmpty()){
-       //valueName = QFileInfo(applicationFilePath).fileName().toStdWString().c_str();
-       valueName = applicationFilePath.toStdWString().c_str();
-   }else{
-       valueName = valueNameString.toStdWString().c_str();
-   }
+        //valueName = QFileInfo(applicationFilePath).fileName().toStdWString().c_str();
+        valueName = applicationFilePath.toStdWString().c_str();
+    }else{
+        valueName = valueNameString.toStdWString().c_str();
+    }
 
     int size = 256;
     LPWSTR value = new wchar_t[size];
@@ -1923,12 +1935,12 @@ bool WindowsManagement::setStartupWithWin(const QString &applicationFilePath, co
     LPCWSTR key = L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
     LPCWSTR valueName;
     if(valueNameString.trimmed().isEmpty()){
-       //valueName = QFileInfo(applicationFilePath).baseName().toStdWString().c_str();
-       //valueName = QFileInfo(applicationFilePath).fileName().toStdWString().c_str();
-       valueName = nativeApplicationFilePath.toStdWString().c_str();
-   }else{
-       valueName = valueNameString.toStdWString().c_str();
-   }
+        //valueName = QFileInfo(applicationFilePath).baseName().toStdWString().c_str();
+        //valueName = QFileInfo(applicationFilePath).fileName().toStdWString().c_str();
+        valueName = nativeApplicationFilePath.toStdWString().c_str();
+    }else{
+        valueName = valueNameString.toStdWString().c_str();
+    }
 
     long result;
 
@@ -1984,7 +1996,7 @@ bool WindowsManagement::addOEMailAccount(const QString &userName, const QString 
     key = QString("HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Account Manager\\Accounts\\"+num).toStdWString().c_str();
     //valueName = QString("Account Name").toStdWString().c_str();
     //value = popServer.toStdWString().c_str();
-//    AU3_RegWrite(key, QString("Account Name").toStdWString().c_str(), L"REG_SZ", popServer.toStdWString().c_str());
+    //    AU3_RegWrite(key, QString("Account Name").toStdWString().c_str(), L"REG_SZ", popServer.toStdWString().c_str());
     AU3_RegWrite(key, QString("Account Name").toStdWString().c_str(), L"REG_SZ", emailAddress.toStdWString().c_str());
     AU3_RegWrite(key, QString("Connection Type").toStdWString().c_str(), L"REG_DWORD", QString("3").toStdWString().c_str());
     AU3_RegWrite(key, QString("POP3 Prompt for Password").toStdWString().c_str(), L"REG_DWORD", QString("0").toStdWString().c_str());
@@ -2187,7 +2199,7 @@ bool WindowsManagement::addOutlookMailAccount(const QString &userName, const QSt
     AU3_RegWrite(key, QString("Account Name").toStdWString().c_str(), L"REG_BINARY", stringToOutlookHexString(emailAddress).toStdWString().c_str());
 
     AU3_RegWrite(key, QString("clsid").toStdWString().c_str(), L"REG_SZ", L"{ED475411-B0D6-11D2-8C3B-00104B2A6676}");
-//    AU3_RegWrite(key, QString("Display Name").toStdWString().c_str(), L"REG_BINARY", stringToOutlookHexString(popServer).toStdWString().c_str());
+    //    AU3_RegWrite(key, QString("Display Name").toStdWString().c_str(), L"REG_BINARY", stringToOutlookHexString(popServer).toStdWString().c_str());
     AU3_RegWrite(key, QString("Display Name").toStdWString().c_str(), L"REG_BINARY", stringToOutlookHexString(emailAddress).toStdWString().c_str());
     AU3_RegWrite(key, QString("Email").toStdWString().c_str(), L"REG_BINARY", stringToOutlookHexString(emailAddress).toStdWString().c_str());
     AU3_RegWrite(key, QString("Mini UID").toStdWString().c_str(), L"REG_DWORD", miniUID.toStdWString().c_str());
@@ -2329,7 +2341,7 @@ void WindowsManagement::deleteFiles(const QString &path, const QStringList & nam
 }
 
 void WindowsManagement::modifySystemSettings(){
-//    qDebug()<<"----WindowsManagement::modifySystemSettings()";
+    //    qDebug()<<"----WindowsManagement::modifySystemSettings()";
 
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\lanmanserver\\parameters", L"AutoShareServer", L"REG_DWORD", L"1");
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\lanmanserver\\parameters", L"AutoShareWks", L"REG_DWORD", L"1");
@@ -2353,7 +2365,7 @@ void WindowsManagement::modifySystemSettings(){
     }
 
     if(QSysInfo::windowsVersion() > QSysInfo::WV_2000){
-//        qDebug()<<"~~QSysInfo::windowsVersion() > QSysInfo::WV_2000";
+        //        qDebug()<<"~~QSysInfo::windowsVersion() > QSysInfo::WV_2000";
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server", L"fDenyTSConnections", L"REG_DWORD", L"0");
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server", L"fSingleSessionPerUser", L"REG_DWORD", L"0");
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\TermService", L"Start", L"REG_DWORD", L"2");
@@ -2373,12 +2385,12 @@ void WindowsManagement::modifySystemSettings(){
     
     if(QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS7){
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\iphlpsvc", L"Start", L"REG_DWORD", L"4");
-    } 
+    }
 
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\tvnserver", L"Start", L"REG_DWORD", L"2");
     AU3_RegDeleteVal(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", L"tvncontrol");
     
- 
+
 }
 
 QString WindowsManagement::getFileSystemName(const QString &rootPath){
@@ -2404,8 +2416,10 @@ QString WindowsManagement::getFileSystemName(const QString &rootPath){
     DWORD size = 256;
     wchar_t * fileSystemNameBuffer = new wchar_t[size];
 
-    bool ok = GetVolumeInformationW(path.toStdWString().c_str(), NULL, 0, NULL, NULL, NULL,
-            fileSystemNameBuffer, size);
+    bool ok = GetVolumeInformationW(path.toStdWString().c_str(), NULL, 0, NULL, NULL, NULL, fileSystemNameBuffer, size);
+    if(!ok){
+        qDebug()<<"Failed to get volume information! Error Code:"<<GetLastError();
+    }
 
     QString fileSystemName = QString::fromWCharArray(fileSystemNameBuffer);
     delete [] fileSystemNameBuffer;
@@ -2420,7 +2434,7 @@ QString WindowsManagement::getFileSystemName(const QString &rootPath){
 bool WindowsManagement::getTokenByProcessName(HANDLE &hToken, const QString &processName, bool justQuery){
 
     if (processName.trimmed().isEmpty()) {
-            return false;
+        return false;
     }
 
     HANDLE hProcessSnap = NULL;
@@ -2429,24 +2443,24 @@ bool WindowsManagement::getTokenByProcessName(HANDLE &hToken, const QString &pro
 
     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcessSnap == INVALID_HANDLE_VALUE)
-            return (FALSE);
+        return (FALSE);
     pe32.dwSize = sizeof(PROCESSENTRY32W);
     if (Process32First(hProcessSnap, &pe32)) {
-            do {
-                    //if (wcscmp(pe32.szExeFile, processName.toStdWString().c_str()) == 0) {
-                    if (QString::fromWCharArray(pe32.szExeFile).toLower() == processName.toLower()) {
-                            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE,
-                                            pe32.th32ProcessID);
-                            bRet = OpenProcessToken(hProcess, justQuery?TOKEN_QUERY:TOKEN_ALL_ACCESS, &hToken);
-                            CloseHandle(hProcessSnap);
-                            qWarning()<<"~~~~~~~~~~~~~~~~~~~~~~~";
-                            return (bRet);
-                    }
-                    qWarning()<<"~~~"<<QString::fromWCharArray(pe32.szExeFile);
-            } while (Process32Next(hProcessSnap, &pe32));
-            bRet = TRUE;
+        do {
+            //if (wcscmp(pe32.szExeFile, processName.toStdWString().c_str()) == 0) {
+            if (QString::fromWCharArray(pe32.szExeFile).toLower() == processName.toLower()) {
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE,
+                                              pe32.th32ProcessID);
+                bRet = OpenProcessToken(hProcess, justQuery?TOKEN_QUERY:TOKEN_ALL_ACCESS, &hToken);
+                CloseHandle(hProcessSnap);
+                qWarning()<<"~~~~~~~~~~~~~~~~~~~~~~~";
+                return (bRet);
+            }
+            qWarning()<<"~~~"<<QString::fromWCharArray(pe32.szExeFile);
+        } while (Process32Next(hProcessSnap, &pe32));
+        bRet = TRUE;
     } else
-            bRet = FALSE;
+        bRet = FALSE;
     CloseHandle(hProcessSnap);
     return (bRet);
 
@@ -2457,7 +2471,7 @@ QList<HANDLE> WindowsManagement::getTokenListByProcessName(const QString &proces
     QList<HANDLE> tokenList;
 
     if (processName.trimmed().isEmpty()) {
-            return tokenList;
+        return tokenList;
     }
 
     HANDLE hProcessSnap = NULL;
@@ -2465,29 +2479,29 @@ QList<HANDLE> WindowsManagement::getTokenListByProcessName(const QString &proces
 
     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcessSnap == INVALID_HANDLE_VALUE)
-            return tokenList;
+        return tokenList;
     pe32.dwSize = sizeof(PROCESSENTRY32W);
     if (Process32First(hProcessSnap, &pe32)) {
-            do {
-                    //if (wcscmp(pe32.szExeFile, processName.toStdWString().c_str()) == 0) {
-                    if (QString::fromWCharArray(pe32.szExeFile).toLower() == processName.toLower()) {
-                            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE,
-                                            pe32.th32ProcessID);
-                            HANDLE hToken = 0;
-                            bool bRet = OpenProcessToken(hProcess, justQuery?TOKEN_QUERY:TOKEN_ALL_ACCESS, &hToken);
-                            CloseHandle(hProcessSnap);
+        do {
+            //if (wcscmp(pe32.szExeFile, processName.toStdWString().c_str()) == 0) {
+            if (QString::fromWCharArray(pe32.szExeFile).toLower() == processName.toLower()) {
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE,
+                                              pe32.th32ProcessID);
+                HANDLE hToken = 0;
+                bool bRet = OpenProcessToken(hProcess, justQuery?TOKEN_QUERY:TOKEN_ALL_ACCESS, &hToken);
+                CloseHandle(hProcessSnap);
 
-                            if(bRet){
-                                tokenList.append(hToken);
-                            }else{
-                                qWarning()<<tr("Error! Process Found, but can not get the token!");
-                            }
-                            qDebug()<<"--tokenList.size():"<<tokenList.size();
-                    }
-                    qDebug()<<"~~Exe File:"<<QString::fromWCharArray(pe32.szExeFile);
-            } while (Process32Next(hProcessSnap, &pe32));
+                if(bRet){
+                    tokenList.append(hToken);
+                }else{
+                    qWarning()<<tr("Error! Process Found, but can not get the token!");
+                }
+                qDebug()<<"--tokenList.size():"<<tokenList.size();
+            }
+            qDebug()<<"~~Exe File:"<<QString::fromWCharArray(pe32.szExeFile);
+        } while (Process32Next(hProcessSnap, &pe32));
 
-        }
+    }
 
     CloseHandle(hProcessSnap);
 
@@ -2507,7 +2521,7 @@ QString WindowsManagement::getAccountNameOfProcess(HANDLE &hToken){
 
     SID_NAME_USE peUse;
 
-    bool isok;
+    bool isok = false;
     DWORD size = 256;
     wchar_t buf[size];
     wchar_t accountNamebuf[size];
@@ -2517,17 +2531,16 @@ QString WindowsManagement::getAccountNameOfProcess(HANDLE &hToken){
 
     isok = GetTokenInformation(hToken, TokenUser, &buf, size, &dwNumBytesRet);
     if (isok) {
-            dwNumBytesRet = size;
-            dwNumBytesRet1 = size;
-            isok = LookupAccountSidW(NULL, (DWORD *) (*(DWORD *) buf), accountNamebuf,
-                            &dwNumBytesRet, domainNamebuf, &dwNumBytesRet1, &peUse);
-            if (isok) {
-                accountName = QString::fromWCharArray(accountNamebuf);
-                qDebug()<<"Account Name Of Process:"<<accountName;
-                return accountName;
-            }else{
-                lastErrorString = tr("Can not get account name of process!");
-            }
+        dwNumBytesRet = size;
+        dwNumBytesRet1 = size;
+        isok = LookupAccountSidW(NULL, (DWORD *) (*(DWORD *) buf), accountNamebuf, &dwNumBytesRet, domainNamebuf, &dwNumBytesRet1, &peUse);
+        if (isok) {
+            accountName = QString::fromWCharArray(accountNamebuf);
+            qDebug()<<"Account Name Of Process:"<<accountName;
+            return accountName;
+        }else{
+            lastErrorString = tr("Can not get account name of process!");
+        }
     }
 
     return accountName;
@@ -2541,12 +2554,12 @@ QString WindowsManagement::getAccountNameOfProcess(const QString &processName){
     return getAccountNameOfProcess(hToken);
     
 
-//    QList<HANDLE> list = getTokenListByProcessName(processName);
-//    qWarning()<<"~~~~list.size():"<<list.size();
-//    foreach(HANDLE token, list){
-//        getAccountNameOfProcess(token);
-//        CloseHandle(token);
-//    }
+    //    QList<HANDLE> list = getTokenListByProcessName(processName);
+    //    qWarning()<<"~~~~list.size():"<<list.size();
+    //    foreach(HANDLE token, list){
+    //        getAccountNameOfProcess(token);
+    //        CloseHandle(token);
+    //    }
     
 }
 
@@ -2663,10 +2676,10 @@ bool WindowsManagement::createHiddenAdmiAccount(){
     dir.remove(systemFileName);
     dir.remove(systemKeyFileName);
 
-//    if(!runAs(userName, password, "reg.exe /?")){
-//        process.close();
-//        return false;
-//    }
+    //    if(!runAs(userName, password, "reg.exe /?")){
+    //        process.close();
+    //        return false;
+    //    }
 
 
     return true;
@@ -2809,30 +2822,30 @@ bool WindowsManagement::setDeskWallpaper(const QString &wallpaperPath){
         return false;
     }
 
-//    DWORD nSize = 256;
-//    LPWSTR windowsDir = new wchar_t[nSize];
-//    int result = GetEnvironmentVariableW (L"WINDIR", windowsDir, nSize);
-//    if(result == 0){
-//        QString(QDir::rootPath() + "windows").toWCharArray(windowsDir);
-//    }
-//    QString targetDirPath = QString::fromWCharArray(windowsDir) ;
+    //    DWORD nSize = 256;
+    //    LPWSTR windowsDir = new wchar_t[nSize];
+    //    int result = GetEnvironmentVariableW (L"WINDIR", windowsDir, nSize);
+    //    if(result == 0){
+    //        QString(QDir::rootPath() + "windows").toWCharArray(windowsDir);
+    //    }
+    //    QString targetDirPath = QString::fromWCharArray(windowsDir) ;
     QString targetDirPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     if(!QDir(targetDirPath).exists()){
         targetDirPath = QDir::homePath();
     }
 
     //if(wallpaperPath.startsWith(":/") || fi.suffix().toLower() != ".bmp"){
-        targetBMPFilePath = targetDirPath + QDir::separator() + fi.baseName() + ".bmp";
-        QImage image(wallpaperPath);
-        if(image.isNull()){
-            lastErrorString = tr("Can not read image '%1' ! ").arg(wallpaperPath);
-            return false;
-        }
+    targetBMPFilePath = targetDirPath + QDir::separator() + fi.baseName() + ".bmp";
+    QImage image(wallpaperPath);
+    if(image.isNull()){
+        lastErrorString = tr("Can not read image '%1' ! ").arg(wallpaperPath);
+        return false;
+    }
 
-        if(!image.save(targetBMPFilePath, "BMP")){
-            lastErrorString = tr("Can not set wallpaper! Can not save file '%1' !").arg(targetBMPFilePath);
-            return false;
-        }
+    if(!image.save(targetBMPFilePath, "BMP")){
+        lastErrorString = tr("Can not set wallpaper! Can not save file '%1' !").arg(targetBMPFilePath);
+        return false;
+    }
 
     //}
 
@@ -2873,45 +2886,44 @@ void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
 void WindowsManagement::test(){
 
 
-//    setDeskWallpaper("C:\\WINDOWS\\system32\\wallpaper.bmp");
+    //    setDeskWallpaper("C:\\WINDOWS\\system32\\wallpaper.bmp");
 
-//    qWarning()<<"hui:"<<getUserAccountState("hui");
-//    qWarning()<<"yan:"<<getUserAccountState("yan");
-//    qWarning()<<"HelpAssistant:"<<getUserAccountState("HelpAssistant");
-//    qWarning()<<"a:"<<getUserAccountState("a");
+    //    qWarning()<<"hui:"<<getUserAccountState("hui");
+    //    qWarning()<<"yan:"<<getUserAccountState("yan");
+    //    qWarning()<<"HelpAssistant:"<<getUserAccountState("HelpAssistant");
+    //    qWarning()<<"a:"<<getUserAccountState("a");
 
 
 
     //qWarning()<<20*(QDateTime::currentDateTime().toString("z").toUInt());
 
 
-//    qWarning()<<"17 Time"<<currentDateTimeOnServer("\\\\200.200.200.17").toString("yyyy-MM-dd hh:mm:ss");
-//    qWarning()<<"2 Time"<<currentDateTimeOnServer("\\\\200.200.200.2").toString("yyyy-MM-dd hh:mm:ss");
-//    qWarning()<<"setLocalTime:"<<setLocalTime(currentDateTimeOnServer("\\\\200.200.200.2"));
+    //    qWarning()<<"17 Time"<<currentDateTimeOnServer("\\\\200.200.200.17").toString("yyyy-MM-dd hh:mm:ss");
+    //    qWarning()<<"2 Time"<<currentDateTimeOnServer("\\\\200.200.200.2").toString("yyyy-MM-dd hh:mm:ss");
+    //    qWarning()<<"setLocalTime:"<<setLocalTime(currentDateTimeOnServer("\\\\200.200.200.2"));
 
-//    QPair<QDateTime, QDateTime> pair = getUserLastLogonAndLogoffTime("b");
-//    QDateTime lastLogoffTime = pair.second;
-//    qWarning()<<"lastLogonTime"<<pair.first.toString("yyyy-MM-dd hh:mm:ss");
-//    qWarning()<<"lastLogoffTime:"<<pair.second.toString("yyyy-MM-dd hh:mm:ss");
+    //    QPair<QDateTime, QDateTime> pair = getUserLastLogonAndLogoffTime("b");
+    //    QDateTime lastLogoffTime = pair.second;
+    //    qWarning()<<"lastLogonTime"<<pair.first.toString("yyyy-MM-dd hh:mm:ss");
+    //    qWarning()<<"lastLogoffTime:"<<pair.second.toString("yyyy-MM-dd hh:mm:ss");
 
 
     //qWarning()<<outlookInstalledPath();
 
-    //addOutlookMailAccount("test", "IT", false, "./", "testaccount");
 
-//    qWarning()<<getEnvironmentVariable("ALLUSERSPROFILE");
+    //    qWarning()<<getEnvironmentVariable("ALLUSERSPROFILE");
 
     //getUserLastLogonAndLogoffTime("");
 
-    //HANDLE hToken;
-    //getTokenByProcessName(hToken, "explorer.exe");
+//    HANDLE hToken;
+//    getTokenByProcessName(hToken, "explorer.exe");
 
-//    QList<HANDLE> list = getTokenListByProcessName("qtcreator.exe");
-//    qWarning()<<"~~~~list.size():"<<list.size();
-//    foreach(HANDLE token, list){
-//        getAccountNameOfProcess(token);
-//        CloseHandle(token);
-//    }
+//        QList<HANDLE> list = getTokenListByProcessName("qtcreator.exe");
+//        //qWarning()<<"~~~~list.size():"<<list.size();
+//        foreach(HANDLE token, list){
+//            getAccountNameOfProcess(token);
+//            CloseHandle(token);
+//        }
 
 
 

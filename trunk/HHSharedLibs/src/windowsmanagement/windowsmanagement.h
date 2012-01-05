@@ -144,7 +144,7 @@ public:
     void test();
 
 
-//private:
+    //private:
     QString userInfoFilePath();
 
     bool addUserToLocalSystem(const QString &userName, const QString &userPassword, const QString &comment);
@@ -202,7 +202,7 @@ signals:
 
 
 private:
-//    void setLastErrorString(const QString &errorString);
+    //    void setLastErrorString(const QString &errorString);
 
 
 private:
