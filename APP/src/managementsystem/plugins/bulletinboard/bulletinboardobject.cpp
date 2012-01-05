@@ -78,8 +78,8 @@ BulletinBoardObject::~BulletinBoardObject(){
 
     //m_udtProtocol->closeUDTProtocol();
 
-    //NetworkManager::freeInstance();
-    resourcesManager->cleanInstance();
+//    resourcesManager->cleanInstance();
+    delete resourcesManager;
     resourcesManager = 0;
 
     PacketHandlerBase::clean();

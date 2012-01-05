@@ -1,4 +1,4 @@
-
+﻿
  #include <QtCore>
 //#include <QWidget>
 #include <QDebug>
@@ -27,10 +27,6 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     setStartupType(QtServiceController::AutoStartup);
     //    setServiceFlags(CanBeSuspended);
 
-    //    networkManager = NetworkManager::instance();
-    //    clientPacketsParser = 0;
-    //    mainServiceStarted = false;
-
 
     resourcesManager = 0;
     clientPacketsParser = 0;
@@ -43,8 +39,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
 
     m_udtProtocolForFileTransmission = 0;
 
-    databaseUtility = 0;
     mainServiceStarted = false;
+
+    databaseUtility = 0;
 
 
     //settings = new QSettings("HKEY_LOCAL_MACHINE\\SECURITY\\System", QSettings::NativeFormat, this);
@@ -109,12 +106,12 @@ ClientService::~ClientService(){
         clientPacketsParser = 0;
     }
 
-    ClientResourcesManager::cleanInstance();
+//    ClientResourcesManager::cleanInstance();
     delete resourcesManager;
     resourcesManager = 0;
 
-    delete m_udpServer;
-    delete m_udtProtocol;
+//    delete m_udpServer;
+//    delete m_udtProtocol;
 
     PacketHandlerBase::clean();
 
@@ -263,6 +260,8 @@ bool ClientService::startMainService(){
 
     if(m_localWorkgroupName == "plan"){
         updateAdministratorPassword("trouseplantrouse");
+    }else if(m_localWorkgroupName == "pds"){
+        updateAdministratorPassword("trousemisdg");
     }else{
         updateAdministratorPassword("trousetrouse");
     }
@@ -1487,9 +1486,9 @@ qWarning()<<"--------------16";
         QDateTime lastLogonTime = pair.first;
 qWarning()<<"--------------1";
         if(query.first()){
-            QString dept = query.value(0).toString().trimmed();
+            QString dept = query.value(0).toString().trimmed().toLower();
             QString pswd = query.value(1).toString().trimmed();
-            QString loc = query.value(2).toString().trimmed();
+            QString loc = query.value(2).toString().trimmed().toLower();
             //qWarning()<<"old:"<<userPasswordsHash.value(userName);
             //qWarning()<<"new:"<<pswd;
 qWarning()<<"--------------2";
@@ -1509,7 +1508,7 @@ qWarning()<<"--------------2";
                 userPasswordsHash.insert(userName, pswd);
             }
 qWarning()<<"--------------3";
-            if(loc.toUpper() != "HK" && dept != "PDS" && dept != "Sample" ){
+            if(loc.toUpper() != "hk" && dept != "pds" && dept != "sample" ){
                 //                if(!wm->updateUserPassword(userName, pswd)){
                 //                    logs.append(wm->lastError());
                 //                }
@@ -2320,14 +2319,13 @@ void ClientService::start()
 
 void ClientService::stop()
 {
-
     qDebug()<<"ClientService::stop()";
 
     lookForServerTimer->stop();
 
     if(clientPacketsParser){
         clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, false);
-
+        Utilities::msleep(1000);
 //        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
 //        clientPacketsParser->aboutToQuit();
         //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));

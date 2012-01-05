@@ -1,4 +1,4 @@
-
+﻿
 #include "systemmanagementwidget.h"
 
 #include <QHostInfo>
@@ -1663,6 +1663,8 @@ void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceI
 
 
 bool SystemManagementWidget::verifyPrivilege(){
+
+    return true;
 
     if(m_adminName == "hehui"){
         return true;
