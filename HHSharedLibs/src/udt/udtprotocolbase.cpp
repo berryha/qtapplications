@@ -327,6 +327,7 @@ void UDTProtocolBase::closeUDTProtocol(){
         //wait for other threads!
         QCoreApplication::processEvents();
         qDebug()<<"Waiting for threads to quit ...";
+        msleep(1);
     }
 
 
