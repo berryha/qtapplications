@@ -86,11 +86,12 @@ ServerService::~ServerService(){
         serverPacketsParser = 0;
     }
 
-    ResourcesManagerInstance::cleanInstance();
+//    ResourcesManagerInstance::cleanInstance();
+    delete resourcesManager;
     resourcesManager = 0;
 
-    delete m_udpServer;
-    delete m_udtProtocol;
+//    delete m_udpServer;
+//    delete m_udtProtocol;
 
     PacketHandlerBase::clean();
 

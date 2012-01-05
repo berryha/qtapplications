@@ -1,4 +1,4 @@
-
+﻿
 #ifndef CLIENTSERVICE_H
 #define CLIENTSERVICE_H
 
@@ -170,13 +170,13 @@ private:
     QSettings *settings;
 
 
+    QString localComputerName;
+    QString m_localWorkgroupName;
+
 #if defined(Q_OS_WIN32)
     WindowsManagement *wm;
 
 #endif
-
-    QString localComputerName;
-    QString m_localWorkgroupName;
 
 
     Process *process;

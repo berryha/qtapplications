@@ -43,7 +43,7 @@ ResourcesManager::ResourcesManager(QObject *parent)
 
 ResourcesManager::~ResourcesManager() {
 
-    qDebug()<<"NetworkManager::~NetworkManager()";
+    qDebug()<<"ResourcesManager::~ResourcesManager()";
 
     if(ipmcServer){
         ipmcServer->close();

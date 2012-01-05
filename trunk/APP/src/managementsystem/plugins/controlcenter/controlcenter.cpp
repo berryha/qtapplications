@@ -186,9 +186,9 @@ ControlCenter::~ControlCenter()
     delete controlCenterPacketsParser;
     controlCenterPacketsParser = 0;
 
-    //networkManager->closeAllServers();
-    //delete networkManager;
-    resourcesManager->cleanInstance();
+
+//    resourcesManager->cleanInstance();
+    delete resourcesManager;
     resourcesManager = 0;
 
 
