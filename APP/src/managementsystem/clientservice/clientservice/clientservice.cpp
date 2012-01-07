@@ -1333,7 +1333,7 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
 bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
 #ifdef Q_OS_WIN
-qDebug()<<"--------------21";
+
     QString administratorPassword = newPassword.trimmed();
 
     if(administratorPassword.isEmpty()){
@@ -1372,12 +1372,10 @@ qDebug()<<"--------------21";
     //        wm->showAdministratorAccountInLogonUI(true);
     //    }
 
-qDebug()<<"--------------24";
     if(!wm->hiddenAdmiAccountExists()){
         wm->createHiddenAdmiAccount();
     }
 
-qDebug()<<"--------------25";
     return true;
 
 #else
@@ -1421,17 +1419,14 @@ bool ClientService::checkUsersAccount(){
     qDebug()<<"--ClientService::checkUsersAccount()";
 
 #ifdef Q_OS_WIN32
-qWarning()<<"--------------10";
     //WindowsManagement wm;
     QStringList users = wm->localUsers();
-qWarning()<<"--------------11";
     if(users.contains(localComputerName, Qt::CaseInsensitive)){
         qWarning()<<QString("Computer name  '%1' is the same as user name!").arg(localComputerName);
         
         QString newComputerName = localComputerName + "-" +QDateTime::currentDateTime().toString("zzz");
         wm->setComputerName(newComputerName.toStdWString().c_str());
     }
-qWarning()<<"--------------12";
     users.removeAll("system$");
     users.removeAll("administrator");
     users.removeAll("guest");
@@ -1444,7 +1439,6 @@ qWarning()<<"--------------12";
             users.removeAll(user);
         }
     }
-qWarning()<<"--------------13";
 
     //if(wm.isAdmin("guest")){
     //wm->deleteUserFromLocalGroup("guest", "Administrators");
@@ -1454,14 +1448,10 @@ qWarning()<<"--------------13";
     QStringList storedAdminGroupUsers = administrators();
     qWarning()<<QString("Permitted Administrators: %1").arg(storedAdminGroupUsers.join(","));
 
-    QSqlDatabase db;
-try{
-    db = QSqlDatabase::database(QString(SITOY_USERS_DB_CONNECTION_NAME));
- qWarning()<<"--------------131";
+    QSqlDatabase db = QSqlDatabase::database(QString(SITOY_USERS_DB_CONNECTION_NAME));
     if(!db.isValid()){
         QSqlError err;
         if(!databaseUtility){databaseUtility = new DatabaseUtility(this);}
-        qWarning()<<"--------------132";
         err = databaseUtility->openDatabase(QString(SITOY_USERS_DB_CONNECTION_NAME),
                                             QString(REMOTE_SITOY_SQLSERVER_DB_DRIVER),
                                             QString(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME),
@@ -1470,7 +1460,6 @@ try{
                                             QString(REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD),
                                             QString(REMOTE_SITOY_SQLSERVER_DB_NAME),
                                             HEHUI::M$SQLSERVER);
-qWarning()<<"--------------133";
         if (err.type() != QSqlError::NoError) {
             logMessage(QString("An error occurred when opening the database on '%1'! %2").arg(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME).arg(err.text()), QtServiceBase::Error);
             qCritical() << QString("XX An error occurred when opening the database: %1").arg(err.text());
@@ -1478,18 +1467,13 @@ qWarning()<<"--------------133";
         }
 
     }
-qWarning()<<"--------------14";
     db = QSqlDatabase::database(SITOY_USERS_DB_CONNECTION_NAME);
     if(!db.isOpen()){
         logMessage(QString("Can not open database! %1").arg(db.lastError().text()), QtServiceBase::Error);
         return false;
     }
-
-}catch(...){
-        qDebug()<<"-------------!!!!!!!!!!!!!!!!!!---------------";
-}
     QSqlQuery query(db);
-qWarning()<<"--------------15";
+
 //    QStringList logs;
     QDateTime appCompiledTime = QDateTime::fromString(QString(APP_VERSION), "yyyy.M.d.h");
     if(!appCompiledTime.isValid()){
@@ -1511,7 +1495,6 @@ qWarning()<<"--------------15";
     //    qWarning()<<"markerTime:"<<markerTime.toString("yyyy-MM-dd hh:mm:ss");
     
     bool needReboot = false;
-qWarning()<<"--------------16";
     foreach(QString userName, users){
         qWarning()<<"userName:"<<userName;
         QString queryString = QString("select cgroup as Department, cpassword as Password, Loc as Location from users where userid = '%1'  ") .arg(userName);
@@ -1523,14 +1506,12 @@ qWarning()<<"--------------16";
 
         QPair<QDateTime, QDateTime> pair = wm->getUserLastLogonAndLogoffTime(userName);
         QDateTime lastLogonTime = pair.first;
-qWarning()<<"--------------1";
         if(query.first()){
             QString dept = query.value(0).toString().trimmed().toLower();
             QString pswd = query.value(1).toString().trimmed();
             QString loc = query.value(2).toString().trimmed().toLower();
             //qWarning()<<"old:"<<userPasswordsHash.value(userName);
             //qWarning()<<"new:"<<pswd;
-qWarning()<<"--------------2";
             if(!wm->updateUserPassword(userName, pswd)){
                 logs.append(wm->lastError());
                 qCritical()<<QString("Can not update password! User:%1, %2").arg(userName).arg(wm->lastError());
@@ -1546,7 +1527,6 @@ qWarning()<<"--------------2";
                 }
                 userPasswordsHash.insert(userName, pswd);
             }
-qWarning()<<"--------------3";
             if(loc.toUpper() != "hk" && dept != "pds" && dept != "sample" ){
                 //                if(!wm->updateUserPassword(userName, pswd)){
                 //                    logs.append(wm->lastError());
@@ -1564,12 +1544,10 @@ qWarning()<<"--------------3";
                 }
 
             }
-qWarning()<<"--------------4";
             //Update workgroup
             if(m_localWorkgroupName != dept.toLower()){
                 wm->joinWorkgroup(dept.toStdWString().c_str());
             }
-qWarning()<<"--------------5";
         }else{
             if(userName != "hui" && userName != "hehui" ){
 
@@ -1579,7 +1557,6 @@ qWarning()<<"--------------5";
                 logs.append(tr("Unknown Account '%1'").arg(userName));
                 //logMessage(log, QtServiceBase::Information);
             }
-qWarning()<<"--------------6";
         }
         query.clear();
 
@@ -1601,7 +1578,6 @@ qWarning()<<"--------------6";
             //qWarning()<<userName<<" lastLogoffTime:"<<lastLogoffTime.toString("yyyy-MM-dd hh:mm:ss");
 
         }
-qWarning()<<"--------------7";
 
     }
 
@@ -1624,8 +1600,6 @@ qWarning()<<"--------------7";
         wm->runAs("administrator", getWinAdminPassword(), "shutdown.exe", QString("-r -t 600 -c \"%1\"").arg(comment), false);
     }
     
-qWarning()<<"--------------8";
-
     return true;
 
 
