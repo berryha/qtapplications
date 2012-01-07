@@ -477,6 +477,10 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
 
+    if(UDT::INVALID_SOCK == socket){
+        return;
+    }
+
     UDT::close(socket);
     UDT::epoll_remove_usock(epollID, socket);
 
@@ -499,6 +503,12 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
     qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
 
     m_errorMessage = "";
+
+    if(UDT::INVALID_SOCK == socket){
+        m_errorMessage = tr("Invalid UDT Socket!");
+        qDebug()<<m_errorMessage;
+        return false;
+    }
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){
@@ -564,6 +574,13 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
 bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl, bool inorder){
     qDebug()<<"--UDTProtocolBase::sendUDTMessageData(...) " <<" socket:"<<socket<<" szie:"<<byteArray->size();
 
+    m_errorMessage = "";
+
+    if(UDT::INVALID_SOCK == socket){
+        m_errorMessage = tr("Invalid UDT Socket!");
+        qDebug()<<m_errorMessage;
+        return false;
+    }
 
     Q_ASSERT_X(epollID, "epollID", "ERROR! EPOLL Not Initialized!");
     if(!epollID){

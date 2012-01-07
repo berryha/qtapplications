@@ -1395,14 +1395,13 @@ bool WindowsManagement::addUserToLocalSystem(LPWSTR userName, LPWSTR userPasswor
         //szUserName, szServerName);
         lastErrorString = "";
         return true;
-    }
-    else
-    {
-        qDebug()<<"An Error occured while adding user '"<<userName<<"' to Local system!\n";
+    } else {
+        //qDebug()<<"An Error occured while adding user '"<<userName<<"' to Local system!\n";
         //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
     }
 
     lastErrorString = tr("An Error occured while adding user '%1' to Local system! Error code: %2").arg(QString::fromWCharArray(userName)).arg(nStatus);
+    qDebug()<<lastErrorString;
     return false;
 
 }
@@ -1657,7 +1656,7 @@ QString WindowsManagement::getWorkgroup(){
     //    qWarning()<<"error:"<<error;
 
     NetApiBufferFree(lpNameBuffer);
-    delete [] lpNameBuffer;
+//    delete [] lpNameBuffer;
 
     return workgroupName;
 
