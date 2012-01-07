@@ -11,7 +11,13 @@
 #include <QObject>
 #include <QHostAddress>
 
+
+
 #ifdef Q_OS_WIN32
+//if compiling on VC6.0 or pre-WindowsXP systems
+//use -DLEGACY_WIN32
+//if compiling with MinGW, UDT only works on XP or above
+//use -D_WIN32_WINNT=0x0501
     //#include <windows.h>
     #include <winsock2.h>
     #include <ws2tcpip.h>
