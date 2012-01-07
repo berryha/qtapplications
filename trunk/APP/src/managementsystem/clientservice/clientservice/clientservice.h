@@ -204,6 +204,8 @@ private:
     QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
     QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
 
+    QStringList logs;
+
 };
 
 } //namespace HEHUI
