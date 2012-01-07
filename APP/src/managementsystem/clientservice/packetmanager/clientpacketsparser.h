@@ -239,6 +239,8 @@ public slots:
     bool sendClientLogPacket(int socketID, const QString &users, quint8 logType, const QString &log){
         //qWarning()<<"----sendClientLogPacket(...) log:"<<log;
 
+
+
         Packet *packet = PacketHandlerBase::getPacket(socketID);
         
         packet->setPacketType(quint8(MS::ClientLog));
