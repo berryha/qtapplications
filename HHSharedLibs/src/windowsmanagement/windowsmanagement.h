@@ -44,15 +44,14 @@
 #include <QPair>
 
 #ifdef Q_OS_WIN32
-#include <windows.h>
-#include <winbase.h>
-#include <Lm.h>
-#include <Lmjoin.h>
-//#include <lmcons.h>
-//#include <lmaccess.h>
-//#include <lmerr.h>
-//#include <lmapibuf.h>
-#include <Tlhelp32.h>
+    #include <windows.h>
+//#include <winbase.h>
+//#include <Lm.h>
+////#include <lmcons.h>
+////#include <lmaccess.h>
+////#include <lmerr.h>
+////#include <lmapibuf.h>
+//#include <Tlhelp32.h>
 
 #endif
 

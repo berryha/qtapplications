@@ -50,11 +50,14 @@
 
 
 #ifdef Q_OS_WIN32
+    #include <Lm.h>
+    #include <Tlhelp32.h>
+    #include <Lmjoin.h>
 
-#include "AutoIt3.h"
+    #include "AutoIt3.h"
 
-const int maxUserAccountNameLength = 20;
-const int maxGroupNameLength = 256;
+    const int maxUserAccountNameLength = 20;
+    const int maxGroupNameLength = 256;
 
 #endif
 
