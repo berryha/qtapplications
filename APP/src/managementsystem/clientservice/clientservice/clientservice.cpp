@@ -365,6 +365,13 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         //update();
     }
 
+    if(logs.size()){
+        bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_CheckMSUsersAccount), logs.join(" | "));
+        if(ok){
+            logs.clear();
+        }
+    }
+
 #endif
 
     //clientPacketsParser->sendClientOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), QHostInfo::localHostName(), false);
@@ -379,13 +386,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     if(time.isNull() || (time.addDays(7) < QDateTime::currentDateTime())){
         processClientDetailedInfoRequestedPacket("", true, m_socketConnectedToServer);
         settings.setValue(section, QDateTime::currentDateTime());
-    }
-
-    if(logs.size()){
-        bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, users.join(","), quint8(MS::LOG_CheckMSUsersAccount), logs.join(" | "));
-        if(ok){
-            logs.clear();
-        }
     }
 
 }
@@ -622,7 +622,7 @@ void ClientService::processSetupProgramesPacket(const QString &computerName, con
     QString log = QString("Programes %1! Admin:%2").arg(ret).arg(adminName);
     bool sent = false;
     if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupUSBSD), log);
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupProgrames), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -697,7 +697,7 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
     QString log = QString("User '%1' %2 Administrators Group! Admin:%3").arg(userName).arg(ret).arg(adminName);
     bool sent = false;
     if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupUSBSD), log);
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -982,7 +982,7 @@ void ClientService::processAdminRequestRemoteAssistancePacket(const QString &com
 
     QString log = QString("Remote Assistance! Admin:%1").arg(adminName);
     if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
-        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminRequestRemoteAssistance), log);
+        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminRequestRemoteAssistance), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -1007,7 +1007,7 @@ void ClientService::processAdminRequestUpdateMSUserPasswordPacket(const QString 
 
     QString log = QString("Update Password! Admin:%1").arg(adminName);
     if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminInformUserNewPassword), log);
+        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminInformUserNewPassword), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -1345,7 +1345,7 @@ qDebug()<<"--------------21";
     if(!wm->updateUserPassword("administrator", administratorPassword, true)){
         QString error = wm->lastError();
         if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
-            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
+            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
             if(!sent){
                 qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
             }
@@ -2328,7 +2328,12 @@ void ClientService::update(){
     if(!result){
         qWarning()<<wm->lastError();
         //logMessage(wm->lastError(), QtServiceBase::Error);
-        clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
+        if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
+            if(!sent){
+                qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+            }
+        }
     }else{
         //        stop();
         //        qApp->quit();
