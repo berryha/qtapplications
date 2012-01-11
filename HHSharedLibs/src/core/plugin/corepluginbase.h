@@ -40,7 +40,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API CorePluginBase : public QObject, public CoreInterface
+class CORE_LIB_API CorePluginBase : public QObject, public CoreInterface
 {
     Q_OBJECT
     Q_INTERFACES(HEHUI::AbstractPluginInterface)

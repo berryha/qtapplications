@@ -38,7 +38,7 @@
 #include "mysharedlib_global.h"
 
 
-class MYSHAREDLIB_API SettingsCore : public QSettings
+class CORE_LIB_API SettingsCore : public QSettings
 {
 	Q_OBJECT
 public:

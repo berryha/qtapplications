@@ -41,7 +41,7 @@ rudpSocket->endDataTransmission(m_peerAddress, m_peerPort, fragmentDataID);
 
 #include <QUdpSocket>
 
-//#include "../mysharedlib_global.h"
+//#include "../networklib.h"
 
 #include "rudpchannel.h"
 #include "../packethandler/packethandlerbase.h"
@@ -49,7 +49,7 @@ rudpSocket->endDataTransmission(m_peerAddress, m_peerPort, fragmentDataID);
 
 namespace HEHUI{
 
-class MYSHAREDLIB_API RUDPSocket : public QUdpSocket
+class NETWORK_LIB_API RUDPSocket : public QUdpSocket
 {
     Q_OBJECT
 public:

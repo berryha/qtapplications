@@ -39,20 +39,20 @@
 #include <QMenu>
 
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "../guilib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API TrayIconData : public QObject{
+class GUI_LIB_API TrayIconData : public QObject{
     Q_OBJECT
     
 public :
     enum TrayIconType{TRAYICON_Normal, TRAYICON_Flash, TRAYICON_Animation};
     
     TrayIconData(QObject *parent = 0);
-    TrayIconData(int dataType, const QString &id, 
-                 const QString &toolTip = "", QMenu *menu = 0, const QVariant &data = QVariant(), 
+    TrayIconData(int dataType, const QString &id,
+                 const QString &toolTip = "", QMenu *menu = 0, const QVariant &data = QVariant(),
                  TrayIconType trayIconType = TRAYICON_Normal, QList<QIcon> iconList = QList<QIcon>(),
                  QObject *parent = 0);
     TrayIconData(const TrayIconData &trayIconData);
@@ -74,7 +74,7 @@ public :
     }
     QString getID() const{
         return id;
-    }   
+    }
     
     void setToolTip(const QString &toolTip){
         this->toolTip = toolTip;
@@ -142,79 +142,79 @@ private:
 };
 
 
-class MYSHAREDLIB_API SystemTrayIconBase :public QSystemTrayIcon{
-	Q_OBJECT
+class GUI_LIB_API SystemTrayIconBase :public QSystemTrayIcon{
+    Q_OBJECT
 public:
-	SystemTrayIconBase(QObject * parent = 0);
-        SystemTrayIconBase(const TrayIconData &defaultData = TrayIconData(), QObject * parent = 0);        
-	SystemTrayIconBase(const QIcon & icon, QObject * parent = 0);
+    SystemTrayIconBase(QObject * parent = 0);
+    SystemTrayIconBase(const TrayIconData &defaultData, QObject * parent = 0);
+    SystemTrayIconBase(const QIcon & icon, QObject * parent = 0);
 
-	virtual ~SystemTrayIconBase();
-
-
-        //Show the icon
-	virtual void showIcon(const TrayIconData &trayIconData = TrayIconData());
-	virtual void showIcon(const QIcon &icon, const QString &toolTip = "", QMenu *menu = 0);
-        virtual void showIcon( const QString &iconName, const QString &toolTip = "", QMenu *menu = 0);
+    virtual ~SystemTrayIconBase();
 
 
+    //Show the icon
+    virtual void showIcon(const TrayIconData &trayIconData = TrayIconData());
+    virtual void showIcon(const QIcon &icon, const QString &toolTip = "", QMenu *menu = 0);
+    virtual void showIcon( const QString &iconName, const QString &toolTip = "", QMenu *menu = 0);
 
-	//Flash the icon
-	virtual void showFlash(const QIcon &icon, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-	virtual void showFlash(const QString &iconName, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-	virtual void showFlash(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 1000);
 
-        
-        
-	//Show a group of icon
-	virtual void showAnimation(QList<QIcon> iconList, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-	virtual void showAnimation(QStringList iconNameList, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-	virtual void showAnimation(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 1000);
 
-        
-        
-	void stop();
-        
-        void resetAll(const TrayIconData &defaultData = TrayIconData());
-        void resetTrayIcon(const QIcon & icon);
-        void resetContexMenu(QMenu *contextMenu);
-        void resetToolTip(const QString &tooltip);
-//        void setDefault(const QIcon &defaultIcon = QIcon(), const TrayIconData &defaultData = TrayIconData());
-        
-        TrayIconData currentTrayIconData() const;
-        TrayIconData defaultTrayIconData() const;
-        
-        void appendTrayIconData(const TrayIconData &trayIconData);
-        void removeTrayIconData(const QString &trayIconDataID);
-        void removeAllTrayIconData();
-        bool setTrayIconData(const QString &trayIconDataID, const QVariant &data);
-        
-        void updateSystemTrayIcon();
+    //Flash the icon
+    virtual void showFlash(const QIcon &icon, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
+    virtual void showFlash(const QString &iconName, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
+    virtual void showFlash(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 1000);
 
-        bool trayIconDataExists(const QString &id);
-        QVariant getData(const QString &id);
-        void setData(const QString &id, const QVariant &data);
-         
+
+
+    //Show a group of icon
+    virtual void showAnimation(QList<QIcon> iconList, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
+    virtual void showAnimation(QStringList iconNameList, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
+    virtual void showAnimation(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 1000);
+
+
+
+    void stop();
+
+    void resetAll(const TrayIconData &defaultData = TrayIconData());
+    void resetTrayIcon(const QIcon & icon);
+    void resetContexMenu(QMenu *contextMenu);
+    void resetToolTip(const QString &tooltip);
+    //        void setDefault(const QIcon &defaultIcon = QIcon(), const TrayIconData &defaultData = TrayIconData());
+
+    TrayIconData currentTrayIconData() const;
+    TrayIconData defaultTrayIconData() const;
+
+    void appendTrayIconData(const TrayIconData &trayIconData);
+    void removeTrayIconData(const QString &trayIconDataID);
+    void removeAllTrayIconData();
+    bool setTrayIconData(const QString &trayIconDataID, const QVariant &data);
+
+    void updateSystemTrayIcon();
+
+    bool trayIconDataExists(const QString &id);
+    QVariant getData(const QString &id);
+    void setData(const QString &id, const QVariant &data);
+
 
 private slots:
-	void slotShowFlash();
-	void slotShowAnimation();
+    void slotShowFlash();
+    void slotShowAnimation();
 
 private:
 
-        TrayIconData m_defaultData;
+    TrayIconData m_defaultData;
 
-	int iconIndex;
+    int iconIndex;
 
-	QList<QIcon> iconQueue;
+    QList<QIcon> iconQueue;
 
-	QTimer *timer;
-        
-        TrayIconData m_currentData;
-        
-        QHash<QString/*Tray Icon Data ID*/, TrayIconData> trayIconDataHash;
+    QTimer *timer;
 
-        bool m_showSystemTrayIconDataLastAdded;
+    TrayIconData m_currentData;
+
+    QHash<QString/*Tray Icon Data ID*/, TrayIconData> trayIconDataHash;
+
+    bool m_showSystemTrayIconDataLastAdded;
 
 
 

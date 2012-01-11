@@ -34,11 +34,11 @@
 #include <QtGui>
 
 #include "../../core/plugin/abstractplugininterface.h"
-#include "../../core/mysharedlib_global.h"
+#include "../guilib.h"
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API GUIInterface: public AbstractPluginInterface {
+class GUI_LIB_API GUIInterface: public AbstractPluginInterface {
 
 public:
 

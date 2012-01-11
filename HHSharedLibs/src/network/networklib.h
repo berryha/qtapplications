@@ -1,8 +1,8 @@
 /*
  ****************************************************************************
- * dataprint.h
+ * networklib.h
  *
- * Created on: 2009-8-14
+ * Created on: 2009-4-27
  *     Author: 贺辉
  *    License: LGPL
  *    Comment:
@@ -28,45 +28,40 @@
  */
 
 
+#ifndef NETWORKLIB_H
+#define NETWORKLIB_H
 
 
-#ifndef DATAPRINT_H_
-#define DATAPRINT_H_
+#include <QtCore/QtGlobal>
 
-#include <QObject>
-#include <QPrinter>
-#include <QTextDocument>
-
-#include "guilib.h"
-
-namespace HEHUI{
-
-class GUI_LIB_API DataPrint : public QObject{
-Q_OBJECT
-public:
-	DataPrint(const QString &fileName, bool preview, QObject *parent = 0);
-
-	DataPrint(const QString &string, bool isRichText, bool preview, QObject *parent = 0);
-	virtual ~DataPrint();
-
-private:
-        bool loadFile(const QString &fileName);
+ #if defined(NETWORK_LIBRARY_EXPORT)
+ #  define NETWORK_LIB_API Q_DECL_EXPORT
+ #else
+ #  define NETWORK_LIB_API Q_DECL_IMPORT
+ #endif
 
 
-public slots:
-	void slotDataPrint();
-	void slotDataPrintPreview();
-	void slotFilePrintPdf();
+/*
 
-private slots:
-	void slotPrintPreview(QPrinter *printer);
+#if defined(Q_WS_WIN)
+#  if !defined(QT_QTSERVICE_EXPORT) && !defined(QT_QTSERVICE_IMPORT)
+#    define QT_QTSERVICE_EXPORT
+#  elif defined(QT_QTSERVICE_IMPORT)
+#    if defined(QT_QTSERVICE_EXPORT)
+#      undef QT_QTSERVICE_EXPORT
+#    endif
+#    define QT_QTSERVICE_EXPORT __declspec(dllimport)
+#  elif defined(QT_QTSERVICE_EXPORT)
+#    undef QT_QTSERVICE_EXPORT
+#    define QT_QTSERVICE_EXPORT __declspec(dllexport)
+#  endif
+#else
+#  define QT_QTSERVICE_EXPORT
+#endif
 
-private:
-	QTextDocument *document;
 
 
-};
+*/
 
-} //namespace HEHUI
 
-#endif /* DATAPRINT_H_ */
+#endif // MYSHAREDLIB_GLOBAL_H

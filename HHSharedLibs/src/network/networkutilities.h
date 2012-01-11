@@ -35,11 +35,11 @@
 
 #include <QHostAddress>
 
-#include "mysharedlib_global.h"
+#include "networklib.h"
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API NetworkUtilities {
+class NETWORK_LIB_API NetworkUtilities {
 public:
 	NetworkUtilities();
 	virtual ~NetworkUtilities();

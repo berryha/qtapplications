@@ -278,6 +278,7 @@ int TEACrypt::qq_crypt ( unsigned char   flag,  unsigned char*  instr,  int  ins
 	return 1; /* flag must be DECRYPT or ENCRYPT*/
 }/* qq_crypt*/
 
+/*
 int TEACrypt::stringToByte(unsigned char* destination, string &source) {
         int length = source.length() + 1;
         char temp[length];
@@ -288,9 +289,9 @@ int TEACrypt::stringToByte(unsigned char* destination, string &source) {
 
         for (int i = 0; i < length; i++) {
                 if (temp[i] < 0) {
-                	destination[i] = temp[i] + 256;
+                    destination[i] = temp[i] + 256;
                 } else {
-                	destination[i] = temp[i];
+                    destination[i] = temp[i];
                 }
         }
         //	std::cout<<"out:"<<out<<endl;
@@ -298,6 +299,7 @@ int TEACrypt::stringToByte(unsigned char* destination, string &source) {
         return length;
 
 }
+*/
 
 void TEACrypt::charToByte(unsigned char* destination, const char *source, int sourceLength){
 

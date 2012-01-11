@@ -44,12 +44,14 @@
 #include "./tcp/tcpserver.h"
 //#include "udp/multicast/multicast.h"
 
-#include "mysharedlib_global.h"
+#include "networklib.h"
+
+
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API NetworkManagerBase : public QObject {
+class NETWORK_LIB_API NetworkManagerBase : public QObject {
     Q_OBJECT
 
 public:

@@ -35,12 +35,12 @@
 
 #include "packet.h"
 
-//#include "../mysharedlib_global.h"
+//#include "../networklib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API PacketHandlerBase :public QObject{
+class NETWORK_LIB_API PacketHandlerBase :public QObject{
     Q_OBJECT
 
 public:

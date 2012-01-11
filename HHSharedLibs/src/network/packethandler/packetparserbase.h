@@ -37,7 +37,7 @@
 #include "packethandlerbase.h"
 #include "../networkmanagerbase.h"
 
-#include "../mysharedlib_global.h"
+#include "../networklib.h"
 
 
 
@@ -46,7 +46,7 @@
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API PacketsParserBase : public QObject{
+class NETWORK_LIB_API PacketsParserBase : public QObject{
     Q_OBJECT
 
 public:

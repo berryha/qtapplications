@@ -16,6 +16,8 @@ QT -= gui
 # include config file
 include(../buildlib_config.pri)
 
+DEFINES += CORE_LIB_LIBRARY_EXPORT
+
 # #
 # DEFINES += MYSHAREDLIB_LIBRARY_EXPORT
 # #

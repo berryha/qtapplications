@@ -1,4 +1,4 @@
-/*
+﻿/*
  ****************************************************************************
  * cryptography.h
  *
@@ -48,8 +48,8 @@ using namespace std;
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API Cryptography
-{
+class CORE_LIB_API Cryptography {
+
 public:
 
     Cryptography();
@@ -57,7 +57,7 @@ public:
     static QByteArray MD5(const QByteArray &data);
     static QByteArray SHA1(const QByteArray &data);
 
-    int stringToByte(unsigned char* destination, string &source);
+//    int stringToByte(unsigned char* destination, string &source);
     void charToByte(unsigned char* destination, const char *source, int sourceLength);
     void byteToChar(char *destination, const unsigned char* source, int sourceLength);
 

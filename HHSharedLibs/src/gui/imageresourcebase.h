@@ -38,12 +38,12 @@
 #include <QIcon>
 #include <QString>
 
-#include "../core/mysharedlib_global.h"
+#include "../guilib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API ImageResourceBase :public QObject{
+class GUI_LIB_API ImageResourceBase :public QObject{
 	Q_OBJECT
 public:
 	ImageResourceBase(QObject *parent = 0);

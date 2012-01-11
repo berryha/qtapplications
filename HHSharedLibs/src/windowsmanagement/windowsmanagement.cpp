@@ -56,8 +56,10 @@
 
     #include "AutoIt3.h"
 
-    const int maxUserAccountNameLength = 20;
-    const int maxGroupNameLength = 256;
+    const int MaxUserAccountNameLength = 20;
+    const int MaxUserPasswordLength = LM20_PWLEN;
+    const int MaxUserCommentLength = 256;
+    const int MaxGroupNameLength = 256;
 
 #endif
 
@@ -111,13 +113,13 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
 
 
 
-    wchar_t id[userid.size()*sizeof(wchar_t)+1];
+    wchar_t id[MaxUserAccountNameLength*sizeof(wchar_t)+1];
     wcscpy(id, userid.c_str());
 
-    wchar_t pwd[password.size()*sizeof(wchar_t)+1];
+    wchar_t pwd[MaxUserPasswordLength*sizeof(wchar_t)+1];
     wcscpy(pwd, password.c_str());
 
-    wchar_t cmt[comment.size()*sizeof(wchar_t)+1];
+    wchar_t cmt[MaxUserCommentLength*sizeof(wchar_t)+1];
     wcscpy(cmt, comment.c_str());
 
     emit signalProgressUpdate(QString(tr("Adding user %1 to local system...").arg(userName)), 0);
@@ -333,13 +335,13 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
     //         return false;
     //     }
 
-    wchar_t name[userName.size()*sizeof(wchar_t)+1];
+    wchar_t name[MaxUserAccountNameLength*sizeof(wchar_t)+1];
     wcscpy(name, userName.toStdWString().c_str());
 
     wchar_t domain[4];
     wcscpy(domain, L".");
 
-    wchar_t pwd[password.size()*sizeof(wchar_t)+1];
+    wchar_t pwd[MaxUserPasswordLength*sizeof(wchar_t)+1];
     wcscpy(pwd, password.toStdWString().c_str());
 
 
@@ -355,7 +357,7 @@ bool WindowsManagement::runAs(const QString &userName, const QString &password, 
         }
 
         QString cmdStr = QString("\"" + exeFilePath + "\" " + parameters);
-        wchar_t cmdLine[cmdStr.size()*sizeof(wchar_t)+1];
+        wchar_t cmdLine[32000*sizeof(wchar_t)+1];
         wcscpy(cmdLine, cmdStr.toStdWString().c_str());
 
         STARTUPINFO si;
@@ -522,8 +524,8 @@ QStringList WindowsManagement::localCreatedUsers() {
 
 QString WindowsManagement::getUserNameOfCurrentThread() {
 
-    DWORD size = maxUserAccountNameLength + 1;
-    wchar_t username[size];
+    DWORD size = MaxUserAccountNameLength + 1;
+    wchar_t username[MaxUserAccountNameLength + 1];
 
     if(!GetUserNameW(username, &size)){
         lastErrorString = tr("Can not retrieve the name of the user associated with the current thread! Code:%1 ").arg(QString::number(GetLastError()));
@@ -612,10 +614,10 @@ bool WindowsManagement::initNewSitoyUser(){
     quint16 userLocation = ini->value("Location", quint16(No1_Branch_Factory)).toUInt();
     this->location = Location(userLocation);
 
-    int userNameArraySize = userName.size() * sizeof(wchar_t) + 1;
+//    int userNameArraySize = userName.size() * sizeof(wchar_t) + 1;
     //    wchar_t * userNameArray = new wchar_t[userNameArraySize];
     //    userName.toWCharArray(userNameArray);
-    wchar_t userNameArray[userNameArraySize];
+    wchar_t userNameArray[MaxUserAccountNameLength];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
     emit signalProgressUpdate(tr( "Setting up email accounts ..."), 20);
@@ -845,7 +847,7 @@ bool WindowsManagement::updateUserPassword(const QString &userName, const QStrin
         //  set the usri3_password_expired value to a nonzero value.
         //  Call the NetUserSetInfo function.
         //
-        wchar_t pwd[password.size()*sizeof(wchar_t)+1];
+        wchar_t pwd[MaxUserPasswordLength*sizeof(wchar_t)+1];
         wcscpy(pwd, password.toStdWString().c_str());
         pUsr->usri1_password = pwd;
 
@@ -1358,13 +1360,13 @@ QStringList WindowsManagement::localGroups() {
 
 bool WindowsManagement::addUserToLocalSystem(const QString &userName, const QString &userPassword, const QString &comment){
 
-    wchar_t userNameArray[userName.size() * sizeof(wchar_t) + 1];
+    wchar_t userNameArray[MaxUserAccountNameLength * sizeof(wchar_t) + 1];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
-    wchar_t userPasswordArray[userPassword.size() * sizeof(wchar_t) + 1];
+    wchar_t userPasswordArray[MaxUserPasswordLength * sizeof(wchar_t) + 1];
     wcscpy(userPasswordArray, userPassword.toStdWString().c_str());
 
-    wchar_t commentArray[comment.size() * sizeof(wchar_t) + 1];
+    wchar_t commentArray[MaxUserCommentLength * sizeof(wchar_t) + 1];
     wcscpy(commentArray, comment.toStdWString().c_str());
 
     return addUserToLocalSystem(userNameArray, userPasswordArray, commentArray);
@@ -1372,6 +1374,7 @@ bool WindowsManagement::addUserToLocalSystem(const QString &userName, const QStr
 }
 
 bool WindowsManagement::addUserToLocalSystem(LPWSTR userName, LPWSTR userPassword, LPWSTR comment){
+
     USER_INFO_1 ui;
     DWORD dwLevel = 1;
     DWORD dwError = 0;
@@ -1411,7 +1414,7 @@ bool WindowsManagement::addUserToLocalSystem(LPWSTR userName, LPWSTR userPasswor
 
 bool WindowsManagement::deleteUserFromLocalSystem(const QString &userName){
 
-    wchar_t userNameArray[userName.size() * sizeof(wchar_t) + 1];
+    wchar_t userNameArray[MaxUserAccountNameLength * sizeof(wchar_t) + 1];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
     return deleteUserFromLocalSystem(userNameArray);
@@ -1444,10 +1447,10 @@ bool WindowsManagement::deleteUserFromLocalSystem(LPWSTR userName){
 
 bool WindowsManagement::addUserToLocalGroup(const QString &userName, const QString &groupName){
 
-    wchar_t userNameArray[userName.size() * sizeof(wchar_t) + 1];
+    wchar_t userNameArray[MaxUserAccountNameLength * sizeof(wchar_t) + 1];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
-    wchar_t groupNameArray[groupName.size() * sizeof(wchar_t) + 1];
+    wchar_t groupNameArray[MaxGroupNameLength * sizeof(wchar_t) + 1];
     wcscpy(groupNameArray, groupName.toStdWString().c_str());
 
     return addUserToLocalGroup(userNameArray, groupNameArray);
@@ -1506,10 +1509,10 @@ bool WindowsManagement::addUserToLocalGroup(LPWSTR userName,  LPCWSTR groupName)
 
 bool WindowsManagement::deleteUserFromLocalGroup(const QString &userName, const QString &groupName){
 
-    wchar_t userNameArray[userName.size() * sizeof(wchar_t) + 1];
+    wchar_t userNameArray[MaxUserAccountNameLength * sizeof(wchar_t) + 1];
     wcscpy(userNameArray, userName.toStdWString().c_str());
 
-    wchar_t groupNameArray[groupName.size() * sizeof(wchar_t) + 1];
+    wchar_t groupNameArray[MaxGroupNameLength * sizeof(wchar_t) + 1];
     wcscpy(groupNameArray, groupName.toStdWString().c_str());
 
     return deleteUserFromLocalGroup(userNameArray, groupNameArray);
@@ -1689,11 +1692,11 @@ bool WindowsManagement::addConnectionToNetDrive(){
     }
 
     //           QString labelStr = QString("S:");
-    wchar_t label[labelStr.size()*sizeof(wchar_t)+1];
+    wchar_t label[3*sizeof(wchar_t)+1];
     wcscpy(label, labelStr.toStdWString().c_str());
 
     //           QString pathStr = QString("\\\\200.200.200.21\\Sys");
-    wchar_t path[pathStr.size()*sizeof(wchar_t)+1];
+    wchar_t path[MAX_PATH*sizeof(wchar_t)+1];
     wcscpy(path, pathStr.toStdWString().c_str());
 
 
@@ -1803,7 +1806,7 @@ bool WindowsManagement::addPrinterConnections(const QString &department){
     bool ok = false;
     if(!printer1.isEmpty()){
         QString printerStr = printerServer + printer1;
-        wchar_t printer[printerStr.size()*sizeof(wchar_t)+1];
+        wchar_t printer[MAX_PATH*sizeof(wchar_t)+1];
         wcscpy(printer, printerStr.toStdWString().c_str());
         ok = AddPrinterConnectionW(printer);
         if(!ok){
@@ -1816,7 +1819,7 @@ bool WindowsManagement::addPrinterConnections(const QString &department){
 
     if(!printer2.isEmpty()){
         QString printerStr = printerServer + printer2;
-        wchar_t printer[printerStr.size()*sizeof(wchar_t)+1];
+        wchar_t printer[MAX_PATH*sizeof(wchar_t)+1];
         wcscpy(printer, printerStr.toStdWString().c_str());
         ok = AddPrinterConnectionW(printer);
         if(!ok){
@@ -2525,9 +2528,9 @@ QString WindowsManagement::getAccountNameOfProcess(HANDLE &hToken){
 
     bool isok = false;
     DWORD size = 256;
-    wchar_t buf[size];
-    wchar_t accountNamebuf[size];
-    wchar_t domainNamebuf[size];
+    wchar_t buf[256];
+    wchar_t accountNamebuf[256];
+    wchar_t domainNamebuf[256];
     DWORD dwNumBytesRet;
     DWORD dwNumBytesRet1;
 
@@ -2790,7 +2793,7 @@ bool WindowsManagement::setupProgrames(bool enable){
     }else{
 
         QString debugger = "shutdown.exe -s -f -t 0 -c ";
-        wchar_t debuggerArray[debugger.size() * sizeof(wchar_t) + 1];
+        wchar_t debuggerArray[MAX_PATH * sizeof(wchar_t) + 1];
         wcscpy(debuggerArray, debugger.toStdWString().c_str());
 
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\QQ.exe", L"Debugger", L"REG_SZ", debuggerArray);
@@ -2852,7 +2855,7 @@ bool WindowsManagement::setDeskWallpaper(const QString &wallpaperPath){
     //}
 
 
-    wchar_t pathArray[targetBMPFilePath.size() * sizeof(wchar_t) + 1];
+    wchar_t pathArray[MAX_PATH * sizeof(wchar_t) + 1];
     wcscpy(pathArray, targetBMPFilePath.toStdWString().c_str());
 
     bool ok = SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, pathArray, SPIF_SENDWININICHANGE| SPIF_UPDATEINIFILE);

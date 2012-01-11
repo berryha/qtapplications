@@ -37,17 +37,16 @@
 #include <QMainWindow>
 
 //#include "../core/settingscore.h"
-//#include "../core/mysharedlib_global.h"
 
 #include "HHSharedCore/hsettingscore.h"
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "guilib.h"
 
 
 
 namespace HEHUI {
 
 
-class  MYSHAREDLIB_API SettingsBase : public SettingsCore
+class  GUI_LIB_API SettingsBase : public SettingsCore
 {
 	Q_OBJECT
 public:

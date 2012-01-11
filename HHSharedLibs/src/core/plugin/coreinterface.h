@@ -41,7 +41,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API CoreInterface : public AbstractPluginInterface{
+class CORE_LIB_API CoreInterface : public AbstractPluginInterface{
     public:
 
         virtual ~CoreInterface(){}

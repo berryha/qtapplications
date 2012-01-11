@@ -9,7 +9,7 @@
 #define RUDP_GLOBAL_H_
 
 
-#include "../mysharedlib_global.h"
+//#include "../networklib.h"
 
 
 #ifndef RUDP_VERSION

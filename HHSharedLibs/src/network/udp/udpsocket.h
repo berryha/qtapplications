@@ -1,4 +1,4 @@
-/*
+﻿/*
  ****************************************************************************
  * udpsocket.h
  *
@@ -37,12 +37,12 @@
 #include "multicast/ipmulticast.h"
 #include "../packethandler/packethandlerbase.h"
 
-#include "../mysharedlib_global.h"
+#include "../networklib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API UDPSocket : public QUdpSocket {
+class NETWORK_LIB_API UDPSocket : public QUdpSocket {
     Q_OBJECT
 public:
     enum ListeningState{NotListening = 1, SimpleListening = 2, IPMulticastListening = 3};

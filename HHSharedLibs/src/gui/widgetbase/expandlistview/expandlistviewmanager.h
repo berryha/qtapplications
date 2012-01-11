@@ -14,7 +14,7 @@
 
 #include "expandlistview.h"
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "../../guilib.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -23,7 +23,7 @@ namespace HEHUI {
 
 class ExpandListView;
 
-class MYSHAREDLIB_API ExpandListViewManager: public QObject {
+class GUI_LIB_API ExpandListViewManager: public QObject {
 	Q_OBJECT
 
 public:

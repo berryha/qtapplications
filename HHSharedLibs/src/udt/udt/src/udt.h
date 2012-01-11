@@ -93,6 +93,11 @@ written by
    #define UDT_API
 #endif
 
+#ifdef NO_UDT_DLL
+#undef UDT_API
+#define UDT_API
+#endif
+
 #define NO_BUSY_WAITING
 
 #ifdef WIN32

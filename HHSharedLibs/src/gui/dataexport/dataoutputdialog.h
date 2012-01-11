@@ -10,12 +10,12 @@
 
 #include "../ui/ui_dataoutputdialog.h"
 
-#include "../../core/mysharedlib_global.h"
+#include "../guilib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API DataOutputDialog: public QDialog
+class GUI_LIB_API DataOutputDialog: public QDialog
 {
 	Q_OBJECT
 	

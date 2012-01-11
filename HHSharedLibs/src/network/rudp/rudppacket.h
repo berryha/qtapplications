@@ -40,7 +40,7 @@
 #include <QTimer>
 
 
-#include "../mysharedlib_global.h"
+#include "../networklib.h"
 
 #include "rudp_global.h"
 
@@ -49,7 +49,7 @@ namespace HEHUI {
 
 
 
-class MYSHAREDLIB_API RUDPPacket : public QObject
+class NETWORK_LIB_API RUDPPacket : public QObject
 {
     Q_OBJECT
 public:

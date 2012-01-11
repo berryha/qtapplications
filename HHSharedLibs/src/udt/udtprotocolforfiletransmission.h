@@ -4,7 +4,7 @@
 
 #include <QObject>
 
-#include "mysharedlib_global.h"
+#include "udtlib.h"
 
 #include "udtprotocolbase.h"
 
@@ -13,7 +13,7 @@
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API UDTProtocolForFileTransmission : public UDTProtocolBase
+class UDT_LIB_API UDTProtocolForFileTransmission : public UDTProtocolBase
 {
     Q_OBJECT
 public:

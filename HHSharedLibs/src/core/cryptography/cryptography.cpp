@@ -1,4 +1,4 @@
-/*
+﻿/*
  ****************************************************************************
  * cryptography.cpp
  *
@@ -53,6 +53,7 @@ QByteArray Cryptography::SHA1(const QByteArray &data){
     return QCryptographicHash::hash(data, QCryptographicHash::Sha1);
 }
 
+/*
 int Cryptography::stringToByte(unsigned char* destination, string &source) {
         int length = source.length() + 1;
         char temp[length];
@@ -73,6 +74,7 @@ int Cryptography::stringToByte(unsigned char* destination, string &source) {
         return length;
 
 }
+*/
 
 void Cryptography::charToByte(unsigned char* destination, const char *source, int sourceLength){
 

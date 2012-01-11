@@ -33,7 +33,7 @@
 #ifndef GLOBAL_NETWORK_H_
 #define GLOBAL_NETWORK_H_
 
-#include "mysharedlib_global.h"
+//#include "networklib.h"
 
 //#ifdef Q_OS_WIN
 //#define OS_IS_WINDOWS 1

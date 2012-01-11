@@ -34,55 +34,54 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
 
- #include <QtCore>
+// #include <QtCore>
  #include <QObject>
  #include <QUdpSocket>
 
-//#include "../shared/global"
-#include "ipmulticastsocketbase.h"
+#include <winsock2.h> //!!!!!Order 1st
+#include <windows.h> //!!!!!Order 2nd
 
-#include <windows.h>
-#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "CBase.h"
-//#define MCASTADDR "224.0.0.1" //本例使用的多播组地址。
-//#define MCASTPORT 3838
-//#define PORT 7838 //绑定的本地端口号。
+//#include "../shared/global"
+#include "ipmulticastsocketbase.h"
+
+
 #define BUFSIZE 5000 //接收数据缓冲大小。
 
 //class QUdpSocket;
 
 class IPMultiCastWin : public IPMulticastSocketBase{
-	Q_OBJECT;
+    Q_OBJECT
 public:
 
-        IPMultiCastWin(QObject *parent);
-        virtual ~IPMultiCastWin();
+    IPMultiCastWin(QObject *parent);
+    virtual ~IPMultiCastWin();
 
 
-//signals:
-//	void signalUDPDatagramsReceived(const QByteArray &data);
+    //signals:
+    //	void signalUDPDatagramsReceived(const QByteArray &data);
 
 public slots:
-        bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
-	void leaveGroup();
-        bool slotSendUDPDatagramViaBoundSocket(const QString &ip, quint16 port, const QByteArray &data);
+    bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort);
+    void leaveGroup();
+    bool slotSendUDPDatagramViaBoundSocket(const QString &ip, quint16 port, const QByteArray &data);
 
 private slots:
-//	void readPendingDatagrams();
+    //	void readPendingDatagrams();
 
 
 private:
-        //QUdpSocket * udpSocket;
-	long count,Receivedpackets;
-	bool bFlag;
-	WSADATA wsd;
-	struct sockaddr_in local,remote,from;
-	SOCKET sock,sockM;
-	char recvbuf[BUFSIZE];
+    //QUdpSocket * udpSocket;
+    long count,Receivedpackets;
+    bool bFlag;
+    WSADATA wsd;
+    struct sockaddr_in local,remote,from;
+    SOCKET sock,sockM;
+//    char recvbuf[BUFSIZE];
+
 };
 
 #endif // RECEIVER_H
