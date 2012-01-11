@@ -49,7 +49,7 @@
 
 
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "sharedmslib.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -58,7 +58,7 @@ class QFile;
 class QTimerEvent;
 QT_END_NAMESPACE
 
-class MYSHAREDLIB_API FileManager : public QThread
+class SHAREDMSLIB_API FileManager : public QThread
 {
     Q_OBJECT
 

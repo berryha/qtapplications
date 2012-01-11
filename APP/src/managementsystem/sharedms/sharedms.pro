@@ -26,13 +26,17 @@ HEADERS += clientinfo.h \
     global_shared.h \
     udtprotocol.h \
     resourcesmanager.h \
-    filemanager.h
+    filemanager.h \
+    sharedmslib.h
 FORMS += 
 SOURCES += clientinfo.cpp \
     udtprotocol.cpp \
     resourcesmanager.cpp \
     filemanager.cpp
 RESOURCES += resources.qrc
+
+DEFINES += SHAREDMSLIB_LIBRARY_EXPORT
+
 win32 { 
     #DEFINES += WIN32 __MINGW__ _WIN32_WINNT=0x0501
     DEFINES += WIN32 _WIN32_WINNT=0x0501

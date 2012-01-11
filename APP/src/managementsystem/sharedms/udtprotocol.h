@@ -4,10 +4,13 @@
 #include "HHSharedUDT/hudtprotocolbase.h"
 #include "HHSharedNetwork/hpacket.h"
 
+#include "sharedmslib.h"
+
+
 namespace HEHUI {
 
 
-class UDTProtocol : public UDTProtocolBase
+class SHAREDMSLIB_API UDTProtocol : public UDTProtocolBase
 {
     Q_OBJECT
 public:
