@@ -12,13 +12,10 @@
 
 #ifdef Q_CC_MSVC
 #include <windows.h>
-#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-#define msleep(x) Sleep(x)
 #endif
 
 #ifdef Q_CC_GNU
 #include <unistd.h>
-#define msleep(x) usleep(x*1000)
 #endif
 
 
@@ -2630,6 +2627,16 @@ RUDPChannel::ChannelState RUDPChannel::getChannelState(){
         //QMutexLocker locker(&m_ChannelStateMutex);
         return m_ChannelState;
     }
+
+}
+
+inline void RUDPChannel::msleep(int msec){
+
+#ifdef Q_OS_WIN32
+    Sleep(msec);
+#else
+    usleep(msec*1000);
+#endif
 
 }
 

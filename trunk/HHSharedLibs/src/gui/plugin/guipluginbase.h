@@ -35,12 +35,12 @@
 
 #include "guiinterface.h"
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "../guilib.h"
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API GUIPluginBase: public QObject, public GUIInterface {
+class GUI_LIB_API GUIPluginBase: public QObject, public GUIInterface {
     Q_OBJECT
     Q_INTERFACES(HEHUI::AbstractPluginInterface)
     Q_INTERFACES(HEHUI::GUIInterface)

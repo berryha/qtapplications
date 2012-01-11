@@ -50,7 +50,7 @@
 
 #include <QTimer>
 
-#include "../../../core/mysharedlib_global.h"
+#include "../../guilib.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -62,7 +62,7 @@ class ExpandListViewManager;
 
 class TreeWidget;
 
-class MYSHAREDLIB_API ExpandListView : public ExpandListViewBase
+class GUI_LIB_API ExpandListView : public ExpandListViewBase
 {
     Q_OBJECT
 public:

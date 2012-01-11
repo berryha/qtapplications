@@ -45,7 +45,7 @@
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API PluginManager: public QObject {
+class CORE_LIB_API PluginManager: public QObject {
     Q_OBJECT
 
 public:

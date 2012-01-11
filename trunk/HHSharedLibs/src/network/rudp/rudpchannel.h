@@ -7,7 +7,7 @@
 #include <QUdpSocket>
 #include <QMutex>
 
-#include "../mysharedlib_global.h"
+#include "../networklib.h"
 
 #include "rudppacket.h"
 #include "../packethandler/packethandlerbase.h"
@@ -16,7 +16,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API RUDPChannel : public QObject
+class NETWORK_LIB_API RUDPChannel : public QObject
 {
     Q_OBJECT
 public:
@@ -169,6 +169,8 @@ private:
 
     void updateChannelState(ChannelState state);
     ChannelState getChannelState();
+
+    void msleep(int msec);
 
 private:
 

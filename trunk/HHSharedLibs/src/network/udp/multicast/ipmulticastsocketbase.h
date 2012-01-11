@@ -40,29 +40,29 @@
 
 
 class IPMulticastSocketBase : public QObject{
-	Q_OBJECT
+    Q_OBJECT
 public:
-        IPMulticastSocketBase(QObject *parent = 0);
-        virtual ~IPMulticastSocketBase();
+    IPMulticastSocketBase(QObject *parent = 0);
+    virtual ~IPMulticastSocketBase();
 
-        QUdpSocket * getUdpSocket() const;
-        void setUdpSocket(QUdpSocket *udpSocket);
-	bool isBound();
-        void setBound(bool bound);
+    QUdpSocket * getUdpSocket() const;
+    void setUdpSocket(QUdpSocket *udpSocket);
+    bool isBound();
+    void setBound(bool bound);
 
-        QHostAddress getMulticastGroupAddress() const;
-        void setMulticastGroupAddress(const QHostAddress &ipMulticastGroupAddress);
-//        QHostAddress getLocalAddress()  const;
-        quint16 getPort() const;
-        void setPort(quint16 port);
+    QHostAddress getMulticastGroupAddress() const;
+    void setMulticastGroupAddress(const QHostAddress &ipMulticastGroupAddress);
+    //        QHostAddress getLocalAddress()  const;
+    quint16 getPort() const;
+    void setPort(quint16 port);
 
-//    static bool sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
+    //    static bool sendUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
 
 signals:
-//        void signalUDPDatagramsReceived(const QString &peerIP, quint16 peerPort, const QByteArray &data);
+    //        void signalUDPDatagramsReceived(const QString &peerIP, quint16 peerPort, const QByteArray &data);
 
 public slots:
-//    bool startSimpleListening(const QHostAddress &localAddress, quint16 localPort);
+    //    bool startSimpleListening(const QHostAddress &localAddress, quint16 localPort);
 
     virtual bool startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort) = 0;
     virtual void leaveGroup() = 0;
@@ -71,14 +71,14 @@ public slots:
 
 
 private slots:
-//    virtual void readPendingDatagrams();
+    //    virtual void readPendingDatagrams();
 
 private:
     QUdpSocket *udpSocket;
     bool bound;
 
     QHostAddress ipMulticastGroupAddress;
-//    QHostAddress localAddress;
+    //    QHostAddress localAddress;
     quint16 port;
 
 };

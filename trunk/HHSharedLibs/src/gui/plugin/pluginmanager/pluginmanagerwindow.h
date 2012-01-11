@@ -33,15 +33,17 @@
 #include <QWidget>
 //#include <QDataWidgetMapper>
 
-#include "../../../core/mysharedlib_global.h"
 
 #include "plugininfomodel.h"
 #include "../../ui/ui_pluginmanagerwindow.h"
 
+#include "../../guilib.h"
+
+
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API PluginManagerWindow: public QWidget {
+class GUI_LIB_API PluginManagerWindow: public QWidget {
     Q_OBJECT
 
 public:

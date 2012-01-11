@@ -20,6 +20,8 @@ include( ../buildlib_config.pri )
 HHSharedLibs += HHSharedCore
 include(../core/core.pri)
 
+DEFINES += GUI_LIBRARY_EXPORT
+
 # DEPENDPATH += . \
 # UI_DIR \
 # ../core
@@ -86,7 +88,8 @@ HEADERS += screenshot/screenshot.h \
     login/logindlg.h \
     dataprint.h \
     widgetbase/mainwindowbase.h \
-    widgetbase/widgetbase.h
+    widgetbase/widgetbase.h \
+    guilib.h
 FORMS += screenshot/screenshot.ui \
     screenshot/selecttargetimagewidget.ui \
     dataexport/dataoutputdialog.ui \

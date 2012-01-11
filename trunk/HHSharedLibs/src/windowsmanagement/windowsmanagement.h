@@ -56,14 +56,14 @@
 #endif
 
 
-#include "mysharedlib_global.h"
+#include "wmlib.h"
 
 
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API WindowsManagement : public QObject
+class WM_LIB_API WindowsManagement : public QObject
 {
     Q_OBJECT
 public:

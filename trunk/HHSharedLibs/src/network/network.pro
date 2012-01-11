@@ -21,6 +21,8 @@ INCLUDEPATH += . \
     ./tcp
 DEPENDPATH += $${INCLUDEPATH}
 
+DEFINES += NETWORK_LIBRARY_EXPORT
+
 # #
 # UI_DIR = ./ui
 # OBJECTS_DIR = ./tmp
@@ -39,14 +41,14 @@ HEADERS += \
     packethandler/packetparserbase.h \
     packethandler/packet.h \
     packethandler/packethandlerbase.h \
-    mysharedlib_global.h \
     networkutilities.h \
     tcp/tcpsocketconnection.h \
     global_network.h \
     tcp/tcpserver.h \
     tcp/tcpsocketthread.h \
     networkmanagerbase.h \
-    rudp/rudpsocket.h
+    rudp/rudpsocket.h \
+    networklib.h
 
 FORMS += 
 SOURCES += \
@@ -71,10 +73,12 @@ win32 {
     HEADERS += udp/multicast/multicastwin.h
     SOURCES += udp/multicast/multicastwin.cpp
     
-    # INCLUDEPATH += E:/DEV/Qt/2009.05/mingw/include
-    LIBS += -Lresources/lib \
-        -lwsock32 \
-        -lws2_32
+    LIBS += -lws2_32
+
+    win32-g++{
+        LIBS += -Lresources/lib \
+        -lwsock32
+    }
 }
 unix { 
     HEADERS += udp/multicast/multicastlinux.h

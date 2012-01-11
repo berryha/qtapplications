@@ -24,6 +24,7 @@ CONFIG( debug, debug|release ) {
 }
 include(./3rdparty/qtservice/src/qtservice.pri)
 
+DEFINES += SERVICE_LIBRARY_EXPORT
 
 DEPENDPATH += . \
             service
@@ -41,8 +42,9 @@ INCLUDEPATH += . \
 # RCC_DIR = ./tmp
 
 # Input
-HEADERS += mysharedlib_global.h \
-    service/service.h
+HEADERS += \
+    service/service.h \
+    servicelib.h
 SOURCES += service/service.cpp
 FORMS += 
 

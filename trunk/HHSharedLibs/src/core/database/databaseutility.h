@@ -42,7 +42,7 @@
 #include "../mysharedlib_global.h"
 
 
-class MYSHAREDLIB_API DatabaseUtility :public QObject {
+class CORE_LIB_API DatabaseUtility :public QObject {
     Q_OBJECT
 
 public:

@@ -1,8 +1,8 @@
 /*
  ****************************************************************************
- * mysharedlib_global.h
+ * servicelib.h
  *
- * Created on: 2009-5-1
+ * Created on: 2012-1-11
  *     Author: 贺辉
  *    License: LGPL
  *    Comment:
@@ -30,17 +30,16 @@
 
 
 
-
-#ifndef MYSHAREDLIB_GLOBAL_H
-#define MYSHAREDLIB_GLOBAL_H
+#ifndef SERVICELIB_H
+#define SERVICELIB_H
 
 
 #include <QtCore/QtGlobal>
 
- #if defined(MYSHAREDLIB_LIBRARY_EXPORT)
- #  define MYSHAREDLIB_API Q_DECL_EXPORT
+ #if defined(SERVICE_LIBRARY_EXPORT)
+ #  define SERVICE_LIB_API Q_DECL_EXPORT
  #else
- #  define MYSHAREDLIB_API Q_DECL_IMPORT
+ #  define SERVICE_LIB_API Q_DECL_IMPORT
  #endif
 
 

@@ -33,13 +33,16 @@
 #include <QObject>
 
 
-#include "../../core/user.h"
-#include "../../core/global_core.h"
-#include "../../core/mysharedlib_global.h"
+//#include "../../core/user.h"
+//#include "../../core/global_core.h"
+#include "HHSharedCore/huser.h"
+#include "HHSharedCore/hglobal_core.h"
+
+#include "../guilib.h"
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API LoginBase: public QObject {
+class GUI_LIB_API LoginBase: public QObject {
     Q_OBJECT
 
 public:

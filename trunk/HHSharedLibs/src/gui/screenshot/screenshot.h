@@ -40,13 +40,13 @@
 
 #include "selecttargetimagewidget.h"
 
-#include "../../core/mysharedlib_global.h"
+#include "../guilib.h"
 
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API Screenshot : public QWidget
+class GUI_LIB_API Screenshot : public QWidget
 {
     Q_OBJECT
 

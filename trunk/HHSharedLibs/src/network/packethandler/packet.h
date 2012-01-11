@@ -39,7 +39,7 @@
 
 #include "../global_network.h"
 
-#include "../mysharedlib_global.h"
+#include "../networklib.h"
 
 
 namespace HEHUI {
@@ -74,7 +74,7 @@ namespace HEHUI {
 //
 //};
 
-class MYSHAREDLIB_API Packet
+class NETWORK_LIB_API Packet
 {
 
 public:

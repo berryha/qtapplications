@@ -39,12 +39,12 @@
 // #include <windows.h>
 //#endif
 
-#include "../mysharedlib_global.h"
+#include "../servicelib.h"
 
 #include "../3rdparty/qtservice/src/qtservice.h"
 
 
- class MYSHAREDLIB_API Service : public QObject, public QtService<QCoreApplication>
+ class SERVICE_LIB_API Service : public QObject, public QtService<QCoreApplication>
 {
     Q_OBJECT
 

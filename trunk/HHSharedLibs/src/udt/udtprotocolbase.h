@@ -43,20 +43,23 @@
 #include <QObject>
 #include <QHash>
 
-#include "mysharedlib_global.h"
+//#define UDT_API Q_DECL_EXPORT
+
 #include "./udt/src/udt.h"
 #include "./udt/src/ccc.h"
+
 
 #include <iostream>
 using namespace std;
 
+#include "udtlib.h"
 
 
 namespace HEHUI {
 
 typedef UDTSTATUS UDTSocketStatus;
 
-class MYSHAREDLIB_API UDTProtocolBase :public QObject{
+class UDT_LIB_API UDTProtocolBase :public QObject{
     Q_OBJECT
 public:
 

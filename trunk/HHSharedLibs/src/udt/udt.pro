@@ -18,6 +18,7 @@ include( ../buildlib_config.pri )
 #UDT
 include( ./udt/build_with_udt.pri )
 
+DEFINES += UDT_LIBRARY_EXPORT
 
 INCLUDEPATH += . \
     UI_DIR \
@@ -32,9 +33,9 @@ DEPENDPATH += $${INCLUDEPATH}
 # RCC_DIR = ./tmp
 # Input
 HEADERS += \
-            mysharedlib_global.h \
     udtprotocolbase.h \
-    udtprotocolforfiletransmission.h
+    udtprotocolforfiletransmission.h \
+    udtlib.h
 SOURCES += \
     udtprotocolbase.cpp \
     udtprotocolforfiletransmission.cpp
@@ -42,8 +43,8 @@ RESOURCES +=
 
 
 win32 { 
-    #DEFINES += WIN32 __MINGW__ _WIN32_WINNT=0x0501
-    DEFINES += WIN32 _WIN32_WINNT=0x0501
+    #DEFINES += WIN32 _WIN32_WINNT=0x0501
+    DEFINES += WIN32 LEGACY_WIN32 NO_UDT_DLL
     win32-g++:DEFINES += __MINGW__
 
     HEADERS +=

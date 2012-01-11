@@ -34,7 +34,7 @@
 #include "mysharedlib_global.h"
 
 
-class MYSHAREDLIB_API SingletonExpose
+class CORE_LIB_API SingletonExpose
 {
 protected:
 	static QHash<const QMetaObject*, QObject*> mInstances;

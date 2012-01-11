@@ -60,7 +60,7 @@ IPMultiCastWin::~IPMultiCastWin()
 //        udpSocket = 0;
 //    }
 
-    delete [] recvbuf;
+//    delete [] recvbuf;
 
 
 }

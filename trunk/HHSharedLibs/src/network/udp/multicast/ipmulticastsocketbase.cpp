@@ -35,13 +35,13 @@
 #include "ipmulticastsocketbase.h"
 
 IPMulticastSocketBase::IPMulticastSocketBase(QObject *parent)
-        :QObject(parent)
+    :QObject(parent)
 {
 
-        udpSocket = 0;
-	bound = false;
-        ipMulticastGroupAddress = QHostAddress::Null;
-        port = 0;
+    udpSocket = 0;
+    bound = false;
+    ipMulticastGroupAddress = QHostAddress::Null;
+    port = 0;
 
 }
 
@@ -58,11 +58,11 @@ void IPMulticastSocketBase::setUdpSocket(QUdpSocket *udpSocket){
 }
 
 bool IPMulticastSocketBase::isBound(){
-	return bound;
+    return bound;
 }
 
 void IPMulticastSocketBase::setBound(bool bound){
-        this->bound = bound;
+    this->bound = bound;
 }
 
 QHostAddress IPMulticastSocketBase::getMulticastGroupAddress() const {

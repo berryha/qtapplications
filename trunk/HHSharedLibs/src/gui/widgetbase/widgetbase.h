@@ -38,10 +38,14 @@
 #include <QWidget>
 #include <QSystemTrayIcon>
 
-#include "../../core/global_core.h"
-#include "HHSharedCore/hmysharedlib_global.h"
+//#include "../../core/global_core.h"
+#include "HHSharedCore/hglobal_core.h"
 
-class MYSHAREDLIB_API WidgetBase :public QWidget {
+#include "../guilib.h"
+
+
+
+class GUI_LIB_API WidgetBase :public QWidget {
     Q_OBJECT
 
 public:

@@ -45,17 +45,21 @@
 
 #include <QSystemTrayIcon>
 
-#include "../../core/global_core.h"
-#include "../../core/plugin/abstractplugininterface.h"
-#include "../../core/plugin/coreinterface.h"
+//#include "../../core/global_core.h"
+//#include "../../core/plugin/abstractplugininterface.h"
+//#include "../../core/plugin/coreinterface.h"
+
+#include "HHSharedCore/hglobal_core.h"
+//#include "HHSharedCore/hcoreinterface.h"
+
 #include "../plugin/guiinterface.h"
 
-#include "../../core/mysharedlib_global.h"
+#include "../guilib.h"
 
 
 namespace HEHUI{
 
-class MYSHAREDLIB_API  MainWindowBase: public QMainWindow {
+class GUI_LIB_API  MainWindowBase: public QMainWindow {
     Q_OBJECT
 
 public:

@@ -37,10 +37,11 @@
 
 #include "../ui/ui_progressdlg.h"
 
-#include "HHSharedCore/hmysharedlib_global.h"
- //#include "../core/mysharedlib_global.h"
+#include "../guilib.h"
 
-class MYSHAREDLIB_API ProgressDlg : public QWidget
+
+
+class GUI_LIB_API ProgressDlg : public QWidget
 {
     Q_OBJECT
 

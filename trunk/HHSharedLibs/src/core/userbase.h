@@ -40,7 +40,7 @@
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API UserBase: public QObject {
+class CORE_LIB_API UserBase: public QObject {
 Q_OBJECT
 
 public:

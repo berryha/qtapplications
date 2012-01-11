@@ -18,6 +18,7 @@ QT += core
 # include config file
 include( ../buildlib_config.pri )
 
+DEFINES += WM_LIBRARY_EXPORT
 
 # #
 UI_DIR = ./ui
@@ -26,21 +27,28 @@ UI_DIR = ./ui
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
 # Input
-HEADERS += mysharedlib_global.h \
-    windowsmanagement.h
+HEADERS += \
+    windowsmanagement.h \
+    wmlib.h
 FORMS += 
 SOURCES += windowsmanagement.cpp
 RESOURCES += 
 win32 { 
-    INCLUDEPATH += resources/lib/WinAPI \
-        resources/lib/AutoIt3
-    LIBS += -Lresources/lib/WinAPI \
+    INCLUDEPATH += resources/lib/AutoIt3
+    LIBS += -luser32 \
         -lNetAPI32 \
+        -lAdvapi32 \
         -lMpr \
         -lWinspool \
         -lVersion \
         -Lresources/lib/AutoIt3 \
         -lautoitx3
+
+    win32-g++{
+        INCLUDEPATH += resources/lib/WinAPI_GCC
+        LIBS += -Lresources/lib/WinAPI_GCC
+    }
+
 }
 
 
@@ -69,6 +77,6 @@ INSTALLS += target
 # define some usefull values
 #QMAKE_TARGET_COMPANY	= "He Hui Team"
 QMAKE_TARGET_PRODUCT	= "M$ Windows Management Library"
-QMAKE_TARGET_DESCRIPTION	= "Crossplatform M$ Windows Management Library Based On Qt"
+QMAKE_TARGET_DESCRIPTION	= "M$ Windows Management Library Based On Qt"
 #QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2010 He Hui"
 
