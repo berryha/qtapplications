@@ -40,15 +40,12 @@
 
 #include "../../sharedms/global_shared.h"
 #include "../../sharedms/udtprotocol.h"
-//#include "../../sharedms/networkmanager.h"
-//#include "../clientnetworkmanager.h"
 
-//#include "../../../shared/network/packethandler/packetparserbase.h"
 
-#include "HHSharedCore/hcryptography.h"
 #include "HHSharedNetwork/hpacketparserbase.h"
 #include "HHSharedNetwork/hnetworkutilities.h"
-
+#include "HHSharedNetwork/hudpsocket.h"
+//#include "HHSharedUDT/hudtprotocolbase.h"
 
 
 namespace HEHUI {

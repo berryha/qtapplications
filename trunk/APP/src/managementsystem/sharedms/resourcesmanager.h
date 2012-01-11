@@ -14,17 +14,18 @@
 #include "global_shared.h"
 #include "udtprotocol.h"
 #include "filemanager.h"
+#include "sharedmslib.h"
 
-
-
-#include "HHSharedCore/hmysharedlib_global.h"
 #include "HHSharedNetwork/hudpsocket.h"
 #include "HHSharedUDT/hudtprotocolforfiletransmission.h"
+
+
+
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API ResourcesManager : public QObject {
+class SHAREDMSLIB_API ResourcesManager : public QObject {
     Q_OBJECT
 
 public:

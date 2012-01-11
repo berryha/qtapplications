@@ -18,9 +18,9 @@ include(../HHSharedLibs.pri)
 
 
 VER_MAJ = 2010
-VER_MIN = 06
+VER_MIN = 6
 VER_PAT = 26
-VER_CMP = 1618
+VER_CMP = 1
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}.$${VER_CMP}
 
 # #

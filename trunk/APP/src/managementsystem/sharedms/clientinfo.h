@@ -14,12 +14,12 @@
 #include <QDateTime>
 #include <QStringList>
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "sharedmslib.h"
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API ClientInfo : public QObject{
+class SHAREDMSLIB_API ClientInfo : public QObject{
 
 public:
     ClientInfo(const QString &computerName = "", QObject *parent = 0);
