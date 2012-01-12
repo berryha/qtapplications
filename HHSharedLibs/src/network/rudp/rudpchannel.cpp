@@ -2326,9 +2326,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
                 //qDebug()<<"----------sizeWrite:"<<sizeWrite<<" fullData.size():"<<fullData.size();
                 qDebug()<<"------------------fragmentDataID:"<<fragmentDataID<<" SN:"<<sn<< " size:"<<p->packetDataSize()<<" Checksum:"<<qChecksum(p->getPacketData().data(), p->packetDataSize());
 
+                m_freeReceiveBufferSize += p->packetDataSize();
                 recylePacket(p);
-                m_freeReceiveBufferSize += packet->packetDataSize();
-
             }
 
             qDebug()<<"~~BeginOrEndDataTransmission--End-- "<<"activeFragmentID:"<<activeFragmentID<<" firstFragmentDataPacketSN:"<<firstFragmentDataPacketSN<<" m_receivedFragmentDataPackets.size():"<<m_receivedFragmentDataPackets.size()<<" fullData.size():"<<fullData.size();
