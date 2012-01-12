@@ -49,7 +49,8 @@ HEADERS += rudp/clientpacketsparser.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h \
-    rudp/udtsocket.h
+    udt/udtsocket.h \
+    udt/udt.h
 SOURCES += rudp/clientpacketsparser.cpp \
     screenshot/selecttargetimagewidget.cpp \
     screenshot/screenshot.cpp \
@@ -58,12 +59,14 @@ SOURCES += rudp/clientpacketsparser.cpp \
     main.cpp \
     about/aboutdialog.cpp \
     mainwindow/mainwindow.cpp \
-    rudp/udtsocket.cpp
+    udt/udtsocket.cpp \
+    udt/udt.cpp
 FORMS += screenshot/selecttargetimagewidget.ui \
     screenshot/screenshot.ui \
     rudp/rudp.ui \
     about/aboutdialog.ui \
-    mainwindow/mainwindow.ui
+    mainwindow/mainwindow.ui \
+    udt/udt.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = iconresource.rc
 mac:ICON = ./resources/images/app.icns

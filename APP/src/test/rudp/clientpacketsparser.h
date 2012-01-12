@@ -55,7 +55,7 @@ public:
     ClientPacketsParser(NetworkManagerBase *networkManager, QObject *parent = 0);
     virtual ~ClientPacketsParser();
 
-
+    void run();
     void parseIncomingPacketData(Packet *packet);
 
 

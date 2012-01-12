@@ -8,16 +8,7 @@
 
 #include "rudp.h"
 
-//#ifdef Q_CC_MSVC
-//#include <windows.h>
-//#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-//#define msleep(x) Sleep(x)
-//#endif
 
-//#ifdef Q_CC_GNU
-//#include <unistd.h>
-//#define msleep(x) usleep(x*1000)
-//#endif
 
 namespace HEHUI {
 
@@ -25,68 +16,72 @@ namespace HEHUI {
 RUDPWidget::RUDPWidget(QWidget *parent)
     : QWidget(parent)
 {
-	ui.setupUi(this);
+    ui.setupUi(this);
 
 
-////        rudpSocket = 0;
-//        m_packetHandlerBase = new PacketHandlerBase(this);
-////        //rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
-//        networkManager = new NetworkManagerBase(m_packetHandlerBase);
-//        clientPacketsParser = new ClientPacketsParser(networkManager, this);
 
-////        //Single Process Thread
-//        QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
+    m_packetHandlerBase = new PacketHandlerBase(this);
+    networkManager = new NetworkManagerBase(m_packetHandlerBase);
+    clientPacketsParser = new ClientPacketsParser(networkManager, this);
+    connect(clientPacketsParser, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
 
-        udtProtocol = 0;
+    rudpSocket = 0;
+//    rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
+//    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+//    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
+//    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 
-        isListening = false;
-        isConnected = false;
+    //Single Process Thread
+    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
 
-        m_receivedDataCount = 0;
 
-        m_peerAddress = QHostAddress(ui.lineEditIP->text());
-        m_peerPort = ui.spinBoxRemotePort->value();
+    isListening = false;
+    isConnected = false;
 
-        localPort = 0;
-//        connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
-//        connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
-//        connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
-//        connect(rudpSocket, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+    m_receivedDataCount = 0;
+
+    m_peerAddress = QHostAddress(ui.lineEditIP->text());
+    m_peerPort = ui.spinBoxRemotePort->value();
+
+    localPort = 0;
 
 }
 
 RUDPWidget::~RUDPWidget()
 {
 
-//    if(clientPacketsParser){
-//        on_toolButtonConnect_clicked();
-//        clientPacketsParser->aboutToQuit();
-//    }
+    on_toolButtonConnect_clicked();
+    clientPacketsParser->aboutToQuit();
+    delete clientPacketsParser;
+    clientPacketsParser = 0;
 
-//    delete clientPacketsParser;
-//    clientPacketsParser = 0;
+    networkManager->closeRUDPServer(0);
+    delete networkManager;
+    networkManager = 0;
 
-////    networkManager->closeRUDPServer(0);
-////    delete networkManager;
-////    networkManager = 0;
+    m_packetHandlerBase->clean();
+    delete m_packetHandlerBase;
+    m_packetHandlerBase = 0;
 
-//    m_packetHandlerBase->clean();
-//    delete m_packetHandlerBase;
-//    m_packetHandlerBase = 0;
 
-    if(udtProtocol){
-        udtProtocol->closeUDTProtocol();
-    }
-    delete udtProtocol;
 
 }
 
 void RUDPWidget::listen(){
 
     if(isListening){
-        udtProtocol->closeUDTProtocol();
+        if(isConnected){
+            ui.toolButtonConnect->setText("Disconnecting...");
+            rudpSocket->disconnectFromPeer(m_peerAddress, m_peerPort);
+            disconnected(m_peerAddress, m_peerPort);
+        }
+
+        networkManager->closeRUDPServer(0);
+        rudpSocket = 0;
         ui.toolButtonListen->setText("Listen");
         isListening = false;
+        ui.textBrowser->append("RUDP Server Closed!");
+
         return;
     }
 
@@ -118,102 +113,20 @@ void RUDPWidget::connectToPeer(){
 
     if(isConnected){
         ui.toolButtonConnect->setText("Disconnecting...");
-        udtProtocol->closeSocket(peerSockeet);
+        rudpSocket->disconnectFromPeer(m_peerAddress, m_peerPort);
         disconnected(m_peerAddress, m_peerPort);
     }else{
 
         if(!isListening){
             listen();
         }
-
-//        if(!startRUDPServer(0)){
-//            ui.toolButtonConnect->setEnabled(true);
-//            return;
-//        }
+        if(!isListening){
+            return;
+        }
 
         ui.toolButtonConnect->setText("Connecting...");
 
-        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, false);
-        UDTSocketStatus status = udtProtocol->getUDTSocketStatus(peerSockeet);
-        qDebug();
-        qDebug()<<"peerSockeet:"<<peerSockeet<<" status:"<<status;
-        switch(status){
-        case INIT: //1
-        {
-            //qDebug()<<"INIT";
-        }
-            break;
-        case OPENED: //2
-        {
-            //qDebug()<<"OPENED";
-        }
-            break;
-        case LISTENING: //3
-        {
-            //qDebug()<<"LISTENING";
-
-        }
-            break;
-        case CONNECTING: //4
-        {
-            //qDebug()<<"CONNECTING";
-        }
-            break;
-        case CONNECTED: //5
-        {
-            qDebug()<<"CONNECTED";
-
-        }
-            break;
-        case BROKEN: //6
-        {
-            qDebug()<<"BROKEN";
-        }
-            break;
-        case CLOSING: //7
-        {
-            //qDebug()<<"CLOSING";
-        }
-            break;
-        case CLOSED: //8
-        {
-            qDebug()<<"CLOSED";
-        }
-            break;
-        case NONEXIST: //9
-        {
-            qDebug()<<"NONEXIST";
-        }
-            break;
-        default:
-            break;
-
-
-        }
-
-        qDebug();
-
-
-
-
-
-
-
-
-
-        if(peerSockeet == UDTProtocolBase::INVALID_UDT_SOCK){
-            qDebug()<<"Can not connect to peer!";
-            disconnected(m_peerAddress, m_peerPort);
-            return;
-        }
-        qDebug()<<"peerSockeet:"<<peerSockeet;
-        udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
-        ui.textBrowser->append("Listening on port:"+QString::number(localPort));
-        ui.spinBoxLocalPort->setValue(localPort);
-
-        //UDTSTATUS status = UDT::getsockstate(peerSockeet);
-        //qDebug()<<"status:"<<status;
-        connected(m_peerAddress, m_peerPort);
+        rudpSocket->connectToPeer(m_peerAddress, m_peerPort);
 
     }
 
@@ -222,29 +135,25 @@ void RUDPWidget::connectToPeer(){
 
 bool RUDPWidget::startRUDPServer(quint16 port){
 
-    if(!udtProtocol){
-        udtProtocol = new UDTProtocolTest(true, 0, this);
-        connect(udtProtocol, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
-        connect(udtProtocol, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 
-        connect(udtProtocol, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
+    rudpSocket = networkManager->startRUDPServerListening(QHostAddress::Any, port);
+    if(!rudpSocket){
+        isListening = false;
+        ui.textBrowser->append("Failed to start RUDP server listening on port:"+QString::number(port));
 
-    }
-
-    serverSocket = udtProtocol->listen(port);
-    if(serverSocket == UDTProtocolBase::INVALID_UDT_SOCK){
         return false;
     }
-    qDebug()<<"serverSocket:"<<serverSocket;
+    isListening = true;
 
-    udtProtocol->startWaitingForIOInSeparateThread();
+    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
+    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
+    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(disconnected(const QHostAddress &, quint16, bool)));
 
-    udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
-    ui.textBrowser->append("Listening on port:"+QString::number(localPort));
-    ui.spinBoxLocalPort->setValue(localPort);
+
+    ui.textBrowser->append("Listening on port:"+QString::number(port));
+    ui.spinBoxLocalPort->setValue(port);
 
     return true;
-    //return udtSocket->listen(port, QHostAddress("200.200.200.117"));
 
 
 }
@@ -272,7 +181,7 @@ void RUDPWidget::send(){
 
     int i = 0;
     while (i<count) {
-        udtProtocol->sendUDTStreamData(peerSockeet, &data);
+        rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data);
 
         i++;
     }
@@ -319,7 +228,7 @@ void RUDPWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, qui
 
 }
 
-void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort){
+void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
     ui.textBrowser->append("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
     if(!isListening){

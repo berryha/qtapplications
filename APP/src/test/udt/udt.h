@@ -1,24 +1,23 @@
-#ifndef RUDPWidget_H
-#define RUDPWidget_H
+#ifndef UDTPWidget_H
+#define UDTPWidget_H
 
 #include <QtGui/QWidget>
 
-#include "ui_rudp.h"
+#include "ui_udt.h"
 
 
-#include "HHSharedNetwork/hnetworkmanagerbase.h"
+#include "udtsocket.h"
 
-#include "clientpacketsparser.h"
 
 namespace HEHUI {
 
-class RUDPWidget : public QWidget
+class UDTWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    RUDPWidget(QWidget *parent = 0);
-    ~RUDPWidget();
+    UDTWidget(QWidget *parent = 0);
+    ~UDTWidget();
 
 
 private slots:
@@ -47,21 +46,21 @@ private slots:
 
     void connected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
-    void disconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose = true);
+    void disconnected(const QHostAddress &peerAddress, quint16 peerPort);
 
     void dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data);
 
 
 
 private:
-    Ui::RUDPClass ui;
+    Ui::UDTClass ui;
 
 
-    PacketHandlerBase *m_packetHandlerBase;
-    NetworkManagerBase *networkManager;
-    ClientPacketsParser *clientPacketsParser;
-    RUDPSocket *rudpSocket;
 
+
+    UDTProtocolTest *udtProtocol;
+
+    UDTSOCKET serverSocket, peerSockeet;
 
     bool isListening;
 
@@ -83,4 +82,4 @@ private:
 };
 } //namespace HEHUI
 
-#endif // RUDPWidget_H
+#endif // UDTWidget_H
