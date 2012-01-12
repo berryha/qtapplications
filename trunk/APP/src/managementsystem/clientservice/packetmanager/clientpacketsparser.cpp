@@ -83,7 +83,6 @@ ClientPacketsParser::~ClientPacketsParser() {
 }
 
 
-
 void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     //    qDebug()<<"----ClientPacketsParser::parseIncomingPacketData(Packet *packet)";
 
