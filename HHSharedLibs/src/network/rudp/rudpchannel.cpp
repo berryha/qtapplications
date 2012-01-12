@@ -2632,7 +2632,7 @@ RUDPChannel::ChannelState RUDPChannel::getChannelState(){
 
 inline void RUDPChannel::msleep(int msec){
 
-#ifdef Q_OS_WIN32
+#ifdef Q_CC_MSVC
     Sleep(msec);
 #else
     usleep(msec*1000);

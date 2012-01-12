@@ -35,7 +35,7 @@
 #define CRYPTOGRAPHY_H
 
 #include <iostream>
-#include <stdint.h>
+//#include <stdint.h>
 
 
 #include <QByteArray>
