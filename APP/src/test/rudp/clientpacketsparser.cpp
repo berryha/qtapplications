@@ -75,14 +75,17 @@ ClientPacketsParser::~ClientPacketsParser() {
 
 
 void ClientPacketsParser::run(){
-    startparseIncomingPackets();
+    while(!isAboutToQuit()){
+        parseIncomingPackets();
+        processOutgoingPackets();
+//        processWaitingForReplyPackets();
+
+    }
 }
 
 void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     qWarning()<<"--ClientPacketsParser::parseIncomingPacketData(Packet *packet)";
 
-    emit dataReceived(packet->getPeerHostAddress().toString(), packet->getPeerHostPort(), packet->getPacketData());
-return;
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_7);

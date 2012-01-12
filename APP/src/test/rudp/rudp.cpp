@@ -23,7 +23,7 @@ RUDPWidget::RUDPWidget(QWidget *parent)
     m_packetHandlerBase = new PacketHandlerBase(this);
     networkManager = new NetworkManagerBase(m_packetHandlerBase);
     clientPacketsParser = new ClientPacketsParser(networkManager, this);
-    connect(clientPacketsParser, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+    connect(clientPacketsParser, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
 
     rudpSocket = 0;
 //    rudpSocket = new RUDPSocket(m_packetHandlerBase, this);
@@ -144,6 +144,7 @@ bool RUDPWidget::startRUDPServer(quint16 port){
         return false;
     }
     isListening = true;
+    localPort = port;
 
     connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
     connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
@@ -182,6 +183,8 @@ void RUDPWidget::send(){
     int i = 0;
     while (i<count) {
         rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data);
+
+        clientPacketsParser->sendTestData(m_peerAddress, m_peerPort, QHostAddress::Any, localPort, &data);
 
         i++;
     }
@@ -244,7 +247,7 @@ void RUDPWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort,
 }
 
 void RUDPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data){
-
+    qDebug()<<"---RUDPWidget::dataReceived(...)";
 
 
     m_receivedDataCount++;
