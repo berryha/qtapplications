@@ -182,7 +182,7 @@ void RUDPWidget::send(){
 
     int i = 0;
     while (i<count) {
-        rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data);
+//        rudpSocket->sendDatagram(m_peerAddress, m_peerPort, &data);
 
         clientPacketsParser->sendTestData(m_peerAddress, m_peerPort, QHostAddress::Any, localPort, &data);
 
