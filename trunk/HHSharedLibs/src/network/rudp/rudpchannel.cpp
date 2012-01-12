@@ -2414,7 +2414,7 @@ void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStrea
 }
 
 void RUDPChannel::cacheData(QByteArray *data){
-    //qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
+    qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
 
     QDataStream in(data, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_7);
@@ -2430,7 +2430,7 @@ void RUDPChannel::cacheData(QByteArray *data){
         packet->setLocalHostPort(m_udpSocket->localPort());
 
         m_packetHandlerBase->appendIncomingPacket(packet);
-        //qDebug()<<"------------m_packetHandlerBase->incomingPacketsCount():"<<m_packetHandlerBase->incomingPacketsCount();
+        qDebug()<<"------------m_packetHandlerBase->incomingPacketsCount():"<<m_packetHandlerBase->incomingPacketsCount();
     }
 
 }
