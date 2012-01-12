@@ -156,9 +156,11 @@ void PacketsParserBase::parseIncomingPackets(){
     for(int i = 0; i < m_packetHandlerBase->incomingPacketsCount(); i++){
         //        while(1){
         Packet *packet = m_packetHandlerBase->takeIncomingPacket();
+
         if (!packet) {
             break;
         }
+
         if (!packet->isValid()) {
             m_packetHandlerBase->recylePacket(packet);
             continue;
