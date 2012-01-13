@@ -123,7 +123,7 @@ void UDTWidget::connectToPeer(){
 
         ui.toolButtonConnect->setText("Connecting...");
 
-        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, false);
+        peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, 0, false);
         UDTSocketStatus status = udtProtocol->getUDTSocketStatus(peerSockeet);
         qDebug();
         qDebug()<<"peerSockeet:"<<peerSockeet<<" status:"<<status;
