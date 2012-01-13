@@ -726,8 +726,8 @@ signals:
     void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
     void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
 
-    void signalFileDownloadRequestAccepted(int socketID, const QString &fileName, const QByteArray &fileMD5Sum, quint64 size);
-    void signalFileDownloadRequestDenied(int socketID, const QString &fileName, const QString &message);
+    void signalFileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size);
+    void signalFileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message);
     void signalFileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
 
     void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);

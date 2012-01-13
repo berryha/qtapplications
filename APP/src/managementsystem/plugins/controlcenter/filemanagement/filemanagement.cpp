@@ -18,7 +18,7 @@ FileSystemModel::FileSystemModel(QFileIconProvider *fileIconProvider, QObject *p
 
     Q_ASSERT(m_fileIconProvider);
 
-    currentDirPath = "";
+    m_currentDirPath = "";
 
 //    setHeaderData(1, Qt::Horizontal, Qt::AlignRight, Qt::TextAlignmentRole);
 
@@ -252,7 +252,7 @@ QVariant FileSystemModel::headerData ( int section, Qt::Orientation orientation,
 
 bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data){
 
-    if(currentDirPath != remoteParentDirPath){
+    if(m_currentDirPath != remoteParentDirPath){
         return false;
     }
 
@@ -390,10 +390,10 @@ QString FileSystemModel::absoluteFilePath(const QModelIndex &index){
 
 
     QString path;
-    if(currentDirPath.isEmpty() || currentDirPath.endsWith("/") || currentDirPath.endsWith("\\")){
-        path = currentDirPath + info->name;
+    if(m_currentDirPath.isEmpty() || m_currentDirPath.endsWith("/") || m_currentDirPath.endsWith("\\")){
+        path = m_currentDirPath + info->name;
     }else{
-        path = currentDirPath + "/" + info->name;
+        path = m_currentDirPath + "/" + info->name;
     }
     QDir dir(path);
     return dir.absolutePath();
@@ -402,12 +402,16 @@ QString FileSystemModel::absoluteFilePath(const QModelIndex &index){
 
 void FileSystemModel::changePath(const QString &newPath){
 
-    currentDirPath = newPath;
+    m_currentDirPath = newPath;
 
     beginResetModel();
     this->fileItems.clear();
     endResetModel();
 
+}
+
+QString FileSystemModel::currentDirPath() const{
+    return m_currentDirPath;
 }
 
 
@@ -424,6 +428,7 @@ FileManagement::FileManagement(QWidget *parent) :
 
     localFileSystemModel = 0;
     localFilesCompleter = 0;
+    m_localCurrentDir = "";
 
     remoteFileSystemModel = 0;
 
@@ -525,6 +530,8 @@ void FileManagement::on_toolButtonShowLocalFiles_clicked(){
     ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(path));
     ui.tableViewLocalFiles->clearSelection();
 
+    m_localCurrentDir = path;
+
 }
 
 void FileManagement::localFileItemDoubleClicked(const QModelIndex &index){
@@ -541,6 +548,9 @@ void FileManagement::localFileItemDoubleClicked(const QModelIndex &index){
 
     ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(newPath));
     ui.tableViewLocalFiles->clearSelection();
+
+    m_localCurrentDir = newPath;
+
 
 }
 
@@ -671,8 +681,16 @@ void FileManagement::on_pushButtonUploadToRemote_clicked(){
         return;
     }
 
+    QString remoteDir = remoteFileSystemModel->currentDirPath();
+    if(remoteDir.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Please select the remote path to save files!"));
+        return;
+    }
+
     QString filePath = localFileSystemModel->fileInfo(index).absoluteFilePath();
-    QMessageBox::information(this, "", filePath);
+    QStringList files;
+    files.append(filePath);
+    emit signalUploadFilesToRemote(files, remoteFileSystemModel->currentDirPath());
 
 
 }
@@ -685,10 +703,15 @@ void FileManagement::on_pushButtonDownloadToLocal_clicked(){
         return;
     }
 
+    if(m_localCurrentDir.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Please select the local path to save files!"));
+        return;
+    }
+
     QString filePath = remoteFileSystemModel->absoluteFilePath(index);
-
-    QMessageBox::information(this, "", filePath);
-
+    QStringList files;
+    files.append(filePath);
+    emit signalDownloadFileFromRemote(files, m_localCurrentDir);
 
 }
 
