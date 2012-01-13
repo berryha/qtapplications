@@ -92,13 +92,16 @@ private slots:
 ///////////////////
     void requestFileSystemInfo(const QString &parentDirPath);
     void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
+    void requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
+    void requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
+
     //File TX
     void startFileManager();
     void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
     void processPeerRequestDownloadFilePacket(int socketID, const QString &filePath);
 
-    void fileDownloadRequestAccepted(int socketID, const QString &fileName, const QByteArray &fileMD5Sum, quint64 size);
-    void fileDownloadRequestDenied(int socketID, const QString &fileName, const QString &message);
+    void fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size);
+    void fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message);
     void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
 
     void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);

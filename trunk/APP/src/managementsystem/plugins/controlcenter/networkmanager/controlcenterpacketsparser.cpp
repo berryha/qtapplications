@@ -359,19 +359,19 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::ResponseFileDownloadRequest):
     {
-        QString fileName = "";
+        QString remoteFilePath = "";
         bool accepted = false;
-        in >> fileName >> accepted;
+        in >> remoteFilePath >> accepted;
 
         if(accepted){
             QByteArray fileMD5Sum;
             quint64 size = 0;
             in >> fileMD5Sum >> size;
-            emit signalFileDownloadRequestAccepted(socketID, fileName, fileMD5Sum, size);
+            emit signalFileDownloadRequestAccepted(socketID, remoteFilePath, fileMD5Sum, size);
         }else{
             QString message;
             in >> message;
-            emit signalFileDownloadRequestDenied(socketID, fileName, message);
+            emit signalFileDownloadRequestDenied(socketID, remoteFilePath, message);
 
         }
 

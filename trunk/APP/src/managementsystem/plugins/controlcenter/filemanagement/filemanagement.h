@@ -45,6 +45,8 @@ public:
 
     void changePath(const QString &newPath);
 
+    QString currentDirPath() const;
+
 private:
     struct FileItemInfo{
         QString name;
@@ -56,7 +58,7 @@ private:
 
     QList<FileItemInfo *> fileItems;
 
-    QString currentDirPath;
+    QString m_currentDirPath;
 
     QFileIconProvider *m_fileIconProvider;
 
@@ -82,7 +84,7 @@ protected:
 signals:
     void signalShowRemoteFiles(const QString &path);
     void signalUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
-    void signalDownloadFileFromRemote(const QString &remoteFilePath, const QString &localDir);
+    void signalDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
 
 public slots:
     bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
@@ -109,6 +111,7 @@ private:
 
     QFileSystemModel *localFileSystemModel;
     QCompleter *localFilesCompleter;
+    QString m_localCurrentDir;
 
     FileSystemModel *remoteFileSystemModel;
 
