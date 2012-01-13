@@ -51,9 +51,11 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     if(localComputer){
         ui.groupBoxAdministrationTools->show();
+        ui.tabWidget->removeTab(ui.tabWidget->indexOf(ui.tabFileManagement));
     }else{
         int index = ui.tabWidget->indexOf(ui.tabLocalManagement);
         ui.tabWidget->removeTab(index);
+
 
         ui.tabLocalManagement->setEnabled(false);
         //            ui.groupBoxAdministrationTools->setEnabled(false);;
@@ -227,52 +229,52 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
 
 }
 
-void SystemManagementWidget::dragEnterEvent(QDragEnterEvent *event){
-
-    if (event->mimeData()->hasUrls()) {
-        event->acceptProposedAction();
-    }
-}
-
-void SystemManagementWidget::dragMoveEvent(QDragMoveEvent *event)
-{
-    // Accept file actions with all extensions.
+//void SystemManagementWidget::dragEnterEvent(QDragEnterEvent *event){
 
 //    if (event->mimeData()->hasUrls()) {
-        event->acceptProposedAction();
+//        event->acceptProposedAction();
+//    }
+//}
+
+//void SystemManagementWidget::dragMoveEvent(QDragMoveEvent *event)
+//{
+//    // Accept file actions with all extensions.
+
+////    if (event->mimeData()->hasUrls()) {
+//        event->acceptProposedAction();
+////    }
+
+//}
+
+//void SystemManagementWidget::dropEvent(QDropEvent *event)
+//{
+
+//    // Accept drops if the file exists.
+
+//    const QMimeData *mimeData = event->mimeData();
+//    QStringList files;
+//    if (mimeData->hasUrls()) {
+//        QList<QUrl> urlList = mimeData->urls();
+//        foreach (QUrl url, urlList) {
+//            if (url.isValid() && url.scheme().toLower() == "file" ){
+//                QString fileName = url.path().remove(0, 1);
+//                //QFileInfo fi(fileName);
+//                //QMessageBox::information(this, fileName, fileName);
+//                if (QFile::exists(fileName)){
+//                    files.append(fileName);
+//                }
+//            }
+//        }
+
 //    }
 
-}
+//    event->acceptProposedAction();
 
-void SystemManagementWidget::dropEvent(QDropEvent *event)
-{
+//    if (!files.isEmpty()){
+//        filesDropped(files);
+//    }
 
-    // Accept drops if the file exists.
-
-    const QMimeData *mimeData = event->mimeData();
-    QStringList files;
-    if (mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
-        foreach (QUrl url, urlList) {
-            if (url.isValid() && url.scheme().toLower() == "file" ){
-                QString fileName = url.path().remove(0, 1);
-                //QFileInfo fi(fileName);
-                //QMessageBox::information(this, fileName, fileName);
-                if (QFile::exists(fileName)){
-                    files.append(fileName);
-                }
-            }
-        }
-
-    }
-
-    event->acceptProposedAction();
-
-    if (!files.isEmpty()){
-        filesDropped(files);
-    }
-
-}
+//}
 
 void SystemManagementWidget::filesDropped(const QStringList &localFiles){
 

@@ -43,7 +43,7 @@
 //#define msleep(x) usleep(x*1000)
 //#endif
 
-//#include "HHSharedCore/hutilities.h"
+#include "HHSharedCore/hutilities.h"
 
 
 namespace HEHUI {
@@ -78,8 +78,7 @@ void ClientPacketsParser::run(){
     while(!isAboutToQuit()){
         parseIncomingPackets();
         processOutgoingPackets();
-//        processWaitingForReplyPackets();
-
+        Utilities::msleep(10);
     }
 }
 

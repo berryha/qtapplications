@@ -10,6 +10,9 @@
     <height>599</height>
    </rect>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>File Mamagement</string>
   </property>
@@ -82,10 +85,7 @@
           <item row="1" column="0" colspan="3">
            <widget class="QTableView" name="tableViewLocalFiles">
             <property name="acceptDrops">
-             <bool>true</bool>
-            </property>
-            <property name="dragEnabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::SingleSelection</enum>
