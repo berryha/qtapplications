@@ -1,11 +1,13 @@
 #ifndef FILEMANAGEMENT_H
 #define FILEMANAGEMENT_H
 
+#include <QWidget>
 #include <QObject>
 #include <QFileSystemModel>
 #include <QCompleter>
 #include <QFileIconProvider>
 #include <QList>
+#include <QDragEnterEvent>
 
 #include "ui_filemanagement.h"
 
@@ -37,6 +39,7 @@ public:
 
     bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
 
+    bool isDrive(const QModelIndex &index);
     bool isDir(const QModelIndex &index);
     QString absoluteFilePath(const QModelIndex &index);
 
@@ -69,9 +72,17 @@ public:
     explicit FileManagement(QWidget *parent = 0);
     
 
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+
+
 signals:
     void signalShowRemoteFiles(const QString &path);
-
+    void signalUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
+    void signalDownloadFileFromRemote(const QString &remoteFilePath, const QString &localDir);
 
 public slots:
     bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
@@ -87,9 +98,10 @@ private slots:
     void on_groupBoxRemote_toggled( bool on );
     void on_toolButtonShowRemoteFiles_clicked();
     void tableViewRemoteFileItemDoubleClicked(const QModelIndex &index);
-
     bool getLocalFilesInfo(const QString &parentDirPath, QByteArray *result, QString *errorMessage);
 
+    void on_pushButtonUploadToRemote_clicked();
+    void on_pushButtonDownloadToLocal_clicked();
 
 private:
     Ui::FileManagement ui;

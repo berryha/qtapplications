@@ -3,7 +3,10 @@
 
 #include <QMessageBox>
 #include <QDateTime>
+#include <QUrl>
 #include <QDebug>
+
+
 
 namespace HEHUI {
 
@@ -320,6 +323,30 @@ bool FileSystemModel::parseRemoteFilesInfo(const QString &remoteParentDirPath, c
     return true;
 }
 
+bool FileSystemModel::isDrive(const QModelIndex & index){
+
+    if(!index.isValid()){
+        return false;
+    }
+
+    int row = index.row();
+    if((row < 0) || (row >= fileItems.size())){
+        return false;
+    }
+
+    FileItemInfo *info = fileItems.at(row);
+    //FileItemInfo *info = static_cast<FileItemInfo *> (fileItems.at(row));
+
+
+    return (info->type == quint8(MS::DRIVE));
+
+//    int column = index.column();
+//    if(column != 0){
+//        QModelIndex idx = index.sibling(index.row(), 0);
+//    }
+
+}
+
 bool FileSystemModel::isDir(const QModelIndex & index){
 
     if(!index.isValid()){
@@ -408,6 +435,53 @@ FileManagement::FileManagement(QWidget *parent) :
 
 }
 
+void FileManagement::dragEnterEvent(QDragEnterEvent *event){
+
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+void FileManagement::dragMoveEvent(QDragMoveEvent *event)
+{
+    // Accept file actions with all extensions.
+
+//    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+//    }
+
+}
+
+void FileManagement::dropEvent(QDropEvent *event)
+{
+
+    // Accept drops if the file exists.
+
+    const QMimeData *mimeData = event->mimeData();
+    QStringList files;
+    if (mimeData->hasUrls()) {
+        QList<QUrl> urlList = mimeData->urls();
+        foreach (QUrl url, urlList) {
+            if (url.isValid() && url.scheme().toLower() == "file" ){
+                QString fileName = url.path().remove(0, 1);
+                //QFileInfo fi(fileName);
+                //QMessageBox::information(this, fileName, fileName);
+                if (QFile::exists(fileName)){
+                    files.append(fileName);
+                }
+            }
+        }
+
+    }
+
+    event->acceptProposedAction();
+
+    if (!files.isEmpty()){
+        emit signalUploadFilesToRemote(files, ui.comboBoxRemotePath->currentText());
+    }
+
+}
+
 void FileManagement::on_groupBoxLocal_toggled( bool on ){
 
     if(on){
@@ -449,6 +523,7 @@ void FileManagement::on_toolButtonShowLocalFiles_clicked(){
     }
 
     ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(path));
+    ui.tableViewLocalFiles->clearSelection();
 
 }
 
@@ -465,6 +540,7 @@ void FileManagement::localFileItemDoubleClicked(const QModelIndex &index){
     ui.comboBoxLocalPath->setEditText(newPath);
 
     ui.tableViewLocalFiles->setRootIndex(localFileSystemModel->index(newPath));
+    ui.tableViewLocalFiles->clearSelection();
 
 }
 
@@ -500,6 +576,7 @@ void FileManagement::on_toolButtonShowRemoteFiles_clicked(){
     QString newPath = ui.comboBoxRemotePath->currentText();
     emit signalShowRemoteFiles(newPath);
     remoteFileSystemModel->changePath(newPath);
+    ui.tableViewRemoteFiles->clearSelection();
 }
 
 void FileManagement::tableViewRemoteFileItemDoubleClicked(const QModelIndex &index){
@@ -519,6 +596,8 @@ void FileManagement::tableViewRemoteFileItemDoubleClicked(const QModelIndex &ind
     ui.comboBoxRemotePath->setEditText(newPath);
 
     remoteFileSystemModel->changePath(newPath);
+
+    ui.tableViewRemoteFiles->clearSelection();
 
 }
 
@@ -582,6 +661,35 @@ bool FileManagement::getLocalFilesInfo(const QString &parentDirPath, QByteArray 
 bool FileManagement::parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data){
 
     return remoteFileSystemModel->parseRemoteFilesInfo(remoteParentDirPath, data);
+}
+
+void FileManagement::on_pushButtonUploadToRemote_clicked(){
+
+    QModelIndex index = ui.tableViewLocalFiles->currentIndex();
+    if(!index.isValid() || localFileSystemModel->fileInfo(index).isRoot()){
+        QMessageBox::critical(this, tr("Error"), tr("Please select one file or folder to upload!"));
+        return;
+    }
+
+    QString filePath = localFileSystemModel->fileInfo(index).absoluteFilePath();
+    QMessageBox::information(this, "", filePath);
+
+
+}
+
+void FileManagement::on_pushButtonDownloadToLocal_clicked(){
+
+    QModelIndex index = ui.tableViewRemoteFiles->currentIndex();
+    if(!index.isValid() || remoteFileSystemModel->isDrive(index)){
+        QMessageBox::critical(this, tr("Error"), tr("Please select one file or folder to download!"));
+        return;
+    }
+
+    QString filePath = remoteFileSystemModel->absoluteFilePath(index);
+
+    QMessageBox::information(this, "", filePath);
+
+
 }
 
 
