@@ -1,5 +1,4 @@
 
-
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -470,7 +469,9 @@ void RUDPChannel::closeChannel(){
 quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
     //qDebug()<<"--RUDPChannel::sendDatagram(QByteArray *data) "<<" data->size():"<<data->size();
 
-    if(getChannelState() == DisconnectingState){
+    Q_ASSERT(data);
+
+    if(!data || (getChannelState() == DisconnectingState) ){
         return 0;
     }
 
@@ -520,6 +521,8 @@ quint64 RUDPChannel::sendDatagram(QByteArray *data, bool isReliableDataPacket){
 }
 
 quint64 RUDPChannel::sendDatagram(QByteArray *data, quint64 offset, bool fragment){
+
+    Q_ASSERT(data);
 
     if(!lostPacketsInSenderSide.isEmpty()) {
         retransmitLostPacket();
@@ -959,6 +962,9 @@ void RUDPChannel::endDataTransmission(quint16 fragmentDataID){
 
 void RUDPChannel::sendUnreliableDataPacket(QByteArray *data){
 
+    Q_ASSERT(data);
+    if(!data){return;}
+
     RUDPPacket *packet = getUnusedPacket();
 
     packet->setPacketType(quint8(RUDP::UnreliableDataPacket));
@@ -1062,6 +1068,7 @@ bool RUDPChannel::tryingToSendPacket(RUDPPacket *packet){
     //retransmitLostPacket();
 
 
+    Q_ASSERT(packet);
 
     static int packetsSent = 0;
 
@@ -1225,7 +1232,6 @@ bool RUDPChannel::retransmitLostPacket(){
 
     //TODO:Disconnect
 
-
     static int count = 0;
 
     if(lostPacketsInSenderSide.isEmpty()){
@@ -1245,11 +1251,12 @@ bool RUDPChannel::retransmitLostPacket(){
     }
 
     quint16 sn = lostPacketsInSenderSide.takeFirst();
+    qDebug()<<"---------------1------------sn:"<<sn;
     lostPacketsInSenderSide.removeAll(sn);
 
     RUDPPacket *packet = sentPackets.value(sn);
     if(!packet){return false;}
-
+ qDebug()<<"---------------2------------sn:"<<packet->getPacketSerialNumber();
 
     QDateTime curTime = QDateTime::currentDateTime();
 
@@ -1270,16 +1277,19 @@ bool RUDPChannel::retransmitLostPacket(){
     }
 
 
+    qDebug()<<"---------------3------------sn:"<<packet->getPacketSerialNumber();
+
+    count++;
+    qDebug()<<"--------------Resend lost packet: sn:"<<packet->getPacketSerialNumber()<<" packetType:"<<packet->getPacketType()<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow;
+    qWarning()<<"--------------Total Resent Packets:"<<count;
+
+
     qint64 interval = abs(QDateTime::currentDateTime().msecsTo(curTime));
     qint64 timeWait = sendPacketInterval - interval;
     if(timeWait > 0){
         msleep(timeWait);
     }
 
-
-    count++;
-    qDebug()<<"--------------Resend lost packet: sn:"<<packet->getPacketSerialNumber()<<" packetType:"<<packet->getPacketType()<<" m_sendWindowSize:"<<m_sendWindowSize<<" m_firstWaitingForACKPacketIDInQueue:"<<m_firstWaitingForACKPacketIDInSendWindow;
-    qWarning()<<"--------------Total Resent Packets:"<<count;
 
     return true;
 
@@ -1591,6 +1601,9 @@ void RUDPChannel::sendNACKTimerTimeout(){
 void RUDPChannel::packLostPacket(QList<quint16> *packets, QDataStream *out){
     //qDebug()<<"--RUDPChannel::packLostPacket(...)";
 
+    Q_ASSERT(packets);
+    Q_ASSERT(out);
+
     if(packets->isEmpty()){return;}
 
     quint16 sn0 = packets->takeFirst();
@@ -1640,11 +1653,11 @@ void RUDPChannel::addLostPacketsInReceiverSide(quint16 start, quint16 end){
 void RUDPChannel::removeLostPacketInReceiverSide(quint16 packetSN){
     //qDebug()<<"--RUDPChannel::removeLostPacketInReceiverSide(...)--"<<" packetSN:"<<packetSN;
 
-    LostPacketInfo *lostPacketInfo = lostPacketsInReceiverSide.take(packetSN);
-    delete lostPacketInfo;
-
     lostPacketsSNInReceiverSide.removeAll(packetSN);
 
+    LostPacketInfo *lostPacketInfo = lostPacketsInReceiverSide.take(packetSN);
+    delete lostPacketInfo;
+    lostPacketInfo = 0;
 
 }
 
@@ -1967,6 +1980,8 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
     //QCoreApplication::processEvents();
 
+    Q_ASSERT(packet);
+
     //TODO:Process Packet
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
@@ -1974,8 +1989,6 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 
     quint8 packetType = packet->getPacketType();
     quint16 packetSerialNumber = packet->getPacketSerialNumber();
-
-
 
     switch(packetType){
     case quint8(RUDP::Handshake):
@@ -2389,6 +2402,10 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
 void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStream *in){
     //qDebug()<<"--RUDPChannel::getLostPacketsFromNACK(...)";
 
+    Q_ASSERT(lostPackets);
+    Q_ASSERT(in);
+
+
     quint16 sn = 0;
     QChar sepChar = ',';
     *in >> sepChar >> sn;
@@ -2412,6 +2429,8 @@ void RUDPChannel::getLostPacketsFromNACK(QList<quint16> *lostPackets, QDataStrea
 void RUDPChannel::cacheData(QByteArray *data){
     qDebug()<<"--RUDPChannel::cacheData(QByteArray *data) "<<" Size:"<<data->size();
 
+    Q_ASSERT(data);
+
     QDataStream in(data, QIODevice::ReadOnly);
     in.setVersion(QDataStream::Qt_4_7);
     QVariant v;
@@ -2433,6 +2452,8 @@ void RUDPChannel::cacheData(QByteArray *data){
 
 inline void RUDPChannel::addWaitingForACKPacket(RUDPPacket *packet){
 
+    Q_ASSERT(packet);
+
     quint16 packetSerialNumber = packet->getPacketSerialNumber();
     sentPackets.insert(packetSerialNumber, packet);
     waitingForACKPackets.append(packetSerialNumber);
@@ -2444,13 +2465,14 @@ void RUDPChannel::removeWaitingForACKPackets(quint16 start, quint16 end){
     while (start <= end) {
         if( (end - start) > RUDP_MAX_SEND_WINDOW_SIZE ){break;}
         QCoreApplication::processEvents();
+
+        waitingForACKPackets.removeAll(start);
+        lostPacketsInSenderSide.removeAll(start);
         RUDPPacket *packet = sentPackets.take(start);
         if(packet){
             updateGlobalFreeSendBufferSize(packet->packetDataSize(), false);
             recylePacket(packet);
         }
-        waitingForACKPackets.removeAll(start);
-        lostPacketsInSenderSide.removeAll(start);
 
         if(!waitingForACKPackets.isEmpty()){
             start = waitingForACKPackets.first();
@@ -2495,6 +2517,8 @@ inline RUDPPacket * RUDPChannel::takeToBeSentPacket(quint16 packetID){
 
 void RUDPChannel::addToBeSentPacket(RUDPPacket *packet ){
 
+    Q_ASSERT(packet);
+
     quint16 sn = packet->getPacketSerialNumber();
     m_ToBeSentPacketsHash.insert(sn, packet);
 
@@ -2521,6 +2545,8 @@ void RUDPChannel::recylePacket(RUDPPacket *packet){
     //qDebug()<<"--RUDPChannel::recylePacket(...)";
 
     //Q_ASSERT_X(packet, "RUDPChannel::recylePacket(RUDPPacket *packet)", "Invalid Packet!");
+
+    if(!packet){return;}
 
     QMutexLocker locker(unusedPacketsMutex);
 
