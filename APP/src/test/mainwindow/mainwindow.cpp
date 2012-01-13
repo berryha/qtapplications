@@ -52,8 +52,9 @@
 namespace HEHUI {
 
 
-MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
-    MainWindowBase(parent) {
+MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
+    :MainWindowBase(parent) {
+
     ui.setupUi(this);
 
     setWindowTitle(QString(APP_NAME) + " Build " + QString(APP_VERSION));
@@ -88,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
         //使窗口居中
         //Center the window
         moveWindow(positon);
-        showMaximized();
+        //showMaximized();
     }
 
 
