@@ -1232,6 +1232,18 @@ bool RUDPChannel::retransmitLostPacket(){
         return false;
     }
 
+    if(m_sendWindowSize > RUDP_SLOWSTART_THRESHOLD){
+        m_sendWindowSize = m_sendWindowSize/2;
+        //m_sendWindowSize -= (m_sendWindowSize/10);
+    }
+    if(m_sendWindowSize > RUDP_MIN_SEND_WINDOW_SIZE){
+        //m_sendWindowSize -= (m_sendWindowSize/10);
+        m_sendWindowSize --;
+    }
+    if(m_sendWindowSize < RUDP_MIN_SEND_WINDOW_SIZE){
+        m_sendWindowSize = RUDP_MIN_SEND_WINDOW_SIZE;
+    }
+
     quint16 sn = lostPacketsInSenderSide.takeFirst();
     lostPacketsInSenderSide.removeAll(sn);
 
@@ -1697,19 +1709,6 @@ void RUDPChannel::retransmissionTimerTimeout(){
     EXPCOUNT++;
 
     if(EXPCOUNT > 4){
-
-        if(m_sendWindowSize > RUDP_SLOWSTART_THRESHOLD){
-            m_sendWindowSize = m_sendWindowSize/2;
-            //m_sendWindowSize -= (m_sendWindowSize/10);
-        }
-        if(m_sendWindowSize > RUDP_MIN_SEND_WINDOW_SIZE){
-            //m_sendWindowSize -= (m_sendWindowSize/10);
-            m_sendWindowSize --;
-        }
-        if(m_sendWindowSize < RUDP_MIN_SEND_WINDOW_SIZE){
-            m_sendWindowSize = RUDP_MIN_SEND_WINDOW_SIZE;
-        }
-
         retransmitLostPacket();
     }
 
@@ -2190,20 +2189,6 @@ void RUDPChannel::processPacket(RUDPPacket *packet){
         //Update the SND period by rate control
 
         //Reset the EXP time variable.
-
-
-        if(m_sendWindowSize > RUDP_SLOWSTART_THRESHOLD){
-            m_sendWindowSize = m_sendWindowSize/2;
-            //m_sendWindowSize -= (m_sendWindowSize/10);
-        }
-        if(m_sendWindowSize > RUDP_MIN_SEND_WINDOW_SIZE){
-            //m_sendWindowSize -= (m_sendWindowSize/10);
-            m_sendWindowSize --;
-        }
-        if(m_sendWindowSize < RUDP_MIN_SEND_WINDOW_SIZE){
-            m_sendWindowSize = RUDP_MIN_SEND_WINDOW_SIZE;
-        }
-
 
 
         retransmitLostPacket();

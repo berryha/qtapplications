@@ -212,8 +212,9 @@ bool PluginManager::reloadPlugin(const QString &pluginFilePath) {
 }
 
 bool PluginManager::unloadPlugins(){
-
+    qDebug()<<"--PluginManager::unloadPlugins()";
     foreach (AbstractPluginInterface *plugin, pluginsHash.values()) {
+        if(!plugin){continue;}
         unloadPlugin(plugin);
     }
 
