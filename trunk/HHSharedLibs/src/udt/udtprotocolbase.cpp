@@ -326,8 +326,8 @@ void UDTProtocolBase::closeUDTProtocol(){
     while (m_threadCount) {
         //wait for other threads!
         QCoreApplication::processEvents();
-        qDebug()<<"Waiting for threads to quit ...";
-        msleep(1);
+        //qDebug()<<"Waiting for threads to quit ...";
+        msleep(10);
     }
 
 
