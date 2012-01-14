@@ -534,7 +534,7 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
-    bool requestDownloadFile(int socketID, const QString &remoteFilePath){
+    bool requestDownloadFile(int socketID, const QString &remoteBaseDir, const QString &remoteFileName, const QString &localFileSaveDir){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 
         packet->setPacketType(quint8(MS::RequestDownloadFile));
@@ -542,7 +542,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << remoteFilePath;
+        out << m_localComputerName << remoteBaseDir << remoteFileName << localFileSaveDir;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -554,7 +554,7 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
-    bool acceptFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QByteArray &fileMD5Sum, quint64 size){
+    bool acceptFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QByteArray &fileMD5Sum, quint64 size, const QString &remoteFileSaveDir){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
 
         packet->setPacketType(quint8(MS::ResponseFileDownloadRequest));
@@ -562,7 +562,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << fileName << accepted << fileMD5Sum << size;
+        out << m_localComputerName << fileName << accepted << fileMD5Sum << size << remoteFileSaveDir;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -736,8 +736,8 @@ signals:
 ///////////////////////////
     void signalFileSystemInfoRequested(int socketID, const QString &parentDirPath);
 
-    void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
-    void signalAdminRequestDownloadFile(int socketID, const QString &filePath);
+    void signalAdminRequestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void signalAdminRequestDownloadFile(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
     void signalFileDataRequested(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void signalFileDataReceived(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void signalFileTXStatusChanged(int socketID, const QByteArray &fileMD5, quint8 status);

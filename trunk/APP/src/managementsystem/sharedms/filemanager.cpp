@@ -345,7 +345,7 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
     }
 
     if(!QFile::exists(localSavePath)){
-        *errorString = tr("File '%1' does not exist! %2").arg(localSavePath);
+        *errorString = tr("File '%1' does not exist!").arg(localSavePath);
         //emit error(ERROR_FILE_NOT_EXIST, errString);
         return 0;
     }
@@ -417,10 +417,17 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
 
     QString tempFilePath = localSavePath + SUFFIX_TEMP_FILE;
     QString infoFilePath = localSavePath + SUFFIX_INFO_FILE;
-    if(QFile::exists(localSavePath)){
+
+    QFileInfo fi(localSavePath);
+    if(fi.exists()){
         *errorString = tr("File '%1' already exists!").arg(localSavePath);
         //emit error(ERROR_FILE_EXIST, errString);
         return 0;
+    }else{
+        if(!fi.dir().mkpath(fi.absolutePath())){
+            *errorString = tr("Can not create directory '%1'!").arg(fi.absolutePath());
+            return 0;
+        }
     }
 
     {
@@ -552,6 +559,17 @@ void FileManager::closeFile(const QByteArray &fileMD5){
 
     delete metaInfo;
 
+}
+
+QString FileManager::getFileLocalSavePath(const QByteArray &fileMD5){
+
+    QMutexLocker locker(&mutex);
+    FileMetaInfo *metaInfo = fileMetaInfoHash.value(fileMD5);
+    if(metaInfo){
+        return metaInfo->file->fileName();
+    }
+
+    return "";
 }
 
 //int FileManager::regenerateFileID(int oldFileID){
@@ -720,16 +738,15 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
         if(!info->file->rename(name)){
             qCritical()<<"ERROR! Failed to rename file!";
         }else{
-            //QString cfgFile = name + SUFFIX_INFO_FILE;
             QFile::remove(info->infoFileName);
             qWarning()<<"File Received!";
 
-            info->file->open(QIODevice::ReadOnly);
-            info->file->seek(0);
-            QByteArray fileMD5Sum = QCryptographicHash::hash(info->file->readAll(), QCryptographicHash::Md5);
-            if(fileMD5Sum != info->md5sum){
-                qCritical()<<"Damaged! MD5:"<<fileMD5Sum.toBase64()<<" info->md5sum:"<<info->md5sum.toBase64();
-            }
+//            info->file->open(QIODevice::ReadOnly);
+//            info->file->seek(0);
+//            QByteArray fileMD5Sum = QCryptographicHash::hash(info->file->readAll(), QCryptographicHash::Md5);
+//            if(fileMD5Sum != info->md5sum){
+//                qCritical()<<"Damaged! MD5:"<<fileMD5Sum.toBase64()<<" info->md5sum:"<<info->md5sum.toBase64();
+//            }
         }
     }
 

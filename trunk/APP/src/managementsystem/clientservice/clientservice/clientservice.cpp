@@ -227,7 +227,7 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalFileSystemInfoRequested(int, const QString &)), this, SLOT(fileSystemInfoRequested(int, const QString &)));
     //File TX
     connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processAdminRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int, const QString &, const QString &, const QString &)), this, SLOT(processAdminRequestDownloadFilePacket(int, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &,quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
@@ -1976,11 +1976,14 @@ void ClientService::startFileManager(){
 
 }
 
-void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
+void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir){
 
     startFileManager();
 
-    QString localPath = remoteFileSaveDir + "/" + fileName;
+    QString localPath = localFileSaveDir + "/" + fileName;
+    if(localFileSaveDir.endsWith('/')){
+        localPath = localFileSaveDir + fileName;
+    }
 
     QString errorString;
     const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
@@ -2014,36 +2017,44 @@ void ClientService::processAdminRequestUploadFilePacket(int socketID, const QByt
 
 }
 
-void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QString &filePath){
+void ClientService::processAdminRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir){
 
     startFileManager();
 
     QString errorString;
-    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
-    if(!info){
-        clientPacketsParser->denyFileDownloadRequest(socketID, filePath, false, errorString);
+
+    QFileInfo fi(localBaseDir, fileName);
+    QString absoluteFilePath = fi.absoluteFilePath();
+    if(fi.isDir()){
+        QDir dir(absoluteFilePath);
+
+        QStringList filters;
+        filters << "*" << "*.*";
+
+        foreach(QString file, dir.entryList(filters, QDir::Dirs | QDir::Files | QDir::System | QDir::Hidden | QDir::NoDotAndDotDot))
+        {
+            QString newRemoteDir = remoteFileSaveDir + "/" + fileName;
+            if(remoteFileSaveDir.endsWith('/')){
+                newRemoteDir = remoteFileSaveDir + fileName;
+            }
+            processAdminRequestDownloadFilePacket(socketID, absoluteFilePath, file, newRemoteDir);
+
+            qApp->processEvents();
+        }
+
+        return;
     }
 
+    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(absoluteFilePath, &errorString);
+    if(!info){
+        clientPacketsParser->denyFileDownloadRequest(socketID, fileName, false, errorString);
+    }
 
-
-
-//    Q_ASSERT(!fileTXWithAdmin);
-//    fileTXWithAdmin = new QFile(filePath);
-//    if(!fileTXWithAdmin->open(QIODevice::ReadOnly)){
-//        clientPacketsParser->responseFileTX(socketID, false, quint8(MS::FileTX_Read_Error), tr("Failed to open file '%1':%2!").arg(filePath).arg(fileTXWithAdmin->errorString()));
-//        closeFileTXWithAdmin();
-//        return;
-//    }
-
-//    fileTXWithAdminStatus = MS::File_TX_Sending;
-
-    if(clientPacketsParser->acceptFileDownloadRequest(socketID, filePath, true, info->md5sum, info->size)){
+    if(clientPacketsParser->acceptFileDownloadRequest(socketID, fileName, true, info->md5sum, info->size, remoteFileSaveDir)){
         fileTXSocketHash.insertMulti(socketID, info->md5sum);
     }else{
         m_fileManager->closeFile(info->md5sum);
     }
-
-
 
 }
 

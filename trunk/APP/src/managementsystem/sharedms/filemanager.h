@@ -116,6 +116,9 @@ public:
 
     void closeFile(const QString &filePath);
     void closeFile(const QByteArray &fileMD5);
+
+    QString getFileLocalSavePath(const QByteArray &fileMD5);
+
 //    int regenerateFileID(int oldFileID);
 //    QFile *generateNewFile(quint64 size, const QString &localSavePath);
 

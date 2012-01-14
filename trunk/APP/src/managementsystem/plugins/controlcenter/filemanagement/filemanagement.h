@@ -8,11 +8,13 @@
 #include <QFileIconProvider>
 #include <QList>
 #include <QDragEnterEvent>
+#include <QMap>
 
 #include "ui_filemanagement.h"
 
 #include "../../sharedms/global_shared.h"
 
+#include "networkmanager/controlcenterpacketsparser.h"
 
 
 namespace HEHUI {
@@ -42,6 +44,7 @@ public:
     bool isDrive(const QModelIndex &index);
     bool isDir(const QModelIndex &index);
     QString absoluteFilePath(const QModelIndex &index);
+    QString fileName(const QModelIndex &index);
 
     void changePath(const QString &newPath);
 
@@ -72,8 +75,11 @@ class FileManagement : public QWidget
     
 public:
     explicit FileManagement(QWidget *parent = 0);
-    
+    ~FileManagement();
 
+    void setPacketsParser(ControlCenterPacketsParser *parser);
+    void setPeerSocket(UDTSOCKET peerSocket);
+    
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
@@ -82,12 +88,36 @@ protected:
 
 
 signals:
-    void signalShowRemoteFiles(const QString &path);
-    void signalUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
-    void signalDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
+//    void signalShowRemoteFiles(const QString &path);
+//    void signalUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
+//    void signalDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
 
 public slots:
-    bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
+    void peerDisconnected(bool normalClose);
+
+    ///////////////////
+    void requestFileSystemInfo(const QString &parentDirPath);
+    void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
+    void requestUploadFilesToRemote(const QString &localBaseDir, const QStringList &localFiles, const QString &remoteDir);
+    void requestDownloadFileFromRemote(const QString &remoteBaseDir, const QStringList &remoteFiles, const QString &localDir);
+
+    //File TX
+    void startFileManager();
+    void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void processPeerRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
+
+    void fileDownloadRequestAccepted(int socketID, const QString &remoteFileName, const QByteArray &fileMD5Sum, quint64 size, const QString &localFileSaveDir);
+    void fileDownloadRequestDenied(int socketID, const QString &remoteFileName, const QString &message);
+    void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+
+    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
+    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
+    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);
+
+    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 
 private slots:
@@ -101,6 +131,7 @@ private slots:
     void on_toolButtonShowRemoteFiles_clicked();
     void tableViewRemoteFileItemDoubleClicked(const QModelIndex &index);
     bool getLocalFilesInfo(const QString &parentDirPath, QByteArray *result, QString *errorMessage);
+    bool parseRemoteFilesInfo(const QString &remoteParentDirPath, const QByteArray &data);
 
     void on_pushButtonUploadToRemote_clicked();
     void on_pushButtonDownloadToLocal_clicked();
@@ -108,6 +139,7 @@ private slots:
 private:
     Ui::FileManagement ui;
 
+    ControlCenterPacketsParser *controlCenterPacketsParser;
 
     QFileSystemModel *localFileSystemModel;
     QCompleter *localFilesCompleter;
@@ -115,7 +147,21 @@ private:
 
     FileSystemModel *remoteFileSystemModel;
 
+//    QMap<QString/*Remote Path*/, QString/*Local Path*/> fileSavePathMap;
 
+
+    UDTProtocol *m_udtProtocol;
+    UDTSOCKET m_peerSocket;
+    QHostAddress m_peerIPAddress;
+
+
+    //    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+    //    UDTSOCKET m_peerFileTransmissionSocket;
+
+
+    FileManager *m_fileManager;
+    QList<int/*File TX Request ID*/> fileTXRequestList;
+    QList<QByteArray/*File MD5*/> filesList;
 
 };
 

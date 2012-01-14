@@ -123,8 +123,8 @@ private slots:
     void fileSystemInfoRequested(int socketID, const QString &parentDirPath);
     //File TX
     void startFileManager();
-    void processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
-    void processAdminRequestDownloadFilePacket(int socketID, const QString &filePath);
+    void processAdminRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void processAdminRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
     void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);

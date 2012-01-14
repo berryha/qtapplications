@@ -89,12 +89,13 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 
 
 
-    ui.lineEditComputerName->setText(localComputerName);
+    //ui.lineEditComputerName->setText(localComputerName);
+    //QString currentUserNameOfOS = Utilities::currentUserNameOfOS();
+    //if(currentUserNameOfOS.toLower() != "administrator"){
+    //    ui.lineEditUserName->setText(currentUserNameOfOS);
+    //}
 
-    QString currentUserNameOfOS = Utilities::currentUserNameOfOS();
-    if(currentUserNameOfOS.toLower() != "administrator"){
-        ui.lineEditUserName->setText(currentUserNameOfOS);
-    }
+    ui.lineEditUserName->setFocus();
 
 
     slotInitTabWidget();
@@ -1155,7 +1156,7 @@ void ControlCenter::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 }
 
 void ControlCenter::peerDisconnected(int socketID){
-    qDebug()<<"--ControlCenter::peerDisconnected(...)";
+    qDebug()<<"--ControlCenter::peerDisconnected(...) socketID:"<<socketID;
 
     if(clientSocketsHash.contains(socketID)){
         qCritical()<<QString("ERROR! Peer %1 Closed Unexpectedly!").arg(clientSocketsHash.value(socketID).toString());

@@ -926,7 +926,6 @@
       <attribute name="title">
        <string>File Management</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_12"/>
      </widget>
      <widget class="QWidget" name="tabLocalManagement">
       <attribute name="title">
