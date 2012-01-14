@@ -90,30 +90,29 @@ private slots:
     void userResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
 
 ///////////////////
-    void requestFileSystemInfo(const QString &parentDirPath);
-    void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
-    void requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
-    void requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
+//    void requestFileSystemInfo(const QString &parentDirPath);
+//    void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
+//    void requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
+//    void requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
 
     //File TX
-    void startFileManager();
-    void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir);
-    void processPeerRequestDownloadFilePacket(int socketID, const QString &filePath);
+//    void startFileManager();
+//    void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &remotePath, quint64 size, const QString &remoteFileSaveDir);
+//    void processPeerRequestDownloadFilePacket(int socketID, const QString &filePath);
 
-    void fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size);
-    void fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message);
-    void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+//    void fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size);
+//    void fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message);
+//    void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
 
-    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
-    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
-    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
-    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);
+//    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
+//    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+//    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
+//    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);
 
-    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
-    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
+//    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+//    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+//    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
-    void filesDropped(const QStringList &localFiles);
 private:
     bool verifyPrivilege();
     bool temporarilyAllowed();
@@ -154,12 +153,12 @@ private:
     UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
 
-    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
-    UDTSOCKET m_peerFileTransmissionSocket;
+//    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+//    UDTSOCKET m_peerFileTransmissionSocket;
 
-    FileManager *m_fileManager;
-    QList<int/*File TX Request ID*/> fileTXRequestList;
-    QList<QByteArray/*File MD5*/> filesList;
+//    FileManager *m_fileManager;
+//    QList<int/*File TX Request ID*/> fileTXRequestList;
+//    QList<QByteArray/*File MD5*/> filesList;
 
     FileManagement *m_fileManagementWidget;
 

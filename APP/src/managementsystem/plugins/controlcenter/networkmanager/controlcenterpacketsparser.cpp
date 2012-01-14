@@ -338,20 +338,21 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         QByteArray fileMD5Sum;
         QString fileName = "";
         quint64 size = 0;
-        QString remoteFileSaveDir = "";
-        in >> fileMD5Sum >> fileName >> size >> remoteFileSaveDir ;
+        QString localFileSaveDir = "";
+        in >> fileMD5Sum >> fileName >> size >> localFileSaveDir ;
 
-        emit signalAdminRequestUploadFile(socketID, fileMD5Sum, fileName, size, remoteFileSaveDir);
+        emit signalAdminRequestUploadFile(socketID, fileMD5Sum, fileName, size, localFileSaveDir);
 
         qDebug()<<"~~RequestUploadFile";
     }
     break;
     case quint8(MS::RequestDownloadFile):
     {
-        QString filePath = "";
-        in >> filePath ;
+        QString localBaseDir, fileName, remoteFileSaveDir;
+        in >> localBaseDir >> fileName >> remoteFileSaveDir;
 
-        emit signalAdminRequestDownloadFile(socketID, filePath);
+        emit signalAdminRequestDownloadFile(socketID, localBaseDir, fileName, remoteFileSaveDir);
+
 
         qDebug()<<"~~RequestDownloadFile";
     }
@@ -359,19 +360,20 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(MS::ResponseFileDownloadRequest):
     {
-        QString remoteFilePath = "";
+        QString remoteFileName = "";
         bool accepted = false;
-        in >> remoteFilePath >> accepted;
+        in >> remoteFileName >> accepted;
 
         if(accepted){
             QByteArray fileMD5Sum;
             quint64 size = 0;
-            in >> fileMD5Sum >> size;
-            emit signalFileDownloadRequestAccepted(socketID, remoteFilePath, fileMD5Sum, size);
+            QString localFileSaveDir = "./";
+            in >> fileMD5Sum >> size >> localFileSaveDir;
+            emit signalFileDownloadRequestAccepted(socketID, remoteFileName, fileMD5Sum, size, localFileSaveDir);
         }else{
             QString message;
             in >> message;
-            emit signalFileDownloadRequestDenied(socketID, remoteFilePath, message);
+            emit signalFileDownloadRequestDenied(socketID, remoteFileName, message);
 
         }
 

@@ -137,8 +137,8 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientInfoPacketReceived(const QString &, const QString &)));
 
 
-    m_udtProtocolForFileTransmission = 0;
-    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
+//    m_udtProtocolForFileTransmission = 0;
+//    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
 
     clientResponseAdminConnectionResultPacketReceived = false;
 
@@ -154,15 +154,19 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     //No editing possible.
     ui.tableWidgetSoftware->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    m_fileManager = 0;
+//    m_fileManager = 0;
 
 
     m_fileManagementWidget = qobject_cast<FileManagement *>(ui.tabFileManagement);
     Q_ASSERT(m_fileManagementWidget);
+    if(!localComputer){
+        m_fileManagementWidget->setPacketsParser(parser);
+    }
 
-    connect(m_fileManagementWidget, SIGNAL(signalShowRemoteFiles(const QString &)), this, SLOT(requestFileSystemInfo(const QString &)));
-    connect(m_fileManagementWidget, SIGNAL(signalUploadFilesToRemote(const QStringList &, const QString &)), this, SLOT(requestUploadFilesToRemote(const QStringList &, const QString &)));
-    connect(m_fileManagementWidget, SIGNAL(signalDownloadFileFromRemote(const QStringList &, const QString &)), this, SLOT(requestDownloadFileFromRemote(const QStringList &, const QString &)));
+
+//    connect(m_fileManagementWidget, SIGNAL(signalShowRemoteFiles(const QString &)), this, SLOT(requestFileSystemInfo(const QString &)));
+//    connect(m_fileManagementWidget, SIGNAL(signalUploadFilesToRemote(const QStringList &, const QString &)), this, SLOT(requestUploadFilesToRemote(const QStringList &, const QString &)));
+//    connect(m_fileManagementWidget, SIGNAL(signalDownloadFileFromRemote(const QStringList &, const QString &)), this, SLOT(requestDownloadFileFromRemote(const QStringList &, const QString &)));
 
 
 
@@ -280,77 +284,7 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
 
 //}
 
-void SystemManagementWidget::filesDropped(const QStringList &localFiles){
 
-//    if(localFiles.size() != 1){
-//        QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
-//        return;
-//    }
-
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        on_toolButtonVerify_clicked();
-    }
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
-        return;
-    }
-
-//    if(!m_udtProtocolForFileTransmission){
-//        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
-//    }
-//    if(m_peerFileTransmissionSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        UDTProtocolBase::SocketOptions options;
-//        options.UDT_SNDSYN = true;
-//        options.UDT_RCVSYN = true;
-//        m_peerFileTransmissionSocket = m_udtProtocolForFileTransmission->connectToPeer(m_peerIPAddress, UDT_FILE_LISTENING_PORT, &options);
-//    }
-//    if(m_peerFileTransmissionSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        QMessageBox::critical(this, tr("Error"), tr("File Transmission Connection is not made!<br>Please connect to peer first!") );
-//        return;
-//    }
-
-
-    int ret = QMessageBox::question(this, tr("Question"), tr("Send file(s) to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-    if(ret == QMessageBox::No){
-        return;
-    }
-
-    startFileManager();
-
-
-    foreach (QString localFileName, localFiles) {
-
-        QFileInfo fi(localFileName);
-        if(fi.isDir()){
-            QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
-            continue;
-        }
-
-        QString errorString;
-        const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(localFileName, &errorString);
-        if(!info){
-            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(errorString) );
-            continue ;
-        }
-
-        bool ok = controlCenterPacketsParser->requestUploadFile(m_peerSocket, info->md5sum, fi.fileName(), info->size);
-        if(!ok){
-            m_fileManager->closeFile(info->md5sum);
-            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
-            continue ;
-        }else{
-            if(!filesList.contains(info->md5sum)){
-                filesList.append(info->md5sum);
-            }
-        }
-
-    }
-
-
-
-
-
-}
 
 void SystemManagementWidget::setUDTProtocol(UDTProtocol *udtProtocol){
 
@@ -381,20 +315,20 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 
     connect(controlCenterPacketsParser, SIGNAL(signalUserResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)), this, SLOT(userResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)));
     
-    ////////////////////
-    connect(controlCenterPacketsParser, SIGNAL(signalFileSystemInfoReceived(int, const QString &, const QByteArray &)), this, SLOT(fileSystemInfoReceived(int, const QString &, const QByteArray &)));
-    //File TX
-    connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processPeerRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processPeerRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
+//    ////////////////////
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileSystemInfoReceived(int, const QString &, const QByteArray &)), this, SLOT(fileSystemInfoReceived(int, const QString &, const QByteArray &)));
+//    //File TX
+//    connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processPeerRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int,QString)), this, SLOT(processPeerRequestDownloadFilePacket(int,QString)), Qt::QueuedConnection);
 
-    connect(controlCenterPacketsParser, SIGNAL(signalFileDownloadRequestAccepted(int, const QString &, const QByteArray &, quint64)), this, SLOT(fileDownloadRequestAccepted(int, const QString &, const QByteArray &, quint64)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileDownloadRequestDenied(int , const QString &, const QString &)), this, SLOT(fileDownloadRequestDenied(int , const QString &, const QString &)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), this, SLOT(fileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileDownloadRequestAccepted(int, const QString &, const QByteArray &, quint64)), this, SLOT(fileDownloadRequestAccepted(int, const QString &, const QByteArray &, quint64)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileDownloadRequestDenied(int , const QString &, const QString &)), this, SLOT(fileDownloadRequestDenied(int , const QString &, const QString &)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), this, SLOT(fileUploadRequestResponsed(int, const QByteArray &, bool, const QString &)), Qt::QueuedConnection);
 
-    connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &, quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
-    connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &, quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
+//    connect(controlCenterPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
 
     ui.toolButtonVerify->setEnabled(true);
@@ -414,6 +348,7 @@ void SystemManagementWidget::peerDisconnected(bool normalClose){
     ui.tabRemoteManagement->setEnabled(false);
     ui.toolButtonVerify->setEnabled(true);
 
+    m_fileManagementWidget->setPeerSocket(UDTProtocol::INVALID_UDT_SOCK);
     ui.tabFileManagement->setEnabled(false);
 
     if(!normalClose){
@@ -422,11 +357,11 @@ void SystemManagementWidget::peerDisconnected(bool normalClose){
 
 
 
-    foreach (QByteArray fileMD5, filesList) {
-        m_fileManager->closeFile(fileMD5);
-    }
-    fileTXRequestList.clear();
-    filesList.clear();
+//    foreach (QByteArray fileMD5, filesList) {
+//        m_fileManager->closeFile(fileMD5);
+//    }
+//    fileTXRequestList.clear();
+//    filesList.clear();
 
 
 }
@@ -936,7 +871,7 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 
 
 void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message){
-        qDebug()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
+    qDebug()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
 
     if(socketID != m_peerSocket || computerName != this->m_computerName){
         return;
@@ -953,6 +888,7 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
         ui.toolButtonRequestSystemInfo->setEnabled(true);
         ui.toolButtonRescanSystemInfo->setEnabled(true);
 
+        m_fileManagementWidget->setPeerSocket(m_peerSocket);
         ui.tabFileManagement->setEnabled(true);
 
         if(!message.trimmed().isEmpty()){
@@ -968,6 +904,7 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
         ui.toolButtonRescanSystemInfo->setEnabled(false);
         ui.toolButtonVerify->setEnabled(true);
 
+        //m_fileManagementWidget->setPeerSocket(m_peerSocket);
         ui.tabFileManagement->setEnabled(false);
 
         QMessageBox::critical(this, tr("Connection Error"), message);
@@ -1342,425 +1279,419 @@ void SystemManagementWidget::userResponseRemoteAssistancePacketReceived(const QS
 
 ///////////////////////////////////////////////////////
 
-void SystemManagementWidget::requestFileSystemInfo(const QString &parentDirPath){
+//void SystemManagementWidget::requestFileSystemInfo(const QString &parentDirPath){
 
-    controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath);
+//    controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath);
 
-}
+//}
 
-void SystemManagementWidget::fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData){
+//void SystemManagementWidget::fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData){
 
-    if(socketID != m_peerSocket){
-        return;
-    }
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
 
-//    FileManagement *fm = qobject_cast<FileManagement *>(ui.tabFileManagement);
-//    if(!fm){return;}
+////    FileManagement *fm = qobject_cast<FileManagement *>(ui.tabFileManagement);
+////    if(!fm){return;}
 
-    m_fileManagementWidget->parseRemoteFilesInfo(parentDirPath, fileSystemInfoData);
+//    m_fileManagementWidget->parseRemoteFilesInfo(parentDirPath, fileSystemInfoData);
 
-}
+//}
 
-void SystemManagementWidget::requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir){
+//void SystemManagementWidget::requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir){
 
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        on_toolButtonVerify_clicked();
-    }
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
-        return;
-    }
-
-
-    int ret = QMessageBox::question(this, tr("Question"), tr("Send file(s) to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-    if(ret == QMessageBox::No){
-        return;
-    }
-
-    startFileManager();
+//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        on_toolButtonVerify_clicked();
+//    }
+//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
+//        return;
+//    }
 
 
-    foreach (QString localFileName, localFiles) {
-
-        QFileInfo fi(localFileName);
-        if(fi.isDir()){
-            QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
-            continue;
-        }
-
-        QString errorString;
-        const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(localFileName, &errorString);
-        if(!info){
-            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(errorString) );
-            continue ;
-        }
-
-        bool ok = controlCenterPacketsParser->requestUploadFile(m_peerSocket, info->md5sum, fi.fileName(), info->size, remoteDir);
-        if(!ok){
-            m_fileManager->closeFile(info->md5sum);
-            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
-            continue ;
-        }else{
-            if(!filesList.contains(info->md5sum)){
-                filesList.append(info->md5sum);
-            }
-        }
-
-    }
-
-}
-
-void SystemManagementWidget::requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir){
-
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        on_toolButtonVerify_clicked();
-    }
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
-        return;
-    }
-
-
-    int ret = QMessageBox::question(this, tr("Question"), tr("Download file(s) from %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-    if(ret == QMessageBox::No){
-        return;
-    }
-
-    startFileManager();
-
-    foreach (QString remoteFileName, remoteFiles) {
-        bool ok = controlCenterPacketsParser->requestDownloadFile(m_peerSocket, remoteFileName);
-        if(!ok){
-            QMessageBox::critical(this, tr("Error"), tr("Can not send request!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
-            continue ;
-        }
-    }
-
-}
-
-
-void SystemManagementWidget::startFileManager(){
-
-    if(!m_fileManager){
-        m_fileManager = ResourcesManagerInstance::instance()->getFileManager();
-        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int, const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
-        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
-
-    }
-
-    if(!m_udtProtocolForFileTransmission){
-        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
-    }
-
-}
-
-void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir){
-
-    if(socketID != m_peerSocket){
-        return;
-    }
-
-    startFileManager();
-
-    QString localPath = remoteFileSaveDir + "/" + fileName;
-
-    QString errorString;
-    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
-    if(!info){
-        controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, false, errorString);
-    }
-
-
-    if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
-        if(!filesList.contains(fileMD5Sum)){
-            filesList.append(fileMD5Sum);
-        }
-        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
-        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
-
-    }else{
-        m_fileManager->closeFile(fileMD5Sum);
-    }
-
-
-
-
-}
-
-void SystemManagementWidget::processPeerRequestDownloadFilePacket(int socketID, const QString &filePath){
-
-    if(socketID != m_peerSocket){
-        return;
-    }
-
-    startFileManager();
-
-    QString errorString;
-    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
-    if(!info){
-        controlCenterPacketsParser->denyFileDownloadRequest(m_peerSocket, filePath, false, errorString);
-    }
-
-    if(controlCenterPacketsParser->acceptFileDownloadRequest(m_peerSocket, filePath, true, info->md5sum, info->size)){
-        if(!filesList.contains(info->md5sum)){
-            filesList.append(info->md5sum);
-        }
-    }else{
-        m_fileManager->closeFile(info->md5sum);
-    }
-
-}
-
-void SystemManagementWidget::fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size){
-
-    if(socketID != m_peerSocket){
-        return;
-    }
-    //TODO:
+//    int ret = QMessageBox::question(this, tr("Question"), tr("Send file(s) to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+//    if(ret == QMessageBox::No){
+//        return;
+//    }
 
 //    startFileManager();
 
-//    QString localPath = remoteFileSaveDir + "/" + fileName;
+
+//    foreach (QString localFileName, localFiles) {
+
+//        QFileInfo fi(localFileName);
+//        if(fi.isDir()){
+//            QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
+//            continue;
+//        }
+
+//        QString errorString;
+//        const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(localFileName, &errorString);
+//        if(!info){
+//            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(errorString) );
+//            continue ;
+//        }
+
+//        bool ok = controlCenterPacketsParser->requestUploadFile(m_peerSocket, info->md5sum, fi.fileName(), info->size, remoteDir);
+//        if(!ok){
+//            m_fileManager->closeFile(info->md5sum);
+//            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
+//            continue ;
+//        }else{
+//            if(!filesList.contains(info->md5sum)){
+//                filesList.append(info->md5sum);
+//            }
+//        }
+
+//    }
+
+//}
+
+//void SystemManagementWidget::requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir){
+
+//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        on_toolButtonVerify_clicked();
+//    }
+//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+//        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
+//        return;
+//    }
+
+
+//    int ret = QMessageBox::question(this, tr("Question"), tr("Download file(s) from %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+//    if(ret == QMessageBox::No){
+//        return;
+//    }
+
+//    startFileManager();
+
+//    foreach (QString remoteFileName, remoteFiles) {
+//        bool ok = controlCenterPacketsParser->requestDownloadFile(m_peerSocket, remoteFileName);
+//        if(!ok){
+//            QMessageBox::critical(this, tr("Error"), tr("Can not send request!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
+//            continue ;
+//        }
+//    }
+
+//}
+
+
+//void SystemManagementWidget::startFileManager(){
+
+//    if(!m_fileManager){
+//        m_fileManager = ResourcesManagerInstance::instance()->getFileManager();
+//        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+//        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int, const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
+//        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
+
+//    }
+
+//    if(!m_udtProtocolForFileTransmission){
+//        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
+//    }
+
+//}
+
+//void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &remotePath, quint64 size, const QString &remoteFileSaveDir){
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+
+//    startFileManager();
+
+//    QString localPath = m_fileManagementWidget->getLocalSavePath(remotePath);
 
 //    QString errorString;
 //    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
 //    if(!info){
-//        controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, false, errorString);
+//        //TODO
+//        QMessageBox::critical(this, tr("Error"), tr("Failed to download file!"));
+//        return;
 //    }
 
+//    if(!filesList.contains(fileMD5Sum)){
+//        filesList.append(fileMD5Sum);
+//    }
+//    //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
+//    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
 
-//    if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
-//        if(!filesList.contains(fileMD5Sum)){
-//            filesList.append(fileMD5Sum);
+
+//}
+
+//void SystemManagementWidget::processPeerRequestDownloadFilePacket(int socketID, const QString &filePath){
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+
+//    startFileManager();
+
+//    QString errorString;
+//    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
+//    if(!info){
+//        controlCenterPacketsParser->denyFileDownloadRequest(m_peerSocket, filePath, false, errorString);
+//    }
+
+//    if(controlCenterPacketsParser->acceptFileDownloadRequest(m_peerSocket, filePath, true, info->md5sum, info->size)){
+//        if(!filesList.contains(info->md5sum)){
+//            filesList.append(info->md5sum);
 //        }
-//        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
-//        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
+//    }else{
+//        m_fileManager->closeFile(info->md5sum);
+//    }
+
+//}
+
+//void SystemManagementWidget::fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size){
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+//    //TODO:
+
+////    startFileManager();
+
+////    QString localPath = remoteFileSaveDir + "/" + fileName;
+
+////    QString errorString;
+////    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
+////    if(!info){
+////        controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, false, errorString);
+////    }
+
+
+////    if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
+////        if(!filesList.contains(fileMD5Sum)){
+////            filesList.append(fileMD5Sum);
+////        }
+////        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
+////        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
+
+////    }else{
+////        m_fileManager->closeFile(fileMD5Sum);
+////    }
+
+
+
+//}
+
+//void SystemManagementWidget::fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message){
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+//    //TODO:
+
+//}
+
+//void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+
+//    Q_ASSERT(m_fileManager);
+//    if(accepted){
+//        //fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
+
+////        QFileInfo fi("C:/3.dxf");
+////        m_udtProtocolForFileTransmission->sendFileToPeer(m_peerFileTransmissionSocket, fi.absoluteFilePath(), 0, fi.size());
+////        qDebug()<<"------------------------------------------1";
 
 //    }else{
+//        QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
 //        m_fileManager->closeFile(fileMD5Sum);
+//        filesList.removeAll(fileMD5Sum);
+//    }
+
+//}
+
+//void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
+//    qDebug()<<"--SystemManagementWidget::processFileDataRequestPacket(...) "<<" startPieceIndex:"<<startPieceIndex<<" endPieceIndex:"<<endPieceIndex;
+
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+//    if(!filesList.contains(fileMD5)){
+//        return;
+//    }
+
+//    Q_ASSERT(m_fileManager);
+
+//    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
+//        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
+//        qDebug()<<"completedPieces:"<<completedPieces;
+
+//        foreach (int pieceIndex, completedPieces) {
+//            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, pieceIndex));
+//            //qApp->processEvents();
+//        }
+
+//    }else{
+//        Q_ASSERT(endPieceIndex >= startPieceIndex);
+//        for(int i=startPieceIndex; i<=endPieceIndex; i++){
+//            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, i));
+//            //qApp->processEvents();
+//        }
+
 //    }
 
 
+//}
 
-}
+//void SystemManagementWidget::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
 
-void SystemManagementWidget::fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message){
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
+//    if(!filesList.contains(fileMD5)){
+//        return;
+//    }
 
-    if(socketID != m_peerSocket){
-        return;
-    }
-    //TODO:
+//    Q_ASSERT(m_fileManager);
+//    m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
 
-}
+//}
 
-void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
+//void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
 
-    if(socketID != m_peerSocket){
-        return;
-    }
+//    if(socketID != m_peerSocket){
+//        return;
+//    }
 
-    Q_ASSERT(m_fileManager);
-    if(accepted){
-        //fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
+//    //MS::FileTXStatus status = MS::FileTXStatus(status);
+//    switch(status){
+//    case quint8(MS::File_TX_Preparing):
+//    {
 
-//        QFileInfo fi("C:/3.dxf");
-//        m_udtProtocolForFileTransmission->sendFileToPeer(m_peerFileTransmissionSocket, fi.absoluteFilePath(), 0, fi.size());
-//        qDebug()<<"------------------------------------------1";
+//    }
+//        break;
+//    case quint8(MS::File_TX_Receiving):
+//    {
 
-    }else{
-        QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
-        m_fileManager->closeFile(fileMD5Sum);
-        filesList.removeAll(fileMD5Sum);
-    }
+//    }
+//        break;
+//    case quint8(MS::File_TX_Sending):
+//    {
 
-}
+//    }
+//        break;
+//    case quint8(MS::File_TX_Progress):
+//    {
 
-void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
-    qDebug()<<"--SystemManagementWidget::processFileDataRequestPacket(...) "<<" startPieceIndex:"<<startPieceIndex<<" endPieceIndex:"<<endPieceIndex;
+//    }
+//        break;
+//    case quint8(MS::File_TX_Paused):
+//    {
 
-    if(socketID != m_peerSocket){
-        return;
-    }
-    if(!filesList.contains(fileMD5)){
-        return;
-    }
+////        fileTXWithAdminStatus = MS::File_TX_Paused;
+//    }
+//        break;
+//    case quint8(MS::File_TX_Aborted):
+//    {
+////        closeFileTXWithAdmin();
 
-    Q_ASSERT(m_fileManager);
+//    }
+//        break;
+//    case quint8(MS::File_TX_Done):
+//    {
+//        m_fileManager->closeFile(fileMD5);
+//    }
+//        break;
+//    default:
+//        break;
+//    }
 
-    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
-        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
-        qDebug()<<"completedPieces:"<<completedPieces;
+//}
 
-        foreach (int pieceIndex, completedPieces) {
-            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, pieceIndex));
-            //qApp->processEvents();
-        }
+//void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage){
+//    qDebug()<<"--SystemManagementWidget::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
+//    qCritical()<<errorMessage;
 
-    }else{
-        Q_ASSERT(endPieceIndex >= startPieceIndex);
-        for(int i=startPieceIndex; i<=endPieceIndex; i++){
-            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, i));
-            //qApp->processEvents();
-        }
+//}
 
-    }
-
-
-}
-
-void SystemManagementWidget::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
-
-    if(socketID != m_peerSocket){
-        return;
-    }
-    if(!filesList.contains(fileMD5)){
-        return;
-    }
-
-    Q_ASSERT(m_fileManager);
-    m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
-
-}
-
-void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
-
-    if(socketID != m_peerSocket){
-        return;
-    }
-
-    //MS::FileTXStatus status = MS::FileTXStatus(status);
-    switch(status){
-    case quint8(MS::File_TX_Preparing):
-    {
-
-    }
-        break;
-    case quint8(MS::File_TX_Receiving):
-    {
-
-    }
-        break;
-    case quint8(MS::File_TX_Sending):
-    {
-
-    }
-        break;
-    case quint8(MS::File_TX_Progress):
-    {
-
-    }
-        break;
-    case quint8(MS::File_TX_Paused):
-    {
-
-//        fileTXWithAdminStatus = MS::File_TX_Paused;
-    }
-        break;
-    case quint8(MS::File_TX_Aborted):
-    {
-//        closeFileTXWithAdmin();
-
-    }
-        break;
-    case quint8(MS::File_TX_Done):
-    {
-        m_fileManager->closeFile(fileMD5);
-    }
-        break;
-    default:
-        break;
-    }
-
-}
-
-void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage){
-    qDebug()<<"--SystemManagementWidget::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
-    qCritical()<<errorMessage;
-
-}
-
-void SystemManagementWidget::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
-    qDebug()<<"--SystemManagementWidget::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
+//void SystemManagementWidget::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
+//    qDebug()<<"--SystemManagementWidget::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
 
 
-    if(!fileTXRequestList.contains(requestID)){
-        return;
-    }
-    fileTXRequestList.removeAll(requestID);
+//    if(!fileTXRequestList.contains(requestID)){
+//        return;
+//    }
+//    fileTXRequestList.removeAll(requestID);
 
-    if(!filesList.contains(fileMD5)){
-        return;
-    }
-
-
-    controlCenterPacketsParser->sendFileData(m_peerSocket, fileMD5, pieceIndex, &data, &dataSHA1SUM);
-
-}
-
-void SystemManagementWidget::fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
-
-    if(!fileTXRequestList.contains(requestID)){
-        return;
-    }
-    fileTXRequestList.removeAll(requestID);
-
-    if(!filesList.contains(fileMD5)){
-        return;
-    }
-
-    qCritical()<<errorString;
+//    if(!filesList.contains(fileMD5)){
+//        return;
+//    }
 
 
-    controlCenterPacketsParser->fileTXError(m_peerSocket, fileMD5, errorCode, errorString);
+//    controlCenterPacketsParser->sendFileData(m_peerSocket, fileMD5, pieceIndex, &data, &dataSHA1SUM);
+
+//}
+
+//void SystemManagementWidget::fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
+
+//    if(!fileTXRequestList.contains(requestID)){
+//        return;
+//    }
+//    fileTXRequestList.removeAll(requestID);
+
+//    if(!filesList.contains(fileMD5)){
+//        return;
+//    }
+
+//    qCritical()<<errorString;
+
+
+//    controlCenterPacketsParser->fileTXError(m_peerSocket, fileMD5, errorCode, errorString);
 
 
 
-}
+//}
 
-void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
-    qDebug()<<"--SystemManagementWidget::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verificationProgress:"<<verificationProgress;
+//void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
+//    qDebug()<<"--SystemManagementWidget::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verificationProgress:"<<verificationProgress;
 
-    if(!filesList.contains(fileMD5)){
-        return;
-    }
+//    if(!filesList.contains(fileMD5)){
+//        return;
+//    }
 
-    if(verified){
+//    if(verified){
 
-        if(verificationProgress == 100){
-            qWarning()<<"Done!";
-            controlCenterPacketsParser->fileTXStatusChanged(m_peerSocket, fileMD5, quint8(MS::File_TX_Done));
+//        if(verificationProgress == 100){
+//            qWarning()<<"Done!";
+//            controlCenterPacketsParser->fileTXStatusChanged(m_peerSocket, fileMD5, quint8(MS::File_TX_Done));
 
-        }else{
-            //TODO:
-//            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-//            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
-//            if(uncompletedPieceIndex < 0){
-//                return;
+//        }else{
+//            //TODO:
+////            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+////            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
+////            if(uncompletedPieceIndex < 0){
+////                return;
+////            }
+////            controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, uncompletedPieceIndex);
+
+//            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+//            //    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+//            //}
+
+//            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+//                if(pieceIndex == 0 ){
+//                        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
+//                }else{
+//                    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
+//                }
 //            }
-//            controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, uncompletedPieceIndex);
-
-            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-            //    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
-            //}
-
-            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-                if(pieceIndex == 0 ){
-                        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
-                }else{
-                    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
-                }
-            }
 
 
-        }
+//        }
 
-    }else{
+//    }else{
 
-        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex, pieceIndex);
-    }
+//        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex, pieceIndex);
+//    }
 
-}
+//}
 
 
 
