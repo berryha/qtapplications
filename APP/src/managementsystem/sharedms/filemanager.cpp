@@ -728,6 +728,12 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
 
     info->verifiedPieces.setBit(pieceIndex);
 
+    if((pieceIndex % 25) == 0){
+        QSettings settings(info->infoFileName, QSettings::IniFormat);
+        settings.setValue("Pieces", info->verifiedPieces);
+        settings.sync();
+    }
+
     int verificationProgress = (info->verifiedPieces.count(true) * 100) / info->verifiedPieces.size();
     Q_ASSERT(verificationProgress >= 0 && verificationProgress <= 100);
 
@@ -751,17 +757,6 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
     }
 
     emit pieceVerified(info->md5sum, pieceIndex, true, verificationProgress);
-
-
-    if((pieceIndex % 25) == 0){
-        QSettings settings(info->infoFileName, QSettings::IniFormat);
-        settings.setValue("Pieces", info->verifiedPieces);
-        settings.sync();
-    }
-
-
-
-
 
     return true;
 
@@ -848,6 +843,12 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
         verified = true;
     }
 
+    if((pieceIndex % 10) == 0){
+        QSettings settings(info->infoFileName, QSettings::IniFormat);
+        settings.setValue("Pieces", info->verifiedPieces);
+        settings.sync();
+    }
+
     int verificationProgress = (info->verifiedPieces.count(true) * 100) / info->verifiedPieces.size();
     Q_ASSERT(verificationProgress >= 0 && verificationProgress <= 100);
 
@@ -860,19 +861,12 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
         }else{
             //QString cfgFile = name + SUFFIX_INFO_FILE;
             QFile::remove(info->infoFileName);
+            QFile::remove(info->infoFileName);
             qWarning()<<"File Received!";
         }
     }
 
     emit pieceVerified(info->md5sum, pieceIndex, verified, verificationProgress);
-
-
-    if((pieceIndex % 10) == 0){
-        QSettings settings(info->infoFileName, QSettings::IniFormat);
-        settings.setValue("Pieces", info->verifiedPieces);
-        settings.sync();
-    }
-
 
     return verified;
 }

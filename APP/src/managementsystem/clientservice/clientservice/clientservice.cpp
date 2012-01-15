@@ -2153,7 +2153,7 @@ void ClientService::processFileTXErrorFromPeer(int socketID, const QByteArray &f
 }
 
 void ClientService::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
-    qDebug()<<"--ClientService::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data;
+    qDebug()<<"--ClientService::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
 
     int socketID = fileTXRequestHash.take(requestID);
     clientPacketsParser->sendFileData(socketID, fileMD5, pieceIndex, &data, &dataSHA1SUM);
@@ -2183,7 +2183,6 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
     }
 
     if(verified){
-
 
         if(verificationProgress == 100){
             qWarning()<<"Done!";

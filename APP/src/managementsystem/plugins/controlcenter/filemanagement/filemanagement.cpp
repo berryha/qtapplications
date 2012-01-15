@@ -458,7 +458,7 @@ FileManagement::FileManagement(QWidget *parent) :
 //    QHeaderView *header = ui.tableViewRemoteFiles->horizontalHeader();
 
 
-    m_udtProtocol = 0;
+//    m_udtProtocol = 0;
     m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 //    m_udtProtocolForFileTransmission = 0;
 //    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
@@ -826,7 +826,7 @@ void FileManagement::requestUploadFilesToRemote(const QString &localBaseDir, con
         bool ok = controlCenterPacketsParser->requestUploadFile(m_peerSocket, info->md5sum, fi.fileName(), info->size, remoteDir);
         if(!ok){
             m_fileManager->closeFile(info->md5sum);
-            ui.textEditLogs->append(tr("Error! Can not send file! %1").arg(m_udtProtocol->getLastErrorMessage()));
+            ui.textEditLogs->append(tr("Error! Can not send file! %1").arg(controlCenterPacketsParser->lastErrorMessage()));
             continue ;
         }else{
             if(!filesList.contains(info->md5sum)){
@@ -856,7 +856,7 @@ void FileManagement::requestDownloadFileFromRemote(const QString &remoteBaseDir,
     foreach (QString remoteFileName, remoteFiles) {
         bool ok = controlCenterPacketsParser->requestDownloadFile(m_peerSocket, remoteBaseDir, remoteFileName, localDir);
         if(!ok){
-            ui.textEditLogs->append(tr("Error! Can not send file download request! %1").arg(m_udtProtocol->getLastErrorMessage()) );
+            ui.textEditLogs->append(tr("Error! Can not send file download request! %1").arg(controlCenterPacketsParser->lastErrorMessage()) );
             continue ;
         }else{
             ui.textEditLogs->append(tr("Request downloading file %1").arg(remoteFileName));
@@ -966,28 +966,30 @@ void FileManagement::fileDownloadRequestAccepted(int socketID, const QString &re
     }
     //TODO:
 
-//    startFileManager();
+    ui.textEditLogs->append(tr("File download request accepted! %1").arg(remoteFileName));
 
-//    QString localPath = remoteFileSaveDir + "/" + fileName;
+    startFileManager();
 
-//    QString errorString;
-//    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
-//    if(!info){
-//        controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, false, errorString);
-//    }
+    QString localPath = localFileSaveDir + "/" + remoteFileName;
+    if(localFileSaveDir.endsWith('/') || localFileSaveDir.endsWith('\\')){
+        localPath = localFileSaveDir + remoteFileName;
+    }
 
+    QString errorString;
+    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
+    if(!info){
+        ui.textEditLogs->append(tr("Error! Failed to download file '%1'! %2 ").arg(remoteFileName).arg(errorString));
+        return;
+    }
 
-//    if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
-//        if(!filesList.contains(fileMD5Sum)){
-//            filesList.append(fileMD5Sum);
-//        }
-//        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
-//        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
-
-//    }else{
-//        m_fileManager->closeFile(fileMD5Sum);
-//    }
-
+    if(!filesList.contains(fileMD5Sum)){
+        filesList.append(fileMD5Sum);
+    }
+    //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
+    if(!controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0)){
+        m_fileManager->closeFile(fileMD5Sum);
+        ui.textEditLogs->append(tr("Error! Failed to download file '%1'! %2 ").arg(remoteFileName).arg(controlCenterPacketsParser->lastErrorMessage()));
+    }
 
 
 }
@@ -998,6 +1000,8 @@ void FileManagement::fileDownloadRequestDenied(int socketID, const QString &remo
         return;
     }
     //TODO:
+
+    ui.textEditLogs->append(tr("Error! File download request denied! %1").arg(remoteFileName));
 
 }
 
@@ -1114,7 +1118,7 @@ void FileManagement::processFileTXStatusChangedPacket(int socketID, const QByteA
     case quint8(MS::File_TX_Done):
     {
 
-        ui.textEditLogs->append(tr("File Transmission Done! '%1'").arg(m_fileManager->getFileLocalSavePath(fileMD5)));
+        ui.textEditLogs->append(tr("File Uploaded! '%1'").arg(m_fileManager->getFileLocalSavePath(fileMD5)));
         m_fileManager->closeFile(fileMD5);
     }
         break;
@@ -1178,8 +1182,9 @@ void FileManagement::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bo
     if(verified){
 
         if(verificationProgress == 100){
-            qWarning()<<"Done!";
+            //qWarning()<<"Done!";
             controlCenterPacketsParser->fileTXStatusChanged(m_peerSocket, fileMD5, quint8(MS::File_TX_Done));
+            ui.textEditLogs->append(tr("File Downloaded! '%1'").arg(m_fileManager->getFileLocalSavePath(fileMD5)));
         }else{
             //TODO:
 //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
@@ -1267,7 +1272,7 @@ void FileManagement::on_pushButtonUploadToRemote_clicked(){
         return;
     }
 
-    int ret = QMessageBox::question(this, tr("Question"), tr("Send files to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    int ret = QMessageBox::question(this, tr("Question"), tr("Are you sure to upload files?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
     if(ret == QMessageBox::No){
         return;
     }
@@ -1314,7 +1319,6 @@ void FileManagement::on_pushButtonDownloadToLocal_clicked(){
         if(filePath == ".."){
             continue;
         }
-        QMessageBox::information(this, "filePath", filePath);
         files.append(filePath);
         qApp->processEvents();
     }
@@ -1324,7 +1328,7 @@ void FileManagement::on_pushButtonDownloadToLocal_clicked(){
         return;
     }
 
-    int ret = QMessageBox::question(this, tr("Question"), tr("Download file(s) from %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    int ret = QMessageBox::question(this, tr("Question"), tr("Are you sure to download files?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
     if(ret == QMessageBox::No){
         return;
     }
