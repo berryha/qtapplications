@@ -147,16 +147,11 @@ private:
 
     FileSystemModel *remoteFileSystemModel;
 
-//    QMap<QString/*Remote Path*/, QString/*Local Path*/> fileSavePathMap;
-
 
 //    UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
-    QHostAddress m_peerIPAddress;
-
-
-    //    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
-    //    UDTSOCKET m_peerFileTransmissionSocket;
+    //UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+    //UDTSOCKET m_peerFileTransmissionSocket;
 
 
     FileManager *m_fileManager;

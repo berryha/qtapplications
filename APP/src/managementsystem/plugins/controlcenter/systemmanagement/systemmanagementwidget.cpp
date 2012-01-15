@@ -42,6 +42,9 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
         this->m_peerIPAddress = QHostAddress::LocalHost;
     }
 
+
+    administratorsManagementMenu = 0;
+
     m_winDirPath = "";
 
     queryModel = 0;
@@ -294,6 +297,8 @@ void SystemManagementWidget::setUDTProtocol(UDTProtocol *udtProtocol){
     }
 
     this->m_udtProtocol = udtProtocol;
+    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
 }
 
 void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsParser *parser){
@@ -304,6 +309,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     }
 
     this->controlCenterPacketsParser = parser;
+    connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(int, const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(int, const QString &, bool, const QString &)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)));
@@ -332,37 +338,6 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
 
 
     ui.toolButtonVerify->setEnabled(true);
-
-}
-
-void SystemManagementWidget::peerDisconnected(bool normalClose){
-    qDebug()<<"--SystemManagementWidget::peerDisconnected(...) "<<" normalClose:"<<normalClose;
-
-    //ui.tabSystemInfo->setEnabled(false);
-    ui.toolButtonRequestSystemInfo->setEnabled(false);
-    ui.toolButtonRescanSystemInfo->setEnabled(false);
-    if(ui.osVersionLineEdit->text().trimmed().isEmpty()){
-        ui.toolButtonSaveAs->setEnabled(false);
-    }
-
-    ui.tabRemoteManagement->setEnabled(false);
-    ui.toolButtonVerify->setEnabled(true);
-
-    m_fileManagementWidget->setPeerSocket(UDTProtocol::INVALID_UDT_SOCK);
-    ui.tabFileManagement->setEnabled(false);
-
-    if(!normalClose){
-        QMessageBox::critical(this, tr("Error"), QString("ERROR! Peer %1 Closed Unexpectedly!").arg(m_peerIPAddress.toString()));
-    }
-
-
-
-//    foreach (QByteArray fileMD5, filesList) {
-//        m_fileManager->closeFile(fileMD5);
-//    }
-//    fileTXRequestList.clear();
-//    filesList.clear();
-
 
 }
 
@@ -418,9 +393,9 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
 void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     QString text = tr("Do you really want to <font color = 'red'><b>%1</b></font> the USB SD on the computer?").arg(m_usbsdEnabled?tr("disable"):tr("enable"));
     int ret = QMessageBox::question(this, tr("Question"), text,
@@ -451,9 +426,9 @@ void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
 
 void SystemManagementWidget::on_pushButtonPrograms_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     QString text = tr("Do you really want to <font color = 'red'><b>%1</b></font> the Programes on the computer?").arg(m_programesEnabled?tr("disable"):tr("enable"));
 
@@ -497,9 +472,9 @@ void SystemManagementWidget::on_pushButtonShowAdmin_clicked(){
 
 void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
     
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
     
     //ui.pushButtonRemoteAssistance->setEnabled(false);
     emit requestRemoteAssistance();
@@ -514,9 +489,9 @@ void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
 
 void SystemManagementWidget::on_actionAddAdmin_triggered(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     bool ok = false;
     QString item = QInputDialog::getItem(this, tr("Select The User"), tr("User:"), m_users.split(","), 0, false, &ok);
@@ -544,9 +519,9 @@ void SystemManagementWidget::on_actionAddAdmin_triggered(){
 
 void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     bool ok = false;
     QString item = QInputDialog::getItem(this, tr("Select The User"), tr("User:"), m_administrators, 0, false, &ok);
@@ -733,9 +708,9 @@ void SystemManagementWidget::on_toolButtonQuerySystemInfo_clicked(){
 
 void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, false);
     if(!ok){
@@ -756,9 +731,9 @@ void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
 
 void SystemManagementWidget::on_toolButtonRescanSystemInfo_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
 
     bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, true);
@@ -805,9 +780,9 @@ void SystemManagementWidget::on_toolButtonSaveAs_clicked(){
 
 void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
     
     if(remoteConsoleRunning){
         int rep = QMessageBox::question(this, tr("Confirm"), tr("Do you really want to terminate the process?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
@@ -821,6 +796,10 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
         }
 
     }else{
+        if(!verifyPrivilege()){
+            return;
+        }
+
         QString remoteAPPPath = ui.comboBoxRemoteApplicationPath->currentText();
         if(!remoteAPPPath.trimmed().isEmpty()){
             bool ok = controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerSocket, m_computerName, remoteAPPPath, m_adminName, true);
@@ -849,9 +828,9 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
 
 void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 
-    if(!verifyPrivilege()){
-        return;
-    }
+//    if(!verifyPrivilege()){
+//        return;
+//    }
 
     QString cmd = ui.comboBoxCommand->currentText();
     bool ok = controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerSocket, m_computerName, cmd);
@@ -869,6 +848,27 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
 
 }
 
+void SystemManagementWidget::processClientOnlineStatusChangedPacket(int socketID, const QString &computerName, bool online){
+    qDebug()<<"--SystemManagementWidget::processClientOnlineStatusChangedPacket(...)";
+
+    if(socketID != m_peerSocket || computerName != this->m_computerName){
+        return;
+    }
+
+//    QString ip = "";
+//    quint16 port = 0;
+//    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
+//        qCritical()<<m_udtProtocol->getLastErrorMessage();
+//        return;
+//    }
+
+    if(!online){
+        peerDisconnected(true);
+    }
+
+    //qWarning()<<QString("Client %1 %2!").arg(clientName).arg(online?"Online":"Offline");
+
+}
 
 void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message){
     qDebug()<<"SystemManagementWidget::processClientResponseVerifyInfoResultPacket:"<<"computerName:"<<computerName<<" result:"<<result;
@@ -945,11 +945,13 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
         return;
     }
 
-
     m_users = usersInfo;
     m_usbsdEnabled = usbsdEnabled;
     m_programesEnabled = programesEnabled;
-    m_administrators = admins.split(",");;
+    m_administrators.clear();
+    if(!admins.trimmed().isEmpty()){
+        m_administrators = admins.split(",");
+    }
 
     QStringList networkInfoList = networkInfo.split(",").at(0).split("/");
     //    m_peerIPAddress = QHostAddress(networkInfoList.at(0));
@@ -995,16 +997,14 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     ui.pushButtonPrograms->setEnabled(true);
 
 
-    if(!admins.trimmed().isEmpty()){
-        m_administrators = admins.split(",");
-    }
-    administratorsManagementMenu = new QMenu(this);
-    if(!m_users.isEmpty()){
+    if(!administratorsManagementMenu){
+        administratorsManagementMenu = new QMenu(this);
         administratorsManagementMenu->addAction(ui.actionAddAdmin);
-    }
-    if(!m_administrators.isEmpty()){
         administratorsManagementMenu->addAction(ui.actionDeleteAdmin);
     }
+    ui.actionAddAdmin->setEnabled(!m_users.isEmpty());
+    ui.actionDeleteAdmin->setEnabled(!m_administrators.isEmpty());
+
     ui.pushButtonAdminsManagement->setMenu(administratorsManagementMenu);
     ui.pushButtonAdminsManagement->setEnabled(true);
 
@@ -1275,428 +1275,49 @@ void SystemManagementWidget::userResponseRemoteAssistancePacketReceived(const QS
     }
 }
 
+void SystemManagementWidget::peerDisconnected(int socketID){
 
+    if(socketID != m_peerSocket){
+        return;
+    }
 
-///////////////////////////////////////////////////////
+    peerDisconnected(false);
 
-//void SystemManagementWidget::requestFileSystemInfo(const QString &parentDirPath){
+}
 
-//    controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath);
+void SystemManagementWidget::peerDisconnected(bool normalClose){
+    qDebug()<<"--SystemManagementWidget::peerDisconnected(...) "<<" normalClose:"<<normalClose;
 
-//}
+    m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
 
-//void SystemManagementWidget::fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData){
+    //ui.tabSystemInfo->setEnabled(false);
+    ui.toolButtonRequestSystemInfo->setEnabled(false);
+    ui.toolButtonRescanSystemInfo->setEnabled(false);
+    if(ui.osVersionLineEdit->text().trimmed().isEmpty()){
+        ui.toolButtonSaveAs->setEnabled(false);
+    }
 
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
+    ui.tabRemoteManagement->setEnabled(false);
+    ui.toolButtonVerify->setEnabled(true);
 
-////    FileManagement *fm = qobject_cast<FileManagement *>(ui.tabFileManagement);
-////    if(!fm){return;}
+    m_fileManagementWidget->peerDisconnected(normalClose);
+    m_fileManagementWidget->setPeerSocket(UDTProtocol::INVALID_UDT_SOCK);
+    ui.tabFileManagement->setEnabled(false);
 
-//    m_fileManagementWidget->parseRemoteFilesInfo(parentDirPath, fileSystemInfoData);
+    if(!normalClose){
+        QMessageBox::critical(this, tr("Error"), QString("ERROR! Peer %1 Closed Unexpectedly!").arg(m_peerIPAddress.toString()));
+    }
 
-//}
 
-//void SystemManagementWidget::requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir){
 
-//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        on_toolButtonVerify_clicked();
-//    }
-//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
-//        return;
-//    }
-
-
-//    int ret = QMessageBox::question(this, tr("Question"), tr("Send file(s) to %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-//    if(ret == QMessageBox::No){
-//        return;
-//    }
-
-//    startFileManager();
-
-
-//    foreach (QString localFileName, localFiles) {
-
-//        QFileInfo fi(localFileName);
-//        if(fi.isDir()){
-//            QMessageBox::warning(this, tr("Error"), tr("Sorry, you can only transmit one file at a time!"));
-//            continue;
-//        }
-
-//        QString errorString;
-//        const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(localFileName, &errorString);
-//        if(!info){
-//            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(errorString) );
-//            continue ;
-//        }
-
-//        bool ok = controlCenterPacketsParser->requestUploadFile(m_peerSocket, info->md5sum, fi.fileName(), info->size, remoteDir);
-//        if(!ok){
-//            m_fileManager->closeFile(info->md5sum);
-//            QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
-//            continue ;
-//        }else{
-//            if(!filesList.contains(info->md5sum)){
-//                filesList.append(info->md5sum);
-//            }
-//        }
-
-//    }
-
-//}
-
-//void SystemManagementWidget::requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir){
-
-//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        on_toolButtonVerify_clicked();
-//    }
-//    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-//        QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
-//        return;
-//    }
-
-
-//    int ret = QMessageBox::question(this, tr("Question"), tr("Download file(s) from %1?").arg(m_peerIPAddress.toString() ), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-//    if(ret == QMessageBox::No){
-//        return;
-//    }
-
-//    startFileManager();
-
-//    foreach (QString remoteFileName, remoteFiles) {
-//        bool ok = controlCenterPacketsParser->requestDownloadFile(m_peerSocket, remoteFileName);
-//        if(!ok){
-//            QMessageBox::critical(this, tr("Error"), tr("Can not send request!<br>%1").arg(m_udtProtocol->getLastErrorMessage()) );
-//            continue ;
-//        }
-//    }
-
-//}
-
-
-//void SystemManagementWidget::startFileManager(){
-
-//    if(!m_fileManager){
-//        m_fileManager = ResourcesManagerInstance::instance()->getFileManager();
-//        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-//        connect(m_fileManager, SIGNAL(error(int, const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int, const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
-//        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
-
-//    }
-
-//    if(!m_udtProtocolForFileTransmission){
-//        m_udtProtocolForFileTransmission = ResourcesManagerInstance::instance()->getUDTProtocolForFileTransmission();
-//    }
-
-//}
-
-//void SystemManagementWidget::processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &remotePath, quint64 size, const QString &remoteFileSaveDir){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-
-//    startFileManager();
-
-//    QString localPath = m_fileManagementWidget->getLocalSavePath(remotePath);
-
-//    QString errorString;
-//    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
-//    if(!info){
-//        //TODO
-//        QMessageBox::critical(this, tr("Error"), tr("Failed to download file!"));
-//        return;
-//    }
-
-//    if(!filesList.contains(fileMD5Sum)){
-//        filesList.append(fileMD5Sum);
-//    }
-//    //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
-//    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
-
-
-//}
-
-//void SystemManagementWidget::processPeerRequestDownloadFilePacket(int socketID, const QString &filePath){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-
-//    startFileManager();
-
-//    QString errorString;
-//    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(filePath, &errorString);
-//    if(!info){
-//        controlCenterPacketsParser->denyFileDownloadRequest(m_peerSocket, filePath, false, errorString);
-//    }
-
-//    if(controlCenterPacketsParser->acceptFileDownloadRequest(m_peerSocket, filePath, true, info->md5sum, info->size)){
-//        if(!filesList.contains(info->md5sum)){
-//            filesList.append(info->md5sum);
-//        }
-//    }else{
-//        m_fileManager->closeFile(info->md5sum);
-//    }
-
-//}
-
-//void SystemManagementWidget::fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-//    //TODO:
-
-////    startFileManager();
-
-////    QString localPath = remoteFileSaveDir + "/" + fileName;
-
-////    QString errorString;
-////    const FileManager::FileMetaInfo *info = m_fileManager->tryToReceiveFile(fileMD5Sum, localPath, size, &errorString);
-////    if(!info){
-////        controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, false, errorString);
-////    }
-
-
-////    if(controlCenterPacketsParser->responseFileUploadRequest(m_peerSocket, fileMD5Sum, true, "")){
-////        if(!filesList.contains(fileMD5Sum)){
-////            filesList.append(fileMD5Sum);
-////        }
-////        //controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, -1, -1);
-////        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5Sum, 0, 0);
-
-////    }else{
-////        m_fileManager->closeFile(fileMD5Sum);
-////    }
-
-
-
-//}
-
-//void SystemManagementWidget::fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-//    //TODO:
-
-//}
-
-//void SystemManagementWidget::fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-
-//    Q_ASSERT(m_fileManager);
-//    if(accepted){
-//        //fileTXRequestList.append(m_fileManager->readPiece(fileMD5Sum, 0));
-
-////        QFileInfo fi("C:/3.dxf");
-////        m_udtProtocolForFileTransmission->sendFileToPeer(m_peerFileTransmissionSocket, fi.absoluteFilePath(), 0, fi.size());
-////        qDebug()<<"------------------------------------------1";
-
-//    }else{
-//        QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
-//        m_fileManager->closeFile(fileMD5Sum);
-//        filesList.removeAll(fileMD5Sum);
-//    }
-
-//}
-
-//void SystemManagementWidget::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
-//    qDebug()<<"--SystemManagementWidget::processFileDataRequestPacket(...) "<<" startPieceIndex:"<<startPieceIndex<<" endPieceIndex:"<<endPieceIndex;
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-//    if(!filesList.contains(fileMD5)){
-//        return;
-//    }
-
-//    Q_ASSERT(m_fileManager);
-
-//    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
-//        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
-//        qDebug()<<"completedPieces:"<<completedPieces;
-
-//        foreach (int pieceIndex, completedPieces) {
-//            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, pieceIndex));
-//            //qApp->processEvents();
-//        }
-
-//    }else{
-//        Q_ASSERT(endPieceIndex >= startPieceIndex);
-//        for(int i=startPieceIndex; i<=endPieceIndex; i++){
-//            fileTXRequestList.append(m_fileManager->readPiece(fileMD5, i));
-//            //qApp->processEvents();
-//        }
-
-//    }
-
-
-//}
-
-//void SystemManagementWidget::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-//    if(!filesList.contains(fileMD5)){
-//        return;
-//    }
-
-//    Q_ASSERT(m_fileManager);
-//    m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
-
-//}
-
-//void SystemManagementWidget::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
-
-//    if(socketID != m_peerSocket){
-//        return;
-//    }
-
-//    //MS::FileTXStatus status = MS::FileTXStatus(status);
-//    switch(status){
-//    case quint8(MS::File_TX_Preparing):
-//    {
-
-//    }
-//        break;
-//    case quint8(MS::File_TX_Receiving):
-//    {
-
-//    }
-//        break;
-//    case quint8(MS::File_TX_Sending):
-//    {
-
-//    }
-//        break;
-//    case quint8(MS::File_TX_Progress):
-//    {
-
-//    }
-//        break;
-//    case quint8(MS::File_TX_Paused):
-//    {
-
-////        fileTXWithAdminStatus = MS::File_TX_Paused;
-//    }
-//        break;
-//    case quint8(MS::File_TX_Aborted):
-//    {
-////        closeFileTXWithAdmin();
-
-//    }
-//        break;
-//    case quint8(MS::File_TX_Done):
-//    {
+//    foreach (QByteArray fileMD5, filesList) {
 //        m_fileManager->closeFile(fileMD5);
 //    }
-//        break;
-//    default:
-//        break;
-//    }
-
-//}
-
-//void SystemManagementWidget::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage){
-//    qDebug()<<"--SystemManagementWidget::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
-//    qCritical()<<errorMessage;
-
-//}
-
-//void SystemManagementWidget::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
-//    qDebug()<<"--SystemManagementWidget::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
+//    fileTXRequestList.clear();
+//    filesList.clear();
 
 
-//    if(!fileTXRequestList.contains(requestID)){
-//        return;
-//    }
-//    fileTXRequestList.removeAll(requestID);
-
-//    if(!filesList.contains(fileMD5)){
-//        return;
-//    }
-
-
-//    controlCenterPacketsParser->sendFileData(m_peerSocket, fileMD5, pieceIndex, &data, &dataSHA1SUM);
-
-//}
-
-//void SystemManagementWidget::fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
-
-//    if(!fileTXRequestList.contains(requestID)){
-//        return;
-//    }
-//    fileTXRequestList.removeAll(requestID);
-
-//    if(!filesList.contains(fileMD5)){
-//        return;
-//    }
-
-//    qCritical()<<errorString;
-
-
-//    controlCenterPacketsParser->fileTXError(m_peerSocket, fileMD5, errorCode, errorString);
-
-
-
-//}
-
-//void SystemManagementWidget::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
-//    qDebug()<<"--SystemManagementWidget::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verificationProgress:"<<verificationProgress;
-
-//    if(!filesList.contains(fileMD5)){
-//        return;
-//    }
-
-//    if(verified){
-
-//        if(verificationProgress == 100){
-//            qWarning()<<"Done!";
-//            controlCenterPacketsParser->fileTXStatusChanged(m_peerSocket, fileMD5, quint8(MS::File_TX_Done));
-
-//        }else{
-//            //TODO:
-////            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-////            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
-////            if(uncompletedPieceIndex < 0){
-////                return;
-////            }
-////            controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, uncompletedPieceIndex);
-
-//            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-//            //    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
-//            //}
-
-//            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
-//                if(pieceIndex == 0 ){
-//                        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
-//                }else{
-//                    controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
-//                }
-//            }
-
-
-//        }
-
-//    }else{
-
-//        controlCenterPacketsParser->requestFileData(m_peerSocket, fileMD5, pieceIndex, pieceIndex);
-//    }
-
-//}
-
-
-
-
-
+}
 
 
 bool SystemManagementWidget::verifyPrivilege(){
@@ -1713,7 +1334,7 @@ bool SystemManagementWidget::verifyPrivilege(){
                                              tr("Access Code:"), QLineEdit::NoEcho,
                                              "", &ok);
         if (ok && !text.isEmpty()){
-            QString accessCodeString = "hehui";
+            QString accessCodeString;// = "hehui";
             accessCodeString.append(QTime::currentTime().toString("hhmm"));
             if(text.toLower() == accessCodeString){
                 return true;
