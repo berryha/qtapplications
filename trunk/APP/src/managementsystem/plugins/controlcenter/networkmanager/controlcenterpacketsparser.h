@@ -674,6 +674,7 @@ public slots:
     }
 
 
+    QString lastErrorMessage(){return m_udtProtocol->getLastErrorMessage();}
 
 
 

@@ -150,7 +150,7 @@ private:
 //    QMap<QString/*Remote Path*/, QString/*Local Path*/> fileSavePathMap;
 
 
-    UDTProtocol *m_udtProtocol;
+//    UDTProtocol *m_udtProtocol;
     UDTSOCKET m_peerSocket;
     QHostAddress m_peerIPAddress;
 
