@@ -293,7 +293,7 @@ void ControlCenter::closeEvent(QCloseEvent *e) {
     clientInfoModel->setClientList(QList<ClientInfo*>());
     clientInfoHash.clear();
     
-    clientSocketsHash.clear();
+//    clientSocketsHash.clear();
 
 
     e->accept();
@@ -553,7 +553,7 @@ void ControlCenter::slotQueryDatabase() {
     
     slotQueryClient(computerName(), userName(), workgroup(), macAddress(), ipAddress(), osVersion(), usbsdEnabled(), programesEnabled());
     
-    statusBar()->showMessage(tr("Matched:%1").arg(QString::number(queryModel->rowCount())));
+    statusBar()->showMessage(tr("Matched In Database:%1").arg(QString::number(queryModel->rowCount())));
     
 }
 
@@ -650,6 +650,7 @@ void ControlCenter::slotQueryClient(const QString &computerName, const QString &
 }
 
 void ControlCenter::querySitoyClientInfo(const QString &queryString){
+
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     DatabaseConnecter dc(this);
@@ -691,6 +692,9 @@ void ControlCenter::querySitoyClientInfo(const QString &queryString){
 
     }
 
+    while(queryModel->canFetchMore()){
+        queryModel->fetchMore();
+    }
 
     QApplication::restoreOverrideCursor();
 

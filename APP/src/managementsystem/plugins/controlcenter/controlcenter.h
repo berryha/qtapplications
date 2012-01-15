@@ -163,7 +163,7 @@ private:
     quint16 m_localUDTListeningPort;
     UDTSOCKET m_socketConnectedToServer;
 
-    QHash<int/*Socket ID*/, QHostAddress/*IP*/> clientSocketsHash;
+//    QHash<int/*Socket ID*/, QHostAddress/*IP*/> clientSocketsHash;
 
     
 };
