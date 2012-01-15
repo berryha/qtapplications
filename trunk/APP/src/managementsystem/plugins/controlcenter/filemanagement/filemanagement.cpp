@@ -472,6 +472,31 @@ FileManagement::FileManagement(QWidget *parent) :
 FileManagement::~FileManagement(){
     //TODO:
 //    fileSavePathMap.clear();
+
+    if(localFileSystemModel){
+        delete localFileSystemModel;
+        localFileSystemModel = 0;
+    }
+
+    if(localFilesCompleter){
+        delete localFilesCompleter;
+        localFilesCompleter = 0;
+    }
+
+    if(remoteFileSystemModel){
+        delete remoteFileSystemModel;
+        remoteFileSystemModel = 0;
+    }
+
+    if(m_fileManager){
+        delete m_fileManager;
+        m_fileManager = 0;
+    }
+
+    fileTXRequestList.clear();
+    filesList.clear();
+
+
 }
 
 void FileManagement::setPacketsParser(ControlCenterPacketsParser *parser){
@@ -503,6 +528,7 @@ void FileManagement::setPacketsParser(ControlCenterPacketsParser *parser){
 void FileManagement::setPeerSocket(UDTSOCKET peerSocket){
     this->m_peerSocket = peerSocket;
     //TODO
+
 }
 
 void FileManagement::dragEnterEvent(QDragEnterEvent *event){
@@ -745,11 +771,19 @@ bool FileManagement::parseRemoteFilesInfo(const QString &remoteParentDirPath, co
 
 void FileManagement::peerDisconnected(bool normalClose){
 
+    if(normalClose){
+        ui.textEditLogs->append(tr("Peer Closed!"));
+    }else{
+        ui.textEditLogs->append(tr("ERROR! Peer Closed Unexpectedly!"));
+    }
+
     foreach (QByteArray fileMD5, filesList) {
         m_fileManager->closeFile(fileMD5);
     }
     fileTXRequestList.clear();
     filesList.clear();
+
+    //TODO
 
 }
 
@@ -757,9 +791,11 @@ void FileManagement::peerDisconnected(bool normalClose){
 
 ////////////////////////////////////////
 
-void FileManagement::requestFileSystemInfo(const QString &parentDirPath){
+inline void FileManagement::requestFileSystemInfo(const QString &parentDirPath){
 
-    controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath);
+    if(!controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath)){
+        ui.textEditLogs->append(tr("Error! Can not send request! %1").arg(controlCenterPacketsParser->lastErrorMessage()));
+    }
 
 }
 

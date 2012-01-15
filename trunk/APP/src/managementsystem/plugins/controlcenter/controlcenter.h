@@ -40,8 +40,6 @@ public:
     ControlCenter(const QString &adminName, QWidget *parent = 0);
     ~ControlCenter();
 
-
-
     static bool isRunning(){return running;}
 
     void retranslateUi();

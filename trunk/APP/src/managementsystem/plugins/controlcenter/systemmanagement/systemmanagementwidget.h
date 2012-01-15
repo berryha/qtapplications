@@ -34,11 +34,7 @@ signals:
 
 public slots:
     void setUDTProtocol(UDTProtocol *udtProtocol);
-
     void setControlCenterPacketsParser(ControlCenterPacketsParser *parser);
-
-    void peerDisconnected(bool normalClose);
-
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -70,7 +66,7 @@ private slots:
     void on_toolButtonRunRemoteApplication_clicked();
     void on_toolButtonSendCommand_clicked();
 
-
+    void processClientOnlineStatusChangedPacket(int socketID, const QString &computerName, bool online);
     void processClientResponseAdminConnectionResultPacket(int socketID, const QString &computerName, bool result, const QString &message);
 
     void requestConnectionToClientTimeout();
@@ -89,29 +85,10 @@ private slots:
 
     void userResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
 
-///////////////////
-//    void requestFileSystemInfo(const QString &parentDirPath);
-//    void fileSystemInfoReceived(int socketID, const QString &parentDirPath, const QByteArray &fileSystemInfoData);
-//    void requestUploadFilesToRemote(const QStringList &localFiles, const QString &remoteDir);
-//    void requestDownloadFileFromRemote(const QStringList &remoteFiles, const QString &localDir);
 
-    //File TX
-//    void startFileManager();
-//    void processPeerRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &remotePath, quint64 size, const QString &remoteFileSaveDir);
-//    void processPeerRequestDownloadFilePacket(int socketID, const QString &filePath);
+    void peerDisconnected(int socketID);
+    void peerDisconnected(bool normalClose);
 
-//    void fileDownloadRequestAccepted(int socketID, const QString &remoteFilePath, const QByteArray &fileMD5Sum, quint64 size);
-//    void fileDownloadRequestDenied(int socketID, const QString &remoteFilePath, const QString &message);
-//    void fileUploadRequestResponsed(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
-
-//    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
-//    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
-//    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
-//    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorMessage);
-
-//    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-//    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
-//    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 private:
     bool verifyPrivilege();
