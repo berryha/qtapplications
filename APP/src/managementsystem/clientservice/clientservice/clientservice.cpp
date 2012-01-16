@@ -323,9 +323,13 @@ bool ClientService::startMainService(){
 }
 
 void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
-    qDebug()<<"----ClientService::serverFound(...)";
+    qWarning()<<"----ClientService::serverFound(...) serverInstanceID:"<<serverInstanceID <<" m_serverInstanceID:"<<m_serverInstanceID;
 
-    if(/*!m_serverAddress.isNull() && */serverInstanceID == m_serverInstanceID){
+    //QMutexLocker locker(&mutex);
+    //qWarning()<<"----------1-------"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
+
+    if(/*!m_serverAddress.isNull() && */serverInstanceID == m_serverInstanceID && m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
+        qWarning()<<"Already Connected To Server "<<serverAddress;
         return;
     }
     m_udtProtocol->closeSocket(m_socketConnectedToServer);
@@ -335,15 +339,29 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     m_serverName = "";
     m_serverInstanceID = 0;
 
-    int msec = QDateTime::currentDateTime().toString("z").toUInt();
+    int msec = QDateTime::currentDateTime().toString("zzz").toUInt();
     Utilities::msleep(10*msec);
 
-    m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
+    m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort, 0, true, 30000);
     if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
         qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         return;
     }
-    clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, true);
+    if(!m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+        m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        return;
+    }
+
+    if(!clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, true)){
+        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+        m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+        qCritical()<<"Error! Can not changed online status to server! "<<m_udtProtocol->getLastErrorMessage();
+        return;
+    }
+
+    lookForServerTimer->stop();
 
     m_serverAddress = QHostAddress(serverAddress);
     m_serverUDTListeningPort = serverUDTListeningPort;
@@ -354,7 +372,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
 
     //logMessage(QString("Server Found! Address:%1 TCP Port:%2 Name:%3").arg(serverAddress).arg(serverTCPListeningPort).arg(serverName), QtServiceBase::Information);
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" UDT Port:"<<serverUDTListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" UDT Port:"<<serverUDTListeningPort<<" Name:"<<serverName<<" Instance ID:"<<serverInstanceID << " Socket ID:"<<m_socketConnectedToServer;
     qWarning();
 
 
@@ -387,6 +405,8 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         processClientDetailedInfoRequestedPacket("", true, m_socketConnectedToServer);
         settings.setValue(section, QDateTime::currentDateTime());
     }
+
+    qWarning()<<"----------2-------"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
 
 }
 
@@ -1192,7 +1212,7 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 }
 
 void ClientService::uploadClientSummaryInfo(int socketID){
-    qWarning()<<"--ClientService::uploadClientSummaryInfo(...)";
+    qWarning()<<"--ClientService::uploadClientSummaryInfo(...) socketID:"<<socketID;
 
     if(UDTProtocol::INVALID_UDT_SOCK == socketID){
         return;
@@ -1900,6 +1920,7 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 }
 
 void ClientService::peerDisconnected(int socketID){
+    qWarning()<<"Peer Disconnected! Socket ID:"<<socketID;
 
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";

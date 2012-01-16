@@ -206,6 +206,8 @@ private:
 
     QStringList logs;
 
+    //QMutex mutex;
+
 };
 
 } //namespace HEHUI

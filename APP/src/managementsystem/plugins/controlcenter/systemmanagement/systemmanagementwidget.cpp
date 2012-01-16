@@ -352,7 +352,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
     ui.toolButtonVerify->setEnabled(false);
 
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT);
+        m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 0, true, 10000);
     }
 
     if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
