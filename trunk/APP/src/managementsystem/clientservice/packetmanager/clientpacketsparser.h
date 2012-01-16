@@ -67,7 +67,7 @@ public slots:
 
 
     bool sendClientLookForServerPacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS)){
-        qDebug()<<"----sendClientLookForServerPacket(...)";
+        qDebug()<<"----sendClientLookForServerPacket(...) targetAddress:"<<targetAddress;
 
         QHostAddress address = QHostAddress(targetAddress);
         if(address.isNull()){
