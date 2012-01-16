@@ -240,15 +240,26 @@ bool ClientInfoSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QMode
     QModelIndex index6 = sourceModel()->index(sourceRow, 6, sourceParent);
 
 
-    return (sourceModel()->data(index0).toString().contains(computerName)
-            && sourceModel()->data(index1).toString().contains(workgroup)
-            && ( sourceModel()->data(index2).toString().contains(ip) || sourceModel()->data(index2).toString().contains(mac) )
-            && sourceModel()->data(index3).toString().contains(userName)
-            && sourceModel()->data(index4).toString().contains(os)
-            && sourceModel()->data(index5).toString().contains(usbSD)
-            && sourceModel()->data(index6).toString().contains(programs)
+//    return (sourceModel()->data(index0).toString().contains(computerName)
+//            && sourceModel()->data(index1).toString().contains(workgroup)
+//            && ( sourceModel()->data(index2).toString().contains(ip) && sourceModel()->data(index2).toString().contains(mac) )
+//            && sourceModel()->data(index3).toString().contains(userName)
+//            && sourceModel()->data(index4).toString().contains(os)
+//            && sourceModel()->data(index5).toString().contains(usbSD)
+//            && sourceModel()->data(index6).toString().contains(programs)
+
+//            );
+
+    return (index0.data().toString().contains(computerName)
+            && index1.data().toString().contains(workgroup)
+            && ( index2.data().toString().contains(ip) && index2.data().toString().contains(mac) )
+            && index3.data().toString().contains(userName)
+            && index4.data().toString().contains(os)
+            && index5.data().toString().contains(usbSD)
+            && index6.data().toString().contains(programs)
 
             );
+
 }
 
 

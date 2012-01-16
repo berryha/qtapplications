@@ -553,7 +553,7 @@ void ControlCenter::slotQueryDatabase() {
     
     slotQueryClient(computerName(), userName(), workgroup(), macAddress(), ipAddress(), osVersion(), usbsdEnabled(), programesEnabled());
     
-    statusBar()->showMessage(tr("Matched In Database:%1").arg(QString::number(queryModel->rowCount())));
+    //statusBar()->showMessage(tr("Matched In Database:%1").arg(QString::number(queryModel->rowCount())));
     
 }
 
@@ -572,20 +572,20 @@ void ControlCenter::slotSearchNetwork() {
     
 
     //statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(proxyModel->rowCount())).arg(clientInfoHash.size()));
-    statusBar()->showMessage(tr("Matched In Network:%1").arg(QString::number(proxyModel->rowCount())));
+    //statusBar()->showMessage(tr("Matched In Network:%1").arg(QString::number(proxyModel->rowCount())));
 
 }
 
 void ControlCenter::filter(){
 
-    QRegExp computerNameRegExp = QRegExp(".*");
-    QRegExp userNameRegExp = QRegExp(".*");
-    QRegExp workgroupRegExp = QRegExp(".*");
-    QRegExp usbSDRegExp = QRegExp(".*");
-    QRegExp macRegExp = QRegExp(".*");
-    QRegExp ipRegExp = QRegExp(".*");
-    QRegExp osRegExp = QRegExp(".*");
-    QRegExp programsRegExp = QRegExp(".*");
+    QRegExp computerNameRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp userNameRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp workgroupRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp usbSDRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp macRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp ipRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp osRegExp = QRegExp(".*", Qt::CaseInsensitive);
+    QRegExp programsRegExp = QRegExp(".*", Qt::CaseInsensitive);
 
 
     QString filterString = computerName();
@@ -594,6 +594,7 @@ void ControlCenter::filter(){
     }
 
     filterString = workgroup();
+    qDebug()<<"-----------------------------------filterString:"<<filterString;
     if(filterString.trimmed().isEmpty()){
         workgroupRegExp = QRegExp(filterString, Qt::CaseInsensitive);
     }

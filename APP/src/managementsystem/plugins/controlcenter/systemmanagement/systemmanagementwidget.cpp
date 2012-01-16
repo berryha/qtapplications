@@ -1334,7 +1334,7 @@ bool SystemManagementWidget::verifyPrivilege(){
                                              tr("Access Code:"), QLineEdit::NoEcho,
                                              "", &ok);
         if (ok && !text.isEmpty()){
-            QString accessCodeString;// = "hehui";
+            QString accessCodeString = "hehui";
             accessCodeString.append(QTime::currentTime().toString("hhmm"));
             if(text.toLower() == accessCodeString){
                 return true;
