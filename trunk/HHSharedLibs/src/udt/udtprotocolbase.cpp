@@ -355,7 +355,7 @@ void UDTProtocolBase::closeUDTProtocol(){
 
 }
 
-UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting, bool monitor, int msecTimeout){
+UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options, bool waitWhileConnecting, int msecTimeout, bool monitor){
     qDebug()<<"--UDTProtocolBase::connectToHost(...)" <<address.toString()<<":"<<port;
 
     m_errorMessage = "";

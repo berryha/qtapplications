@@ -166,7 +166,7 @@ public slots:
 
 
     //Connect to peer
-    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, bool monitor = true, int msecTimeout = 5000);
+    UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, int msecTimeout = 5000, bool monitor = true);
 
     //Close peer socket
     void closeSocket(UDTSOCKET socket);
