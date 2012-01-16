@@ -572,7 +572,7 @@ void ControlCenter::slotSearchNetwork() {
     
 
     //statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(proxyModel->rowCount())).arg(clientInfoHash.size()));
-    //statusBar()->showMessage(tr("Matched In Network:%1").arg(QString::number(proxyModel->rowCount())));
+    statusBar()->showMessage(tr("Matched In Network:%1").arg(QString::number(proxyModel->rowCount())));
 
 }
 
@@ -594,8 +594,7 @@ void ControlCenter::filter(){
     }
 
     filterString = workgroup();
-    qDebug()<<"-----------------------------------filterString:"<<filterString;
-    if(filterString.trimmed().isEmpty()){
+    if(!filterString.trimmed().isEmpty()){
         workgroupRegExp = QRegExp(filterString, Qt::CaseInsensitive);
     }
 
@@ -1099,7 +1098,7 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
     
 
     //if(ui.tableViewClientList->model() == proxyModel){
-    //    statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(ui.tableViewClientList->model()->rowCount())).arg(clientInfoHash.size()));
+        statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(ui.tableViewClientList->model()->rowCount())).arg(clientInfoHash.size()));
     //}
 
 
