@@ -63,6 +63,7 @@ private slots:
 
     void slotQueryDatabase();
     void slotSearchNetwork();
+    void filter();
     //    void slotUpdateButtonClicked();
 
     void slotShowClientInfo(const QModelIndex &index);
@@ -151,7 +152,8 @@ private:
 
     QHash<QString/*Computer Name*/, ClientInfo *> clientInfoHash;
     ClientInfoModel *clientInfoModel;
-    QSortFilterProxyModel *proxyModel;
+    //QSortFilterProxyModel *proxyModel;
+    ClientInfoSortFilterProxyModel *proxyModel;
     
 
     bool m_networkReady;

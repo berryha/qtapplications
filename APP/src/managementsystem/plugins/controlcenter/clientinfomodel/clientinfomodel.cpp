@@ -52,13 +52,13 @@ void ClientInfoModel::setClientList(QList<ClientInfo*> clientsList)
 
 void ClientInfoModel::addClientInfo(ClientInfo *clientInfo){
     
+    beginResetModel();
+
     if(!clientsList.contains(clientInfo)){
         this->clientsList.append(clientInfo);
-    
     }
     
-    beginResetModel();
-    this->clientsList = clientsList;
+    //this->clientsList = clientsList;
     endResetModel();
     
 }
@@ -185,11 +185,77 @@ QVariant ClientInfoModel::headerData ( int section, Qt::Orientation orientation,
 
 }
 
+////////////////////////////////////////////////////////////
 
+ClientInfoSortFilterProxyModel::ClientInfoSortFilterProxyModel(QObject *parent)
+    :QSortFilterProxyModel(parent)
+{
 
-
-
-
-
+    computerName = QRegExp(".*", Qt::CaseInsensitive);
+    userName = QRegExp(".*", Qt::CaseInsensitive);
+    workgroup = QRegExp(".*", Qt::CaseInsensitive);
+    usbSD = QRegExp(".*", Qt::CaseInsensitive);
+    mac = QRegExp(".*", Qt::CaseInsensitive);
+    ip = QRegExp(".*", Qt::CaseInsensitive);
+    os = QRegExp(".*", Qt::CaseInsensitive);
 
 }
+
+void ClientInfoSortFilterProxyModel::cleanFilters(){
+
+    computerName = QRegExp(".*", Qt::CaseInsensitive);
+    userName = QRegExp(".*", Qt::CaseInsensitive);
+    workgroup = QRegExp(".*", Qt::CaseInsensitive);
+    usbSD = QRegExp(".*", Qt::CaseInsensitive);
+    mac = QRegExp(".*", Qt::CaseInsensitive);
+    ip = QRegExp(".*", Qt::CaseInsensitive);
+    os = QRegExp(".*", Qt::CaseInsensitive);
+
+    invalidateFilter();
+}
+
+void ClientInfoSortFilterProxyModel::setFilters(const QRegExp &computerName, const QRegExp &userName, const QRegExp &workgroup, const QRegExp &usbSD, const QRegExp &mac, const QRegExp &ip, const QRegExp &os, const QRegExp &programs){
+
+    this->computerName = computerName;
+    this->userName = userName;
+    this->workgroup = workgroup;
+    this->usbSD = usbSD;
+    this->mac = mac;
+    this->ip = ip;
+    this->os = os;
+    this->programs = programs;
+
+    invalidateFilter();
+
+}
+
+bool ClientInfoSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+{
+    QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
+    QModelIndex index1 = sourceModel()->index(sourceRow, 1, sourceParent);
+    QModelIndex index2 = sourceModel()->index(sourceRow, 2, sourceParent);
+    QModelIndex index3 = sourceModel()->index(sourceRow, 3, sourceParent);
+    QModelIndex index4 = sourceModel()->index(sourceRow, 4, sourceParent);
+    QModelIndex index5 = sourceModel()->index(sourceRow, 5, sourceParent);
+    QModelIndex index6 = sourceModel()->index(sourceRow, 6, sourceParent);
+
+
+    return (sourceModel()->data(index0).toString().contains(computerName)
+            && sourceModel()->data(index1).toString().contains(workgroup)
+            && ( sourceModel()->data(index2).toString().contains(ip) || sourceModel()->data(index2).toString().contains(mac) )
+            && sourceModel()->data(index3).toString().contains(userName)
+            && sourceModel()->data(index4).toString().contains(os)
+            && sourceModel()->data(index5).toString().contains(usbSD)
+            && sourceModel()->data(index6).toString().contains(programs)
+
+            );
+}
+
+
+
+
+
+
+
+
+} //namespace HEHUI
