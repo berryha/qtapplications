@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>948</width>
+    <width>980</width>
     <height>515</height>
    </rect>
   </property>
@@ -339,37 +339,17 @@
              </item>
             </widget>
            </item>
-           <item row="1" column="9">
-            <widget class="QToolButton" name="toolButtonUpdatePassword">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>Update Windows Logon Password</string>
-             </property>
-             <property name="statusTip">
-              <string>Update Windows Logon Password</string>
-             </property>
-             <property name="text">
-              <string>Update Windows Logon Password</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../bulletinboard/bulletinboard.qrc">
-               <normaloff>:/icon/resources/images/password.png</normaloff>:/icon/resources/images/password.png</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="8">
             <widget class="QToolButton" name="toolButtonQuery">
+             <property name="toolTip">
+              <string/>
+             </property>
              <property name="text">
               <string>Query</string>
              </property>
              <property name="icon">
               <iconset resource="controlcenter.qrc">
-               <normaloff>:/icon/resources/images/select.png</normaloff>:/icon/resources/images/select.png</iconset>
+               <normaloff>:/icon/resources/images/querydatabase.png</normaloff>:/icon/resources/images/querydatabase.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+Return</string>
@@ -396,7 +376,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="9">
+           <item row="2" column="10">
             <widget class="QToolButton" name="toolButtonAnnouncement">
              <property name="enabled">
               <bool>false</bool>
@@ -405,11 +385,57 @@
               <string>Update All Clients' Info</string>
              </property>
              <property name="icon">
-              <iconset resource="../bulletinboard/bulletinboard.qrc">
+              <iconset resource="controlcenter.qrc">
                <normaloff>:/icon/resources/images/announcement.png</normaloff>:/icon/resources/images/announcement.png</iconset>
              </property>
              <property name="shortcut">
               <string>F5</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="9">
+            <widget class="QToolButton" name="toolButtonUpdatePassword">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="statusTip">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="text">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/password.png</normaloff>:/icon/resources/images/password.png</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="9">
+            <widget class="QToolButton" name="toolButtonfilter">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="toolTip">
+              <string>Filter Data</string>
+             </property>
+             <property name="statusTip">
+              <string>Filter Data</string>
+             </property>
+             <property name="text">
+              <string>Filter</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -452,7 +478,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>948</width>
+     <width>980</width>
      <height>23</height>
     </rect>
    </property>
@@ -491,7 +517,7 @@
   <action name="actionSearchNetwork">
    <property name="icon">
     <iconset resource="controlcenter.qrc">
-     <normaloff>:/icon/resources/images/select.png</normaloff>:/icon/resources/images/select.png</iconset>
+     <normaloff>:/icon/resources/images/searchnetwork.png</normaloff>:/icon/resources/images/searchnetwork.png</iconset>
    </property>
    <property name="text">
     <string>Search Network</string>
@@ -499,7 +525,7 @@
   </action>
   <action name="actionUpdatePassword">
    <property name="icon">
-    <iconset resource="../bulletinboard/bulletinboard.qrc">
+    <iconset resource="controlcenter.qrc">
      <normaloff>:/icon/resources/images/password.png</normaloff>:/icon/resources/images/password.png</iconset>
    </property>
    <property name="text">
@@ -517,16 +543,27 @@
   </action>
   <action name="actionAnnouncement">
    <property name="icon">
-    <iconset resource="../bulletinboard/bulletinboard.qrc">
+    <iconset resource="controlcenter.qrc">
      <normaloff>:/icon/resources/images/announcement.png</normaloff>:/icon/resources/images/announcement.png</iconset>
    </property>
    <property name="text">
     <string>Announcement</string>
    </property>
   </action>
+  <action name="actionFilter">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="../bulletinboard/bulletinboard.qrc"/>
   <include location="controlcenter.qrc"/>
  </resources>
  <connections/>

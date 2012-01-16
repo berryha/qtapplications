@@ -51,21 +51,19 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     queryModel = new QSqlQueryModel(this);
 
     clientInfoModel = new ClientInfoModel(this);
-    proxyModel = new QSortFilterProxyModel(this);
-//    proxyModel->setSourceModel(clientInfoModel);
+    //proxyModel = new QSortFilterProxyModel(this);
+    proxyModel = new ClientInfoSortFilterProxyModel(this);
     proxyModel->setSourceModel(queryModel);
+    proxyModel->setDynamicSortFilter(true);
 
-//    ui.tableViewClientList->setModel(queryModel);
     ui.tableViewClientList->setModel(proxyModel);
 
 
-    //        connect(ui.toolButtonQuery, SIGNAL(clicked()), this, SLOT(slotQueryButtonClicked()));
-    //connect(ui.toolButtonUpdate, SIGNAL(clicked()), this, SLOT(slotUpdateButtonClicked()));
     connect(ui.toolButtonManage, SIGNAL(clicked()), this, SLOT(slotRemoteManagement()));
-    //connect(ui.toolButtonUpdatePassword, SIGNAL(clicked()), this, SLOT(slotUpdateUserLogonPassword()));
 
     connect(ui.actionQueryDatabase, SIGNAL(triggered()), this, SLOT(slotQueryDatabase()));
     connect(ui.actionSearchNetwork, SIGNAL(triggered()), this, SLOT(slotSearchNetwork()));
+    connect(ui.actionFilter, SIGNAL(triggered()), this, SLOT(filter()));
 
 
     connect(ui.actionUpdatePassword, SIGNAL(triggered()), this, SLOT(slotUpdateUserLogonPassword()));
@@ -131,6 +129,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     searchClientsMenu->addAction(ui.actionSearchNetwork);
     ui.toolButtonQuery->setMenu(searchClientsMenu);
     ui.toolButtonQuery->setDefaultAction(ui.actionQueryDatabase);
+
+    ui.toolButtonfilter->setDefaultAction(ui.actionFilter);
     
     updatePasswordMenu = new QMenu;
     updatePasswordMenu->addAction(ui.actionInformNewPassword);
@@ -549,7 +549,7 @@ void ControlCenter::slotQueryDatabase() {
     ui.toolButtonQuery->setDefaultAction(ui.actionQueryDatabase);  
 //    ui.tableViewClientList->setModel(queryModel);
     proxyModel->setSourceModel(queryModel);
-
+    proxyModel->cleanFilters();
     
     slotQueryClient(computerName(), userName(), workgroup(), macAddress(), ipAddress(), osVersion(), usbsdEnabled(), programesEnabled());
     
@@ -562,47 +562,8 @@ void ControlCenter::slotSearchNetwork() {
     ui.toolButtonQuery->setDefaultAction(ui.actionSearchNetwork);
     
     proxyModel->setSourceModel(clientInfoModel);
+    filter();
 
-    
-    QString filterString = computerName();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(0);
-    }
-    
-    filterString = workgroup();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(1);
-    }
-    
-    filterString = macAddress();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(2);
-    }
-    filterString = ipAddress();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(2);
-    }
-    
-    filterString = userName();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(3);
-    }
-    
-    filterString = osVersion();
-    if(!filterString.trimmed().isEmpty()){
-        proxyModel->setFilterRegExp(QRegExp(filterString, Qt::CaseInsensitive, QRegExp::FixedString));
-        proxyModel->setFilterKeyColumn(4);
-    }
-    
-
-//    ui.tableViewClientList->setModel(proxyModel);
-
-    
     //Broadcast
     QList<QHostAddress> broadcastAddresses = NetworkUtilities::broadcastAddresses();
     foreach (QHostAddress address, broadcastAddresses) {
@@ -611,6 +572,64 @@ void ControlCenter::slotSearchNetwork() {
     
 
     //statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(proxyModel->rowCount())).arg(clientInfoHash.size()));
+    statusBar()->showMessage(tr("Matched In Network:%1").arg(QString::number(proxyModel->rowCount())));
+
+}
+
+void ControlCenter::filter(){
+
+    QRegExp computerNameRegExp = QRegExp(".*");
+    QRegExp userNameRegExp = QRegExp(".*");
+    QRegExp workgroupRegExp = QRegExp(".*");
+    QRegExp usbSDRegExp = QRegExp(".*");
+    QRegExp macRegExp = QRegExp(".*");
+    QRegExp ipRegExp = QRegExp(".*");
+    QRegExp osRegExp = QRegExp(".*");
+    QRegExp programsRegExp = QRegExp(".*");
+
+
+    QString filterString = computerName();
+    if(!filterString.trimmed().isEmpty()){
+        computerNameRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = workgroup();
+    if(filterString.trimmed().isEmpty()){
+        workgroupRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = usbsdEnabled();
+    if(!filterString.trimmed().isEmpty()){
+        usbSDRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = macAddress();
+    if(!filterString.trimmed().isEmpty()){
+        macRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = ipAddress();
+    if(!filterString.trimmed().isEmpty()){
+        ipRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = userName();
+    if(!filterString.trimmed().isEmpty()){
+        userNameRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = osVersion();
+    if(!filterString.trimmed().isEmpty()){
+        osRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    filterString = programesEnabled();
+    if(!filterString.trimmed().isEmpty()){
+        programsRegExp = QRegExp(filterString, Qt::CaseInsensitive);
+    }
+
+    proxyModel->setFilters(computerNameRegExp, userNameRegExp, workgroupRegExp, usbSDRegExp, macRegExp, ipRegExp, osRegExp, programsRegExp);
+
     statusBar()->showMessage(tr("Matched:%1").arg(QString::number(proxyModel->rowCount())));
 
 }
@@ -1017,13 +1036,6 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTL
 
 
 
-
-
-
-
-
-
-
 //    if(m_serverInstanceID != 0 && serverInstanceID != m_serverInstanceID){
 //        controlCenterPacketsParser->sendClientOnlinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), m_adminName+"@"+localComputerName, true);
 //    }
@@ -1084,9 +1096,13 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
 
     clientInfoModel->addClientInfo(info);
     
-    if(ui.tableViewClientList->model() == proxyModel){
-        statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(ui.tableViewClientList->model()->rowCount())).arg(clientInfoHash.size()));
-    }
+
+    //if(ui.tableViewClientList->model() == proxyModel){
+    //    statusBar()->showMessage(tr("Matched:%1 Total:%2").arg(QString::number(ui.tableViewClientList->model()->rowCount())).arg(clientInfoHash.size()));
+    //}
+
+
+    qApp->processEvents();
 
 }
 
