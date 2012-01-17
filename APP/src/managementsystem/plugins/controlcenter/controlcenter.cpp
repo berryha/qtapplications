@@ -410,6 +410,7 @@ void ControlCenter::slotcloseTab(){
         }
         ui.tabWidget->removeTab(ui.tabWidget->currentIndex());
         systemManagementWidget->close();
+        systemManagementWidget->deleteLater();
     }
 
 

@@ -1306,6 +1306,8 @@ void SystemManagementWidget::peerDisconnected(bool normalClose){
 
     if(!normalClose){
         QMessageBox::critical(this, tr("Error"), QString("ERROR! Peer %1 Closed Unexpectedly!").arg(m_peerIPAddress.toString()));
+    }else{
+        QMessageBox::warning(this, tr("Warning"), QString("Warning! Peer %1 Closed!").arg(m_peerIPAddress.toString()));
     }
 
 

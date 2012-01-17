@@ -344,13 +344,13 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
 
     m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort, 0, true, 30000);
     if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
-        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        qCritical()<<tr("Error! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         return;
     }
     if(!m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
         m_udtProtocol->closeSocket(m_socketConnectedToServer);
         m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
-        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        qCritical()<<tr("Error! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         return;
     }
 
