@@ -56,7 +56,7 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
         localComputerName = wm->getComputerName().toLower();
     }
 
-    m_localWorkgroupName = wm->getWorkgroup().toLower();
+    m_localWorkgroupName = wm->getJoinInformation().toLower();
 #endif
 
     process = 0;
@@ -418,7 +418,6 @@ void ClientService::processServerRequestClientInfoPacket(const QString &groupNam
     //WindowsManagement wm;
 
     if(!groupName.isEmpty()){
-        //if(groupName.toLower() != wm->getWorkgroup().toLower()){
         if(groupName.toLower() != m_localWorkgroupName){
             return;
         }
@@ -1222,7 +1221,6 @@ void ClientService::uploadClientSummaryInfo(int socketID){
 
     //WindowsManagement wm;
     QString computerName = localComputerName;
-    //QString workgroupName = wm->getWorkgroup();
 
     QStringList users = wm->localUsers();
     users.removeAll("system$");
@@ -1288,7 +1286,6 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
 
     //WindowsManagement wm;
     QString computerName = localComputerName;
-    //QString workgroupName = wm->getWorkgroup();
 
     QStringList users = wm->localUsers();
     users.removeAll("system$");

@@ -75,7 +75,7 @@
             </property>
             <property name="icon">
              <iconset resource="../controlcenter.qrc">
-              <normaloff>:/icon/resources/images/select.png</normaloff>:/icon/resources/images/select.png</iconset>
+              <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -239,7 +239,7 @@
             </property>
             <property name="icon">
              <iconset resource="../controlcenter.qrc">
-              <normaloff>:/icon/resources/images/select.png</normaloff>:/icon/resources/images/select.png</iconset>
+              <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>

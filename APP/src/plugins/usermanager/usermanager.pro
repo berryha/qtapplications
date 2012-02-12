@@ -28,8 +28,9 @@ UI_DIR = ./ui
 HEADERS += usermanagerplugin.h \
     usermanagermainwindow.h \
     modifyuserinfo/modifyuserinfodialog.h
-FORMS +=  usermanager.ui \
-    modifyuserinfo/modifyuserinfodialog.ui
+FORMS +=  \
+    modifyuserinfo/modifyuserinfodialog.ui \
+    usermanagermainwindow.ui
 SOURCES += usermanagerplugin.cpp \
     usermanagermainwindow.cpp \
     modifyuserinfo/modifyuserinfodialog.cpp
