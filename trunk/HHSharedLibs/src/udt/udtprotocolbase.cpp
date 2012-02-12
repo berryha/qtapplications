@@ -1,5 +1,5 @@
 ﻿/*
- * abstractudtsocket.cpp
+ * udtprotocolbase.cpp
  *
  *  Created on: 2010-12-15
  *      Author: hehui

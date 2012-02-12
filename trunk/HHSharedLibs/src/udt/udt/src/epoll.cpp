@@ -132,7 +132,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
    }
 
    ev.data.fd = s;
-   if (epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
+   if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
       throw CUDTException();
 #endif
 
@@ -169,7 +169,7 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 
 #ifdef LINUX
    epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
-   if (epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
+   if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
       throw CUDTException();
 #endif
 
@@ -228,7 +228,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          #ifdef LINUX
          const int max_events = p->second.m_sLocals.size();
          epoll_event ev[max_events];
-         int nfds = epoll_wait(p->second.m_iLocalID, ev, max_events, 0);
+         int nfds = ::epoll_wait(p->second.m_iLocalID, ev, max_events, 0);
 
          for (int i = 0; i < nfds; ++ i)
          {
@@ -265,7 +265,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          timeval tv;
          tv.tv_sec = 0;
          tv.tv_usec = 0;
-         if (select(0, &readfds, &writefds, NULL, &tv) > 0)
+         if (::select(0, &readfds, &writefds, NULL, &tv) > 0)
          {
             for (set<SYSSOCKET>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
             {

@@ -1,4 +1,4 @@
-C++ = g++ -g
+C++ = g++
 
 ifndef os
    os = LINUX
@@ -30,7 +30,7 @@ ifeq ($(arch), AMD64)
    CCFLAGS += -DAMD64
 endif
 
-OBJS = md5.o common.o window.o list.o buffer.o packet.o channel.o queue.o ccc.o cache.o core.o epoll.o api.o
+OBJS = api.o buffer.o cache.o ccc.o channel.o common.o core.o epoll.o list.o md5.o packet.o queue.o window.o
 DIR = $(shell pwd)
 
 all: libudt.so libudt.a udt

@@ -206,7 +206,7 @@ CUDT::~CUDT()
    delete m_pRNode;
 }
 
-void CUDT::setOpt(UDTOpt optName, const void* optval, const int&)
+void CUDT::setOpt(UDTOpt optName, const void* optval, int)
 {
    if (m_bBroken || m_bClosing)
       throw CUDTException(2, 1, 0);
@@ -785,8 +785,8 @@ POST_CONNECT:
    m_pCC = m_pCCFactory->create();
    m_pCC->m_UDT = m_SocketID;
    m_pCC->setMSS(m_iMSS);
-   m_pCC->setMaxCWndSize((int&)m_iFlowWindowSize);
-   m_pCC->setSndCurrSeqNo((int32_t&)m_iSndCurrSeqNo);
+   m_pCC->setMaxCWndSize(m_iFlowWindowSize);
+   m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
    m_pCC->setRcvRate(m_iDeliveryRate);
    m_pCC->setRTT(m_iRTT);
    m_pCC->setBandwidth(m_iBandwidth);
@@ -885,8 +885,8 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
    m_pCC = m_pCCFactory->create();
    m_pCC->m_UDT = m_SocketID;
    m_pCC->setMSS(m_iMSS);
-   m_pCC->setMaxCWndSize((int&)m_iFlowWindowSize);
-   m_pCC->setSndCurrSeqNo((int32_t&)m_iSndCurrSeqNo);
+   m_pCC->setMaxCWndSize(m_iFlowWindowSize);
+   m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
    m_pCC->setRcvRate(m_iDeliveryRate);
    m_pCC->setRTT(m_iRTT);
    m_pCC->setBandwidth(m_iBandwidth);
@@ -1012,7 +1012,7 @@ void CUDT::close()
    m_bOpened = false;
 }
 
-int CUDT::send(const char* data, const int& len)
+int CUDT::send(const char* data, int len)
 {
    if (UDT_DGRAM == m_iSockType)
       throw CUDTException(5, 10, 0);
@@ -1121,7 +1121,7 @@ int CUDT::send(const char* data, const int& len)
    return size;
 }
 
-int CUDT::recv(char* data, const int& len)
+int CUDT::recv(char* data, int len)
 {
    if (UDT_DGRAM == m_iSockType)
       throw CUDTException(5, 10, 0);
@@ -1208,7 +1208,7 @@ int CUDT::recv(char* data, const int& len)
    return res;
 }
 
-int CUDT::sendmsg(const char* data, const int& len, const int& msttl, const bool& inorder)
+int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
 {
    if (UDT_STREAM == m_iSockType)
       throw CUDTException(5, 9, 0);
@@ -1311,7 +1311,7 @@ int CUDT::sendmsg(const char* data, const int& len, const int& msttl, const bool
    return len;   
 }
 
-int CUDT::recvmsg(char* data, const int& len)
+int CUDT::recvmsg(char* data, int len)
 {
    if (UDT_STREAM == m_iSockType)
       throw CUDTException(5, 9, 0);
@@ -1410,7 +1410,7 @@ int CUDT::recvmsg(char* data, const int& len)
    return res;
 }
 
-int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, const int64_t& size, const int& block)
+int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
 {
    if (UDT_DGRAM == m_iSockType)
       throw CUDTException(5, 10, 0);
@@ -1503,7 +1503,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, const int64_t& size, const
    return size - tosend;
 }
 
-int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, const int64_t& size, const int& block)
+int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
 {
    if (UDT_DGRAM == m_iSockType)
       throw CUDTException(5, 10, 0);
@@ -1618,7 +1618,7 @@ void CUDT::sample(CPerfMon* perf, bool clear)
    perf->usPktSndPeriod = m_ullInterval / double(m_ullCPUFrequency);
    perf->pktFlowWindow = m_iFlowWindowSize;
    perf->pktCongestionWindow = (int)m_dCongestionWindow;
-   perf->pktFlightSize = CSeqNo::seqlen(const_cast<int32_t&>(m_iSndLastAck), CSeqNo::incseq(m_iSndCurrSeqNo)) - 1;
+   perf->pktFlightSize = CSeqNo::seqlen(m_iSndLastAck, CSeqNo::incseq(m_iSndCurrSeqNo)) - 1;
    perf->msRTT = m_iRTT/1000.0;
    perf->mbpsBandwidth = m_iBandwidth * m_iPayloadSize * 8.0 / 1000000.0;
 
@@ -1724,7 +1724,7 @@ void CUDT::releaseSynch()
    #endif
 }
 
-void CUDT::sendCtrl(const int& pkttype, void* lparam, void* rparam, const int& size)
+void CUDT::sendCtrl(int pkttype, void* lparam, void* rparam, int size)
 {
    CPacket ctrlpkt;
 
@@ -1959,9 +1959,9 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       if (4 == ctrlpkt.getLength())
       {
          ack = *(int32_t *)ctrlpkt.m_pcData;
-         if (CSeqNo::seqcmp(ack, const_cast<int32_t&>(m_iSndLastAck)) >= 0)
+         if (CSeqNo::seqcmp(ack, m_iSndLastAck) >= 0)
          {
-            m_iFlowWindowSize -= CSeqNo::seqoff(const_cast<int32_t&>(m_iSndLastAck), ack);
+            m_iFlowWindowSize -= CSeqNo::seqoff(m_iSndLastAck, ack);
             m_iSndLastAck = ack;
          }
 
@@ -1993,7 +1993,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
          break;
       }
 
-      if (CSeqNo::seqcmp(ack, const_cast<int32_t&>(m_iSndLastAck)) >= 0)
+      if (CSeqNo::seqcmp(ack, m_iSndLastAck) >= 0)
       {
          // Update Flow Window Size, must update before and together with m_iSndLastAck
          m_iFlowWindowSize = *((int32_t *)ctrlpkt.m_pcData + 3);
@@ -2003,7 +2003,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       // protect packet retransmission
       CGuard::enterCS(m_AckLock);
 
-      int offset = CSeqNo::seqoff((int32_t&)m_iSndLastDataAck, ack);
+      int offset = CSeqNo::seqoff(m_iSndLastDataAck, ack);
       if (offset <= 0)
       {
          // discard it if it is a repeated ACK
@@ -2021,7 +2021,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       // update sending variables
       m_iSndLastDataAck = ack;
-      m_pSndLossList->remove(CSeqNo::decseq((int32_t&)m_iSndLastDataAck));
+      m_pSndLossList->remove(CSeqNo::decseq(m_iSndLastDataAck));
 
       CGuard::leaveCS(m_AckLock);
 
@@ -2116,7 +2116,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       {
          if (0 != (losslist[i] & 0x80000000))
          {
-            if ((CSeqNo::seqcmp(losslist[i] & 0x7FFFFFFF, losslist[i + 1]) > 0) || (CSeqNo::seqcmp(losslist[i + 1], const_cast<int32_t&>(m_iSndCurrSeqNo)) > 0))
+            if ((CSeqNo::seqcmp(losslist[i] & 0x7FFFFFFF, losslist[i + 1]) > 0) || (CSeqNo::seqcmp(losslist[i + 1], m_iSndCurrSeqNo) > 0))
             {
                // seq_a must not be greater than seq_b; seq_b must not be greater than the most recent sent seq
                secure = false;
@@ -2124,19 +2124,19 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             int num = 0;
-            if (CSeqNo::seqcmp(losslist[i] & 0x7FFFFFFF, const_cast<int32_t&>(m_iSndLastAck)) >= 0)
+            if (CSeqNo::seqcmp(losslist[i] & 0x7FFFFFFF, m_iSndLastAck) >= 0)
                num = m_pSndLossList->insert(losslist[i] & 0x7FFFFFFF, losslist[i + 1]);
-            else if (CSeqNo::seqcmp(losslist[i + 1], const_cast<int32_t&>(m_iSndLastAck)) >= 0)
-               num = m_pSndLossList->insert(const_cast<int32_t&>(m_iSndLastAck), losslist[i + 1]);
+            else if (CSeqNo::seqcmp(losslist[i + 1], m_iSndLastAck) >= 0)
+               num = m_pSndLossList->insert(m_iSndLastAck, losslist[i + 1]);
 
             m_iTraceSndLoss += num;
             m_iSndLossTotal += num;
 
             ++ i;
          }
-         else if (CSeqNo::seqcmp(losslist[i], const_cast<int32_t&>(m_iSndLastAck)) >= 0)
+         else if (CSeqNo::seqcmp(losslist[i], m_iSndLastAck) >= 0)
          {
-            if (CSeqNo::seqcmp(losslist[i], const_cast<int32_t&>(m_iSndCurrSeqNo)) > 0)
+            if (CSeqNo::seqcmp(losslist[i], m_iSndCurrSeqNo) > 0)
             {
                //seq_a must not be greater than the most recent sent seq
                secure = false;
@@ -2273,7 +2273,7 @@ int CUDT::packData(CPacket& packet, uint64_t& ts)
       // protect m_iSndLastDataAck from updating by ACK processing
       CGuard ackguard(m_AckLock);
 
-      int offset = CSeqNo::seqoff((int32_t&)m_iSndLastDataAck, packet.m_iSeqNo);
+      int offset = CSeqNo::seqoff(m_iSndLastDataAck, packet.m_iSeqNo);
       if (offset < 0)
          return 0;
 
@@ -2292,7 +2292,7 @@ int CUDT::packData(CPacket& packet, uint64_t& ts)
          m_pSndLossList->remove(seqpair[1]);
 
          // skip all dropped packets
-         if (CSeqNo::seqcmp(const_cast<int32_t&>(m_iSndCurrSeqNo), CSeqNo::incseq(seqpair[1])) < 0)
+         if (CSeqNo::seqcmp(m_iSndCurrSeqNo, CSeqNo::incseq(seqpair[1])) < 0)
              m_iSndCurrSeqNo = CSeqNo::incseq(seqpair[1]);
 
          return 0;
@@ -2309,12 +2309,12 @@ int CUDT::packData(CPacket& packet, uint64_t& ts)
 
       // check congestion/flow window limit
       int cwnd = (m_iFlowWindowSize < (int)m_dCongestionWindow) ? m_iFlowWindowSize : (int)m_dCongestionWindow;
-      if (cwnd >= CSeqNo::seqlen(const_cast<int32_t&>(m_iSndLastAck), CSeqNo::incseq(m_iSndCurrSeqNo)))
+      if (cwnd >= CSeqNo::seqlen(m_iSndLastAck, CSeqNo::incseq(m_iSndCurrSeqNo)))
       {
          if (0 != (payload = m_pSndBuffer->readData(&(packet.m_pcData), packet.m_iMsgNo)))
          {
             m_iSndCurrSeqNo = CSeqNo::incseq(m_iSndCurrSeqNo);
-            m_pCC->setSndCurrSeqNo((int32_t&)m_iSndCurrSeqNo);
+            m_pCC->setSndCurrSeqNo(m_iSndCurrSeqNo);
 
             packet.m_iSeqNo = m_iSndCurrSeqNo;
 
@@ -2617,7 +2617,7 @@ void CUDT::checkTimers()
          {
             // resend all unacknowledged packets on timeout, but only if there is no packet in the loss list
             int32_t csn = m_iSndCurrSeqNo;
-            int num = m_pSndLossList->insert(const_cast<int32_t&>(m_iSndLastAck), csn);
+            int num = m_pSndLossList->insert(m_iSndLastAck, csn);
             m_iTraceSndLoss += num;
             m_iSndLossTotal += num;
          }
