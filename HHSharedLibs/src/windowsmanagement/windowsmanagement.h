@@ -161,7 +161,10 @@ public:
     bool setComputerName(LPCWSTR m_newComputerNameToBeUsed);
     QString getComputerName();
     bool joinWorkgroup(LPCWSTR workgroup);
-    QString getWorkgroup();
+    bool joinDomain(const QString &domainName, const QString &accountName, const QString &password);
+    QString getJoinInformation(bool *isJoinedToDomain = 0);
+
+    bool getLoggedOnUserInfo(QString *userName, QString *domain, QString *logonServer);
 
     bool isStartupWithWin(const QString &applicationFilePath, const QString &parameters, const QString &valueNameString);
     bool setStartupWithWin(const QString &applicationFilePath, const QString &parameters, const QString &valueNameString, bool startupWithWin);

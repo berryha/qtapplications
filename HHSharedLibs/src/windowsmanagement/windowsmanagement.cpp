@@ -1641,8 +1641,39 @@ bool WindowsManagement::joinWorkgroup(LPCWSTR workgroup){
 
 }
 
-QString WindowsManagement::getWorkgroup(){
-    qDebug()<<"--WindowsManagement::getWorkgroup()";
+bool WindowsManagement::joinDomain(const QString &domainName, const QString &accountName, const QString &password){
+
+    lastErrorString = "";
+
+    NET_API_STATUS err = NetJoinDomain(NULL, domainName.toStdWString().c_str(), NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN);
+    switch(err){
+    case NERR_Success:
+        return true;
+        break;
+    case ERROR_INVALID_PARAMETER:
+        lastErrorString = tr("Failed to join domain! Invalid parameter!");
+        break;
+    case ERROR_NO_SUCH_DOMAIN:
+        lastErrorString = tr("Failed to join domain! No such domain!");
+        break;
+    case NERR_SetupAlreadyJoined:
+        lastErrorString = tr("Failed to join domain! The computer is already joined to a domain!");
+        break;
+    case NERR_InvalidWorkgroupName:
+        lastErrorString = tr("Failed to join workgroup! The specified workgroup name is not valid!");
+        break;
+    default:
+        lastErrorString = tr("Failed to join domain! Error code:%1").arg(err);
+        break;
+
+    }
+
+    return false;
+
+}
+
+QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain){
+    qDebug()<<"--WindowsManagement::getJoinInformation()";
 
     lastErrorString = "";
     QString workgroupName = "";
@@ -1651,22 +1682,97 @@ QString WindowsManagement::getWorkgroup(){
     LPWSTR lpNameBuffer = new wchar_t[256];
     NETSETUP_JOIN_STATUS bufferType;
 
-
     err = NetGetJoinInformation(lpServer, &lpNameBuffer, &bufferType);
     if(err == NERR_Success){
         workgroupName = QString::fromWCharArray(lpNameBuffer);
     }else{
-        lastErrorString = tr("Can not get workgroup information!");
+        lastErrorString = tr("Can not get join status information!");
     }
-    //    qWarning()<<"workgroupName:"<<workgroupName;
-    //    qWarning()<<"error:"<<error;
 
     NetApiBufferFree(lpNameBuffer);
-//    delete [] lpNameBuffer;
+
+//    switch(bufferType){
+//    case NetSetupUnknownStatus :
+//        workgroupName = "";
+//        lastErrorString += tr("The join status is unknown!");
+//        break;
+//    case NetSetupUnjoined :
+//        workgroupName = "";
+//        lastErrorString += tr("The computer is not joined!");
+//        break;
+//    case NetSetupWorkgroupName :
+//        qWarning()<<"The computer is joined to a workgroup!";
+//        break;
+//    case NetSetupDomainName :
+//        workgroupName = "";
+//        lastErrorString += tr("The computer is joined to a domain!");
+//        break;
+//    }
+
+    if(isJoinedToDomain){
+        *isJoinedToDomain = (bufferType == NetSetupDomainName)?true:false;
+    }
 
     return workgroupName;
 
 }
+
+bool WindowsManagement::getLoggedOnUserInfo(QString *userName, QString *domain, QString *logonServer){
+
+    bool ok = false;
+    DWORD dwLevel = 1;
+    LPWKSTA_USER_INFO_1 pBuf = NULL;
+    NET_API_STATUS nStatus;
+    //
+    // Call the NetWkstaUserGetInfo function;
+    //  specify level 1.
+    //
+    nStatus = NetWkstaUserGetInfo(NULL, dwLevel,(LPBYTE *)&pBuf);
+    //
+    // If the call succeeds, print the information
+    //  about the logged-on user.
+    //
+    if (nStatus == NERR_Success)
+    {
+        if (pBuf != NULL)
+        {
+            //wprintf(L"\n\tUser:          %s\n", pBuf->wkui1_username);
+            //wprintf(L"\tDomain:        %s\n", pBuf->wkui1_logon_domain);
+            //wprintf(L"\tOther Domains: %s\n", pBuf->wkui1_oth_domains);
+            //wprintf(L"\tLogon Server:  %s\n", pBuf->wkui1_logon_server);
+
+            if(userName){
+                *userName = QString::fromWCharArray(pBuf->wkui1_username);
+            }
+            if(domain){
+                *domain = QString::fromWCharArray(pBuf->wkui1_logon_domain);
+            }
+            if(logonServer){
+                *logonServer = QString::fromWCharArray(pBuf->wkui1_logon_server);
+            }
+
+            ok = true;
+        }
+
+    } else {
+        // Otherwise, print the system error.
+        //
+        //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+        qCritical()<<QString("A system error has occurred: %1").arg(nStatus);
+    }
+
+
+    //
+    // Free the allocated memory.
+    //
+    if (pBuf != NULL)
+        NetApiBufferFree(pBuf);
+
+    return ok;
+
+
+}
+
 
 bool WindowsManagement::addConnectionToNetDrive(){
 

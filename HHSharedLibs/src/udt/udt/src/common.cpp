@@ -156,7 +156,7 @@ uint64_t CTimer::getCPUFrequency()
    return s_ullCPUFrequency;
 }
 
-void CTimer::sleep(const uint64_t& interval)
+void CTimer::sleep(uint64_t interval)
 {
    uint64_t t;
    rdtsc(t);
@@ -165,7 +165,7 @@ void CTimer::sleep(const uint64_t& interval)
    sleepto(t + interval);
 }
 
-void CTimer::sleepto(const uint64_t& nexttime)
+void CTimer::sleepto(uint64_t nexttime)
 {
    // Use class member such that the method can be interrupted by others
    m_ullSchedTime = nexttime;
@@ -673,7 +673,7 @@ const int CUDTException::EUNKNOWN = -1;
 
 
 //
-bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, const int& ver)
+bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, int ver)
 {
    if (AF_INET == ver)
    {
@@ -701,7 +701,7 @@ bool CIPAddress::ipcmp(const sockaddr* addr1, const sockaddr* addr2, const int& 
    return false;
 }
 
-void CIPAddress::ntop(const sockaddr* addr, uint32_t ip[4], const int& ver)
+void CIPAddress::ntop(const sockaddr* addr, uint32_t ip[4], int ver)
 {
    if (AF_INET == ver)
    {
@@ -718,7 +718,7 @@ void CIPAddress::ntop(const sockaddr* addr, uint32_t ip[4], const int& ver)
    }
 }
 
-void CIPAddress::pton(sockaddr* addr, const uint32_t ip[4], const int& ver)
+void CIPAddress::pton(sockaddr* addr, const uint32_t ip[4], int ver)
 {
    if (AF_INET == ver)
    {

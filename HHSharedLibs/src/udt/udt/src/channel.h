@@ -50,7 +50,7 @@ class CChannel
 {
 public:
    CChannel();
-   CChannel(const int& version);
+   CChannel(int version);
    ~CChannel();
 
       // Functionality:
@@ -105,7 +105,7 @@ public:
       // Returned value:
       //    None.
 
-   void setSndBufSize(const int& size);
+   void setSndBufSize(int size);
 
       // Functionality:
       //    Set the UDP receiving buffer size.
@@ -114,7 +114,7 @@ public:
       // Returned value:
       //    None.
 
-   void setRcvBufSize(const int& size);
+   void setRcvBufSize(int size);
 
       // Functionality:
       //    Query the socket address that the channel is using.

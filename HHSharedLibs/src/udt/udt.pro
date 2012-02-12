@@ -43,6 +43,14 @@ RESOURCES +=
 
 
 win32 { 
+
+####Add the following code to "udt.h" before "#define NO_BUSY_WAITING" ###
+#ifdef NO_UDT_DLL
+#undef UDT_API
+#define UDT_API
+#endif
+######################################
+
     #DEFINES += WIN32  LEGACY_WIN32 NO_UDT_DLL
     DEFINES += WIN32 _WIN32_WINNT=0x0501 NO_UDT_DLL
     win32-g++:DEFINES += __MINGW__
