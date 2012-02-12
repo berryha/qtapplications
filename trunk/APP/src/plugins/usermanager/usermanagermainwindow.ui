@@ -104,6 +104,9 @@
        </item>
        <item row="0" column="0" colspan="8">
         <widget class="QTableView" name="userListTableView">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
          <property name="toolTip">
           <string>User List</string>
          </property>
@@ -286,6 +289,38 @@
     </item>
    </layout>
   </widget>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Query Result</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit User Info</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>Print</string>
+   </property>
+   <property name="toolTip">
+    <string>Print Query Result</string>
+   </property>
+  </action>
+  <action name="actionAutoLogon">
+   <property name="text">
+    <string>Auto Logon</string>
+   </property>
+   <property name="toolTip">
+    <string>Logon To Domain</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>userIDComboBox</tabstop>

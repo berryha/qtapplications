@@ -120,11 +120,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
 
         quint16 peerUDPListeningPort;
-        in >> peerUDPListeningPort;
+        QString version = "";
+        in >> peerUDPListeningPort >> version;
 
-        sendServerDeclarePacket(peerAddress, peerUDPListeningPort );
+        sendServerDeclarePacket(peerAddress, peerUDPListeningPort);
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
-        qWarning()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerUDPListeningPort:"<<peerUDPListeningPort;
+        qWarning()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort<<" peerUDPListeningPort:"<<peerUDPListeningPort <<" Version:"<<version;
     }
     break;
     case quint8(MS::ClientOnline):

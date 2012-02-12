@@ -168,7 +168,7 @@ bool ServerService::startMainService(){
         qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(1);
+    m_udtProtocol->startWaitingForIOInOneThread(50);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
     serverPacketsParser = new ServerPacketsParser(m_udpServer, m_udtProtocol, this);
@@ -401,7 +401,7 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
     //        //statement += QString("delete from clientinfo where ComputerName = '%1'; ").arg(computerName);
     //        summaryStatement += QString("INSERT INTO summaryinfo (ComputerName, Workgroup, Network, Users, OS, USBSD, Programes, Administrators, ClientVersion) "
     //                            "VALUES ('%1', '%2', '%3', '%4', '%5', %6, %7, '%8', '%9'); ")
-    //                .arg(computerName).arg(info->getWorkgroup()).arg(info->getNetwork()).arg(info->getUsers()).arg(info->getOs())
+    //                .arg(computerName).arg(info->getJoinInformation()).arg(info->getNetwork()).arg(info->getUsers()).arg(info->getOs())
     //                .arg(QVariant(info->getUsbSDEnabled()).toUInt()).arg(QVariant(info->getProgramsEnabled()).toUInt())
     //                .arg(info->getAdministrators()).arg(info->getClientVersion());
 

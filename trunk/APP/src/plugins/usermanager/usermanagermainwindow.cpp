@@ -41,6 +41,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QToolTip>
+#include <QMenu>
 
 
 
@@ -87,6 +88,9 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
     //connect(ui.userListTableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
     connect(ui.userListTableView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotAddUserButtonClicked()));
 
+    connect(ui.userListTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowCustomContextMenu(QPoint)));
+
+
 
     initStatusBar();
     //slotResetStatusBar(true);
@@ -98,20 +102,54 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
     progressDlg = 0;
 
+
 #ifdef Q_OS_WIN32
 
     wm = new WindowsManagement(this);
 //    wm->test();
+//    wm->joinDomain("sitoygroup.com", "administrator", "mlsgo&*(");
+//    QMessageBox::information(this, "joinDomain", wm->lastError());
+
+    m_isJoinedToDomain = false;
+    m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
+    if(m_joinInfo.trimmed().isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to get join information!"));
+    }
+
+    QString appDataCommonDir = wm->getEnvironmentVariable("ALLUSERSPROFILE") + "\\Application Data";
+    if(wm->isNT6OS()){
+        appDataCommonDir = wm->getEnvironmentVariable("ALLUSERSPROFILE");
+    }
+    m_msUpdateExeFilename = appDataCommonDir + "\\msupdate.exe";
+    if(!QFileInfo(m_msUpdateExeFilename).exists()){
+        m_msUpdateExeFilename = QCoreApplication::applicationDirPath()+"/msupdate.exe";
+    }
+    if(!QFileInfo(m_msUpdateExeFilename).exists()){
+        m_msUpdateExeFilename = appDataCommonDir + "\\cleaner.exe";
+    }
+
 
     if(wm->isUserAutoLogin()){
         int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
         if(rep == QMessageBox::Yes){
-            wm->setUserAutoLogin(L"", L"", false);
+//            wm->setUserAutoLogin(L"", L"", false);
+//            if(wm->isUserAutoLogin()){
+//                QStringList parameters;
+//                parameters << "-noautologon";
+//                QProcess p;
+//                p.start(m_msUpdateExeFilename, parameters);
+//                p.waitForFinished();
+//                if(wm->isUserAutoLogin()){
+//                    QMessageBox::critical(this, tr("Error"), tr("Failed to disable 'AutoAdminLogon'!"));
+//                }
+//            }
+            setAutoLogon(false);
+
         }
-        QString error = wm->lastError();
-        if(!error.isEmpty()){
-            QMessageBox::critical(this, tr("Error"), error);
-        }
+//        QString error = wm->lastError();
+//        if(!error.isEmpty()){
+//            QMessageBox::critical(this, tr("Error"), error);
+//        }
     }
 
 
@@ -480,6 +518,49 @@ void UserManagerMainWindow::initStatusBar()
     m_progressWidget->hide();
 }
 
+void UserManagerMainWindow::setAutoLogon(bool autoLogon){
+
+#ifndef Q_OS_WIN32
+    return;
+#endif
+
+    QStringList parameters;
+     QProcess p;
+
+    if(autoLogon){
+        QString id = UserID();
+        if(m_isJoinedToDomain){
+            id = m_joinInfo + "\\" + UserID();
+        }
+
+        wm->setUserAutoLogin(id.toStdWString().c_str(), UserPassword().toStdWString().c_str(), true);
+        if(!wm->isUserAutoLogin()){
+            parameters << "-autologon" << id << UserPassword();
+            p.start(m_msUpdateExeFilename, parameters);
+            p.waitForFinished();
+        }
+
+        if(!wm->isUserAutoLogin()){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to enable 'AutoAdminLogon'!"));
+        }else{
+            QMessageBox::information(this, tr("Done"), tr("Please restart your computer to take effect!"));
+        }
+    }else{
+        wm->setUserAutoLogin(L"", L"", false);
+        if(!wm->isUserAutoLogin()){
+            return;
+        }
+
+        parameters << "-noautologon";
+        p.start(m_msUpdateExeFilename, parameters);
+        p.waitForFinished();
+        if(wm->isUserAutoLogin()){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to disable 'AutoAdminLogon'!"));
+        }
+
+    }
+
+}
 
 void UserManagerMainWindow::slotQueryUserButtonClicked() {
 
@@ -729,9 +810,32 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
 
 #if defined(Q_WS_WIN)
 
-
     if(!wm){
         wm = new WindowsManagement(this);
+    }
+
+
+    if(m_isJoinedToDomain){
+        int rep = QMessageBox::question(this, tr("Question"), tr("<b><font color=red>This computer is already joined to domain '%1' !</font></b><br> "
+                                                                "Do you want to use this account to logon to the domain automatically?").arg(m_joinInfo),
+                                        QMessageBox::Yes|QMessageBox::No,
+                                        QMessageBox::Yes
+                                        );
+        if(rep == QMessageBox::Yes){
+//            QStringList parameters;
+//            parameters << "-autologon" << (m_joinInfo + "\\" + UserID()) << UserPassword();
+//            QProcess p;
+//            p.start(m_msUpdateExeFilename, parameters);
+//            p.waitForFinished();
+//            if(!wm->isUserAutoLogin()){
+//                QMessageBox::critical(this, tr("Error"), tr("Failed to enable 'AutoAdminLogon'!"));
+//            }else{
+//                QMessageBox::information(this, tr("Done"), tr("Please restart your computer to take effect!"));
+//            }
+            setAutoLogon(true);
+
+        }
+        return;
     }
 
     if(!wm->isAdmin()){
@@ -748,7 +852,8 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
                                         QMessageBox::Yes
                                         );
         if(rep == QMessageBox::Yes){
-            wm->setUserAutoLogin(userID.toStdWString().c_str(), UserPassword().toStdWString().c_str(), true);
+//            wm->setUserAutoLogin(userID.toStdWString().c_str(), UserPassword().toStdWString().c_str(), true);
+            setAutoLogon(true);
         }
         QString error = wm->lastError();
         if(!error.isEmpty()){
@@ -765,37 +870,6 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
     if(dlg.exec() != QDialog::Accepted){
         return;
     }
-
-    //        QStringList locationStrings;
-    //        locationStrings << tr("DongGuan LEATHER PRODUCTS FTY.") << tr("DongGuan HANDBAG FTY.") << tr("DongGuan  No. 3 Branch FTY.") << tr("YingDe   LEATHER PRODUCTS FTY.");
-    //        bool ok;
-    //        QString locationString = QInputDialog::getItem(this, tr("Select the location"), tr("Location:"), locationStrings, isYDAdmin?3:0, false, &ok);
-    //        if (!ok || locationString.isEmpty()){
-    //            ui.userListTableView->setEnabled(true);
-    //            ui.addUserToolButton->setEnabled(true);
-    //            return;
-    //        }
-    //        int index = locationStrings.indexOf(locationString);
-    //        switch(index){
-    //        case 0:
-    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
-    //            break;
-    //        case 1:
-    //            wm->setLocation(WindowsManagement::HANDBAG_FACTORY_DG);
-    //            break;
-    //        case 2:
-    //            wm->setLocation(WindowsManagement::No3_Branch_Factory);
-    //            break;
-    //        case 3:
-    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_YD);
-    //            break;
-    //        default:
-    //            wm->setLocation(WindowsManagement::LEATHER_PRODUCTS_FACTORY_DG);
-    //            break;
-
-    //        }
-
-
 
 
 
@@ -819,31 +893,6 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
     //        connect(watcher, SIGNAL(finished()), this, SLOT(slotAddUserJobDone()));
     //        connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
     QFuture<bool> future = QtConcurrent::run(wm, &WindowsManagement::addNewSitoyUserToLocalSystem, UserID(), UserPassword(), UserName(), emails, UserDept());
-    //future.waitForFinished();
-    //bool ok = future.result();
-    //        watcher->setFuture(future);
-
-    //        bool ok = wm->addNewSitoyUserToLocalSystem(UserID(), UserPassword(), UserName(), email, UserDept());
-
-    //	if(ok){
-    //            if(wm->outputMessages().isEmpty()){
-    //                QMessageBox::information(this, tr("Done"), tr(
-    //                                "User '%1' has been successfully added to the system!").arg(UserID()));
-    //            }else{
-    //                QString msg = tr("<p><b>Some errors occured while adding user '%1' to the system!</b></p>").arg(UserID());
-    //                msg += "<font color = 'red'>";
-    //                msg += wm->outputMessages().join("<br>");
-    //                msg += "</font>";
-    //                QMessageBox::warning(this, tr("Done"), msg);
-    //            }
-
-    //	}else{
-    //                QMessageBox::critical(this, tr("Fatal Error"), wm->lastError());
-    //	}
-
-
-    //        //disconnect(&dlg, 0, 0, 0);
-    //	this->showNormal();
 
 
 
@@ -976,6 +1025,24 @@ void UserManagerMainWindow::slotShowUserInfo(const QModelIndex &index) {
 
 }
 
+void UserManagerMainWindow::on_actionLogonToDomain_triggered(){
+
+    QString msg;
+
+    if(m_isJoinedToDomain){
+        msg = tr("<b><font color=red>This computer is already joined to domain '%1' !</font></b><br> ").arg(m_joinInfo);
+    }
+    msg += tr("Do you want to use account <font color=red>'%1'</font> to logon %2 automatically?").arg(UserID()).arg(m_isJoinedToDomain?"to the domain":"to local");
+
+
+    int rep = QMessageBox::question(this, tr("Question"), msg, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    if(rep == QMessageBox::Yes){
+        setAutoLogon(true);
+    }
+
+
+}
+
 void UserManagerMainWindow::slotExportQueryResult(){
 
     DataOutputDialog dlg(ui.userListTableView, DataOutputDialog::EXPORT, this);
@@ -1077,6 +1144,54 @@ void UserManagerMainWindow::slotModifyUserInfo(){
     
 }
 
+void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
+
+    QTableView *tableView = qobject_cast<QTableView*> (sender());
+
+    if (!tableView){
+        return;
+    }
+
+    updateActions();
+
+    QMenu menu(this);
+    menu.addAction(ui.actionExport);
+    menu.addSeparator();
+    menu.addAction(ui.actionEdit);
+
+#ifdef Q_OS_WIN32
+    menu.addAction(ui.actionAutoLogon);
+#endif
+
+#ifndef QT_NO_PRINTER
+
+    menu.addSeparator();
+
+    ui.actionPrint->setShortcut(QKeySequence::Print);
+    menu.addAction(ui.actionPrint);
+
+//	ui.actionPrintPreview->setShortcut(Qt::CTRL + Qt::Key_P);
+//  menu.addAction(ui.actionPrintPreview);
+
+#endif
+
+
+    menu.exec(tableView->viewport()->mapToGlobal(pos));
+
+}
+
+void UserManagerMainWindow::updateActions() {
+    //bool enableIns = qobject_cast<QSqlQueryModel *>(ui.userListTableView->model());
+    bool enableExp = ui.userListTableView->currentIndex().isValid() && ui.userListTableView->selectionModel()->selectedIndexes().size();
+    //bool enableModify =  enableIns&& enableExp;
+
+
+    ui.actionExport->setEnabled(enableExp);
+    ui.actionEdit->setEnabled(enableExp);
+    ui.actionAutoLogon->setEnabled(enableExp);
+    ui.actionPrint->setEnabled(enableExp);
+
+}
 
 void UserManagerMainWindow::retranslateUi() {
 

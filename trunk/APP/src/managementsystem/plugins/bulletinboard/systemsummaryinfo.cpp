@@ -57,7 +57,7 @@ SystemSummaryInfo::SystemSummaryInfo(QWidget *parent)
 #ifdef Q_OS_WIN
 
     WindowsManagement wm;
-    ui.lineEditWorkgroup->setText(wm.getWorkgroup());
+    ui.lineEditWorkgroup->setText(wm.getJoinInformation());
 
     switch(QSysInfo::windowsVersion()){
     case QSysInfo::WV_2000:

@@ -81,7 +81,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << m_udpServer->localPort();
+        out << m_localComputerName << m_udpServer->localPort() << QString(APP_VERSION);
         packet->setPacketData(ba);
 
         ba.clear();

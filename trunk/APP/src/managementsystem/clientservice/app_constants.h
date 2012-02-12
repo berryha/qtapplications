@@ -21,7 +21,7 @@
 #endif
 
 #ifndef APP_VERSION
-#define APP_VERSION	"2011.2.25.1"
+#define APP_VERSION	"2012.2.10.1"
 #endif
 
 #ifndef APP_ORG_DOMAIN

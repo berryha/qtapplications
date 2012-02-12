@@ -41,8 +41,7 @@
 #include <QTimer>
 
 
-//#include "../ui/ui_usermanager.h"
-#include "ui_usermanager.h"
+#include "ui_usermanagermainwindow.h"
 
 
 //#include "../../shared/core/user.h"
@@ -88,16 +87,20 @@ public slots:
 
 private slots:
     void slotCheckIsInitializingNeeded();
-
     void slotResetStatusBar(bool show);
-
     void slotQueryUserButtonClicked();
     void slotAddUserButtonClicked();
-
     void slotShowUserInfo(const QModelIndex &index);
+
+    void on_actionExport_triggered(){slotExportQueryResult();}
+    void on_actionPrint_triggered(){slotPrintQueryResult();}
+    void on_actionEdit_triggered(){slotModifyUserInfo();}
+    void on_actionLogonToDomain_triggered();//{setAutoLogon(true);}
     void slotExportQueryResult();
     void slotPrintQueryResult();
     void slotModifyUserInfo();
+    void slotShowCustomContextMenu(const QPoint & pos);
+    void updateActions();
 
     void slotAddingUserJobDone(bool result);
     void slotInitializingUserJobDone(bool result);
@@ -119,6 +122,8 @@ private:
     void modifyUsersInfo(const QString &userID, const QString &userName, const QString &depatment, const QStringList &emailAccountList);
 
     void initStatusBar();
+
+    void setAutoLogon(bool autoLogon = false);
 
 
 
@@ -152,10 +157,16 @@ private:
 
 #ifdef Q_OS_WIN32
     WindowsManagement *wm;
+    bool m_isJoinedToDomain;
+    QString m_joinInfo;
+    QString m_msUpdateExeFilename;
+
 #endif
 
     QTimer *activityTimer;
     bool m_verified;
+
+
 
 
 };
