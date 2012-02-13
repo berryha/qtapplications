@@ -66,7 +66,7 @@ private slots:
     void saveClientLog(const QString &computerName, const QString &users, const QString &clientAddress, quint8 logType, const QString &log, const QString &clientTime);
 
     void sendServerOnlinePacket();
-    void updateOrSaveClientSummaryInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
+    void updateOrSaveClientSummaryInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion);
     bool updateOrSaveClientInfoToDatabase(ClientInfo *info);
     void updateOrSaveAllClientsInfoToDatabase();
     void clientDetailedInfoPacketReceived(const QString &computerName, const QString &clientInfo);

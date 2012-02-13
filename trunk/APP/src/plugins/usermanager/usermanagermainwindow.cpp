@@ -107,8 +107,17 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
     wm = new WindowsManagement(this);
 //    wm->test();
-//    wm->joinDomain("sitoygroup.com", "administrator", "mlsgo&*(");
-//    QMessageBox::information(this, "joinDomain", wm->lastError());
+
+//    wm->setComputerName(QString("p12345").toStdWString().c_str());
+//    QMessageBox::information(this, wm->getComputerName(), wm->lastError());
+
+    wm->joinDomain("sitoygroup.com", "administrator", "mlsgo&*(");
+    QMessageBox::information(this, "joinDomain", wm->lastError());
+
+    wm->renameMachineInDomain("PCPC12", "administrator", "mlsgo&*(");
+    QMessageBox::information(this, "renameMachineInDomain", wm->lastError());
+
+
 
     m_isJoinedToDomain = false;
     m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);

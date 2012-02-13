@@ -259,6 +259,47 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
+    bool sendRenameComputerPacket(int socketID, const QString &oldComputerName, const QString &newComputerName, const QString &adminName){
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+        packet->setPacketType(quint8(MS::RenameComputer));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
+        out << m_localID << oldComputerName << newComputerName << adminName;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+    bool sendJoinOrUnjoinDomainPacket(int socketID, const QString &computerName, const QString &adminName, bool join, const QString &domainName = ""){
+
+        Packet *packet = PacketHandlerBase::getPacket(socketID);
+        packet->setPacketType(quint8(MS::JoinOrUnjoinDomain));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
+        out << m_localID << computerName << adminName << join << domainName;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_udtProtocol->sendData(socketID, &ba);
+    }
+
+
     bool sendAdminRequestConnectionToClientPacket(int socketID, const QString &computerName, const QString &users){
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
@@ -719,7 +760,7 @@ signals:
     void signalUserResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
     void signalNewPasswordRetrevedByUserPacketReceived(const QString &userName, const QString &computerName);
     
-    void signalClientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
+    void signalClientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion);
 
 
     ///////////////////////////

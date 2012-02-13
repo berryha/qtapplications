@@ -176,7 +176,7 @@ bool ServerService::startMainService(){
     //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
 
     connect(serverPacketsParser, SIGNAL(signalClientLogReceived(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), this, SLOT(saveClientLog(const QString&, const QString&, const QString&, quint8, const QString&, const QString&)), Qt::QueuedConnection);
-    connect(serverPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientSummaryInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
+    connect(serverPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), this, SLOT(updateOrSaveClientSummaryInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), Qt::QueuedConnection);
     connect(serverPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
 
 //    connect(serverPacketsParser, SIGNAL(signalHeartbeatPacketReceived(const QString &, const QString&)), this, SLOT(processHeartbeatPacket(const QString &, const QString&)), Qt::QueuedConnection);
@@ -260,7 +260,7 @@ void ServerService::sendServerOnlinePacket(){
 
 }
 
-void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion){
+void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion){
     //    qWarning()<<"ServerService::updateOrSaveClientSummaryInfo(...)";
 
     if(computerName.trimmed().isEmpty()){
@@ -313,6 +313,8 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         statement += QString(", Programes = %1 ").arg(QVariant(programesEnabled).toUInt());
         //info->setProgramsEnabled(programesEnabled);
         //}
+        statement += QString(", JoinedToDomain = %1 ").arg(QVariant(isJoinedToDomain).toUInt());
+
         if(admins != info->getAdministrators()){
             statement += QString(", Administrators = '%1' ").arg(admins);
             //info->setAdministrators(admins);
@@ -330,18 +332,16 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         qDebug()<<"Client Summary Info Not Exists!";
 
         statement = "START TRANSACTION;";
-        statement += QString("INSERT INTO summaryinfo (ComputerName, Workgroup, Network, Users, OS, USBSD, Programes, Administrators, ClientVersion) "
-                             "VALUES ('%1', '%2', '%3', '%4', '%5', %6, %7, '%8', '%9'); ")
+        statement += QString("INSERT INTO summaryinfo (ComputerName, Workgroup, Network, Users, OS, USBSD, Programes, JoinedToDomain, Administrators, ClientVersion) "
+                             "VALUES ('%1', '%2', '%3', '%4', '%5', %6, %7, %8, '%9', '%10'); ")
                 .arg(computerName).arg(workgroupName).arg(networkInfo).arg(usersInfo).arg(osInfo)
                 .arg(QVariant(usbsdEnabled).toUInt()).arg(QVariant(programesEnabled).toUInt())
-                .arg(admins).arg(clientVersion);
+                .arg(QVariant(isJoinedToDomain).toUInt()).arg(admins).arg(clientVersion);
 
         statement += QString("INSERT INTO detailedinfo (ComputerName) "
                              "VALUES ('%1'); ").arg(computerName);
 
         statement += "COMMIT;";
-
-
     }
 
     info->setSummaryInfoSavedTODatabase(false);
@@ -356,6 +356,7 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
             info->setUsbSDEnabled(usbsdEnabled);
             info->setProgramsEnabled(programesEnabled);
             info->setAdministrators(admins);
+            info->setIsJoinedToDomain(isJoinedToDomain);
             info->setClientVersion(clientVersion);
 
             info->setLastHeartbeatTime(QDateTime::currentDateTime());
@@ -780,11 +781,13 @@ void ServerService::getRecordsInDatabase(){
     }
 
     recordsInDatabase.clear();
-    if(query->exec("select ComputerName from clientinfo")){
+    if(query->exec("select ComputerName from summaryinfo")){
         while(query->next()){
             recordsInDatabase.append(query->value(0).toString().toLower());
         }
-        //qWarning()<<"Records In Database:"<<recordsInDatabase.size();
+        qWarning()<<"Records In Database:"<<recordsInDatabase.size();
+    }else{
+        qCritical()<<QString("Error! Can not query records from database! %1").arg(query->lastError().text());
     }
     query->clear();
 

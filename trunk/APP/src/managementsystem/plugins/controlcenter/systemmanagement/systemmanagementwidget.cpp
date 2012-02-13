@@ -22,8 +22,8 @@
 namespace HEHUI {
 
 
-SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, QWidget *parent)
-    : QWidget(parent), m_adminName(adminName), m_computerName(computerName), m_users(users), m_peerIPAddress(QHostAddress(peerIPAddress)), m_peerMACAddress(peerMACAddress), m_usbsdEnabled(usbsdEnabled), m_programesEnabled(programesEnabled)
+SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, QWidget *parent)
+    : QWidget(parent), m_adminName(adminName), m_computerName(computerName), m_users(users), m_peerIPAddress(QHostAddress(peerIPAddress)), m_peerMACAddress(peerMACAddress), m_usbsdEnabled(usbsdEnabled), m_programesEnabled(programesEnabled), m_isJoinedToDomain(isJoinedToDomain)
 {
     ui.setupUi(this);
 
@@ -47,6 +47,7 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     m_winDirPath = "";
 
+
     queryModel = 0;
 
 
@@ -59,7 +60,6 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
         int index = ui.tabWidget->indexOf(ui.tabLocalManagement);
         ui.tabWidget->removeTab(index);
 
-
         ui.tabLocalManagement->setEnabled(false);
         //            ui.groupBoxAdministrationTools->setEnabled(false);;
         //            ui.groupBoxAdministrationTools->hide();
@@ -69,16 +69,31 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     m_winDirPath = wm.getEnvironmentVariable("windir");
 
 
+    if(m_isJoinedToDomain){
+        ui.pushButtonAdminsManagement->hide();
+        ui.pushButtonDomain->setText(tr("Unjoin From Domain"));
+    }else{
+        ui.pushButtonAdminsManagement->show();
+        ui.pushButtonDomain->setText(tr("Join To Domain"));
+    }
+
+
 
 #else
     ui.pushButtonShowAdmin->setEnabled(false);
     ui.pushButtonShowAdmin->hide();
+//    ui.pushButtonRenameComputer->setEnabled(false);
+//    ui.pushButtonRenameComputer->hide();
+//    ui.pushButtonDomain->setEnabled(false);
+//    ui.pushButtonDomain->hide();
 
     int index = ui.tabWidget->indexOf(ui.tabLocalManagement);
     ui.tabWidget->removeTab(index);
     ui.tabLocalManagement->setEnabled(false);
     //        ui.groupBoxAdministrationTools->setEnabled(false);;
     //        ui.groupBoxAdministrationTools->hide();
+
+
 
 #endif
 
@@ -312,7 +327,7 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(int, const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(int, const QString &, bool, const QString &)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
-    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)));
+    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)));
 
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
 
@@ -549,6 +564,78 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
     }
 
     ui.pushButtonAdminsManagement->setEnabled(false);
+
+}
+
+void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
+
+//    if(!verifyPrivilege()){
+//        return;
+//    }
+
+    QString text = tr("Do you really want to <font color = 'red'>rename</font> the computer? ");
+    int ret = QMessageBox::question(this, tr("Question"), text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if(ret == QMessageBox::No){
+        return;
+    }
+
+    bool ok = false;
+    QString newComputerName = "";
+    do {
+        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
+        if (ok && !newComputerName.isEmpty()){
+            break;
+        }
+
+        QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
+
+    } while (ok);
+
+    ok = controlCenterPacketsParser->sendRenameComputerPacket(m_peerSocket, m_computerName, newComputerName, m_adminName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
+
+//    ui.pushButtonRenameComputer->setEnabled(false);
+
+}
+
+void SystemManagementWidget::on_pushButtonDomain_clicked(){
+
+    //    if(!verifyPrivilege()){
+    //        return;
+    //    }
+
+    QString text = tr("Do you really want to <font color = 'red'>join</font> the computer to a domain? ");
+    if(m_isJoinedToDomain){
+        text = tr("Do you really want to <font color = 'red'>unjoin</font> the computer from the domain? ");
+    }
+    int ret = QMessageBox::question(this, tr("Question"), text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if(ret == QMessageBox::No){
+        return;
+    }
+
+    bool ok = false;
+    QString domainName = "";
+    if(!m_isJoinedToDomain){
+        do {
+            domainName = QInputDialog::getText(this, tr("Join To Domain"), tr("Domain Name:"), QLineEdit::Normal, DOMAIN_NAME, &ok).trimmed();
+            if (ok && !domainName.isEmpty()){
+                break;
+            }
+
+            QMessageBox::critical(this, tr("Error"), tr("Incorrect Domain Name!"));
+
+        } while (ok);
+    }
+
+    ok = controlCenterPacketsParser->sendJoinOrUnjoinDomainPacket(m_peerSocket, m_computerName, m_adminName, !m_isJoinedToDomain, domainName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        return;
+    }
+
 
 }
 
@@ -939,7 +1026,7 @@ void SystemManagementWidget::clientMessageReceived(const QString &computerName, 
 }
 
 
-void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion){
+void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion){
 
     if(this->m_computerName.toLower() != computerName.toLower()){
         return;
@@ -1021,7 +1108,14 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
 
     ui.groupBoxRemoteConsole->setEnabled(true);
 
-
+    m_isJoinedToDomain = isJoinedToDomain;
+    if(m_isJoinedToDomain){
+        ui.pushButtonAdminsManagement->hide();
+        ui.pushButtonDomain->setText(tr("Unjoin From Domain"));
+    }else{
+        ui.pushButtonAdminsManagement->show();
+        ui.pushButtonDomain->setText(tr("Join To Domain"));
+    }
 
 
 

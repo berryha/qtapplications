@@ -51,6 +51,14 @@ public:
         this->nic2Info = nic2Info;
     }
 
+    void setIsJoinedToDomain(bool joined){
+        this->m_isJoinedToDomain = joined;
+    }
+
+    bool isJoinedToDomain(){
+        return m_isJoinedToDomain;
+    }
+
     QString getStorage() const
     {
         return storage;
@@ -351,12 +359,12 @@ public:
         this->workgroup = workgroup;
     }
 
-//    QStringList getInstalledSoftwaresInfo(){
-//        return installedSoftwaresInfo;
-//    }
-//    void setInstalledSoftwaresInfo(const QStringList &list){
-//        this->installedSoftwaresInfo = list;
-//    }
+    //    QStringList getInstalledSoftwaresInfo(){
+    //        return installedSoftwaresInfo;
+    //    }
+    //    void setInstalledSoftwaresInfo(const QStringList &list){
+    //        this->installedSoftwaresInfo = list;
+    //    }
 
     int getinstalledSoftwaresCount(){
         return installedSoftwaresCount;
@@ -413,6 +421,8 @@ private:
     QString nic1Info;
     QString nic2Info;
 
+    bool m_isJoinedToDomain;
+
 
     QString updateDetailedInfoStatement;
     bool detailedInfoSavedTODatabase;
@@ -420,7 +430,7 @@ private:
 
     /////////////////////////////////////////////////
 
-//    QStringList installedSoftwaresInfo;
+    //    QStringList installedSoftwaresInfo;
     int installedSoftwaresCount;
     QString updateInstalledSoftwaresInfoStatement;
     bool installedSoftwaresInfoSavedTODatabase;
