@@ -1645,22 +1645,22 @@ bool WindowsManagement::joinDomain(const QString &domainName, const QString &acc
 
     lastErrorString = "";
 
-    NET_API_STATUS err = NetJoinDomain(NULL, domainName.toStdWString().c_str(), NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN);
+    NET_API_STATUS err = NetJoinDomain(NULL, domainName.toStdWString().c_str(), NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE | NETSETUP_JOIN_WITH_NEW_NAME);
     switch(err){
     case NERR_Success:
         return true;
         break;
     case ERROR_INVALID_PARAMETER:
-        lastErrorString = tr("Failed to join domain! Invalid parameter!");
+        lastErrorString = tr("Invalid parameter!");
         break;
     case ERROR_NO_SUCH_DOMAIN:
-        lastErrorString = tr("Failed to join domain! No such domain!");
+        lastErrorString = tr("No such domain!");
         break;
     case NERR_SetupAlreadyJoined:
-        lastErrorString = tr("Failed to join domain! The computer is already joined to a domain!");
+        lastErrorString = tr("The computer is already joined to a domain!");
         break;
     case NERR_InvalidWorkgroupName:
-        lastErrorString = tr("Failed to join workgroup! The specified workgroup name is not valid!");
+        lastErrorString = tr("The specified workgroup name is not valid!");
         break;
     default:
         lastErrorString = tr("Failed to join domain! Error code:%1").arg(err);
@@ -1669,6 +1669,33 @@ bool WindowsManagement::joinDomain(const QString &domainName, const QString &acc
     }
 
     return false;
+
+}
+
+bool WindowsManagement::unjoinDomain(const QString &accountName, const QString &password){
+
+    lastErrorString = "";
+    NET_API_STATUS err = NetUnjoinDomain(NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_ACCT_DELETE);
+    switch(err){
+    case NERR_Success:
+        return true;
+        break;
+    case ERROR_INVALID_PARAMETER:
+        lastErrorString = tr("A parameter is incorrect.");
+        break;
+    case NERR_SetupNotJoined:
+        lastErrorString = tr("The computer is not currently joined to a domain.");
+        break;
+    case NERR_SetupDomainController:
+        lastErrorString = tr("This computer is a domain controller and cannot be unjoined from a domain.");
+        break;
+    default:
+        lastErrorString = tr("Failed to unjoin machine from the domain! Error code: %1").arg(err);
+        break;
+    }
+
+    return false;
+
 
 }
 
@@ -1714,6 +1741,33 @@ QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain){
     }
 
     return workgroupName;
+
+}
+
+bool WindowsManagement::renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password){
+
+    lastErrorString = "";
+
+    NET_API_STATUS err = NetRenameMachineInDomain(NULL, newMachineName.toStdWString().c_str(), accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE | NETSETUP_JOIN_WITH_NEW_NAME);
+    switch(err){
+    case NERR_Success:
+        return true;
+        break;
+    case ERROR_INVALID_PARAMETER:
+        lastErrorString = tr("A parameter is incorrect.");
+        break;
+    case NERR_SetupNotJoined:
+        lastErrorString = tr("The computer is not currently joined to a domain.");
+        break;
+    case NERR_SetupDomainController:
+        lastErrorString = tr("This computer is a domain controller and cannot be unjoined from a domain.");
+        break;
+    default:
+        lastErrorString = tr("Failed to rename machine in domain! Error code: %1").arg(err);
+        break;
+    }
+
+    return false;
 
 }
 
