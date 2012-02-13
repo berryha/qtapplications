@@ -1006,7 +1006,7 @@ void ControlCenter::startNetwork(){
     controlCenterPacketsParser = new ControlCenterPacketsParser(m_udpServer, m_udtProtocol, this);
 
     connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
-    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), Qt::QueuedConnection);
+    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), Qt::QueuedConnection);
     //connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
 
     if(localSystemManagementWidget){
@@ -1065,7 +1065,7 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTL
 
 }
 
-void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion){
+void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion){
 
     qDebug()<<"updateOrSaveClientInfo(...) "<<computerName<<" "<<workgroupName<<" "<<networkInfo<<" "<<usersInfo;
     
@@ -1094,6 +1094,7 @@ void ControlCenter::updateOrSaveClientInfo(const QString &computerName, const QS
     info->setAdministrators(admins);
     info->setClientVersion(clientVersion);
     info->setLastOnlineTime(QDateTime::currentDateTime());
+    info->setIsJoinedToDomain(isJoinedToDomain);
 
     clientInfoModel->addClientInfo(info);
     

@@ -21,7 +21,7 @@ class SystemManagementWidget : public QWidget
     Q_OBJECT
 
 public:
-    SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", QWidget *parent = 0);
+    SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", bool isJoinedToDomain = false, QWidget *parent = 0);
     ~SystemManagementWidget();
 
 
@@ -53,6 +53,9 @@ private slots:
     void on_actionAddAdmin_triggered();
     void on_actionDeleteAdmin_triggered();
 
+    void on_pushButtonRenameComputer_clicked();
+    void on_pushButtonDomain_clicked();
+
     void on_pushButtonMMC_clicked();
     void on_pushButtonCMD_clicked();
     void on_pushButtonRegedit_clicked();
@@ -73,7 +76,7 @@ private slots:
 
     void clientMessageReceived(const QString &computerName, const QString &message);
 
-    void clientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, const QString &clientVersion);
+    void clientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion);
 
 
     void clientDetailedInfoPacketReceived(const QString &computerName, const QString &clientInfo);
@@ -123,6 +126,8 @@ private:
 
 
     QString m_winDirPath;
+    bool m_isJoinedToDomain;
+    //QString m_joinInfo;
 
     QSqlQueryModel *queryModel;
 
@@ -138,6 +143,8 @@ private:
 //    QList<QByteArray/*File MD5*/> filesList;
 
     FileManagement *m_fileManagementWidget;
+
+
 
 
 };

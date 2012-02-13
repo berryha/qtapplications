@@ -112,7 +112,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabSystemInfo">
       <attribute name="title">
@@ -745,7 +745,7 @@
           <item row="0" column="3">
            <widget class="QPushButton" name="pushButtonAdminsManagement">
             <property name="text">
-             <string>administrators</string>
+             <string>Administrators</string>
             </property>
            </widget>
           </item>
@@ -762,6 +762,20 @@
             </property>
             <property name="text">
              <string>Remote Assistance</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QPushButton" name="pushButtonRenameComputer">
+            <property name="text">
+             <string>Rename Computer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <widget class="QPushButton" name="pushButtonDomain">
+            <property name="text">
+             <string>Join Domain</string>
             </property>
            </widget>
           </item>

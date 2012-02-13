@@ -337,6 +337,34 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~ModifyAdminGroupUser";
     }
     break;
+    case quint8(MS::RenameComputer):
+    {
+        QString oldComputerName = "", newComputerName = "", adminName = "";
+        in >> oldComputerName >> newComputerName >> adminName;
+
+        if(oldComputerName.toLower() != m_localComputerName){
+            return;
+        }
+
+        emit signalRenameComputerPacketReceived(newComputerName, adminName, peerAddress.toString(), peerPort);
+        qDebug()<<"~~RenameComputer";
+    }
+    break;
+    case quint8(MS::JoinOrUnjoinDomain):
+    {
+        QString computerName = "", adminName = "", domainName = "";
+        bool join = false;
+        in >> computerName >> adminName >> join >> domainName;
+
+        if(computerName.toLower() != m_localComputerName){
+            return;
+        }
+
+        emit signalJoinOrUnjoinDomainPacketReceived(adminName, join, domainName, peerAddress.toString(), peerPort);
+        qDebug()<<"~~JoinOrUnjoinDomain";
+    }
+    break;
+
     case quint8(MS::AdminRequestConnectionToClient):
     {
 

@@ -48,7 +48,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     settings = 0;
 
     localComputerName = QHostInfo::localHostName().toLower();
-    m_localWorkgroupName = "";
+
+    m_isJoinedToDomain = false;
+    m_joinInfo = "";
 
 #ifdef Q_OS_WIN32
     wm = new WindowsManagement(this);
@@ -56,7 +58,13 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
         localComputerName = wm->getComputerName().toLower();
     }
 
-    m_localWorkgroupName = wm->getJoinInformation().toLower();
+    m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
+    if(m_joinInfo.trimmed().isEmpty()){
+        qCritical()<< tr("Failed to get join information!");
+    }
+
+
+
 #endif
 
     process = 0;
@@ -206,6 +214,8 @@ bool ClientService::startMainService(){
     connect(clientPacketsParser, SIGNAL(signalSetupProgramesPacketReceived(const QString &, const QString &, bool, bool, const QString &, const QString &, quint16 )), this, SLOT(processSetupProgramesPacket(const QString &, const QString &, bool, bool, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalShowAdminPacketReceived(const QString &, const QString &, bool)), this, SLOT(processShowAdminPacket(const QString &,const QString &, bool)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalModifyAdminGroupUserPacketReceived(const QString &, const QString &, bool, const QString &, const QString &, quint16 )), this, SLOT(processModifyAdminGroupUserPacket(const QString &, const QString &, bool, const QString &, const QString &, quint16 )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalRenameComputerPacketReceived(const QString &, const QString &, const QString &, quint16)), this, SLOT(processRenameComputerPacketReceived(const QString &, const QString &, const QString &, quint16)));
+    connect(clientPacketsParser, SIGNAL(signalJoinOrUnjoinDomainPacketReceived(const QString &, bool, const QString &, const QString &, quint16)), this, SLOT(processJoinOrUnjoinDomainPacketReceived(const QString &, bool, const QString &, const QString &, quint16)));
     connect(clientPacketsParser, SIGNAL(signalAdminRequestConnectionToClientPacketReceived(int, const QString &, const QString &)), this, SLOT(processAdminRequestConnectionToClientPacket(int, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAdminSearchClientPacketReceived(const QString &, quint16 , const QString &, const QString &, const QString &, const QString &, const QString &, const QString &, const QString &)), this, SLOT(processAdminSearchClientPacket(const QString &, quint16 , const QString &, const QString &, const QString &, const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     
@@ -258,9 +268,9 @@ bool ClientService::startMainService(){
 
     mainServiceStarted = true;
 
-    if(m_localWorkgroupName == "plan"){
+    if(m_joinInfo == "plan"){
         updateAdministratorPassword("trouseplantrouse");
-    }else if(m_localWorkgroupName == "pds"){
+    }else if(m_joinInfo == "pds"){
         updateAdministratorPassword("trousemisdg");
     }else{
         updateAdministratorPassword("trousetrouse");
@@ -323,7 +333,7 @@ bool ClientService::startMainService(){
 }
 
 void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
-    qWarning()<<"----ClientService::serverFound(...) serverInstanceID:"<<serverInstanceID <<" m_serverInstanceID:"<<m_serverInstanceID;
+    qDebug()<<"----ClientService::serverFound(...) serverInstanceID:"<<serverInstanceID <<" m_serverInstanceID:"<<m_serverInstanceID;
 
     //QMutexLocker locker(&mutex);
     //qWarning()<<"----------1-------"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
@@ -406,7 +416,6 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         settings.setValue(section, QDateTime::currentDateTime());
     }
 
-    qWarning()<<"----------2-------"<<QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
 
 }
 
@@ -418,7 +427,7 @@ void ClientService::processServerRequestClientInfoPacket(const QString &groupNam
     //WindowsManagement wm;
 
     if(!groupName.isEmpty()){
-        if(groupName.toLower() != m_localWorkgroupName){
+        if(groupName.toLower() != m_joinInfo){
             return;
         }
     }
@@ -734,6 +743,84 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
 
 }
 
+void ClientService::processRenameComputerPacketReceived(const QString &newComputerName, const QString &adminName, const QString &adminAddress, quint16 adminPort){
+
+#ifndef Q_OS_WIN32
+    return;
+#endif
+
+    bool ok = false;
+    if(m_isJoinedToDomain){
+        ok = wm->renameMachineInDomain(newComputerName, DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
+    }else{
+        ok = wm->setComputerName(newComputerName.toStdWString().c_str());
+    }
+
+    QString log;
+    if(ok){
+        log = QString("Computer Renamed From '%1' To '%2'! Admin:%3.").arg(localComputerName).arg(newComputerName).arg(adminName);
+    }else{
+        log = QString("Failed to rename computer! Admin:%1. %2").arg(adminName).arg(wm->lastError());
+    }
+
+    bool sent = false;
+    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
+    }
+
+    if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
+        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
+    }
+
+
+}
+
+void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainName, const QString &adminAddress, quint16 adminPort){
+
+#ifndef Q_OS_WIN32
+    return;
+#endif
+
+    bool ok = false;
+    if(join){
+        ok = wm->joinDomain(domainName, DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
+    }else{
+        ok = wm->unjoinDomain(DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
+    }
+
+    QString log;
+    if(ok){
+        log = QString("The computer '%1' is successfully %2 domain '%3'! Admin:%4.").arg(join?"joined to":"unjoined from").arg(localComputerName).arg(domainName).arg(adminName);
+    }else{
+        log = QString("Failed to %1 domain '%2'! Admin:%3. %4").arg(join?"join the computer to":"unjoin the computer from").arg(domainName).arg(adminName).arg(wm->lastError());
+    }
+
+    bool sent = false;
+    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
+    }
+
+    if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
+        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+        if(!sent){
+            qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
+        }
+    }
+
+
+
+
+}
+
 void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketID, const QString &computerName, const QString &users){
 
     int previousSocketConnectedToAdmin = m_socketConnectedToAdmin;
@@ -783,14 +870,14 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
 
 #else
     clientPacketsParser->sendClientResponseAdminConnectionResultPacket(adminSocketID, true, "It's NOT M$ Windows!");
-    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminSocketID, "m_localWorkgroupName", "ip/mac", "usersInfo", "osInfo", true, true, "storedAdminGroupUsers");
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminSocketID, "m_localWorkgroupName", "ip/mac", "usersInfo", "osInfo", true, true, "storedAdminGroupUsers", false);
 
     //m_udtProtocol->closeSocket(adminSocketID);
 #endif
 
     if( (previousSocketConnectedToAdmin != UDTProtocol::INVALID_UDT_SOCK) && (previousSocketConnectedToAdmin != m_socketConnectedToAdmin) ){
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
-        clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_localWorkgroupName, false);
+        clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_joinInfo, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
 //        closeFileTXWithAdmin();
     }
@@ -815,7 +902,7 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
     }
     
     if(!workgroup.trimmed().isEmpty()){
-        if(!m_localWorkgroupName.contains(workgroup, Qt::CaseInsensitive)){
+        if(!m_joinInfo.contains(workgroup, Qt::CaseInsensitive)){
             return;
         }
     }
@@ -899,7 +986,7 @@ void ClientService::processServerAnnouncementPacket(const QString &workgroupName
 #ifdef Q_OS_WIN
     
     if(!workgroupName.isEmpty()){
-        if(workgroupName.toLower() != m_localWorkgroupName){
+        if(workgroupName.toLower() != m_joinInfo){
             return;
         }
     }
@@ -1017,7 +1104,7 @@ void ClientService::processAdminRequestUpdateMSUserPasswordPacket(const QString 
 #ifdef Q_OS_WIN
 
     if(!workgroupName.isEmpty()){
-        if(workgroupName.toLower() != m_localWorkgroupName.toLower()){
+        if(workgroupName.toLower() != m_joinInfo.toLower()){
             return;
         }
     }
@@ -1043,7 +1130,7 @@ void ClientService::processAdminRequestInformUserNewPasswordPacket(const QString
 #ifdef Q_OS_WIN
     
     if(!workgroupName.isEmpty()){
-        if(workgroupName.toLower() != m_localWorkgroupName){
+        if(workgroupName.toLower() != m_joinInfo){
             return;
         }
     }
@@ -1220,7 +1307,7 @@ void ClientService::uploadClientSummaryInfo(int socketID){
 #ifdef Q_OS_WIN
 
     //WindowsManagement wm;
-    QString computerName = localComputerName;
+    //QString computerName = localComputerName;
 
     QStringList users = wm->localUsers();
     users.removeAll("system$");
@@ -1269,7 +1356,7 @@ void ClientService::uploadClientSummaryInfo(int socketID){
     QString storedAdminGroupUsers = administrators().join(",");
 
 
-    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(socketID, m_localWorkgroupName, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers);
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(socketID, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers, m_isJoinedToDomain);
 
     wm->freeMemory();
 
@@ -1334,7 +1421,7 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
     QString storedAdminGroupUsers = administrators().join(",");
 
 
-    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminAddress, adminPort, m_localWorkgroupName, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers);
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminAddress, adminPort, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers, m_isJoinedToDomain);
 
     wm->freeMemory();
 
@@ -1562,7 +1649,7 @@ bool ClientService::checkUsersAccount(){
 
             }
             //Update workgroup
-            if(m_localWorkgroupName != dept.toLower()){
+            if(m_joinInfo != dept.toLower()){
                 wm->joinWorkgroup(dept.toStdWString().c_str());
             }
         }else{

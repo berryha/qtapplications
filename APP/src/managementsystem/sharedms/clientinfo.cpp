@@ -17,60 +17,62 @@ namespace HEHUI {
 ClientInfo::ClientInfo(const QString &computerName, QObject *parent)
     :QObject(parent)
 {
-        this->computerName = computerName;
-	workgroup = "";
-	network = "";
-	users = "";
-	os = "";
-	usbSDEnabled = false;
-	programsEnabled = false;
-	administrators = "";
-	lastOnlineTime = QDateTime();
-	clientVersion = "";
+    this->computerName = computerName;
+    workgroup = "";
+    network = "";
+    users = "";
+    os = "";
+    usbSDEnabled = false;
+    programsEnabled = false;
+    administrators = "";
+    lastOnlineTime = QDateTime();
+    clientVersion = "";
 
-        summaryInfoSavedTODatabase = false;
-        updateSummaryInfoStatement = "";
-
-
-
-        installationDate = "";
-        windowsDir = "";
-        osKey = "";
-        cpu = "";
-        memory = "";
-        motherboardName = "";
-        dmiUUID = "";
-        chipset = "";
-        video = "";
-        monitor = "";
-        audio = "";
-        storage = "";
-        nic1Info = "";
-        nic2Info = "";
-        updateDetailedInfoStatement = "";
-        detailedInfoSavedTODatabase = false;
-
-        //installedSoftwaresInfo.clear();
-        installedSoftwaresCount = 0;
-        updateInstalledSoftwaresInfoStatement = "";
-        installedSoftwaresInfoSavedTODatabase = false;
+    summaryInfoSavedTODatabase = false;
+    updateSummaryInfoStatement = "";
 
 
-        lastHeartbeatTime = QDateTime();
 
-        online = false;
+    installationDate = "";
+    windowsDir = "";
+    osKey = "";
+    cpu = "";
+    memory = "";
+    motherboardName = "";
+    dmiUUID = "";
+    chipset = "";
+    video = "";
+    monitor = "";
+    audio = "";
+    storage = "";
+    nic1Info = "";
+    nic2Info = "";
+    m_isJoinedToDomain = false;
 
-        clientUDTListeningAddress = "";
-        clientUDTListeningPort = 0;
+    updateDetailedInfoStatement = "";
+    detailedInfoSavedTODatabase = false;
+
+    //installedSoftwaresInfo.clear();
+    installedSoftwaresCount = 0;
+    updateInstalledSoftwaresInfoStatement = "";
+    installedSoftwaresInfoSavedTODatabase = false;
+
+
+    lastHeartbeatTime = QDateTime();
+
+    online = false;
+
+    clientUDTListeningAddress = "";
+    clientUDTListeningPort = 0;
 
 }
 
 ClientInfo::~ClientInfo() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 bool ClientInfo::isValid(){
-	return computerName.trimmed().size();
+    return computerName.trimmed().size();
 
 }
 

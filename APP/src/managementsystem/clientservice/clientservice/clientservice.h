@@ -63,6 +63,9 @@ private slots:
     void processSetupProgramesPacket(const QString &computerName, const QString &users, bool enable, bool temporarilyAllowed, const QString &adminName, const QString &adminAddress, quint16 adminPort);
     void processShowAdminPacket(const QString &computerName, const QString &users, bool show);
     void processModifyAdminGroupUserPacket(const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName, const QString &adminAddress, quint16 adminPort);
+    void processRenameComputerPacketReceived(const QString &newComputerName, const QString &adminName, const QString &adminAddress, quint16 adminPort);
+    void processJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainName, const QString &adminAddress, quint16 adminPort);
+
     void processAdminRequestConnectionToClientPacket(int adminSocketID, const QString &computerName, const QString &users);
     void processAdminSearchClientPacket(const QString &adminAddress, quint16 adminPort, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName);
     
@@ -171,10 +174,13 @@ private:
 
 
     QString localComputerName;
-    QString m_localWorkgroupName;
+    bool m_isJoinedToDomain;
+    QString m_joinInfo;
+
 
 #if defined(Q_OS_WIN32)
     WindowsManagement *wm;
+
 
 #endif
 

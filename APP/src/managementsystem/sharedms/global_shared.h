@@ -96,6 +96,15 @@
 #define FILE_PIECES_IN_ONE_REQUEST 20 //20 Pieces
 #endif
 
+#ifndef DOMAIN_NAME
+#define DOMAIN_NAME "sitoygroup.com"
+#endif
+#ifndef DOMAIN_ADMIN_NAME
+#define DOMAIN_ADMIN_NAME "administrator"
+#endif
+#ifndef DOMAIN_ADMIN_PASSWORD
+#define DOMAIN_ADMIN_PASSWORD "mlsgo&*("
+#endif
 
 
 #include "HHSharedNetwork/hglobal_network.h"
@@ -163,6 +172,7 @@ namespace HEHUI {
             LocalUserOnline,
             LocalUserOffline,
 
+            //File TX
             RequestFileSystemInfo,
             ResponseFileSystemInfo,
             RequestDownloadFile,
@@ -174,6 +184,9 @@ namespace HEHUI {
             FileTXStatusChanged,
             FileTXError,
 
+            RenameComputer,
+            JoinOrUnjoinDomain,
+            Remark
 
             
 
