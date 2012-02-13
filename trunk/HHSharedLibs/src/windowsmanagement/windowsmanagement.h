@@ -162,7 +162,9 @@ public:
     QString getComputerName();
     bool joinWorkgroup(LPCWSTR workgroup);
     bool joinDomain(const QString &domainName, const QString &accountName, const QString &password);
+    bool unjoinDomain(const QString &accountName, const QString &password);
     QString getJoinInformation(bool *isJoinedToDomain = 0);
+    bool renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password);
 
     bool getLoggedOnUserInfo(QString *userName, QString *domain, QString *logonServer);
 
