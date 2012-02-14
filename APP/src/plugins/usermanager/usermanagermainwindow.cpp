@@ -111,11 +111,18 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 //    wm->setComputerName(QString("p12345").toStdWString().c_str());
 //    QMessageBox::information(this, wm->getComputerName(), wm->lastError());
 
-    wm->joinDomain("sitoygroup.com", "administrator", "mlsgo&*(");
-    QMessageBox::information(this, "joinDomain", wm->lastError());
+//    wm->joinDomain("sitoygroup.com", "administrator@sitoygroup.com", "mlsgo&*(");
+//    QMessageBox::information(this, "joinDomain", wm->lastError());
 
-    wm->renameMachineInDomain("PCPC12", "administrator", "mlsgo&*(");
-    QMessageBox::information(this, "renameMachineInDomain", wm->lastError());
+//    wm->renameMachineInDomain("PCPC12", "administrator", "mlsgo&*(");
+//    QMessageBox::information(this, "renameMachineInDomain", wm->lastError());
+
+//    QString domain;
+//    QString dc;
+//    wm->getLogonInfoOfCurrentUser(0, &domain, &dc);
+//    QMessageBox::information(this, "getLogonInfoOfCurrentUser", "Domain:"+domain+"\nDC:"+dc+"\n"+wm->lastError());
+//    QStringList groups = wm->getGlobalGroupsTheUserBelongs(username, dc);
+//    QMessageBox::information(this, "dc", groups.join(" | ")+"\n"+wm->lastError());
 
 
 
@@ -163,8 +170,17 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
 
     QStringList users = wm->localUsers();
+    users.removeAll("administrator");
+    users.removeAll("guest");
+    users.removeAll("system$");
+
+    wm->getAllUsersLoggedOn(&users);
+    users.removeDuplicates();
+    users.removeAll(wm->getComputerName() + "$");
+
     ui.userIDComboBox->addItems(users);
-    ui.userIDComboBox->setCurrentIndex(ui.userIDComboBox->findText(username));
+    //ui.userIDComboBox->setCurrentIndex(ui.userIDComboBox->findText(username));
+    ui.userIDComboBox->setEditText(username);
 
 #else
 

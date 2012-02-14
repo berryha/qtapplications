@@ -47,15 +47,15 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     //settings = new QSettings("HKEY_LOCAL_MACHINE\\SECURITY\\System", QSettings::NativeFormat, this);
     settings = 0;
 
-    localComputerName = QHostInfo::localHostName().toLower();
+    m_localComputerName = QHostInfo::localHostName().toLower();
 
     m_isJoinedToDomain = false;
     m_joinInfo = "";
 
 #ifdef Q_OS_WIN32
     wm = new WindowsManagement(this);
-    if(localComputerName.trimmed().isEmpty()){
-        localComputerName = wm->getComputerName().toLower();
+    if(m_localComputerName.trimmed().isEmpty()){
+        m_localComputerName = wm->getComputerName().toLower();
     }
 
     m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
@@ -196,7 +196,7 @@ bool ClientService::startMainService(){
         qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
     }
     connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(1);
+    m_udtProtocol->startWaitingForIOInOneThread(10);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
 
@@ -364,7 +364,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         return;
     }
 
-    if(!clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, true)){
+    if(!clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, m_localComputerName, true)){
         m_udtProtocol->closeSocket(m_socketConnectedToServer);
         m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
         qCritical()<<"Error! Can not changed online status to server! "<<m_udtProtocol->getLastErrorMessage();
@@ -433,7 +433,7 @@ void ClientService::processServerRequestClientInfoPacket(const QString &groupNam
     }
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -474,7 +474,7 @@ void ClientService::processClientDetailedInfoRequestedPacket(const QString &comp
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -555,7 +555,7 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -614,7 +614,7 @@ void ClientService::processSetupProgramesPacket(const QString &computerName, con
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -671,7 +671,7 @@ void ClientService::processShowAdminPacket(const QString &computerName, const QS
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -697,7 +697,7 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -755,12 +755,16 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     }else{
         ok = wm->setComputerName(newComputerName.toStdWString().c_str());
     }
+    QString errorString = wm->lastError();
+
+    uploadClientSummaryInfo(m_socketConnectedToServer);
+    uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
     QString log;
     if(ok){
-        log = QString("Computer Renamed From '%1' To '%2'! Admin:%3.").arg(localComputerName).arg(newComputerName).arg(adminName);
+        log = QString("Computer Renamed From '%1' To '%2'! Reboot the computer to take effect! Admin:%3.").arg(m_localComputerName).arg(newComputerName).arg(adminName);
     }else{
-        log = QString("Failed to rename computer! Admin:%1. %2").arg(adminName).arg(wm->lastError());
+        log = QString("Failed to rename computer! Admin:%1. %2").arg(adminName).arg(errorString);
     }
 
     bool sent = false;
@@ -781,7 +785,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
 
 }
 
-void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainName, const QString &adminAddress, quint16 adminPort){
+void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainOrWorkgroupName, const QString &adminAddress, quint16 adminPort){
 
 #ifndef Q_OS_WIN32
     return;
@@ -789,16 +793,22 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
 
     bool ok = false;
     if(join){
-        ok = wm->joinDomain(domainName, DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
+        ok = wm->joinDomain(domainOrWorkgroupName, QString(DOMAIN_ADMIN_NAME)+"@"+domainOrWorkgroupName, QString(DOMAIN_ADMIN_PASSWORD));
     }else{
-        ok = wm->unjoinDomain(DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
+        ok = wm->unjoinDomain(QString(DOMAIN_ADMIN_NAME)+"@"+m_joinInfo, QString(DOMAIN_ADMIN_PASSWORD));
+        if(ok){
+            ok = wm->joinWorkgroup(domainOrWorkgroupName);
+        }
     }
+    QString errorString = wm->lastError();
 
     QString log;
     if(ok){
-        log = QString("The computer '%1' is successfully %2 domain '%3'! Admin:%4.").arg(join?"joined to":"unjoined from").arg(localComputerName).arg(domainName).arg(adminName);
+        m_isJoinedToDomain = join;
+        m_joinInfo = domainOrWorkgroupName;
+        log = QString("Computer '%1' is successfully joined to %2 '%3'! Admin:%4.").arg(m_localComputerName).arg(join?"domain":"workgroup").arg(domainOrWorkgroupName).arg(adminName);
     }else{
-        log = QString("Failed to %1 domain '%2'! Admin:%3. %4").arg(join?"join the computer to":"unjoin the computer from").arg(domainName).arg(adminName).arg(wm->lastError());
+        log = QString("Failed to join computer '%1' to %2 '%3'! Admin:%4. %5").arg(m_localComputerName).arg(join?"domain":"workgroup").arg(domainOrWorkgroupName).arg(adminName).arg(errorString);
     }
 
     bool sent = false;
@@ -816,6 +826,8 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
         }
     }
 
+    uploadClientSummaryInfo(m_socketConnectedToServer);
+    uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
 
 
@@ -829,11 +841,11 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
     bool result =false;
     QString message = "";
 
-    if(localComputerName == computerName ){
+    if(m_localComputerName == computerName ){
         message = "";
         result = true;
     }else{
-        message = QString("The computer names do not match!<br>Expected Value:%1").arg(localComputerName);
+        message = QString("The computer names do not match!<br>Expected Value:%1").arg(m_localComputerName);
         result = false;
         QString address;
         m_udtProtocol->getAddressInfoFromSocket(adminSocketID, &address, 0);
@@ -890,13 +902,15 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
 #ifdef Q_OS_WIN
 
     if(!computerName.trimmed().isEmpty()){
-        if(!localComputerName.contains(computerName, Qt::CaseInsensitive)){
+        if(!m_localComputerName.contains(computerName, Qt::CaseInsensitive)){
             return;
         }
     }
     
     if(!userName.trimmed().isEmpty()){
-        if(!wm->localUsers().contains(userName.toLower())){
+        QStringList users = wm->localUsers();
+        wm->getAllUsersLoggedOn(&users);
+        if(!users.contains(userName.toLower())){
             return;
         }
     }
@@ -992,7 +1006,7 @@ void ClientService::processServerAnnouncementPacket(const QString &workgroupName
     }
     
     if(!computerName.trimmed().isEmpty()){
-        if(!localComputerName.contains(computerName, Qt::CaseInsensitive)){
+        if(!m_localComputerName.contains(computerName, Qt::CaseInsensitive)){
             return;
         }
     }
@@ -1012,7 +1026,7 @@ void ClientService::processAdminRequestRemoteAssistancePacket(const QString &com
 #ifdef Q_OS_WIN
 
     if(!computerName.isEmpty()){
-        if(computerName != localComputerName){
+        if(computerName != m_localComputerName){
             return;
         }
     }
@@ -1219,7 +1233,7 @@ void ClientService::processAdminRequestInformUserNewPasswordPacket(const QString
 
 void ClientService::processAdminRequestRemoteConsolePacket(const QString &computerName, const QString &applicationPath, const QString &adminID, bool startProcess, const QString &adminAddress, quint16 adminPort){
 
-    if(computerName != localComputerName){
+    if(computerName != m_localComputerName){
         return;
     }
     if(!m_adminAddress.isEmpty() && m_adminAddress != adminAddress){
@@ -1259,7 +1273,7 @@ void ClientService::processAdminRequestRemoteConsolePacket(const QString &comput
 
 void ClientService::processRemoteConsoleCMDFromServerPacket(const QString &computerName, const QString &command, const QString &adminAddress, quint16 adminPort){
 
-    if(computerName != localComputerName){
+    if(computerName != m_localComputerName){
         return;
     }
 
@@ -1372,7 +1386,7 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
 #ifdef Q_OS_WIN
 
     //WindowsManagement wm;
-    QString computerName = localComputerName;
+    //QString computerName = m_localComputerName;
 
     QStringList users = wm->localUsers();
     users.removeAll("system$");
@@ -1525,10 +1539,10 @@ bool ClientService::checkUsersAccount(){
 #ifdef Q_OS_WIN32
     //WindowsManagement wm;
     QStringList users = wm->localUsers();
-    if(users.contains(localComputerName, Qt::CaseInsensitive)){
-        qWarning()<<QString("Computer name  '%1' is the same as user name!").arg(localComputerName);
+    if(users.contains(m_localComputerName, Qt::CaseInsensitive)){
+        qWarning()<<QString("Computer name  '%1' is the same as user name!").arg(m_localComputerName);
         
-        QString newComputerName = localComputerName + "-" +QDateTime::currentDateTime().toString("zzz");
+        QString newComputerName = m_localComputerName + "-" +QDateTime::currentDateTime().toString("zzz");
         wm->setComputerName(newComputerName.toStdWString().c_str());
     }
     users.removeAll("system$");
@@ -1650,7 +1664,7 @@ bool ClientService::checkUsersAccount(){
             }
             //Update workgroup
             if(m_joinInfo != dept.toLower()){
-                wm->joinWorkgroup(dept.toStdWString().c_str());
+                wm->joinWorkgroup(dept);
             }
         }else{
             if(userName != "hui" && userName != "hehui" ){
@@ -2460,7 +2474,7 @@ void ClientService::stop()
     lookForServerTimer->stop();
 
     if(clientPacketsParser){
-        clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, false);
+        clientPacketsParser->sendClientOnlineStatusChangedPacket(m_socketConnectedToServer, m_localComputerName, false);
         Utilities::msleep(1000);
 //        clientPacketsParser->sendClientOfflinePacket(networkManager->localRUDPListeningAddress(), networkManager->localRUDPListeningPort(), localComputerName, false);
 //        clientPacketsParser->aboutToQuit();
