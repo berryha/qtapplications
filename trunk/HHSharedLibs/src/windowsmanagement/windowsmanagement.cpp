@@ -65,7 +65,7 @@
 
 
 
-#include "string.h"
+//#include "string.h"
 using namespace std;
 
 
@@ -196,7 +196,7 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
 
     emit signalProgressUpdate(QString(tr("Join workgroup ...")), 70);
     QCoreApplication::processEvents();
-    ok = joinWorkgroup(dept.toStdWString().c_str());
+    ok = joinWorkgroup(dept);
     if(!ok){
         m_outputMsgs.append(lastErrorString);
     }
@@ -614,7 +614,7 @@ bool WindowsManagement::initNewSitoyUser(){
     quint16 userLocation = ini->value("Location", quint16(No1_Branch_Factory)).toUInt();
     this->location = Location(userLocation);
 
-//    int userNameArraySize = userName.size() * sizeof(wchar_t) + 1;
+    //    int userNameArraySize = userName.size() * sizeof(wchar_t) + 1;
     //    wchar_t * userNameArray = new wchar_t[userNameArraySize];
     //    userName.toWCharArray(userNameArray);
     wchar_t userNameArray[MaxUserAccountNameLength];
@@ -797,7 +797,8 @@ bool WindowsManagement::isAdmin(const QString &userName){
         return false;
     }
 
-    QStringList groups = getLocalGroupsTheUserBelongs(userName);
+    QStringList groups;
+    getLocalGroupsTheUserBelongs(&groups, userName);
     //qWarning()<<QString("User:%1 Groups:%2").arg(userName).arg(groups.join(","));
     
     bool userIsAdmin = groups.contains("Administrators", Qt::CaseInsensitive);
@@ -1153,7 +1154,16 @@ bool WindowsManagement::setLocalTime(const QDateTime &datetime){
 
 }
 
-QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userName){
+void WindowsManagement::getLocalGroupsTheUserBelongs(QStringList *groups, const QString &userName){
+
+    lastErrorString = "";
+
+    Q_ASSERT(groups);
+    if(!groups){
+        lastErrorString = tr("Invalid QStringList pointer!");
+        return;
+    }
+
     QString name = userName.trimmed();
     if(name.isEmpty()){
         name = getUserNameOfCurrentThread();
@@ -1162,7 +1172,8 @@ QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userN
     if(name.isEmpty()){
         lastErrorString = tr("Invalid user name!");
         qCritical()<<lastErrorString;
-        return QStringList();
+        //return QStringList();
+        return;
     }
 
     //    if(!localUsers().contains(name, Qt::CaseInsensitive)){
@@ -1172,7 +1183,7 @@ QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userN
     //    }
 
 
-    QStringList groups;
+//    QStringList groups;
 
     LPLOCALGROUP_USERS_INFO_0 pBuf = NULL;
     DWORD dwLevel = 0;
@@ -1226,7 +1237,7 @@ QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userN
                 }
 
                 //                   wprintf(L"\t-- %s\n", pTmpBuf->lgrui0_name);
-                groups.append(QString::fromWCharArray(pTmpBuf->lgrui0_name));
+                groups->append(QString::fromWCharArray(pTmpBuf->lgrui0_name));
 
                 pTmpBuf++;
                 dwTotalCount++;
@@ -1258,7 +1269,128 @@ QStringList WindowsManagement::getLocalGroupsTheUserBelongs(const QString &userN
         NetApiBufferFree(pBuf);
 
 
-    return groups;
+//    return groups;
+
+}
+
+void WindowsManagement::getGlobalGroupsTheUserBelongs(QStringList *groups, const QString &userName, const QString &serverName){
+
+    lastErrorString = "";
+
+    Q_ASSERT(groups);
+    if(!groups){
+        lastErrorString = tr("Invalid QStringList pointer!");
+        return;
+    }
+
+
+    QString name = userName.trimmed();
+    if(name.isEmpty()){
+        name = getUserNameOfCurrentThread();
+    }
+    if(userName.isEmpty()){
+        lastErrorString = tr("Invalid user name!");
+        qCritical()<<lastErrorString;
+//        return QStringList();
+        return;
+    }
+
+    //QStringList groups;
+
+    LPGROUP_USERS_INFO_0 pBuf = NULL;
+    DWORD dwLevel = 0;
+    DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
+    DWORD dwEntriesRead = 0;
+    DWORD dwTotalEntries = 0;
+    NET_API_STATUS nStatus;
+    LPCWSTR pszServerName = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        pszServerName = serverName.toStdWString().c_str();
+    }
+
+    //
+    // Call the NetUserGetGroups function, specifying level 0.
+    //
+    nStatus = NetUserGetGroups(pszServerName,
+                               userName.toStdWString().c_str(),
+                               dwLevel,
+                               (LPBYTE*)&pBuf,
+                               dwPrefMaxLen,
+                               &dwEntriesRead,
+                               &dwTotalEntries);
+    //
+    // If the call succeeds,
+    //
+    if (nStatus == NERR_Success)
+    {
+        LPGROUP_USERS_INFO_0 pTmpBuf;
+        DWORD i;
+        DWORD dwTotalCount = 0;
+
+        if ((pTmpBuf = pBuf) != NULL)
+        {
+            //fprintf(stderr, "\nGlobal group(s):\n");
+            //
+            // Loop through the entries;
+            //  print the name of the global groups
+            //  to which the user belongs.
+            //
+            for (i = 0; i < dwEntriesRead; i++)
+            {
+                Q_ASSERT(pTmpBuf != NULL);
+
+                if (pTmpBuf == NULL)
+                {
+                    fprintf(stderr, "An access violation has occurred\n");
+                    lastErrorString += tr("An access violation has occurred!\n");
+                    break;
+                }
+
+                //wprintf(L"\t-- %s\n", pTmpBuf->grui0_name);
+                groups->append(QString::fromWCharArray(pTmpBuf->grui0_name));
+
+                pTmpBuf++;
+                dwTotalCount++;
+            }
+        }
+        //
+        // If all available entries were
+        //  not enumerated, print the number actually
+        //  enumerated and the total number available.
+        //
+        //if (dwEntriesRead < dwTotalEntries){
+        //    fprintf(stderr, "\nTotal entries: %d", dwTotalEntries);
+        //}
+        //
+        // Otherwise, just print the total.
+        //
+        //printf("\nEntries enumerated: %d\n", dwTotalCount);
+    }else{
+        switch(nStatus){
+        case ERROR_ACCESS_DENIED:
+            lastErrorString += tr("The user does not have access to the requested information.");
+            break;
+        case NERR_InvalidComputer:
+            lastErrorString += tr("The computer name is invalid.");
+            break;
+        case NERR_UserNotFound:
+            lastErrorString += tr("The user name could not be found.");
+            break;
+        default:
+            lastErrorString += tr("A system error has occurred: %1\n").arg(nStatus);
+            break;
+        }
+
+        //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+    }
+    //
+    // Free the allocated buffer.
+    //
+    if (pBuf != NULL){
+        NetApiBufferFree(pBuf);
+    }
+
+    //return groups;
 
 }
 
@@ -1587,6 +1719,7 @@ bool WindowsManagement::setComputerName(LPCWSTR computerName) {
 
 QString WindowsManagement::getComputerName(){
     qDebug()<<"--WindowsManagement::getComputerName()";
+
     lastErrorString = "";
     QString computerName = "";
     DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
@@ -1604,11 +1737,11 @@ QString WindowsManagement::getComputerName(){
 
 }
 
-bool WindowsManagement::joinWorkgroup(LPCWSTR workgroup){
+bool WindowsManagement::joinWorkgroup(const QString &workgroup){
 
 
     NET_API_STATUS err;
-    err = NetJoinDomain(NULL, workgroup, NULL, NULL, NULL, 0);
+    err = NetJoinDomain(NULL, workgroup.toStdWString().c_str(), NULL, NULL, NULL, 0);
 
     switch ( err )
     {
@@ -1624,14 +1757,14 @@ bool WindowsManagement::joinWorkgroup(LPCWSTR workgroup){
         //printf("Invalid Workgroup Name!\n");
         err = 0;
 
-        lastErrorString = tr("Invalid Workgroup Name '%1'!").arg(QString::fromWCharArray(workgroup));
+        lastErrorString = tr("Invalid Workgroup Name '%1'!").arg(workgroup);
         return false;
         break;
     default:
         qDebug()<<"An error occured while trying to join the workgroup '"<<workgroup<<"' .\n";
         //printf("Error occured while trying to join the workgroup: %d\n", err);
 
-        lastErrorString = tr("An error occured while trying to join the workgroup '%1'! Error code: %2 ").arg(QString::fromWCharArray(workgroup)).arg(err);
+        lastErrorString = tr("An error occured while trying to join the workgroup '%1'! Error code: %2 ").arg(workgroup).arg(err);
         return false;
         break;
     }
@@ -1641,11 +1774,18 @@ bool WindowsManagement::joinWorkgroup(LPCWSTR workgroup){
 
 }
 
-bool WindowsManagement::joinDomain(const QString &domainName, const QString &accountName, const QString &password){
+bool WindowsManagement::joinDomain(const QString &domainName, const QString &accountName, const QString &password, const QString &serverName){
+    qWarning()<<"--WindowsManagement::joinDomain(...) "<<"domainName:"<<domainName<<" accountName:"<<accountName<<" password:"<<password;
 
     lastErrorString = "";
 
-    NET_API_STATUS err = NetJoinDomain(NULL, domainName.toStdWString().c_str(), NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE | NETSETUP_JOIN_WITH_NEW_NAME);
+    LPCWSTR pszServerName = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        pszServerName = serverName.toStdWString().c_str();
+    }
+    //LPCWSTR lpAccount = QString(accountName + "@" + domainName).toStdWString().c_str();
+
+    NET_API_STATUS err = NetJoinDomain(pszServerName, domainName.toStdWString().c_str(), NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE);
     switch(err){
     case NERR_Success:
         return true;
@@ -1663,7 +1803,7 @@ bool WindowsManagement::joinDomain(const QString &domainName, const QString &acc
         lastErrorString = tr("The specified workgroup name is not valid!");
         break;
     default:
-        lastErrorString = tr("Failed to join domain! Error code:%1").arg(err);
+        lastErrorString = tr("Failed to join a domain! Error code:%1").arg(err);
         break;
 
     }
@@ -1672,10 +1812,18 @@ bool WindowsManagement::joinDomain(const QString &domainName, const QString &acc
 
 }
 
-bool WindowsManagement::unjoinDomain(const QString &accountName, const QString &password){
+bool WindowsManagement::unjoinDomain(const QString &accountName, const QString &password, const QString &serverName){
 
     lastErrorString = "";
-    NET_API_STATUS err = NetUnjoinDomain(NULL, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_ACCT_DELETE);
+
+    LPCWSTR pszServerName = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        pszServerName = serverName.toStdWString().c_str();
+    }
+    //LPCWSTR lpAccount = QString(accountName + "@" + domainName).toStdWString().c_str();
+
+
+    NET_API_STATUS err = NetUnjoinDomain(pszServerName, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_ACCT_DELETE);
     switch(err){
     case NERR_Success:
         return true;
@@ -1699,15 +1847,19 @@ bool WindowsManagement::unjoinDomain(const QString &accountName, const QString &
 
 }
 
-QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain){
+QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain, const QString &serverName){
     qDebug()<<"--WindowsManagement::getJoinInformation()";
 
     lastErrorString = "";
+
     QString workgroupName = "";
     NET_API_STATUS err;
-    LPCWSTR lpServer = NULL;
     LPWSTR lpNameBuffer = new wchar_t[256];
     NETSETUP_JOIN_STATUS bufferType;
+    LPCWSTR lpServer = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        lpServer = serverName.toStdWString().c_str();
+    }
 
     err = NetGetJoinInformation(lpServer, &lpNameBuffer, &bufferType);
     if(err == NERR_Success){
@@ -1718,23 +1870,23 @@ QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain){
 
     NetApiBufferFree(lpNameBuffer);
 
-//    switch(bufferType){
-//    case NetSetupUnknownStatus :
-//        workgroupName = "";
-//        lastErrorString += tr("The join status is unknown!");
-//        break;
-//    case NetSetupUnjoined :
-//        workgroupName = "";
-//        lastErrorString += tr("The computer is not joined!");
-//        break;
-//    case NetSetupWorkgroupName :
-//        qWarning()<<"The computer is joined to a workgroup!";
-//        break;
-//    case NetSetupDomainName :
-//        workgroupName = "";
-//        lastErrorString += tr("The computer is joined to a domain!");
-//        break;
-//    }
+    //    switch(bufferType){
+    //    case NetSetupUnknownStatus :
+    //        workgroupName = "";
+    //        lastErrorString += tr("The join status is unknown!");
+    //        break;
+    //    case NetSetupUnjoined :
+    //        workgroupName = "";
+    //        lastErrorString += tr("The computer is not joined!");
+    //        break;
+    //    case NetSetupWorkgroupName :
+    //        qWarning()<<"The computer is joined to a workgroup!";
+    //        break;
+    //    case NetSetupDomainName :
+    //        workgroupName = "";
+    //        lastErrorString += tr("The computer is joined to a domain!");
+    //        break;
+    //    }
 
     if(isJoinedToDomain){
         *isJoinedToDomain = (bufferType == NetSetupDomainName)?true:false;
@@ -1744,11 +1896,16 @@ QString WindowsManagement::getJoinInformation(bool *isJoinedToDomain){
 
 }
 
-bool WindowsManagement::renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password){
+bool WindowsManagement::renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password, const QString &serverName){
 
     lastErrorString = "";
 
-    NET_API_STATUS err = NetRenameMachineInDomain(NULL, newMachineName.toStdWString().c_str(), accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE | NETSETUP_JOIN_WITH_NEW_NAME);
+    LPCWSTR pszServerName = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        pszServerName = serverName.toStdWString().c_str();
+    }
+
+    NET_API_STATUS err = NetRenameMachineInDomain(pszServerName, newMachineName.toStdWString().c_str(), accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_JOIN_DOMAIN | NETSETUP_ACCT_CREATE | NETSETUP_JOIN_WITH_NEW_NAME);
     switch(err){
     case NERR_Success:
         return true;
@@ -1771,7 +1928,122 @@ bool WindowsManagement::renameMachineInDomain(const QString &newMachineName, con
 
 }
 
-bool WindowsManagement::getLoggedOnUserInfo(QString *userName, QString *domain, QString *logonServer){
+void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &serverName){
+
+    Q_ASSERT(users);
+    lastErrorString = "";
+
+    if(!users){
+        lastErrorString = "Invalid QStringList pointer!";
+        return;
+    }
+
+    LPWKSTA_USER_INFO_0 pBuf = NULL;
+    LPWKSTA_USER_INFO_0 pTmpBuf;
+    DWORD dwLevel = 0;
+    DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
+    DWORD dwEntriesRead = 0;
+    DWORD dwTotalEntries = 0;
+    DWORD dwResumeHandle = 0;
+    DWORD i;
+    DWORD dwTotalCount = 0;
+    NET_API_STATUS nStatus;
+    //    LPCWSTR pszServerName = NULL; // The server is the default local computer.
+    //    if(!serverName.trimmed().isEmpty()){
+    //        pszServerName = serverName.toStdWString().c_str();
+    //    }
+
+    wchar_t serverNameArray[MaxGroupNameLength * sizeof(wchar_t) + 1];
+    wcscpy(serverNameArray, serverName.toStdWString().c_str());
+
+
+    //
+    // Call the NetWkstaUserEnum function, specifying level 0.
+    //
+    do // begin do
+    {
+        nStatus = NetWkstaUserEnum(serverNameArray,
+                                   dwLevel,
+                                   (LPBYTE*)&pBuf,
+                                   dwPrefMaxLen,
+                                   &dwEntriesRead,
+                                   &dwTotalEntries,
+                                   &dwResumeHandle);
+        //
+        // If the call succeeds,
+        //
+        if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA))
+        {
+            if ((pTmpBuf = pBuf) != NULL)
+            {
+                //
+                // Loop through the entries.
+                //
+                for (i = 0; (i < dwEntriesRead); i++)
+                {
+                    Q_ASSERT(pTmpBuf != NULL);
+
+                    if (pTmpBuf == NULL)
+                    {
+                        //
+                        // Only members of the Administrators local group
+                        //  can successfully execute NetWkstaUserEnum
+                        //  locally and on a remote server.
+                        //
+                        fprintf(stderr, "An access violation has occurred\n");
+                        break;
+                    }
+                    //
+                    // Print the user logged on to the workstation.
+                    //
+                    wprintf(L"\t-- %s\n", pTmpBuf->wkui0_username);
+                    users->append(QString::fromWCharArray(pTmpBuf->wkui0_username).toLower());
+
+                    pTmpBuf++;
+                    dwTotalCount++;
+                }
+            }
+        }
+        else{
+            //
+            // Otherwise, indicate a system error.
+            //
+            //fprintf(stderr, "A system error has occurred: %d\n", nStatus);
+            lastErrorString += tr("A system error has occurred: %1\n").arg(nStatus);
+        }
+
+        //
+        // Free the allocated memory.
+        //
+        if (pBuf != NULL)
+        {
+            NetApiBufferFree(pBuf);
+            pBuf = NULL;
+        }
+    }
+    //
+    // Continue to call NetWkstaUserEnum while
+    //  there are more entries.
+    //
+    while (nStatus == ERROR_MORE_DATA); // end do
+    //
+    // Check again for allocated memory.
+    //
+    if (pBuf != NULL)
+        NetApiBufferFree(pBuf);
+
+    //
+    // Print the final count of workstation users.
+    //
+    //fprintf(stderr, "\nTotal of %d entries enumerated\n", dwTotalCount);
+
+
+}
+
+
+bool WindowsManagement::getLogonInfoOfCurrentUser(QString *userName, QString *domain, QString *logonServer){
+
+    lastErrorString = "";
 
     bool ok = false;
     DWORD dwLevel = 1;
@@ -3080,15 +3352,15 @@ void WindowsManagement::test(){
 
     //getUserLastLogonAndLogoffTime("");
 
-//    HANDLE hToken;
-//    getTokenByProcessName(hToken, "explorer.exe");
+    //    HANDLE hToken;
+    //    getTokenByProcessName(hToken, "explorer.exe");
 
-//        QList<HANDLE> list = getTokenListByProcessName("qtcreator.exe");
-//        //qWarning()<<"~~~~list.size():"<<list.size();
-//        foreach(HANDLE token, list){
-//            getAccountNameOfProcess(token);
-//            CloseHandle(token);
-//        }
+    //        QList<HANDLE> list = getTokenListByProcessName("qtcreator.exe");
+    //        //qWarning()<<"~~~~list.size():"<<list.size();
+    //        foreach(HANDLE token, list){
+    //            getAccountNameOfProcess(token);
+    //            CloseHandle(token);
+    //        }
 
 
 

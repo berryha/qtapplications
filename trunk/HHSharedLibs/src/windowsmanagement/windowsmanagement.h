@@ -37,7 +37,6 @@
 #include <QCoreApplication>
 #include <QObject>
 #include <QString>
-//#include <QThread>
 #include <QStringList>
 #include <QMutex>
 #include <QDateTime>
@@ -115,7 +114,8 @@ public:
 
 
 
-    QStringList getLocalGroupsTheUserBelongs(const QString &userName = "");
+    void getLocalGroupsTheUserBelongs(QStringList *groups, const QString &userName = "");
+    void getGlobalGroupsTheUserBelongs(QStringList *groups, const QString &userName = "", const QString &serverName = "");
 
     void cleanTemporaryFiles();
     //void deleteFiles(const QString &path);
@@ -160,13 +160,13 @@ public:
 
     bool setComputerName(LPCWSTR m_newComputerNameToBeUsed);
     QString getComputerName();
-    bool joinWorkgroup(LPCWSTR workgroup);
-    bool joinDomain(const QString &domainName, const QString &accountName, const QString &password);
-    bool unjoinDomain(const QString &accountName, const QString &password);
-    QString getJoinInformation(bool *isJoinedToDomain = 0);
-    bool renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password);
-
-    bool getLoggedOnUserInfo(QString *userName, QString *domain, QString *logonServer);
+    bool joinWorkgroup(const QString &workgroup);
+    bool joinDomain(const QString &domainName, const QString &accountName, const QString &password, const QString &serverName = "");
+    bool unjoinDomain(const QString &accountName, const QString &password, const QString &serverName = "");
+    QString getJoinInformation(bool *isJoinedToDomain = 0, const QString &serverName = "");
+    bool renameMachineInDomain(const QString &newMachineName, const QString &accountName, const QString &password, const QString &serverName = "");
+    void getAllUsersLoggedOn(QStringList *users, const QString &serverName = "");
+    bool getLogonInfoOfCurrentUser(QString *userName, QString *domain, QString *logonServer);
 
     bool isStartupWithWin(const QString &applicationFilePath, const QString &parameters, const QString &valueNameString);
     bool setStartupWithWin(const QString &applicationFilePath, const QString &parameters, const QString &valueNameString, bool startupWithWin);
