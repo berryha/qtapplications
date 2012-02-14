@@ -352,15 +352,15 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::JoinOrUnjoinDomain):
     {
-        QString computerName = "", adminName = "", domainName = "";
+        QString computerName = "", adminName = "", domainOrWorkgroupName = "";
         bool join = false;
-        in >> computerName >> adminName >> join >> domainName;
+        in >> computerName >> adminName >> join >> domainOrWorkgroupName;
 
         if(computerName.toLower() != m_localComputerName){
             return;
         }
 
-        emit signalJoinOrUnjoinDomainPacketReceived(adminName, join, domainName, peerAddress.toString(), peerPort);
+        emit signalJoinOrUnjoinDomainPacketReceived(adminName, join, domainOrWorkgroupName, peerAddress.toString(), peerPort);
         qDebug()<<"~~JoinOrUnjoinDomain";
     }
     break;

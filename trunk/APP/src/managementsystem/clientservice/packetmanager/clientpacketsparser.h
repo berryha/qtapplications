@@ -724,7 +724,7 @@ signals:
     void signalShowAdminPacketReceived(const QString &computerName, const QString &users, bool show);
     void signalModifyAdminGroupUserPacketReceived(const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName, const QString &adminAddress, quint16 adminPort);
     void signalRenameComputerPacketReceived(const QString &newComputerName, const QString &adminName, const QString &adminAddress, quint16 adminPort);
-    void signalJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainName, const QString &adminAddress, quint16 adminPort);
+    void signalJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainOrWorkgroupName, const QString &adminAddress, quint16 adminPort);
 
     void signalAdminRequestConnectionToClientPacketReceived(int socketID, const QString &computerName, const QString &users);
     void signalAdminSearchClientPacketReceived(const QString &adminAddress, quint16 adminPort, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName);

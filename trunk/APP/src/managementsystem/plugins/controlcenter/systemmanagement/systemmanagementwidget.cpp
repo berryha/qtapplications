@@ -71,10 +71,10 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     if(m_isJoinedToDomain){
         ui.pushButtonAdminsManagement->hide();
-        ui.pushButtonDomain->setText(tr("Unjoin From Domain"));
+        ui.pushButtonDomain->setText(tr("Unjoin The Domain"));
     }else{
         ui.pushButtonAdminsManagement->show();
-        ui.pushButtonDomain->setText(tr("Join To Domain"));
+        ui.pushButtonDomain->setText(tr("Join A Domain"));
     }
 
 
@@ -573,7 +573,7 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
 //        return;
 //    }
 
-    QString text = tr("Do you really want to <font color = 'red'>rename</font> the computer? ");
+    QString text = tr("Do you really want to <b><font color = 'red'>rename</font></b> the computer? ");
     int ret = QMessageBox::question(this, tr("Question"), text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(ret == QMessageBox::No){
         return;
@@ -582,7 +582,7 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
     bool ok = false;
     QString newComputerName = "";
     do {
-        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
+        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Computer Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
         if (ok && !newComputerName.isEmpty()){
             break;
         }
@@ -597,7 +597,7 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
         return;
     }
 
-//    ui.pushButtonRenameComputer->setEnabled(false);
+    ui.pushButtonRenameComputer->setEnabled(false);
 
 }
 
@@ -607,9 +607,9 @@ void SystemManagementWidget::on_pushButtonDomain_clicked(){
     //        return;
     //    }
 
-    QString text = tr("Do you really want to <font color = 'red'>join</font> the computer to a domain? ");
+    QString text = tr("Do you really want to <b><font color = 'red'>join</font></b> the computer to a domain? ");
     if(m_isJoinedToDomain){
-        text = tr("Do you really want to <font color = 'red'>unjoin</font> the computer from the domain? ");
+        text = tr("Do you really want to <b><font color = 'red'>unjoin</font></b> the computer from the domain? ");
     }
     int ret = QMessageBox::question(this, tr("Question"), text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(ret == QMessageBox::No){
@@ -617,25 +617,27 @@ void SystemManagementWidget::on_pushButtonDomain_clicked(){
     }
 
     bool ok = false;
-    QString domainName = "";
-    if(!m_isJoinedToDomain){
+    QString domainOrWorkgroupName = "";
+    QString joinType = m_isJoinedToDomain?tr("Workgroup"):tr("Domain");
+//    if(!m_isJoinedToDomain){
         do {
-            domainName = QInputDialog::getText(this, tr("Join To Domain"), tr("Domain Name:"), QLineEdit::Normal, DOMAIN_NAME, &ok).trimmed();
-            if (ok && !domainName.isEmpty()){
+            domainOrWorkgroupName = QInputDialog::getText(this, tr("Join To %1").arg(joinType), tr("%1 Name:").arg(joinType), QLineEdit::Normal, DOMAIN_NAME, &ok).trimmed();
+            if (ok && !domainOrWorkgroupName.isEmpty()){
                 break;
             }
 
-            QMessageBox::critical(this, tr("Error"), tr("Incorrect Domain Name!"));
+            QMessageBox::critical(this, tr("Error"), tr("Incorrect %1 Name!").arg(joinType));
 
         } while (ok);
-    }
+//    }
 
-    ok = controlCenterPacketsParser->sendJoinOrUnjoinDomainPacket(m_peerSocket, m_computerName, m_adminName, !m_isJoinedToDomain, domainName);
+    ok = controlCenterPacketsParser->sendJoinOrUnjoinDomainPacket(m_peerSocket, m_computerName, m_adminName, !m_isJoinedToDomain, domainOrWorkgroupName);
     if(!ok){
         QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
         return;
     }
 
+    ui.pushButtonDomain->setEnabled(false);
 
 }
 
@@ -1095,6 +1097,17 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     ui.pushButtonAdminsManagement->setMenu(administratorsManagementMenu);
     ui.pushButtonAdminsManagement->setEnabled(true);
 
+    ui.pushButtonRenameComputer->setEnabled(true);
+    ui.pushButtonDomain->setEnabled(true);
+    m_isJoinedToDomain = isJoinedToDomain;
+    if(m_isJoinedToDomain){
+        ui.pushButtonAdminsManagement->hide();
+        ui.pushButtonDomain->setText(tr("Unjoin The Domain"));
+    }else{
+        ui.pushButtonAdminsManagement->show();
+        ui.pushButtonDomain->setText(tr("Join A Domain"));
+    }
+
 
     //ui.tabSystemInfo->setEnabled(true);
     ui.toolButtonRequestSystemInfo->setEnabled(true);
@@ -1107,16 +1120,6 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     //ui.groupBoxSettings->show();
 
     ui.groupBoxRemoteConsole->setEnabled(true);
-
-    m_isJoinedToDomain = isJoinedToDomain;
-    if(m_isJoinedToDomain){
-        ui.pushButtonAdminsManagement->hide();
-        ui.pushButtonDomain->setText(tr("Unjoin From Domain"));
-    }else{
-        ui.pushButtonAdminsManagement->show();
-        ui.pushButtonDomain->setText(tr("Join To Domain"));
-    }
-
 
 
 }

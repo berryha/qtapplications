@@ -279,7 +279,7 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
-    bool sendJoinOrUnjoinDomainPacket(int socketID, const QString &computerName, const QString &adminName, bool join, const QString &domainName = ""){
+    bool sendJoinOrUnjoinDomainPacket(int socketID, const QString &computerName, const QString &adminName, bool join, const QString &domainOrWorkgroupName){
 
         Packet *packet = PacketHandlerBase::getPacket(socketID);
         packet->setPacketType(quint8(MS::JoinOrUnjoinDomain));
@@ -287,7 +287,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << computerName << adminName << join << domainName;
+        out << m_localID << computerName << adminName << join << domainOrWorkgroupName;
         packet->setPacketData(ba);
 
         ba.clear();
