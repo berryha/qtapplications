@@ -206,7 +206,6 @@ namespace HEHUI {
         enum FileType{FILE = 0, DRIVE, FOLDER };
 
 
-
         enum Log{
             LOG_Unknown = 0,
             
@@ -228,16 +227,11 @@ namespace HEHUI {
             LOG_AdminInformUserNewPassword,
 
             LOG_ServerAnnouncement,
-            LOG_ServerTask,
-
-
-            
-
-
-
-
+            LOG_ServerTask
             
         };
+
+        enum ClientMessageType{MSG_Information = 0, MSG_Warning, MSG_Critical};
         
         
 

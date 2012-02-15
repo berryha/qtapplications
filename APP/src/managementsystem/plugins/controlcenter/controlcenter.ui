@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
+    <width>862</width>
     <height>515</height>
    </rect>
   </property>
@@ -51,7 +51,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEditComputerName"/>
+            <widget class="QLineEdit" name="lineEditComputerName">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="2" column="5">
             <widget class="QComboBox" name="comboBoxOSVersion">
@@ -241,7 +248,14 @@
             </widget>
            </item>
            <item row="1" column="3">
-            <widget class="QLineEdit" name="lineEditUserName"/>
+            <widget class="QLineEdit" name="lineEditUserName">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="labelMACAddress">
@@ -257,7 +271,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="lineEditMACAddress"/>
+            <widget class="QLineEdit" name="lineEditMACAddress">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="2" column="2">
             <widget class="QLabel" name="labelIPAddress">
@@ -273,7 +294,14 @@
             </widget>
            </item>
            <item row="2" column="3">
-            <widget class="QLineEdit" name="lineEditIPAddress"/>
+            <widget class="QLineEdit" name="lineEditIPAddress">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="1" column="6">
             <widget class="QLabel" name="labelUSBSD">
@@ -478,7 +506,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>980</width>
+     <width>862</width>
      <height>23</height>
     </rect>
    </property>

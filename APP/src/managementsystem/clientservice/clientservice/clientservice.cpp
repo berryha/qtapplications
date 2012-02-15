@@ -62,6 +62,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     if(m_joinInfo.trimmed().isEmpty()){
         qCritical()<< tr("Failed to get join information!");
     }
+    if(m_isJoinedToDomain){
+        wm->getComputerNameInfo(&m_joinInfo, 0, 0);
+    }
 
 
 
@@ -762,7 +765,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
 
     QString log;
     if(ok){
-        log = QString("Computer Renamed From '%1' To '%2'! Reboot the computer to take effect! Admin:%3.").arg(m_localComputerName).arg(newComputerName).arg(adminName);
+        log = QString("The computer is renamed from '%1' to '%2'! Restart the computer to apply all changes! Admin:%3.").arg(m_localComputerName).arg(newComputerName).arg(adminName);
     }else{
         log = QString("Failed to rename computer! Admin:%1. %2").arg(adminName).arg(errorString);
     }
@@ -776,7 +779,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     }
 
     if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
-        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log, ok?quint8(MS::MSG_Information):quint8(MS::MSG_Critical));
         if(!sent){
             qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -806,7 +809,7 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
     if(ok){
         m_isJoinedToDomain = join;
         m_joinInfo = domainOrWorkgroupName;
-        log = QString("Computer '%1' is successfully joined to %2 '%3'! Admin:%4.").arg(m_localComputerName).arg(join?"domain":"workgroup").arg(domainOrWorkgroupName).arg(adminName);
+        log = QString("Computer '%1' is successfully joined to %2 '%3'! Restart the computer to apply all changes! Admin:%4.").arg(m_localComputerName).arg(join?"domain":"workgroup").arg(domainOrWorkgroupName).arg(adminName);
     }else{
         log = QString("Failed to join computer '%1' to %2 '%3'! Admin:%4. %5").arg(m_localComputerName).arg(join?"domain":"workgroup").arg(domainOrWorkgroupName).arg(adminName).arg(errorString);
     }
@@ -820,7 +823,7 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
     }
 
     if(m_udtProtocol->isSocketConnected(m_socketConnectedToAdmin)){
-        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log);
+        sent = clientPacketsParser->sendClientMessagePacket(m_socketConnectedToAdmin, log, ok?quint8(MS::MSG_Information):quint8(MS::MSG_Critical));
         if(!sent){
             qCritical()<<tr("ERROR! Can not send message to admin from %1:%2! %3").arg(m_adminAddress).arg(m_adminPort).arg(m_udtProtocol->getLastErrorMessage());
         }
@@ -888,7 +891,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
 #endif
 
     if( (previousSocketConnectedToAdmin != UDTProtocol::INVALID_UDT_SOCK) && (previousSocketConnectedToAdmin != m_socketConnectedToAdmin) ){
-        clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
+        clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress), quint8(MS::MSG_Critical));
         clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_joinInfo, false);
         m_udtProtocol->closeSocket(previousSocketConnectedToAdmin);
 //        closeFileTXWithAdmin();
@@ -1240,7 +1243,7 @@ void ClientService::processAdminRequestRemoteConsolePacket(const QString &comput
         qWarning()<<"m_adminAddress:"<<m_adminAddress;
         qWarning()<<"adminAddress:"<<adminAddress;
         //clientPacketsParser->sendClientMessagePacket(QHostAddress(adminAddress), adminPort, localComputerName, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
-        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, QString("Another administrator has logged on from %1!").arg(m_adminAddress));
+        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, QString("Another administrator has logged on from %1!").arg(m_adminAddress), quint8(MS::MSG_Critical));
 
         return;
     }
@@ -1278,7 +1281,7 @@ void ClientService::processRemoteConsoleCMDFromServerPacket(const QString &compu
     }
 
     if((!process) || (!process->isRunning())){
-        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, "The Process is not running!");
+        clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, false, "The Process is not running!", qint8(MS::MSG_Critical));
         return;
     }
 
@@ -1290,7 +1293,6 @@ void ClientService::processRemoteConsoleCMDFromServerPacket(const QString &compu
 
 void ClientService::consoleProcessStateChanged(bool running, const QString &message){
     clientPacketsParser->sendClientResponseRemoteConsoleStatusPacket(m_socketConnectedToAdmin, running, message);
-
 }
 
 void ClientService::consoleProcessOutputRead(const QString &output){
@@ -1312,7 +1314,7 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 }
 
 void ClientService::uploadClientSummaryInfo(int socketID){
-    qWarning()<<"--ClientService::uploadClientSummaryInfo(...) socketID:"<<socketID;
+    qDebug()<<"--ClientService::uploadClientSummaryInfo(...) socketID:"<<socketID;
 
     if(UDTProtocol::INVALID_UDT_SOCK == socketID){
         return;

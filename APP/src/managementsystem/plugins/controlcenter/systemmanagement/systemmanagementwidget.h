@@ -74,7 +74,7 @@ private slots:
 
     void requestConnectionToClientTimeout();
 
-    void clientMessageReceived(const QString &computerName, const QString &message);
+    void clientMessageReceived(const QString &computerName, const QString &message, quint8 clientMessageType);
 
     void clientResponseClientSummaryInfoPacketReceived(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, const QString &clientVersion);
 
@@ -82,7 +82,7 @@ private slots:
     void clientDetailedInfoPacketReceived(const QString &computerName, const QString &clientInfo);
     void requestClientInfoTimeout();
 
-    void clientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool running, const QString &extraMessage);
+    void clientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool running, const QString &extraMessage, quint8 messageType);
     void remoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, const QString &result);
     void requestRemoteConsoleTimeout();
 

@@ -117,7 +117,7 @@ public slots:
 
     }
 
-    bool sendClientResponseRemoteConsoleStatusPacket(int adminSocketID, bool running, const QString &extraMessage){
+    bool sendClientResponseRemoteConsoleStatusPacket(int adminSocketID, bool running, const QString &extraMessage, quint8 messageType = quint8(MS::MSG_Information)){
         qDebug()<<"----sendClientResponseRemoteConsolePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(adminSocketID);
@@ -127,7 +127,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << (running?quint8(1):quint8(0)) << extraMessage;
+        out << m_localComputerName << (running?quint8(1):quint8(0)) << extraMessage << messageType;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -309,7 +309,7 @@ public slots:
         return m_udtProtocol->sendData(socketID, &ba);
     }
 
-    bool sendClientMessagePacket(int adminSocketID, const QString &message){
+    bool sendClientMessagePacket(int adminSocketID, const QString &message, quint8 clientMessageType = quint8(MS::MSG_Information)){
 
 
         Packet *packet = PacketHandlerBase::getPacket(adminSocketID);
@@ -319,7 +319,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_localComputerName << message  ;
+        out << m_localComputerName << message <<clientMessageType;
         packet->setPacketData(ba);
 
         ba.clear();
