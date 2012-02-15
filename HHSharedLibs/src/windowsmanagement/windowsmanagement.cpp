@@ -50,6 +50,7 @@
 
 
 #ifdef Q_OS_WIN32
+
     #include <Lm.h>
     #include <Tlhelp32.h>
     #include <Lmjoin.h>
@@ -60,6 +61,7 @@
     const int MaxUserPasswordLength = LM20_PWLEN;
     const int MaxUserCommentLength = 256;
     const int MaxGroupNameLength = 256;
+
 
 #endif
 
@@ -1737,6 +1739,54 @@ QString WindowsManagement::getComputerName(){
 
 }
 
+void WindowsManagement::getComputerNameInfo(QString *dnsDomain, QString *dnsHostname, QString *netBIOSName){
+
+    lastErrorString = "";
+
+    bool ok = false;
+    COMPUTER_NAME_FORMAT nameType;
+    wchar_t buffer[512];
+    ZeroMemory(buffer, 512);
+    DWORD size = sizeof(buffer);
+
+    if(dnsDomain){
+        nameType = ComputerNameDnsDomain;
+        ok = GetComputerNameExW(nameType, buffer, &size);
+        if(ok){
+            *dnsDomain = QString::fromWCharArray(buffer);
+        }else{
+            lastErrorString += tr("\nFailed to get dns domain! Error Code: %1").arg(GetLastError());
+        }
+    }
+    ZeroMemory(buffer, size);
+    size = sizeof(buffer);
+
+    if(dnsHostname){
+        nameType = ComputerNameDnsHostname;
+        ok = GetComputerNameExW(nameType, buffer, &size);
+        if(ok){
+            *dnsHostname = QString::fromWCharArray(buffer);
+        }else{
+            lastErrorString += tr("\nFailed to get dns hostname! Error Code: %1").arg(GetLastError());
+        }
+    }
+    ZeroMemory(buffer, size);
+    size = sizeof(buffer);
+
+    if(netBIOSName){
+        nameType = ComputerNameNetBIOS;
+        ok = GetComputerNameExW(nameType, buffer, &size);
+        if(ok){
+            *netBIOSName = QString::fromWCharArray(buffer);
+        }else{
+            lastErrorString += tr("\nFailed to get NetBIOS name! Error Code: %1").arg(GetLastError());
+        }
+    }
+    ZeroMemory(buffer, size);
+    //size = sizeof(buffer);
+
+}
+
 bool WindowsManagement::joinWorkgroup(const QString &workgroup){
 
 
@@ -1820,8 +1870,6 @@ bool WindowsManagement::unjoinDomain(const QString &accountName, const QString &
     if(!serverName.trimmed().isEmpty()){
         pszServerName = serverName.toStdWString().c_str();
     }
-    //LPCWSTR lpAccount = QString(accountName + "@" + domainName).toStdWString().c_str();
-
 
     NET_API_STATUS err = NetUnjoinDomain(pszServerName, accountName.toStdWString().c_str(), password.toStdWString().c_str(), NETSETUP_ACCT_DELETE);
     switch(err){

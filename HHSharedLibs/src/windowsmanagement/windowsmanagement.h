@@ -43,7 +43,9 @@
 #include <QPair>
 
 #ifdef Q_OS_WIN32
+    //#define _WIN32_WINNT 0x0500
     #include <windows.h>
+
 //#include <winbase.h>
 //#include <Lm.h>
 ////#include <lmcons.h>
@@ -160,6 +162,7 @@ public:
 
     bool setComputerName(LPCWSTR m_newComputerNameToBeUsed);
     QString getComputerName();
+    void getComputerNameInfo(QString *dnsDomain, QString *dnsHostname, QString *netBIOSName);
     bool joinWorkgroup(const QString &workgroup);
     bool joinDomain(const QString &domainName, const QString &accountName, const QString &password, const QString &serverName = "");
     bool unjoinDomain(const QString &accountName, const QString &password, const QString &serverName = "");
