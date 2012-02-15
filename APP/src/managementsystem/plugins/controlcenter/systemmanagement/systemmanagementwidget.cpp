@@ -583,13 +583,19 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
     QString newComputerName = "";
     do {
         newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Computer Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
-        if (ok && !newComputerName.isEmpty()){
-            break;
+        if (ok){
+            if(newComputerName.isEmpty()){
+                QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
+            }else{
+                break;
+            }
         }
 
-        QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
-
     } while (ok);
+
+    if(newComputerName.isEmpty()){
+        return;
+    }
 
     ok = controlCenterPacketsParser->sendRenameComputerPacket(m_peerSocket, m_computerName, newComputerName, m_adminName);
     if(!ok){
@@ -622,14 +628,20 @@ void SystemManagementWidget::on_pushButtonDomain_clicked(){
 //    if(!m_isJoinedToDomain){
         do {
             domainOrWorkgroupName = QInputDialog::getText(this, tr("Join To %1").arg(joinType), tr("%1 Name:").arg(joinType), QLineEdit::Normal, m_isJoinedToDomain?"WORKGROUP":DOMAIN_NAME, &ok).trimmed();
-            if (ok && !domainOrWorkgroupName.isEmpty()){
-                break;
+            if (ok){
+                if(domainOrWorkgroupName.isEmpty()){
+                    QMessageBox::critical(this, tr("Error"), tr("Incorrect %1 Name!").arg(joinType));
+                }else{
+                    break;
+                }
             }
-
-            QMessageBox::critical(this, tr("Error"), tr("Incorrect %1 Name!").arg(joinType));
 
         } while (ok);
 //    }
+
+    if(domainOrWorkgroupName.isEmpty()){
+        return;
+    }
 
     ok = controlCenterPacketsParser->sendJoinOrUnjoinDomainPacket(m_peerSocket, m_computerName, m_adminName, !m_isJoinedToDomain, domainOrWorkgroupName);
     if(!ok){

@@ -124,9 +124,9 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 //    QStringList groups = wm->getGlobalGroupsTheUserBelongs(username, dc);
 //    QMessageBox::information(this, "dc", groups.join(" | ")+"\n"+wm->lastError());
 
-    QString dnsDomain, dnsHostname, netBIOS;
-    wm->getComputerNameInfo(&dnsDomain, &dnsHostname, &netBIOS);
-    QMessageBox::information(this, "getLogonInfoOfCurrentUser", "dnsDomain:"+dnsDomain+"\ndnsHostname:"+dnsHostname+"\nnetBIOS:"+netBIOS+"\n"+wm->lastError());
+//    QString dnsDomain, dnsHostname, netBIOS;
+//    wm->getComputerNameInfo(&dnsDomain, &dnsHostname, &netBIOS);
+//    QMessageBox::information(this, "getLogonInfoOfCurrentUser", "dnsDomain:"+dnsDomain+"\ndnsHostname:"+dnsHostname+"\nnetBIOS:"+netBIOS+"\n"+wm->lastError());
 
 
 
@@ -136,7 +136,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
         QMessageBox::critical(this, tr("Error"), tr("Failed to get join information!"));
     }
     if(m_isJoinedToDomain){
-        wm->getComputerNameInfo(m_joinInfo, 0, 0);
+        wm->getComputerNameInfo(&m_joinInfo, 0, 0);
     }
 
     QString appDataCommonDir = wm->getEnvironmentVariable("ALLUSERSPROFILE") + "\\Application Data";
