@@ -76,7 +76,7 @@ int	 ClientInfoModel::columnCount ( const QModelIndex & parent) const{
 		return 0;
 	}
 
-	return 10;
+    return 11;
 
 
 }
@@ -116,12 +116,15 @@ QVariant ClientInfoModel::data ( const QModelIndex & index, int role) const{
                 return info->getProgramsEnabled()?"1":"0";
                 break;
             case 7:
-                return info->getAdministrators();
+                return info->isJoinedToDomain()?"1":"0";
                 break;
             case 8:
-                return info->getLastOnlineTime().toString("yyyy.MM.dd hh:mm:ss");
+                return info->getAdministrators();
                 break;
             case 9:
+                return info->getLastOnlineTime().toString("yyyy.MM.dd hh:mm:ss");
+                break;
+            case 10:
                 return info->getClientVersion();
                 break;
             
@@ -165,12 +168,15 @@ QVariant ClientInfoModel::headerData ( int section, Qt::Orientation orientation,
                 return QString(tr("Programes"));
                 break; 
             case 7:
+                return QString(tr("JoinedToDomain"));
+                break;
+            case 8:
                 return QString(tr("Administrators"));
                 break; 
-            case 8:
+            case 9:
                 return QString(tr("LastOnlineTime"));
                 break;       
-            case 9:
+            case 10:
                 return QString(tr("ClientVersion"));
                 break; 
                 
