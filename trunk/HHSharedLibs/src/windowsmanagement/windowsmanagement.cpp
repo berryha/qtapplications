@@ -2038,13 +2038,14 @@ void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &s
                         //  can successfully execute NetWkstaUserEnum
                         //  locally and on a remote server.
                         //
-                        fprintf(stderr, "An access violation has occurred\n");
+                        //fprintf(stderr, "An access violation has occurred\n");
+                        lastErrorString += tr("An access violation has occurred\n");
                         break;
                     }
                     //
                     // Print the user logged on to the workstation.
                     //
-                    wprintf(L"\t-- %s\n", pTmpBuf->wkui0_username);
+                    //wprintf(L"\t-- %s\n", pTmpBuf->wkui0_username);
                     users->append(QString::fromWCharArray(pTmpBuf->wkui0_username).toLower());
 
                     pTmpBuf++;
