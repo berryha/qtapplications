@@ -95,7 +95,7 @@ private slots:
     void on_actionExport_triggered(){slotExportQueryResult();}
     void on_actionPrint_triggered(){slotPrintQueryResult();}
     void on_actionEdit_triggered(){slotModifyUserInfo();}
-    void on_actionLogonToDomain_triggered();//{setAutoLogon(true);}
+    void on_actionAutoLogon_triggered();//{setAutoLogon(true);}
     void slotExportQueryResult();
     void slotPrintQueryResult();
     void slotModifyUserInfo();

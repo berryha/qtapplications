@@ -225,11 +225,12 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     //        break;
     case quint8(MS::ClientResponseRemoteConsoleStatus):
     {
-        QString extraMessage = "";
         quint8 running = false;
-        in >> running >> extraMessage;
+        QString extraMessage = "";
+        quint8 messageType = quint8(MS::MSG_Information);
+        in >> running >> extraMessage >> messageType;
 
-        emit signalClientResponseRemoteConsoleStatusPacketReceived(peerName, ((running == 0)?false:true), extraMessage);
+        emit signalClientResponseRemoteConsoleStatusPacketReceived(peerName, ((running == 0)?false:true), extraMessage, messageType);
         qDebug()<<"~~ClientResponseRemoteConsole";
     }
     break;
@@ -289,8 +290,9 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
 //        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString message = "";
-        in >> message;
-        emit signalClientMessagePacketReceived(peerName, message);
+        quint8 clientMessageType = quint8(MS::MSG_Information);
+        in >> message >> clientMessageType;
+        emit signalClientMessagePacketReceived(peerName, message, clientMessageType);
     }
     break;
 

@@ -736,7 +736,7 @@ signals:
 
     //    void signalAdminLoggedOnToServerRequestPacketReceived(const QHostAddress adminAddress, quint16 adminPort, const QString &adminID);
     //    void signalServerRequestRemoteConsolePacketReceived(const QString &adminID);
-    void signalClientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool accept, const QString &extraMessage);
+    void signalClientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool accept, const QString &extraMessage, quint8 messageType);
     //    void signalRemoteConsoleCMDFromServerPacketReceived(const QString &command);
     void signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &computerName, const QString &result);
 
@@ -755,7 +755,7 @@ signals:
 
 
     void signalClientResponseAdminConnectionResultPacketReceived(int socketID, const QString &computerName, bool result, const QString &message);
-    void signalClientMessagePacketReceived(const QString &computerName, const QString &message);
+    void signalClientMessagePacketReceived(const QString &computerName, const QString &message, quint8 clientMessageType);
 
     void signalUserResponseRemoteAssistancePacketReceived(const QString &userName, const QString &computerName, bool accept);
     void signalNewPasswordRetrevedByUserPacketReceived(const QString &userName, const QString &computerName);

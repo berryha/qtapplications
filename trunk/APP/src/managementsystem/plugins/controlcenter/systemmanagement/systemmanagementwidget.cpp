@@ -326,12 +326,12 @@ void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsP
     this->controlCenterPacketsParser = parser;
     connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(int, const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(int, const QString &, bool, const QString &)));
-    connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
+    connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &, quint8)), this, SLOT(clientMessageReceived(const QString &, const QString &, quint8)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)));
 
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientDetailedInfoPacketReceived(const QString &, const QString &)), this, SLOT(clientDetailedInfoPacketReceived(const QString &, const QString &)));
 
-    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &)), this, SLOT(clientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &)));
+    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &, quint8)), this, SLOT(clientResponseRemoteConsoleStatusPacketReceived(const QString &, bool, const QString &, quint8)));
     connect(controlCenterPacketsParser, SIGNAL(signalRemoteConsoleCMDResultFromClientPacketReceived(const QString &, const QString &)), this, SLOT(remoteConsoleCMDResultFromClientPacketReceived(const QString &, const QString &)));
 
     connect(controlCenterPacketsParser, SIGNAL(signalUserResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)), this, SLOT(userResponseRemoteAssistancePacketReceived(const QString &, const QString &, bool)));
@@ -621,7 +621,7 @@ void SystemManagementWidget::on_pushButtonDomain_clicked(){
     QString joinType = m_isJoinedToDomain?tr("Workgroup"):tr("Domain");
 //    if(!m_isJoinedToDomain){
         do {
-            domainOrWorkgroupName = QInputDialog::getText(this, tr("Join To %1").arg(joinType), tr("%1 Name:").arg(joinType), QLineEdit::Normal, DOMAIN_NAME, &ok).trimmed();
+            domainOrWorkgroupName = QInputDialog::getText(this, tr("Join To %1").arg(joinType), tr("%1 Name:").arg(joinType), QLineEdit::Normal, m_isJoinedToDomain?"WORKGROUP":DOMAIN_NAME, &ok).trimmed();
             if (ok && !domainOrWorkgroupName.isEmpty()){
                 break;
             }
@@ -1013,7 +1013,7 @@ void SystemManagementWidget::requestConnectionToClientTimeout(){
 
 }
 
-void SystemManagementWidget::clientMessageReceived(const QString &computerName, const QString &message){
+void SystemManagementWidget::clientMessageReceived(const QString &computerName, const QString &message, quint8 clientMessageType){
 
     if(computerName != this->m_computerName){
         return;
@@ -1021,7 +1021,19 @@ void SystemManagementWidget::clientMessageReceived(const QString &computerName, 
 
     QString msg = QString(tr("<p>Message From Computer <b>%1</b> :</p>").arg(computerName));
     msg += message;
-    QMessageBox::information(this, tr("Message"), msg);
+    switch(clientMessageType){
+    case quint8(MS::MSG_Information):
+        QMessageBox::information(this, tr("Message"), msg);
+        break;
+    case quint8(MS::MSG_Warning):
+        QMessageBox::warning(this, tr("Warning"), msg);
+        break;
+    case quint8(MS::MSG_Critical):
+        QMessageBox::critical(this, tr("Error"), msg);
+        break;
+    default:
+        QMessageBox::information(this, tr("Message"), msg);
+    }
 
 
 
@@ -1295,7 +1307,7 @@ void SystemManagementWidget::requestClientInfoTimeout(){
 
 }
 
-void SystemManagementWidget::clientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool running, const QString &extraMessage){
+void SystemManagementWidget::clientResponseRemoteConsoleStatusPacketReceived(const QString &computerName, bool running, const QString &extraMessage, quint8 messageType){
 
 
     if(computerName != this->m_computerName){
@@ -1315,13 +1327,6 @@ void SystemManagementWidget::clientResponseRemoteConsoleStatusPacketReceived(con
         ui.comboBoxCommand->setFocus();
         ui.toolButtonSendCommand->setEnabled(true);
 
-
-        if(!extraMessage.trimmed().isEmpty()){
-            clientMessageReceived(computerName, extraMessage);
-        }
-
-
-
     }else{
         remoteConsoleRunning = false;
         //        ui.horizontalLayoutRemoteApplication->setEnabled(true);
@@ -1331,14 +1336,15 @@ void SystemManagementWidget::clientResponseRemoteConsoleStatusPacketReceived(con
         ui.toolButtonRunRemoteApplication->setEnabled(true);
         ui.toolButtonRunRemoteApplication->setIcon(QIcon(":/icon/resources/images/start.png"));
         
-
         ui.toolButtonSendCommand->setEnabled(false);
 
-        QMessageBox::critical(this, tr("Error"), tr("<p>Message From Computer <b>%1</b> :</p>").arg(computerName) + extraMessage);
-
+        //QMessageBox::critical(this, tr("Error"), tr("<p>Message From Computer <b>%1</b> :</p>").arg(computerName) + extraMessage);
 
     }
 
+    if(!extraMessage.trimmed().isEmpty()){
+        clientMessageReceived(computerName, extraMessage, messageType);
+    }
 
 }
 

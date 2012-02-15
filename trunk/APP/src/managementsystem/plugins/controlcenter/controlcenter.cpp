@@ -158,6 +158,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     
 
 //    m_serverInstanceID = 0;
+
+
     
 }
 

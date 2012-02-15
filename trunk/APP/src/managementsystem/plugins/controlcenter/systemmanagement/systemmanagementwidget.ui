@@ -310,7 +310,7 @@
               <item row="1" column="2">
                <widget class="QLabel" name="workgroupLabel">
                 <property name="text">
-                 <string>Workgroup:</string>
+                 <string>Workgroup/Domain:</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -767,6 +767,12 @@
           </item>
           <item row="0" column="5">
            <widget class="QPushButton" name="pushButtonRenameComputer">
+            <property name="toolTip">
+             <string>Change the computer name</string>
+            </property>
+            <property name="statusTip">
+             <string>Change the computer name</string>
+            </property>
             <property name="text">
              <string>Rename Computer</string>
             </property>
@@ -774,8 +780,14 @@
           </item>
           <item row="0" column="6">
            <widget class="QPushButton" name="pushButtonDomain">
+            <property name="toolTip">
+             <string>Join or unjoin a domain</string>
+            </property>
+            <property name="statusTip">
+             <string>Join or unjoin a domain</string>
+            </property>
             <property name="text">
-             <string>Join Domain</string>
+             <string>Join A Domain</string>
             </property>
            </widget>
           </item>
