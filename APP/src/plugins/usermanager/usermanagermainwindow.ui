@@ -290,6 +290,9 @@
    </layout>
   </widget>
   <action name="actionExport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Export</string>
    </property>
@@ -298,6 +301,9 @@
    </property>
   </action>
   <action name="actionEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Edit</string>
    </property>
@@ -306,6 +312,9 @@
    </property>
   </action>
   <action name="actionPrint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Print</string>
    </property>
@@ -314,11 +323,14 @@
    </property>
   </action>
   <action name="actionAutoLogon">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Auto Logon</string>
    </property>
    <property name="toolTip">
-    <string>Logon To Domain</string>
+    <string>Auto Logon</string>
    </property>
   </action>
  </widget>

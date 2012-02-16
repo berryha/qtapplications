@@ -102,6 +102,8 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
     progressDlg = 0;
 
+    m_isJoinedToDomain = false;
+    m_joinInfo = "";
 
 #ifdef Q_OS_WIN32
 
@@ -130,7 +132,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
 
 
-    m_isJoinedToDomain = false;
+
     m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
     if(m_joinInfo.trimmed().isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Failed to get join information!"));
@@ -552,9 +554,7 @@ void UserManagerMainWindow::initStatusBar()
 
 void UserManagerMainWindow::setAutoLogon(bool autoLogon){
 
-#ifndef Q_OS_WIN32
-    return;
-#endif
+#ifdef Q_OS_WIN32
 
     QStringList parameters;
      QProcess p;
@@ -591,6 +591,11 @@ void UserManagerMainWindow::setAutoLogon(bool autoLogon){
         }
 
     }
+
+
+#endif
+
+    qWarning()<<"This function works on M$ Windows only!";
 
 }
 
@@ -1217,15 +1222,16 @@ void UserManagerMainWindow::updateActions() {
     bool enableExp = ui.userListTableView->currentIndex().isValid() && ui.userListTableView->selectionModel()->selectedIndexes().size();
     //bool enableModify =  enableIns&& enableExp;
 
-
     ui.actionExport->setEnabled(enableExp);
     ui.actionEdit->setEnabled(enableExp);
-    ui.actionAutoLogon->setEnabled(enableExp);
     ui.actionPrint->setEnabled(enableExp);
 
+#ifdef Q_OS_WIN32
+    ui.actionAutoLogon->setEnabled(enableExp);
     if(!m_isJoinedToDomain){
         ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
     }
+#endif
 
 }
 

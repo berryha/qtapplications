@@ -154,14 +154,13 @@ private:
 
     bool isYDAdmin;
 
-
-#ifdef Q_OS_WIN32
-    WindowsManagement *wm;
     bool m_isJoinedToDomain;
     QString m_joinInfo;
+#ifdef Q_OS_WIN32
+    WindowsManagement *wm;
     QString m_msUpdateExeFilename;
-
 #endif
+
 
     QTimer *activityTimer;
     bool m_verified;
