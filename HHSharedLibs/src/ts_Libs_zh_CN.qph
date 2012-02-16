@@ -1273,4 +1273,408 @@ An error occured while connecting to network printer &apos;%1&apos;! Error code:
     <source>Publisher</source>
     <target>发行商</target>
 </phrase>
+<phrase>
+    <source>&amp;Close</source>
+    <target>关闭(&amp;C)</target>
+</phrase>
+<phrase>
+    <source>Invalid QStringList pointer!</source>
+    <target>无效的QStringList指针！</target>
+</phrase>
+<phrase>
+    <source>The user does not have access to the requested information.</source>
+    <target>用户无权访问请求的信息。</target>
+</phrase>
+<phrase>
+    <source>The computer name is invalid.</source>
+    <target>计算机名称无效。</target>
+</phrase>
+<phrase>
+    <source>The user name could not be found.</source>
+    <target>找不到用户名。</target>
+</phrase>
+<phrase>
+    <source>
+Failed to get dns domain! Error Code: %1</source>
+    <target>无法获取DNS域！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>
+Failed to get dns hostname! Error Code: %1</source>
+    <target>无法获取DNS主机名！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>
+Failed to get NetBIOS name! Error Code: %1</source>
+    <target>无法获取NetBIOS名称！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>Invalid parameter!</source>
+    <target>无效参数！</target>
+</phrase>
+<phrase>
+    <source>No such domain!</source>
+    <target>没有这个域！</target>
+</phrase>
+<phrase>
+    <source>The computer is already joined to a domain!</source>
+    <target>该计算机已经加入到一个域！</target>
+</phrase>
+<phrase>
+    <source>The specified workgroup name is not valid!</source>
+    <target>指定的工作组名称无效！</target>
+</phrase>
+<phrase>
+    <source>Failed to join a domain! Error code:%1</source>
+    <target>无法加入域！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>A parameter is incorrect.</source>
+    <target>参数错误。</target>
+</phrase>
+<phrase>
+    <source>The computer is not currently joined to a domain.</source>
+    <target>该计算机没有加入到域。</target>
+</phrase>
+<phrase>
+    <source>This computer is a domain controller and cannot be unjoined from a domain.</source>
+    <target>该计算机是域控制器而且不能退出域。</target>
+</phrase>
+<phrase>
+    <source>Failed to unjoin machine from the domain! Error code: %1</source>
+    <target>无法退出域！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>Can not get join status information!</source>
+    <target>无法获取计算机所加入的工作组或域信息！</target>
+</phrase>
+<phrase>
+    <source>Failed to rename machine in domain! Error code: %1</source>
+    <target>无法在域内重命名计算机！错误代码： %1</target>
+</phrase>
+<phrase>
+    <source>An access violation has occurred
+</source>
+    <target>非法访问\n</target>
+</phrase>
+<phrase>
+    <source>Filter Data</source>
+    <target>过滤数据</target>
+</phrase>
+<phrase>
+    <source>Filter</source>
+    <target>过滤</target>
+</phrase>
+<phrase>
+    <source>File Mamagement</source>
+    <target>文件管理</target>
+</phrase>
+<phrase>
+    <source>&amp;Local</source>
+    <target>本地[&amp;L]</target>
+</phrase>
+<phrase>
+    <source>Path:</source>
+    <target>路径：</target>
+</phrase>
+<phrase>
+    <source>Upload To Remote</source>
+    <target>上传到远端</target>
+</phrase>
+<phrase>
+    <source>Download To Local</source>
+    <target>下载到本地</target>
+</phrase>
+<phrase>
+    <source>&amp;Remote</source>
+    <target>远端[&amp;R]</target>
+</phrase>
+<phrase>
+    <source>Transmitting</source>
+    <target>正在传输</target>
+</phrase>
+<phrase>
+    <source>Logs</source>
+    <target>日志</target>
+</phrase>
+<phrase>
+    <source>File &apos;%1&apos; does not exist!</source>
+    <target>文件 ‘%1’不存在！</target>
+</phrase>
+<phrase>
+    <source>Failed to open file %1! %2</source>
+    <target>无法打开文件 %1！ %2</target>
+</phrase>
+<phrase>
+    <source>File &apos;%1&apos; already exists!</source>
+    <target>文件 ‘%1’ 已经存在！</target>
+</phrase>
+<phrase>
+    <source>Can not create directory &apos;%1&apos;!</source>
+    <target>无法创建目录 ‘%1’！</target>
+</phrase>
+<phrase>
+    <source>File &apos;%1&apos; is in use!</source>
+    <target>文件 ‘%1’ 正在被使用！</target>
+</phrase>
+<phrase>
+    <source>Failed to open/create file %1: %2</source>
+    <target>无法打开或创建文件 %1：%2</target>
+</phrase>
+<phrase>
+    <source>Failed to resize file %1: %2</source>
+    <target>无法重置文件 %1：%2</target>
+</phrase>
+<phrase>
+    <source>Failed to read file info!</source>
+    <target>无法读取文件信息！</target>
+</phrase>
+<phrase>
+    <source>Failed to open file &apos;%1&apos;! %2</source>
+    <target>无法打开文件 ‘%1’ %2</target>
+</phrase>
+<phrase>
+    <source>Failed to read data from file &apos;%1&apos;! %2</source>
+    <target>无法从文件 ‘%1’ 中读取数据！</target>
+</phrase>
+<phrase>
+    <source>Failed to write data to file &apos;%1&apos;! %2</source>
+    <target>无法写入数据到文件 ‘%1’！ %2</target>
+</phrase>
+<phrase>
+    <source>JoinedToDomain</source>
+    <target>域成员</target>
+</phrase>
+<phrase>
+    <source>Can not start UDP listening on port %1! %2</source>
+    <target>无法在端口 %1 上启动UDP监听！ %2</target>
+</phrase>
+<phrase>
+    <source>Target path does not exist!</source>
+    <target>目标路径不存在！</target>
+</phrase>
+<phrase>
+    <source>&apos;%1&apos; is not a directorie!</source>
+    <target>‘%1’ 不是一个目录！</target>
+</phrase>
+<phrase>
+    <source>Directorie &apos;%1&apos; does not exist!</source>
+    <target>目录 ‘%1’ 不存在！</target>
+</phrase>
+<phrase>
+    <source>Peer Closed!</source>
+    <target>对端关闭！</target>
+</phrase>
+<phrase>
+    <source>ERROR! Peer Closed Unexpectedly!</source>
+    <target>错误！对端非正常关闭！</target>
+</phrase>
+<phrase>
+    <source>Error! Can not send request! %1</source>
+    <target>错误！无法发送请求！ %1</target>
+</phrase>
+<phrase>
+    <source>Connection is not made!&lt;br&gt;Please connect to peer first!</source>
+    <target>未建立连接！&lt;br&gt;请先连接到对端！</target>
+</phrase>
+<phrase>
+    <source>Error! Can not send file! %1</source>
+    <target>错误！无法发送文件！ %1</target>
+</phrase>
+<phrase>
+    <source>Request uploading file %1</source>
+    <target>无法上传设施 %1</target>
+</phrase>
+<phrase>
+    <source>Error! Can not send file download request! %1</source>
+    <target>错误！无法发送下载请求！ %1</target>
+</phrase>
+<phrase>
+    <source>Request downloading file %1</source>
+    <target>请求下载文件 %1</target>
+</phrase>
+<phrase>
+    <source>File download request accepted! %1</source>
+    <target>已接受文件下载请求！ %1</target>
+</phrase>
+<phrase>
+    <source>Error! Failed to download file &apos;%1&apos;! %2 </source>
+    <target>错误！无法下载文件 ‘%1’！ %2</target>
+</phrase>
+<phrase>
+    <source>Error! File download request denied! %1</source>
+    <target>错误！文件下载请求被拒绝！ %1</target>
+</phrase>
+<phrase>
+    <source>Error! Can not send file!&lt;br&gt;%1</source>
+    <target>错误！无法发送文件！&lt;br&gt; %1</target>
+</phrase>
+<phrase>
+    <source>File Downloaded! &apos;%1&apos;</source>
+    <target>文件下载成功！ ‘%1’</target>
+</phrase>
+<phrase>
+    <source>Please select the remote path to save files!</source>
+    <target>请选择文件远程保存路径！</target>
+</phrase>
+<phrase>
+    <source>Please select at least one file or folder to upload!</source>
+    <target>请至少选择一个要上传的文件或文件夹！</target>
+</phrase>
+<phrase>
+    <source>Are you sure to upload files?</source>
+    <target>你确定要上传文件？</target>
+</phrase>
+<phrase>
+    <source>Please select the local path to save files!</source>
+    <target>请选择本地保存文件的路径！</target>
+</phrase>
+<phrase>
+    <source>Please select at least one file or folder to download!</source>
+    <target>请选择至少一个要下载的文件或文件夹！</target>
+</phrase>
+<phrase>
+    <source>Are you sure to download files?</source>
+    <target>你确定要下载文件？</target>
+</phrase>
+<phrase>
+    <source>Drive</source>
+    <target>驱动器</target>
+</phrase>
+<phrase>
+    <source>Folder</source>
+    <target>文件夹</target>
+</phrase>
+<phrase>
+    <source>File</source>
+    <target>文件</target>
+</phrase>
+<phrase>
+    <source>Type</source>
+    <target>类型</target>
+</phrase>
+<phrase>
+    <source>Date Modified</source>
+    <target>修改日期</target>
+</phrase>
+<phrase>
+    <source>Unjoin The Domain</source>
+    <target>退出域</target>
+</phrase>
+<phrase>
+    <source>Join A Domain</source>
+    <target>加入域</target>
+</phrase>
+<phrase>
+    <source>Can not connect to host!&lt;br&gt;%1</source>
+    <target>无法连接到主机！&lt;br&gt;%1</target>
+</phrase>
+<phrase>
+    <source>Can not send connection request to host!&lt;br&gt;%1</source>
+    <target>无法发送请求到主机！&lt;br&gt;%1</target>
+</phrase>
+<phrase>
+    <source>Can not send data to peer!&lt;br&gt;%1</source>
+    <target>无法发到数据到对端！&lt;br&gt;%1</target>
+</phrase>
+<phrase>
+    <source>Do you really want to &lt;b&gt;&lt;font color = &apos;red&apos;&gt;rename&lt;/font&gt;&lt;/b&gt; the computer? </source>
+    <target>你真的想要 &lt;font color = &apos;red&apos;&gt;&lt;b&gt;重命名&lt;/b&gt;&lt;/font&gt; 这台计算机？</target>
+</phrase>
+<phrase>
+    <source>Rename Computer</source>
+    <target>重命名计算机</target>
+</phrase>
+<phrase>
+    <source>New Computer Name:</source>
+    <target>新计算机名称：</target>
+</phrase>
+<phrase>
+    <source>Incorrect Computer Name!</source>
+    <target>无效的计算机名称！</target>
+</phrase>
+<phrase>
+    <source>Do you really want to &lt;b&gt;&lt;font color = &apos;red&apos;&gt;join&lt;/font&gt;&lt;/b&gt; the computer to a domain? </source>
+    <target>你真的想要将这台计算机 &lt;font color = &apos;red&apos;&gt;&lt;b&gt;加入域&lt;/b&gt;&lt;/font&gt; ？</target>
+</phrase>
+<phrase>
+    <source>Do you really want to &lt;b&gt;&lt;font color = &apos;red&apos;&gt;unjoin&lt;/font&gt;&lt;/b&gt; the computer from the domain? </source>
+    <target>你真的想要将这台计算机 &lt;font color = &apos;red&apos;&gt;&lt;b&gt;退出域&lt;/b&gt;&lt;/font&gt; ？</target>
+</phrase>
+<phrase>
+    <source>Domain</source>
+    <target>域</target>
+</phrase>
+<phrase>
+    <source>Join To %1</source>
+    <target>加入到 %1</target>
+</phrase>
+<phrase>
+    <source>%1 Name:</source>
+    <target>%1 名称：</target>
+</phrase>
+<phrase>
+    <source>Incorrect %1 Name!</source>
+    <target>无效的 %1 名称！</target>
+</phrase>
+<phrase>
+    <source>Workgroup/Domain:</source>
+    <target>工作组或域：</target>
+</phrase>
+<phrase>
+    <source>Change the computer name</source>
+    <target>更改计算机名称</target>
+</phrase>
+<phrase>
+    <source>Join or unjoin a domain</source>
+    <target>加入或退出域</target>
+</phrase>
+<phrase>
+    <source>Failed to get join information!</source>
+    <target>无法获取本机加入的工作组或域信息！</target>
+</phrase>
+<phrase>
+    <source>Failed to enable &apos;AutoAdminLogon&apos;!</source>
+    <target>无法启用‘自动登陆’！</target>
+</phrase>
+<phrase>
+    <source>Please restart your computer to take effect!</source>
+    <target>请重启你的计算机以使设置生效！</target>
+</phrase>
+<phrase>
+    <source>Failed to disable &apos;AutoAdminLogon&apos;!</source>
+    <target>无法停用‘自动登陆’！</target>
+</phrase>
+<phrase>
+    <source>&lt;b&gt;&lt;font color=red&gt;This computer is already joined to domain &apos;%1&apos; !&lt;/font&gt;&lt;/b&gt;&lt;br&gt; Do you want to use this account to logon to the domain automatically?</source>
+    <target>&lt;b&gt;&lt;font color=red&gt;此计算机已经加入到域 &apos;%1&apos; ！&lt;/font&gt;&lt;/b&gt;&lt;br&gt; 你真的想用这个帐户来自动登陆到域？</target>
+</phrase>
+<phrase>
+    <source>Do you want to use account &lt;font color=red&gt;&apos;%1&apos;&lt;/font&gt; to logon %2 automatically?</source>
+    <target>你真的想用帐户 &lt;font color=red&gt;‘%1’&lt;/font&gt; 来自动登陆？</target>
+</phrase>
+<phrase>
+    <source>Export Query Result</source>
+    <target>导出查询结果</target>
+</phrase>
+<phrase>
+    <source>Edit</source>
+    <target>编辑</target>
+</phrase>
+<phrase>
+    <source>Edit User Info</source>
+    <target>编辑用户信息</target>
+</phrase>
+<phrase>
+    <source>Print</source>
+    <target>打印</target>
+</phrase>
+<phrase>
+    <source>Print Query Result</source>
+    <target>打印查询结果</target>
+</phrase>
+<phrase>
+    <source>Auto Logon</source>
+    <target>自动登陆</target>
+</phrase>
 </QPH>

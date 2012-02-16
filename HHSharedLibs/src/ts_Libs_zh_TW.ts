@@ -857,8 +857,9 @@
     </message>
     <message>
         <location filename="core/plugin/pluginmanager.cpp" line="165"/>
-        <source>OK! Plug-in &apos;%1&apos; loaded!</source>
-        <translation>完成!增益集&apos;%1&apos;已載入!</translation>
+        <source>Plug-in &apos;%1&apos; loaded!</source>
+        <oldsource>OK! Plug-in &apos;%1&apos; loaded!</oldsource>
+        <translation type="unfinished">完成!增益集&apos;%1&apos;已載入!</translation>
     </message>
     <message>
         <location filename="core/plugin/pluginmanager.cpp" line="173"/>
@@ -992,496 +993,628 @@
 <context>
     <name>HEHUI::UDTProtocolBase</name>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="113"/>
+        <location filename="udt/udtprotocolbase.cpp" line="115"/>
         <source>Server is already listenning on %1:%2!</source>
         <translation>伺服器正在監聽 %1:%2 ！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="129"/>
+        <location filename="udt/udtprotocolbase.cpp" line="131"/>
         <source>Failed to start listening! Illegal port number or port is busy!</source>
         <translation>無法監聽！非法的通訊埠或通訊埠正忙！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="177"/>
+        <location filename="udt/udtprotocolbase.cpp" line="179"/>
         <source>Failed to start listening! Bind error! </source>
         <translation>無法監聽！綁定時發生錯誤！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="192"/>
+        <location filename="udt/udtprotocolbase.cpp" line="194"/>
         <source>Failed to start listening! </source>
         <translation>無法監聽！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="285"/>
+        <location filename="udt/udtprotocolbase.cpp" line="364"/>
         <source>Can not connect to host! Invalid peer address!</source>
         <translation>無法連接到主機！無效的位址！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="291"/>
+        <location filename="udt/udtprotocolbase.cpp" line="370"/>
         <source>Can not connect to host! Invalid peer port!</source>
         <translation>無法連接到主機！無效的通訊埠！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="317"/>
+        <location filename="udt/udtprotocolbase.cpp" line="396"/>
         <source>Can not connect to host! Invalid peer address or port!</source>
         <translation>無法連接到主機！無效的位址或通訊埠！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="327"/>
+        <location filename="udt/udtprotocolbase.cpp" line="406"/>
         <source>Can not connect to host! Invalid local address or port!!</source>
         <translation>無法連接到主機！無效的位址或通訊埠！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="344"/>
+        <location filename="udt/udtprotocolbase.cpp" line="423"/>
         <source>Can not connect to host! Failed to bind!</source>
         <translation>無法連接到主機！綁定失敗！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="362"/>
+        <location filename="udt/udtprotocolbase.cpp" line="443"/>
         <source>Can not connect to host! Failed to connect!</source>
         <translation>無法連接到主機！連接失敗！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="423"/>
-        <location filename="udt/udtprotocolbase.cpp" line="488"/>
+        <location filename="udt/udtprotocolbase.cpp" line="508"/>
+        <location filename="udt/udtprotocolbase.cpp" line="580"/>
+        <source>Invalid UDT Socket!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="udt/udtprotocolbase.cpp" line="515"/>
+        <location filename="udt/udtprotocolbase.cpp" line="587"/>
         <source>EPOLL Not Initialized!</source>
         <translation>EPOLL未初始化！</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="430"/>
-        <location filename="udt/udtprotocolbase.cpp" line="496"/>
+        <location filename="udt/udtprotocolbase.cpp" line="522"/>
+        <location filename="udt/udtprotocolbase.cpp" line="595"/>
         <source>Data is too large! Max allowed size:%1, current data size:%2</source>
         <translation>資料太大！允許的最大尺寸：%1，目前資料尺寸：%2</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="454"/>
+        <location filename="udt/udtprotocolbase.cpp" line="546"/>
         <source>Data sent failed! Data size:%1, Sent size:%2! %3</source>
         <translation>資料傳送失敗！資料尺寸：%1，已傳送尺寸：%2！ %3</translation>
     </message>
     <message>
-        <location filename="udt/udtprotocolbase.cpp" line="506"/>
+        <location filename="udt/udtprotocolbase.cpp" line="605"/>
         <source>Failed to send message data!</source>
         <translation>無法傳送訊息資料！</translation>
     </message>
 </context>
 <context>
+    <name>HEHUI::UDTProtocolForFileTransmission</name>
+    <message>
+        <location filename="udt/udtprotocolforfiletransmission.cpp" line="72"/>
+        <source>Failed to send file! </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="udt/udtprotocolforfiletransmission.cpp" line="101"/>
+        <source>Failed to receive file! </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HEHUI::WindowsManagement</name>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="120"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="127"/>
         <source>Adding user %1 to local system...</source>
         <translation>正在新增使用者 %1 到本機系統....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="128"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="135"/>
         <source>Adding user %1 to local &apos;Administrators&apos; group...</source>
         <translation>正在新增使用者 %1 到本機 &apos;Administrators&apos; 組....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="137"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="144"/>
         <source>Save settings...</source>
         <translation>儲存設定....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="160"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="167"/>
         <source>Update computer name ...</source>
         <translation>更新計算機名稱....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="192"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="199"/>
         <source>Join workgroup ...</source>
         <translation>加入工作組....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="199"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="206"/>
         <source>Set Starting up with M$ windows ...</source>
         <translation>設定開機啟動項....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="220"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="227"/>
         <source>Done!</source>
         <translation>完成！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="227"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="234"/>
         <source>This Function Is For Ducking M$ Windows Only!</source>
         <translation>本功能只能在該死的M$ Windows下執行！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="264"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="271"/>
         <source>Can Not Adjust Token Privileges!</source>
         <translation>無法修改權杖權限！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="282"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="289"/>
         <source>Current OS is not NT6!</source>
         <translation>目前系統是NT6！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="324"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="777"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="811"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="891"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="948"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="991"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1151"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="331"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="789"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="824"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="905"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="963"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1006"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1175"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1294"/>
         <source>Invalid user name!</source>
         <translation>無效的使用者名！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="350"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="357"/>
         <source>Can not log user %1 on to this computer! Error code:%2</source>
         <translation>使用者 %1 無法登陸到本系統！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="376"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="386"/>
         <source>Starting process &apos;%1&apos; failed! Error Code:%2</source>
         <translation>程式&apos;%1&apos;啟動失敗！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="396"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="406"/>
         <source>Starting program &apos;%1&apos; failed!</source>
         <translation>程式&apos;%1&apos;啟動失敗！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="521"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="533"/>
         <source>Can not retrieve the name of the user associated with the current thread! Code:%1 </source>
         <translation>無法獲取目前執行緒的使用者名！錯誤代碼：%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="551"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1917"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="563"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2414"/>
         <source>Administrator Privilege Required!</source>
         <translation>需要管理員權限!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="563"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="575"/>
         <source>Can not set &apos;DefaultUserName&apos; for &apos;AutoAdminLogon&apos;!</source>
         <translation>無法為自動登陸設定&apos;DefaultUserName&apos;註冊表項值！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="571"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="583"/>
         <source>Can not set &apos;DefaultPassword&apos; for &apos;AutoAdminLogon&apos;!</source>
         <translation>無法為自動登陸設定&apos;DefaultPassword&apos;註冊表項值！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="590"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="602"/>
         <source>Reading settings ...</source>
         <translation>正在讀取設定....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="595"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="607"/>
         <source>Can not find user info!</source>
         <translation>找不到使用者訊息！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="613"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="625"/>
         <source>Setting up email accounts ...</source>
         <translation>正在設定郵件帳戶....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="617"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2163"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="629"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2660"/>
         <source>Setting Up Outlook Mail Account</source>
         <translation>設定Outlook郵件帳戶</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="640"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="652"/>
         <source>Email Store Root:&apos;%1&apos;</source>
         <translation>郵件存儲位置根路徑:%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="644"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2034"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="656"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2531"/>
         <source>Setting Up Live Mail Account</source>
         <translation>設定Live Mail郵件帳戶</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="649"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="661"/>
         <source>Setting Up OE Mail Account</source>
         <translation>設定OE郵件帳戶</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="656"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="668"/>
         <source>Setting Up File Permissions</source>
         <translation>設定檔案權限</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="673"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="685"/>
         <source>Setting up IME ...</source>
         <translation>正在設定輸入法....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="681"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="693"/>
         <source>Adding user to local &apos;Power Users&apos; group...</source>
         <translation>正在新增使用者 %1 到本機 &apos;Power Users&apos; 組....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="688"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="700"/>
         <source>Deleting user from local &apos;Administrators&apos; group...</source>
         <translation>正在從本機 &apos;Administrators&apos; 組刪除使用者 %1 ....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="695"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="707"/>
         <source>Connecting to net drive ...</source>
         <translation>正在連接網路磁盤....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="702"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="714"/>
         <source>Connecting to network printers ...</source>
         <translation>正在連接網路列印機....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="708"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="720"/>
         <source>Disable Application Starting with M$ windows ...</source>
         <translation>禁用開機啟動....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="714"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="726"/>
         <source>Saving settings ...</source>
         <translation>儲存設定....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="722"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="734"/>
         <source>Done! User &apos;%1&apos; initialized!</source>
         <translation>完成！使用者&apos;%1&apos;的設定已經初始化！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="760"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="772"/>
         <source>Can not get disk free space!</source>
         <translation>無法獲取磁盤剩餘空間大小！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="786"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1535"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="798"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1685"/>
         <source>User &apos;%1&apos; does not exist!</source>
         <translation>使用者 &apos;%1&apos;不存在！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="866"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="879"/>
         <source>Error %1 occurred while updating the password. Parm Error %2 returned.</source>
         <translation>更新密碼時發生錯誤%1。返回錯誤%2。</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="875"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="889"/>
         <source>An error occurred while updating the password. NetUserGetInfo failed: %1</source>
         <translation>更新密碼時發生錯誤。函數「NetUserGetInfo」失敗：%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="925"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="939"/>
         <source>Error %1 occurred while setting up the account. Parm Error %2 returned.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="932"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="970"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="947"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="985"/>
         <source>An error occurred while setting up the account. NetUserGetInfo failed: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1027"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1042"/>
         <source>An error occurred while getting the last logon/logoff time. NetUserGetInfo failed: %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1118"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1133"/>
         <source>Invalid Time!</source>
         <translation>無效時間!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1135"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1150"/>
         <source>Can not set system time! Error code: %1</source>
         <translation>無法設定系統時間!錯誤代碼:%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1236"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1425"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1165"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1284"/>
+        <source>Invalid QStringList pointer!</source>
+        <translation>無效的QStringList指標！</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1265"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1575"/>
         <source>A system error has occurred: %1</source>
         <translation>發生系統錯誤：%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1394"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1347"/>
+        <source>An access violation has occurred!
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1373"/>
+        <source>The user does not have access to the requested information.</source>
+        <translation>使用者無權存取要求的訊息。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1376"/>
+        <source>The computer name is invalid.</source>
+        <translation>計算機名稱無效。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1379"/>
+        <source>The user name could not be found.</source>
+        <translation>找不到使用者名。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1382"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2061"/>
+        <source>A system error has occurred: %1
+</source>
+        <translation>發生系統錯誤：%1
+</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1543"/>
         <source>An Error occured while adding user &apos;%1&apos; to Local system! Error code: %2</source>
         <translation>新增使用者&apos;%1&apos;到本機系統時發生錯誤！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1475"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1625"/>
         <source>User is already in Local &apos;%1&apos; Group</source>
         <translation>使用者已經在本機&apos;%1&apos;組</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1484"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1634"/>
         <source>An error occured while adding user &apos;%1&apos; to local group &apos;%2&apos;! Error code: %3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1544"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1694"/>
         <source>An error occured while deleting user &apos;%1&apos; from local group &apos;%2&apos;! Error code: %3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1563"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1713"/>
         <source>Can not set computer name to &apos;%1&apos;</source>
         <translation>無法設定計算機名稱為&apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1582"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1733"/>
         <source>Can not get computer name! Error: %1</source>
         <translation>無法設定計算機名稱！錯誤代碼：%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1611"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1758"/>
+        <source>
+Failed to get dns domain! Error Code: %1</source>
+        <translation>無法獲取DNS域！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1770"/>
+        <source>
+Failed to get dns hostname! Error Code: %1</source>
+        <translation>無法獲取DNS主機名！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1782"/>
+        <source>
+Failed to get NetBIOS name! Error Code: %1</source>
+        <translation>無法獲取NetBIOS名稱！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1810"/>
         <source>Invalid Workgroup Name &apos;%1&apos;!</source>
         <translation>無效的工作組名稱&apos;%1&apos;！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1618"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1817"/>
         <source>An error occured while trying to join the workgroup &apos;%1&apos;! Error code: %2 </source>
         <translation>加入工作組&apos;%1&apos;時發生錯誤！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1643"/>
-        <source>Can not get workgroup information!</source>
-        <translation>無法獲取工作組訊息！</translation>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1844"/>
+        <source>Invalid parameter!</source>
+        <translation>無效參數！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1705"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1847"/>
+        <source>No such domain!</source>
+        <translation>沒有這個域！</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1850"/>
+        <source>The computer is already joined to a domain!</source>
+        <translation>該計算機已經加入到一個域！</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1853"/>
+        <source>The specified workgroup name is not valid!</source>
+        <translation>指定的工作組名稱無效！</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1856"/>
+        <source>Failed to join a domain! Error code:%1</source>
+        <translation>無法加入域！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1880"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1962"/>
+        <source>A parameter is incorrect.</source>
+        <translation>參數錯誤。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1883"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1965"/>
+        <source>The computer is not currently joined to a domain.</source>
+        <translation>該計算機沒有加入到域。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1886"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1968"/>
+        <source>This computer is a domain controller and cannot be unjoined from a domain.</source>
+        <translation>該計算機是域控制器而且不能結束域。</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1889"/>
+        <source>Failed to unjoin machine from the domain! Error code: %1</source>
+        <translation>無法結束域！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1916"/>
+        <source>Can not get join status information!</source>
+        <translation>無法獲取計算機所加入的工作組或域訊息！</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="1971"/>
+        <source>Failed to rename machine in domain! Error code: %1</source>
+        <translation>無法在域內重新命名計算機！錯誤代碼： %1</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2042"/>
+        <source>An access violation has occurred
+</source>
+        <translation>非法存取\n</translation>
+    </message>
+    <message>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2202"/>
         <source>ACCESS DENIED</source>
         <translation>拒絕存取</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1711"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2208"/>
         <source>NO NETWORK</source>
         <translation>無網路</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1716"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2213"/>
         <source>NO NET OR BAD PATH</source>
         <translation>無網路或無效路徑</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1721"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2218"/>
         <source>BAD NET NAME</source>
         <translation>無效的網路名稱</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1727"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2224"/>
         <source>An error occured while connecting to network drive! Error code: %1</source>
         <translation>連接網路磁盤時發生錯誤！錯誤代碼：%1</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1799"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2296"/>
         <source>An error occured while connecting to network printer &apos;%1&apos;! Error code: %2</source>
         <translation>連接網路列印機&apos;%1&apos;時發生錯誤！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1812"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2309"/>
         <source>
 An error occured while connecting to network printer &apos;%1&apos;! Error code: %2</source>
         <translation>\n連接網路列印機&apos;%1&apos;時發生錯誤！錯誤代碼：%2</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1864"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2361"/>
         <source>Can Not Find WB IME Key</source>
         <translation>找不到輸入法的鍵值</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1948"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2445"/>
         <source>Failure writing to the system registry! Can not %1 &apos;%2&apos; to start with M$ Windows!</source>
         <translation>寫系統註冊表失敗！無法%1 &apos;%2&apos;自啟動！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1948"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2445"/>
         <source>enable</source>
         <translation>啟用</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="1948"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2445"/>
         <source>disable</source>
         <translation>禁用</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2277"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2774"/>
         <source>Deleting Temporary Files ...</source>
         <translation>正在刪除臨時檔案....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2281"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2778"/>
         <source>Deleting Temporary Internet Files ...</source>
         <translation>正在刪除臨時檔案....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2302"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2799"/>
         <source>Deleting Files In &apos;%1&apos; ...</source>
         <translation>正在刪除&apos;%1&apos;裡的檔案....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2317"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2814"/>
         <source>Deleting File &apos;%1&apos; ...</source>
         <translation>正在刪除檔案&apos;%1&apos;....</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2399"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2896"/>
         <source>Invalid Root Path &apos;%1&apos; !</source>
         <translation>無效的根目錄路徑 &apos;%1&apos; ！</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2484"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="2983"/>
         <source>Error! Process Found, but can not get the token!</source>
         <translation>錯誤!進程已找到,但是無法獲取權杖!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2505"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3004"/>
         <source>Invalid Process Token!</source>
         <translation>無效的進程權杖!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2530"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3028"/>
         <source>Can not get account name of process!</source>
         <translation>無法獲取進程的帳戶名稱!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2625"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3123"/>
         <source>Can not find the user key of %1!</source>
         <translation>找不到帳戶&apos;%1&apos;的鍵值!</translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2636"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3134"/>
         <source>Can not read the value of &apos;F&apos; from key &apos;000001F4&apos;!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2690"/>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2721"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3188"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3219"/>
         <source>Can not read System$ key!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2697"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3195"/>
         <source>Can not delete key &apos;System$&apos;!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2731"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3229"/>
         <source>Can not read key &apos;%1&apos; related to System$!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2753"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3251"/>
         <source>Can not write registry!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2809"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3307"/>
         <source>Can not set wallpaper! File &apos;%1&apos; does not exist!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2829"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3327"/>
         <source>Can not read image &apos;%1&apos; ! </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="windowsmanagement/windowsmanagement.cpp" line="2834"/>
+        <location filename="windowsmanagement/windowsmanagement.cpp" line="3332"/>
         <source>Can not set wallpaper! Can not save file &apos;%1&apos; !</source>
         <translation></translation>
     </message>
@@ -1490,75 +1623,75 @@ An error occured while connecting to network printer &apos;%1&apos;! Error code:
     <name>LoginDlgUI</name>
     <message>
         <location filename="gui/login/logindlg.ui" line="27"/>
-        <location filename="gui/ui/ui_logindlg.h" line="214"/>
+        <location filename="gui/ui/ui_logindlg.h" line="211"/>
         <source>Login...</source>
         <translation>登陸....</translation>
     </message>
     <message>
         <location filename="gui/login/logindlg.ui" line="68"/>
-        <location filename="gui/ui/ui_logindlg.h" line="216"/>
+        <location filename="gui/ui/ui_logindlg.h" line="213"/>
         <source>User Info</source>
         <translation>使用者訊息</translation>
     </message>
     <message>
         <location filename="gui/login/logindlg.ui" line="86"/>
-        <location filename="gui/ui/ui_logindlg.h" line="217"/>
+        <location filename="gui/ui/ui_logindlg.h" line="214"/>
         <source>&amp;ID:</source>
         <translation></translation>
     </message>
     <message>
         <location filename="gui/login/logindlg.ui" line="105"/>
-        <location filename="gui/ui/ui_logindlg.h" line="219"/>
+        <location filename="gui/ui/ui_logindlg.h" line="216"/>
         <source>User Name</source>
         <translation>使用者名</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="121"/>
-        <location filename="gui/ui/ui_logindlg.h" line="221"/>
+        <location filename="gui/login/logindlg.ui" line="118"/>
+        <location filename="gui/ui/ui_logindlg.h" line="218"/>
         <source>&amp;Password:</source>
         <translation>密碼(&amp;P)：</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="140"/>
-        <location filename="gui/ui/ui_logindlg.h" line="223"/>
+        <location filename="gui/login/logindlg.ui" line="137"/>
+        <location filename="gui/ui/ui_logindlg.h" line="220"/>
         <source>Password</source>
         <translation>密碼</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="153"/>
-        <location filename="gui/login/logindlg.ui" line="167"/>
-        <location filename="gui/ui/ui_logindlg.h" line="225"/>
-        <location filename="gui/ui/ui_logindlg.h" line="226"/>
+        <location filename="gui/login/logindlg.ui" line="150"/>
+        <location filename="gui/login/logindlg.ui" line="164"/>
+        <location filename="gui/ui/ui_logindlg.h" line="222"/>
+        <location filename="gui/ui/ui_logindlg.h" line="223"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="187"/>
-        <location filename="gui/ui/ui_logindlg.h" line="228"/>
+        <location filename="gui/login/logindlg.ui" line="184"/>
+        <location filename="gui/ui/ui_logindlg.h" line="225"/>
         <source>Authenticode</source>
         <translation>驗證碼</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="197"/>
-        <location filename="gui/ui/ui_logindlg.h" line="230"/>
+        <location filename="gui/login/logindlg.ui" line="194"/>
+        <location filename="gui/ui/ui_logindlg.h" line="227"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="234"/>
-        <location filename="gui/ui/ui_logindlg.h" line="231"/>
+        <location filename="gui/login/logindlg.ui" line="231"/>
+        <location filename="gui/ui/ui_logindlg.h" line="228"/>
         <source>&amp;Login</source>
         <translation>登陸(&amp;L)</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="244"/>
-        <location filename="gui/ui/ui_logindlg.h" line="232"/>
+        <location filename="gui/login/logindlg.ui" line="241"/>
+        <location filename="gui/ui/ui_logindlg.h" line="229"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
     <message>
-        <location filename="gui/login/logindlg.ui" line="247"/>
-        <location filename="gui/ui/ui_logindlg.h" line="233"/>
+        <location filename="gui/login/logindlg.ui" line="244"/>
+        <location filename="gui/ui/ui_logindlg.h" line="230"/>
         <source>Esc</source>
         <translation></translation>
     </message>
@@ -1646,26 +1779,32 @@ An error occured while connecting to network printer &apos;%1&apos;! Error code:
     <message>
         <location filename="gui/progress/progressdlg.ui" line="23"/>
         <location filename="gui/progress/progressdlg.ui" line="41"/>
-        <location filename="gui/ui/ui_progressdlg.h" line="123"/>
-        <location filename="gui/ui/ui_progressdlg.h" line="124"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="136"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="137"/>
         <source>Work In Progress</source>
         <translation>工作進行中</translation>
     </message>
     <message>
         <location filename="gui/progress/progressdlg.ui" line="67"/>
-        <location filename="gui/ui/ui_progressdlg.h" line="125"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="138"/>
         <source>Working....</source>
         <translation>正在工作....</translation>
     </message>
     <message>
-        <location filename="gui/progress/progressdlg.ui" line="77"/>
-        <location filename="gui/ui/ui_progressdlg.h" line="126"/>
+        <location filename="gui/progress/progressdlg.ui" line="99"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="140"/>
+        <source>&amp;Close</source>
+        <translation>關閉(&amp;C)</translation>
+    </message>
+    <message>
+        <location filename="gui/progress/progressdlg.ui" line="109"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="141"/>
         <source>&amp;Details</source>
         <translation>細節訊息(&amp;D)</translation>
     </message>
     <message>
-        <location filename="gui/progress/progressdlg.ui" line="102"/>
-        <location filename="gui/ui/ui_progressdlg.h" line="127"/>
+        <location filename="gui/progress/progressdlg.ui" line="82"/>
+        <location filename="gui/ui/ui_progressdlg.h" line="139"/>
         <source>%p%</source>
         <translation></translation>
     </message>
