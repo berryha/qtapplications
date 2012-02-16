@@ -38,7 +38,7 @@
 #include <QIcon>
 #include <QString>
 
-#include "../guilib.h"
+#include "guilib.h"
 
 
 namespace HEHUI {
