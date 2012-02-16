@@ -53,3 +53,4 @@ RESOURCES += bulletinboard.qrc
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "Bulletin Board"
 QMAKE_TARGET_DESCRIPTION = "Bulletin Board For Sitoy Based On Qt"
+DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""

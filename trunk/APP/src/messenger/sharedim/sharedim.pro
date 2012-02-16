@@ -13,18 +13,25 @@ QT += core \
 
 # include config file
 include(../config.pri)
+
+HHSharedLibs += HHSharedCore \
+    HHSharedNetwork \
+    HHSharedUDT
 include(../../HHSharedLibs.pri)
 
 # Input
 HEADERS += groupbase.h \
     constants_global_shared.h \
     imuserbase.h \
-    networkmanager/networkmanager.h
+    networkmanager/networkmanager.h \
+    sharedimlib.h
 SOURCES += groupbase.cpp \
     imuserbase.cpp \
     networkmanager/networkmanager.cpp
 FORMS += 
 RESOURCES += resources.qrc
+
+DEFINES += SHAREDIMLIB_LIBRARY_EXPORT
 
 # ##
 unix:target.path += /usr/lib

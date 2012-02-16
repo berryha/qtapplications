@@ -39,21 +39,18 @@
 
 
 #include "constants_global_shared.h"
+#include "sharedimlib.h"
 
 
-//#include "../../shared/core/user.h"
-//#include "../../shared/core/singleton.h"
-//#include "mysharedlib_global.h"
 
 #include "HHSharedCore/huser.h"
 #include "HHSharedCore/hglobal_core.h"
-#include "HHSharedCore/hmysharedlib_global.h"
 
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API IMUserBase : public User//, public Singleton<IMUserBase>
+class SHAREDIMLIB_API IMUserBase : public User//, public Singleton<IMUserBase>
 {
     Q_OBJECT;
     //friend class Singleton<IMUserBase>;

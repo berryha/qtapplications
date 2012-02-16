@@ -20,6 +20,9 @@ QT -= gui
 
 # include config file
 include( ../config.pri )
+HHSharedLibs += HHSharedCore \
+    HHSharedNetwork \
+    HHSharedUDT
 include(../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedIM
 include (../sharedim/sharedim.pri)

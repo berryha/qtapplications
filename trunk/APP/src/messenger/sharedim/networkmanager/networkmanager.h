@@ -13,13 +13,13 @@
 
 #include "../constants_global_shared.h"
 #include "HHSharedNetwork/hnetworkmanagerbase.h"
-#include "HHSharedCore/hmysharedlib_global.h"
 
+#include "../sharedimlib.h"
 
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API NetworkManager : public NetworkManagerBase {
+class SHAREDIMLIB_API NetworkManager : public NetworkManagerBase {
     Q_OBJECT
 public:
 

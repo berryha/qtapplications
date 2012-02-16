@@ -12,12 +12,12 @@
 #include "HHSharedCore/hsettingscore.h"
 #include "HHSharedCore/hcryptography.h"
 
-//#include "HHSharedCore/hmysharedlib_global.h"
+#include "../sharedim/sharedimlib.h"
  
 
 namespace HEHUI{
 
-class MYSHAREDLIB_API Settings : public SettingsCore
+class SHAREDIMLIB_API Settings : public SettingsCore
 {
 	Q_OBJECT
 

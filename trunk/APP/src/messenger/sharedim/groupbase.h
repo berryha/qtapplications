@@ -18,13 +18,13 @@
 
 #include "constants_global_shared.h"
 
-#include "HHSharedCore/hmysharedlib_global.h"
+#include "sharedimlib.h"
 
 
 
 namespace HEHUI {
 
-class MYSHAREDLIB_API GroupBase : public QObject {
+class SHAREDIMLIB_API GroupBase : public QObject {
     Q_OBJECT
 public:
     GroupBase(quint32 groupID = 0, QObject *parent = 0);
