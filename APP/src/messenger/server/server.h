@@ -49,7 +49,7 @@
 namespace HEHUI {
 
 
-class MYSHAREDLIB_API Server : public QObject
+class SHAREDIMLIB_API Server : public QObject
 {
     Q_OBJECT
 public:
