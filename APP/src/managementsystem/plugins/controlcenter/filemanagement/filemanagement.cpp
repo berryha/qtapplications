@@ -1056,10 +1056,10 @@ void FileManagement::fileUploadRequestResponsed(int socketID, const QByteArray &
 //        qDebug()<<"------------------------------------------1";
 
     }else{
-        //QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%12").arg(message) );
+        //QMessageBox::critical(this, tr("Error"), tr("Can not send file!<br>%1").arg(message) );
         m_fileManager->closeFile(fileMD5Sum);
         filesList.removeAll(fileMD5Sum);
-        ui.textEditLogs->append(tr("Error! Can not send file!<br>%12").arg(message));
+        ui.textEditLogs->append(tr("Error! Can not send file!<br>%1").arg(message));
     }
 
 }

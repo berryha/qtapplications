@@ -1223,6 +1223,10 @@ void UserManagerMainWindow::updateActions() {
     ui.actionAutoLogon->setEnabled(enableExp);
     ui.actionPrint->setEnabled(enableExp);
 
+    if(!m_isJoinedToDomain){
+        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
+    }
+
 }
 
 void UserManagerMainWindow::retranslateUi() {
