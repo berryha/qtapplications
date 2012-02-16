@@ -748,9 +748,7 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
 
 void ClientService::processRenameComputerPacketReceived(const QString &newComputerName, const QString &adminName, const QString &adminAddress, quint16 adminPort){
 
-#ifndef Q_OS_WIN32
-    return;
-#endif
+#ifdef Q_OS_WIN32
 
     bool ok = false;
     if(m_isJoinedToDomain){
@@ -786,13 +784,14 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     }
 
 
+#endif
+    qWarning()<<"This function works on M$ Windows only!";
+
 }
 
 void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &adminName, bool join, const QString &domainOrWorkgroupName, const QString &adminAddress, quint16 adminPort){
 
-#ifndef Q_OS_WIN32
-    return;
-#endif
+#ifdef Q_OS_WIN32
 
     bool ok = false;
     if(join){
@@ -833,6 +832,9 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
     uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
 
+#endif
+
+    qWarning()<<"This function works on M$ Windows only!";
 
 }
 
