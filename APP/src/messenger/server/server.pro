@@ -49,7 +49,8 @@ HEADERS += \
     usersmanager/usersmanager.h \
     networkmanager/servernetworkmanager.h \
     usersmanager/userinfo.h \
-    usersmanager/group.h
+    usersmanager/group.h \
+    serverlib.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \
@@ -67,6 +68,9 @@ win32 {
     QMAKE_DISTCLEAN += $$[QT_INSTALL_BINS]\\$${TARGET}.dll
 }
 
+DEFINES += SERVERLIB_LIBRARY_EXPORT
+
+
 # ##
 unix:target.path += /usr/lib
 win32:target.path += %windir%/system32
@@ -75,3 +79,4 @@ INSTALLS += target
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "Server Library For IM System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Server Library For IM System Based On Qt"
+DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""

@@ -12,20 +12,18 @@
 #include "HHSharedCore/hsettingscore.h"
 #include "HHSharedCore/hcryptography.h"
 
-#include "../sharedim/sharedimlib.h"
+#include "serverlib.h"
  
 
 namespace HEHUI{
 
-class SHAREDIMLIB_API Settings : public SettingsCore
+class SERVERLIB_API Settings : public SettingsCore
 {
 	Q_OBJECT
 
 public:
     Settings( const QString &appName = APP_NAME, const QString &appVersion = APP_VERSION, const QString fileBaseName = APP_NAME, const QString fileDirPath = QCoreApplication::applicationDirPath(), QObject *parent = 0 );
     ~Settings();
-
-
 
 
     void setDataRootPath(const QString &dataRootPath){

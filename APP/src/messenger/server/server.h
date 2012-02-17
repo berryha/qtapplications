@@ -40,6 +40,7 @@
 
 #include "packetmanager/serverpacketsparser.h"
 
+#include "serverlib.h"
 
 #include "HHSharedCore/hdatabaseutility.h"
 //#include "HHSharedNetwork/hnetworkmanagerbase.h"
@@ -49,7 +50,7 @@
 namespace HEHUI {
 
 
-class SHAREDIMLIB_API Server : public QObject
+class SERVERLIB_API Server : public QObject
 {
     Q_OBJECT
 public:
