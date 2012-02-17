@@ -19,23 +19,23 @@
 namespace HEHUI {
 
 ServerUtilities::ServerUtilities() {
-	// TODO Auto-generated constructor stub
+    // TODO Auto-generated constructor stub
 
 }
 
 ServerUtilities::~ServerUtilities() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 QByteArray ServerUtilities::generateSessionEncryptionKey(){
     QByteArray tempKeyArray;
     qsrand(QDateTime::currentDateTime().time().msec());
     for(int i=0; i<16; i++){
-    	int k = qrand()%255;
-    	if(k < 0){
-    		k += 255;
-    	}
-    	tempKeyArray.append(k);
+        int k = qrand()%255;
+        if(k < 0){
+            k += 255;
+        }
+        tempKeyArray.append(k);
     }
 
     return tempKeyArray;
@@ -48,52 +48,52 @@ QByteArray ServerUtilities::generateSessionEncryptionKey(){
 
 QSqlQuery ServerUtilities::queryDatabase(const QString & queryString, bool localConfigDatabase) {
 
-	QSqlQuery query;
-	DatabaseUtility du;
+    QSqlQuery query;
+    DatabaseUtility du;
 
-        Settings settings;
-        QString localDatabaseFilePath = settings.getLocalDatabaseFilePath();
+    Settings settings;
+    QString localDatabaseFilePath = settings.getLocalDatabaseFilePath();
 
 
-	if(localConfigDatabase){
-		query = du.queryDatabase(queryString,
-				LOCAL_SERVER_DB_CONNECTION_NAME,
-				LOCAL_SERVER_DB_DRIVER,
-				"",
-				0,
-				"",
-				"",
-				localDatabaseFilePath,
-				HEHUI::SQLITE);
-	}else{
-		query = du.queryDatabase(queryString,
-				REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME,
-				REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-				REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-				REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-				REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-				REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-				REMOTE_SITOY_COMPUTERS_DB_NAME,
-				HEHUI::MYSQL);
-	}
+    if(localConfigDatabase){
+        query = du.queryDatabase(queryString,
+                                 LOCAL_SERVER_DB_CONNECTION_NAME,
+                                 LOCAL_SERVER_DB_DRIVER,
+                                 "",
+                                 0,
+                                 "",
+                                 "",
+                                 localDatabaseFilePath,
+                                 HEHUI::SQLITE);
+    }else{
+        query = du.queryDatabase(queryString,
+                                 REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME,
+                                 REMOTE_SITOY_COMPUTERS_DB_DRIVER,
+                                 REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
+                                 REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
+                                 REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
+                                 REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
+                                 REMOTE_SITOY_COMPUTERS_DB_NAME,
+                                 HEHUI::MYSQL);
+    }
 
-	return query;
+    return query;
 
 
 }
 
 
 QSqlQuery ServerUtilities::queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
-		const QString &host, int port, const QString &user, const QString &passwd,
-		const QString &databaseName, HEHUI::DatabaseType databaseType) {
+                                         const QString &host, int port, const QString &user, const QString &passwd,
+                                         const QString &databaseName, HEHUI::DatabaseType databaseType) {
 
 
-	QSqlQuery query;
-	DatabaseUtility du;
+    QSqlQuery query;
+    DatabaseUtility du;
 
-	query = du.queryDatabase(queryString, connectionName, driver, host, port, user, passwd, databaseName, databaseType);
+    query = du.queryDatabase(queryString, connectionName, driver, host, port, user, passwd, databaseName, databaseType);
 
-	return query;
+    return query;
 
 }
 
@@ -121,7 +121,7 @@ QSqlQuery ServerUtilities::queryDatabase(const QString & queryString, const QStr
 //    case IM::PI_Face:
 //        columnName = "Face";
 //        break;
-        
+
 //    case IM::PI_PersonalContactGroupsInfoString:
 //        columnName = "PersonalContactGroupsInfo";
 //        break;  
@@ -143,7 +143,7 @@ QSqlQuery ServerUtilities::queryDatabase(const QString & queryString, const QStr
 //    case IM::PI_PersonalInfoVersion:
 //        columnName = "PersonalInfoVersion";
 //        break; 
-        
+
 
 //    case IM::PI_HomeAddress:
 //        columnName = "HomeAddress";
@@ -216,7 +216,7 @@ QSqlQuery ServerUtilities::queryDatabase(const QString & queryString, const QStr
 //    case IM::PI_Role:
 //        columnName = "Role";
 //        break;         
-        
+
 //    default:
 //        columnName = "";
 
