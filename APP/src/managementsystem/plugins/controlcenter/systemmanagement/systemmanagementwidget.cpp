@@ -21,13 +21,14 @@
 
 namespace HEHUI {
 
+QMap<QString/*Short Name*/, QString/*Department*/> SystemManagementWidget::departments = QMap<QString, QString>();
 
 SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, QWidget *parent)
     : QWidget(parent), m_adminName(adminName), m_computerName(computerName), m_users(users), m_peerIPAddress(QHostAddress(peerIPAddress)), m_peerMACAddress(peerMACAddress), m_usbsdEnabled(usbsdEnabled), m_programesEnabled(programesEnabled), m_isJoinedToDomain(isJoinedToDomain)
 {
     ui.setupUi(this);
 
-    ui.lineEditComputerName->setText(computerName);
+    ui.lineEditComputerName->setText(computerName.toUpper());
     ui.lineEditUsers->setText(users);
     ui.lineEditIPAddress->setText(peerIPAddress);
     ui.lineEditMACAddress->setText(peerMACAddress);
@@ -43,12 +44,10 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     }
 
 
-    administratorsManagementMenu = 0;
 
     m_winDirPath = "";
 
 
-    queryModel = 0;
 
 
 #ifdef Q_OS_WIN32
@@ -112,6 +111,8 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     //        }
 
 
+    administratorsManagementMenu = 0;
+
     if(!admins.trimmed().isEmpty()){
         m_administrators = admins.split(",");
     }
@@ -125,7 +126,64 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
     //        ui.pushButtonAdminsManagement->setMenu(administratorsManagementMenu);
 
 
-    ui.groupBoxSettings->setEnabled(false);
+    ui.comboBoxLocation->addItem(tr("Dong Guan"), "dg");
+    ui.comboBoxLocation->addItem(tr("Ying De"), "yd");
+    ui.comboBoxLocation->addItem(tr("Hong Kong"), "hk");
+    QString location = computerName.left(2).toLower();
+    if("yd" == location){
+        ui.comboBoxLocation->setCurrentIndex(1);
+    }else if("hk" == location){
+        ui.comboBoxLocation->setCurrentIndex(2);
+    }else{
+        ui.comboBoxLocation->setCurrentIndex(0);
+    }
+    connect(ui.comboBoxLocation, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
+
+    if(departments.isEmpty()){
+        departments.insert("it", tr("IT"));
+        departments.insert("ac", tr("Account"));
+        departments.insert("ad", tr("AdminDept"));
+        departments.insert("co", tr("Cost"));
+        departments.insert("cu", tr("Custom"));
+        departments.insert("gm", tr("GMO"));
+        departments.insert("hr", tr("HR"));
+        departments.insert("ma", tr("Marker"));
+        departments.insert("pd", tr("PDS"));
+        departments.insert("pg", tr("PG"));
+        departments.insert("pl", tr("Plan"));
+        departments.insert("pm", tr("PMC"));
+        departments.insert("qc", tr("QC"));
+        departments.insert("re", tr("Retail"));
+        departments.insert("sa", tr("Sales"));
+        //departmentsHash.insert("", tr("Sample"));
+        departments.insert("se", tr("Secretary"));
+        departments.insert("sh", tr("Ship"));
+        departments.insert("sp", tr("Shop"));
+        departments.insert("wh", tr("WHouse"));
+    }
+    QString department = computerName.mid(2, 2).toLower();
+//    int index = -1;
+    foreach (QString key, departments.keys()) {
+        ui.comboBoxDepartment->addItem(departments.value(key), key);
+//        if(key == department){
+//            index = ui.comboBoxDepartment->currentIndex();
+//        }
+    }
+    for(int i=0; i<ui.comboBoxDepartment->count(); i++){
+        if(ui.comboBoxDepartment->itemData(i) == department){
+            ui.comboBoxDepartment->setCurrentIndex(i);
+            break;
+        }
+    }
+    connect(ui.comboBoxDepartment, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
+
+    int sn = computerName.right(5).toInt();
+    ui.spinBoxSN->setValue(sn);
+    connect(ui.spinBoxSN, SIGNAL(valueChanged(int)), this, SLOT(getNewComputerName()));
+
+
+    ui.groupBoxBasicSettings->setEnabled(false);
+    ui.groupBoxOtherSettings->setEnabled(false);
     //ui.groupBoxSettings->hide();
 
     ui.horizontalLayoutCommand->setEnabled(false);
@@ -143,6 +201,8 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     ui.tabRemoteManagement->setEnabled(false);
 
+
+    queryModel = 0;
 
     m_udtProtocol = 0;
     m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
@@ -567,6 +627,19 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
 
 }
 
+void SystemManagementWidget::getNewComputerName(){
+    QString location = ui.comboBoxLocation->itemData(ui.comboBoxLocation->currentIndex()).toString();
+    QString dept = ui.comboBoxDepartment->itemData(ui.comboBoxDepartment->currentIndex()).toString();
+    QString sn = QString::number(ui.spinBoxSN->value()).rightJustified(5, '0');
+
+    QString newName = location + dept + sn;
+    ui.lineEditNewComputerName->setText(newName.toUpper());
+
+    ui.pushButtonRenameComputer->setEnabled((newName.size() == 9) && (m_computerName != newName));
+
+
+}
+
 void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
 
 //    if(!verifyPrivilege()){
@@ -580,18 +653,18 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
     }
 
     bool ok = false;
-    QString newComputerName = "";
-    do {
-        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Computer Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
-        if (ok){
-            if(newComputerName.isEmpty()){
-                QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
-            }else{
-                break;
-            }
-        }
+    QString newComputerName = ui.lineEditNewComputerName->text();
+//    do {
+//        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Computer Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
+//        if (ok){
+//            if(newComputerName.isEmpty()){
+//                QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
+//            }else{
+//                break;
+//            }
+//        }
 
-    } while (ok);
+//    } while (ok);
 
     if(newComputerName.isEmpty()){
         return;
@@ -983,7 +1056,8 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
     if(result == true){
         //ui.tabSystemInfo->setEnabled(true);
         ui.tabRemoteManagement->setEnabled(true);
-        ui.groupBoxSettings->setEnabled(true);
+        ui.groupBoxBasicSettings->setEnabled(true);
+        ui.groupBoxOtherSettings->setEnabled(true);
         ui.groupBoxRemoteConsole->setEnabled(true);
 
         ui.toolButtonRequestSystemInfo->setEnabled(true);
@@ -998,7 +1072,8 @@ void SystemManagementWidget::processClientResponseAdminConnectionResultPacket(in
     }else{
         //ui.tabSystemInfo->setEnabled(false);
         ui.tabRemoteManagement->setEnabled(false);
-        ui.groupBoxSettings->setEnabled(false);
+        ui.groupBoxBasicSettings->setEnabled(false);
+        ui.groupBoxOtherSettings->setEnabled(false);
         ui.groupBoxRemoteConsole->setEnabled(false);
 
         ui.toolButtonRequestSystemInfo->setEnabled(false);
@@ -1121,7 +1196,7 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
     ui.pushButtonAdminsManagement->setMenu(administratorsManagementMenu);
     ui.pushButtonAdminsManagement->setEnabled(true);
 
-    ui.pushButtonRenameComputer->setEnabled(true);
+    //ui.pushButtonRenameComputer->setEnabled(true);
     ui.pushButtonDomain->setEnabled(true);
     m_isJoinedToDomain = isJoinedToDomain;
     if(m_isJoinedToDomain){
@@ -1140,7 +1215,8 @@ void SystemManagementWidget::clientResponseClientSummaryInfoPacketReceived(const
 
     ui.tabRemoteManagement->setEnabled(true);
 
-    ui.groupBoxSettings->setEnabled(true);
+    ui.groupBoxBasicSettings->setEnabled(true);
+    ui.groupBoxOtherSettings->setEnabled(true);
     //ui.groupBoxSettings->show();
 
     ui.groupBoxRemoteConsole->setEnabled(true);

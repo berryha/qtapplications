@@ -53,6 +53,7 @@ private slots:
     void on_actionAddAdmin_triggered();
     void on_actionDeleteAdmin_triggered();
 
+    void getNewComputerName();
     void on_pushButtonRenameComputer_clicked();
     void on_pushButtonDomain_clicked();
 
@@ -112,22 +113,24 @@ private:
     QString m_peerMACAddress;
     bool m_usbsdEnabled;
     bool m_programesEnabled;
-    QStringList m_administrators;
-    QMenu *administratorsManagementMenu;
-
+    bool m_isJoinedToDomain;
 
     bool localComputer;
+
+    QString m_winDirPath;
+    //QString m_joinInfo;
+
+    static QMap<QString/*Short Name*/, QString/*Department*/>departments;
+
+    QMenu *administratorsManagementMenu;
+    QStringList m_administrators;
+
 
     QStringList adminProcesses;
 
     bool clientResponseAdminConnectionResultPacketReceived;
-
     bool remoteConsoleRunning;
 
-
-    QString m_winDirPath;
-    bool m_isJoinedToDomain;
-    //QString m_joinInfo;
 
     QSqlQueryModel *queryModel;
 
