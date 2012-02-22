@@ -40,8 +40,6 @@
 #include "global_network.h"
 #include "./udp/udpsocket.h"
 #include "./rudp/rudpsocket.h"
-//#include "./tcp/tcpsocket.h"
-#include "./tcp/tcpserver.h"
 
 #include "networklib.h"
 
@@ -63,7 +61,6 @@ public:
     void closeUDPServer(quint16 port);
     void closeRUDPServer(quint16 port);
     void closeRUDPServerInstance(RUDPServer *rudpServer);
-    void closeTCPServer(quint16 port);
     void closeAllServers();
 
     void setPacketHandler(PacketHandlerBase *packetHandlerBase);
@@ -82,8 +79,6 @@ public:
     RUDPServer * getRUDPServer(quint16 port, const QHostAddress &localAddress);
     RUDPServer * startRUDPServerListening(const QHostAddress &localAddress, quint16 localPort, int keepAliveTimerInterval = RUDP_KEEPALIVE_TIMER_INTERVAL);
 
-    TcpServer *getTcpServer(quint16 port, const QHostAddress &serverIPAddress);
-    bool startTCPServerListening(const QHostAddress &localAddress = QHostAddress::Any, quint16 port = 0);
 
     QString errorString() const;
 
@@ -119,11 +114,8 @@ private:
 
     QMultiHash<quint16, UDPServer *> udpServers;
     QMultiHash<quint16, RUDPServer *> rudpServers;
-    QMultiHash<quint16, TcpServer *> tcpServers;
-    QMultiHash<QHostAddress, TcpSocket *> tcpSocketConnections;
     QMutex udpMutex;
     QMutex rudpMutex;
-    QMutex tcpMutex;
 
     QString m_errorString;
 

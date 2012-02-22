@@ -43,12 +43,10 @@ HEADERS += \
     packethandler/packethandlerbase.h \
     networkutilities.h \
     global_network.h \
-    tcp/tcpserver.h \
     networkmanagerbase.h \
     rudp/rudpsocket.h \
     networklib.h \
-    tcp/tcpbase.h \
-    tcp/tcpsocket.h
+    tcp/tcpbase.h
 
 FORMS += 
 SOURCES += \
@@ -61,12 +59,10 @@ SOURCES += \
     packethandler/packet.cpp \
     packethandler/packethandlerbase.cpp \
     networkutilities.cpp \
-    tcp/tcpserver.cpp \
     networkmanagerbase.cpp \
     packethandler/packetstreamoperator.cpp \
     rudp/rudpsocket.cpp \
-    tcp/tcpbase.cpp \
-    tcp/tcpsocket.cpp
+    tcp/tcpbase.cpp
 
 RESOURCES += 
 win32 { 
