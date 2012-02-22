@@ -225,6 +225,7 @@ void TCPWidget::send(){
     while (i<count) {
         if(tcpProtocol->sendData(peerSockeet, &data)){
             i++;
+            ui.textBrowser->append(QString("Data %1 Sent!").arg(i));
         }else{
             ui.textBrowser->append("Failed to send data! " +tcpProtocol->socketErrorString(peerSockeet));
         }
@@ -286,13 +287,14 @@ void TCPWidget::disconnected(int socketID, const QString &peerAddress, quint16 p
 
     isConnected = false;
 
-    tcpProtocol->closeSocket(socketID);
+//    tcpProtocol->closeSocket(socketID);
 
 
 }
 
 void TCPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data){
 
+    qDebug()<<"-------------2-------Thread ID:"<<QThread::currentThreadId ();
 
 
     m_receivedDataCount++;
