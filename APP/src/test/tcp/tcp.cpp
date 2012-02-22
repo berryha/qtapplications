@@ -1,7 +1,7 @@
 #include "tcp.h"
 
 
-
+#include <QThread>
 
 namespace HEHUI {
 
@@ -18,7 +18,9 @@ void TCP::processData(int socketID, const QByteArray &data){
     quint16 port;
     socketPeerAddressInfo(socketID, &address, &port);
 
+    qDebug()<<"-------------1-------Thread ID:"<<QThread::currentThreadId ();
     emit dataReceived(address.toString(), port, data);
+
 
 
 }
