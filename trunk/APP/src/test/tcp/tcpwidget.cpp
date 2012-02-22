@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 #include <QtConcurrentRun>
-
+#include <QDateTime>
 
 #include "HHSharedCore/hcryptography.h"
 
@@ -19,8 +19,8 @@ TCPWidget::TCPWidget(QWidget *parent)
 
 
     tcpProtocol = new TCP(this);
-    connect(tcpProtocol, SIGNAL(connected(int, const QHostAddress &, quint16)), this, SLOT(connected(int, const QHostAddress &, quint16)));
-    connect(tcpProtocol, SIGNAL(disconnected(int, const QHostAddress &, quint16)), this, SLOT(disconnected(int, const QHostAddress &, quint16)));
+    connect(tcpProtocol, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(connected(int, const QString &, quint16)));
+    connect(tcpProtocol, SIGNAL(disconnected(int, const QString &, quint16)), this, SLOT(disconnected(int, const QString &, quint16)));
     connect(tcpProtocol, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
 
     peerSockeet = -1;
@@ -83,7 +83,7 @@ void TCPWidget::connectToPeer(){
     if(isConnected){
         ui.toolButtonConnect->setText("Disconnecting...");
         tcpProtocol->closeSocket(peerSockeet);
-        disconnected(peerSockeet, m_peerAddress, m_peerPort);
+        disconnected(peerSockeet, m_peerAddress.toString(), m_peerPort);
     }else{
 
 //        if(!isListening){
@@ -163,7 +163,7 @@ void TCPWidget::connectToPeer(){
 
         if(!tcpProtocol->isConnected(peerSockeet)){
             qDebug()<<"Can not connect to peer!";
-            disconnected(peerSockeet, m_peerAddress, m_peerPort);
+            disconnected(peerSockeet, m_peerAddress.toString(), m_peerPort);
             return;
         }
         qDebug()<<"peerSockeet:"<<peerSockeet;
@@ -172,7 +172,7 @@ void TCPWidget::connectToPeer(){
         ui.textBrowser->append("Local port:"+QString::number(localPort));
         ui.spinBoxLocalPort->setValue(localPort);
 
-        connected(peerSockeet, m_peerAddress, m_peerPort);
+        connected(peerSockeet, m_peerAddress.toString(), m_peerPort);
 
     }
 
@@ -245,9 +245,9 @@ void TCPWidget::clean(){
 
 }
 
-void TCPWidget::connected(int socketID, const QHostAddress &peerAddress, quint16 peerPort){
+void TCPWidget::connected(int socketID, const QString &peerAddress, quint16 peerPort){
 
-    ui.textBrowser->append("Connected! "+peerAddress.toString()+":"+QString::number(peerPort)+" Socket ID:"+QString::number(socketID));
+    ui.textBrowser->append("Connected! "+peerAddress+":"+QString::number(peerPort)+" Socket ID:"+QString::number(socketID));
 
     //if(!isListening){
         ui.lineEditIP->setEnabled(false);
@@ -261,8 +261,8 @@ void TCPWidget::connected(int socketID, const QHostAddress &peerAddress, quint16
 
 }
 
-void TCPWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
-    ui.textBrowser->append("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
+void TCPWidget::signalConnectToPeerTimeout(const QString &peerAddress, quint16 peerPort){
+    ui.textBrowser->append("Connecting Timeout! "+peerAddress+":"+QString::number(peerPort));
 
     ui.lineEditIP->setEnabled(true);
     ui.spinBoxRemotePort->setEnabled(true);
@@ -273,8 +273,8 @@ void TCPWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quin
 
 }
 
-void TCPWidget::disconnected(int socketID, const QHostAddress &peerAddress, quint16 peerPort){
-    ui.textBrowser->append("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort)+" Socket ID:"+QString::number(socketID));
+void TCPWidget::disconnected(int socketID, const QString &peerAddress, quint16 peerPort){
+    ui.textBrowser->append("Disconnected! "+peerAddress+":"+QString::number(peerPort)+" Socket ID:"+QString::number(socketID));
 
     if(!isListening){
         ui.lineEditIP->setEnabled(true);
