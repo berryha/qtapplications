@@ -9,12 +9,12 @@
     #include "hpacketparserbase.h"
     #include "hpacket.h"
     #include "hpackethandlerbase.h"
-    #include "hmysharedlib_global.h"
+    #include "networklib.h"
     #include "hnetworkutilities.h"
     #include "htcpsocketconnection.h"
     #include "hglobal_network.h"
     #include "htcpserver.h"
-    #include "htcpsocketthread.h"
+    #include "htcpbase.h"
     #include "hnetworkmanagerbase.h"
 
 

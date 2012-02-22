@@ -40,9 +40,8 @@
 #include "global_network.h"
 #include "./udp/udpsocket.h"
 #include "./rudp/rudpsocket.h"
-#include "./tcp/tcpsocketconnection.h"
+//#include "./tcp/tcpsocket.h"
 #include "./tcp/tcpserver.h"
-//#include "udp/multicast/multicast.h"
 
 #include "networklib.h"
 
@@ -85,34 +84,21 @@ public:
 
     TcpServer *getTcpServer(quint16 port, const QHostAddress &serverIPAddress);
     bool startTCPServerListening(const QHostAddress &localAddress = QHostAddress::Any, quint16 port = 0);
-    bool hasConnection(const QHostAddress &senderIp, quint16 senderPort = 0);
-    void appendConnection(TcpSocketConnection *connection);
-    void removeConnection(TcpSocketConnection *connection);
-    TcpSocketConnection* getConnection(const QString &ip, quint16 port);
 
     QString errorString() const;
 
 signals:
-    void signalTCPConnectionDisconnected(const QString &peerAddress, quint16 peerPort);
-    void signalTCPConnectionError(const QString &peerAddress, quint16 peerPort, QAbstractSocket::SocketError error);
 
 public slots:
 
-    bool slotCreateTCPConnection(const QString &IP, quint16 Port);
 
-    void slotProcessNewTCPConnectionConnected(TcpSocketConnection *tcpSocketConnection);
 
-    bool slotSendNewTCPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data);
     bool slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, QByteArray *data, quint16 localPort, bool useRUDP);
 
 
     bool slotSendPacket(Packet *packet);
 
 private slots:
-    void slotProcessNewIncomingTCPConnection(int socketDescriptor);
-    void slotConnectionError(QAbstractSocket::SocketError socketError);
-    void slotProcessTcpSocketDisconnected();
-    void slotTcpSocketReadyForUse();
 
     //接收到数据时执行
     //	virtual void slotUDPDatagramsReceived(const QString &ip, quint16 port, const QByteArray &data) = 0;
@@ -134,7 +120,7 @@ private:
     QMultiHash<quint16, UDPServer *> udpServers;
     QMultiHash<quint16, RUDPServer *> rudpServers;
     QMultiHash<quint16, TcpServer *> tcpServers;
-    QMultiHash<QHostAddress, TcpSocketConnection *> tcpSocketConnections;
+    QMultiHash<QHostAddress, TcpSocket *> tcpSocketConnections;
     QMutex udpMutex;
     QMutex rudpMutex;
     QMutex tcpMutex;

@@ -202,7 +202,7 @@ void PacketsParserBase::processOutgoingPackets() {
 
         bool result = false;
         if (transmissionProtocol == TP_TCP) {
-            result = m_networkManagerBase->slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
+            //result = m_networkManagerBase->slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
 
         } else if (transmissionProtocol == TP_UDP) {
             result = m_networkManagerBase->slotSendNewUDPDatagram(packet->getPeerHostAddress(), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
