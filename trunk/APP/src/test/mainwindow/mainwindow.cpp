@@ -102,10 +102,13 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
 
 
 
-    rudpWidger = new RUDPWidget(this);
-    ui.mdiArea->addSubWindow(rudpWidger);
-    rudpWidger->show();
+//    rudpWidger = new RUDPWidget(this);
+//    ui.mdiArea->addSubWindow(rudpWidger);
+//    rudpWidger->show();
 
+    tcpWidget = new TCPWidget(this);
+    ui.mdiArea->addSubWindow(tcpWidget);
+    tcpWidget->show();
 
 }
 

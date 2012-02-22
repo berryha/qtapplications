@@ -7,7 +7,6 @@
 #include <QByteArray>
 
 #include "clientservice.h"
-//#include "sharedms/global_shared.h"
 
 #include "HHSharedNetwork/hnetworkutilities.h"
 #include "HHSharedCore/hutilities.h"
@@ -360,6 +359,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         qCritical()<<tr("Error! INVALID UDT SOCK! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         return;
     }
+    //qWarning()<<"--------------getUDTSocketStatus:"<<m_udtProtocol->getUDTSocketStatus(m_socketConnectedToServer);
     if(!m_udtProtocol->isSocketConnected(m_socketConnectedToServer)){
         qCritical()<<tr("Error! Timeout! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
         m_udtProtocol->closeSocket(m_socketConnectedToServer);

@@ -44,6 +44,7 @@
 #include "HHSharedGUI/hmainwindowbase.h"
 
 #include "rudp/rudp.h"
+#include "tcp/tcpwidget.h"
 
 namespace HEHUI {
 
@@ -110,6 +111,7 @@ private:
 
     RUDPWidget *rudpWidger;
 
+    TCPWidget *tcpWidget;
 
 
 
