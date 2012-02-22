@@ -42,7 +42,6 @@
 #include "../networkmanager/clientnetworkmanager.h"
 #include "imuser.h"
 
-//#include "../../../shared/network/packethandler/packetparserbase.h"
 
 #include "HHSharedCore/hcryptography.h"
 #include "HHSharedNetwork/hpacketparserbase.h"

@@ -8,7 +8,6 @@
 #include <QSettings>
 
 #include "../../sharedms/global_shared.h"
-//#include "../../sharedms/networkmanager.h"
 #include "packetmanager/clientpacketsparser.h"
 #include "../clientresourcesmanager.h"
 #include "process.h"
@@ -16,12 +15,9 @@
 
 
 
-//#include "../../../shared/service/service/service.h"
-//#include "../../../shared/network/networkmanagerbase.h"
 
 #include "HHSharedService/hservice.h"
 #include "HHSharedCore/hdatabaseutility.h"
-//#include "HHSharedNetwork/hnetworkmanagerbase.h"
 
 #include "HHSharedUDT/hudtprotocolforfiletransmission.h"
 
