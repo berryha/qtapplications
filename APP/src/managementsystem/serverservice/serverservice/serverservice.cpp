@@ -126,16 +126,6 @@ bool ServerService::startMainService(){
         getRecordsInDatabase();
     }
 
-//    m_udpServer = resourcesManager->startIPMCServer();
-//    if(!m_udpServer){
-//        QString msg = QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
-//        logMessage(msg, QtServiceBase::Error);
-//        qCritical()<<msg;
-//        resourcesManager->startUDPServerListening(QHostAddress::Any, IP_MULTICAST_GROUP_PORT);
-//        //return false;
-//    }else{
-//        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
-//    }
 
     QString errorMessage = "";
     m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT), &errorMessage);
@@ -146,6 +136,13 @@ bool ServerService::startMainService(){
         //logMessage(QString("Starting IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT), QtServiceBase::Information);
         qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IP_MULTICAST_GROUP_ADDRESS).arg(IP_MULTICAST_GROUP_PORT);
     }
+
+//    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
+//    if(!m_udpServer){
+//        logMessage(QString("Can not start UDP listening on port %1! %2").arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
+//    }else{
+//        qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
+//    }
 
 //    m_udtProtocol = resourcesManager->startUDTServer(QHostAddress::Any, UDT_LISTENING_PORT);
 //    if(!m_udtProtocol){
