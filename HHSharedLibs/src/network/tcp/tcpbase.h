@@ -75,6 +75,8 @@ private slots:
 private:
     virtual void processData(int socketID, const QByteArray &data) = 0;
 
+    bool isSocketBusy(int socketID);
+    void changeSocketBusyStatus(int socketID, bool busy);
 
 private:
     QTcpServer *m_tcpServer;
@@ -82,6 +84,8 @@ private:
 
     QHash<int/*Socket ID*/, QTcpSocket*> m_socketsHash;
     QHash<int/*Socket ID*/, quint32 /*Block Size*/> m_socketBlockSizeInfoHash;
+    QList<int/*Socket ID*/> m_busySockets;
+    QMutex m_busyMutex;
 
 
     QNetworkProxy m_proxy;
