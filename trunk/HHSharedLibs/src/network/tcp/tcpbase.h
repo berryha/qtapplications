@@ -5,9 +5,9 @@
 #include <QHostAddress>
 #include <QNetworkProxy>
 #include <QMutex>
+#include <QTcpServer>
+#include <QTcpSocket>
 
-#include "tcpsocket.h"
-#include "tcpserver.h"
 
 #include "../networklib.h"
 #include "../global_network.h"
@@ -59,22 +59,29 @@ signals:
 protected:
     
 private slots:
-    void newIncomingConnection(TcpSocket *socket);
+    void newIncomingConnection();
     void peerConnected ();
     void peerDisconnected ();
 
-    void setupNewSocket(TcpSocket *socket);
-    void dataReceived(const QByteArray &data);
+    void setupNewSocket(QTcpSocket *socket);
+
+    void slotProcessSocketReadyRead();
+    void readSocketdData(int socketID, QTcpSocket *socket);
+
+
+//    void dataReceived(const QByteArray &data);
 
 private:
     virtual void processData(int socketID, const QByteArray &data) = 0;
 
 
 private:
-    TcpServer *m_tcpServer;
+    QTcpServer *m_tcpServer;
     int m_lastSocketID;
 
-    QHash<int/*Socket ID*/, TcpSocket*> m_socketsHash;
+    QHash<int/*Socket ID*/, QTcpSocket*> m_socketsHash;
+    QHash<int/*Socket ID*/, quint32 /*Block Size*/> m_socketBlockSizeInfoHash;
+
 
     QNetworkProxy m_proxy;
 

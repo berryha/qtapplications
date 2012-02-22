@@ -136,30 +136,6 @@ void NetworkManagerBase::closeRUDPServerInstance(RUDPServer *rudpServer){
 
 }
 
-void NetworkManagerBase::closeTCPServer(quint16 port){
-
-    QMutexLocker tcpLocker(&tcpMutex);
-    if(!tcpServers.isEmpty()){
-        QList<TcpServer *> tcpServerList = (port == 0)?(tcpServers.values()):(tcpServers.values(port));
-        foreach(TcpServer *tcpServer, tcpServerList){
-            if(!tcpServer){continue;}
-            //if(tcpServer->serverPort() == port){
-                tcpServer->close();
-                delete tcpServer;
-                tcpServer = 0;
-                tcpServers.remove(port, tcpServer);
-            //}
-
-        }
-        if(port == 0){
-            tcpServers.clear();
-        }else{
-            tcpServers.remove(port);
-        }
-
-    }
-
-}
 
 void NetworkManagerBase::closeAllServers(){
     qDebug()<<"NetworkManagerBase::closeAllServers()";
@@ -192,19 +168,6 @@ void NetworkManagerBase::closeAllServers(){
         rudpServers.clear();
     }
 
-    QMutexLocker tcpLocker(&tcpMutex);
-    if(!tcpServers.isEmpty()){
-        QList<TcpServer *> tcpServerList = tcpServers.values();
-        foreach(TcpServer *tcpServer, tcpServerList){
-            if(!tcpServer){continue;}
-            tcpServer->close();
-            delete tcpServer;
-            tcpServer = 0;
-        }
-        tcpServerList.clear();
-        tcpServers.clear();
-
-    }
 
 
 }
@@ -372,62 +335,6 @@ RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &lo
     return 0;
 
 }
-
-TcpServer * NetworkManagerBase::getTcpServer(quint16 port, const QHostAddress &serverIPAddress){
-    QMutexLocker locker(&tcpMutex);
-
-    QList<TcpServer *> list = tcpServers.values(port);
-    if(!list.isEmpty()){
-        if(serverIPAddress == QHostAddress::Any){
-            return list.at(0);
-        }
-        foreach(TcpServer *server, list){
-            QHostAddress serverAddress = server->serverAddress();
-            if((serverAddress == serverIPAddress) || (serverAddress == QHostAddress::Any)){
-                return server;
-            }
-        }
-    }
-
-    return 0;
-}
-
-bool NetworkManagerBase::startTCPServerListening(const QHostAddress &localAddress, quint16 port) {
-    //qDebug()<< "----NetworkManagerBase::slotStartTCPServerListening(const QString &IP, quint16 Port)";
-
-    m_errorString = "";
-
-    TcpServer *tcpServer = getTcpServer(port, localAddress);
-    if(tcpServer){
-        qWarning("TCP Server has already started!");
-        return true;
-    }else{
-        QHostAddress serverAddress = localAddress;
-        if(serverAddress.isNull()){
-            serverAddress = QHostAddress::Any;
-        }
-        tcpServer = new TcpServer(this);
-        tcpServer->listen(serverAddress, port);
-    }
-
-    if (tcpServer->isListening()) {
-        QMutexLocker locker(&tcpMutex);
-        tcpServers.insert(tcpServer->serverPort(), tcpServer);
-        return true;
-    } else {
-
-        m_errorString = tcpServer->errorString();
-        qCritical()<<QString("ERROR! Failed to start TCPServer Listening! %1").arg(m_errorString);
-
-        tcpServer->close();
-        tcpServer->deleteLater();
-
-        return false;
-    }
-
-}
-
-
 
 
 
