@@ -1,7 +1,6 @@
 
 #include <QtConcurrentRun>
 
-
 #include "tcpbase.h"
 
 //#include "../packethandler/packet.h"
@@ -39,6 +38,7 @@ TCPBase::~TCPBase(){
     m_socketsHash.clear();
 
     m_socketBlockSizeInfoHash.clear();
+    m_busySockets.clear();
 
 }
 
@@ -284,11 +284,7 @@ bool TCPBase::sendData(int socketID, const QByteArray *byteArray){
     int blcokSize = block.size();
     out << quint32(blcokSize - sizeof(quint32));
 
-    if(socket->write(block) == blcokSize){
-        return true;
-    }
-
-    return false;
+    return (socket->write(block) == blcokSize);
 
 }
 
@@ -323,6 +319,7 @@ void TCPBase::peerDisconnected (){
     }
 
     m_socketBlockSizeInfoHash.remove(socketID);
+    changeSocketBusyStatus(socketID, false);
 
 
     qDebug()<<QString("Peer Disconnected! %1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
@@ -391,9 +388,13 @@ void TCPBase::slotProcessSocketReadyRead() {
     }
     Q_ASSERT(socketID > 0);
 
-//    QtConcurrent::run(this, &TCPBase::readSocketdData, socketID, socket);
 
+//    if(!isSocketBusy(socketID)){
+//        changeSocketBusyStatus(socketID, true);
+//        QtConcurrent::run(this, &TCPBase::readSocketdData, socketID, socket);
+//    }
     readSocketdData(socketID, socket);
+
 }
 
 void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
@@ -413,7 +414,7 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
             }
             in >> nextBlockSize;
             m_socketBlockSizeInfoHash[socketID] = nextBlockSize;
-            qDebug()<<"---------------nextBlockSize:"<<nextBlockSize;
+            //qDebug()<<"---------------nextBlockSize:"<<nextBlockSize;
         }
 
 //        if (nextBlockSize == PACKET_TERMINATING_SYMBOL) {
@@ -432,16 +433,18 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
 
         in >> buffer;
 
-        qDebug()<<QString("Data Received From %1:%2. Size:%3").arg(socket->peerAddress().toString()).arg(socket->peerPort()).arg(buffer.size());
+        //qDebug()<<QString("Data Received From %1:%2. Size:%3").arg(socket->peerAddress().toString()).arg(socket->peerPort()).arg(buffer.size());
+
+
 
         processData(socketID, buffer);
 
 
+        nextBlockSize = 0;
         m_socketBlockSizeInfoHash[socketID] = 0;
-
     }
 
-
+    changeSocketBusyStatus(socketID, false);
 
 }
 
@@ -494,6 +497,22 @@ void TCPBase::processData(int socketID, const QByteArray &data){
 ////        emit packetReceived(packet);
 //    }
 
+
+}
+
+bool TCPBase::isSocketBusy(int socketID){
+    QMutexLocker locket(&m_busyMutex);
+    return m_busySockets.contains(socketID);
+}
+
+void TCPBase::changeSocketBusyStatus(int socketID, bool busy){
+
+    QMutexLocker locker(&m_busyMutex);
+    if(busy){
+        m_busySockets.append(socketID);
+    }else{
+        m_busySockets.removeAll(socketID);
+    }
 
 }
 
