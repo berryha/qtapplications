@@ -92,7 +92,7 @@ int TCPBase::connectToHost ( const QString & hostName, quint16 port, int waitMse
     QTcpSocket *socket = new QTcpSocket(this);
     socket->setProxy(m_proxy);
     connect(socket, SIGNAL(connected()), this, SLOT(peerConnected()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(socketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(processSocketError(QAbstractSocket::SocketError)));
 
     int socketID = -1;
     {
@@ -114,7 +114,7 @@ int TCPBase::connectToHost ( const QHostAddress & address, quint16 port, int wai
     QTcpSocket *socket = new QTcpSocket(this);
     socket->setProxy(m_proxy);
     connect(socket, SIGNAL(connected()), this, SLOT(peerConnected()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(socketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(processSocketError(QAbstractSocket::SocketError)));
 
     int socketID = -1;
     {
@@ -265,6 +265,7 @@ QString	TCPBase::socketErrorString (int socketID){
 }
 
 bool TCPBase::sendData(int socketID, const QByteArray *byteArray){
+    qDebug()<<"--TCPBase::sendData(...) "<<" byteArray->size():"<<byteArray->size();
 
     QTcpSocket *socket = 0;
     {
@@ -279,9 +280,15 @@ bool TCPBase::sendData(int socketID, const QByteArray *byteArray){
     out << quint32(0) << *byteArray;
 
     out.device()->seek(0);
-    out << quint32(block.size() - sizeof(quint32));
 
-    return (socket->write(block) == block.size());
+    int blcokSize = block.size();
+    out << quint32(blcokSize - sizeof(quint32));
+
+    if(socket->write(block) == blcokSize){
+        return true;
+    }
+
+    return false;
 
 }
 
@@ -323,6 +330,25 @@ void TCPBase::peerDisconnected (){
 
 }
 
+void TCPBase::processSocketError(QAbstractSocket::SocketError socketError){
+
+    QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
+    if(!socket){
+        return;
+    }
+
+    int socketID = -1;
+    {
+        QMutexLocker locker(&mutex);
+        socketID = m_socketsHash.key(socket);
+    }
+    Q_ASSERT(socket > 0);
+
+
+    qDebug()<<"Socket Error! "<<socketError;
+
+}
+
 void TCPBase::setupNewSocket(QTcpSocket *socket){
 
     if(!socket){
@@ -330,7 +356,7 @@ void TCPBase::setupNewSocket(QTcpSocket *socket){
     }
     connect(socket, SIGNAL(disconnected()), this, SLOT(peerDisconnected()));
 //    connect(socket, SIGNAL(dataReceived(const QByteArray &)), this, SLOT(dataReceived(const QByteArray &)));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(socketError(QAbstractSocket::SocketError)));
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(processSocketError(QAbstractSocket::SocketError)));
 
     QObject::connect(socket, SIGNAL(readyRead()), this, SLOT(slotProcessSocketReadyRead()));
 
@@ -348,7 +374,7 @@ void TCPBase::setupNewSocket(QTcpSocket *socket){
 
 
     qDebug()<<QString("Peer Connected! %1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
-    emit connected(socketID, socket->peerAddress().tos, socket->peerPort());
+    emit connected(socketID, socket->peerAddress().toString(), socket->peerPort());
 
 }
 
@@ -358,7 +384,6 @@ void TCPBase::slotProcessSocketReadyRead() {
         return;
     }
 
-
     int socketID = -1;
     {
         QMutexLocker locker(&mutex);
@@ -366,8 +391,9 @@ void TCPBase::slotProcessSocketReadyRead() {
     }
     Q_ASSERT(socketID > 0);
 
-    QtConcurrent::run(this, &TCPBase::readSocketdData, socketID, socket);
+//    QtConcurrent::run(this, &TCPBase::readSocketdData, socketID, socket);
 
+    readSocketdData(socketID, socket);
 }
 
 void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
@@ -377,13 +403,12 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
 
 
     quint32 nextBlockSize = m_socketBlockSizeInfoHash.value(socketID);
-    QByteArray buffer;
 
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_4_8);
     forever {
         if (nextBlockSize == 0) {
-            if (socket->bytesAvailable() < sizeof(quint16)){
+            if (socket->bytesAvailable() < sizeof(quint32)){
                 break;
             }
             in >> nextBlockSize;
@@ -391,16 +416,19 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
             qDebug()<<"---------------nextBlockSize:"<<nextBlockSize;
         }
 
-        if (nextBlockSize == PACKET_TERMINATING_SYMBOL) {
-            //TODO:是否需要关闭连接？
-            socket->close();
-            break;
-        }
+//        if (nextBlockSize == PACKET_TERMINATING_SYMBOL) {
+//            //TODO:是否需要关闭连接？
+//            socket->close();
+//            break;
+//        }
 
 
         if (socket->bytesAvailable() < nextBlockSize){
             break;
         }
+
+        QByteArray buffer;
+        buffer.resize(nextBlockSize);
 
         in >> buffer;
 
@@ -408,7 +436,7 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
 
         processData(socketID, buffer);
 
-        buffer.clear();
+
         m_socketBlockSizeInfoHash[socketID] = 0;
 
     }
