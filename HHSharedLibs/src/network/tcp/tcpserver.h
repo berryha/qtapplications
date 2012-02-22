@@ -35,7 +35,7 @@
 #include <QStringList>
 #include <QTcpServer>
 
-#include "tcpsocketconnection.h"
+#include "tcpsocket.h"
 
 namespace HEHUI {
 
@@ -44,11 +44,11 @@ class TcpServer : public QTcpServer
     Q_OBJECT
 
 public:
-    TcpServer(const QHostAddress & address = QHostAddress::Any, quint16 port = 0 , QObject *parent = 0);
+    TcpServer(QObject *parent = 0);
+
 
 signals:
-        //void signalNewIncomingTCPConnection(TcpSocketConnection *connection);
-    void signalNewIncomingTCPConnection(int socketDescriptor);
+    void newIncomingTCPConnection(TcpSocket *socket);
 
 protected:
     void incomingConnection(int socketDescriptor);

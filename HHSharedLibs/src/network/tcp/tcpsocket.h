@@ -1,6 +1,6 @@
 /*
  ****************************************************************************
- * tcpsocketthread.h
+ * tcpsocket.h
  *
  * Created on: 2009-11-6
  *     Author: 贺辉
@@ -29,47 +29,69 @@
 
 
 
-#ifndef TCPSOCKETTHREAD_H
-#define TCPSOCKETTHREAD_H
 
-#include <QThread>
+#ifndef TCPSOCKET_H
+#define TCPSOCKET_H
+
+#include <QHostAddress>
+#include <QString>
 #include <QTcpSocket>
+#include <QTime>
+#include <QTimer>
+#include <QMutex>
 
-#include "tcpsocketconnection.h"
-#include "packethandler/packethandlerbase.h"
+#include "../global_network.h"
+
+//#include "../packethandler/packethandlerbase.h"
+
+
 
 namespace HEHUI {
 
-class TcpSocketThread : public QThread
+static const int MaxBufferSize = 1024000;
+
+class TcpSocket : public QTcpSocket
 {
     Q_OBJECT
 
 public:
-    TcpSocketThread(int socketDescriptor, PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
-    TcpSocketThread(const QHostAddress & address, quint16 port, PacketHandlerBase *packetHandlerBase, QObject *parent = 0);
-    ~TcpSocketThread();
 
-    void run();
+    TcpSocket(QObject *parent = 0);
+    ~TcpSocket();
+
+    bool sendTCPDatagram(const QByteArray *data);
+
 
 signals:
-    void error(QAbstractSocket::SocketError socketError);
-    void signalNewTCPConnectionConnected(TcpSocketConnection *connection);
+    void dataReceived(const QByteArray &data);
+
+public slots:
+    void abortConnection();
+
+
+private slots:
+    void slotProcessReadyRead();
+
+    void readData();
+
 
 private:
-    TcpSocketConnection *connection;
-    int socketDescriptor;
 
-    QHostAddress address;
-    quint16 port;
+    //int m_socketID;
 
-    PacketHandlerBase *m_packetHandlerBase;
+//    PacketHandlerBase *m_packetHandlerBase;
+
+    QByteArray buffer;
+
+    quint16 nextBlockSize;
+
+    QMutex writeMutex;
+    QMutex readMutex;
 
 
 
 };
 
 } //namespace HEHUI
-
-
 
 #endif

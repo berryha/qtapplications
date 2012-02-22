@@ -37,7 +37,6 @@
 #include "networkmanagerbase.h"
 //#include "./udpServer/udpServer.h"
 //#include "tcp/tcpserver.h"
-#include "tcp/tcpsocketthread.h"
 
 
 namespace HEHUI {
@@ -207,15 +206,6 @@ void NetworkManagerBase::closeAllServers(){
 
     }
 
-    if(!tcpSocketConnections.isEmpty()){
-        //TODO:connection?
-        QList<TcpSocketConnection *> connections = tcpSocketConnections.values();
-        foreach (TcpSocketConnection *connection, connections){
-            if(connection){connection->destory();}
-        }
-        connections.clear();
-        tcpSocketConnections.clear();
-    }
 
 }
 
@@ -416,11 +406,11 @@ bool NetworkManagerBase::startTCPServerListening(const QHostAddress &localAddres
         if(serverAddress.isNull()){
             serverAddress = QHostAddress::Any;
         }
-        tcpServer = new TcpServer(serverAddress, port, this);
+        tcpServer = new TcpServer(this);
+        tcpServer->listen(serverAddress, port);
     }
 
     if (tcpServer->isListening()) {
-        connect(tcpServer, SIGNAL(signalNewIncomingTCPConnection(int)), this, SLOT(slotProcessNewIncomingTCPConnection(int)));
         QMutexLocker locker(&tcpMutex);
         tcpServers.insert(tcpServer->serverPort(), tcpServer);
         return true;
@@ -437,74 +427,9 @@ bool NetworkManagerBase::startTCPServerListening(const QHostAddress &localAddres
 
 }
 
-void NetworkManagerBase::slotProcessNewIncomingTCPConnection(int socketDescriptor) {
-    qDebug("----NetworkManagerBase::slotProcessNewIncomingConnection(int socketDescriptor)");
-
-    TcpSocketThread *thread = new TcpSocketThread(socketDescriptor, m_packetHandlerBase, this);
-    connect(thread, SIGNAL(signalNewTCPConnectionConnected(TcpSocketConnection *)), this, SLOT(slotProcessNewTCPConnectionConnected(TcpSocketConnection *)));
-    //	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-}
-
-bool NetworkManagerBase::slotCreateTCPConnection(const QString &IP, quint16 Port) {
-
-    m_errorString = "";
-
-    QMutexLocker locker(&tcpMutex);
-
-    TcpSocketThread *thread = new TcpSocketThread(QHostAddress(IP), Port, m_packetHandlerBase, this);
-    connect(thread, SIGNAL(signalNewTCPConnectionConnected(TcpSocketConnection *)), this, SLOT(slotProcessNewTCPConnectionConnected(TcpSocketConnection *)));
-    //	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-
-    return thread->isRunning();
-
-}
-
-bool NetworkManagerBase::slotSendNewTCPDatagram(const QHostAddress &targetAddress, quint16 targetPort, const QByteArray &data) {
-    qDebug()<<"----NetworkManagerBase::slotSendNewTCPDatagram(...)";
-
-    m_errorString = "";
-
-    if (data.isEmpty()) {
-        m_errorString = tr("Data is empty!");
-        return false;
-    }
-
-    bool result = false;
-
-    if (targetAddress == QHostAddress::Null) {
-        QList<TcpSocketConnection *> connections = tcpSocketConnections.values();
-        foreach (TcpSocketConnection *connection, connections)
-        {
-            result = connection->sendTCPDatagram(data);
-        }
-    } else {
-        if (!hasConnection(targetAddress, targetPort)) {
-            slotCreateTCPConnection(targetAddress.toString(), targetPort);
-        }
-
-        //TODO:   
-				TcpSocketConnection *connection = getConnection(targetAddress.toString(), targetPort);
-        if (connection) {
-            result = connection->sendTCPDatagram(data);
-            m_errorString = connection->errorString();
-        }else{
-            qWarning()<<"Can not get tcp connection!"<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;;
-        }
-
-    }
-
-    if (result) {
-        qDebug()<< "TCP Datagram Sent Successfully! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;;
-    } else {
-        qCritical()<< "ERROR! TCP Datagram Sent Failed! "<<" Target:"<<targetAddress.toString()<<" Port:"<<targetPort;
-    }
 
 
-    return result;
 
-}
 
 bool NetworkManagerBase::slotSendNewUDPDatagram(const QHostAddress &targetAddress, quint16 targetPort, QByteArray *data, quint16 localPort, bool useRUDP){
     //qDebug()<< "NetworkManagerBase::slotSendNewUDPDatagram(...): Target Address:"<<targetAddress.toString()<<" Target Port:"<<targetPort << " Local Port"<<localPort;
@@ -601,7 +526,7 @@ bool NetworkManagerBase::slotSendPacket(Packet *packet){
 
     bool result = false;
     if (transmissionProtocol == TP_TCP) {
-        result = slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
+        //result = slotSendNewTCPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), block);
     } else if (transmissionProtocol == TP_UDP) {
         //UDPPacket *udpPacket = static_cast<UDPPacket *> (packet);
         result = slotSendNewUDPDatagram(QHostAddress(packet->getPeerHostAddress()), packet->getPeerHostPort(), &block, packet->getLocalHostPort(), false);
@@ -642,106 +567,17 @@ NetworkManagerBase::CommunicationMode NetworkManagerBase::getCommunicationMode()
 
 }
 
-bool NetworkManagerBase::hasConnection(const QHostAddress &senderIp, quint16 senderPort){
-    QMutexLocker locker(&tcpMutex);
-
-    if (senderPort == 0)
-        return tcpSocketConnections.contains(senderIp);
-
-    if (!tcpSocketConnections.contains(senderIp))
-        return false;
-
-    QList<TcpSocketConnection *> connections = tcpSocketConnections.values(senderIp);
-    foreach (TcpSocketConnection *connection, connections)
-    {
-        if (connection->peerPort() == senderPort)
-            return true;
-    }
-
-    return false;
-}
-
-void NetworkManagerBase::slotProcessNewTCPConnectionConnected(TcpSocketConnection *tcpSocketConnection) {
-    connect(tcpSocketConnection, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slotConnectionError(QAbstractSocket::SocketError)));
-
-    connect(tcpSocketConnection, SIGNAL(disconnected()), this, SLOT(slotProcessTcpSocketDisconnected()));
-
-    connect(tcpSocketConnection, SIGNAL(readyRead()), this, SLOT(slotTcpSocketReadyForUse()));
-
-    //connect(tcpSocketConnection, SIGNAL(signalNewTCPPacketReceived(Packet *)), this, SIGNAL(signalNewPacketReceived(Packet *)));
-
-    appendConnection(tcpSocketConnection);
-
-}
-
-void NetworkManagerBase::slotTcpSocketReadyForUse() {
-    TcpSocketConnection *connection = qobject_cast<TcpSocketConnection *> (
-                sender());
-    if (!connection){
-        return;
-    }
-    if( hasConnection(connection->peerAddress(), connection->peerPort())){
-        return;
-    }
-
-    //TODO
-    connect(connection, SIGNAL(signalTCPDatagramsReceived(const QString &, quint16 , const QByteArray &)),
-            this, SLOT(slotTCPDatagramsReceived(const QString &, quint16 , const QByteArray &)));
 
 
 
-}
 
-void NetworkManagerBase::slotProcessTcpSocketDisconnected() {
-    if (TcpSocketConnection *connection = qobject_cast<TcpSocketConnection *>(sender())){
-        emit signalTCPConnectionDisconnected(connection->peerAddress().toString(), connection->peerPort());
-        removeConnection(connection);
-    }
 
-}
 
-void NetworkManagerBase::slotConnectionError(QAbstractSocket::SocketError socketError ) {
-    if (TcpSocketConnection *connection = qobject_cast<TcpSocketConnection *>(sender())) {
-        emit signalTCPConnectionError(connection->peerAddress().toString(), connection->peerPort(), socketError);
-        removeConnection(connection);
-    }
 
-}
 
-void NetworkManagerBase::appendConnection(TcpSocketConnection *connection){
-    QMutexLocker locker(&tcpMutex);
-    tcpSocketConnections.insert(connection->peerAddress(), connection);
 
-}
 
-void NetworkManagerBase::removeConnection(TcpSocketConnection *connection) {
-    QMutexLocker locker(&tcpMutex);
-    Q_ASSERT(connection);
-    if (tcpSocketConnections.contains(connection->peerAddress())) {
-        tcpSocketConnections.remove(connection->peerAddress());
-    }
-    connection->destory();
-    //	connection->deleteLater();
-}
 
-TcpSocketConnection* NetworkManagerBase::getConnection(const QString &ip,
-                                                       quint16 port) {
-    QMutexLocker locker(&tcpMutex);
-
-    if (!tcpSocketConnections.contains(QHostAddress(ip))) {
-        return 0;
-    }
-
-    QList<TcpSocketConnection *> connections = tcpSocketConnections.values(QHostAddress(ip));
-    foreach (TcpSocketConnection *connection, connections)
-    {
-        if (connection->peerPort() == port)
-            return connection;
-    }
-
-    return 0;
-
-}
 
 QString NetworkManagerBase::errorString() const{
     return m_errorString;

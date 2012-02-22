@@ -30,31 +30,28 @@
 
 
 #include "tcpserver.h"
-#include "tcpsocketthread.h"
+
+
 
 namespace HEHUI {
 
-TcpServer::TcpServer(const QHostAddress & address, quint16 port, QObject *parent)
+TcpServer::TcpServer(QObject *parent)
     : QTcpServer(parent)
 {
 
-//        if(port > 0 && port < 65535){
-		listen(address, port);
-//	}
 
 }
 
-
-
 void TcpServer::incomingConnection(int socketDescriptor)
 {
-    qDebug("----TcpServer::incomingConnection(int socketDescriptor)");
-    emit signalNewIncomingTCPConnection(socketDescriptor);
 
-//    TcpSocketThread *thread = new TcpSocketThread(socketDescriptor, this);
-//    connect(thread, SIGNAL(signalNewTCPConnection(TcpSocketConnection *)), this, SIGNAL(signalNewIncomingTCPConnection(TcpSocketConnection *)));
-//    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-//    thread->start();
+    TcpSocket *socket = new TcpSocket();
+    if(socket->setSocketDescriptor(socketDescriptor)){
+        emit newIncomingTCPConnection(socket);
+    }else{
+        delete socket;
+    }
+
 }
 
 
