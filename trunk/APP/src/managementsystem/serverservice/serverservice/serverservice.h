@@ -107,6 +107,7 @@ private:
     UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
     //UDTSOCKET m_socketConnectedToAdmin;
+    TCPServer *m_tcpServer;
 
     bool mainServiceStarted;
 

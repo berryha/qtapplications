@@ -48,15 +48,26 @@
 namespace HEHUI {
 
 
-ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent)
-    :QObject(parent), m_udpServer(udpServer), m_udtProtocol(udtProtocol)
+ControlCenterPacketsParser::ControlCenterPacketsParser(ResourcesManagerInstance *manager, QObject *parent)
+    :QObject(parent), m_resourcesManager(manager)
 {
 
+    Q_ASSERT(m_resourcesManager);
+
+    m_udpServer = m_resourcesManager->getUDPServer();
     Q_ASSERT_X(m_udpServer, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDPServer!");
+
+    m_udtProtocol = m_resourcesManager->getUDTProtocol();
     Q_ASSERT_X(m_udtProtocol, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDTProtocol!");
+
+    m_tcpServer = m_resourcesManager->getTCPServer();
+    Q_ASSERT(m_tcpServer);
+
 
     connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
     serverAddress = QHostAddress::Null;
     serverUDTListeningPort = 0;
@@ -68,7 +79,8 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDT
     ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
 
 
-    localRUDPListeningPort = m_udtProtocol->getUDTListeningPort();
+    localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
+    m_localTCPServerListeningPort = m_tcpServer->getTCPServerListeningPort();
 
 
     m_localComputerName = QHostInfo::localHostName().toLower();

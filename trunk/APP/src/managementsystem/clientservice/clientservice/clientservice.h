@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QTimer>
 
 #include "../../sharedms/global_shared.h"
 #include "packetmanager/clientpacketsparser.h"
@@ -157,6 +158,8 @@ private:
     UDTSOCKET m_socketConnectedToServer;
     UDTSOCKET m_socketConnectedToAdmin;
     UDTSOCKET peerSocketThatRequiresDetailedInfo;
+
+    TCPServer *m_tcpServer;
 
     UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
 

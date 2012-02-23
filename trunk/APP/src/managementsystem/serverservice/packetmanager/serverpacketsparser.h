@@ -37,7 +37,7 @@
 #include <QDebug>
 
 #include "../../sharedms/global_shared.h"
-#include "../../sharedms/resourcesmanager.h"
+#include "../resourcesmanagerinstance.h"
 
 #include "HHSharedCore/hcryptography.h"
 
@@ -49,7 +49,7 @@ namespace HEHUI {
 class ServerPacketsParser : public QObject{
     Q_OBJECT
 public:
-    ServerPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent = 0);
+    ServerPacketsParser(ResourcesManagerInstance *manager, QObject *parent = 0);
     virtual ~ServerPacketsParser();
 
 
@@ -301,14 +301,17 @@ private:
 private:
     QHostAddress localUDTListeningAddress;
     quint16 localUDTListeningPort;
+    quint16 m_localTCPServerListeningPort;
+
     QString m_serverName;
 
     quint16 localIPMCListeningPort;
 
 
-
+    ResourcesManagerInstance *m_resourcesManager;
     UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
+    TCPServer *m_tcpServer;
 
 
 };

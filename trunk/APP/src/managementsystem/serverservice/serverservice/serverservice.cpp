@@ -61,6 +61,7 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
 
     m_udpServer = 0;
     m_udtProtocol = 0;
+    m_tcpServer = 0;
 
     databaseUtility = 0;
     query = 0;
@@ -167,7 +168,14 @@ bool ServerService::startMainService(){
     m_udtProtocol->startWaitingForIOInOneThread(50);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
-    serverPacketsParser = new ServerPacketsParser(m_udpServer, m_udtProtocol, this);
+    m_tcpServer = resourcesManager->startTCPServer(QHostAddress::Any, TCP_LISTENING_PORT, true, &errorMessage);
+    if(!m_tcpServer){
+        logMessage(QString("Can not start TCP listening on port %1! %2").arg(TCP_LISTENING_PORT).arg(errorMessage), QtServiceBase::Error);
+    }else{
+        qWarning()<<QString("TCP listening on port %1!").arg(TCP_LISTENING_PORT);
+    }
+
+    serverPacketsParser = new ServerPacketsParser(resourcesManager, this);
     //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
     //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
 

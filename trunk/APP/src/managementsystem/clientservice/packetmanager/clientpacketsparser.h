@@ -38,14 +38,9 @@
 #include <QFile>
 #include <QCryptographicHash>
 
-#include "../../sharedms/global_shared.h"
-#include "../../sharedms/udtprotocol.h"
+#include "../clientresourcesmanager.h"
 
-
-#include "HHSharedNetwork/hpacketparserbase.h"
 #include "HHSharedNetwork/hnetworkutilities.h"
-//#include "HHSharedNetwork/hudpsocket.h"
-//#include "HHSharedUDT/hudtprotocolbase.h"
 
 
 namespace HEHUI {
@@ -54,7 +49,7 @@ namespace HEHUI {
 class ClientPacketsParser : public QObject{
     Q_OBJECT
 public:
-    ClientPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent = 0);
+    ClientPacketsParser(ClientResourcesManager *manager, QObject *parent = 0);
     virtual ~ClientPacketsParser();
 
 
@@ -756,15 +751,16 @@ private:
 
     QHostAddress m_localUDTListeningAddress;
     quint16 m_localUDTServerListeningPort;
+    quint16 m_localTCPServerListeningPort;
 
 
 
     QString m_localComputerName;
 
-
-
+    ClientResourcesManager *m_resourcesManager;
     UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
+    TCPServer *m_tcpServer;
 
     QHash<int /*UDT Socket ID*/, QString /*User Name*/> m_localUserSocketsHash;
 
