@@ -84,7 +84,7 @@ public slots:
 
     }
 
-    bool sendServerOnlinePacket(){
+    bool sendServerOnlinePacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS), quint16 targetPort = quint16(IP_MULTICAST_GROUP_PORT)){
         qDebug()<<"----sendServerOnlinePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket();
@@ -103,11 +103,11 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
+        return m_udpServer->sendDatagram(ba, QHostAddress(targetAddress), targetPort);
 
     }
 
-    bool sendServerOfflinePacket(){
+    bool sendServerOfflinePacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS), quint16 targetPort = quint16(IP_MULTICAST_GROUP_PORT)){
         qDebug()<<"----sendServerOfflinePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket();
@@ -126,7 +126,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
+        return m_udpServer->sendDatagram(ba, QHostAddress(targetAddress), targetPort);
 
     }
 
@@ -246,7 +246,7 @@ public slots:
 
     }
 
-    bool sendUpdateClientSoftwarePacket(){
+    bool sendUpdateClientSoftwarePacket(const QString &targetAddress = QString(IP_MULTICAST_GROUP_ADDRESS), quint16 targetPort = quint16(IP_MULTICAST_GROUP_PORT)){
         qDebug()<<"----sendUpdateClientSoftwarePacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket();
@@ -265,7 +265,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udpServer->sendDatagram(ba, QHostAddress(IP_MULTICAST_GROUP_ADDRESS), quint16(IP_MULTICAST_GROUP_PORT));
+        return m_udpServer->sendDatagram(ba, QHostAddress(targetAddress), targetPort);
 
     }
 

@@ -793,8 +793,8 @@ private:
     quint16 serverUDTListeningPort;
     QString serverName;
 
-//    QHostAddress ipmcGroupAddress;
-//    quint16 ipmcListeningPort;
+    QHostAddress ipmcGroupAddress;
+    quint16 ipmcListeningPort;
 
     quint16 localRUDPListeningPort;
 

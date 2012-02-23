@@ -64,8 +64,8 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDT
 
 
 
-//    ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
-//    ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
+    ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
+    ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
 
 
     localRUDPListeningPort = m_udtProtocol->getUDTListeningPort();

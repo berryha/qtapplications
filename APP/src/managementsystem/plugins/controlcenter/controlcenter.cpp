@@ -1018,7 +1018,7 @@ void ControlCenter::startNetwork(){
 
     m_networkReady = true;
 
-    controlCenterPacketsParser->sendClientLookForServerPacket();
+    controlCenterPacketsParser->sendClientLookForServerPacket("255.255.255.255");
 
 
 }
