@@ -73,7 +73,7 @@ private slots:
 //    void dataReceived(const QByteArray &data);
 
 private:
-    virtual void processData(int socketID, const QByteArray &data) = 0;
+    virtual void processData(int socketID, QByteArray *data) = 0;
 
     bool isSocketBusy(int socketID);
     void changeSocketBusyStatus(int socketID, bool busy);

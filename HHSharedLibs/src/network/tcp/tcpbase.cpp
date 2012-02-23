@@ -440,7 +440,7 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
 
 
 
-        processData(socketID, buffer);
+        processData(socketID, &buffer);
 
 
         nextBlockSize = 0;
@@ -472,7 +472,7 @@ void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
 
 //}
 
-void TCPBase::processData(int socketID, const QByteArray &data){
+void TCPBase::processData(int socketID, QByteArray *data){
 
 
 //    QHostAddress address;
