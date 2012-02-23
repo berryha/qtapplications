@@ -64,8 +64,8 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(UDPServer *udpServer, UDT
 
 
 
-    ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
-    ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
+//    ipmcGroupAddress = QString(IP_MULTICAST_GROUP_ADDRESS);
+//    ipmcListeningPort = quint16(IP_MULTICAST_GROUP_PORT);
 
 
     localRUDPListeningPort = m_udtProtocol->getUDTListeningPort();
@@ -286,8 +286,6 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     break;
     case quint8(MS::ClientMessage):
     {
-        //一定要用ipmcListeningPort
-//        sendConfirmationOfReceiptPacket(peerAddress, ipmcListeningPort, packetSerialNumber, peerName);
 
         QString message = "";
         quint8 clientMessageType = quint8(MS::MSG_Information);
