@@ -226,6 +226,7 @@ void TCPWidget::send(){
         if(tcpProtocol->sendData(peerSockeet, &data)){
             i++;
             ui.textBrowser->append(QString("Data %1 Sent!").arg(i));
+            QApplication::processEvents();
         }else{
             ui.textBrowser->append("Failed to send data! " +tcpProtocol->socketErrorString(peerSockeet));
         }
