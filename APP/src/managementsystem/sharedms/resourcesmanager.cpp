@@ -27,7 +27,8 @@ ResourcesManager::ResourcesManager(QObject *parent)
 
     ipmcServer = 0;
     udpServer = 0;
-    udtProtocol = 0;
+    udtProtocol = new UDTProtocol(true, 0, this);
+    m_tcpServer = new TCPServer(this);
 
     m_fileManager = 0;
 
@@ -62,6 +63,11 @@ ResourcesManager::~ResourcesManager() {
         udtProtocol->closeUDTProtocol();
         delete udtProtocol;
         udtProtocol = 0;
+    }
+
+    if(m_tcpServer){
+        delete m_tcpServer;
+        m_tcpServer = 0;
     }
 
     if(m_fileManager){
@@ -155,7 +161,37 @@ UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddres
 
 }
 
-FileManager *ResourcesManager::getFileManager(){
+TCPServer * ResourcesManager::startTCPServer(const QHostAddress &address, quint16 port, bool tryOtherPort, QString *errorMessage){
+
+    if(!m_tcpServer){
+        m_tcpServer = new TCPServer(this);
+    }
+
+    if( (!m_tcpServer->listen(address, port)) && tryOtherPort){
+        m_tcpServer->listen();
+    }
+
+    if(!m_tcpServer->isListening()){
+        if(errorMessage){
+            *errorMessage = m_tcpServer->serverErrorString();
+        }
+        delete m_tcpServer;
+        m_tcpServer = 0;
+    }
+
+    return m_tcpServer;
+
+}
+
+bool ResourcesManager::sendReliableData(int socketID, const QByteArray *byteArray){
+    if(!m_tcpServer->sendData(socketID, byteArray)){
+        return udtProtocol->sendData(socketID, byteArray);
+    }
+    return true;
+
+}
+
+FileManager * ResourcesManager::getFileManager(){
     if(!m_fileManager){
         m_fileManager = new FileManager(this);
         m_fileManager->start(QThread::LowestPriority);

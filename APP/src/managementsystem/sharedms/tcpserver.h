@@ -1,17 +1,20 @@
-#ifndef TCP_H
-#define TCP_H
+#ifndef TCPSERVER_H
+#define TCPSERVER_H
+
+#include "sharedmslib.h"
 
 #include "HHSharedNetwork/htcpbase.h"
 #include "HHSharedNetwork/hpacket.h"
 
 namespace HEHUI {
 
-class TCP : public TCPBase
+class SHAREDMSLIB_API TCPServer : public TCPBase
 {
     Q_OBJECT
 public:
-    explicit TCP(QObject *parent = 0);
+    explicit TCPServer(QObject *parent = 0);
 
+    quint16 getTCPServerListeningPort();
 
 signals:
     void packetReceived(Packet *packet);
@@ -28,4 +31,4 @@ private:
 
 }
 
-#endif // TCP_H
+#endif // TCPSERVER_H

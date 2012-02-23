@@ -36,6 +36,8 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
     peerSocketThatRequiresDetailedInfo = UDTProtocol::INVALID_UDT_SOCK;
 
+    m_tcpServer = 0;
+
     m_udtProtocolForFileTransmission = 0;
 
     mainServiceStarted = false;
@@ -206,10 +208,17 @@ bool ClientService::startMainService(){
     m_udtProtocol->startWaitingForIOInOneThread(10);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
+    m_tcpServer = resourcesManager->startTCPServer(QHostAddress::Any, TCP_LISTENING_PORT, true, &errorMessage);
+    if(!m_tcpServer){
+        logMessage(QString("Can not start TCP listening on port %1! %2").arg(TCP_LISTENING_PORT).arg(errorMessage), QtServiceBase::Error);
+    }else{
+        qWarning()<<QString("TCP listening on port %1!").arg(TCP_LISTENING_PORT);
+    }
+
 
 //    m_udtProtocolForFileTransmission = resourcesManager->getUDTProtocolForFileTransmission();
 
-    clientPacketsParser = new ClientPacketsParser(m_udpServer, m_udtProtocol, this);
+    clientPacketsParser = new ClientPacketsParser(resourcesManager, this);
     //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     //connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 

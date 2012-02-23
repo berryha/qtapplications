@@ -1,4 +1,4 @@
-#include "tcp.h"
+#include "tcpserver.h"
 
 #include "HHSharedNetwork/hpackethandlerbase.h"
 
@@ -6,13 +6,19 @@
 namespace HEHUI {
 
 
-TCP::TCP(QObject *parent) :
+TCPServer::TCPServer(QObject *parent) :
     TCPBase(parent)
 {
 
 }
 
-void TCP::processData(int socketID, QByteArray *data){
+quint16 TCPServer::getTCPServerListeningPort(){
+    quint16 port = 0;
+    serverAddressInfo(0, &port);
+    return port;
+}
+
+void TCPServer::processData(int socketID, QByteArray *data){
 
     QHostAddress address;
     quint16 port;

@@ -15,6 +15,7 @@
 #include "udtprotocol.h"
 #include "filemanager.h"
 #include "sharedmslib.h"
+#include "tcpserver.h"
 
 #include "HHSharedNetwork/hudpsocket.h"
 #include "HHSharedUDT/hudtprotocolforfiletransmission.h"
@@ -42,23 +43,29 @@ public:
     UDTProtocol * getUDTProtocol(){return udtProtocol;}
     UDTProtocol * startUDTProtocol(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
+    TCPServer * getTCPServer(){return m_tcpServer;}
+    TCPServer * startTCPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true, QString *errorMessage = 0);
+
+    bool sendReliableData(int socketID, const QByteArray *byteArray);
+
+
     FileManager *getFileManager();
 
-    UDTProtocolForFileTransmission * getUDTProtocolForFileTransmission();
 
+private:
+    UDTProtocolForFileTransmission * getUDTProtocolForFileTransmission();
 
 
 private:
 
-
     UDPServer *ipmcServer;
     UDPServer *udpServer;
     UDTProtocol *udtProtocol;
+    TCPServer *m_tcpServer;
 
     FileManager *m_fileManager;
 
     UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
-    
     
 
 };

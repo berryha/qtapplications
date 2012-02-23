@@ -40,7 +40,6 @@
 
 
 #include "HHSharedCore/hcryptography.h"
-#include "HHSharedNetwork/hpacketparserbase.h"
 
 
 
@@ -50,7 +49,7 @@ namespace HEHUI {
 class ControlCenterPacketsParser : public QObject{
     Q_OBJECT
 public:
-    ControlCenterPacketsParser(UDPServer *udpServer, UDTProtocol *udtProtocol, QObject *parent = 0);
+    ControlCenterPacketsParser(ResourcesManagerInstance *manager, QObject *parent = 0);
     virtual ~ControlCenterPacketsParser();
 
 public slots:
@@ -121,7 +120,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_6);
-        out << m_localID << localRUDPListeningPort << computerName << rescan;
+        out << m_localID << localUDTListeningPort << computerName << rescan;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -791,12 +790,15 @@ private:
 private:
     QHostAddress serverAddress;
     quint16 serverUDTListeningPort;
+
+
     QString serverName;
 
     QHostAddress ipmcGroupAddress;
     quint16 ipmcListeningPort;
 
-    quint16 localRUDPListeningPort;
+    quint16 localUDTListeningPort;
+    quint16 m_localTCPServerListeningPort;
 
 
     PacketHandlerBase *m_packetHandlerBase;
@@ -808,8 +810,10 @@ private:
 
     QMultiHash<QString /*Peer ID*/, QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > m_receivedPacketsHash;
 
+    ResourcesManagerInstance *m_resourcesManager;
     UDPServer *m_udpServer;
     UDTProtocol *m_udtProtocol;
+    TCPServer *m_tcpServer;
 
 
 
