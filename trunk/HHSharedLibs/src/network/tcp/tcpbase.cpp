@@ -327,7 +327,7 @@ void TCPBase::peerDisconnected (){
 
 }
 
-void TCPBase::processSocketError(QAbstractSocket::SocketError socketError){
+void TCPBase::processSocketError(QAbstractSocket::SocketError error){
 
     QTcpSocket *socket = qobject_cast<QTcpSocket *>(sender());
     if(!socket){
@@ -342,7 +342,9 @@ void TCPBase::processSocketError(QAbstractSocket::SocketError socketError){
     Q_ASSERT(socket > 0);
 
 
-    qDebug()<<"Socket Error! "<<socketError;
+    qDebug()<<"Socket Error! "<<error;
+
+    emit socketError(socketID, error);
 
 }
 
@@ -393,6 +395,7 @@ void TCPBase::slotProcessSocketReadyRead() {
 //        changeSocketBusyStatus(socketID, true);
 //        QtConcurrent::run(this, &TCPBase::readSocketdData, socketID, socket);
 //    }
+
     readSocketdData(socketID, socket);
 
 }
