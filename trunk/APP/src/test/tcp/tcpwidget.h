@@ -48,7 +48,7 @@ private slots:
     void signalConnectToPeerTimeout(const QString &peerAddress, quint16 peerPort);
     void disconnected(int socketID, const QString &peerAddress, quint16 peerPort);
 
-    void dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data);
+    void dataReceived(const QString &peerAddress, quint16 peerPort, QByteArray *data);
 
 
 

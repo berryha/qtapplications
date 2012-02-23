@@ -21,7 +21,7 @@ TCPWidget::TCPWidget(QWidget *parent)
     tcpProtocol = new TCP(this);
     connect(tcpProtocol, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(connected(int, const QString &, quint16)));
     connect(tcpProtocol, SIGNAL(disconnected(int, const QString &, quint16)), this, SLOT(disconnected(int, const QString &, quint16)));
-    connect(tcpProtocol, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
+    connect(tcpProtocol, SIGNAL(dataReceived(const QString &, quint16, QByteArray *)), this, SLOT(dataReceived(const QString &, quint16, QByteArray *)));
 
     peerSockeet = -1;
 
@@ -293,13 +293,13 @@ void TCPWidget::disconnected(int socketID, const QString &peerAddress, quint16 p
 
 }
 
-void TCPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data){
+void TCPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, QByteArray *data){
 
     qDebug()<<"-------------2-------Thread ID:"<<QThread::currentThreadId ();
 
 
     m_receivedDataCount++;
-    QString md5 = Cryptography::MD5(data).toBase64();
+    QString md5 = Cryptography::MD5(*data).toBase64();
 
     ui.textBrowser->append(QString::number(m_receivedDataCount)+" Data Received From "+peerAddress+":"+QString::number(peerPort)+" MD5:"+md5+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
 

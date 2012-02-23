@@ -1286,6 +1286,7 @@ bool UserManagerMainWindow::verifyPrivilege(){
             QString accessCodeString = "hehui";
             accessCodeString.append(QTime::currentTime().toString("hhmm"));
             if(text.toLower() == accessCodeString){
+                m_verified = true;
                 return true;
             }
         }

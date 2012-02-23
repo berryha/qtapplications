@@ -27,12 +27,14 @@ HEADERS += clientinfo.h \
     udtprotocol.h \
     resourcesmanager.h \
     filemanager.h \
-    sharedmslib.h
+    sharedmslib.h \
+    tcp.h
 FORMS += 
 SOURCES += clientinfo.cpp \
     udtprotocol.cpp \
     resourcesmanager.cpp \
-    filemanager.cpp
+    filemanager.cpp \
+    tcp.cpp
 RESOURCES += resources.qrc
 
 DEFINES += SHAREDMSLIB_LIBRARY_EXPORT
