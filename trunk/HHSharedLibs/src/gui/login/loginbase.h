@@ -46,39 +46,39 @@ class GUI_LIB_API LoginBase: public QObject {
     Q_OBJECT
 
 public:
-        LoginBase(User *user, QObject *parent = 0);
-        LoginBase(User *user, const QString &windowTitle = "", QObject *parent = 0);
-	virtual ~LoginBase();
+    LoginBase(User *user, QObject *parent = 0);
+    LoginBase(User *user, const QString &windowTitle = "", QObject *parent = 0);
+    virtual ~LoginBase();
 
-        virtual bool isVerified();
+    virtual bool isVerified();
 
-        QString getUserID() const;
-//        QString userName() const;
-	QString passWord() const;
+    QString getUserID() const;
+    //        QString userName() const;
+    QString passWord() const;
 
-	QWidget* getParentWidget();
-//	User* getUser();
-
-private:
-        virtual bool verifyUser();
-	virtual bool getUserInfo();
-	virtual bool canLogin();
-
-	void setUser(User *u);
-
-
-
-
+    QWidget* getParentWidget();
+    //	User* getUser();
 
 private:
+    virtual bool verifyUser();
+    virtual bool getUserInfo();
+    virtual bool canLogin();
 
-	QWidget *parentWidget;
+    void setUser(User *u);
 
-	User *user;
 
-	bool isSuccesseful;
 
-        QString m_windowTitle;
+
+
+private:
+
+    QWidget *parentWidget;
+
+    User *user;
+
+    bool isSuccesseful;
+
+    QString m_windowTitle;
 
 
 };

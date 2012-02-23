@@ -15,15 +15,15 @@ namespace HEHUI {
 
 class LoginDlg : public QDialog /*, public Singleton<LoginDlg>*/
 {
-	Q_OBJECT
-	//friend class Singleton<LoginDlg>;
+    Q_OBJECT
+    //friend class Singleton<LoginDlg>;
 
 public:
-        LoginDlg(User *user, const QString &windowTitle = "", QWidget *parent = 0);
-	~LoginDlg();
+    LoginDlg(User *user, const QString &windowTitle = "", QWidget *parent = 0);
+    ~LoginDlg();
 
 
-        void setUser(User *u){user = u;}
+    void setUser(User *u){user = u;}
 
 
 private:
@@ -32,29 +32,29 @@ private:
 
 
 protected:
-	void keyPressEvent(QKeyEvent *);
-	void languageChange();
+    void keyPressEvent(QKeyEvent *);
+    void languageChange();
 
 
 signals:
-        void signalUserButtonClicked();
-        void signalKeyButtonClicked();
+    void signalUserButtonClicked();
+    void signalKeyButtonClicked();
 
 private slots:
-        void on_toolButtonUser_clicked();
-        void on_toolButtonKey_clicked();
-	void on_loginButton_clicked();
-        void on_cancelButton_clicked();
+    void on_toolButtonUser_clicked();
+    void on_toolButtonKey_clicked();
+    void on_loginButton_clicked();
+    void on_cancelButton_clicked();
 
 
 
 private:
-	Ui::LoginDlgUI ui;
+    Ui::LoginDlgUI ui;
 
-	User *user;
+    User *user;
 
-	inline QString userID() const;
-	inline QString passWord() const;
+    inline QString userID() const;
+    inline QString passWord() const;
 
 };
 
