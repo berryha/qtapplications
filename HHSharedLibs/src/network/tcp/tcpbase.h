@@ -54,7 +54,7 @@ public:
 signals:
     void connected (int socketID, const QString &peerAddress, quint16 peerPort);
     void disconnected (int socketID, const QString &peerAddress, quint16 peerPort);
-//    void socketError(int socketID, QAbstractSocket::SocketError socketError);
+    void socketError(int socketID, QAbstractSocket::SocketError error);
 
 protected:
     
@@ -62,7 +62,7 @@ private slots:
     void newIncomingConnection();
     void peerConnected ();
     void peerDisconnected ();
-    void processSocketError(QAbstractSocket::SocketError socketError);
+    void processSocketError(QAbstractSocket::SocketError error);
 
     void setupNewSocket(QTcpSocket *socket);
 
