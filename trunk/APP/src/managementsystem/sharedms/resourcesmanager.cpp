@@ -25,10 +25,12 @@ ResourcesManager::ResourcesManager(QObject *parent)
 {
 
 
-    ipmcServer = 0;
-    udpServer = 0;
-    udtProtocol = new UDTProtocol(true, 0, this);
-    m_tcpServer = new TCPServer(this);
+    m_ipmcServer = 0;
+    m_udpServer = 0;
+//    udtProtocol = new UDTProtocol(true, 0, this);
+//    m_tcpServer = new TCPServer(this);
+
+    m_rtp = new RTP(this);
 
     m_fileManager = 0;
 
@@ -46,29 +48,24 @@ ResourcesManager::~ResourcesManager() {
 
     qDebug()<<"ResourcesManager::~ResourcesManager()";
 
-    if(ipmcServer){
-        ipmcServer->close();
-        delete ipmcServer;
-        ipmcServer = 0;
+    if(m_ipmcServer){
+        m_ipmcServer->close();
+        delete m_ipmcServer;
+        m_ipmcServer = 0;
     }
 
 
-    if(udpServer){
-        udpServer->close();
-        delete udpServer;
-        udpServer = 0;
+    if(m_udpServer){
+        m_udpServer->close();
+        delete m_udpServer;
+        m_udpServer = 0;
     }
 
-    if(udtProtocol){
-        udtProtocol->closeUDTProtocol();
-        delete udtProtocol;
-        udtProtocol = 0;
+    if(m_rtp){
+        delete m_rtp;
+        m_rtp = 0;
     }
 
-    if(m_tcpServer){
-        delete m_tcpServer;
-        m_tcpServer = 0;
-    }
 
     if(m_fileManager){
         m_fileManager->exit();
@@ -84,110 +81,122 @@ ResourcesManager::~ResourcesManager() {
 UDPServer * ResourcesManager::startIPMCServer(const QHostAddress &ipmcGroupAddress, quint16 ipmcGroupPort, QString *errorMessage){
 
 
-    if(!ipmcServer){
-        ipmcServer = new UDPServer(this);
+    if(!m_ipmcServer){
+        m_ipmcServer = new UDPServer(this);
     }
 
-    if (ipmcServer->startIPMulticastListening(ipmcGroupAddress, ipmcGroupPort)) {
-        return ipmcServer;
+    if (m_ipmcServer->startIPMulticastListening(ipmcGroupAddress, ipmcGroupPort)) {
+        return m_ipmcServer;
     }else{
         if(errorMessage){
-            *errorMessage = ipmcServer->errorString();
+            *errorMessage = m_ipmcServer->errorString();
         }
 
-        delete ipmcServer;
-        ipmcServer = 0;
+        delete m_ipmcServer;
+        m_ipmcServer = 0;
 
         return 0;
     }
 
-    return ipmcServer;
+    return m_ipmcServer;
 
 }
 
 UDPServer * ResourcesManager::startUDPServer(const QHostAddress &address, quint16 startPort, bool tryOtherPort, QString *errorMessage){
 
-    if(!udpServer){
-        udpServer = new UDPServer(this);
+    if(!m_udpServer){
+        m_udpServer = new UDPServer(this);
     }
 
-    if(udpServer->localPort() == startPort){
-        return udpServer;
+    if(m_udpServer->localPort() == startPort){
+        return m_udpServer;
     }
 
-    if (udpServer->startSimpleListening(address, startPort)) {
-        return udpServer;
+    if (m_udpServer->startSimpleListening(address, startPort)) {
+        return m_udpServer;
     }else{
         if(tryOtherPort){
-            if (udpServer->startSimpleListening(address, 0)) {
-                return udpServer;
+            if (m_udpServer->startSimpleListening(address, 0)) {
+                return m_udpServer;
             }
         }
 
         if(errorMessage){
-            *errorMessage = udpServer->errorString();
+            *errorMessage = m_udpServer->errorString();
         }
-        delete udpServer;
-        udpServer = 0;
+        delete m_udpServer;
+        m_udpServer = 0;
 
         return 0;
     }
 
-    return udpServer;
+    return m_udpServer;
 
 }
 
-UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddress, quint16 localPort, bool tryOtherPort, QString *errorMessage){
+//UDTProtocol * ResourcesManager::startUDTProtocol(const QHostAddress &localAddress, quint16 localPort, bool tryOtherPort, QString *errorMessage){
 
-    if(!udtProtocol){
-        udtProtocol = new UDTProtocol(true, 0, this);
+//    if(!udtProtocol){
+//        udtProtocol = new UDTProtocol(true, 0, this);
+//    }
+
+//    UDTSOCKET socket = udtProtocol->listen(localPort, localAddress);
+//    if(socket == UDTProtocolBase::INVALID_UDT_SOCK && tryOtherPort){
+//        socket = udtProtocol->listen();
+//    }
+
+//    if(socket == UDTProtocolBase::INVALID_UDT_SOCK){
+//        if(errorMessage){
+//            *errorMessage = udtProtocol->getLastErrorMessage();
+//        }
+//        delete udtProtocol;
+//        udtProtocol = 0;
+//        return 0;
+//    }
+
+//    return udtProtocol;
+
+//}
+
+//TCPServer * ResourcesManager::startTCPServer(const QHostAddress &address, quint16 port, bool tryOtherPort, QString *errorMessage){
+
+//    if(!m_tcpServer){
+//        m_tcpServer = new TCPServer(this);
+//    }
+
+//    if( (!m_tcpServer->listen(address, port)) && tryOtherPort){
+//        m_tcpServer->listen();
+//    }
+
+//    if(!m_tcpServer->isListening()){
+//        if(errorMessage){
+//            *errorMessage = m_tcpServer->serverErrorString();
+//        }
+//        delete m_tcpServer;
+//        m_tcpServer = 0;
+//    }
+
+//    return m_tcpServer;
+
+//}
+
+//bool ResourcesManager::sendReliableData(int socketID, const QByteArray *byteArray){
+
+//    if(!m_tcpServer->sendData(socketID, byteArray)){
+//        return udtProtocol->sendData(socketID, byteArray);
+//    }
+//    return true;
+
+//}
+
+RTP * ResourcesManager::startRTP(const QHostAddress &localAddress, quint16 localPort, bool tryOtherPort, QString *errorMessage){
+
+    if(!m_rtp){
+        m_rtp = new RTP(this);
     }
 
-    UDTSOCKET socket = udtProtocol->listen(localPort, localAddress);
-    if(socket == UDTProtocolBase::INVALID_UDT_SOCK && tryOtherPort){
-        socket = udtProtocol->listen();
-    }
-
-    if(socket == UDTProtocolBase::INVALID_UDT_SOCK){
-        if(errorMessage){
-            *errorMessage = udtProtocol->getLastErrorMessage();
-        }
-        delete udtProtocol;
-        udtProtocol = 0;
-        return 0;
-    }
-
-    return udtProtocol;
-
-}
-
-TCPServer * ResourcesManager::startTCPServer(const QHostAddress &address, quint16 port, bool tryOtherPort, QString *errorMessage){
-
-    if(!m_tcpServer){
-        m_tcpServer = new TCPServer(this);
-    }
-
-    if( (!m_tcpServer->listen(address, port)) && tryOtherPort){
-        m_tcpServer->listen();
-    }
-
-    if(!m_tcpServer->isListening()){
-        if(errorMessage){
-            *errorMessage = m_tcpServer->serverErrorString();
-        }
-        delete m_tcpServer;
-        m_tcpServer = 0;
-    }
-
-    return m_tcpServer;
-
-}
-
-bool ResourcesManager::sendReliableData(int socketID, const QByteArray *byteArray){
-    if(!m_tcpServer->sendData(socketID, byteArray)){
-        return udtProtocol->sendData(socketID, byteArray);
-    }
-    return true;
+    m_rtp->startServers(localAddress, localPort, tryOtherPort, errorMessage);
+    return m_rtp;
 
 }
 

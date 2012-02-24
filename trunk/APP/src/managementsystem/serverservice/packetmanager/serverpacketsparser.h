@@ -71,7 +71,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_7);
-        out << m_serverName << localUDTListeningAddress.toString() << localUDTListeningPort << QString(APP_VERSION) << serverInstanceID;
+        out << m_serverName << localUDTListeningAddress.toString() << localUDTListeningPort << m_localTCPServerListeningPort << QString(APP_VERSION) << serverInstanceID;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -174,7 +174,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -219,7 +219,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
 
@@ -242,7 +242,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -310,6 +310,8 @@ private:
 
     ResourcesManagerInstance *m_resourcesManager;
     UDPServer *m_udpServer;
+
+    RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
 

@@ -114,9 +114,12 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     m_networkReady = false;
     m_udpServer = 0;
     m_localUDPListeningPort = IP_MULTICAST_GROUP_PORT + 10;
+
+    m_rtp = 0;
     m_udtProtocol = 0;
     m_localUDTListeningPort = UDT_LISTENING_PORT + 10;
     m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+
 
     startNetwork();
 
@@ -448,7 +451,7 @@ void ControlCenter::slotRemoteManagement(){
     }
 
 
-    SystemManagementWidget *systemManagementWidget = new SystemManagementWidget(m_udtProtocol, controlCenterPacketsParser, m_adminName, targetComputerName, userName(), ipAddress(), macAddress(), (usbsdEnabled() == "1"?true:false), (programesEnabled() == "1"?true:false), m_administrators, this);
+    SystemManagementWidget *systemManagementWidget = new SystemManagementWidget(m_rtp, controlCenterPacketsParser, m_adminName, targetComputerName, userName(), ipAddress(), macAddress(), (usbsdEnabled() == "1"?true:false), (programesEnabled() == "1"?true:false), m_administrators, this);
     connect(systemManagementWidget, SIGNAL(requestRemoteAssistance()), this, SLOT(slotVNC()));
     
     ui.tabWidget->addTab(systemManagementWidget, targetComputerName);
@@ -993,26 +996,31 @@ void ControlCenter::startNetwork(){
         qWarning()<<QString("UDP listening on port %1!").arg(m_localUDPListeningPort);
     }
 
-    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, m_localUDTListeningPort, true, &errorMessage);
-    if(!m_udtProtocol){
-        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
-        QMessageBox::critical(this, tr("Error"), error);
-        close();
-        return;
-    }
+    m_rtp = resourcesManager->startRTP(QHostAddress::Any, m_localUDTListeningPort, true, &errorMessage);
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+//    if(!m_udtProtocol){
+//        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
+//        QMessageBox::critical(this, tr("Error"), error);
+//        close();
+//        return;
+//    }
     m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
     //connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIOInOneThread(1);
     //m_udtProtocol->startWaitingForIOInSeparateThread();
 
+
+
+
     controlCenterPacketsParser = new ControlCenterPacketsParser(resourcesManager, this);
 
-    connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&, int)));
+    connect(controlCenterPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&, int)), this, SLOT(serverFound(const QString&, quint16, quint16, const QString&, const QString&, int)));
     connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), this, SLOT(updateOrSaveClientInfo(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, bool, const QString&)), Qt::QueuedConnection);
     //connect(controlCenterPacketsParser, SIGNAL(signalClientOnlineStatusChanged(int, const QString&, bool)), this, SLOT(processClientOnlineStatusChangedPacket(int, const QString&, bool)), Qt::QueuedConnection);
 
     if(localSystemManagementWidget){
-        localSystemManagementWidget->setUDTProtocol(m_udtProtocol);
+        localSystemManagementWidget->setRTP(m_rtp);
         localSystemManagementWidget->setControlCenterPacketsParser(controlCenterPacketsParser);
     }
 
@@ -1023,7 +1031,7 @@ void ControlCenter::startNetwork(){
 
 }
 
-void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
+void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID){
     qDebug()<<"----ControlCenter::serverFound(...)";
 
 

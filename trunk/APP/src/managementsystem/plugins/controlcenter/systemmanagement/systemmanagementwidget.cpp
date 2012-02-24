@@ -23,7 +23,7 @@ namespace HEHUI {
 
 QMap<QString/*Short Name*/, QString/*Department*/> SystemManagementWidget::departments = QMap<QString, QString>();
 
-SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, QWidget *parent)
+SystemManagementWidget::SystemManagementWidget(RTP *rtp, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain, QWidget *parent)
     : QWidget(parent), m_adminName(adminName), m_computerName(computerName), m_users(users), m_peerIPAddress(QHostAddress(peerIPAddress)), m_peerMACAddress(peerMACAddress), m_usbsdEnabled(usbsdEnabled), m_programesEnabled(programesEnabled), m_isJoinedToDomain(isJoinedToDomain)
 {
     ui.setupUi(this);
@@ -204,10 +204,19 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
     queryModel = 0;
 
-    m_udtProtocol = 0;
-    m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
-    setUDTProtocol(udtProtocol);
+
+    setRTP(rtp);
+    m_peerSocket = INVALID_SOCK_ID;
+
+
+//    m_udtProtocol = 0;
+//    setUDTProtocol(udtProtocol);
+
+//    m_tcpServer = tcpServer;
+//    m_usingTCP = false;
+
     setControlCenterPacketsParser(parser);
+
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseAdminConnectionResultPacketReceived(const QString &, bool, const QString &)), this, SLOT(processClientResponseAdminConnectionResultPacket(const QString &, bool, const QString &)));
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientMessagePacketReceived(const QString &, const QString &)), this, SLOT(clientMessageReceived(const QString &, const QString &)));
     //    connect(controlCenterPacketsParser, SIGNAL(signalClientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)), this, SLOT(clientResponseClientSummaryInfoPacketReceived(const QString&, const QString&, const QString&, const QString&, const QString&, bool, bool, const QString&, const QString&)));
@@ -216,7 +225,7 @@ SystemManagementWidget::SystemManagementWidget(UDTProtocol *udtProtocol, Control
 
 
 //    m_udtProtocolForFileTransmission = 0;
-//    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
+//    m_peerFileTransmissionSocket = INVALID_SOCK_ID;
 
     clientResponseAdminConnectionResultPacketReceived = false;
 
@@ -309,7 +318,7 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
         queryModel = 0;
     }
 
-    m_udtProtocol->closeSocket(m_peerSocket);
+    m_rtp->closeSocket(m_peerSocket);
 
     event->accept();
 
@@ -363,18 +372,40 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
 //}
 
 
+void SystemManagementWidget::setRTP(RTP *rtp){
 
-void SystemManagementWidget::setUDTProtocol(UDTProtocol *udtProtocol){
-
-    if(!udtProtocol){
+    if(!rtp){
         ui.toolButtonVerify->setEnabled(false);
         return;
     }
 
-    this->m_udtProtocol = udtProtocol;
-    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-
+    this->m_rtp = rtp;
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 }
+
+//void SystemManagementWidget::setUDTProtocol(UDTProtocol *udtProtocol){
+
+//    if(!udtProtocol){
+//        ui.toolButtonVerify->setEnabled(false);
+//        return;
+//    }
+
+//    this->m_udtProtocol = udtProtocol;
+//    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+//}
+
+//void SystemManagementWidget::setTCPServer(TCPServer *tcpServer){
+//    if(!tcpServer){
+//        ui.toolButtonVerify->setEnabled(false);
+//        return;
+//    }
+
+//    this->m_tcpServer = tcpServer;
+//    connect(m_tcpServer, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+
+//}
 
 void SystemManagementWidget::setControlCenterPacketsParser(ControlCenterPacketsParser *parser){
 
@@ -426,39 +457,23 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     ui.toolButtonVerify->setEnabled(false);
 
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        m_peerSocket = m_udtProtocol->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 0, true, 10000);
+    QString errorMessage;
+    if(m_peerSocket == INVALID_SOCK_ID){
+        m_peerSocket = m_rtp->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 10000, &errorMessage);
     }
-
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+    if(m_peerSocket == INVALID_SOCK_ID){
+        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(errorMessage));
         ui.toolButtonVerify->setEnabled(true);
         return;
     }
-
-//    while (m_udtProtocol->isConnecting(m_peerSocket)) {
-//        QCoreApplication::processEvents();
-//    }
-
-    if(!m_udtProtocol->isSocketConnected(m_peerSocket)){
-        m_udtProtocol->closeSocket(m_peerSocket);
-        m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
-
-        QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
-        ui.toolButtonVerify->setEnabled(true);
-
-        return;
-    }
-
 
     bool ok = controlCenterPacketsParser->sendAdminRequestConnectionToClientPacket(m_peerSocket, this->m_computerName, this->m_users);
     if(!ok){
-        m_udtProtocol->closeSocket(m_peerSocket);
-        m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
-
-        QMessageBox::critical(this, tr("Error"), tr("Can not send connection request to host!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QString err = m_rtp->lastErrorString();
+        m_rtp->closeSocket(m_peerSocket);
+        m_peerSocket = INVALID_SOCK_ID;
+        QMessageBox::critical(this, tr("Error"), tr("Can not send connection request to host!<br>%1").arg(err));
         ui.toolButtonVerify->setEnabled(true);
-
         return;
     }
 
@@ -492,7 +507,7 @@ void SystemManagementWidget::on_pushButtonUSBSD_clicked(){
 
     bool ok = controlCenterPacketsParser->sendSetupUSBSDPacket(m_peerSocket, m_computerName, m_users, !m_usbsdEnabled, m_temporarilyAllowed, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
     ui.pushButtonUSBSD->setEnabled(false);
@@ -526,7 +541,7 @@ void SystemManagementWidget::on_pushButtonPrograms_clicked(){
 
     bool ok = controlCenterPacketsParser->sendSetupProgramesPacket(m_peerSocket, m_computerName, m_users, !m_programesEnabled, m_temporarilyAllowed, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
     ui.pushButtonPrograms->setEnabled(false);
@@ -537,7 +552,7 @@ void SystemManagementWidget::on_pushButtonShowAdmin_clicked(){
 
     bool ok = controlCenterPacketsParser->sendShowAdminPacket(m_peerSocket, m_computerName, m_users, true);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -556,7 +571,7 @@ void SystemManagementWidget::on_pushButtonRemoteAssistance_clicked(){
     
     bool ok = controlCenterPacketsParser->sendRemoteAssistancePacket(m_peerSocket, m_computerName, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -584,7 +599,7 @@ void SystemManagementWidget::on_actionAddAdmin_triggered(){
 
     ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, true, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -619,7 +634,7 @@ void SystemManagementWidget::on_actionDeleteAdmin_triggered(){
 
     ok = controlCenterPacketsParser->sendModifyAdminGroupUserPacket(m_peerSocket, m_computerName, item, false, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -672,7 +687,7 @@ void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
 
     ok = controlCenterPacketsParser->sendRenameComputerPacket(m_peerSocket, m_computerName, newComputerName, m_adminName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -718,7 +733,7 @@ void SystemManagementWidget::on_pushButtonDomain_clicked(){
 
     ok = controlCenterPacketsParser->sendJoinOrUnjoinDomainPacket(m_peerSocket, m_computerName, m_adminName, !m_isJoinedToDomain, domainOrWorkgroupName);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!<br>%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -888,7 +903,7 @@ void SystemManagementWidget::on_toolButtonRequestSystemInfo_clicked(){
 
     bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, false);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -912,7 +927,7 @@ void SystemManagementWidget::on_toolButtonRescanSystemInfo_clicked(){
 
     bool ok = controlCenterPacketsParser->sendRequestClientDetailedInfoPacket(m_peerSocket, m_computerName, true);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -963,7 +978,7 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
         if(rep == QMessageBox::Yes){
             bool ok = controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerSocket, m_computerName, "", m_adminName, false);
             if(!ok){
-                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_rtp->lastErrorString()));
                 return;
             }
             //ui.toolButtonRunRemoteApplication->setEnabled(false);
@@ -978,7 +993,7 @@ void SystemManagementWidget::on_toolButtonRunRemoteApplication_clicked(){
         if(!remoteAPPPath.trimmed().isEmpty()){
             bool ok = controlCenterPacketsParser->sendAdminRequestRemoteConsolePacket(m_peerSocket, m_computerName, remoteAPPPath, m_adminName, true);
             if(!ok){
-                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+                QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_rtp->lastErrorString()));
                 return;
             }
         }
@@ -1009,7 +1024,7 @@ void SystemManagementWidget::on_toolButtonSendCommand_clicked(){
     QString cmd = ui.comboBoxCommand->currentText();
     bool ok = controlCenterPacketsParser->sendRemoteConsoleCMDFromAdminPacket(m_peerSocket, m_computerName, cmd);
     if(!ok){
-        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_udtProtocol->getLastErrorMessage()));
+        QMessageBox::critical(this, tr("Error"), tr("Can not send data to peer!\n%1").arg(m_rtp->lastErrorString()));
         return;
     }
 
@@ -1032,7 +1047,7 @@ void SystemManagementWidget::processClientOnlineStatusChangedPacket(int socketID
 //    QString ip = "";
 //    quint16 port = 0;
 //    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
-//        qCritical()<<m_udtProtocol->getLastErrorMessage();
+//        qCritical()<<m_rtp->lastErrorString();
 //        return;
 //    }
 
@@ -1479,7 +1494,7 @@ void SystemManagementWidget::peerDisconnected(int socketID){
 void SystemManagementWidget::peerDisconnected(bool normalClose){
     qDebug()<<"--SystemManagementWidget::peerDisconnected(...) "<<" normalClose:"<<normalClose;
 
-    m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
+    m_peerSocket = INVALID_SOCK_ID;
 
     //ui.tabSystemInfo->setEnabled(false);
     ui.toolButtonRequestSystemInfo->setEnabled(false);
@@ -1492,7 +1507,7 @@ void SystemManagementWidget::peerDisconnected(bool normalClose){
     ui.toolButtonVerify->setEnabled(true);
 
     m_fileManagementWidget->peerDisconnected(normalClose);
-    m_fileManagementWidget->setPeerSocket(UDTProtocol::INVALID_UDT_SOCK);
+    m_fileManagementWidget->setPeerSocket(INVALID_SOCK_ID);
     ui.tabFileManagement->setEnabled(false);
 
     if(!normalClose){

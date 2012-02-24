@@ -20,9 +20,9 @@ quint16 TCPServer::getTCPServerListeningPort(){
 
 void TCPServer::processData(int socketID, QByteArray *data){
 
-    QHostAddress address;
+    QString address;
     quint16 port;
-    socketPeerAddressInfo(socketID, &address, &port);
+    getAddressInfoFromSocket(socketID, &address, &port, true);
 
 
     QDataStream in(data, QIODevice::ReadOnly);
@@ -36,7 +36,7 @@ void TCPServer::processData(int socketID, QByteArray *data){
         //packet->setSocketID(socketID);
 
 
-        packet->setPeerHostAddress(address);
+        packet->setPeerHostAddress(QHostAddress(address));
         packet->setPeerHostPort(port);
 //        packet->setLocalHostAddress(m_udpSocket->localAddress());
 //        packet->setLocalHostPort(m_udpSocket->localPort());

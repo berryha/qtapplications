@@ -16,6 +16,8 @@
 #include"clientinfomodel/clientinfomodel.h"
 
 #include "../../sharedms/clientinfo.h"
+#include "../../sharedms/rtp.h"
+
 
 
 #include "systemmanagement/systemmanagementwidget.h"
@@ -82,7 +84,7 @@ private slots:
 
     void startNetwork();
 
-    void serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     void updateOrSaveClientInfo(const QString &computerName, const QString &workgroupName, const QString &networkInfo, const QString &usersInfo, const QString &osInfo, bool usbsdEnabled, bool programesEnabled, const QString &admins, bool isJoinedToDomain,const QString &clientVersion);
     
@@ -161,9 +163,12 @@ private:
     UDPServer *m_udpServer;
     quint16 m_localUDPListeningPort;
 
+    RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     quint16 m_localUDTListeningPort;
     UDTSOCKET m_socketConnectedToServer;
+
+    TCPServer *m_tcpServer;
 
 //    QHash<int/*Socket ID*/, QHostAddress/*IP*/> clientSocketsHash;
 

@@ -167,7 +167,7 @@ void TCPWidget::connectToPeer(){
             return;
         }
         qDebug()<<"peerSockeet:"<<peerSockeet;
-        tcpProtocol->socketLocalAddressInfo(peerSockeet, 0, &localPort);
+        tcpProtocol->getAddressInfoFromSocket(peerSockeet, 0, &localPort);
 
         ui.textBrowser->append("Local port:"+QString::number(localPort));
         ui.spinBoxLocalPort->setValue(localPort);

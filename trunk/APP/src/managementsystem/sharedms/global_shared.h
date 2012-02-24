@@ -72,6 +72,10 @@
 #define TCP_LISTENING_PORT	12344
 #endif
 
+#ifndef INVALID_SOCK_ID
+#define INVALID_SOCK_ID	-1
+#endif
+
 #ifndef WIN_ADMIN_PASSWORD
 #define WIN_ADMIN_PASSWORD "trousetrouse" //"computermisdg"
 #endif

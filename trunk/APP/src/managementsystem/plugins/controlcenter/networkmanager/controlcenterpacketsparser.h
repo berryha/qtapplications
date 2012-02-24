@@ -105,7 +105,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -129,7 +129,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -151,7 +151,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendRemoteConsoleCMDFromAdminPacket(int socketID, const QString &computerName, const QString &command){
@@ -173,7 +173,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendSetupUSBSDPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
@@ -194,7 +194,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendSetupProgramesPacket(int socketID, const QString &computerName, const QString &userName, bool enable, bool temporarilyAllowed, const QString &adminName){
@@ -215,7 +215,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendShowAdminPacket(int socketID, const QString &computerName, const QString &userName, bool show){
@@ -235,7 +235,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendModifyAdminGroupUserPacket(int socketID, const QString &computerName, const QString &userName, bool addToAdminGroup, const QString &adminName){
@@ -255,7 +255,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendRenameComputerPacket(int socketID, const QString &oldComputerName, const QString &newComputerName, const QString &adminName){
@@ -275,7 +275,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendJoinOrUnjoinDomainPacket(int socketID, const QString &computerName, const QString &adminName, bool join, const QString &domainOrWorkgroupName){
@@ -295,7 +295,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
 
@@ -316,7 +316,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     
     bool sendAdminSearchClientPacket(const QHostAddress &targetAddress, const QString &computerName, const QString &userName, const QString &workgroup, const QString &macAddress, const QString &ipAddress, const QString &osVersion, const QString &adminName){
@@ -358,7 +358,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendUpdateMSUserPasswordPacket(const QString &peerAddress, quint16 peerPort, const QString &workgroupName, const QString &adminName){
@@ -405,7 +405,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -454,7 +454,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -503,7 +503,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -528,7 +528,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir = "./"){
@@ -548,7 +548,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestDownloadFile(int socketID, const QString &remoteBaseDir, const QString &remoteFileName, const QString &localFileSaveDir){
@@ -568,7 +568,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool acceptFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QByteArray &fileMD5Sum, quint64 size, const QString &remoteFileSaveDir){
@@ -589,7 +589,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     bool denyFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QString &message){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
@@ -608,7 +608,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool responseFileUploadRequest(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
@@ -628,7 +628,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestFileData(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
@@ -648,7 +648,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendFileData(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray *data, const QByteArray *sha1){
@@ -670,7 +670,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool fileTXStatusChanged(int socketID, const QByteArray &fileMD5, quint8 status){
@@ -690,7 +690,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool fileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
@@ -710,7 +710,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
 
@@ -723,7 +723,7 @@ signals:
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
     //    void signalClientLookForServerPacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
-    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     //    void signalClientOnlinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
     //    void signalClientOfflinePacketReceived(const QHostAddress clientAddress, quint16 clientPort, const QString &clientName);
@@ -812,6 +812,7 @@ private:
 
     ResourcesManagerInstance *m_resourcesManager;
     UDPServer *m_udpServer;
+    RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
 
