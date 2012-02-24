@@ -140,14 +140,14 @@ public:
     bool isConnecting(UDTSOCKET socket);
     bool isSocketConnected(UDTSOCKET socket);
     bool isSocketBroken(UDTSOCKET socket);
+    bool isSocketExist(UDTSOCKET socket);
 
     QString getUDTListeningAddress();
     quint16 getUDTListeningPort();
     virtual QString getLastErrorMessage() const;
 
 signals:
-    void connected(const QHostAddress &address, quint16 port);
-    void connected(int socket);
+    void connected(int socket, const QString &address, quint16 port);
     void disconnected(int socket);
 
     void fileDataSent(int socket, const QString &filePath, qint64 offset, qint64 sizeSent, const QString &errorMessage);
