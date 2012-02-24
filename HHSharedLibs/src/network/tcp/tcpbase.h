@@ -43,8 +43,10 @@ public:
     bool isConnected(const QHostAddress & address, quint16 port);
     QAbstractSocket::SocketState socketState(int socketID);
     QAbstractSocket::SocketState socketState(const QHostAddress & address, quint16 port);
-    void socketPeerAddressInfo(int socketID, QHostAddress *peerAddress, quint16 *peerPort );
-    void socketLocalAddressInfo(int socketID, QHostAddress *localAddress, quint16 *localPort );
+//    void socketPeerAddressInfo(int socketID, QHostAddress *peerAddress, quint16 *peerPort );
+//    void socketLocalAddressInfo(int socketID, QHostAddress *localAddress, quint16 *localPort );
+    bool getAddressInfoFromSocket(int socketID, QString *address, quint16 *port, bool getPeerInfo = true);
+
     QString	socketErrorString (int socketID);
 
     bool sendData(int socketID, const QByteArray *byteArray);
@@ -53,7 +55,7 @@ public:
 
 signals:
     void connected (int socketID, const QString &peerAddress, quint16 peerPort);
-    void disconnected (int socketID, const QString &peerAddress, quint16 peerPort);
+    void disconnected (int socketID);
     void socketError(int socketID, QAbstractSocket::SocketError error);
 
 protected:

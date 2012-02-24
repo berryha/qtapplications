@@ -214,7 +214,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
     m_listening = true;
 
     getAddressInfoFromSocket(serverSocket, &m_serverAddress, &m_serverPort, false);
-    qDebug()<<QString("Server is ready on %1:%2. Listening socket ID:%3").arg(m_serverAddress).arg(m_serverPort).arg(serverSocket);
+    qDebug()<<QString("UDT Server is ready on %1:%2. Listening socket ID:%3").arg(m_serverAddress).arg(m_serverPort).arg(serverSocket);
 
 
     //Call startWaitingForIO() to wait for IO
@@ -477,7 +477,7 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
 
-    if(UDT::INVALID_SOCK == socket){
+    if( (UDT::INVALID_SOCK == socket) || (UDT::getsockstate(socket) == NONEXIST) ){
         return;
     }
 
@@ -829,7 +829,7 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
         return UDT::INVALID_SOCK;
     }
 
-    emit connected(peer);
+    emit connected(peer, QString::fromLocal8Bit(peerAddress), QString::fromLocal8Bit(peerPort).toUInt());
 
     return peer;
 
@@ -1134,6 +1134,10 @@ bool UDTProtocolBase::isSocketConnected(UDTSOCKET socket){
 
 bool UDTProtocolBase::isSocketBroken(UDTSOCKET socket){
     return (UDT::getsockstate(socket) == BROKEN) || (UDT::getsockstate(socket) == NONEXIST);
+}
+
+bool UDTProtocolBase::isSocketExist(UDTSOCKET socket){
+    return UDT::getsockstate(socket) != NONEXIST;
 }
 
 QString UDTProtocolBase::getUDTListeningAddress(){

@@ -213,39 +213,69 @@ QAbstractSocket::SocketState TCPBase::socketState(const QHostAddress & address, 
 
 }
 
-void TCPBase::socketPeerAddressInfo(int socketID, QHostAddress *peerAddress, quint16 *peerPort ){
+//void TCPBase::socketPeerAddressInfo(int socketID, QHostAddress *peerAddress, quint16 *peerPort ){
+
+//    QTcpSocket *socket = 0;
+//    {
+//        QMutexLocker locker(&mutex);
+//        socket = m_socketsHash.value(socketID);
+//    }
+//    if(!socket){return;}
+
+//    if(peerAddress){
+//        *peerAddress = socket->peerAddress();
+//    }
+//    if(peerPort){
+//        *peerPort = socket->peerPort();
+//    }
+
+//}
+
+//void TCPBase::socketLocalAddressInfo(int socketID, QHostAddress *localAddress, quint16 *localPort ){
+
+//    QTcpSocket *socket = 0;
+//    {
+//        QMutexLocker locker(&mutex);
+//        socket = m_socketsHash.value(socketID);
+//    }
+//    if(!socket){return;}
+
+//    if(localAddress){
+//        *localAddress = socket->localAddress();
+//    }
+//    if(localPort){
+//        *localPort = socket->localPort();
+//    }
+
+//}
+
+bool TCPBase::getAddressInfoFromSocket(int socketID, QString *address, quint16 *port, bool getPeerInfo){
 
     QTcpSocket *socket = 0;
     {
         QMutexLocker locker(&mutex);
         socket = m_socketsHash.value(socketID);
     }
-    if(!socket){return;}
+    if(!socket){return false;}
 
-    if(peerAddress){
-        *peerAddress = socket->peerAddress();
-    }
-    if(peerPort){
-        *peerPort = socket->peerPort();
+
+    if(getPeerInfo){
+        if(address){
+            *address = socket->peerAddress().toString();
+        }
+        if(port){
+            *port = socket->peerPort();
+        }
+    }else{
+        if(address){
+            *address = socket->localAddress().toString();
+        }
+        if(port){
+            *port = socket->localPort();
+        }
     }
 
-}
-
-void TCPBase::socketLocalAddressInfo(int socketID, QHostAddress *localAddress, quint16 *localPort ){
-
-    QTcpSocket *socket = 0;
-    {
-        QMutexLocker locker(&mutex);
-        socket = m_socketsHash.value(socketID);
-    }
-    if(!socket){return;}
-
-    if(localAddress){
-        *localAddress = socket->localAddress();
-    }
-    if(localPort){
-        *localPort = socket->localPort();
-    }
+    return true;
 
 }
 
@@ -323,7 +353,7 @@ void TCPBase::peerDisconnected (){
 
 
     qDebug()<<QString("Peer Disconnected! %1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
-    emit disconnected(socketID, socket->peerAddress().toString(), socket->peerPort());
+    emit disconnected(socketID);
 
 }
 
@@ -372,7 +402,7 @@ void TCPBase::setupNewSocket(QTcpSocket *socket){
 
 
 
-    qDebug()<<QString("Peer Connected! %1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
+    qDebug()<<QString("Peer %1:%2 connected via TCP! ").arg(socket->peerAddress().toString()).arg(socket->peerPort());
     emit connected(socketID, socket->peerAddress().toString(), socket->peerPort());
 
 }
