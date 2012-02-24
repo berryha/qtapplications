@@ -46,10 +46,14 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *manager, QObjec
     m_udpServer = m_resourcesManager->getUDPServer();
     Q_ASSERT_X(m_udpServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
 
-    m_udtProtocol = m_resourcesManager->getUDTProtocol();
-    Q_ASSERT_X(m_udtProtocol, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDTProtocol!");
 
-    m_tcpServer = m_resourcesManager->getTCPServer();
+    m_rtp = m_resourcesManager->getRTP();
+    Q_ASSERT(m_rtp);
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+    Q_ASSERT(m_udtProtocol);
+
+    m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
 
     connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
@@ -107,16 +111,16 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
 
         QString address = "";
-        quint16 port = 0;
+        quint16 udtPort = 0, tcpPort = 0;
         QString version = "";
         int serverInstanceID = 0;
-        in >> address >> port >> version >> serverInstanceID;
+        in >> address >> udtPort >> tcpPort >> version >> serverInstanceID;
         serverAddress = peerAddress;
-        serverUDTListeningPort = port;
+        serverUDTListeningPort = udtPort;
         serverName = peerName;
 
-        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverUDTListeningPort, serverName, version, serverInstanceID);
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress.toString()<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverUDTListeningPort;
+        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverUDTListeningPort, tcpPort, serverName, version, serverInstanceID);
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress.toString()<<" servername:"<<serverName <<" serverRUDPListeningPort:"<<serverUDTListeningPort << " serverTCPListeningPort:"<<tcpPort;
     }
     break;
     case quint8(MS::ServerOnline):

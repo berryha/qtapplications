@@ -48,13 +48,18 @@
 namespace HEHUI {
 
 
-BulletinBoardPacketsParser::BulletinBoardPacketsParser(UDTProtocol *udtProtocol, QObject *parent)
-    :QObject(parent), m_udtProtocol(udtProtocol)
+BulletinBoardPacketsParser::BulletinBoardPacketsParser(ResourcesManagerInstance *resourcesManager, QObject *parent)
+    :QObject(parent), m_resourcesManager(resourcesManager)
 {
 
-    Q_ASSERT_X(m_udtProtocol, "BulletinBoardPacketsParser::BulletinBoardPacketsParser(...)", "Invalid UDTProtocol!");
 
-    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+    m_rtp = m_resourcesManager->getRTP();
+    Q_ASSERT(m_rtp);
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+    Q_ASSERT(m_udtProtocol);
+
+   connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
 
 
 

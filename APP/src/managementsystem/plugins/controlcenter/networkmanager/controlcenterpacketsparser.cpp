@@ -57,16 +57,21 @@ ControlCenterPacketsParser::ControlCenterPacketsParser(ResourcesManagerInstance 
     m_udpServer = m_resourcesManager->getUDPServer();
     Q_ASSERT_X(m_udpServer, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDPServer!");
 
-    m_udtProtocol = m_resourcesManager->getUDTProtocol();
-    Q_ASSERT_X(m_udtProtocol, "ControlCenterPacketsParser::ControlCenterPacketsParser(...)", "Invalid UDTProtocol!");
 
-    m_tcpServer = m_resourcesManager->getTCPServer();
+
+    m_rtp = m_resourcesManager->getRTP();
+    Q_ASSERT(m_rtp);
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+    Q_ASSERT(m_udtProtocol);
+
+    m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
-
 
     connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
 
     serverAddress = QHostAddress::Null;
@@ -140,16 +145,16 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
     {
 
         QString address = "";
-        quint16 port = 0;
+        quint16 udtPort = 0, tcpPort = 0;
         QString version;
         int serverInstanceID = 0;
-        in >> address >> port >> version >> serverInstanceID;
+        in >> address >> udtPort >> tcpPort >> version >> serverInstanceID;
         serverAddress = peerAddress;
-        serverUDTListeningPort = port;
+        serverUDTListeningPort = udtPort;
         serverName = peerName;
-        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverUDTListeningPort, serverName, version, serverInstanceID);
+        emit signalServerDeclarePacketReceived(serverAddress.toString(), serverUDTListeningPort, tcpPort, serverName, version, serverInstanceID);
 
-        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverUDTListeningPort;
+        qDebug()<<"~~ServerDeclare"<<" serverAddress:"<<serverAddress<<" servername:"<<peerName <<" serverRUDPListeningPort:"<<serverUDTListeningPort<<" serverTCPListeningPort:"<<tcpPort;
     }
     break;
     //    case quint8(MS::ClientOnline):
@@ -293,7 +298,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         bool result = false;
         in >> result >> message;
         emit signalClientResponseAdminConnectionResultPacketReceived(socketID, peerName, result, message);
-        qDebug()<<"~~ClientResponseAdminConnectionResult";
+        qWarning()<<"~~ClientResponseAdminConnectionResult";
     }
     break;
     case quint8(MS::ClientMessage):

@@ -57,15 +57,20 @@ ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *manager, QObj
     m_udpServer = m_resourcesManager->getUDPServer();
     Q_ASSERT_X(m_udpServer, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
 
-    m_udtProtocol = m_resourcesManager->getUDTProtocol();
-    Q_ASSERT_X(m_udtProtocol, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid UDPServer!");
 
-    m_tcpServer = m_resourcesManager->getTCPServer();
+    m_rtp = m_resourcesManager->getRTP();
+    Q_ASSERT(m_rtp);
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+    Q_ASSERT(m_udtProtocol);
+
+    m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
 
     connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
 
     localUDTListeningAddress = m_udtProtocol->getUDTListeningAddress();

@@ -7,6 +7,7 @@
 #include <QSqlQueryModel>
 
 #include "ui_systemmanagementwidget.h"
+#include "../../sharedms/rtp.h"
 
 #include "networkmanager/controlcenterpacketsparser.h"
 
@@ -21,7 +22,7 @@ class SystemManagementWidget : public QWidget
     Q_OBJECT
 
 public:
-    SystemManagementWidget(UDTProtocol *udtProtocol, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", bool isJoinedToDomain = false, QWidget *parent = 0);
+    SystemManagementWidget(RTP *rtp, ControlCenterPacketsParser *parser, const QString &adminName, const QString &computerName, const QString &users, const QString &peerIPAddress, const QString &peerMACAddress, bool usbsdEnabled = false, bool programesEnabled = false, const QString &admins = "", bool isJoinedToDomain = false, QWidget *parent = 0);
     ~SystemManagementWidget();
 
 
@@ -33,7 +34,9 @@ signals:
     void requestRemoteAssistance();
 
 public slots:
-    void setUDTProtocol(UDTProtocol *udtProtocol);
+    void setRTP(RTP *rtp);
+//    void setUDTProtocol(UDTProtocol *udtProtocol);
+//    void setTCPServer(TCPServer *tcpServer);
     void setControlCenterPacketsParser(ControlCenterPacketsParser *parser);
 
 protected:
@@ -134,9 +137,14 @@ private:
 
     QSqlQueryModel *queryModel;
 
+    RTP *m_rtp;
+    int m_peerSocket;
+
     //UDPServer *m_udpServer;
-    UDTProtocol *m_udtProtocol;
-    UDTSOCKET m_peerSocket;
+//    UDTProtocol *m_udtProtocol;
+
+//    TCPServer *m_tcpServer;
+//    bool m_usingTCP;
 
 //    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
 //    UDTSOCKET m_peerFileTransmissionSocket;

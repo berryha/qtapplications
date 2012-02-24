@@ -105,6 +105,8 @@ private:
     ServerPacketsParser *serverPacketsParser;
 
     UDPServer *m_udpServer;
+    RTP *m_rtp;
+
     UDTProtocol *m_udtProtocol;
     //UDTSOCKET m_socketConnectedToAdmin;
     TCPServer *m_tcpServer;

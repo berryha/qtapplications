@@ -23,6 +23,7 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     updatePasswordWidget = 0;
     
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
+    m_rtp = 0;
     m_udtProtocol = 0;
     m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
 //    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
@@ -93,21 +94,23 @@ void BulletinBoardObject::startNetwork(){
 
     if(!m_udtProtocol){
         QString errorMessage = "";
-        m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, localUDTListeningPort, true, &errorMessage);
-        if(!m_udtProtocol){
-            QString error = tr("Can not start UDT listening on port %1! %2").arg(localUDTListeningPort).arg(errorMessage);
-            qCritical()<< error;
-            return;
-        }
+
+        m_rtp = resourcesManager->startRTP(QHostAddress::Any, localUDTListeningPort, true, &errorMessage);
+        m_udtProtocol = m_rtp->getUDTProtocol();
+//        if(!m_udtProtocol){
+//            QString error = tr("Can not start UDT listening on port %1! %2").arg(localUDTListeningPort).arg(errorMessage);
+//            qCritical()<< error;
+//            return;
+//        }
         localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
-        connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+//        connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
         m_udtProtocol->startWaitingForIOInOneThread(1000);
         //m_udtProtocol->startWaitingForIOInSeparateThread(1, 500);
 
     }
 
     if(!bulletinBoardPacketsParser){
-        bulletinBoardPacketsParser = new BulletinBoardPacketsParser(m_udtProtocol, this);
+        bulletinBoardPacketsParser = new BulletinBoardPacketsParser(resourcesManager, this);
 
         connect(bulletinBoardPacketsParser, SIGNAL(signalAdminRequestRemoteAssistancePacketReceived(const QString&, quint16, const QString&)), this, SLOT(adminRequestRemoteAssistancePacketReceived(const QString&, quint16, const QString&)), Qt::QueuedConnection);
         connect(bulletinBoardPacketsParser, SIGNAL(signalAdminInformUserNewPasswordPacketReceived(const QString&, quint16, const QString&, const QString&, const QString&)), this, SLOT(AdminInformUserNewPasswordPacketReceived(const QString&, quint16, const QString&, const QString&, const QString&)), Qt::QueuedConnection);

@@ -51,7 +51,7 @@ class BulletinBoardPacketsParser : public QObject{
     Q_OBJECT
 
 public:
-    BulletinBoardPacketsParser(UDTProtocol *udtProtocol, QObject *parent = 0);
+    BulletinBoardPacketsParser(ResourcesManagerInstance *resourcesManager, QObject *parent = 0);
     virtual ~BulletinBoardPacketsParser();
 
 
@@ -79,7 +79,7 @@ public slots:
         out << v;
 
         //return m_udtProtocol->sendUDTMessageData(socketID, &ba);
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
 //    void sendUserOfflinePacket(){
@@ -117,7 +117,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(adminSocketID, &ba);
+        return m_rtp->sendReliableData(adminSocketID, &ba);
     }
 
     bool sendNewPasswordRetrevedByUserPacket(int adminSocketID){
@@ -138,7 +138,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(adminSocketID, &ba);
+        return m_rtp->sendReliableData(adminSocketID, &ba);
     }
 
     
@@ -163,7 +163,7 @@ signals:
 private:
 
 
-
+    ResourcesManagerInstance *m_resourcesManager;
     PacketHandlerBase *m_packetHandlerBase;
     //NetworkManagerInstance *networkManager;
 
@@ -172,6 +172,7 @@ private:
     QString m_localComputerName;
     QString m_localID;
 
+    RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
 
 

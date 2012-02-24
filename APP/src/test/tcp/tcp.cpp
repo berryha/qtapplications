@@ -13,11 +13,11 @@ TCP::TCP(QObject *parent) :
 
 void TCP::processData(int socketID, QByteArray *data){
 
-    QHostAddress address;
+    QString address;
     quint16 port;
-    socketPeerAddressInfo(socketID, &address, &port);
+    getAddressInfoFromSocket(socketID, &address, &port);
 
-    emit dataReceived(address.toString(), port, data);
+    emit dataReceived(address, port, data);
 
 
 

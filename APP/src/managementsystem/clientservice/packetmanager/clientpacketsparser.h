@@ -108,7 +108,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -131,7 +131,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(adminSocketID, &ba);
+        return m_rtp->sendReliableData(adminSocketID, &ba);
 
     }
 
@@ -155,7 +155,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(adminSocketID, &ba);
+        return m_rtp->sendReliableData(adminSocketID, &ba);
 
     }
 
@@ -178,7 +178,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID ,&ba);
+        return m_rtp->sendReliableData(socketID ,&ba);
 
     }
 
@@ -224,7 +224,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendClientLogPacket(int socketID, const QString &users, quint8 logType, const QString &log){
@@ -248,7 +248,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendClientResponseClientDetailedInfoPacket(int socketID, const QString &systemInfoFilePath){
@@ -278,7 +278,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
 
     }
 
@@ -301,7 +301,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendClientMessagePacket(int adminSocketID, const QString &message, quint8 clientMessageType = quint8(MS::MSG_Information)){
@@ -323,7 +323,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(adminSocketID, &ba);
+        return m_rtp->sendReliableData(adminSocketID, &ba);
     }
 
     bool sendClientResponseUSBInfoPacket(int socketID, const QString &info){
@@ -345,7 +345,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendClientResponseProgramesInfoPacket(int socketID, const QString &info){
@@ -367,7 +367,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
 
@@ -391,7 +391,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(userSocketID, &ba);
+        return m_rtp->sendReliableData(userSocketID, &ba);
     }
     
     void requestRemoteAssistance(const QString &adminAddress, quint16 adminPort, const QString &adminName){
@@ -421,7 +421,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(userSocketID, &ba);
+        return m_rtp->sendReliableData(userSocketID, &ba);
     }
 
 
@@ -451,7 +451,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     
     void sendAnnouncement(const QString &adminName, quint32 announcementID, const QString &announcement){
@@ -482,7 +482,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(userSocketID, &ba);
+        return m_rtp->sendReliableData(userSocketID, &ba);
     }
 
 
@@ -505,7 +505,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestUploadFile(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &remoteFileSaveDir = ""){
@@ -525,7 +525,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestDownloadFile(int socketID, const QString &remoteBaseDir, const QString &remoteFileName, const QString &localFileSaveDir){
@@ -545,7 +545,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool acceptFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QByteArray &fileMD5Sum, quint64 size, const QString &remoteFileSaveDir){
@@ -565,7 +565,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     bool denyFileDownloadRequest(int socketID, const QString &fileName, bool accepted, const QString &message){
         Packet *packet = PacketHandlerBase::getPacket(socketID);
@@ -584,7 +584,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool responseFileUploadRequest(int socketID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
@@ -604,7 +604,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool requestFileData(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
@@ -626,7 +626,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool sendFileData(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray *data, const QByteArray *sha1){
@@ -646,7 +646,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     
     bool fileTXStatusChanged(int socketID, const QByteArray &fileMD5, quint8 status){
@@ -666,7 +666,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
 
     bool fileTXError(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
@@ -686,7 +686,7 @@ public slots:
         v.setValue(*packet);
         out << v;
 
-        return m_udtProtocol->sendData(socketID, &ba);
+        return m_rtp->sendReliableData(socketID, &ba);
     }
     
 private slots:
@@ -696,7 +696,7 @@ signals:
     void  signalHeartbeatPacketReceived(const QString &computerName);
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
-    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverUDTListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void signalServerDeclarePacketReceived(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     void signalServerOnlinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
     void signalServerOfflinePacketReceived(const QHostAddress serverAddress, quint16 serverPort, const QString &serverName);
@@ -758,7 +758,10 @@ private:
     QString m_localComputerName;
 
     ClientResourcesManager *m_resourcesManager;
+
     UDPServer *m_udpServer;
+
+    RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
 

@@ -49,7 +49,7 @@ signals:
 private slots:
     bool startMainService();
 
-    void serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
+    void serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     void processServerRequestClientInfoPacket(const QString &groupName, const QString &computerName, const QString &userName/*, const QString &address*/);
 
@@ -154,12 +154,13 @@ private:
     ClientPacketsParser *clientPacketsParser;
 
     UDPServer *m_udpServer;
-    UDTProtocol *m_udtProtocol;
-    UDTSOCKET m_socketConnectedToServer;
-    UDTSOCKET m_socketConnectedToAdmin;
-    UDTSOCKET peerSocketThatRequiresDetailedInfo;
+    RTP *m_rtp;
 
-    TCPServer *m_tcpServer;
+    UDTProtocol *m_udtProtocol;
+    int m_socketConnectedToServer;
+    int m_socketConnectedToAdmin;
+    int peerSocketThatRequiresDetailedInfo;
+
 
     UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
 
@@ -198,6 +199,7 @@ private:
 
     QHostAddress m_serverAddress;
     quint16 m_serverUDTListeningPort;
+
     QString m_serverName;
     int m_serverInstanceID;
 

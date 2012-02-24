@@ -60,8 +60,8 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
     serverPacketsParser = 0;
 
     m_udpServer = 0;
+    m_rtp = 0;
     m_udtProtocol = 0;
-    m_tcpServer = 0;
 
     databaseUtility = 0;
     query = 0;
@@ -144,36 +144,24 @@ bool ServerService::startMainService(){
         qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
     }
 
-//    m_udtProtocol = resourcesManager->startUDTServer(QHostAddress::Any, UDT_LISTENING_PORT);
+
+    m_rtp = resourcesManager->startRTP(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+    m_udtProtocol = m_rtp->getUDTProtocol();
+
 //    if(!m_udtProtocol){
-//        QString msg = QString("Can not start UDT listening on port '%1'!").arg(UDT_LISTENING_PORT);
-//        logMessage(msg, QtServiceBase::Error);
-//        qCritical()<<msg;
+//        QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
+//        logMessage(error, QtServiceBase::Error);
 //        return false;
 //    }else{
-//        //qWarning()<<QString("UDT listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
+//        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
 //    }
 //    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-//    m_udtProtocol->startWaitingForIO(1);
-
-    m_udtProtocol = resourcesManager->startUDTProtocol(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
-    if(!m_udtProtocol){
-        QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
-        logMessage(error, QtServiceBase::Error);
-        return false;
-    }else{
-        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
-    }
-    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
     m_udtProtocol->startWaitingForIOInOneThread(50);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
-    m_tcpServer = resourcesManager->startTCPServer(QHostAddress::Any, TCP_LISTENING_PORT, true, &errorMessage);
-    if(!m_tcpServer){
-        logMessage(QString("Can not start TCP listening on port %1! %2").arg(TCP_LISTENING_PORT).arg(errorMessage), QtServiceBase::Error);
-    }else{
-        qWarning()<<QString("TCP listening on port %1!").arg(TCP_LISTENING_PORT);
-    }
+
 
     serverPacketsParser = new ServerPacketsParser(resourcesManager, this);
     //connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), clientPacketsParser, SLOT(parseIncomingPacketData(Packet*)));
