@@ -36,13 +36,13 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
 
     ui.setupUi(this);
 
-    computerName = QHostInfo::localHostName().toLower();
-    ui.lineEditComputerName->setText(computerName.toUpper());
+    m_computerName = QHostInfo::localHostName().toLower();
+    ui.lineEditComputerName->setText(m_computerName.toUpper());
 
     ui.comboBoxLocation->addItem(tr("Dong Guan"), "dg");
     ui.comboBoxLocation->addItem(tr("Ying De"), "yd");
     ui.comboBoxLocation->addItem(tr("Hong Kong"), "hk");
-    QString location = computerName.left(2).toLower();
+    QString location = m_computerName.left(2).toLower();
     if("yd" == location){
         ui.comboBoxLocation->setCurrentIndex(1);
     }else if("hk" == location){
@@ -74,7 +74,7 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
         departments.insert("sp", tr("Shop"));
         departments.insert("wh", tr("WHouse"));
     }
-    QString department = computerName.mid(2, 2).toLower();
+    QString department = m_computerName.mid(2, 2).toLower();
     foreach (QString key, departments.keys()) {
         ui.comboBoxDepartment->addItem(departments.value(key), key);
     }
@@ -85,7 +85,7 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
         }
     }
 
-    int sn = computerName.right(5).toInt();
+    int sn = m_computerName.right(5).toInt();
     ui.spinBoxSN->setValue(sn);
 
 
@@ -417,7 +417,7 @@ void SystemInfo::slotReadReport(){
 
     ui.osVersionLineEdit->setText(os);
     ui.installationDateLineEdit->setText(installationDate);
-    ui.computerNameLineEdit->setText(computerName);
+    ui.computerNameLineEdit->setText(m_computerName);
     ui.workgroupLineEdit->setText(workgroup);
 
     ui.logicalDrivesComboBox->clear();
@@ -554,7 +554,7 @@ void SystemInfo::slotUploadSystemInfo(){
     query.bindValue(":OS", os);
     query.bindValue(":InstallationDate", installationDate);
     query.bindValue(":Workgroup", workgroup);
-    query.bindValue(":ComputerName", computerName);
+    query.bindValue(":ComputerName", m_computerName);
     query.bindValue(":WindowsDir", windowsDir);
     query.bindValue(":DrivesInfo", drivesInfo.join(";*;"));
     query.bindValue(":UserName", userName);
@@ -766,7 +766,7 @@ void SystemInfo::slotQuerySystemInfo(){
     }
     queryModel->clear();
 
-    QString queryString = QString("SELECT s.OS, s.Workgroup, s.Users, d.* FROM summaryinfo s, detailedinfo d WHERE s.ComputerName = '%1' AND d.ComputerName = '%1' ").arg(computerName);
+    QString queryString = QString("SELECT s.OS, s.Workgroup, s.Users, d.* FROM summaryinfo s, detailedinfo d WHERE s.ComputerName = '%1' AND d.ComputerName = '%1' ").arg(m_computerName);
     queryModel->setQuery(QSqlQuery(queryString, db));
     QApplication::restoreOverrideCursor();
 
@@ -795,7 +795,7 @@ void SystemInfo::slotQuerySystemInfo(){
 
     ui.osVersionLineEdit->setText(record.value("OS").toString());
     ui.installationDateLineEdit->setText(record.value("InstallationDate").toString());
-    ui.computerNameLineEdit->setText(computerName);
+    ui.computerNameLineEdit->setText(m_computerName);
     ui.workgroupLineEdit->setText(record.value("Workgroup").toString());
 
     QStringList storageInfo = record.value("Storage").toString().split("|");
@@ -924,7 +924,7 @@ void SystemInfo::slotResetAllInfo()
     os.clear();
     installationDate.clear();;
     workgroup.clear();
-    computerName.clear();
+    m_computerName.clear();
     windowsDir.clear();
 
     drivesInfo.clear();
@@ -1029,7 +1029,7 @@ void SystemInfo::slotGetAllInfo()
     os = ui.osVersionLineEdit->text();
     installationDate = ui.installationDateLineEdit->text();
     workgroup = ui.workgroupLineEdit->text();
-    computerName = ui.computerNameLineEdit->text();
+    m_computerName = ui.computerNameLineEdit->text();
     //windowsDir = ;
 
     drivesInfo.clear();

@@ -72,6 +72,8 @@ private:
 private:
     Ui::SystemInfoMainWindowUI ui;
 
+    QString m_computerName;
+
     static bool running;
     static qint64 failedFilesTotalSize;
 
@@ -87,56 +89,6 @@ private:
 
     QProcess *process;
     QString m_systemInfoFilePath;
-
-    //OS Info
-    QString os;
-    QString installationDate;
-    QString workgroup;
-    QString computerName;
-    QString windowsDir;
-
-    QStringList drivesInfo;
-
-    QStringList usersInfo;
-
-
-    //User Info
-    QString userName;
-    bool isAdmin;
-    QString myDocuments;
-
-    QString emailStoreRoot;
-    int emailFolderSize;
-    QString biggestDBXFile;
-
-    int tempDirSize;
-    int ieTempDirSize;
-
-    //Devices Info
-    QString cpu;
-    QString dmiUUID;
-    QString motherboardName;
-    QString chipset;
-    QString memory;
-
-    QString video;
-    QString monitor;
-    QString audio;
-    QString partitionsTotalSize;
-
-    QStringList network1Info;
-    QStringList network2Info;
-
-    //Other Info
-    QString pNo;
-    QString remark;
-    QString dept;
-    QString area;
-
-    QDate motherboardMDate;
-    QDate monitorMDate;
-
-    QString serviceNumber;
 
     bool recordExists;
 
