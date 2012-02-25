@@ -563,7 +563,7 @@ An error occured while connecting to network printer &apos;%1&apos;! Error code:
 </phrase>
 <phrase>
     <source>&amp;Load</source>
-    <target>加载(&amp;L)</target>
+    <target>r</target>
 </phrase>
 <phrase>
     <source>&amp;Unload</source>
@@ -1482,10 +1482,6 @@ Failed to get NetBIOS name! Error Code: %1</source>
     <target>错误！无法发送文件！ %1</target>
 </phrase>
 <phrase>
-    <source>Request uploading file %1</source>
-    <target>无法上传设施 %1</target>
-</phrase>
-<phrase>
     <source>Error! Can not send file download request! %1</source>
     <target>错误！无法发送下载请求！ %1</target>
 </phrase>
@@ -1676,5 +1672,9 @@ Failed to get NetBIOS name! Error Code: %1</source>
 <phrase>
     <source>Auto Logon</source>
     <target>自动登陆</target>
+</phrase>
+<phrase>
+    <source>Request uploading file %1</source>
+    <target>请求上传文件 %1</target>
 </phrase>
 </QPH>
