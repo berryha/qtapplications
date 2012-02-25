@@ -932,7 +932,7 @@
     <message>
         <location filename="plugins/controlcenter/filemanagement/filemanagement.cpp" line="871"/>
         <source>Request uploading file %1</source>
-        <translation>无法上传设施 %1</translation>
+        <translation>请求上传文件 %1</translation>
     </message>
     <message>
         <location filename="plugins/controlcenter/filemanagement/filemanagement.cpp" line="895"/>

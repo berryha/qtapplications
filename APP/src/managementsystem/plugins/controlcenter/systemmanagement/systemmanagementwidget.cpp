@@ -208,6 +208,8 @@ SystemManagementWidget::SystemManagementWidget(RTP *rtp, ControlCenterPacketsPar
     setRTP(rtp);
     m_peerSocket = INVALID_SOCK_ID;
 
+    m_aboutToCloseSocket = false;
+
 
 //    m_udtProtocol = 0;
 //    setUDTProtocol(udtProtocol);
@@ -318,6 +320,7 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
         queryModel = 0;
     }
 
+    m_aboutToCloseSocket = true;
     m_rtp->closeSocket(m_peerSocket);
     m_peerSocket = INVALID_SOCK_ID;
 
@@ -1488,7 +1491,7 @@ void SystemManagementWidget::peerDisconnected(int socketID){
         return;
     }
 
-    peerDisconnected(false);
+    peerDisconnected(m_aboutToCloseSocket);
 
 }
 
