@@ -30,10 +30,10 @@ void TCPServer::processData(int socketID, QByteArray *data){
     QVariant v;
     in >> v;
     if (v.canConvert<Packet>()){
-        Packet *packet = PacketHandlerBase::getPacket(socketID);
+        Packet *packet = PacketHandlerBase::getPacket();
         *packet = v.value<Packet>();
         packet->setTransmissionProtocol(TP_UDT);
-        //packet->setSocketID(socketID);
+        packet->setSocketID(socketID);
 
 
         packet->setPeerHostAddress(QHostAddress(address));

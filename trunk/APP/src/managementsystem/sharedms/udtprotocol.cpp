@@ -54,7 +54,7 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
     QVariant v;
     in >> v;
     if (v.canConvert<Packet>()){
-        Packet *packet = PacketHandlerBase::getPacket(socket);
+        Packet *packet = PacketHandlerBase::getPacket();
         *packet = v.value<Packet>();
         packet->setTransmissionProtocol(TP_UDT);
         packet->setSocketID(socket);
