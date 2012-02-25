@@ -23,9 +23,11 @@ public:
 
     UDTProtocol * getUDTProtocol(){return m_udtProtocol;}
     UDTProtocol * startUDTProtocol(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
+    quint16 getUDTServerPort();
 
     TCPServer * getTCPServer(){return m_tcpServer;}
     TCPServer * startTCPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true, QString *errorMessage = 0);
+    quint16 getTCPServerPort();
 
     int connectToHost ( const QHostAddress &hostAddress, quint16 port, int waitMsecs = 0, QString *errorMessage = 0);
     void closeSocket(int socketID);
@@ -45,6 +47,7 @@ public slots:
 
 
 private:
+
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
 

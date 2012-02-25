@@ -62,7 +62,7 @@ public slots:
 
         qsrand(QDateTime::currentDateTime().toTime_t());
         static int serverInstanceID = qrand();
-        qDebug()<<"Server Instance ID:"<<serverInstanceID;
+        //qDebug()<<"Server Instance ID:"<<serverInstanceID;
 
         Packet *packet = PacketHandlerBase::getPacket();
 

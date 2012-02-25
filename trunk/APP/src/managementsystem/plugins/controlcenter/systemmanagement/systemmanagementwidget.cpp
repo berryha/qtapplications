@@ -463,7 +463,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     QString errorMessage;
     if(m_peerSocket == INVALID_SOCK_ID){
-        m_peerSocket = m_rtp->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 10000, &errorMessage);
+        m_peerSocket = m_rtp->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 5000, &errorMessage);
     }
     if(m_peerSocket == INVALID_SOCK_ID){
         QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(errorMessage));

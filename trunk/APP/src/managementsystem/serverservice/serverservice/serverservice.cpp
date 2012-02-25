@@ -823,7 +823,7 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
 
     }else{
         clientSocketsHash.remove(socketID);
-        m_udtProtocol->closeSocket(socketID);
+        m_rtp->closeSocket(socketID);
     }
 
     ClientInfo *info = 0;
@@ -851,7 +851,7 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
     }
 
     qWarning();
-    qWarning()<<QString("Client '%1' From %2:%3 %4 ! Time:%5").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+    qWarning()<<QString("Client '%1' From %2:%3 %4 via %5! Time:%6").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(m_rtp->isUDTSocket(socketID)?"UDT":"TCP").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
     qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 
@@ -862,8 +862,8 @@ void ServerService::processAdminOnlineStatusChangedPacket(int socketID, const QS
     QString ip = "";
     quint16 port = 0;
 
-    if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
-        qCritical()<<m_udtProtocol->getLastErrorMessage();
+    if(!m_rtp->getAddressInfoFromSocket(socketID, &ip, &port)){
+        qCritical()<<m_rtp->lastErrorString();
 
         return;
     }
@@ -901,7 +901,7 @@ void ServerService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 
 void ServerService::peerDisconnected(int socketID){
 
-    m_udtProtocol->closeSocket(socketID);
+    m_rtp->closeSocket(socketID);
 
     if(clientSocketsHash.contains(socketID)){
         QString address = "Unknown Address";
@@ -1062,8 +1062,8 @@ void ServerService::stop()
     if(m_udpServer){
         m_udpServer->close();
     }
-    if(m_udtProtocol){
-        m_udtProtocol->closeUDTProtocol();
+    if(m_rtp){
+        m_rtp->stopServers();
     }
 
 }
