@@ -140,6 +140,8 @@ private:
     RTP *m_rtp;
     int m_peerSocket;
 
+    bool m_aboutToCloseSocket;
+
     //UDPServer *m_udpServer;
 //    UDTProtocol *m_udtProtocol;
 

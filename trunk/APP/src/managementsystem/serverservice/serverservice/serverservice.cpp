@@ -808,8 +808,8 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
 
     if(online){
 
-        if(!m_udtProtocol->getAddressInfoFromSocket(socketID, &ip, &port)){
-            qCritical()<<m_udtProtocol->getLastErrorMessage();
+        if(!m_rtp->getAddressInfoFromSocket(socketID, &ip, &port)){
+            qCritical()<<m_rtp->lastErrorString();
             return;
         }
 

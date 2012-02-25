@@ -489,6 +489,7 @@ FileManagement::~FileManagement(){
     }
 
     if(m_fileManager){
+        m_fileManager->exit();
         delete m_fileManager;
         m_fileManager = 0;
     }

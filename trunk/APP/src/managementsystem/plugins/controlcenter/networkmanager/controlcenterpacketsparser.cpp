@@ -298,7 +298,7 @@ void ControlCenterPacketsParser::parseIncomingPacketData(Packet *packet){
         bool result = false;
         in >> result >> message;
         emit signalClientResponseAdminConnectionResultPacketReceived(socketID, peerName, result, message);
-        qWarning()<<"~~ClientResponseAdminConnectionResult";
+        qDebug()<<"~~ClientResponseAdminConnectionResult";
     }
     break;
     case quint8(MS::ClientMessage):

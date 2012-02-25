@@ -932,7 +932,7 @@
     <message>
         <location filename="plugins/controlcenter/filemanagement/filemanagement.cpp" line="871"/>
         <source>Request uploading file %1</source>
-        <translation>無法上傳設施 %1</translation>
+        <translation>請求上傳文件 %1</translation>
     </message>
     <message>
         <location filename="plugins/controlcenter/filemanagement/filemanagement.cpp" line="895"/>
@@ -1200,7 +1200,7 @@
         <location filename="plugins/controlcenter/systemmanagement/systemmanagementwidget.cpp" line="74"/>
         <location filename="plugins/controlcenter/systemmanagement/systemmanagementwidget.cpp" line="1129"/>
         <source>Unjoin The Domain</source>
-        <translation>結束域</translation>
+        <translation>退出域</translation>
     </message>
     <message>
         <location filename="plugins/controlcenter/systemmanagement/systemmanagementwidget.cpp" line="77"/>
