@@ -38,7 +38,7 @@ public:
     int connectToHost ( const QString & hostName, quint16 port, int waitMsecs = 0);
     int connectToHost ( const QHostAddress & address, quint16 port, int waitMsecs = 0);
     void disconnectFromHost (int socketID, int waitMsecs = 0);
-    void closeSocket(int socketID);
+    void abort(int socketID);
     bool isConnected(int socketID);
     bool isConnected(const QHostAddress & address, quint16 port);
     QAbstractSocket::SocketState socketState(int socketID);

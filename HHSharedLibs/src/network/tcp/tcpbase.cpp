@@ -150,7 +150,7 @@ void TCPBase::disconnectFromHost (int socketID, int waitMsecs){
 
 }
 
-void TCPBase::closeSocket(int socketID){
+void TCPBase::abort(int socketID){
 
     QMutexLocker locker(&mutex);
     QTcpSocket *socket = m_socketsHash.take(socketID);
@@ -158,7 +158,7 @@ void TCPBase::closeSocket(int socketID){
         return;
     }
 
-    socket->close();
+    socket->abort();
     delete socket;
     socket = 0;
 
@@ -295,7 +295,7 @@ QString	TCPBase::socketErrorString (int socketID){
 }
 
 bool TCPBase::sendData(int socketID, const QByteArray *byteArray){
-    qDebug()<<"--TCPBase::sendData(...) "<<" byteArray->size():"<<byteArray->size();
+    qDebug()<<"--TCPBase::sendData(...) "<<"socketID:"<< "byteArray->size():"<<byteArray->size();
 
     QTcpSocket *socket = 0;
     {
@@ -303,6 +303,7 @@ bool TCPBase::sendData(int socketID, const QByteArray *byteArray){
         socket = m_socketsHash.value(socketID);
     }
     if(!socket){return false;}
+    qDebug()<<"peerAddress:"<<socket->peerAddress()<<":"<<socket->peerPort();
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -431,6 +432,7 @@ void TCPBase::slotProcessSocketReadyRead() {
 }
 
 void TCPBase::readSocketdData(int socketID, QTcpSocket *socket){
+    qDebug()<<"--TCPBase::readSocketdData(...) "<<" socketID:"<<socketID<<" peerAddress:"<<socket->peerAddress().toString();
 
     Q_ASSERT(socketID > 0);
     Q_ASSERT(socket);
