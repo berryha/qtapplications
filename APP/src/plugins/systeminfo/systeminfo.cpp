@@ -13,7 +13,7 @@
 
 #include "./systeminfo.h"
 #include "HHSharedCore/hglobal_core.h"
-
+#include "HHSharedWindowsManagement/hwindowsmanagement.h"
 
 
 #ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
@@ -24,14 +24,18 @@
 #define MYSQL_DB_CONNECTION_NAME "200.200.200.17/sitoycomputers/systeminfo"
 #endif
 
+#ifndef REMOTE_SITOY_ASSETS_DB_NAME
+#define REMOTE_SITOY_ASSETS_DB_NAME "sitoyassets"
+#endif
+
 
 namespace HEHUI {
 
 bool SystemInfo::running = false;
-qint64 SystemInfo::failedFilesTotalSize = 0;
+QMap<QString/*Short Name*/, QString/*Department*/> SystemInfo::departments = QMap<QString, QString>();
 
-SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
-        QMainWindow(parent), isYDAdmin(isYDAdmin)
+SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent)
+    :QMainWindow(parent), isYDAdmin(isYDAdmin)
 {
 
     ui.setupUi(this);
@@ -335,6 +339,7 @@ void SystemInfo::slotScanSystem() {
 
 void SystemInfo::slotScannerExit( int exitCode, QProcess::ExitStatus exitStatus){
     if((exitCode != 0) || (exitStatus == QProcess::CrashExit)){
+        QMessageBox::critical(this, tr("Error"), tr("Scanner Error!"));
         return;
     }
 
@@ -366,25 +371,25 @@ void SystemInfo::slotReadReport(){
 
     systemInfo.beginGroup("DevicesInfo");
 
-    QString cpu = systemInfo.value("CPU").toString();
-    QString memory = systemInfo.value("Memory").toString();
-    QString motherboardName = systemInfo.value("MotherboardName").toString();
-    QString dmiUUID = systemInfo.value("DMIUUID").toString();
-    QString chipset = systemInfo.value("Chipset").toString();
-    QString video = systemInfo.value("Video").toString();
-    QString monitor = systemInfo.value("Monitor").toString();
-    QString audio = systemInfo.value("Audio").toString();
-    QString partitionsTotalSize = systemInfo.value("PartitionsTotalSize").toString();
+    cpu = systemInfo.value("CPU").toString();
+    memory = systemInfo.value("Memory").toString();
+    motherboardName = systemInfo.value("MotherboardName").toString();
+    dmiUUID = systemInfo.value("DMIUUID").toString();
+    chipset = systemInfo.value("Chipset").toString();
+    video = systemInfo.value("Video").toString();
+    monitor = systemInfo.value("Monitor").toString();
+    audio = systemInfo.value("Audio").toString();
+    audio.replace("'", "\\'");
 
-    QString adapter1Name = systemInfo.value("Adapter1Name").toString();
-    QString adapter1HDAddress = systemInfo.value("Adapter1HDAddress").toString();
-    QString adapter1IPAddress = systemInfo.value("Adapter1IPAddress").toString();
-    //network1Info<<adapter1Name<<adapter1HDAddress<<adapter1IPAddress;
+    adapter1Name = systemInfo.value("Adapter1Name").toString();
+    adapter1HDAddress = systemInfo.value("Adapter1HDAddress").toString();
+    adapter1IPAddress = systemInfo.value("Adapter1IPAddress").toString();
+    nic1Info = adapter1Name + "|" + adapter1HDAddress + "|" + adapter1IPAddress;
 
-    QString adapter2Name = systemInfo.value("Adapter2Name").toString();
-    QString adapter2HDAddress = systemInfo.value("Adapter2HDAddress").toString();
-    QString adapter2IPAddress = systemInfo.value("Adapter2IPAddress").toString();
-    //network2Info<<adapter2Name<<adapter2HDAddress<<adapter2IPAddress;
+    adapter2Name = systemInfo.value("Adapter2Name").toString();
+    adapter2HDAddress = systemInfo.value("Adapter2HDAddress").toString();
+    adapter2IPAddress = systemInfo.value("Adapter2IPAddress").toString();
+    nic2Info = adapter2Name + "|" + adapter2HDAddress + "|" + adapter2IPAddress;
 
     systemInfo.endGroup();
 
@@ -421,7 +426,7 @@ void SystemInfo::slotReadReport(){
     ui.workgroupLineEdit->setText(workgroup);
 
     ui.logicalDrivesComboBox->clear();
-    QStringList drivesInfo;
+    drivesInfo.clear();
     for (int i = 1; i < 10; i++) {
         QString logicalDrivesKey,driveInfo;
         logicalDrivesKey = QString("Partition" + QString::number(i));
@@ -433,6 +438,7 @@ void SystemInfo::slotReadReport(){
         drivesInfo.append(driveInfo);
         ui.logicalDrivesComboBox->addItem(driveInfo);
     }
+    storagesInfo = drivesInfo.join(" | ");
     systemInfo.endGroup();
 
     systemInfo.beginGroup("Users");
@@ -448,6 +454,7 @@ void SystemInfo::slotReadReport(){
         usersInfo.append(userInfo);
         ui.comboBoxSystemUsers->addItem(userInfo);
     }
+    m_users = usersInfo.join(" | ");
     systemInfo.endGroup();
 
     ui.osGroupBox->setEnabled(true);
@@ -460,16 +467,16 @@ void SystemInfo::slotReadReport(){
     systemInfo.endGroup();
 
     systemInfo.beginGroup("InstalledSoftwareInfo");
-    QStringList infoList;
+    softwares.clear();
     for(int k = 1; k < 400; k++){
         QString info = systemInfo.value(QString::number(k)).toString();
         if(info.isEmpty()){break;}
-        infoList.append(info);
+        softwares.append(info);
     }
-    int rowCount = infoList.size();
+    int rowCount = softwares.size();
     ui.tableWidgetSoftware->setRowCount(rowCount);
     for(int m=0; m<rowCount; m++){
-        QStringList info = infoList.at(m).split(" | ");
+        QStringList info = softwares.at(m).split(" | ");
         if(info.size() != 5){break;}
         for(int n=0; n<5; n++){
             ui.tableWidgetSoftware->setItem(m, n, new QTableWidgetItem(info.at(n)));
@@ -515,7 +522,7 @@ void SystemInfo::slotUploadSystemInfo(){
                              REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
                              REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
                              REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                             "sitoyassets",
+                             REMOTE_SITOY_ASSETS_DB_NAME,
                              HEHUI::MYSQL
                              )){
         QApplication::restoreOverrideCursor();
@@ -533,52 +540,53 @@ void SystemInfo::slotUploadSystemInfo(){
 
     if(recordExists){
         QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, tr("Record Already Exists!"), tr("Record '%1' Already Exists!<br>Update it?").arg(pNo),
-                                      QMessageBox::Yes | QMessageBox::No);
+        reply = QMessageBox::question(this, tr("Record Already Exists!"), tr("Record Already Exists!<br>Update it?"), QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::No) {
             return;
         }
 
-        query.prepare(QString("UPDATE systeminfo SET OS = :OS, InstallationDate = :InstallationDate, Workgroup = :Workgroup, ComputerName = :ComputerName, WindowsDir = :WindowsDir, DrivesInfo = :DrivesInfo, UserName = :UserName, IsAdmin = :IsAdmin, MyDocuments = :MyDocuments, EmailStoreRoot = :EmailStoreRoot,"
-                              "CPU = :CPU, DMIUUID = :DMIUUID, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Video = :Video, Monitor = :Monitor, Audio = :Audio, Network1 = :Network1, Network2 = :Network2, Remark = :Remark, PropertyNO = :PropertyNO, Dept = :Dept, Location = :Location, MotherboardMDate = :MotherboardMDate, MonitorMDate = :MonitorMDate, SystemUsers = :SystemUsers, ServiceNumber = :ServiceNumber "
-                              " WHERE PropertyNO LIKE '%1'").arg(pNo));
+        query.prepare(QString("UPDATE assetsinfo SET Workgroup = :Workgroup, Users = :Users, OS = :OS, SN = :SN, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber，Registrant = :Registrant, "
+                              "InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
+                              "NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = :UpdateTime, Remark = :Remark"
+                              " WHERE ComputerName ＝ '%1'").arg(m_computerName));
 
     }else{
-        query.prepare("INSERT INTO systeminfo (OS, InstallationDate, Workgroup, ComputerName, WindowsDir, DrivesInfo, UserName, IsAdmin, MyDocuments, EmailStoreRoot, CPU, DMIUUID, MotherboardName, Chipset ,Memory, Video, Monitor, Audio, Network1, Network2, Remark, PropertyNO, Dept, Location, MotherboardMDate, MonitorMDate, SystemUsers, ServiceNumber) "
-                      "VALUES (:OS, :InstallationDate, :Workgroup, :ComputerName, :WindowsDir, :DrivesInfo, :UserName, :IsAdmin, :MyDocuments, :EmailStoreRoot, :CPU, :DMIUUID, :MotherboardName, :Chipset , :Memory, :Video, :Monitor, :Audio, :Network1, :Network2, :Remark, :PropertyNO, :Dept, :Location, :MotherboardMDate, :MonitorMDate, :SystemUsers, :ServiceNumber)");
+        query.prepare("INSERT INTO assetsinfo (ComputerName, Workgroup, Users, OS, SN, Vender, Warranty, ServiceNumber, Registrant, "
+                      "InstallationDate, OSKey, CPU, MotherboardName, Chipset, Memory, Storage, Video, Audio, NIC1, NIC2, Monitor, "
+                      "UpdateTime, Remark)"
+                      "VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :Warranty, :ServiceNumber, :Registrant, "
+                      ":InstallationDate, :OSKey, :CPU, :MotherboardName, :Chipset, :Memory, :Storage, :Video, :Audio, :NIC1, :NIC2, :Monitor, "
+                      ":UpdateTime, :Remark"
+                      ")"
+
+                      );
 
     }
 
-    //	     query.prepare("INSERT INTO systeminfo (OS, InstallationDate, Workgroup, ComputerName, WindowsDir, DrivesInfo, UserName, IsAdmin, MyDocuments, EmailStoreRoot, CPU, DMIUUID, MotherboardName, Chipset ,Memory, Video, Monitor, Audio, Network1, Network2, Remark, PropertyNO, Dept, Location) "
-    //	                   "VALUES (:OS, :InstallationDate, :Workgroup, :ComputerName, :WindowsDir, :DrivesInfo, :UserName, :IsAdmin, :MyDocuments, :EmailStoreRoot, :CPU, :DMIUUID, :MotherboardName, :Chipset , :Memory, :Video, :Monitor, :Audio, :Network1, :Network2, :Remark, :PropertyNO, :Dept, :Location)");
-    query.bindValue(":OS", os);
-    query.bindValue(":InstallationDate", installationDate);
-    query.bindValue(":Workgroup", workgroup);
     query.bindValue(":ComputerName", m_computerName);
-    query.bindValue(":WindowsDir", windowsDir);
-    query.bindValue(":DrivesInfo", drivesInfo.join(";*;"));
-    query.bindValue(":UserName", userName);
-    query.bindValue(":IsAdmin", (isAdmin?"1":"0"));
-    query.bindValue(":MyDocuments", myDocuments);
-    query.bindValue(":EmailStoreRoot", emailStoreRoot);
+    query.bindValue(":Workgroup", m_workgroup);
+    query.bindValue(":Users", m_users);
+    query.bindValue(":OS", m_os);
+    query.bindValue(":SN", sn);
+    query.bindValue(":Vender", vender);
+    query.bindValue(":Warranty", warranty);
+    query.bindValue(":ServiceNumber", serviceNumber);
+    query.bindValue(":Registrant", registrant);
+
+    query.bindValue(":InstallationDate", installationDate);
+    query.bindValue(":OSKey", osKey);
     query.bindValue(":CPU", cpu);
-    query.bindValue(":DMIUUID", dmiUUID);
     query.bindValue(":MotherboardName", motherboardName);
     query.bindValue(":Chipset", chipset);
     query.bindValue(":Memory", memory);
+    query.bindValue(":Storage", storagesInfo);
     query.bindValue(":Video", video);
-    query.bindValue(":Monitor", monitor);
     query.bindValue(":Audio", audio);
-    query.bindValue(":Network1", network1Info.join(";*;"));
-    query.bindValue(":Network2", network2Info.join(";*;"));
+    query.bindValue(":NIC1", nic1Info);
+    query.bindValue(":NIC2", nic2Info);
+    query.bindValue(":Monitor", monitor);
+    query.bindValue(":UpdateTime", "");
     query.bindValue(":Remark", remark );
-    query.bindValue(":PropertyNO", pNo);
-    query.bindValue(":Dept", dept);
-    query.bindValue(":Location", area);
-    query.bindValue(":MotherboardMDate", motherboardMDate.toString("yyyy-MM-dd"));
-    query.bindValue(":MonitorMDate", monitorMDate.toString("yyyy-MM-dd"));
-    query.bindValue(":SystemUsers", usersInfo.join(";*;"));
-    query.bindValue(":ServiceNumber", serviceNumber);
 
 
     if(!query.exec()){
@@ -590,12 +598,30 @@ void SystemInfo::slotUploadSystemInfo(){
 
         return;
     }
-
     query.clear();
+
+
+
+    if(softwares.size()){
+        QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from installedsoftware where ComputerName = '%1'; ").arg(m_computerName);
+        foreach (QString info, softwares) {
+            QStringList values = info.split(" | ");
+            if(values.size() != 5){continue;}
+            updateInstalledSoftwaresInfoStatement += QString(" insert into installedsoftware(ComputerName, SoftwareName, SoftwareVersion, Size, InstallationDate, Publisher) values('%1', '%2', '%3', '%4', '%5', '%6'); ").arg(m_computerName).arg(values.at(0)).arg(values.at(1)).arg(values.at(2)).arg(values.at(3)).arg(values.at(4));
+        }
+        updateInstalledSoftwaresInfoStatement += "COMMIT;";
+
+        if(!query.exec(updateInstalledSoftwaresInfoStatement)){
+            QApplication::restoreOverrideCursor();
+            QMessageBox::critical(this, tr("Error"), tr("Failed to upload installed software info to database! <br>%1").arg(query.lastError().text()));
+        }
+
+    }
+
+
 
     QApplication::restoreOverrideCursor();
 
-    //QSqlDatabase::removeDatabase(MYSQL_DB_CONNECTION_NAME);
 
     QMessageBox::information(this, tr("Done"), tr("Data has been uploaded to server!"));
 
@@ -747,7 +773,7 @@ void SystemInfo::slotQuerySystemInfo(){
                             REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
                             REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
                             REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                            REMOTE_SITOY_COMPUTERS_DB_NAME,
+                            REMOTE_SITOY_ASSETS_DB_NAME,
                             HEHUI::MYSQL
                             )){
         QApplication::restoreOverrideCursor();
@@ -871,120 +897,6 @@ void SystemInfo::slotResetAllInfo()
     ui.computerNameLineEdit->clear();
     ui.workgroupLineEdit->clear();
     ui.logicalDrivesComboBox->clear();
-    ui.osGroupBox->setEnabled(false);
-
-
-
-    ui.userNamelineEdit->clear();
-    ui.isAdminlineEdit->clear();
-    ui.myDocumentsLineEdit->clear();
-    ui.backupMyDocsToolButton->setEnabled(false);
-    ui.emailStoreRootLineEdit->clear();
-    ui.backupEmailToolButton->setEnabled(false);
-    ui.emailFolderSizeLineEdit->clear();
-    ui.biggestDBXLineEdit->clear();
-    ui.tempDirLineEdit->clear();
-    ui.ieTempDirLineEdit->clear();
-    ui.cleanTempFilesToolButton->setEnabled(false);
-    ui.userGroupBox->setEnabled(false);
-
-
-    ui.cpuLineEdit->clear();
-    ui.memoryLineEdit->clear();
-    ui.motherboardLineEdit->clear();
-    ui.dmiUUIDLineEdit->clear();
-    ui.chipsetLineEdit->clear();
-    ui.videoCardLineEdit->clear();
-    ui.monitorLineEdit->clear();
-    ui.audioLineEdit->clear();
-    ui.adapter1NameLineEdit->clear();
-    ui.adapter1HDAddressLineEdit->clear();
-    ui.adapter1IPAddressLineEdit->clear();
-    ui.adapter2NameLineEdit->clear();
-    ui.adapter2HDAddressLineEdit->clear();
-    ui.adapter2IPAddressLineEdit->clear();
-    ui.devicesInfoGroupBox->setEnabled(false);
-
-    ui.toolButtonUpload->setEnabled(false);
-    //ui.idLineEdit->setText("");
-    ui.remarkLineEdit->clear();
-    ui.deptComboBox->setCurrentIndex(0);
-    ui.locationComboBox->setCurrentIndex(-1);
-    ui.locationComboBox->clear();
-
-    ui.dateEditMotherboardDate->setDate(ui.dateEditMotherboardDate->minimumDate());
-    ui.dateEditMonitorDate->setDate(ui.dateEditMonitorDate->minimumDate());
-
-    ui.lineEditServiceNumber->clear();
-    ui.lineEditServiceNumber->setEnabled(false);
-
-
-    ////////////////////////////////
-    //OS Info
-    os.clear();
-    installationDate.clear();;
-    workgroup.clear();
-    m_computerName.clear();
-    windowsDir.clear();
-
-    drivesInfo.clear();
-
-    //User Info
-    userName.clear();
-    isAdmin = false;
-
-    myDocuments.clear();
-
-    emailStoreRoot.clear();
-    emailFolderSize = 0;
-    biggestDBXFile.clear();
-
-    tempDirSize = 0;
-    ieTempDirSize = 0;
-
-    //Devices Info
-    cpu.clear();
-    dmiUUID.clear();
-    motherboardName.clear();
-    chipset.clear();
-    memory.clear();
-
-    video.clear();
-    monitor.clear();
-    audio.clear();
-    partitionsTotalSize.clear();
-
-    network1Info.clear();
-    network2Info.clear();
-
-
-    //Other Info
-    //pNo = ;
-    remark.clear();
-    dept.clear();
-    area.clear();
-
-    motherboardMDate = QDate();
-    monitorMDate = QDate();
-
-    usersInfo.clear();
-    serviceNumber.clear();
-
-    recordExists = false;
-
-    updateGeometry();
-
-
-}
-
-void SystemInfoWidget::resetSystemInfo(){
-
-
-    ui.osVersionLineEdit->clear();
-    ui.installationDateLineEdit->clear();
-    ui.computerNameLineEdit->clear();
-    ui.workgroupLineEdit->clear();
-    ui.logicalDrivesComboBox->clear();
     ui.comboBoxSystemUsers->clear();
 
     ui.osGroupBox->setEnabled(false);
@@ -1012,140 +924,49 @@ void SystemInfoWidget::resetSystemInfo(){
 
 
     ui.labelReportCreationTime->clear();
-    ui.toolButtonSaveAs->setEnabled(false);
+    ui.toolButtonUpload->setEnabled(false);
 
     recordExists = false;
 
     updateGeometry();
 
-}
 
+}
 
 
 void SystemInfo::slotGetAllInfo()
 {
 
-    //OS Info
-    os = ui.osVersionLineEdit->text();
-    installationDate = ui.installationDateLineEdit->text();
-    workgroup = ui.workgroupLineEdit->text();
-    m_computerName = ui.computerNameLineEdit->text();
-    //windowsDir = ;
+    m_computerName = ui.lineEditComputerName->text().trimmed();
+    m_workgroup = ui.comboBoxDepartment->currentText();
+    sn = ui.spinBoxSN->value();
 
-    drivesInfo.clear();
-    for(int i = 0; i < ui.logicalDrivesComboBox->count(); i++){
-        drivesInfo.append(ui.logicalDrivesComboBox->itemText(i));
-    }
+    serviceNumber = ui.lineEditDellServiceNumber->text().trimmed();
+    vender = ui.comboBoxVender->currentText();
+    warranty = ui.lineEditWarranty->text().trimmed().toUInt();
+    remark = ui.textEditRemark->toPlainText();
 
-    //User Info
-    userName = ui.userNamelineEdit->text();
-    isAdmin = (ui.isAdminlineEdit->text() == QString(tr("Yes")))?true:false;
-
-    myDocuments = ui.myDocumentsLineEdit->text();
-
-    emailStoreRoot = ui.emailStoreRootLineEdit->text();
-    emailFolderSize = ui.emailFolderSizeLineEdit->text().toInt();
-    biggestDBXFile = ui.biggestDBXLineEdit->text();
-
-    tempDirSize = ui.tempDirLineEdit->text().toInt();
-    ieTempDirSize = ui.ieTempDirLineEdit->text().toInt();
-
-    //Devices Info
-    cpu = ui.cpuLineEdit->text();
-    dmiUUID = ui.dmiUUIDLineEdit->text();
-    motherboardName = ui.motherboardLineEdit->text();
-    chipset = ui.chipsetLineEdit->text();
-    memory = ui.memoryLineEdit->text();
-
-    video = ui.videoCardLineEdit->text();
-    monitor = ui.monitorLineEdit->text();
-    audio = ui.audioLineEdit->text();
-    //partitionsTotalSize = ;
-
-    network1Info.clear();
-    network2Info.clear();
-    network1Info.append(ui.adapter1NameLineEdit->text());
-    network1Info.append(ui.adapter1HDAddressLineEdit->text());
-    network1Info.append(ui.adapter1IPAddressLineEdit->text());
-    network2Info.append(ui.adapter2NameLineEdit->text());
-    network2Info.append(ui.adapter2HDAddressLineEdit->text());
-    network2Info.append(ui.adapter2IPAddressLineEdit->text());
-
-
-    //Other Info
-    //pNo = ;
-    remark = ui.remarkLineEdit->text();
-    dept = ui.deptComboBox->currentText();
-    area = ui.locationComboBox->currentText();
-
-    motherboardMDate = ui.dateEditMotherboardDate->date();
-    monitorMDate = ui.dateEditMonitorDate->date();
-
-    usersInfo.clear();
-    for(int i = 0; i < ui.comboBoxSystemUsers->count(); i++){
-        usersInfo.append(ui.comboBoxSystemUsers->itemText(i));
-    }
-
-    serviceNumber = ui.lineEditServiceNumber->text();
 
 
 }
 
 
-
-
-
 void SystemInfo::on_toolButtonQuerySystemInfo_clicked()
 {
-    ui.otherInfoGroupBox->setEnabled(false);
 
     slotQuerySystemInfo();
-
-    ui.otherInfoGroupBox->setEnabled(true);
-
-    ui.idLineEdit->setFocus();
 
 }
 
 void SystemInfo::on_toolButtonUpload_clicked()
 {
-    ui.otherInfoGroupBox->setEnabled(false);
-
     slotUploadSystemInfo();
-
-    ui.otherInfoGroupBox->setEnabled(true);
 
 }
 
 void SystemInfo::on_toolButtonScan_clicked()
 {
-//    ui.otherInfoGroupBox->setEnabled(false);
-//    slotScanSystem();
-//    ui.otherInfoGroupBox->setEnabled(true);
-//    ui.idLineEdit->setFocus();
-
-#ifdef Q_OS_WIN
-
-    if(SystemInfoScanner::isRunning()){
-        return;
-    }
-
-    if(!scanner){
-        scanner = new SystemInfoScanner(this);
-        connect(scanner, SIGNAL(signalScanFinished(bool, const QString&)), this, SLOT(scanFinished(bool, const QString&)));
-    }
-
-    scanner->slotScanSystem(true);
-
-#endif
-
-    ui.toolButtonRequestSystemInfo->setEnabled(false);
-    ui.toolButtonRescanSystemInfo->setEnabled(false);
-    ui.toolButtonSaveAs->setEnabled(false);
-
-    ui.osGroupBox->setEnabled(false);
-    ui.devicesInfoGroupBox->setEnabled(false);
-
+    slotScanSystem();
 
 }
 

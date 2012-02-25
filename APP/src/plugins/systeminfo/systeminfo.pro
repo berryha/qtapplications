@@ -11,6 +11,9 @@ QT += core \
 
 # include config file
 include( ../config.pri )
+HHSharedLibs += HHSharedCore \
+    HHSharedGUI
+win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../HHSharedLibs.pri)
 
 INCLUDEPATH += $$UI_DIR \
