@@ -633,6 +633,13 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonRenameComputer">
+        <property name="text">
+         <string>Rename Computer</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -647,6 +654,52 @@
      <property name="title">
       <string>Assets Registration </string>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>DELL Service Number:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditDellServiceNumber"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Vender:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QComboBox" name="comboBoxVender">
+        <item>
+         <property name="text">
+          <string>DIY</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DELL</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLineEdit" name="lineEditWarranty"/>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Warranty(Months):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="6">
+       <widget class="QTextEdit" name="textEditRemark"/>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="3" column="0">

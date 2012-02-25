@@ -73,6 +73,9 @@ private:
     Ui::SystemInfoMainWindowUI ui;
 
     QString m_computerName;
+    QString m_workgroup;
+    QString m_users;
+    QString m_os;
 
     static bool running;
     static qint64 failedFilesTotalSize;
@@ -94,13 +97,52 @@ private:
 
     QRegExpValidator *validator;
 
-
     DatabaseConnecter *dc;
     QSqlQueryModel *queryModel;
 
     bool isYDAdmin;
 
     static QMap<QString/*Short Name*/, QString/*Department*/>departments;
+
+
+
+ ///////////////////////////////////
+    //DevicesInfo
+    QString cpu;
+    QString memory;
+    QString motherboardName;
+    QString dmiUUID;
+    QString chipset;
+    QString video;
+    QString monitor;
+    QString audio;
+    QStringList drivesInfo;
+    QString storagesInfo;
+
+    QString adapter1Name;
+    QString adapter1HDAddress;
+    QString adapter1IPAddress;
+    QString nic1Info;
+    QString adapter2Name;
+    QString adapter2HDAddress;
+    QString adapter2IPAddress;
+    QString nic2Info;
+
+    //OSInfo
+    QString installationDate;
+    QString windowsDir;
+    QString osKey;
+
+    //InstalledSoftwareInfo
+    QStringList softwares;
+
+    //
+    int sn;
+    QString serviceNumber;
+    QString vender;
+    int warranty;
+    QString registrant;
+    QString remark;
 
 
 
