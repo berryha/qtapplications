@@ -918,7 +918,7 @@
                <string>Send command to the remote application</string>
               </property>
               <property name="text">
-               <string>&amp;Send</string>
+               <string>Send</string>
               </property>
               <property name="shortcut">
                <string>Ctrl+Return</string>

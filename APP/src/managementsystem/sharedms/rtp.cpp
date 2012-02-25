@@ -40,13 +40,13 @@ void RTP::startServers(const QHostAddress &localAddress, quint16 localPort, bool
 
     QString err;
 
-//    UDTSOCKET socket = m_udtProtocol->listen(localPort, localAddress);
-//    if(socket == UDTProtocol::INVALID_UDT_SOCK && tryOtherPort){
-//        socket = m_udtProtocol->listen();
-//    }
-//    if(socket == UDTProtocol::INVALID_UDT_SOCK){
-//        err = m_udtProtocol->getLastErrorMessage();
-//    }
+    UDTSOCKET socket = m_udtProtocol->listen(localPort, localAddress);
+    if(socket == UDTProtocol::INVALID_UDT_SOCK && tryOtherPort){
+        socket = m_udtProtocol->listen();
+    }
+    if(socket == UDTProtocol::INVALID_UDT_SOCK){
+        err = m_udtProtocol->getLastErrorMessage();
+    }
 
     bool ok = m_tcpServer->listen(localAddress, localPort);
     if(!ok){
@@ -59,6 +59,7 @@ void RTP::startServers(const QHostAddress &localAddress, quint16 localPort, bool
     if(errorMessage){
         *errorMessage = err;
     }
+
 
 }
 
@@ -97,6 +98,10 @@ UDTProtocol * RTP::startUDTProtocol(const QHostAddress &localAddress, quint16 lo
 
 }
 
+quint16 RTP::getUDTServerPort(){
+    return m_udtProtocol->getUDTListeningPort();
+}
+
 TCPServer * RTP::startTCPServer(const QHostAddress &address, quint16 port, bool tryOtherPort, QString *errorMessage){
 
     if(!m_tcpServer){
@@ -117,6 +122,12 @@ TCPServer * RTP::startTCPServer(const QHostAddress &address, quint16 port, bool 
 
     return m_tcpServer;
 
+}
+
+quint16 RTP::getTCPServerPort(){
+    quint16 port;
+    m_tcpServer->serverAddressInfo(0, &port);
+    return port;
 }
 
 int RTP::connectToHost( const QHostAddress & hostAddress, quint16 port, int waitMsecs, QString *errorMessage){
