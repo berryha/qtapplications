@@ -6,7 +6,8 @@ TARGET = systeminfo
 # VERSION = 2009.09.08.1055
 QT += core \
     gui \
-    sql
+    sql \
+    network
 
 # include config file
 include( ../config.pri )
@@ -21,9 +22,12 @@ INCLUDEPATH += $$UI_DIR \
 UI_DIR = ./ui
 
 # Input
-HEADERS += systeminfo.h \
-    systeminfoplugin.h
-FORMS += systeminfo.ui
+HEADERS += \
+    systeminfoplugin.h \
+    systeminfo.h
+FORMS += systeminfo.ui \
+    systeminfowidget/systeminfowidget.ui \
+    systeminfo.ui
 SOURCES += systeminfoplugin.cpp \
     systeminfo.cpp
 RESOURCES += systeminfo.qrc

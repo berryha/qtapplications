@@ -7,15 +7,14 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QSqlQuery>
+#include <QHostInfo>
+#include <QStatusBar>
 
 
 #include "./systeminfo.h"
-//#include "../../shared/core/global_core.h"
 #include "HHSharedCore/hglobal_core.h"
 
 
-bool SystemInfo::running = false;
-qint64 SystemInfo::failedFilesTotalSize = 0;
 
 #ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
 #define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/PC"
@@ -26,6 +25,10 @@ qint64 SystemInfo::failedFilesTotalSize = 0;
 #endif
 
 
+namespace HEHUI {
+
+bool SystemInfo::running = false;
+qint64 SystemInfo::failedFilesTotalSize = 0;
 
 SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
         QMainWindow(parent), isYDAdmin(isYDAdmin)
@@ -33,35 +36,69 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
 
     ui.setupUi(this);
 
+    computerName = QHostInfo::localHostName().toLower();
+    ui.lineEditComputerName->setText(computerName.toUpper());
 
-    if(!isYDAdmin){
-        //ui.comboBoxIDPart1->setCurrentIndex(ui.comboBoxIDPart1->findText("SDG"));
-        ui.comboBoxIDPart1->setCurrentIndex(0);
+    ui.comboBoxLocation->addItem(tr("Dong Guan"), "dg");
+    ui.comboBoxLocation->addItem(tr("Ying De"), "yd");
+    ui.comboBoxLocation->addItem(tr("Hong Kong"), "hk");
+    QString location = computerName.left(2).toLower();
+    if("yd" == location){
+        ui.comboBoxLocation->setCurrentIndex(1);
+    }else if("hk" == location){
+        ui.comboBoxLocation->setCurrentIndex(2);
     }else{
-        //ui.comboBoxIDPart1->setCurrentIndex(ui.comboBoxIDPart1->findText("SYD"));
-        ui.comboBoxIDPart1->setCurrentIndex(1);
+        ui.comboBoxLocation->setCurrentIndex(0);
+    }
+    connect(ui.comboBoxLocation, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
+
+    if(departments.isEmpty()){
+        departments.insert("it", tr("IT"));
+        departments.insert("ac", tr("Account"));
+        departments.insert("ad", tr("AdminDept"));
+        departments.insert("co", tr("Cost"));
+        departments.insert("cu", tr("Custom"));
+        departments.insert("gm", tr("GMO"));
+        departments.insert("hr", tr("HR"));
+        departments.insert("ma", tr("Marker"));
+        departments.insert("pd", tr("PDS"));
+        departments.insert("pg", tr("PG"));
+        departments.insert("pl", tr("Plan"));
+        departments.insert("pm", tr("PMC"));
+        departments.insert("qc", tr("QC"));
+        departments.insert("re", tr("Retail"));
+        departments.insert("sa", tr("Sales"));
+        //departmentsHash.insert("", tr("Sample"));
+        departments.insert("se", tr("Secretary"));
+        departments.insert("sh", tr("Ship"));
+        departments.insert("sp", tr("Shop"));
+        departments.insert("wh", tr("WHouse"));
+    }
+    QString department = computerName.mid(2, 2).toLower();
+    foreach (QString key, departments.keys()) {
+        ui.comboBoxDepartment->addItem(departments.value(key), key);
+    }
+    for(int i=0; i<ui.comboBoxDepartment->count(); i++){
+        if(ui.comboBoxDepartment->itemData(i) == department){
+            ui.comboBoxDepartment->setCurrentIndex(i);
+            break;
+        }
     }
 
+    int sn = computerName.right(5).toInt();
+    ui.spinBoxSN->setValue(sn);
 
-    ui.dateEditMonitorDate->setMaximumDate(QDate::currentDate());
-    ui.dateEditMotherboardDate->setMaximumDate(QDate::currentDate());
 
-    ui.lineEditServiceNumber->setEnabled(false);
+    //No editing possible.
+    ui.tableWidgetSoftware->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    QHeaderView *view = ui.tableWidgetSoftware->horizontalHeader();
+    view->resizeSection(0, 200);
+    view->setVisible(true);
 
-    validator = new QRegExpValidator(this);
-    //QRegExp rx("\\bS(DG|YD)-[ABC]-\\d{4}");
-    QRegExp rx("\\d{4}");
-    validator->setRegExp(rx);
-    ui.idLineEdit->setValidator(validator);
-
-    ui.idLineEdit->setFocus();
 
     dc = new DatabaseConnecter(this);
+    queryModel = 0;
 
-    connect(ui.cleanTempFilesToolButton, SIGNAL(clicked()), this, SLOT(slotCleaner()));
-    connect(ui.backupMyDocsToolButton, SIGNAL(clicked()), this, SLOT(slotBackupMyDocs()));
-    connect(ui.backupEmailToolButton, SIGNAL(clicked()), this, SLOT(slotBackupEmails()));
-    //connect(ui.actionUploadSystemInfo, SIGNAL(triggered()), this, SLOT(slotUploadSystemInfo()));
 
 
     installEventFilter(this);
@@ -70,16 +107,6 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent) :
 
 
 
-    //TODO:为何不可
-    //setWindowFlags(Qt::WindowMinimizeButtonHint);
-
-    // Get the size of screen
-    //QDesktopWidget* desktop = QApplication::desktop();
-    //int desktopWidth = desktop->width();
-    //int desktopHeight = desktop->height();
-
-    //move the dialog
-    //move((desktopWidth - width()) / 2, (desktopHeight - height()) / 2);
 
     initStatusBar();
 
@@ -253,80 +280,13 @@ void SystemInfo::slotResetStatusBar(bool show){
 
 
 
-void SystemInfo::slotCleaner() {
-    qDebug()<<"SystemInfo::slotCleaner()";
-
-#if defined(Q_WS_WIN)
-    ui.cleanTempFilesToolButton->setEnabled(false);
-    QString tempPath = QDir::tempPath();
-    QString tempIEPath = QDir::homePath () + QDir::separator() + "Local Settings/Temporary Internet Files/Content.IE5";
-
-    slotCleanTempFiles(tempPath);
-    ui.tempDirLineEdit->setText(QVariant(failedFilesTotalSize/(1024*1024)).toString());
-    failedFilesTotalSize = 0;
-
-    slotCleanTempFiles(tempIEPath);
-    ui.ieTempDirLineEdit->setText(QVariant(failedFilesTotalSize/(1024*1024)).toString());
-    failedFilesTotalSize = 0;
-
-    ui.cleanTempFilesToolButton->setEnabled(true);
-#else
-    QMessageBox::critical(this, tr("Operation Canceled"), tr(
-            "This Function Is For Fucking M$ Windows Only!"));
-#endif
-
-}
-
-void SystemInfo::slotCleanTempFiles(const QString &path) {
-    qDebug()<<"SystemInfo::slotCleanTempFiles(const QString &path)";
-
-    QDir dir(path);
-
-    slotResetStatusBar(true);
-    progressBar->setRange(0,dir.count());
-
-    //qlonglong size = 0;
-    //QStringList filters;
-    //filters << "*" << "*.*";
-    int i = 0;
-    foreach(QString file, dir.entryList(/*filters,*/QDir::Files|QDir::System|QDir::Hidden))
-    {
-        if(!dir.remove(file)){
-            failedFilesTotalSize += QFileInfo(dir.filePath(file)).size();
-            qDebug() << "Delete Failed:" + path + QDir::separator() + file ;
-        }
-
-        progressBar->setValue(++i);
-        statusBar()->showMessage(tr("Deleting %1").arg(file));
-        qApp->processEvents();
-    }
-
-    foreach(QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
-    {
-        slotCleanTempFiles(path + QDir::separator() + subDir);
-    }
-
-    if (path != QDir::tempPath()) {
-        dir.rmdir(path);
-    }
-
-
-    slotResetStatusBar(false);
-    statusBar()->showMessage(tr("Temporary files deleted."),3000);
-
-}
 
 void SystemInfo::slotScanSystem() {
     qDebug()<<"SystemInfo::slotScanSystem()";
 
-    //#ifndef Q_OS_WIN32
-    //    QMessageBox::critical(this, tr("Error"), tr("This function is only available for M$ Windows!"));
-    //    return;
-    //#endif
 
     QDir::setCurrent(QCoreApplication::applicationDirPath ());
-    //QString everestDirPath = QCoreApplication::applicationDirPath () + QString("/everest");
-    QString everestDirPath = QString("./everest");
+    QString everestDirPath = QString("./aida64business");
 
     QString systemInfoFilePath = everestDirPath + QString("/systeminfo.ini");
 
@@ -389,45 +349,42 @@ void SystemInfo::slotReadReport(){
 
     isScanning = false;
 
-    QString systemInfoFilePath = QCoreApplication::applicationDirPath () + QDir::separator()
-                                 + QString("everest")+QDir::separator()+QString("systeminfo.ini");
 
+    slotResetAllInfo();
 
-    QSettings systemInfo(systemInfoFilePath, QSettings::IniFormat, this);
+    QSettings systemInfo(m_systemInfoFilePath, QSettings::IniFormat, this);
+    //systemInfo.setIniCodec("UTF-8");
 
-    if(!QFile(systemInfoFilePath).exists()){
-        QMessageBox::critical(this, QString(tr("Error")), QString(tr("File '")+systemInfoFilePath+tr("' Missing!")));
+    if(!QFile(m_systemInfoFilePath).exists()){
+        QMessageBox::critical(this, QString(tr("Error")), QString(tr("Client Info File '")+m_systemInfoFilePath+tr("' Missing!")));
 
-        slotResetStatusBar(false);
-        statusBar()->showMessage(tr("Error! File '%1' missing!").arg(systemInfoFilePath));
-        //TODO:Close the window
-        removeEventFilter(this);
-        //close()
+        //slotResetStatusBar(false);
+        //statusBar()->showMessage(tr("Error! Client Info File '%1' missing!").arg(clientInfoFilePath));
         return;
     }
 
 
     systemInfo.beginGroup("DevicesInfo");
 
-    cpu = systemInfo.value("CPU").toString();
-    memory = systemInfo.value("Memory").toString();
-    motherboardName = systemInfo.value("MotherboardName").toString();
-    dmiUUID = systemInfo.value("DMIUUID").toString();
-    chipset = systemInfo.value("Chipset").toString();
-    video = systemInfo.value("Video").toString();
-    monitor = systemInfo.value("Monitor").toString();
-    audio = systemInfo.value("Audio").toString();
-    partitionsTotalSize = systemInfo.value("PartitionsTotalSize").toString();
+    QString cpu = systemInfo.value("CPU").toString();
+    QString memory = systemInfo.value("Memory").toString();
+    QString motherboardName = systemInfo.value("MotherboardName").toString();
+    QString dmiUUID = systemInfo.value("DMIUUID").toString();
+    QString chipset = systemInfo.value("Chipset").toString();
+    QString video = systemInfo.value("Video").toString();
+    QString monitor = systemInfo.value("Monitor").toString();
+    QString audio = systemInfo.value("Audio").toString();
+    QString partitionsTotalSize = systemInfo.value("PartitionsTotalSize").toString();
 
     QString adapter1Name = systemInfo.value("Adapter1Name").toString();
     QString adapter1HDAddress = systemInfo.value("Adapter1HDAddress").toString();
     QString adapter1IPAddress = systemInfo.value("Adapter1IPAddress").toString();
-    network1Info<<adapter1Name<<adapter1HDAddress<<adapter1IPAddress;
+    //network1Info<<adapter1Name<<adapter1HDAddress<<adapter1IPAddress;
 
     QString adapter2Name = systemInfo.value("Adapter2Name").toString();
     QString adapter2HDAddress = systemInfo.value("Adapter2HDAddress").toString();
     QString adapter2IPAddress = systemInfo.value("Adapter2IPAddress").toString();
-    network2Info<<adapter2Name<<adapter2HDAddress<<adapter2IPAddress;
+    //network2Info<<adapter2Name<<adapter2HDAddress<<adapter2IPAddress;
 
     systemInfo.endGroup();
 
@@ -451,11 +408,11 @@ void SystemInfo::slotReadReport(){
 
 
     systemInfo.beginGroup("OSInfo");
-    os = systemInfo.value("OS").toString();
-    installationDate = systemInfo.value("InstallationDate").toString();
-    workgroup = systemInfo.value("Workgroup").toString();
-    computerName = systemInfo.value("ComputerName").toString();
-    windowsDir = systemInfo.value("WindowsDir").toString();
+    QString os = systemInfo.value("OS").toString();
+    QString installationDate = systemInfo.value("InstallationDate").toString();
+    QString workgroup = systemInfo.value("Workgroup").toString();
+    //QString computerName = systemInfo.value("ComputerName").toString();
+    QString windowsDir = systemInfo.value("WindowsDir").toString();
 
 
     ui.osVersionLineEdit->setText(os);
@@ -464,9 +421,10 @@ void SystemInfo::slotReadReport(){
     ui.workgroupLineEdit->setText(workgroup);
 
     ui.logicalDrivesComboBox->clear();
+    QStringList drivesInfo;
     for (int i = 1; i < 10; i++) {
         QString logicalDrivesKey,driveInfo;
-        logicalDrivesKey = QString("Drive" + QString::number(i));
+        logicalDrivesKey = QString("Partition" + QString::number(i));
         driveInfo = systemInfo.value(logicalDrivesKey).toString();
         if (driveInfo.isEmpty()) {
             continue;
@@ -479,6 +437,7 @@ void SystemInfo::slotReadReport(){
 
     systemInfo.beginGroup("Users");
     ui.comboBoxSystemUsers->clear();
+    QStringList usersInfo;
     for(int j = 0; j < 10; j++){
         QString userKey, userInfo;
         userKey = QString("User" + QString::number(j));
@@ -493,80 +452,37 @@ void SystemInfo::slotReadReport(){
 
     ui.osGroupBox->setEnabled(true);
 
-    systemInfo.beginGroup("UserInfo");
-    userName = systemInfo.value("UserName").toString();
-    isAdmin = systemInfo.value("IsAdmin").toBool();
-    myDocuments = systemInfo.value("MyDocuments").toString();
 
-    emailStoreRoot = systemInfo.value("EmailStoreRoot").toString();
-    //emailFolderSize = systemInfo.value("EmailFolderSize").toInt();
-    emailFolderSize = 0;
-    float biggestDBXFileSize = 0;
-    if(!emailStoreRoot.isEmpty()){
-        QDir dir(emailStoreRoot);
-        biggestDBXFile = dir.path()+"/Folders.dbx";
-
-        foreach(QString file, dir.entryList(QDir::Files))
-        {
-            int curFileSize = QFileInfo(dir.filePath(file)).size()/(1024*1024);
-            if(curFileSize > biggestDBXFileSize){
-                biggestDBXFile = file;
-                biggestDBXFileSize = QFileInfo(dir.filePath(file)).size()/(1024*1024);
-            }
-            emailFolderSize += curFileSize;
-            qApp->processEvents();
-        }
-    }
-
-
-
-    //TODO: Use Iterator to get the directory size on startup
-    tempDirSize = systemInfo.value("TempDirSize").toInt();
-    ieTempDirSize = systemInfo.value("IETempDirSize").toInt();
-
+    systemInfo.beginGroup("Other");
+    QString creationTime = systemInfo.value("CreationTime").toString();
+    ui.labelReportCreationTime->setText("Report Creation Time: " + creationTime);
+    //ui.labelReportCreationTime->show();
     systemInfo.endGroup();
 
-    ui.userNamelineEdit->setText(userName);
-    if(isAdmin){
-        ui.isAdminlineEdit->setText(QString(tr("Yes")));
-    }else{
-        ui.isAdminlineEdit->setText(QString(tr("No")));
+    systemInfo.beginGroup("InstalledSoftwareInfo");
+    QStringList infoList;
+    for(int k = 1; k < 400; k++){
+        QString info = systemInfo.value(QString::number(k)).toString();
+        if(info.isEmpty()){break;}
+        infoList.append(info);
     }
-    ui.myDocumentsLineEdit->setText(myDocuments);
-    ui.backupMyDocsToolButton->setEnabled(true);
-
-    ui.emailStoreRootLineEdit->setText(emailStoreRoot);
-    ui.backupEmailToolButton->setEnabled(true);
-    ui.emailFolderSizeLineEdit->setText(QString::number(emailFolderSize));
-    if(!emailStoreRoot.isEmpty()){
-	ui.biggestDBXLineEdit->setText(QFileInfo(biggestDBXFile).fileName()+": "+QVariant(biggestDBXFileSize).toString());
+    int rowCount = infoList.size();
+    ui.tableWidgetSoftware->setRowCount(rowCount);
+    for(int m=0; m<rowCount; m++){
+        QStringList info = infoList.at(m).split(" | ");
+        if(info.size() != 5){break;}
+        for(int n=0; n<5; n++){
+            ui.tableWidgetSoftware->setItem(m, n, new QTableWidgetItem(info.at(n)));
+        }
     }
+    systemInfo.endGroup();
 
-    ui.tempDirLineEdit->setText(QString::number(tempDirSize));
-    ui.ieTempDirLineEdit->setText(QString::number(ieTempDirSize));
-    ui.cleanTempFilesToolButton->setEnabled(true);
 
-    ui.userGroupBox->setEnabled(true);
-
-    ui.idLineEdit->setFocus();
-    unsigned int no = createPropertyNO();
-//    if(no < 1000){
-//        ui.idLineEdit->setText("0" + QString::number(no));
-//    }else{
-//        ui.idLineEdit->setText(QString::number(no));
-//    }
-    ui.idLineEdit->setText(QString::number(no).rightJustified(4, '0'));
-
+    ui.toolButtonScan->setEnabled(true);
     ui.toolButtonUpload->setEnabled(true);
-    ui.remarkLineEdit->setEnabled(true);
-    ui.deptComboBox->setEnabled(true);
-    ui.locationComboBox->setEnabled(true);
-    ui.dateEditMotherboardDate->setEnabled(true);
-    ui.dateEditMonitorDate->setEnabled(true);
 
-    if(os.toUpper() == "WIN_7"){
-        ui.lineEditServiceNumber->setEnabled(true);
-    }
+ ///////////////////////
+
 
 
     slotResetStatusBar(false);
@@ -576,171 +492,19 @@ void SystemInfo::slotReadReport(){
 }
 
 
-void SystemInfo::slotBackupMyDocs(){
-    qDebug()<<"SystemInfo::slotBackupMyDocs()";
-
-    QString openFilesPath = ui.myDocumentsLineEdit->text();
-    QString selectedFilter;
-    QFileDialog::Options options;
-    //options |= QFileDialog::DontUseNativeDialog;
-
-    QStringList files = QFileDialog::getOpenFileNames(
-            this, tr("Select files to be backup"),
-            openFilesPath,
-            tr("All Files (*);;Excel Files (*.xls);;Word Files (*.doc)"),
-            &selectedFilter,
-            options);
-    if (files.count()) {
-        copyFiles(files);
-    }
-
-}
-
-void SystemInfo::slotBackupEmails(){
-    qDebug()<<"SystemInfo::slotBackupEmails()";
-
-    QString openFilesPath = QDir(ui.emailStoreRootLineEdit->text()).path();
-    QString selectedFilter;
-    QFileDialog::Options options;
-    //options |= QFileDialog::DontUseNativeDialog;
-
-    QStringList files = QFileDialog::getOpenFileNames(
-            this, tr("Select files to be backup"),
-            openFilesPath,
-            tr("All Files (*);;DBX Files (*.dbx)"),
-            &selectedFilter,
-            options);
-    if (files.count()) {
-        copyFiles(files);
-    }
-
-}
-
-void SystemInfo::copyFiles(const QStringList &list){
-    qDebug()<<"SystemInfo::copyFiles(const QStringList &list)";
-
-    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
-    //options |= QFileDialog::DontUseNativeDialog;
-    QString directory = QFileDialog::getExistingDirectory(this,
-                                                          tr("Select target directory"),
-                                                          QDir::rootPath(),
-                                                          options);
-    if (directory.isEmpty()){
-    	statusBar()->showMessage(tr("Operation 'My Documents Backup' canceled!"));
-        return;
-    }else if(directory == QFileInfo(list[0]).dir().path()){
-    	QMessageBox::critical(this,tr("Error"),tr("Source and target directory should not be the same!"));
-    	statusBar()->showMessage(tr("Source and target directory should not be the same!"));
-    	return;
-    }
-
-    int i = 0;
-    slotResetStatusBar(true);
-    progressBar->setRange(0,list.count());
-
-    foreach(QString file, list){
-    	statusBar()->showMessage(tr("Copying %1").arg(file));
-
-    	copyFile(file, directory + "/" + QFileInfo(file).fileName(), true);
-
-    	progressBar->setValue(++i);
-    	qApp->processEvents();
-    }
-
-    slotResetStatusBar(false);
-    statusBar()->showMessage(tr("Operation 'My Documents Backup' Done."));
-
-}
 
 
-bool SystemInfo::copyFile(const QString &source, const QString &target, bool confirmFileExists){
-    qDebug()<<"SystemInfo::copyFile(....)";
-
-    if(QFile(target).exists()){
-        if(confirmFileExists){
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, tr("File Already Exists!"), tr("File '%1' Already Exists!<br>Overwrite it?").arg(target),
-                                          QMessageBox::Yes | QMessageBox::No);
-            if (reply == QMessageBox::No) {
-                return false;
-            }
-        }
-
-
-        if(!QFile::remove(target)){
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::critical(this, tr("Fatal Error"),
-                                          tr("Can not remove the target file %1").arg(target),
-                                          QMessageBox::Retry | QMessageBox::Ignore);
-            if (reply == QMessageBox::Retry){
-                copyFile(source, target, false);
-            }else{
-                return false;
-            }
-        }
-
-    }
-
-
-    return QFile::copy(source, target);
-
-}
 
 void SystemInfo::slotUploadSystemInfo(){
     qDebug()<<"SystemInfo::slotUploadSystemInfo()";
 
-    if(!slotIsPropertyNOValid()){
-        QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
-        return;
-    }
-
-
-    remark = ui.remarkLineEdit->text();
-    dept = ui.deptComboBox->currentText();
-    area = ui.locationComboBox->currentText();
-    motherboardMDate = ui.dateEditMotherboardDate->date();
-    monitorMDate = ui.dateEditMonitorDate->date();
-
-    if(pNo.isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Property NO. Required! "));
-        ui.idLineEdit->setFocus();
-        return;
-    }
-
-    if(dept.isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Department Information Required!"));
-        ui.deptComboBox->setFocus();
-        return;
-    }
-
-    if(ui.osVersionLineEdit->text().trimmed().toUpper() == "WIN_7"){
-        if(!ui.lineEditServiceNumber->isEnabled()){
-            ui.lineEditServiceNumber->setEnabled(true);
-        }
-        if(ui.lineEditServiceNumber->text().trimmed().isEmpty()){
-            QMessageBox::critical(this, tr("Error"), tr("Service Number Required!"));
-            ui.lineEditServiceNumber->setFocus();
-            return;
-        }
-    }
-
-
-    if(ui.cpuLineEdit->text().trimmed().isEmpty() ||ui.motherboardLineEdit->text().trimmed().isEmpty()){
-        QMessageBox::critical(this, tr("Error"), tr("Devices Information Required! "));
-        return;
-    }
 
 
 
     slotGetAllInfo();
 
-    slotUploadSystemInfoToSitoyDBServer();
+//    slotUploadSystemInfoToSitoyDBServer();
 
-
-    //if(isUploaded){
-    //    QMessageBox::critical(this,tr("Operation Canceled"),tr("Data had been uploaded to server!"));
-    //    return;
-    //}
 
     //QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -751,7 +515,7 @@ void SystemInfo::slotUploadSystemInfo(){
                              REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
                              REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
                              REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                             REMOTE_SITOY_COMPUTERS_DB_NAME,
+                             "sitoyassets",
                              HEHUI::MYSQL
                              )){
         QApplication::restoreOverrideCursor();
@@ -853,170 +617,143 @@ void SystemInfo::retranslateUi() {
 
 
 
-void SystemInfo::slotUploadSystemInfoToSitoyDBServer(){
-    qDebug()<<"SystemInfo::slotUploadSystemInfoToSitoyDBServer()";
+//void SystemInfo::slotUploadSystemInfoToSitoyDBServer(){
+//    qDebug()<<"SystemInfo::slotUploadSystemInfoToSitoyDBServer()";
 
 
-    //if(isUploadedToSitoyDB){
-    //    QMessageBox::critical(this,tr("Operation Canceled"),tr("Data had been uploaded to server 200.200.200.2!"));
-    //    return;
-    //}
+//    //if(isUploadedToSitoyDB){
+//    //    QMessageBox::critical(this,tr("Operation Canceled"),tr("Data had been uploaded to server 200.200.200.2!"));
+//    //    return;
+//    //}
 
-    if(!slotIsPropertyNOValid()){
-        QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
-        return;
-    }
+//    if(!slotIsPropertyNOValid()){
+//        QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
+//        return;
+//    }
 
-    //QApplication::setOverrideCursor(Qt::WaitCursor);
+//    //QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    //DatabaseConnecter dc(this);
-    //QString connectionName = "200.200.200.2/MIS/PC";
-    if(!dc->isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
-                             "QODBC",
-                             "200.200.200.2",
-                             1433,
-                             "sa",
-                             "sitoydb",
-                             "mis",
-                             HEHUI::M$SQLSERVER
-                             )){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Upload Failed!"));
-        qCritical() << QString("Error: Database Connection Failed! Upload Failed!");
-        return;
-    }
-
-
-    QSqlDatabase db;
-    db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
-    QSqlQuery query(db);
-
-    bool recordExistsInSitoyDB = false;
-    QString queryString = QString("select _No  from PC where _No = '%1'").arg(pNo);
-
-    if(!query.exec(queryString)){
-        QMessageBox::information(this, "Error", query.lastError().text());
-        return ;
-    }
-
-    if(query.first()){
-        recordExistsInSitoyDB = true;
-    }
-
-//    if(query.size() > 1){
-//        QMessageBox::critical(this, tr("Fatal Error"), tr("Duplicate Property No.!"));
-//        statusBar()->showMessage(tr("Error! Duplicate No.!"));
-//        qCritical()<<"Error! Duplicate No.!";
-//        recordExistsInSitoyDB = true;
-//    }else if(query.size() == 1){
-//        statusBar()->showMessage(tr("Record exists in server 200.200.200.2!"));
-//        recordExistsInSitoyDB = true;
-//    }else{
-//        recordExistsInSitoyDB = false;
+//    //DatabaseConnecter dc(this);
+//    //QString connectionName = "200.200.200.2/MIS/PC";
+//    if(!dc->isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
+//                             "QODBC",
+//                             "200.200.200.2",
+//                             1433,
+//                             "sa",
+//                             "sitoydb",
+//                             "mis",
+//                             HEHUI::M$SQLSERVER
+//                             )){
+//        QApplication::restoreOverrideCursor();
+//        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Upload Failed!"));
+//        qCritical() << QString("Error: Database Connection Failed! Upload Failed!");
+//        return;
 //    }
 
 
-    query.clear();
+//    QSqlDatabase db;
+//    db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
+//    QSqlQuery query(db);
 
-    if(recordExistsInSitoyDB){
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, tr("Record Already Exists!"), tr("Record '%1' already exists in server 200.200.200.2!<br>Update it?").arg(pNo),
-                                      QMessageBox::Yes | QMessageBox::No);
-        if (reply == QMessageBox::No) {
-            return;
-        }
+//    bool recordExistsInSitoyDB = false;
+//    QString queryString = QString("select _No  from PC where _No = '%1'").arg(pNo);
 
-        query.prepare(QString("UPDATE PC SET _No = :_No, CPU = :CPU, RAM = :RAM, HDD = :HDD, Remark = :Remark, Depart = :Depart, Area = :Area, Monitor = :Monitor, MainBoard = :MainBoard WHERE _No LIKE '%1'").arg(pNo));
+//    if(!query.exec(queryString)){
+//        QMessageBox::information(this, "Error", query.lastError().text());
+//        return ;
+//    }
 
-    }else{
-        query.prepare("INSERT INTO PC (_No, CPU, RAM, HDD, Remark, Depart, Area, Monitor, MainBoard) "
-                      "VALUES (:_No, :CPU, :RAM, :HDD, :Remark, :Depart, :Area, :Monitor, :MainBoard)");
+//    if(query.first()){
+//        recordExistsInSitoyDB = true;
+//    }
 
-    }
-
-    query.bindValue(":_No", pNo.left(20));
-    query.bindValue(":CPU", cpu.left(20));
-    query.bindValue(":RAM", memory.left(20));
-    query.bindValue(":HDD", partitionsTotalSize.left(20));
-    query.bindValue(":Remark", remark.left(200));
-    query.bindValue(":Depart", dept.left(20));
-    query.bindValue(":Area", area.left(20));
-    query.bindValue(":Monitor", monitor.left(20));
-    query.bindValue(":MainBoard", motherboardName.left(20));
-
-
-    if(!query.exec()){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not upload data to server 200.200.200.2! <br> %1").arg(query.lastError().text()));
-        qCritical()<<QString("Can not upload data to server 200.200.200.2!");
-        qCritical()<<QString("Error: %1").arg(query.lastError().text());
-        statusBar()->showMessage(tr("Error! Can not upload data to server 200.200.200.2!"));
-
-        return;
-    }
-
-    QApplication::restoreOverrideCursor();
+////    if(query.size() > 1){
+////        QMessageBox::critical(this, tr("Fatal Error"), tr("Duplicate Property No.!"));
+////        statusBar()->showMessage(tr("Error! Duplicate No.!"));
+////        qCritical()<<"Error! Duplicate No.!";
+////        recordExistsInSitoyDB = true;
+////    }else if(query.size() == 1){
+////        statusBar()->showMessage(tr("Record exists in server 200.200.200.2!"));
+////        recordExistsInSitoyDB = true;
+////    }else{
+////        recordExistsInSitoyDB = false;
+////    }
 
 
-    QMessageBox::information(this, tr("Done"), tr("Data has been uploaded to server 200.200.200.2!"));
+//    query.clear();
 
-    //isUploadedToSitoyDB = true;
-    statusBar()->showMessage(tr("Done! Data has been uploaded to server 200.200.200.2!"));
+//    if(recordExistsInSitoyDB){
+//        QMessageBox::StandardButton reply;
+//        reply = QMessageBox::question(this, tr("Record Already Exists!"), tr("Record '%1' already exists in server 200.200.200.2!<br>Update it?").arg(pNo),
+//                                      QMessageBox::Yes | QMessageBox::No);
+//        if (reply == QMessageBox::No) {
+//            return;
+//        }
+
+//        query.prepare(QString("UPDATE PC SET _No = :_No, CPU = :CPU, RAM = :RAM, HDD = :HDD, Remark = :Remark, Depart = :Depart, Area = :Area, Monitor = :Monitor, MainBoard = :MainBoard WHERE _No LIKE '%1'").arg(pNo));
+
+//    }else{
+//        query.prepare("INSERT INTO PC (_No, CPU, RAM, HDD, Remark, Depart, Area, Monitor, MainBoard) "
+//                      "VALUES (:_No, :CPU, :RAM, :HDD, :Remark, :Depart, :Area, :Monitor, :MainBoard)");
+
+//    }
+
+//    query.bindValue(":_No", pNo.left(20));
+//    query.bindValue(":CPU", cpu.left(20));
+//    query.bindValue(":RAM", memory.left(20));
+//    query.bindValue(":HDD", partitionsTotalSize.left(20));
+//    query.bindValue(":Remark", remark.left(200));
+//    query.bindValue(":Depart", dept.left(20));
+//    query.bindValue(":Area", area.left(20));
+//    query.bindValue(":Monitor", monitor.left(20));
+//    query.bindValue(":MainBoard", motherboardName.left(20));
 
 
-}
+//    if(!query.exec()){
+//        QApplication::restoreOverrideCursor();
+//        QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not upload data to server 200.200.200.2! <br> %1").arg(query.lastError().text()));
+//        qCritical()<<QString("Can not upload data to server 200.200.200.2!");
+//        qCritical()<<QString("Error: %1").arg(query.lastError().text());
+//        statusBar()->showMessage(tr("Error! Can not upload data to server 200.200.200.2!"));
+
+//        return;
+//    }
+
+//    QApplication::restoreOverrideCursor();
+
+
+//    QMessageBox::information(this, tr("Done"), tr("Data has been uploaded to server 200.200.200.2!"));
+
+//    //isUploadedToSitoyDB = true;
+//    statusBar()->showMessage(tr("Done! Data has been uploaded to server 200.200.200.2!"));
+
+
+//}
 
 void SystemInfo::slotQuerySystemInfo(){
     qDebug()<<"SystemInfo::slotQuerySystemInfo()";
 
 
-    if(!slotIsPropertyNOValid()){
-        QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
-        return;
-    }
-
     slotResetAllInfo();
 
+ ////////////////////////////
+
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-
-    //DatabaseConnecter dc(this);
-
-    /*
-        //QString connectionName = "200.200.200.2/MIS/PC";
-        if(!dc.isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
-                                                "QODBC",
-                                                "200.200.200.2",
-                                                1433,
-                                                "sa",
-                                                "sitoydb",
-                                                "mis",
-                                                HEHUI::M$SQLSERVER
-                                                )){
-                QApplication::restoreOverrideCursor();
-                QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Upload Failed!"));
-                qCritical() << QString("Error: Database Connection Failed! Upload Failed!");
-                return;
-        }
-
-
-                QSqlDatabase db;
-                        db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
-*/
-
-    if(!dc->isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                             REMOTE_SITOY_COMPUTERS_DB_NAME,
-                             HEHUI::MYSQL
-                             )){
+    DatabaseConnecter dc(this);
+    if(!dc.isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
+                            REMOTE_SITOY_COMPUTERS_DB_DRIVER,
+                            REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
+                            REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
+                            REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
+                            REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
+                            REMOTE_SITOY_COMPUTERS_DB_NAME,
+                            HEHUI::MYSQL
+                            )){
         QApplication::restoreOverrideCursor();
         QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
         qCritical() << QString("Error: Database Connection Failed! Query Failed!");
-        return;
+        return ;
     }
 
 
@@ -1024,229 +761,107 @@ void SystemInfo::slotQuerySystemInfo(){
     db = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
 
 
-
-    QSqlQuery query(db);
-
-    //QString queryString = QString("select _No, Remark, Depart, Area  from PC where _No like '%1'").arg(pNo);
-    //QString queryString = QString("select PropertyNO, Remark, Dept, Location, MotherboardMDate, MonitorMDate  from systeminfo where PropertyNO like '%1'").arg(pNo);
-    QString queryString = QString("select OS, InstallationDate, Workgroup, ComputerName, WindowsDir, DrivesInfo, UserName, IsAdmin, MyDocuments, EmailStoreRoot, CPU, DMIUUID, MotherboardName, Chipset ,Memory, Video, Monitor, Audio, Network1, Network2, Remark, Dept, Location, MotherboardMDate, MonitorMDate, SystemUsers, ServiceNumber  from systeminfo where PropertyNO like '%1'").arg(pNo);
-
-
-    if(!query.exec(queryString)){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::information(this, "Error", query.lastError().text());
-        return;
+    if(!queryModel){
+        queryModel = new QSqlQueryModel(this);
     }
+    queryModel->clear();
 
+    QString queryString = QString("SELECT s.OS, s.Workgroup, s.Users, d.* FROM summaryinfo s, detailedinfo d WHERE s.ComputerName = '%1' AND d.ComputerName = '%1' ").arg(computerName);
+    queryModel->setQuery(QSqlQuery(queryString, db));
     QApplication::restoreOverrideCursor();
 
-    if(query.size() > 1){
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Duplicate No.!"));
-        statusBar()->showMessage(tr("Error! Duplicate No.!"));
-        qCritical()<<"Error! Duplicate No.!";
-        return;
-    }else if(query.size() == 1){
-        recordExists = true;
-        query.first();
+    QSqlError error = queryModel->lastError();
+    if (error.type() != QSqlError::NoError) {
+        QString msg = QString("Can not query client info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        //QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Fatal Error"), msg);
 
-        os = query.value(0).toString();
-        installationDate = query.value(1).toString();
-        workgroup = query.value(2).toString();
-        computerName = query.value(3).toString();
-        windowsDir = query.value(4).toString();
-        QStringList drivesInfoList = query.value(5).toString().split(";*;");
-
-
-        userName = query.value(6).toString();
-        isAdmin = query.value(7).toBool();
-        myDocuments = query.value(8).toString();
-        emailStoreRoot = query.value(9).toString();
-
-        cpu = query.value(10).toString();
-        dmiUUID = query.value(11).toString();
-        motherboardName = query.value(12).toString();
-        chipset = query.value(13).toString();
-        memory = query.value(14).toString();
-
-        video = query.value(15).toString();
-        monitor = query.value(16).toString();
-        audio = query.value(17).toString();
-
-        network1Info = query.value(18).toString().split(";*;");
-        network2Info = query.value(19).toString().split(";*;");
-
-        remark = query.value(20).toString();
-        dept = query.value(21).toString();
-        area = query.value(22).toString();
-        motherboardMDate = query.value(23).toDate();
-        monitorMDate = query.value(24).toDate();
-
-        QStringList usersInfoList = query.value(25).toString().split(";*;");
-        serviceNumber = query.value(26).toString();
-
-
-
-        ui.osVersionLineEdit->setText(os);
-        ui.installationDateLineEdit->setText(installationDate);
-        ui.computerNameLineEdit->setText(computerName);
-        ui.workgroupLineEdit->setText(workgroup);
-
-        ui.logicalDrivesComboBox->clear();
-        ui.logicalDrivesComboBox->addItems(drivesInfoList);
-
-        ui.comboBoxSystemUsers->clear();
-        ui.comboBoxSystemUsers->addItems(usersInfoList);
-
-        ui.osGroupBox->setEnabled(true);
-
-
-
-        ui.userNamelineEdit->setText(userName);
-        if(isAdmin){
-            ui.isAdminlineEdit->setText(QString(tr("Yes")));
-        }else{
-            ui.isAdminlineEdit->setText(QString(tr("No")));
-        }
-        ui.myDocumentsLineEdit->setText(myDocuments);
-
-        ui.emailStoreRootLineEdit->setText(emailStoreRoot);
-
-        ui.userGroupBox->setEnabled(true);
-
-
-        ui.cpuLineEdit->setText(cpu);
-        ui.memoryLineEdit->setText(memory);
-        ui.motherboardLineEdit->setText(motherboardName);
-        ui.dmiUUIDLineEdit->setText(dmiUUID);
-        ui.chipsetLineEdit->setText(chipset);
-        ui.videoCardLineEdit->setText(video);
-        ui.monitorLineEdit->setText(monitor);
-        ui.audioLineEdit->setText(audio);
-
-        if(network1Info.size() == 3){
-            ui.adapter1NameLineEdit->setText(network1Info[0]);
-            ui.adapter1HDAddressLineEdit->setText(network1Info[1]);
-            ui.adapter1IPAddressLineEdit->setText(network1Info[2]);
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            db.close();
+            QSqlDatabase::removeDatabase(MYSQL_DB_CONNECTION_NAME);
+            return;
         }
 
-        if(network2Info.size() == 3){
-            ui.adapter2NameLineEdit->setText(network2Info[0]);
-            ui.adapter2HDAddressLineEdit->setText(network2Info[1]);
-            ui.adapter2IPAddressLineEdit->setText(network2Info[2]);
-        }
+    }
 
-        ui.devicesInfoGroupBox->setEnabled(true);
-
-
-        ui.toolButtonUpload->setEnabled(true);
-        //ui.idLineEdit->setText(pNo);
-        ui.remarkLineEdit->setText(remark);
-        ui.remarkLineEdit->setEnabled(true);
-        ui.deptComboBox->setCurrentIndex(ui.deptComboBox->findText(dept));
-        ui.deptComboBox->setEnabled(true);
-        //ui.locationComboBox->setCurrentIndex(ui.locationComboBox->findText(area));
-        ui.locationComboBox->setEditText(area);
-        ui.locationComboBox->setEnabled(true);
-
-        ui.dateEditMotherboardDate->setDate(motherboardMDate);
-        ui.dateEditMotherboardDate->setEnabled(true);
-        ui.dateEditMonitorDate->setDate(monitorMDate);
-        ui.dateEditMonitorDate->setEnabled(true);
-
-        if(os.toUpper() == "WIN_7"){
-            ui.lineEditServiceNumber->setEnabled(true);
-            ui.lineEditServiceNumber->setText(serviceNumber);
-        }
-
-
-        //ui.idLineEdit->setText(pNo);
-
-    }else{
-        QMessageBox::critical(this, tr("Error"), tr("Record does not exist!"));
+    QSqlRecord record = queryModel->record(0);
+    if(record.isEmpty()){
+        QMessageBox::critical(this, tr("Fatal Error"), tr("No Record Found!"));
         recordExists = false;
-
+        return;
     }
+    recordExists = true;
+
+    ui.osVersionLineEdit->setText(record.value("OS").toString());
+    ui.installationDateLineEdit->setText(record.value("InstallationDate").toString());
+    ui.computerNameLineEdit->setText(computerName);
+    ui.workgroupLineEdit->setText(record.value("Workgroup").toString());
+
+    QStringList storageInfo = record.value("Storage").toString().split("|");
+    foreach (QString info, storageInfo) {
+        ui.logicalDrivesComboBox->addItem(info);
+    }
+
+    ui.comboBoxSystemUsers->addItem(record.value("Users").toString());
+
+    ui.osGroupBox->setEnabled(true);
+
+
+    ui.cpuLineEdit->setText(record.value("CPU").toString());
+    ui.motherboardLineEdit->setText(record.value("MotherboardName").toString());
+    ui.dmiUUIDLineEdit->setText(record.value("DMIUUID").toString());
+    ui.chipsetLineEdit->setText(record.value("Chipset").toString());
+    ui.memoryLineEdit->setText(record.value("Memory").toString());
+    ui.videoCardLineEdit->setText(record.value("Video").toString());
+    ui.monitorLineEdit->setText(record.value("Monitor").toString());
+    ui.audioLineEdit->setText(record.value("Audio").toString());
+
+    QStringList nic1Info = record.value("NIC1").toString().split("|");
+    if(nic1Info.size() == 3){
+        ui.adapter1NameLineEdit->setText(nic1Info.at(0));
+        ui.adapter1HDAddressLineEdit->setText(nic1Info.at(1));
+        ui.adapter1IPAddressLineEdit->setText(nic1Info.at(2));
+    }
+
+
+    QStringList nic2Info = record.value("NIC2").toString().split("|");
+    if(nic2Info.size() == 3){
+        ui.adapter2NameLineEdit->setText(nic2Info.at(0));
+        ui.adapter2HDAddressLineEdit->setText(nic2Info.at(1));
+        ui.adapter2IPAddressLineEdit->setText(nic2Info.at(2));
+    }
+
+
+    ui.devicesInfoGroupBox->setEnabled(true);
+
+
+    queryModel->clear();
+    queryString = QString("SELECT SoftwareName, SoftwareVersion, Size, InstallationDate, Publisher FROM installedsoftware WHERE ComputerName = '%1' ").arg(m_computerName);
+    queryModel->setQuery(QSqlQuery(queryString, db));
+    while (queryModel->canFetchMore()){
+        queryModel->fetchMore();
+    }
+    int rows = queryModel->rowCount();
+    ui.tableWidgetSoftware->setRowCount(rows);
+    for(int i=0; i<rows; i++){
+        QSqlRecord record = queryModel->record(i);
+        for(int j=0; j<5; j++){
+            ui.tableWidgetSoftware->setItem(i, j, new QTableWidgetItem(record.value(j).toString()));
+        }
+    }
+    queryModel->clear();
+
+    //ui.tableWidgetSoftware->setModel(queryModel);
+    ui.labelReportCreationTime->setText(tr("Last Update Time: %1").arg(record.value("UpdateTime").toString()));
+
+
+    //QApplication::restoreOverrideCursor();
 
 
 
 }
 
-unsigned int SystemInfo::createPropertyNO(){
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    if(!dc->isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                             REMOTE_SITOY_COMPUTERS_DB_NAME,
-                             HEHUI::MYSQL
-                             )){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
-        qCritical() << QString("Error: Database Connection Failed! Query Failed!");
-        return 0;
-    }
-
-
-    QSqlDatabase db;
-    db = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
-
-    QSqlQuery query(db);
-
-    QString queryString = QString("select PropertyNO  from systeminfo where ID = (%1)").arg("select max(ID)  from systeminfo");
-
-
-    if(!query.exec(queryString)){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::information(this, "Error", query.lastError().text());
-        return 0;
-    }
-
-    QApplication::restoreOverrideCursor();
-
-    if(query.size() > 1){
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Duplicate No.!"));
-        statusBar()->showMessage(tr("Error! Duplicate No.!"));
-        qCritical()<<"Error! Duplicate No.!";
-        return 0;
-    }else if(query.size() == 1){
-        recordExists = true;
-        query.first();
-        QString noStr = query.value(0).toString();
-        unsigned int no = noStr.right(4).toUInt();
-
-        return no + 1;
-    }
-
-    return 0;
-}
-
-bool SystemInfo::slotIsPropertyNOValid(){
-    qDebug()<<"SystemInfo::slotIsIDValid()";
-
-    pNo = ui.comboBoxIDPart1->currentText() + "-"
-    		+ ui.comboBoxIDPart2->currentText() + "-"
-    		+ui.idLineEdit->text().trimmed();
-
-    int pos = 0;
-    QRegExpValidator rxValidator(this);
-    QRegExp rx("\\bS(DG|YD)-[ABC]-\\d{4}");
-    rxValidator.setRegExp(rx);
-    //if(validator->validate(pNo, pos) != QValidator::Acceptable){
-    if(rxValidator.validate(pNo, pos) != QValidator::Acceptable){
-        //QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
-        qDebug()<<"Invalid Property NO.!";
-        ui.idLineEdit->setFocus();
-        ui.idLineEdit->end(false);
-        return false;
-    }
-
-    return true;
-
-}
 
 void SystemInfo::slotResetAllInfo()
 {
@@ -1362,6 +977,51 @@ void SystemInfo::slotResetAllInfo()
 
 }
 
+void SystemInfoWidget::resetSystemInfo(){
+
+
+    ui.osVersionLineEdit->clear();
+    ui.installationDateLineEdit->clear();
+    ui.computerNameLineEdit->clear();
+    ui.workgroupLineEdit->clear();
+    ui.logicalDrivesComboBox->clear();
+    ui.comboBoxSystemUsers->clear();
+
+    ui.osGroupBox->setEnabled(false);
+
+
+    ui.cpuLineEdit->clear();
+    ui.memoryLineEdit->clear();
+    ui.motherboardLineEdit->clear();
+    ui.dmiUUIDLineEdit->clear();
+    ui.chipsetLineEdit->clear();
+    ui.videoCardLineEdit->clear();
+    ui.monitorLineEdit->clear();
+    ui.audioLineEdit->clear();
+
+    ui.adapter1NameLineEdit->clear();
+    ui.adapter1HDAddressLineEdit->clear();
+    ui.adapter1IPAddressLineEdit->clear();
+    ui.adapter2NameLineEdit->clear();
+    ui.adapter2HDAddressLineEdit->clear();
+    ui.adapter2IPAddressLineEdit->clear();
+
+    ui.devicesInfoGroupBox->setEnabled(false);
+
+    ui.tableWidgetSoftware->clearContents();
+
+
+    ui.labelReportCreationTime->clear();
+    ui.toolButtonSaveAs->setEnabled(false);
+
+    recordExists = false;
+
+    updateGeometry();
+
+}
+
+
+
 void SystemInfo::slotGetAllInfo()
 {
 
@@ -1431,167 +1091,11 @@ void SystemInfo::slotGetAllInfo()
 
 }
 
-void SystemInfo::on_idLineEdit_editingFinished (){
-    qDebug()<<"SystemInfo::on_idLineEdit_editingFinished()";
-
-    if(!slotIsPropertyNOValid()){
-        //QMessageBox::critical(this, tr("Error"), tr("Invalid Property NO.!"));
-        return;
-    }
-
-    focusNextChild();
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-
-    //DatabaseConnecter dc(this);
-
-    /*
-	//QString connectionName = "200.200.200.2/MIS/PC";
-        if(!dc.isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
-						"QODBC",
-						"200.200.200.2",
-						1433,
-						"sa",
-						"sitoydb",
-						"mis",
-						HEHUI::M$SQLSERVER
-						)){
-		QApplication::restoreOverrideCursor();
-		QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Upload Failed!"));
-		qCritical() << QString("Error: Database Connection Failed! Upload Failed!");
-		return;
-	}
-
-
-		QSqlDatabase db;
-                        db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
-*/
-
-    if(!dc->isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-                             REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-                             REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                             REMOTE_SITOY_COMPUTERS_DB_NAME,
-                             HEHUI::MYSQL
-                             )){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
-        qCritical() << QString("Error: Database Connection Failed! Query Failed!");
-        return;
-    }
-
-
-    QSqlDatabase db;
-    db = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
 
 
 
-    QSqlQuery query(db);
 
-    //QString queryString = QString("select _No, Remark, Depart, Area  from PC where _No like '%1'").arg(pNo);
-    QString queryString = QString("select PropertyNO, Remark, Dept, Location, MotherboardMDate, MonitorMDate  from systeminfo where PropertyNO like '%1'").arg(pNo);
-
-
-    if(!query.exec(queryString)){
-        QApplication::restoreOverrideCursor();
-        QMessageBox::information(this, "Error", query.lastError().text());
-        return;
-    }
-
-    QApplication::restoreOverrideCursor();
-
-    if(query.size() > 1){
-        QMessageBox::critical(this, tr("Fatal Error"), tr("Duplicate No.!"));
-        statusBar()->showMessage(tr("Error! Duplicate No.!"));
-        qCritical()<<"Error! Duplicate No.!";
-        return;
-    }else if(query.size() == 1){
-        recordExists = true;
-        statusBar()->showMessage(tr("Record '%1' already exists!").arg(pNo));
-
-
-        //        query.first();
-        //        //pNo = query.value(0).toString();
-        //        remark = query.value(1).toString();
-        //        dept = query.value(2).toString();
-        //        area = query.value(3).toString();
-        //        motherboardMDate = query.value(4).toDate();
-        //        monitorMDate = query.value(5).toDate();
-        //
-        //        //ui.idLineEdit->setText(pNo);
-        //        ui.remarkLineEdit->setText(remark);
-        //        ui.deptComboBox->setCurrentIndex(ui.deptComboBox->findText(dept));
-        //        //ui.locationComboBox->setCurrentIndex(ui.locationComboBox->findText(area));
-        //        ui.locationComboBox->setEditText(area);
-        //
-        //        ui.dateEditMotherboardDate->setDate(motherboardMDate);
-        //        ui.dateEditMonitorDate->setDate(monitorMDate);
-        //
-        //        ui.idLineEdit->setText(pNo);
-
-    }else{
-        recordExists = false;
-        statusBar()->showMessage(tr("Record '%1' does not exist!").arg(pNo));
-
-    }
-
-
-    //QSqlDatabase::removeDatabase(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
-
-
-}
-
-void SystemInfo::on_deptComboBox_currentIndexChanged(const QString & text){
-    qDebug()<<"SystemInfo::on_deptComboBox_currentIndexChanged(const QString & text)";
-
-    ui.locationComboBox->clear();
-
-    if(text == "Sales"){  
-        QStringList locations;
-        locations<<"Coach"<<"PS"<<"Ben"<<"LN"<<"Fossil";
-        ui.locationComboBox->addItems(locations);
-    }
-
-    if(text == "Shop"){
-        QStringList locations;
-        locations<<"A"<<"B"<<"C"<<"D"<<"E"<<"F"<<"G";
-        ui.locationComboBox->addItems(locations);
-    }
-
-    //QMessageBox::information(this, "", text);
-
-
-}
-
-void SystemInfo::on_dateEditMotherboardDate_dateChanged(const QDate &date){
-    qDebug()<<"SystemInfo::on_dateEditMotherboardDate_dateChanged(const QDate &date)";
-
-    if(slotIsPropertyNOValid()){
-        return;
-    }
-
-
-    if(date.year() >= 2009){
-    	ui.comboBoxIDPart2->setCurrentIndex(0);
-      //ui.idLineEdit->setText("SDG-A-0");
-    }else if(date.year()<2006){
-    	ui.comboBoxIDPart2->setCurrentIndex(1);
-        //ui.idLineEdit->setText("SDG-C-0");
-    }else{
-    	ui.comboBoxIDPart2->setCurrentIndex(2);
-        //ui.idLineEdit->setText("SDG-B-0");
-    }
-
-    //ui.idLineEdit->setText("0");
-
-    //ui.idLineEdit->end(false);
-}
-
-
-void SystemInfo::on_toolButtonQuery_clicked()
+void SystemInfo::on_toolButtonQuerySystemInfo_clicked()
 {
     ui.otherInfoGroupBox->setEnabled(false);
 
@@ -1615,13 +1119,33 @@ void SystemInfo::on_toolButtonUpload_clicked()
 
 void SystemInfo::on_toolButtonScan_clicked()
 {
-    ui.otherInfoGroupBox->setEnabled(false);
+//    ui.otherInfoGroupBox->setEnabled(false);
+//    slotScanSystem();
+//    ui.otherInfoGroupBox->setEnabled(true);
+//    ui.idLineEdit->setFocus();
 
-    slotScanSystem();
+#ifdef Q_OS_WIN
 
-    ui.otherInfoGroupBox->setEnabled(true);
+    if(SystemInfoScanner::isRunning()){
+        return;
+    }
 
-    ui.idLineEdit->setFocus();
+    if(!scanner){
+        scanner = new SystemInfoScanner(this);
+        connect(scanner, SIGNAL(signalScanFinished(bool, const QString&)), this, SLOT(scanFinished(bool, const QString&)));
+    }
+
+    scanner->slotScanSystem(true);
+
+#endif
+
+    ui.toolButtonRequestSystemInfo->setEnabled(false);
+    ui.toolButtonRescanSystemInfo->setEnabled(false);
+    ui.toolButtonSaveAs->setEnabled(false);
+
+    ui.osGroupBox->setEnabled(false);
+    ui.devicesInfoGroupBox->setEnabled(false);
+
 
 }
 
@@ -1629,6 +1153,19 @@ void SystemInfo::on_toolButtonScan_clicked()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 

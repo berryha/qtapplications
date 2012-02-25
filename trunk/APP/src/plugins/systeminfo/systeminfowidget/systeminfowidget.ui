@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SystemInfoMainWindowUI</class>
- <widget class="QWidget" name="SystemInfoMainWindowUI">
+ <class>SystemInfoWidgetClass</class>
+ <widget class="QWidget" name="SystemInfoWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -521,7 +521,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBoxLocation">
+       <widget class="QComboBox" name="comboBoxLocation_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -554,7 +554,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBoxDepartment">
+       <widget class="QComboBox" name="comboBoxDepartment_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -602,7 +602,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBoxSN">
+       <widget class="QSpinBox" name="spinBoxSN_2">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -680,7 +680,7 @@
         <string>Query</string>
        </property>
        <property name="icon">
-        <iconset resource="systeminfo.qrc">
+        <iconset resource="../systeminfo.qrc">
          <normaloff>:/resources/images/querydatabase.png</normaloff>:/resources/images/querydatabase.png</iconset>
        </property>
        <property name="autoRaise">
@@ -705,7 +705,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButtonScan">
+      <widget class="QToolButton" name="toolButtonRequestSystemInfo">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -719,7 +719,7 @@
         <string>Scan</string>
        </property>
        <property name="icon">
-        <iconset resource="systeminfo.qrc">
+        <iconset resource="../systeminfo.qrc">
          <normaloff>:/resources/images/scansystem.png</normaloff>:/resources/images/scansystem.png</iconset>
        </property>
        <property name="autoRaise">
@@ -728,7 +728,30 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButtonUpload">
+      <widget class="QToolButton" name="toolButtonRescanSystemInfo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Rescan System</string>
+       </property>
+       <property name="statusTip">
+        <string>Rescan System</string>
+       </property>
+       <property name="text">
+        <string>Rescan</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../systeminfo.qrc">
+         <normaloff>:/resources/images/rescan.png</normaloff>:/resources/images/rescan.png</iconset>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonSaveAs">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -742,7 +765,7 @@
         <string>Save</string>
        </property>
        <property name="icon">
-        <iconset resource="systeminfo.qrc">
+        <iconset resource="../systeminfo.qrc">
          <normaloff>:/resources/images/uploadtodatabase.png</normaloff>:/resources/images/uploadtodatabase.png</iconset>
        </property>
        <property name="autoRaise">
@@ -772,8 +795,9 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>toolButtonScan</tabstop>
-  <tabstop>toolButtonUpload</tabstop>
+  <tabstop>toolButtonRequestSystemInfo</tabstop>
+  <tabstop>toolButtonRescanSystemInfo</tabstop>
+  <tabstop>toolButtonSaveAs</tabstop>
   <tabstop>osVersionLineEdit</tabstop>
   <tabstop>installationDateLineEdit</tabstop>
   <tabstop>computerNameLineEdit</tabstop>
@@ -796,7 +820,7 @@
   <tabstop>adapter2IPAddressLineEdit</tabstop>
  </tabstops>
  <resources>
-  <include location="systeminfo.qrc"/>
+  <include location="../systeminfo.qrc"/>
  </resources>
  <connections/>
 </ui>

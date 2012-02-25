@@ -13,11 +13,8 @@
 
 bool SystemInfo::running = false;
 
-
-
-
 SystemInfo::SystemInfo(QObject *parent) :
-        QObject(parent)
+    QObject(parent)
 {
 
 

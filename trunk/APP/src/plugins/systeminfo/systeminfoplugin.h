@@ -40,7 +40,6 @@
 
 #include "systeminfo.h"
 
-//#include "../../shared/gui/plugin/guipluginbase.h"
 #include "HHSharedGUI/hguipluginbase.h"
 
 namespace HEHUI {
