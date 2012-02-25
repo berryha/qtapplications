@@ -6,5 +6,6 @@
     <file>resources/images/querydatabase.png</file>
     <file>resources/images/scansystem.png</file>
     <file>resources/images/uploadtodatabase.png</file>
+    <file>resources/images/rescan.png</file>
   </qresource>
 </RCC>

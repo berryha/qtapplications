@@ -7,40 +7,40 @@
 
 
 class SystemInfo: public QObject {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
 
-        SystemInfo(QObject *parent = 0);
-	~SystemInfo();
+    SystemInfo(QObject *parent = 0);
+    ~SystemInfo();
 
-        static bool isRunning(){return running;}
+    static bool isRunning(){return running;}
 
-        QString systemInfoFilePath() const{return m_systemInfoFilePath;}
+    QString systemInfoFilePath() const{return m_systemInfoFilePath;}
 
 
 signals:
-        void signalScanFinished(bool ok, const QString &message);
+    void signalScanFinished(bool ok, const QString &message);
 
 
 public slots:
-        void slotScanSystem(bool rescan = false);
-        void stopProcess();
+    void slotScanSystem(bool rescan = false);
+    void stopProcess();
 
 
 private slots:
-        void slotScannerExit( int exitCode, QProcess::ExitStatus exitStatus);
+    void slotScannerExit( int exitCode, QProcess::ExitStatus exitStatus);
 
 
 
 private:
 
-        static bool running;
+    static bool running;
 
-	QProcess *process;
+    QProcess *process;
 
-        QString everestDirPath;
-        QString m_systemInfoFilePath;
+    QString everestDirPath;
+    QString m_systemInfoFilePath;
 
 
 };

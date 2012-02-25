@@ -1,8 +1,8 @@
 TEMPLATE        = subdirs
 
 SUBDIRS += sqlexplorer \
-        usermanager #\
-        #systeminfo \
+        usermanager \
+        systeminfo #\
         #samplemanagement
 
      
