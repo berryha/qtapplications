@@ -100,6 +100,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     quint16 peerPort = packet->getPeerHostPort();
     quint8 packetType = packet->getPacketType();
     int socketID = packet->getSocketID();
+    qDebug()<<"---------------------socketID:"<<socketID;
 
     PacketHandlerBase::recylePacket(packet);
 

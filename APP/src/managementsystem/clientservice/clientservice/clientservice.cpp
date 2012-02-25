@@ -884,6 +884,9 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
     }
 
     bool ok = clientPacketsParser->sendClientResponseAdminConnectionResultPacket(adminSocketID, result, message);
+    if(!ok){
+        qCritical()<<"Error! Failed to response admin connection request! "<<m_rtp->lastErrorString();
+    }
     //    qWarning()<<"ClientService::processAdminRequestVerifyClientInfoPacket:"<<adminAddress<< " "<<adminPort;
 
     if(ok && result){

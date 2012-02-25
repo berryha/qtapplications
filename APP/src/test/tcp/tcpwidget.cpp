@@ -82,7 +82,7 @@ void TCPWidget::connectToPeer(){
 
     if(isConnected){
         ui.toolButtonConnect->setText("Disconnecting...");
-        tcpProtocol->closeSocket(peerSockeet);
+        tcpProtocol->abort(peerSockeet);
         disconnected(peerSockeet, m_peerAddress.toString(), m_peerPort);
     }else{
 

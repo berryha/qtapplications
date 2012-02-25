@@ -132,7 +132,7 @@ int RTP::connectToHost( const QHostAddress & hostAddress, quint16 port, int wait
         if(!m_tcpServer->isConnected(socketID) ){
             err += tr("\nCan not connect to host %1:%2 via TCP! %3").arg(hostAddress.toString()).arg(port).arg(m_tcpServer->socketErrorString(socketID));
 
-            m_tcpServer->closeSocket(socketID);
+            m_tcpServer->abort(socketID);
             socketID = INVALID_SOCK_ID;
         }
     }
@@ -147,9 +147,10 @@ int RTP::connectToHost( const QHostAddress & hostAddress, quint16 port, int wait
 }
 
 void RTP::closeSocket(int socketID){
+    qDebug()<<"--RTP::closeSocket(...)";
 
     m_udtProtocol->closeSocket(socketID);
-    m_tcpServer->closeSocket(socketID);
+    m_tcpServer->disconnectFromHost(socketID);
 
 }
 

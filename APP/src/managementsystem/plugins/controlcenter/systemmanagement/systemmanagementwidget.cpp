@@ -319,6 +319,7 @@ void SystemManagementWidget::closeEvent(QCloseEvent *event){
     }
 
     m_rtp->closeSocket(m_peerSocket);
+    m_peerSocket = INVALID_SOCK_ID;
 
     event->accept();
 
