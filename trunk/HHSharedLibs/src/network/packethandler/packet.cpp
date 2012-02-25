@@ -82,9 +82,7 @@ Packet::Packet() {
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
-    this->socketID = 0;
-
-        
+    this->socketID = -1;
 
 }
 
@@ -135,9 +133,7 @@ Packet::Packet(const QString &peerAddress, quint16 peerPort, const QString &loca
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
-    this->socketID = 0;
-
-
+    this->socketID = -1;
 
 }
 
@@ -165,9 +161,7 @@ Packet::Packet(const QHostAddress &peerAddress, quint16 peerPort, const QHostAdd
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
-    this->socketID = 0;
-
-
+    this->socketID = -1;
 
 }
 
@@ -225,7 +219,7 @@ void Packet::resetPacket(){
     this->remainingRetransmissionTimes = 10;
     this->lastTransmissionTime = QDateTime();
 
-    this->socketID = 0;
+    this->socketID = -1;
     
 }
 
