@@ -785,7 +785,17 @@
          </item>
          <item>
           <property name="text">
-           <string>DELL</string>
+           <string>DELL Desktop</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DELL Laptop</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Other</string>
           </property>
          </item>
         </widget>
