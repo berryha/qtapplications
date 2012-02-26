@@ -1,7 +1,7 @@
 #ifndef SYSINFODLG_H
 #define SYSINFODLG_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QProcess>
 #include <QProgressBar>
 
@@ -14,7 +14,7 @@
 namespace HEHUI {
 
 
-class SystemInfo: public QWidget {
+class SystemInfo: public QMainWindow {
     Q_OBJECT
 
 public:

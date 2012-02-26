@@ -28,8 +28,7 @@ UI_DIR = ./ui
 HEADERS += \
     systeminfoplugin.h \
     systeminfo.h
-FORMS += systeminfo.ui \
-    systeminfowidget/systeminfowidget.ui
+FORMS += systeminfo.ui
 SOURCES += systeminfoplugin.cpp \
     systeminfo.cpp
 RESOURCES += systeminfo.qrc
