@@ -163,7 +163,7 @@ void SystemInfoPlugin::slotMainActionForMenuTriggered(){
             isYDAdmin = true;
         }
 
-        SystemInfo *systemInfo = new SystemInfo(isYDAdmin, parentWidget);
+        SystemInfo *systemInfo = new SystemInfo(user.getUserID(), parentWidget);
         connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
 
 	if(parentWidget){

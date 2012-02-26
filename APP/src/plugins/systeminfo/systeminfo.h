@@ -1,7 +1,7 @@
 #ifndef SYSINFODLG_H
 #define SYSINFODLG_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QProcess>
 #include <QProgressBar>
 
@@ -14,12 +14,12 @@
 namespace HEHUI {
 
 
-class SystemInfo: public QMainWindow {
+class SystemInfo: public QWidget {
     Q_OBJECT
 
 public:
 
-    SystemInfo(bool isYDAdmin = false, QWidget *parent = 0);
+    SystemInfo(const QString &adminName, QWidget *parent = 0);
     ~SystemInfo();
 
     static bool isRunning(){return running;}
@@ -75,6 +75,7 @@ private:
 private:
     Ui::SystemInfoMainWindowUI ui;
 
+    QString m_adminName;
     QString m_computerName;
     QString m_workgroup;
     QString m_users;
@@ -119,7 +120,7 @@ private:
     QString video;
     QString monitor;
     QString audio;
-    QStringList drivesInfo;
+    QStringList storages;
     QString storagesInfo;
 
     QString adapter1Name;
