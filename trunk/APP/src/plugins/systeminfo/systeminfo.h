@@ -144,7 +144,7 @@ private:
     int sn;
     QString serviceNumber;
     QString vender;
-    int warranty;
+    QString warranty;
     QString registrant;
     QString remark;
 
