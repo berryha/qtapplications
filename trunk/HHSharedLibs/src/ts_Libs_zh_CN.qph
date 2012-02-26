@@ -1677,4 +1677,120 @@ Failed to get NetBIOS name! Error Code: %1</source>
     <source>Request uploading file %1</source>
     <target>请求上传文件 %1</target>
 </phrase>
+<phrase>
+    <source>Dong Guan</source>
+    <target>东莞</target>
+</phrase>
+<phrase>
+    <source>Ying De</source>
+    <target>英德</target>
+</phrase>
+<phrase>
+    <source>Hong Kong</source>
+    <target>香港</target>
+</phrase>
+<phrase>
+    <source>Account</source>
+    <target>会计部</target>
+</phrase>
+<phrase>
+    <source>AdminDept</source>
+    <target>行政部</target>
+</phrase>
+<phrase>
+    <source>Cost</source>
+    <target>成本部</target>
+</phrase>
+<phrase>
+    <source>Custom</source>
+    <target>报关组</target>
+</phrase>
+<phrase>
+    <source>GMO</source>
+    <target>总经办</target>
+</phrase>
+<phrase>
+    <source>HR</source>
+    <target>人事部</target>
+</phrase>
+<phrase>
+    <source>PDS</source>
+    <target>板房</target>
+</phrase>
+<phrase>
+    <source>PG</source>
+    <target>开发部</target>
+</phrase>
+<phrase>
+    <source>Plan</source>
+    <target>计划部</target>
+</phrase>
+<phrase>
+    <source>PMC</source>
+    <target>物控部</target>
+</phrase>
+<phrase>
+    <source>Retail</source>
+    <target>零售部</target>
+</phrase>
+<phrase>
+    <source>Sales</source>
+    <target>业务部</target>
+</phrase>
+<phrase>
+    <source>Secretary</source>
+    <target>秘书</target>
+</phrase>
+<phrase>
+    <source>Ship</source>
+    <target>船务部</target>
+</phrase>
+<phrase>
+    <source>Shop</source>
+    <target>生产部</target>
+</phrase>
+<phrase>
+    <source>WHouse</source>
+    <target>仓库</target>
+</phrase>
+<phrase>
+    <source>Scanner Error!</source>
+    <target>扫描器发生错误！</target>
+</phrase>
+<phrase>
+    <source>Can not open system info file &apos;</source>
+    <target>无法打开系统信息文件 &apos;</target>
+</phrase>
+<phrase>
+    <source>Can not write system info file &apos;</source>
+    <target>无法写系统信息文件 &apos;</target>
+</phrase>
+<phrase>
+    <source>Can not write system info file &apos;</source>
+    <target>无法写系统信息文件 &apos;</target>
+</phrase>
+<phrase>
+    <source>System Info File &apos;</source>
+    <target>系统信息文件 &apos;</target>
+</phrase>
+<phrase>
+    <source>Failed to query info! &lt;br&gt;%1</source>
+    <target>无法查询信息! &lt;br&gt;%1</target>
+</phrase>
+<phrase>
+    <source>Record Already Exists!&lt;br&gt;Update it?</source>
+    <target>记录已经存在！&lt;br&gt;是否更新它？</target>
+</phrase>
+<phrase>
+    <source>Failed to upload installed software info to database! &lt;br&gt;%1</source>
+    <target>无法上传已安装的软件信息到数据库！ &lt;br&gt;%1</target>
+</phrase>
+<phrase>
+    <source>No Record Found!</source>
+    <target>没有找到记录！</target>
+</phrase>
+<phrase>
+    <source>Dell Service Number Required!</source>
+    <target>需提供DELL服务编号！</target>
+</phrase>
 </QPH>
