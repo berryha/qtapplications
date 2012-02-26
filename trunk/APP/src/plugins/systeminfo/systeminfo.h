@@ -63,7 +63,10 @@ private slots:
     void on_toolButtonUpload_clicked();
     void on_toolButtonScan_clicked();
 
+    void getNewComputerName();
+    void on_pushButtonRenameComputer_clicked();
 
+    void setComputerName(const QString &newName);
 
 private:
     void initStatusBar();

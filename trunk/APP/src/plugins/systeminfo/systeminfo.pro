@@ -29,8 +29,7 @@ HEADERS += \
     systeminfoplugin.h \
     systeminfo.h
 FORMS += systeminfo.ui \
-    systeminfowidget/systeminfowidget.ui \
-    systeminfo.ui
+    systeminfowidget/systeminfowidget.ui
 SOURCES += systeminfoplugin.cpp \
     systeminfo.cpp
 RESOURCES += systeminfo.qrc

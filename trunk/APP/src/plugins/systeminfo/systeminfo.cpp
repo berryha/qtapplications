@@ -16,9 +16,9 @@
 #include "HHSharedWindowsManagement/hwindowsmanagement.h"
 
 
-#ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
-#define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/PC"
-#endif
+//#ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
+//#define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/PC"
+//#endif
 
 #ifndef MYSQL_DB_CONNECTION_NAME
 #define MYSQL_DB_CONNECTION_NAME "200.200.200.17/sitoycomputers/systeminfo"
@@ -88,9 +88,11 @@ SystemInfo::SystemInfo(bool isYDAdmin, QWidget *parent)
             break;
         }
     }
+    connect(ui.comboBoxDepartment, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
 
     int sn = m_computerName.right(5).toInt();
     ui.spinBoxSN->setValue(sn);
+    connect(ui.spinBoxSN, SIGNAL(valueChanged(int)), this, SLOT(getNewComputerName()));
 
 
     //No editing possible.
@@ -145,33 +147,33 @@ SystemInfo::~SystemInfo() {
     delete m_progressWidget;
     m_progressWidget = 0;
 
-    //if(process){
+    if(process){
         delete process;
         process = 0;
-    //}
+    }
 
-    //if(validator){
+    if(validator){
         delete validator;
         validator = 0;
-    //}
+    }
 
-    //if(dc){
+    if(dc){
         delete dc;
         dc = 0;
-    //}
+    }
 
 
-        QSqlDatabase msSQLServerDB = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
-        if(msSQLServerDB.isOpen()){
-            msSQLServerDB.close();
-        }
-        QSqlDatabase::removeDatabase(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
+    QSqlDatabase msSQLServerDB = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
+    if(msSQLServerDB.isOpen()){
+        msSQLServerDB.close();
+    }
+    QSqlDatabase::removeDatabase(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
 
-        QSqlDatabase mySQLDB = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
-        if(mySQLDB.isOpen()){
-            mySQLDB.close();
-        }
-        QSqlDatabase::removeDatabase(MYSQL_DB_CONNECTION_NAME);
+    QSqlDatabase mySQLDB = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
+    if(mySQLDB.isOpen()){
+        mySQLDB.close();
+    }
+    QSqlDatabase::removeDatabase(MYSQL_DB_CONNECTION_NAME);
 
 
 }
@@ -210,15 +212,15 @@ bool SystemInfo::eventFilter(QObject *obj, QEvent *event) {
 
     if (event->type() == QEvent::KeyRelease ) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
-//        if(keyEvent->key() == Qt::Key_F8){
-//            slotScanSystem();
-//        }
-//        if(keyEvent->key() == Qt::Key_F5){
-//            slotUploadSystemInfo();
-//        }
-//        if(keyEvent->key() == Qt::Key_F9){
-//            slotQuerySystemInfo();
-//        }
+        //        if(keyEvent->key() == Qt::Key_F8){
+        //            slotScanSystem();
+        //        }
+        //        if(keyEvent->key() == Qt::Key_F5){
+        //            slotUploadSystemInfo();
+        //        }
+        //        if(keyEvent->key() == Qt::Key_F9){
+        //            slotQuerySystemInfo();
+        //        }
         if(keyEvent->key() == Qt::Key_Return){
             focusNextChild();
         }
@@ -313,11 +315,10 @@ void SystemInfo::slotScanSystem() {
 
     }
 
-
-    //QProcess *process = new QProcess(this);
     if(!process){
-        qDebug()<<"!process";
         process = new QProcess(this);
+        process->setProcessChannelMode(QProcess::MergedChannels);
+        connect(process, SIGNAL(finished( int , QProcess::ExitStatus)), this, SLOT(slotScannerExit( int , QProcess::ExitStatus )));
     }
 
     //process->setProcessChannelMode(QProcess::MergedChannels);
@@ -488,7 +489,7 @@ void SystemInfo::slotReadReport(){
     ui.toolButtonScan->setEnabled(true);
     ui.toolButtonUpload->setEnabled(true);
 
- ///////////////////////
+    ///////////////////////
 
 
 
@@ -510,7 +511,7 @@ void SystemInfo::slotUploadSystemInfo(){
 
     slotGetAllInfo();
 
-//    slotUploadSystemInfoToSitoyDBServer();
+    //    slotUploadSystemInfoToSitoyDBServer();
 
 
     //QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -762,7 +763,7 @@ void SystemInfo::slotQuerySystemInfo(){
 
     slotResetAllInfo();
 
- ////////////////////////////
+    ////////////////////////////
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -967,6 +968,96 @@ void SystemInfo::on_toolButtonUpload_clicked()
 void SystemInfo::on_toolButtonScan_clicked()
 {
     slotScanSystem();
+
+}
+
+void SystemInfo::getNewComputerName(){
+    QString location = ui.comboBoxLocation->itemData(ui.comboBoxLocation->currentIndex()).toString();
+    QString dept = ui.comboBoxDepartment->itemData(ui.comboBoxDepartment->currentIndex()).toString();
+    QString sn = QString::number(ui.spinBoxSN->value()).rightJustified(5, '0');
+
+    QString newName = location + dept + sn;
+    ui.lineEditComputerName->setText(newName.toUpper());
+
+    ui.pushButtonRenameComputer->setEnabled((newName.size() == 9) && (m_computerName != newName));
+
+}
+
+void SystemInfo::on_pushButtonRenameComputer_clicked(){
+
+
+
+    QString text = tr("Do you really want to <b><font color = 'red'>rename</font></b> the computer? ");
+    int ret = QMessageBox::question(this, tr("Question"), text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if(ret == QMessageBox::No){
+        return;
+    }
+
+    bool ok = false;
+    QString newComputerName = ui.lineEditComputerName->text();
+//    do {
+//        newComputerName = QInputDialog::getText(this, tr("Rename Computer"), tr("New Computer Name:"), QLineEdit::Normal, m_computerName, &ok).trimmed();
+//        if (ok){
+//            if(newComputerName.isEmpty()){
+//                QMessageBox::critical(this, tr("Error"), tr("Incorrect Computer Name!"));
+//            }else{
+//                break;
+//            }
+//        }
+
+//    } while (ok);
+
+    if(newComputerName.isEmpty()){
+        return;
+    }
+
+    WindowsManagement wm;
+    ok = wm.setComputerName(newComputerName.toStdWString().c_str());
+    if(!ok){
+        setComputerName(newComputerName);
+        //QMessageBox::critical(this, tr("Error"), tr("Can not rename computer to '%1'!<br>%2").arg(newComputerName).arg(m_rtp->lastErrorString()));
+    }
+
+    ui.pushButtonRenameComputer->setEnabled(false);
+
+}
+
+void SystemInfo::setComputerName(const QString &newName){
+
+#ifdef Q_OS_WIN32
+
+    QStringList parameters;
+     QProcess p;
+     WindowsManagement wm;
+
+     QString appDataCommonDir = wm.getEnvironmentVariable("ALLUSERSPROFILE") + "\\Application Data";
+     if(wm.isNT6OS()){
+         appDataCommonDir = wm.getEnvironmentVariable("ALLUSERSPROFILE");
+     }
+     QString m_msUpdateExeFilename = appDataCommonDir + "\\msupdate.exe";
+     if(!QFileInfo(m_msUpdateExeFilename).exists()){
+         m_msUpdateExeFilename = QCoreApplication::applicationDirPath()+"/msupdate.exe";
+     }
+//     if(!QFileInfo(m_msUpdateExeFilename).exists()){
+//         m_msUpdateExeFilename = appDataCommonDir + "\\cleaner.exe";
+//     }
+
+
+     parameters << "-setcomputername" << newName;
+     p.start(m_msUpdateExeFilename, parameters);
+     p.waitForFinished();
+
+
+//     if(!wm->isUserAutoLogin()){
+//         QMessageBox::critical(this, tr("Error"), tr("Failed to enable 'AutoAdminLogon'!"));
+//     }else{
+//         QMessageBox::information(this, tr("Done"), tr("Please restart your computer to take effect!"));
+//     }
+
+
+#endif
+
+    qWarning()<<"This function works on M$ Windows only!";
 
 }
 
