@@ -455,6 +455,7 @@ void SystemInfo::slotReadReport(){
     //m_workgroup = systemInfo.value("Workgroup").toString();
     //QString computerName = systemInfo.value("ComputerName").toString();
     windowsDir = systemInfo.value("WindowsDir").toString();
+    osKey = systemInfo.value("Key").toString();
 
 
     ui.osVersionLineEdit->setText(m_os);
@@ -584,25 +585,32 @@ void SystemInfo::slotUploadSystemInfo(){
             return;
         }
 
-        query.prepare(QString("UPDATE assetsinfo SET Workgroup = :Workgroup, Users = :Users, OS = :OS, SN = :SN, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
-                              "InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
-                              "NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = :UpdateTime, Remark = :Remark"
-                              " WHERE ComputerName ＝ '%1'").arg(m_computerName));
+        bool ok = query.prepare(QString("UPDATE assetsinfo SET Workgroup = :Workgroup, Users = :Users, OS = :OS, SN = :SN, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
+                              " InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
+                              " NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = NULL, Remark = :Remark "
+                              " WHERE ComputerName = '%1'").arg(m_computerName));
+        if(!ok){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to prepare query! <br>%1").arg(query.lastError().text()));
+            return;
+        }
 
     }else{
-        query.prepare("INSERT INTO assetsinfo (ComputerName, Workgroup, Users, OS, SN, Vender, Warranty, ServiceNumber, Registrant, "
-                      "InstallationDate, OSKey, CPU, MotherboardName, Chipset, Memory, Storage, Video, Audio, NIC1, NIC2, Monitor, "
-                      "UpdateTime, Remark)"
-                      "VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :Warranty, :ServiceNumber, :Registrant, "
-                      ":InstallationDate, :OSKey, :CPU, :MotherboardName, :Chipset, :Memory, :Storage, :Video, :Audio, :NIC1, :NIC2, :Monitor, "
-                      ":UpdateTime, :Remark"
+         bool ok = query.prepare("INSERT INTO assetsinfo (ComputerName, Workgroup, Users, OS, SN, Vender, Warranty, ServiceNumber, Registrant, "
+                      " InstallationDate, OSKey, CPU, MotherboardName, Chipset, Memory, Storage, Video, Audio, NIC1, NIC2, Monitor, "
+                      " UpdateTime, Remark)"
+                      " VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :Warranty, :ServiceNumber, :Registrant, "
+                      " :InstallationDate, :OSKey, :CPU, :MotherboardName, :Chipset, :Memory, :Storage, :Video, :Audio, :NIC1, :NIC2, :Monitor, "
+                      " NULL, :Remark"
                       ")"
-
                       );
+        if(!ok){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to prepare query! <br>%1").arg(query.lastError().text()));
+            return;
+        }
 
+        query.bindValue(":ComputerName", m_computerName);
     }
 
-    query.bindValue(":ComputerName", m_computerName);
     query.bindValue(":Workgroup", m_workgroup);
     query.bindValue(":Users", m_users);
     query.bindValue(":OS", m_os);
@@ -624,17 +632,15 @@ void SystemInfo::slotUploadSystemInfo(){
     query.bindValue(":NIC1", nic1Info);
     query.bindValue(":NIC2", nic2Info);
     query.bindValue(":Monitor", monitor);
-    query.bindValue(":UpdateTime", "NULL");
     query.bindValue(":Remark", remark );
 
 
     if(!query.exec()){
         QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, QObject::tr("Fatal Error"), tr("Can not upload data to server! <br> %1").arg(query.lastError().text()));
+        QMessageBox::critical(this, QObject::tr("Error"), tr("Can not upload data to server! <br> %1").arg(query.lastError().text()));
         qCritical()<<QString("Can not upload data to server!");
         qCritical()<<QString("Error: %1").arg(query.lastError().text());
 //        statusBar()->showMessage(tr("Error! Can not upload data to server!"));
-
         return;
     }
     query.clear();
@@ -990,7 +996,7 @@ void SystemInfo::slotGetAllInfo()
 
     serviceNumber = ui.lineEditDellServiceNumber->text().trimmed();
     vender = ui.comboBoxVender->currentText();
-    warranty = ui.lineEditWarranty->text().trimmed().toUInt();
+    warranty = ui.lineEditWarranty->text();
     remark = ui.textEditRemark->toPlainText();
 
 
