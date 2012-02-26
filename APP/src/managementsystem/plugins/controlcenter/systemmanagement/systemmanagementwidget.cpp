@@ -656,7 +656,6 @@ void SystemManagementWidget::getNewComputerName(){
 
     ui.pushButtonRenameComputer->setEnabled((newName.size() == 9) && (m_computerName != newName));
 
-
 }
 
 void SystemManagementWidget::on_pushButtonRenameComputer_clicked(){
