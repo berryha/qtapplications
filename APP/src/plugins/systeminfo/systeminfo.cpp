@@ -9,7 +9,7 @@
 #include <QSqlQuery>
 #include <QHostInfo>
 #include <QStatusBar>
-
+#include <QSettings>
 
 #include "./systeminfo.h"
 #include "HHSharedCore/hglobal_core.h"
@@ -1098,6 +1098,9 @@ void SystemInfo::on_pushButtonRenameComputer_clicked(){
     sn = ui.spinBoxSN->value();
 
     ui.computerNameLineEdit->setText(m_computerName);
+
+    QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\HEHUI", QSettings::NativeFormat, this);
+    settings.setValue("ComputerName", m_computerName);
 
 }
 
