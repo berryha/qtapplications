@@ -71,9 +71,6 @@
       </item>
       <item>
        <widget class="QComboBox" name="comboBoxLocation">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="minimumSize">
          <size>
           <width>80</width>
@@ -104,9 +101,6 @@
       </item>
       <item>
        <widget class="QComboBox" name="comboBoxDepartment">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -152,9 +146,6 @@
       </item>
       <item>
        <widget class="QSpinBox" name="spinBoxSN">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -204,6 +195,13 @@
       <string>Assets Registration </string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="6">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Registrant:</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -245,7 +243,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="6">
+      <item row="0" column="7">
+       <widget class="QLineEdit" name="lineEditRegistrant">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="8">
        <widget class="QTextEdit" name="textEditRemark"/>
       </item>
      </layout>
@@ -260,7 +265,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabOS">
       <attribute name="title">
@@ -626,11 +631,7 @@
            </widget>
           </item>
           <item row="6" column="1" colspan="3">
-           <widget class="QLineEdit" name="monitorLineEdit">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="monitorLineEdit"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="dmiUUIDLabel">
