@@ -371,6 +371,311 @@
     </message>
 </context>
 <context>
+    <name>HEHUI::SystemInfo</name>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="50"/>
+        <source>Dong Guan</source>
+        <translation>东莞</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="51"/>
+        <source>Ying De</source>
+        <translation>英德</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="52"/>
+        <source>Hong Kong</source>
+        <translation>香港</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="64"/>
+        <source>IT</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="65"/>
+        <source>Account</source>
+        <translation>会计部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="66"/>
+        <source>AdminDept</source>
+        <translation>行政部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="67"/>
+        <source>Cost</source>
+        <translation>成本部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="68"/>
+        <source>Custom</source>
+        <translation>报关组</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="69"/>
+        <source>GMO</source>
+        <translation>总经办</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="70"/>
+        <source>HR</source>
+        <translation>人事部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="71"/>
+        <source>Marker</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="72"/>
+        <source>PDS</source>
+        <translation>板房</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="73"/>
+        <source>PG</source>
+        <translation>开发部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="74"/>
+        <source>Plan</source>
+        <translation>计划部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="75"/>
+        <source>PMC</source>
+        <translation>物控部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="76"/>
+        <source>QC</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="77"/>
+        <source>Retail</source>
+        <translation>零售部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="78"/>
+        <source>Sales</source>
+        <translation>业务部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="80"/>
+        <source>Secretary</source>
+        <translation>秘书</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="81"/>
+        <source>Ship</source>
+        <translation>船务部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="82"/>
+        <source>Shop</source>
+        <translation>生产部</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="83"/>
+        <source>WHouse</source>
+        <translation>仓库</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="141"/>
+        <source>Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="193"/>
+        <location filename="systeminfo/systeminfo.cpp" line="338"/>
+        <source>Scanning....</source>
+        <translation>正在扫描....</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="193"/>
+        <source>Scanner is running! &lt;br&gt; Exit the system?</source>
+        <translation>扫描器正在运行！&lt;br&gt;确定要退出系统？</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="304"/>
+        <source>System Infomation File Already Exists!</source>
+        <translation>系统信息文件已经存在！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="304"/>
+        <source>Rescan the system?</source>
+        <translation>重新扫描系统？</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="316"/>
+        <location filename="systeminfo/systeminfo.cpp" line="346"/>
+        <location filename="systeminfo/systeminfo.cpp" line="352"/>
+        <location filename="systeminfo/systeminfo.cpp" line="360"/>
+        <location filename="systeminfo/systeminfo.cpp" line="387"/>
+        <location filename="systeminfo/systeminfo.cpp" line="570"/>
+        <location filename="systeminfo/systeminfo.cpp" line="593"/>
+        <location filename="systeminfo/systeminfo.cpp" line="607"/>
+        <location filename="systeminfo/systeminfo.cpp" line="661"/>
+        <location filename="systeminfo/systeminfo.cpp" line="864"/>
+        <location filename="systeminfo/systeminfo.cpp" line="1023"/>
+        <location filename="systeminfo/systeminfo.cpp" line="1031"/>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="316"/>
+        <source>File &apos;</source>
+        <translation>文件 &apos;</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="316"/>
+        <location filename="systeminfo/systeminfo.cpp" line="387"/>
+        <source>&apos; Missing!</source>
+        <translation>&apos; 丢失！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="346"/>
+        <source>Scanner Error!</source>
+        <translation>扫描器发生错误！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="352"/>
+        <source>Can not open system info file &apos;</source>
+        <translation>无法打开系统信息文件 &apos;</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="352"/>
+        <location filename="systeminfo/systeminfo.cpp" line="360"/>
+        <source>&apos;!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="360"/>
+        <source>Can not write system info file &apos;</source>
+        <translation>无法写系统信息文件 &apos;</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="376"/>
+        <source>Reading Reports....</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="387"/>
+        <source>System Info File &apos;</source>
+        <translation>系统信息文件 &apos;</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="390"/>
+        <source>Error! Client Info File &apos;%1&apos; missing!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="524"/>
+        <source>Done. Press &apos;Ctrl+S&apos; to upload the data to server!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="557"/>
+        <location filename="systeminfo/systeminfo.cpp" line="825"/>
+        <location filename="systeminfo/systeminfo.cpp" line="848"/>
+        <source>Fatal Error</source>
+        <translation>严重错误</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="557"/>
+        <source>Database Connection Failed! Upload Failed!</source>
+        <translation>连接数据库失败！上传失败！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="570"/>
+        <source>Failed to query info! &lt;br&gt;%1</source>
+        <translation>无法查询信息! &lt;br&gt;%1</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="583"/>
+        <source>Record Already Exists!</source>
+        <translation>记录已经存在！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="583"/>
+        <source>Record Already Exists!&lt;br&gt;Update it?</source>
+        <translation>记录已经存在！&lt;br&gt;是否更新它？</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="593"/>
+        <location filename="systeminfo/systeminfo.cpp" line="607"/>
+        <source>Failed to prepare query! &lt;br&gt;%1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="640"/>
+        <source>Can not upload data to server! &lt;br&gt; %1</source>
+        <translation>无法上传数据到服务器！&lt;br&gt;%1</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="643"/>
+        <source>Error! Can not upload data to server!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="661"/>
+        <source>Failed to upload installed software info to database! &lt;br&gt;%1</source>
+        <translation>无法上传已安装的软件信息到数据库！ &lt;br&gt;%1</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="671"/>
+        <source>Done</source>
+        <translation>完成</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="671"/>
+        <source>Data has been uploaded to server!</source>
+        <translation>数据已经被上传到服务器！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="674"/>
+        <source>Done! Data has been uploaded to server!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="825"/>
+        <source>Database Connection Failed! Query Failed!</source>
+        <translation>连接数据库失败！查询失败！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="864"/>
+        <source>No Record Found!</source>
+        <translation>没有找到记录！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="912"/>
+        <source>Last Update Time: %1</source>
+        <translation>最后更新时间：%1</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="1023"/>
+        <source>Invalid Computer Name!</source>
+        <translation>无效的计算机名称！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="1031"/>
+        <source>Dell Service Number Required!</source>
+        <translation>需提供DELL服务编号！</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="1063"/>
+        <source>Do you really want to &lt;b&gt;&lt;font color = &apos;red&apos;&gt;rename&lt;/font&gt;&lt;/b&gt; the computer? </source>
+        <translation>你真的想要 &lt;font color = &apos;red&apos;&gt;&lt;b&gt;重命名&lt;/b&gt;&lt;/font&gt; 这台计算机？</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.cpp" line="1064"/>
+        <source>Question</source>
+        <translation>询问</translation>
+    </message>
+</context>
+<context>
     <name>HEHUI::SystemInfoPlugin</name>
     <message>
         <location filename="systeminfo/systeminfoplugin.cpp" line="99"/>
@@ -393,40 +698,40 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="156"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="466"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="851"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1070"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="158"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="468"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="856"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1075"/>
         <source>Question</source>
         <translation>询问</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="466"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="468"/>
         <source>Do you want to initialize the settings?</source>
         <translation>你要初始化设置吗？</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="472"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="474"/>
         <source>Initialize user&apos;s settings</source>
         <translation>初始化用户设置</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="315"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="317"/>
         <source>Password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="136"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="138"/>
         <source>Failed to get join information!</source>
         <translation>无法获取本机加入的工作组或域信息！</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="388"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="390"/>
         <source>Job Inprogress</source>
         <translation>工作进度</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="388"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="390"/>
         <source>Job Inprogress! Application will exit later!</source>
         <translation>工作进行中！程序稍后退出！</translation>
     </message>
@@ -446,130 +751,130 @@
         <translation>无法停用‘自动登陆’！</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="640"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="653"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="681"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="968"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="645"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="658"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="686"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="973"/>
         <source>Fatal Error</source>
         <translation>严重错误</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="640"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="645"/>
         <source>Database Connection Failed! Query Failed!</source>
         <translation>连接数据库失败！查询失败！</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="653"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="681"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="658"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="686"/>
         <source>%1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="851"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="856"/>
         <source>&lt;b&gt;&lt;font color=red&gt;This computer is already joined to domain &apos;%1&apos; !&lt;/font&gt;&lt;/b&gt;&lt;br&gt; Do you want to use this account to logon to the domain automatically?</source>
         <translation>&lt;b&gt;&lt;font color=red&gt;此计算机已经加入到域 &apos;%1&apos; ！&lt;/font&gt;&lt;/b&gt;&lt;br&gt; 你真的想用这个帐户来自动登陆到域？</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="874"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="879"/>
         <source>You don&apos;t have the administrator privilege!</source>
         <translation>你没有管理员权限!</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="881"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="886"/>
         <source>Confirm</source>
         <translation>确认</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="881"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="886"/>
         <source>&lt;b&gt;&lt;font color=red&gt;User &apos;%1&apos; already exists!&lt;/font&gt;&lt;/b&gt;&lt;br&gt; Do you want to enable &apos;AutoAdminLogon&apos; with this account?</source>
         <translation>&lt;b&gt;&lt;font color=red&gt;用户 &apos;%1&apos; 已存在！&lt;/font&gt;&lt;/b&gt;&lt;br&gt; 你想要让该用户自动登陆吗？</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="913"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="918"/>
         <source>Add user to local system</source>
         <translation>添加用户到本地系统</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1283"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1294"/>
         <source>Incorrect Access Code!</source>
         <translation>访问代码错误!</translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.cpp" line="578"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="957"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="964"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1002"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="962"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="969"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1007"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="957"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="962"/>
         <source>User &apos;%1&apos; has been successfully added to the system!</source>
         <translation>用户&apos;%1&apos;已经成功地添加到本地系统！</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="960"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="965"/>
         <source>&lt;p&gt;&lt;b&gt;Some errors occured while adding user &apos;%1&apos; to the system!&lt;/b&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;添加用户&apos;%1&apos;到本地系统时发生了一些错误！&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1065"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1070"/>
         <source>&lt;b&gt;&lt;font color=red&gt;This computer is already joined to domain &apos;%1&apos; !&lt;/font&gt;&lt;/b&gt;&lt;br&gt; </source>
         <translation>&lt;b&gt;&lt;font color=red&gt;此计算机已经加入到域 &apos;%1&apos; ！&lt;/font&gt;&lt;/b&gt;&lt;br&gt; </translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1067"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1072"/>
         <source>Do you want to use account &lt;font color=red&gt;&apos;%1&apos;&lt;/font&gt; to logon %2 automatically?</source>
         <translation>你真的想用帐户 &lt;font color=red&gt;‘%1’&lt;/font&gt; 来自动登陆？</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1272"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1282"/>
         <source>Privilege Required</source>
         <translation>要求提供授权</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1273"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1283"/>
         <source>Access Code:</source>
         <translation>访问代码：</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="156"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="158"/>
         <source>Do you want to disable &apos;AutoAdminLogon&apos;?</source>
         <translation>你想禁用 &apos;AutoAdminLogon&apos; 吗？</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="136"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="138"/>
         <location filename="usermanager/usermanagermainwindow.cpp" line="576"/>
         <location filename="usermanager/usermanagermainwindow.cpp" line="590"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="874"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="892"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="993"/>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1283"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="879"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="897"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="998"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1294"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="996"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1001"/>
         <source>&lt;p&gt;&lt;b&gt;Some errors occured while initializing the settings!&lt;/b&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;初始化系统设置时发生了一些错误！&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1000"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1005"/>
         <source>Initialization Done</source>
         <translation>初始化完成</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="1002"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="1007"/>
         <source>Initialization Done!</source>
         <translation>初始化完成！</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="934"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="939"/>
         <source>Invalid Operation</source>
         <translation>无效操作</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.cpp" line="934"/>
+        <location filename="usermanager/usermanagermainwindow.cpp" line="939"/>
         <source>This Function Is For Fucking M$ Windows Only!</source>
         <translation>本功能仅在该死的M$操作系统上可用！</translation>
     </message>
@@ -593,69 +898,57 @@
     <name>ModifyUserInfoDialog</name>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="14"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="173"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="20"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="174"/>
         <source>Chinese &amp;Name:</source>
         <translation>中文名称[&amp;N]:</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="40"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="175"/>
         <source>&amp;Department:</source>
         <translation>部门[&amp;D]:</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="56"/>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="62"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="179"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="185"/>
         <source>Department</source>
         <translation>部门</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="104"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="176"/>
         <source>MIS</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="177"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="187"/>
         <source>Email</source>
         <translation>电子邮件</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="183"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="189"/>
         <source>External Email Account</source>
         <translation>外部邮件帐号</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="193"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="192"/>
         <source>Internal Email Account</source>
         <translation>内部邮件帐号</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="203"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="195"/>
         <source>Email Account Name</source>
         <translation>外部邮件帐号</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="228"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="197"/>
         <source>&amp;OK</source>
         <translation>确定[&amp;O]</translation>
     </message>
     <message>
         <location filename="usermanager/modifyuserinfo/modifyuserinfodialog.ui" line="251"/>
-        <location filename="usermanager/ui/ui_modifyuserinfodialog.h" line="198"/>
         <source>&amp;Cancel</source>
         <translation>取消[&amp;C]</translation>
     </message>
@@ -663,109 +956,92 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="systeminfo/systeminfo.cpp" line="822"/>
-        <location filename="systeminfo/systeminfo.cpp" line="950"/>
-        <source>Fatal Error</source>
-        <translation>严重错误</translation>
+        <location filename="systeminfo/systeminfo.cpp" line="640"/>
+        <source>Error</source>
+        <translation type="unfinished">错误</translation>
     </message>
 </context>
 <context>
     <name>SettingsDialogClass</name>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="14"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="254"/>
         <source>SettingsDialog</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="38"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="255"/>
         <source>Domain Account</source>
-        <translation type="unfinished"></translation>
+        <translation>域帐用户帐号</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="58"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="256"/>
         <source>Local Account</source>
-        <translation type="unfinished"></translation>
+        <translation>本地用户帐号</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="95"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="257"/>
         <source>&amp;Location:</source>
         <translation>位置(&amp;L)</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="118"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="260"/>
         <source>DongGuan No. 1 Branch FTY.</source>
         <oldsource>DongGuan LEATHER PRODUCTS FTY.</oldsource>
         <translation>东莞一厂</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="123"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="261"/>
         <source>DongGuan No. 2 Branch FTY.</source>
         <oldsource>DongGuan HANDBAG FTY.</oldsource>
         <translation>东莞二厂</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="128"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="262"/>
         <source>DongGuan No. 3 Branch FTY.</source>
         <translation>东莞三厂</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="133"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="263"/>
         <source>DongGuan No. 4 Branch FTY.</source>
         <translation>东莞四厂</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="138"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="264"/>
         <source>YingDe   LEATHER PRODUCTS FTY.</source>
         <translation>英德厂</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="154"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="266"/>
         <source>Domain:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="170"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="267"/>
         <source>Computer Name</source>
         <translation>计算机名称</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="176"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="268"/>
         <source>Current:</source>
         <translation>当前名称：</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="193"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="269"/>
         <source>&amp;New:</source>
         <translation>新名称(&amp;N)：</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="218"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="270"/>
         <source>Auto Logon</source>
-        <translation type="unfinished"></translation>
+        <translation>自动登陆</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="241"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="271"/>
         <source>&amp;OK</source>
         <translation>确定(&amp;O)</translation>
     </message>
     <message>
         <location filename="usermanager/settingsdialog/settingsdialog.ui" line="264"/>
-        <location filename="usermanager/ui/ui_settingsdialog.h" line="272"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
@@ -1040,628 +1316,280 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>SystemInfo</name>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="104"/>
-        <source>Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query</source>
-        <translation>Ctrl+S: 上传    F5: 扫描    Ctrl+Return: 查询</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="156"/>
-        <location filename="systeminfo/systeminfo.cpp" line="370"/>
-        <source>Scanning....</source>
-        <translation>正在扫描....</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="156"/>
-        <source>Scanner is running! &lt;br&gt; Exit the system?</source>
-        <translation>扫描器正在运行！&lt;br&gt;确定要退出系统？</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="274"/>
-        <source>This Function Is For Fucking M$ Windows Only!</source>
-        <translation>本功能仅在该死的M$操作系统上可用！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="300"/>
-        <source>Deleting %1</source>
-        <translation>正在删除 %1</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="315"/>
-        <source>Temporary files deleted.</source>
-        <translation>已经删除临时文件。</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="335"/>
-        <source>System Infomation File Already Exists!</source>
-        <translation>系统信息文件已经存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="335"/>
-        <source>Rescan the system?</source>
-        <translation>重新扫描系统？</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="347"/>
-        <location filename="systeminfo/systeminfo.cpp" line="399"/>
-        <location filename="systeminfo/systeminfo.cpp" line="632"/>
-        <location filename="systeminfo/systeminfo.cpp" line="693"/>
-        <location filename="systeminfo/systeminfo.cpp" line="705"/>
-        <location filename="systeminfo/systeminfo.cpp" line="711"/>
-        <location filename="systeminfo/systeminfo.cpp" line="721"/>
-        <location filename="systeminfo/systeminfo.cpp" line="729"/>
-        <location filename="systeminfo/systeminfo.cpp" line="866"/>
-        <location filename="systeminfo/systeminfo.cpp" line="974"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1165"/>
-        <source>Error</source>
-        <translation>错误</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="347"/>
-        <location filename="systeminfo/systeminfo.cpp" line="399"/>
-        <source>File &apos;</source>
-        <translation>文件 &apos;</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="347"/>
-        <location filename="systeminfo/systeminfo.cpp" line="399"/>
-        <source>&apos; Missing!</source>
-        <translation>&apos; 丢失！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="388"/>
-        <source>Reading Reports....</source>
-        <translation>正在读取报告....</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="402"/>
-        <source>Error! File &apos;%1&apos; missing!</source>
-        <translation>错误！文件 &apos;%1&apos; 丢失！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="531"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1106"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1382"/>
-        <source>Yes</source>
-        <translation>是</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="533"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1108"/>
-        <source>No</source>
-        <translation>否</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="573"/>
-        <source>Done. Press &apos;Ctrl+S&apos; to upload the data to server!</source>
-        <translation>完成。请按&apos;Ctrl+S&apos;上传数据到服务器！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="923"/>
-        <source>Record &apos;%1&apos; already exists in server 200.200.200.2!&lt;br&gt;Update it?</source>
-        <translation>记录&apos;%1&apos;已经在服务器200.200.200.2上存在！是否更新？</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1513"/>
-        <source>Record &apos;%1&apos; already exists!</source>
-        <translation>记录&apos;%1&apos;已经存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1537"/>
-        <source>Record &apos;%1&apos; does not exist!</source>
-        <translation>记录&apos;%1&apos;不存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="588"/>
-        <location filename="systeminfo/systeminfo.cpp" line="608"/>
-        <source>Select files to be backup</source>
-        <translation>选择要备份的文件</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="590"/>
-        <source>All Files (*);;Excel Files (*.xls);;Word Files (*.doc)</source>
-        <translation>所有文件 (*);;Excel (*.xls);;Word (*.doc)</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="610"/>
-        <source>All Files (*);;DBX Files (*.dbx)</source>
-        <translation>所有文件 (*);;DBX (*.dbx)</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="625"/>
-        <source>Select target directory</source>
-        <translation>选择目标目录</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="629"/>
-        <source>Operation &apos;My Documents Backup&apos; canceled!</source>
-        <translation>&apos;备份我的文档&apos; 操作已取消！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="632"/>
-        <location filename="systeminfo/systeminfo.cpp" line="633"/>
-        <source>Source and target directory should not be the same!</source>
-        <translation>源目录和目标目录不能相同！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="642"/>
-        <source>Copying %1</source>
-        <translation>正在复制 %1</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="651"/>
-        <source>Operation &apos;My Documents Backup&apos; Done.</source>
-        <translation>&apos;备份我的文档&apos; 操作已完成。</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="662"/>
-        <source>File Already Exists!</source>
-        <translation>文件已经存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="662"/>
-        <source>File &apos;%1&apos; Already Exists!&lt;br&gt;Overwrite it?</source>
-        <translation>文件 &apos;%1&apos; 已经存在！&lt;br&gt;是否覆盖？</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="672"/>
-        <location filename="systeminfo/systeminfo.cpp" line="758"/>
-        <location filename="systeminfo/systeminfo.cpp" line="884"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1017"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1044"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1188"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1211"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1481"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1507"/>
-        <source>Fatal Error</source>
-        <translation>严重错误</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="673"/>
-        <source>Can not remove the target file %1</source>
-        <translation>无法移除目标文件 %1</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="950"/>
-        <source>Can not upload data to server 200.200.200.2! &lt;br&gt; %1</source>
-        <translation>无法上传数据到服务器200.200.200.2! &lt;br&gt; %1</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="953"/>
-        <source>Error! Can not upload data to server 200.200.200.2!</source>
-        <translation>错误！无法上传数据到服务器200.200.200.2！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="961"/>
-        <source>Data has been uploaded to server 200.200.200.2!</source>
-        <translation>数据已上传到服务器 200.200.200.2！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="964"/>
-        <source>Done! Data has been uploaded to server 200.200.200.2!</source>
-        <translation>完成！数据被成功上传到服务器200.200.200.2！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1017"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1188"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1481"/>
-        <source>Database Connection Failed! Query Failed!</source>
-        <translation>连接数据库失败！查询失败！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1044"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1211"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1507"/>
-        <source>Duplicate No.!</source>
-        <translation>编号重复！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1045"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1212"/>
-        <location filename="systeminfo/systeminfo.cpp" line="1508"/>
-        <source>Error! Duplicate No.!</source>
-        <translation>错误！编号重复！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="1165"/>
-        <source>Record does not exist!</source>
-        <translation>记录不存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="274"/>
-        <source>Operation Canceled</source>
-        <translation>操作被取消</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="693"/>
-        <location filename="systeminfo/systeminfo.cpp" line="866"/>
-        <location filename="systeminfo/systeminfo.cpp" line="974"/>
-        <source>Invalid Property NO.!</source>
-        <translation>无效的资产编号！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="705"/>
-        <source>Property NO. Required! </source>
-        <translation>要求提供资产编号！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="711"/>
-        <source>Department Information Required!</source>
-        <translation>要求提供部门信息！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="721"/>
-        <source>Service Number Required!</source>
-        <translation>要求提供服务编号！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="729"/>
-        <source>Devices Information Required! </source>
-        <translation>要求提供设备信息！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="758"/>
-        <location filename="systeminfo/systeminfo.cpp" line="884"/>
-        <source>Database Connection Failed! Upload Failed!</source>
-        <translation>连接数据库失败！上传失败！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="772"/>
-        <location filename="systeminfo/systeminfo.cpp" line="923"/>
-        <source>Record Already Exists!</source>
-        <translation>记录已经存在！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="772"/>
-        <source>Record &apos;%1&apos; Already Exists!&lt;br&gt;Update it?</source>
-        <translation>记录 &apos;%1&apos; 已经存在！&lt;br&gt;是否更新？</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="822"/>
-        <source>Can not upload data to server! &lt;br&gt; %1</source>
-        <translation>无法上传数据到服务器！&lt;br&gt;%1</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="825"/>
-        <source>Error! Can not upload data to server!</source>
-        <translation>错误！无法上传数据到服务器！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="836"/>
-        <location filename="systeminfo/systeminfo.cpp" line="961"/>
-        <source>Done</source>
-        <translation>完成</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="836"/>
-        <source>Data has been uploaded to server!</source>
-        <translation>数据已经被上传到服务器！</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.cpp" line="839"/>
-        <source>Done! Data has been uploaded to server!</source>
-        <translation>完成！数据被成功上传到服务器！</translation>
-    </message>
-</context>
-<context>
     <name>SystemInfoMainWindowUI</name>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="20"/>
-        <source>System Information</source>
+        <location filename="systeminfo/systeminfo.ui" line="14"/>
+        <source>System Info</source>
+        <oldsource>System Management</oldsource>
         <translation>系统信息</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="31"/>
-        <source>Software</source>
-        <translation>软件</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="46"/>
+        <location filename="systeminfo/systeminfo.ui" line="206"/>
         <source>OS</source>
         <translation>操作系统</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="55"/>
+        <location filename="systeminfo/systeminfo.ui" line="215"/>
         <source>OS Version:</source>
         <translation>系统版本：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="69"/>
-        <source>Logical Drives:</source>
-        <translation>逻辑驱动器：</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="86"/>
+        <location filename="systeminfo/systeminfo.ui" line="229"/>
         <source>Copmuter Name:</source>
         <translation>计算机名称：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="100"/>
-        <source>Workgroup:</source>
-        <translation>工作组：</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="110"/>
+        <location filename="systeminfo/systeminfo.ui" line="253"/>
         <source>Installation Date:</source>
         <translation>安装日期：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="134"/>
+        <location filename="systeminfo/systeminfo.ui" line="277"/>
         <source>System Users:</source>
         <translation>系统用户：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="156"/>
-        <source>Current User</source>
-        <translation>当前用户：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="21"/>
+        <source>Basic Info</source>
+        <translation>基本信息</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="162"/>
-        <source>User Name:</source>
-        <translation>用户名：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="33"/>
+        <source>Computer Name:</source>
+        <translation>计算机名称：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="169"/>
-        <source>Is Admin:</source>
-        <translation>管理员：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="60"/>
+        <source>Location:</source>
+        <translation>位置：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="186"/>
-        <source>Folder Size(MB):</source>
-        <translation>文件夹大小(MB)：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="90"/>
+        <source>Department:</source>
+        <translation>部门：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="200"/>
-        <source>Biggest .dbx(MB):</source>
-        <translation>最大文件(MB)：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="135"/>
+        <source>SN:</source>
+        <translation>编号：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="217"/>
-        <source>Temp Files(MB):</source>
-        <translation>临时文件(MB)：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="171"/>
+        <source>Rename Computer</source>
+        <translation>重命名计算机</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="231"/>
-        <source>IE Temp Files(MB):</source>
-        <translation>IE临时文件(MB)：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="740"/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="248"/>
-        <location filename="systeminfo/systeminfo.ui" line="325"/>
-        <source>Backup</source>
-        <translation>备份</translation>
+        <location filename="systeminfo/systeminfo.ui" line="752"/>
+        <source>Assets Registration </source>
+        <translation>资产登记</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="262"/>
-        <source>OE Folder:</source>
-        <translation>OE存储位置：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="758"/>
+        <source>Registrant:</source>
+        <translation>登记人：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="283"/>
-        <source>Clean</source>
-        <translation>清理</translation>
+        <location filename="systeminfo/systeminfo.ui" line="765"/>
+        <source>DELL Service Number:</source>
+        <translation>DELL服务编号：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="311"/>
-        <source>My Documents</source>
-        <translation>我的文档</translation>
+        <location filename="systeminfo/systeminfo.ui" line="775"/>
+        <source>Vender:</source>
+        <translation>供应商：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="343"/>
-        <source>Hardware</source>
-        <translation>硬件</translation>
+        <location filename="systeminfo/systeminfo.ui" line="783"/>
+        <source>DIY</source>
+        <translation>组装</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="364"/>
+        <location filename="systeminfo/systeminfo.ui" line="788"/>
+        <source>DELL</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="799"/>
+        <source>Warranty:</source>
+        <oldsource>Warranty(Months):</oldsource>
+        <translation>保修：</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="191"/>
+        <source>&amp;OS</source>
+        <translation>操作系统[&amp;O]</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="243"/>
+        <source>Workgroup/Domain:</source>
+        <translation>工作组或域：</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="297"/>
+        <source>Disk Drives:</source>
+        <translation>磁盘驱动器：</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="321"/>
+        <source>&amp;Devices</source>
+        <translation>设备(&amp;D)</translation>
+    </message>
+    <message>
+        <location filename="systeminfo/systeminfo.ui" line="342"/>
         <source>Devices</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="380"/>
+        <location filename="systeminfo/systeminfo.ui" line="358"/>
         <source>Video Card:</source>
         <translation>显卡：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="401"/>
-        <location filename="systeminfo/systeminfo.ui" line="466"/>
+        <location filename="systeminfo/systeminfo.ui" line="379"/>
+        <location filename="systeminfo/systeminfo.ui" line="444"/>
         <source>MAC Address:</source>
         <translation>网卡物理地址：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="422"/>
+        <location filename="systeminfo/systeminfo.ui" line="400"/>
         <source>CPU:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="436"/>
-        <location filename="systeminfo/systeminfo.ui" line="480"/>
+        <location filename="systeminfo/systeminfo.ui" line="414"/>
+        <location filename="systeminfo/systeminfo.ui" line="458"/>
         <source>IP Address:</source>
         <translation>IP地址：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="497"/>
+        <location filename="systeminfo/systeminfo.ui" line="475"/>
         <source>Adapter 1:</source>
         <translation>适配器1：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="504"/>
+        <location filename="systeminfo/systeminfo.ui" line="482"/>
         <source>Adapter 2:</source>
         <translation>适配器2：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="511"/>
+        <location filename="systeminfo/systeminfo.ui" line="489"/>
         <source>Network Info:</source>
         <translation>网络信息：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="518"/>
-        <location filename="systeminfo/systeminfo.ui" line="965"/>
+        <location filename="systeminfo/systeminfo.ui" line="496"/>
         <source>Motherboard:</source>
         <translation>主板：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="525"/>
+        <location filename="systeminfo/systeminfo.ui" line="503"/>
         <source>Chipset:</source>
         <translation>芯片：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="539"/>
+        <location filename="systeminfo/systeminfo.ui" line="517"/>
         <source>Memory:</source>
         <oldsource>Memory(MB):</oldsource>
         <translation>内存(MB)：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="556"/>
+        <location filename="systeminfo/systeminfo.ui" line="534"/>
         <source>Audio Card:</source>
         <translation>声卡：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="570"/>
-        <location filename="systeminfo/systeminfo.ui" line="1006"/>
+        <location filename="systeminfo/systeminfo.ui" line="548"/>
         <source>Monitor:</source>
         <translation>显示器：</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="580"/>
+        <location filename="systeminfo/systeminfo.ui" line="558"/>
         <source>DMI UUID:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="604"/>
-        <source>Other Info</source>
-        <translation>其它信息</translation>
+        <location filename="systeminfo/systeminfo.ui" line="589"/>
+        <source>&amp;Software</source>
+        <translation>软件(&amp;S)</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="610"/>
-        <source>&amp;ID:</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="608"/>
+        <source>Name</source>
+        <translation>名称</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="959"/>
-        <source>Manufacturing Date</source>
-        <translation>生产日期</translation>
+        <location filename="systeminfo/systeminfo.ui" line="613"/>
+        <source>Version</source>
+        <translation>版本</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="1052"/>
-        <source>Service NO.:</source>
-        <translation>服务编号：</translation>
+        <location filename="systeminfo/systeminfo.ui" line="618"/>
+        <source>Size</source>
+        <translation>大小</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="620"/>
-        <source>&amp;Remark:</source>
-        <translation>备注(&amp;R)</translation>
+        <location filename="systeminfo/systeminfo.ui" line="623"/>
+        <source>Date</source>
+        <translation>日期</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="633"/>
-        <source>SDG</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="628"/>
+        <source>Publisher</source>
+        <translation>发行商</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="638"/>
-        <source>SYD</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="672"/>
+        <source>Ctrl+Return</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="646"/>
-        <location filename="systeminfo/systeminfo.ui" line="675"/>
-        <source>-</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="701"/>
+        <location filename="systeminfo/systeminfo.ui" line="704"/>
+        <source>Get System Information</source>
+        <translation>获取系统信息</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="657"/>
-        <source>A</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="707"/>
+        <source>Scan</source>
+        <translation>扫描</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="662"/>
-        <source>B</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="714"/>
+        <source>F5</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="667"/>
-        <source>C</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="727"/>
+        <location filename="systeminfo/systeminfo.ui" line="730"/>
+        <source>Save System Information</source>
+        <translation>保存系统信息</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="688"/>
-        <source>0</source>
-        <translation></translation>
+        <location filename="systeminfo/systeminfo.ui" line="733"/>
+        <source>Save</source>
+        <translation>保存</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="712"/>
-        <location filename="systeminfo/systeminfo.ui" line="715"/>
+        <location filename="systeminfo/systeminfo.ui" line="665"/>
         <source>Query</source>
         <translation>查询</translation>
     </message>
     <message>
-        <location filename="systeminfo/systeminfo.ui" line="722"/>
-        <source>Ctrl+Return</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="735"/>
-        <source>Upload to database</source>
-        <translation>上传到数据库</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="738"/>
-        <source>&amp;Upload</source>
-        <translation>上传(&amp;U)</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="745"/>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="755"/>
-        <source>Scan system</source>
-        <translation>扫描系统</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="758"/>
-        <source>&amp;Scan</source>
-        <translation>扫描(&amp;S)</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="765"/>
-        <source>F5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="786"/>
-        <source>Location</source>
-        <translation>位置</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="795"/>
-        <source>&amp;Department:</source>
-        <translation>部门(&amp;D)</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="827"/>
-        <location filename="systeminfo/systeminfo.ui" line="830"/>
-        <location filename="systeminfo/systeminfo.ui" line="833"/>
+        <location filename="systeminfo/systeminfo.ui" line="109"/>
+        <location filename="systeminfo/systeminfo.ui" line="115"/>
         <source>Department</source>
         <translation>部门</translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="867"/>
-        <source>IT</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="systeminfo/systeminfo.ui" line="805"/>
-        <source>&amp;Location:</source>
-        <translation>位置(&amp;L)</translation>
     </message>
 </context>
 <context>
     <name>UserManagerMainWindowUI</name>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="14"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="171"/>
         <source>User Manager</source>
         <translation>用户管理器</translation>
     </message>
@@ -1669,17 +1597,12 @@ p, li { white-space: pre-wrap; }
         <location filename="usermanager/usermanagermainwindow.ui" line="21"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="111"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="117"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="188"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="221"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="227"/>
         <source>User List</source>
         <translation>用户列表</translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="27"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="33"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="190"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="196"/>
         <source>User Name</source>
         <translation></translation>
     </message>
@@ -1687,111 +1610,85 @@ p, li { white-space: pre-wrap; }
         <location filename="usermanager/usermanagermainwindow.ui" line="43"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="46"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="49"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="199"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="202"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="204"/>
         <source>Query</source>
         <translation>查询</translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="56"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="205"/>
         <source>Ctrl+Return</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="69"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="210"/>
         <source>User Password</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="85"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="88"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="213"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="216"/>
         <source>Add New User</source>
         <translation>添加新用户</translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="91"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="218"/>
         <source>Add</source>
         <translation>添加</translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="198"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="229"/>
         <source>MIS</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="294"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="172"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="297"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="297"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="174"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="300"/>
         <source>Export Query Result</source>
         <translation>导出查询结果</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="302"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="176"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="308"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="305"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="178"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="311"/>
         <source>Edit User Info</source>
         <translation>编辑用户信息</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="310"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="180"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="319"/>
         <source>Print</source>
         <translation>打印</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="313"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="182"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="322"/>
         <source>Print Query Result</source>
         <translation>打印查询结果</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="318"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="184"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="330"/>
+        <location filename="usermanager/usermanagermainwindow.ui" line="333"/>
         <source>Auto Logon</source>
         <translation>自动登陆</translation>
     </message>
     <message>
-        <location filename="usermanager/usermanagermainwindow.ui" line="321"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="186"/>
-        <source>Logon To Domain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="98"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="219"/>
         <source>F9</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="148"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="154"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="232"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="238"/>
         <source>Department</source>
         <translation></translation>
     </message>
     <message>
         <location filename="usermanager/usermanagermainwindow.ui" line="277"/>
         <location filename="usermanager/usermanagermainwindow.ui" line="280"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="241"/>
-        <location filename="usermanager/ui/ui_usermanagermainwindow.h" line="244"/>
         <source>User ID</source>
         <translation></translation>
     </message>

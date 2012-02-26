@@ -35,7 +35,7 @@ bool SystemInfo::running = false;
 QMap<QString/*Short Name*/, QString/*Department*/> SystemInfo::departments = QMap<QString, QString>();
 
 SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
-    :QWidget(parent), m_adminName(adminName)
+    :QMainWindow(parent), m_adminName(adminName)
 {
 
     ui.setupUi(this);
@@ -138,7 +138,7 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     slotScanSystem();
 
 
-//    statusBar()->showMessage(tr("Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query"));
+    statusBar()->showMessage(tr("Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query"));
 
 
 }
@@ -267,7 +267,7 @@ void SystemInfo::initStatusBar()
     hlayout->setMargin(0);
     hlayout->addWidget(progressBar);
 
-//    statusBar()->addPermanentWidget(m_progressWidget);
+    statusBar()->addPermanentWidget(m_progressWidget);
     m_progressWidget->hide();
 }
 
@@ -335,7 +335,7 @@ void SystemInfo::slotScanSystem() {
     //isUploaded = false;
 
     slotResetStatusBar(true);
-//    statusBar()->showMessage(tr("Scanning...."));
+    statusBar()->showMessage(tr("Scanning...."));
 
 
 
@@ -373,7 +373,7 @@ void SystemInfo::slotScannerExit( int exitCode, QProcess::ExitStatus exitStatus)
 void SystemInfo::slotReadReport(){
     qDebug()<<"SystemInfo::slotReadReport()";
 
-//    statusBar()->showMessage(tr("Reading Reports...."));
+    statusBar()->showMessage(tr("Reading Reports...."));
 
     isScanning = false;
 
@@ -387,7 +387,7 @@ void SystemInfo::slotReadReport(){
         QMessageBox::critical(this, QString(tr("Error")), QString(tr("System Info File '")+m_systemInfoFilePath+tr("' Missing!")));
 
         //slotResetStatusBar(false);
-        //statusBar()->showMessage(tr("Error! Client Info File '%1' missing!").arg(clientInfoFilePath));
+        statusBar()->showMessage(tr("Error! Client Info File '%1' missing!").arg(m_systemInfoFilePath));
         return;
     }
 
@@ -521,7 +521,7 @@ void SystemInfo::slotReadReport(){
 
 
     slotResetStatusBar(false);
-//    statusBar()->showMessage(tr("Done. Press 'Ctrl+S' to upload the data to server!"));
+    statusBar()->showMessage(tr("Done. Press 'Ctrl+S' to upload the data to server!"));
 
 
 }
@@ -640,7 +640,7 @@ void SystemInfo::slotUploadSystemInfo(){
         QMessageBox::critical(this, QObject::tr("Error"), tr("Can not upload data to server! <br> %1").arg(query.lastError().text()));
         qCritical()<<QString("Can not upload data to server!");
         qCritical()<<QString("Error: %1").arg(query.lastError().text());
-//        statusBar()->showMessage(tr("Error! Can not upload data to server!"));
+        statusBar()->showMessage(tr("Error! Can not upload data to server!"));
         return;
     }
     query.clear();
@@ -671,7 +671,7 @@ void SystemInfo::slotUploadSystemInfo(){
     QMessageBox::information(this, tr("Done"), tr("Data has been uploaded to server!"));
 
     //isUploaded = true;
-//    statusBar()->showMessage(tr("Done! Data has been uploaded to server!"));
+    statusBar()->showMessage(tr("Done! Data has been uploaded to server!"));
 
 
 }
