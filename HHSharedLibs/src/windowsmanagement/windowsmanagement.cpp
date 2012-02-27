@@ -1714,9 +1714,6 @@ bool WindowsManagement::setComputerName(LPCWSTR computerName) {
         return false;
     }
 
-
-
-
 }
 
 QString WindowsManagement::getComputerName(){
