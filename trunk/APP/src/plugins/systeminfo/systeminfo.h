@@ -71,6 +71,12 @@ private slots:
 private:
     void initStatusBar();
 
+    QString getEnvironmentVariable(const QString &environmentVariable);
+    QString getJoinInformation(bool *isJoinedToDomain = 0, const QString &serverName = "");
+    QString getComputerName();
+    bool setComputerNameWithAPI(const QString &computerName);
+    bool isNT6OS();
+
 
 private:
     Ui::SystemInfoMainWindowUI ui;
