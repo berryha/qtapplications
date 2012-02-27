@@ -151,9 +151,9 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
     }
 
     Q_ASSERT(pluginLoader);
-
     QObject *pluginInstance = pluginLoader->instance();
     if (pluginInstance) {
+
         AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (pluginInstance);
         if (plugin) {
             pluginLoadersHash[pluginFilePath] = pluginLoader;
@@ -179,12 +179,11 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
         }
 
     } else {
-
+        error = tr("Error: %1").arg(pluginLoader->errorString());
         pluginLoader->unload();
         delete pluginLoader;
         pluginLoader = 0;
 
-        error = tr("Error: %1").arg(pluginLoader->errorString());
         qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
         if(errorString){
             *errorString = error;

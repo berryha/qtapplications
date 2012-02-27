@@ -1793,4 +1793,48 @@ Failed to get NetBIOS name! Error Code: %1</source>
     <source>Dell Service Number Required!</source>
     <target>需提供DELL服务编号！</target>
 </phrase>
+<phrase>
+    <source>Domain Account</source>
+    <target>域帐用户帐号</target>
+</phrase>
+<phrase>
+    <source>Local Account</source>
+    <target>本地用户帐号</target>
+</phrase>
+<phrase>
+    <source>Basic Info</source>
+    <target>基本信息</target>
+</phrase>
+<phrase>
+    <source>SN:</source>
+    <target>编号：</target>
+</phrase>
+<phrase>
+    <source>Assets Registration </source>
+    <target>资产登记</target>
+</phrase>
+<phrase>
+    <source>Registrant:</source>
+    <target>登记人：</target>
+</phrase>
+<phrase>
+    <source>DELL Service Number:</source>
+    <target>DELL服务编号：</target>
+</phrase>
+<phrase>
+    <source>Vender:</source>
+    <target>供应商</target>
+</phrase>
+<phrase>
+    <source>Scan</source>
+    <target>扫描</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>保存</target>
+</phrase>
+<phrase>
+    <source>Warranty:</source>
+    <target>保修：</target>
+</phrase>
 </QPH>
