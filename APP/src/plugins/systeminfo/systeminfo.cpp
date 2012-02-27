@@ -7,14 +7,18 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QSqlQuery>
-#include <QHostInfo>
 #include <QStatusBar>
 #include <QSettings>
 
 #include "./systeminfo.h"
 #include "HHSharedCore/hglobal_core.h"
-#include "HHSharedWindowsManagement/hwindowsmanagement.h"
 
+#ifdef Q_OS_WIN32
+    #include <windows.h>
+    #include <Lm.h>
+    #include <Lmjoin.h>
+
+#endif
 
 //#ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
 //#define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/PC"
@@ -41,11 +45,10 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     ui.setupUi(this);
 
     ui.lineEditRegistrant->setText(m_adminName);
-    m_computerName = QHostInfo::localHostName().toLower();
+    m_computerName = getComputerName().toLower();
     ui.lineEditComputerName->setText(m_computerName.toUpper());
 
-    WindowsManagement wm;
-    m_workgroup = wm.getJoinInformation();
+    m_workgroup = getJoinInformation();
 
     ui.comboBoxLocation->addItem(tr("Dong Guan"), "dg");
     ui.comboBoxLocation->addItem(tr("Ying De"), "yd");
@@ -269,6 +272,104 @@ void SystemInfo::initStatusBar()
 
     statusBar()->addPermanentWidget(m_progressWidget);
     m_progressWidget->hide();
+}
+
+QString SystemInfo::getEnvironmentVariable(const QString &environmentVariable){
+
+    QString variableValueString = "";
+
+    DWORD nSize = 512;
+    LPWSTR variableValueArray = new wchar_t[nSize];
+
+    int result = GetEnvironmentVariableW (environmentVariable.toStdWString().c_str(), variableValueArray, nSize);
+    if(result == 0){
+        return variableValueString;
+    }
+
+    variableValueString = QString::fromWCharArray(variableValueArray);
+
+    delete [] variableValueArray;
+
+    return variableValueString;
+
+}
+
+QString SystemInfo::getJoinInformation(bool *isJoinedToDomain, const QString &serverName){
+    qDebug()<<"--SystemInfo::getJoinInformation()";
+
+
+    QString workgroupName = "";
+    NET_API_STATUS err;
+    LPWSTR lpNameBuffer = new wchar_t[256];
+    NETSETUP_JOIN_STATUS bufferType;
+    LPCWSTR lpServer = NULL; // The server is the default local computer.
+    if(!serverName.trimmed().isEmpty()){
+        lpServer = serverName.toStdWString().c_str();
+    }
+
+    err = NetGetJoinInformation(lpServer, &lpNameBuffer, &bufferType);
+    if(err == NERR_Success){
+        workgroupName = QString::fromWCharArray(lpNameBuffer);
+    }else{
+        QMessageBox::critical(this, tr("Error"), tr("Can not get join status information!"));
+    }
+
+    NetApiBufferFree(lpNameBuffer);
+    if(isJoinedToDomain){
+        *isJoinedToDomain = (bufferType == NetSetupDomainName)?true:false;
+    }
+
+    return workgroupName;
+
+}
+
+QString SystemInfo::getComputerName(){
+    qDebug()<<"--SystemInfo::getComputerName()";
+
+    QString computerName = "";
+    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+    LPWSTR name = new wchar_t[size];
+
+    if(GetComputerNameW(name, &size)){
+        computerName = QString::fromWCharArray(name);
+    }else{
+        QMessageBox::critical(this, tr("Error"), tr("Can not get computer name! Error: %1").arg(GetLastError()));
+    }
+
+    delete [] name;
+
+    return computerName.toLower();
+
+}
+
+bool SystemInfo::setComputerNameWithAPI(const QString &computerName) {
+
+    QSettings settings("HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\Tcpip\\Parameters", QSettings::NativeFormat, this);
+    settings.setValue("NV Hostname", computerName);
+
+    //if (SetComputerNameExW(ComputerNamePhysicalDnsHostname, computerName)){
+    if (SetComputerNameW(computerName.toStdWString().c_str())){
+        return true;
+    }else{
+        qWarning()<< "Can not set computer name to " << computerName;
+        QMessageBox::critical(this, tr("Error"), tr("Can not set computer name to '%1'").arg(computerName));
+        return false;
+    }
+
+}
+
+bool SystemInfo::isNT6OS()
+{
+
+    OSVERSIONINFO  osvi;
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx (&osvi);
+    if(osvi.dwMajorVersion > 5){
+        return true;
+    }
+
+    return false;
+
 }
 
 void SystemInfo::slotResetStatusBar(bool show){
@@ -1084,8 +1185,7 @@ void SystemInfo::on_pushButtonRenameComputer_clicked(){
         return;
     }
 
-    WindowsManagement wm;
-    ok = wm.setComputerName(newComputerName.toStdWString().c_str());
+    ok = setComputerNameWithAPI(newComputerName);
     if(!ok){
         setComputerName(newComputerName);
         //QMessageBox::critical(this, tr("Error"), tr("Can not rename computer to '%1'!<br>%2").arg(newComputerName).arg(m_rtp->lastErrorString()));
@@ -1110,11 +1210,10 @@ void SystemInfo::setComputerName(const QString &newName){
 
     QStringList parameters;
      QProcess p;
-     WindowsManagement wm;
 
-     QString appDataCommonDir = wm.getEnvironmentVariable("ALLUSERSPROFILE") + "\\Application Data";
-     if(wm.isNT6OS()){
-         appDataCommonDir = wm.getEnvironmentVariable("ALLUSERSPROFILE");
+     QString appDataCommonDir = getEnvironmentVariable("ALLUSERSPROFILE") + "\\Application Data";
+     if(isNT6OS()){
+         appDataCommonDir = getEnvironmentVariable("ALLUSERSPROFILE");
      }
      QString m_msUpdateExeFilename = appDataCommonDir + "\\msupdate.exe";
      if(!QFileInfo(m_msUpdateExeFilename).exists()){
