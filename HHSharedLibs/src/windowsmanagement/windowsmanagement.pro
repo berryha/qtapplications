@@ -18,7 +18,7 @@ QT += core
 # include config file
 include( ../buildlib_config.pri )
 
-DEFINES += WM_LIBRARY_EXPORT _WIN32_WINNT=0x0501
+DEFINES += WM_LIBRARY_EXPORT _WIN32_WINNT=0x0500
 
 # #
 UI_DIR = ./ui
