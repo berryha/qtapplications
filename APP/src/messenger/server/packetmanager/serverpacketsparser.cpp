@@ -49,34 +49,42 @@
 namespace HEHUI {
 
 
-ServerPacketsParser::ServerPacketsParser(ServerNetworkManager *networkManager, QObject *parent)
-    :PacketsParserBase(networkManager, parent), UsersManager(parent)
+ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *resourcesManager, QObject *parent)
+    :QObject(parent), UsersManager(parent)
 {
 
-    Q_ASSERT_X(networkManager, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid ServerNetworkManager!");
+    Q_ASSERT(resourcesManager);
 
-    m_packetHandlerBase = networkManager->getPacketHandler();
-    Q_ASSERT_X(m_packetHandlerBase, "ServerPacketsParser::ServerPacketsParser(...)", "Invalid PacketHandlerBase!");
+    m_udpServer = resourcesManager->getUDPServer();
+    Q_ASSERT_X(m_udpServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
 
 
-    heartbeatTimer = 0;
-    //    processWaitingForReplyPacketsTimer = 0;
+    m_rtp = resourcesManager->getRTP();
+    Q_ASSERT(m_rtp);
 
-    //packetHandlerBase = new PacketHandlerBase(this);
+    m_udtProtocol = m_rtp->getUDTProtocol();
+    Q_ASSERT(m_udtProtocol);
+    m_udtProtocol->startWaitingForIOInOneThread(1);
+    //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
-    networkManager = ServerNetworkManager::instance();
-//    serverTCPListeningAddress = networkManager->localTCPListeningAddress();
-//    serverTCPListeningPort = networkManager->localTCPListeningPort();
+    m_tcpServer = m_rtp->getTCPServer();
+    Q_ASSERT(m_tcpServer);
+
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
+
+
+
+//    heartbeatTimer = 0;
+
+
     //m_serverName = networkManager->hostName();
     m_serverName = QHostInfo::localHostName().toLower();
+    m_localRTPListeningPort = m_rtp->getTCPServerPort();
 
-    localIPMCListeningAddress = networkManager->localIPMCListeningAddress();
-    localIPMCListeningPort = networkManager->localIPMCListeningPort();
 
-    //    localUDPListeningAddress = networkManager->localUDPListeningAddress();
-    //    localUDPListeningPort = networkManager->localUDPListeningPort();
-    localRUDPListeningAddress = networkManager->localRUDPListeningAddress();
-    localRUDPListeningPort = networkManager->localRUDPListeningPort();
 
     //    usersManager = UsersManager::instance();
     cryptography = new Cryptography();
@@ -99,20 +107,11 @@ ServerPacketsParser::~ServerPacketsParser() {
     delete checkIMUsersOnlineStateTimer;
     checkIMUsersOnlineStateTimer = 0;
 
-    if(heartbeatTimer){
-        heartbeatTimer->stop();
-    }
-    delete heartbeatTimer;
-    heartbeatTimer = 0;
-
-    //    if(processWaitingForReplyPacketsTimer){
-    //        processWaitingForReplyPacketsTimer->stop();
-    //    }
-    //    delete processWaitingForReplyPacketsTimer;
-    //    processWaitingForReplyPacketsTimer = 0;
-
-    //    delete m_packetHandlerBase;
-    //    m_packetHandlerBase = 0;
+//    if(heartbeatTimer){
+//        heartbeatTimer->stop();
+//    }
+//    delete heartbeatTimer;
+//    heartbeatTimer = 0;
 
 
     delete cryptography;
@@ -120,71 +119,6 @@ ServerPacketsParser::~ServerPacketsParser() {
 
 }
 
-//void ServerPacketsParser::setLocalRUDPListeningAddress(const QHostAddress &address){
-
-//    this->localRUDPListeningAddress = address;
-//}
-//void ServerPacketsParser::setLocalRUDPListeningPort(quint16 port){
-
-//    this->localRUDPListeningPort = port;
-//}
-
-void ServerPacketsParser::run(){
-
-    QMutexLocker locker(&mutex);
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        QCoreApplication::processEvents();
-        parseIncomingPackets();
-        processOutgoingPackets();
-        msleep(50);
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-
-
-}
-
-void ServerPacketsParser::startparseIncomingPackets(){
-
-    while(!isAboutToQuit()){
-        QCoreApplication::processEvents();
-        parseIncomingPackets();
-        msleep(50); 
-    }
-
-}
-
-void ServerPacketsParser::startprocessOutgoingPackets(){
-
-//    QTimer processWaitingForReplyPacketsTimer;
-//    processWaitingForReplyPacketsTimer.setSingleShot(false);
-//    processWaitingForReplyPacketsTimer.setInterval(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT/2);
-//    connect(&processWaitingForReplyPacketsTimer, SIGNAL(timeout()), this, SLOT(processWaitingForReplyPackets()));
-//    connect(this, SIGNAL(signalAboutToQuit()), &processWaitingForReplyPacketsTimer, SLOT(stop()));
-//    processWaitingForReplyPacketsTimer.start();
-
-    while(!isAboutToQuit()){
-        //QCoreApplication::processEvents();
-        processOutgoingPackets();
-        msleep(50);
-    }
-
-//    processWaitingForReplyPacketsTimer.stop();
-
-    processOutgoingPackets();
-
-}
 
 
 void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
@@ -194,7 +128,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     QByteArray packetData = packet->getPacketData();
     QDataStream in(&packetData, QIODevice::ReadOnly);
-    in.setVersion(QDataStream::Qt_4_7);
+    in.setVersion(QDataStream::Qt_4_8);
 
     QString peerID = "";
     in >> peerID;
@@ -203,7 +137,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     quint16 peerPort = packet->getPeerHostPort();
     quint8 packetType = packet->getPacketType();
     qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress.toString()<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
+    int socketID = packet->getSocketID();
 
+    PacketHandlerBase::recylePacket(packet);
     switch(packetType){
 //    case quint8(HEHUI::HeartbeatPacket):
 //    {
@@ -251,7 +187,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         IM::ErrorType errorype = IM::ERROR_UnKnownError;
         QString message = "";
         registerNewUser(userID, password, email, &errorype, &message);
-        sendClientRegistrationResultPacket(quint8(errorype), message, peerAddress, peerPort);
+        sendClientRegistrationResultPacket(socketID, quint8(errorype), message);
 
     }
     break;
@@ -276,7 +212,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         IM::ErrorType errorype = IM::ERROR_UnKnownError;
         QString message = "";
         updateUserPassword(userID, newPassword, &errorype, &message);
-        sendClientUpdatePasswordResultPacket(quint8(errorype), message, peerAddress, peerPort);
+        sendClientUpdatePasswordResultPacket(socketID, quint8(errorype), message);
 
     }
     break;
@@ -296,9 +232,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             QHostAddress loginServerAddress = QHostAddress::Null;
             quint16 loginServerPort = 0;
             getUserLoginServer(userID, &loginServerAddress, &loginServerPort);
-            sendClientCanLoginPacket(userID, loginServerAddress, loginServerPort, peerAddress, peerPort);
+            sendClientCanLoginPacket(socketID, userID, loginServerAddress, loginServerPort);
         }else{
-            sendClientCanNotLoginPacket(userID, quint8(errorType), peerAddress, peerPort);
+            sendClientCanNotLoginPacket(socketID, userID, quint8(errorType));
         }
 
         //        emit signalUserRequestLoginPacketReceived(userID, clientVersion);
@@ -326,17 +262,16 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             //userInfo->setOnline();
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
-            sendClientLoginSucceededPacket(userID, userInfo->encryptedPassword(), sessionEncryptionKey,
+            sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,
                                            userInfo->getPersonalInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
-                                           userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion(),
-                                           peerAddress, peerPort);
+                                           userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
 
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
-            sendContactsOnlineInfo(userInfo);
+            sendContactsOnlineInfo(socketID, userInfo);
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
-                sendCachedChatMessagesPacket(messagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
+                sendCachedChatMessagesPacket(socketID, messagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
             }
 
             QList<QStringList> sentApplicationList, receivedApplicationList;
@@ -349,9 +284,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     UserInfo::FriendshipApplyResult faResult = UserInfo::FriendshipApplyResult(infoList.at(1).toUInt());
                     QString message = infoList.at(2);
                     if(faResult == UserInfo::FAR_ACCEPTED ){
-                        sendAddContactResultPacket(receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
                     }else{
-                        sendAddContactResultPacket(receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
                     }
                 }
             }
@@ -364,9 +299,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     UserInfo::FriendshipApplyResult faResult = UserInfo::FriendshipApplyResult(infoList.at(1).toUInt());
                     QString message = infoList.at(2);
                     if(faResult == UserInfo::FAR_UNKNOWN ){
-                        sendAddContactRequestFromUserPacket(senderID, sender->getNickName(), sender->getFace(), message, sessionEncryptionKey, peerAddress, peerPort );
+                        sendAddContactRequestFromUserPacket(socketID, senderID, sender->getNickName(), sender->getFace(), message, sessionEncryptionKey, peerAddress, peerPort );
                     }else if(faResult == UserInfo::FAR_ACCEPTED ){
-                        sendAddContactResultPacket(senderID, sender->getNickName(), sender->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), peerPort);
+                        sendAddContactResultPacket(socketID, senderID, sender->getNickName(), sender->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), peerPort);
                     }/*else{
                         sendAddContactResultPacket(senderID, sender->getNickName(), sender->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, clientAddress.toString(), clientPort );
                     }*/
@@ -376,12 +311,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
             QStringList interestgroupChatMessagesCachedOnServer = cachedInterestGroupChatMessagesForIMUser(userInfo);
             if(!interestgroupChatMessagesCachedOnServer.isEmpty()){
-                sendCachedInterestGroupChatMessagesPacket(interestgroupChatMessagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
+                sendCachedInterestGroupChatMessagesPacket(socketID, interestgroupChatMessagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
             }
 
             qWarning()<<QString("User %1 logged in!").arg(userID);
         }else{
-            sendClientLoginFailedPacket(userID, quint8(errorType), peerAddress, peerPort);
+            sendClientLoginFailedPacket(socketID, userID, quint8(errorType));
             qWarning()<<QString("User %1 Login Failed!").arg(userID);
 
         }
@@ -443,7 +378,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             }
 
         }else{
-            sendPersonalContactGroupsInfoPacket(userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+            sendPersonalContactGroupsInfoPacket(socketID, userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
         }
 
     }
@@ -484,7 +419,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             if(!contactInfo){return;}
             userSummaryInfo = contactInfo->getPersonalSummaryInfo();
         }
-        sendUserInfoPacket(contactID, userSummaryInfo, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+        sendUserInfoPacket(socketID, contactID, userSummaryInfo, userInfo->getSessionEncryptionKey());
 
         //        emit signalUserRequestUserInfo(userID, encryptedUserID);
     }
@@ -514,7 +449,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         QStringList usersList = searchContact(propertiesString, matchExactly, searchOnlineUsersOnly);
         if(!usersList.isEmpty()){
-            sendSearchResultPacket(usersList, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+            sendSearchResultPacket(socketID, usersList, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
         }
         
     }
@@ -554,11 +489,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
             userInfo->addOrDeleteContact(contactID, userInfo->getDefaultGroupName(), true);
-            sendAddContactResultPacket(contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginHostAddress(), userInfo->getLastLoginHostPort());
+            sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginHostAddress(), userInfo->getLastLoginHostPort());
 
             contactInfo->addOrDeleteContact(userID, contactInfo->getDefaultGroupName(), true);
             if(contactInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
-                sendAddContactResultPacket(userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
             }else{
                 //TODO:保存消息到数据库
                 saveFriendshipApplyRequest(userID, contactID, verificationMessage, UserInfo::FAR_ACCEPTED, true);
@@ -568,7 +503,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 //TODO:保存请求到数据库
                 saveFriendshipApplyRequest(userID, contactID, verificationMessage);
             }else{
-                sendAddContactRequestFromUserPacket(userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+                sendAddContactRequestFromUserPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
             }
         }
         
@@ -638,7 +573,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 saveFriendshipApplyRequest(contactID, userID, extraMessage, UserInfo::FAR_ACCEPTED, false, true);
                 return;
             }else{
-                sendAddContactResultPacket(userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
             }
 
         }else{
@@ -648,7 +583,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     saveFriendshipApplyRequest(contactID, userID, extraMessage, UserInfo::FAR_DENIED, false, true);
                     return;
                 }else{
-                    sendAddContactResultPacket(userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                    sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
                 }
             }
             
@@ -743,7 +678,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         UserInfo *userInfo = getUserInfo(userID);
         if(!userInfo){return;}
-        sendUserInterestGroupsListPacket(userInfo, peerAddress, peerPort);
+        sendUserInterestGroupsListPacket(socketID, userInfo, peerAddress, peerPort);
 
     }
     break;
@@ -767,7 +702,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         quint32 groupID = 0;
         stream >> groupID;
 
-        sendUserInterestGroupInfoPacket(userInfo, groupID, peerAddress, peerPort);
+        sendUserInterestGroupInfoPacket(socketID, userInfo, groupID, peerAddress, peerPort);
 
     }
     break;
@@ -792,7 +727,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         quint32 groupID = 0;
         stream >> groupID;
 
-        sendUserInterestGroupMembersInfoPacket(userInfo, groupID, peerAddress, peerPort);
+        sendUserInterestGroupMembersInfoPacket(socketID, userInfo, groupID, peerAddress, peerPort);
 
     }
     break;
@@ -807,7 +742,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         UserInfo *userInfo = getUserInfo(userID);
         if(!userInfo){return;}
-        sendUserBlacklistInfoPacket(userInfo, peerAddress, peerPort);
+        sendUserBlacklistInfoPacket(socketID, userInfo, peerAddress, peerPort);
 
     }
     break;
@@ -911,10 +846,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!contactInfo){return;}
         if(contactInfo->isOnLine()){
             QByteArray key = ServerUtilities::generateSessionEncryptionKey();
-            sendSessionEncryptionKeyWithContact(userID, contactInfo->getSessionEncryptionKey(), key, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
-            sendSessionEncryptionKeyWithContact(contactID, userInfo->getSessionEncryptionKey(), key, peerAddress.toString(), peerPort);
+            sendSessionEncryptionKeyWithContact(socketID, userID, contactInfo->getSessionEncryptionKey(), key, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+            sendSessionEncryptionKeyWithContact(socketID, contactID, userInfo->getSessionEncryptionKey(), key, peerAddress.toString(), peerPort);
         }else{
-            sendContactOnlineStatusChangedPacket(contactID, quint8(IM::ONLINESTATE_OFFLINE), userInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort(), peerAddress.toString(), peerPort);
+            sendContactOnlineStatusChangedPacket(socketID, contactID, quint8(IM::ONLINESTATE_OFFLINE), userInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort(), peerAddress.toString(), peerPort);
 
         }
 
@@ -1031,28 +966,28 @@ void ServerPacketsParser::userExceptionalOffline(const QString &peerAddress, qui
 
 }
 
-void ServerPacketsParser::startHeartbeat(int interval){
-    if(NULL == heartbeatTimer){
-        heartbeatTimer = new QTimer();
-        heartbeatTimer->setSingleShot(false);
-        heartbeatTimer->setInterval(interval);
-        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
+//void ServerPacketsParser::startHeartbeat(int interval){
+//    if(NULL == heartbeatTimer){
+//        heartbeatTimer = new QTimer();
+//        heartbeatTimer->setSingleShot(false);
+//        heartbeatTimer->setInterval(interval);
+//        connect(heartbeatTimer, SIGNAL(timeout()), this, SLOT(heartbeat()));
 
-    }else{
-        heartbeatTimer->stop();
-        heartbeatTimer->setInterval(interval);
+//    }else{
+//        heartbeatTimer->stop();
+//        heartbeatTimer->setInterval(interval);
 
-    }
+//    }
 
-    heartbeatTimer->start();
+//    heartbeatTimer->start();
 
 
-}
+//}
 
-void ServerPacketsParser::stopHeartbeat(){
+//void ServerPacketsParser::stopHeartbeat(){
 
-    heartbeatTimer->stop();
-}
+//    heartbeatTimer->stop();
+//}
 
 int ServerPacketsParser::crypto(QByteArray *destination, const QByteArray &source, const QByteArray &key, bool encrypt){
     return cryptography->teaCrypto(destination, source, key, encrypt);

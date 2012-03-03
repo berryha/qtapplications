@@ -23,11 +23,12 @@
 namespace HEHUI {
 
 
-ClientResourcesManager::ClientResourcesManager(PacketHandlerBase *packetHandlerBase, NetworkType type, CommunicationMode mode, QObject *parent)
-    :NetworkManager(packetHandlerBase, type, mode, parent)//, mainWindow(mainWindow)
+ClientResourcesManager::ClientResourcesManager(NetworkType type, CommunicationMode mode, QObject *parent)
+    :ResourcesManager(parent)//, mainWindow(mainWindow)
 {
 
-    setParent(parent);
+    setNetworkType(type);
+    setCommunicationMode(mode);
 
 }
 

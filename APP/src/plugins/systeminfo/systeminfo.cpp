@@ -76,6 +76,7 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
         departments.insert("pg", tr("PG"));
         departments.insert("pl", tr("Plan"));
         departments.insert("pm", tr("PMC"));
+        departments.insert("pu", tr("Purchase"));
         departments.insert("qc", tr("QC"));
         departments.insert("re", tr("Retail"));
         departments.insert("sa", tr("Sales"));

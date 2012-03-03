@@ -31,6 +31,8 @@
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QDebug>
+#include <QTimer>
+
 
 #include "servermanagerwindow.h"
 
@@ -54,7 +56,7 @@ ServerManagerWindow::ServerManagerWindow(QWidget *parent)
         //connect(clientNetworkManager, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
         
 
-        if(clientNetworkManager->getNetworkType() == NetworkManagerBase::LAN){
+        if(clientNetworkManager->getNetworkType() == ClientResourcesManager::LAN){
                 ui.lineEditIP->setText(QString(IM_SERVER_IPMC_ADDRESS));
                 ui.spinBoxPort->setValue(IM_SERVER_IPMC_LISTENING_PORT);
 		ui.toolButtonSearchServer->show();

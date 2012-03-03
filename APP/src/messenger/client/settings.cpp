@@ -10,10 +10,10 @@
 namespace HEHUI {
 
 Settings::Settings(const QString &appName, const QString &appVersion, const QString fileBaseName, const QString fileDirPath, QObject* o )
-        : SettingsBase(appName, appVersion, fileBaseName, fileDirPath, o )
+    : SettingsBase(appName, appVersion, fileBaseName, fileDirPath, o )
 {
 
-	//beginGroup( mProgramVersion );
+    //beginGroup( mProgramVersion );
     
     key = QString("HEHUI@HEHUI").toUtf8();
     
@@ -23,40 +23,40 @@ Settings::Settings(const QString &appName, const QString &appVersion, const QStr
 
 Settings::~Settings()
 {
-	//endGroup();
+    //endGroup();
 
 }
 
 void Settings::setDataRootPath(const QString &dataRootPath){
-	setValue("MainWindow/DataRootPath", dataRootPath);
+    setValue("MainWindow/DataRootPath", dataRootPath);
 
 }
 
 QString Settings::getDataRootPath() const{
-	QString dataRootPath = QApplication::applicationDirPath() + "/data";
-        if(!QFile::exists(dataRootPath)){
-            QDir dir;
-            dir.mkpath(dataRootPath);
-        }
-	return value("MainWindow/DataRootPath",dataRootPath).toString();
+    QString dataRootPath = QApplication::applicationDirPath() + "/data";
+    if(!QFile::exists(dataRootPath)){
+        QDir dir;
+        dir.mkpath(dataRootPath);
+    }
+    return value("MainWindow/DataRootPath",dataRootPath).toString();
 }
 
 
 
 void Settings::setImageRootPath(const QString &imageRootPath){
-	setValue("MainWindow/ImageRootPath", imageRootPath);
+    setValue("MainWindow/ImageRootPath", imageRootPath);
 
 }
 
 QString Settings::getImageRootPath() const{
 
-        QString path = QApplication::applicationDirPath() + QString("/images");
-        if(!QFile::exists(path)){
-            QDir dir;
-            dir.mkpath(path);
-        }
-        return value("MainWindow/ImageRootPath", path).toString();
-        
+    QString path = QApplication::applicationDirPath() + QString("/images");
+    if(!QFile::exists(path)){
+        QDir dir;
+        dir.mkpath(path);
+    }
+    return value("MainWindow/ImageRootPath", path).toString();
+
 }
 
 
@@ -110,78 +110,78 @@ QString Settings::getPictureCacheDir(){
 }
 
 QString Settings::getUserPrivateDataDir(const QString &userID) const{
-	QString userPrivateDataDir = getDataRootPath() + "/" + userID;
-        if(!QFile::exists(userPrivateDataDir)){
-            QDir dir;
-            dir.mkpath(userPrivateDataDir);
-        }
-	return userPrivateDataDir;
+    QString userPrivateDataDir = getDataRootPath() + "/" + userID;
+    if(!QFile::exists(userPrivateDataDir)){
+        QDir dir;
+        dir.mkpath(userPrivateDataDir);
+    }
+    return userPrivateDataDir;
 
 }
 
 QString Settings::getUserPrivateDataFilePath(const QString &userID) const
 {
-	//QString userPrivateDataFilePath = getDataRootPath() + QDir::separator() + userName + QDir::separator() + QString(LOCAL_USERDATA_DB_NAME);
-	QString userPrivateDataFilePath = getUserPrivateDataDir(userID) + "/" + QString(LOCAL_USERDATA_DB_NAME);
+    //QString userPrivateDataFilePath = getDataRootPath() + QDir::separator() + userName + QDir::separator() + QString(LOCAL_USERDATA_DB_NAME);
+    QString userPrivateDataFilePath = getUserPrivateDataDir(userID) + "/" + QString(LOCAL_USERDATA_DB_NAME);
 
-	return userPrivateDataFilePath;
+    return userPrivateDataFilePath;
 }
 
 
 void Settings::setRecentUser(const QString &userName){
-	setValue("MainWindow/RecentUser", userName);
+    setValue("MainWindow/RecentUser", userName);
 
 }
 
 QString Settings::getRecentUser() const{
-	return value("MainWindow/RecentUser").toString();
+    return value("MainWindow/RecentUser").toString();
 
 }
 
 void Settings::setRecentUserPassword(const QString &password){
-        
-        QByteArray *destination = new QByteArray();
-        Cryptography cryptography;
-        cryptography.teaCrypto(destination, password.toUtf8(), key, true);
-        setValue("MainWindow/RecentUserPassword", *destination);
-        delete destination;
+
+    QByteArray *destination = new QByteArray();
+    Cryptography cryptography;
+    cryptography.teaCrypto(destination, password.toUtf8(), key, true);
+    setValue("MainWindow/RecentUserPassword", *destination);
+    delete destination;
 
 }
 
 QString Settings::getRecentUserPassword() const{
-        
-        QByteArray passwordArray = value("MainWindow/RecentUserPassword").toByteArray();
-        if(!passwordArray.isEmpty()){
 
-            QByteArray *destination = new QByteArray();
-            Cryptography cryptography;
-            cryptography.teaCrypto(destination, passwordArray, key, false);
-            passwordArray = *destination;
-            delete destination;
+    QByteArray passwordArray = value("MainWindow/RecentUserPassword").toByteArray();
+    if(!passwordArray.isEmpty()){
 
-        }
-        
-        return QString(passwordArray);
+        QByteArray *destination = new QByteArray();
+        Cryptography cryptography;
+        cryptography.teaCrypto(destination, passwordArray, key, false);
+        passwordArray = *destination;
+        delete destination;
+
+    }
+
+    return QString(passwordArray);
 
 }
 
 void Settings::setInvisibleLogin(bool invisible){
-	setValue("MainWindow/InvisibleLogin", invisible);
+    setValue("MainWindow/InvisibleLogin", invisible);
 
 }
 
 bool Settings::getInvisibleLogin(){
-	return value("MainWindow/InvisibleLogin", false).toBool();
+    return value("MainWindow/InvisibleLogin", false).toBool();
 
 }
 
 void Settings::setAutoLogin(bool autoLogin){
-	setValue("MainWindow/AutoLogin", autoLogin);
+    setValue("MainWindow/AutoLogin", autoLogin);
 
 }
 
 bool Settings::getAutoLogin() const{
-	return value("MainWindow/AutoLogin", false).toBool();
+    return value("MainWindow/AutoLogin", false).toBool();
 
 }
 
@@ -189,61 +189,61 @@ bool Settings::getAutoLogin() const{
 //网络配置----
 void Settings::setNetworkType(int index)
 {
-	setValue("Network/NetworkType", index);
+    setValue("Network/NetworkType", index);
 }
 
 int Settings::getNetworkType() const
 {
-	return value("Network/NetworkType", 0).toInt();
+    return value("Network/NetworkType", 0).toInt();
 
 
 }
 
 void Settings::setProtocol(int index)
 {
-	setValue("Network/Protocol", index);
+    setValue("Network/Protocol", index);
 }
 
 int Settings::getProtocol() const
 {
-	return value("Network/Protocol", 0).toInt();
+    return value("Network/Protocol", 0).toInt();
 
 }
 
 
 void Settings::setServers(QStringList &serversList)
 {
-	setValue("Network/Servers", serversList);
+    setValue("Network/Servers", serversList);
 }
 
 QStringList Settings::getServers() const
 {
-	return value("Network/Servers").toStringList();
+    return value("Network/Servers").toStringList();
 
 }
 
 //格式： IP:Port (eg. 192.168.1.1:12345)
 void Settings::setLastServer(const QString &server)
 {
-	setValue("Network/LastServer", server);
+    setValue("Network/LastServer", server);
 
 }
 
 QString Settings::getLastServer() const
 {
 
-	return value("Network/LastServer").toString();
+    return value("Network/LastServer").toString();
 }
 
 void Settings::setSaveConfig(bool save)
 {
-	setValue("Network/SaveConfig", save);
+    setValue("Network/SaveConfig", save);
 
 }
 
 bool Settings::getSaveConfig() const
 {
-	return value("Network/SaveConfig", true).toBool();
+    return value("Network/SaveConfig", true).toBool();
 }
 //----网络配置
 

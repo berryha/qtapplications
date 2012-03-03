@@ -54,7 +54,7 @@ public:
 
 
     bool isOnLine();
-//    void updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived);
+    //    void updateRemainingOnlineStatusCheckingTimes(bool heartbeatPacketReceived);
 
     bool isBanned();
     void setBanned(bool banned);
@@ -66,9 +66,11 @@ public:
     
     QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
     
-//    QString getUpdateSQLStatement() const;
-//    void clearUpdatedProperties();
+    //    QString getUpdateSQLStatement() const;
+    //    void clearUpdatedProperties();
 
+    void setSocketID(int socketID){this->m_socketID = socketID;}
+    int getSocketID(){return m_socketID;}
 
 
 public slots:
@@ -82,25 +84,25 @@ public slots:
 
 
 private:
-        void init();
+    void init();
 
 
 private:
 
-//    quint16 remainingOnlineStatusCheckingTimes;
+    //    quint16 remainingOnlineStatusCheckingTimes;
 
     quint16 remainingAuthenticationRequestTimes;
     bool bannedFromAuthenticationRequest;
     QDateTime timeToLiftTheBan;
-//    QDateTime timeLastHeartbeatPacketReceived;
+    //    QDateTime timeLastHeartbeatPacketReceived;
 
 
     //QHash<IM::PropertyID/*Property ID*/, QString/*Property Value*/> updatedProperties;
     
-//    QHash<IM::PropertyID/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
-//    QMutex *updatedPropertiesMutex;
+    //    QHash<IM::PropertyID/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
+    //    QMutex *updatedPropertiesMutex;
 
-
+    int m_socketID;
 
 
 

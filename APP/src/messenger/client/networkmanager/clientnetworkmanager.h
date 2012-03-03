@@ -10,18 +10,16 @@
 
 #include <QObject>
 
-#include "../../sharedim/networkmanager/networkmanager.h"
-//#include "../../shared/impacket.h"
+#include "../../sharedim/resourcesmanager.h"
 
-//#include "../../../shared/core/user.h"
-//#include "../../../shared/core/singleton.h"
+
 #include "HHSharedCore/huser.h"
 #include "HHSharedCore/hsingleton.h"
 
 namespace HEHUI {
 
 
-class ClientResourcesManager: public NetworkManager, public Singleton<ClientResourcesManager>
+class ClientResourcesManager: public ResourcesManager, public Singleton<ClientResourcesManager>
 {
     Q_OBJECT
 
@@ -29,7 +27,7 @@ class ClientResourcesManager: public NetworkManager, public Singleton<ClientReso
 
 public:
 
-    ClientResourcesManager(PacketHandlerBase *packetHandlerBase = 0, NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
+    ClientResourcesManager(NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
     virtual ~ClientResourcesManager();
 
 

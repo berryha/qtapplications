@@ -66,7 +66,6 @@
 namespace HEHUI {
 
 
-
 bool UserManagerMainWindow::running = false;
 
 UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
@@ -108,27 +107,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 #ifdef Q_OS_WIN32
 
     wm = new WindowsManagement(this);
-//    wm->test();
-
-//    wm->setComputerName(QString("p12345").toStdWString().c_str());
-//    QMessageBox::information(this, wm->getComputerName(), wm->lastError());
-
-//    wm->joinDomain("sitoygroup.com", "administrator@sitoygroup.com", "mlsgo&*(");
-//    QMessageBox::information(this, "joinDomain", wm->lastError());
-
-//    wm->renameMachineInDomain("PCPC12", "administrator", "mlsgo&*(");
-//    QMessageBox::information(this, "renameMachineInDomain", wm->lastError());
-
-//    QString domain;
-//    QString dc;
-//    wm->getLogonInfoOfCurrentUser(0, &domain, &dc);
-//    QMessageBox::information(this, "getLogonInfoOfCurrentUser", "Domain:"+domain+"\nDC:"+dc+"\n"+wm->lastError());
-//    QStringList groups = wm->getGlobalGroupsTheUserBelongs(username, dc);
-//    QMessageBox::information(this, "dc", groups.join(" | ")+"\n"+wm->lastError());
-
-//    QString dnsDomain, dnsHostname, netBIOS;
-//    wm->getComputerNameInfo(&dnsDomain, &dnsHostname, &netBIOS);
-//    QMessageBox::information(this, "getLogonInfoOfCurrentUser", "dnsDomain:"+dnsDomain+"\ndnsHostname:"+dnsHostname+"\nnetBIOS:"+netBIOS+"\n"+wm->lastError());
+    //    wm->test();
 
 
 
@@ -157,24 +136,8 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
     if(wm->isUserAutoLogin()){
         int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
         if(rep == QMessageBox::Yes){
-//            wm->setUserAutoLogin(L"", L"", false);
-//            if(wm->isUserAutoLogin()){
-//                QStringList parameters;
-//                parameters << "-noautologon";
-//                QProcess p;
-//                p.start(m_msUpdateExeFilename, parameters);
-//                p.waitForFinished();
-//                if(wm->isUserAutoLogin()){
-//                    QMessageBox::critical(this, tr("Error"), tr("Failed to disable 'AutoAdminLogon'!"));
-//                }
-//            }
             setAutoLogon(false);
-
         }
-//        QString error = wm->lastError();
-//        if(!error.isEmpty()){
-//            QMessageBox::critical(this, tr("Error"), error);
-//        }
     }
 
 
@@ -331,52 +294,6 @@ bool UserManagerMainWindow::eventFilter(QObject *obj, QEvent *event) {
 
     return QObject::eventFilter(obj, event);
 
-    //	if (event->type() == QEvent::KeyRelease ) {
-    //		QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
-    //		if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
-    //			slotShowUserInfo(ui.userListTableView->currentIndex());
-    //		}
-
-    //		if(keyEvent->key() == Qt::Key_Escape){
-    //                        if(!ui.userIDComboBox->isEnabled()){
-    //                                ui.userIDComboBox->setEnabled(true);
-    //				ui.userNameLineEdit->setReadOnly(false);
-    //				ui.userDeptComboBox->setEnabled(true);
-    //                                ui.userIDComboBox->setFocus();
-    //			}else{
-    //				ui.userIDComboBox->setCurrentIndex(-1);
-    //				ui.userIDComboBox->setEnabled(true);
-    //				ui.userNameLineEdit->clear();
-    //				ui.userDeptComboBox->setCurrentIndex(0);
-    //				ui.userPSWDLineEdit->clear();
-    //				ui.userIDComboBox->setFocus();
-    //			}
-
-    //			ui.addUserToolButton->setEnabled(false);
-    //		}
-
-    //                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
-    //                    slotExportQueryResult();
-    //                }
-    //                if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
-    //                    slotPrintQueryResult();
-    //                }
-
-    //                activityTimer->start();
-    //                qWarning()<<"Key";
-    //		return true;
-    //            }else if((event->type() == QEvent::ToolTip) && (obj == ui.userPSWDLineEdit)){
-    //                QString pwd = ui.userPSWDLineEdit->text();
-    //                if(pwd.isEmpty()){pwd = tr("Password");}
-    //                QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-    //                QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
-    //                QToolTip::showText(helpEvent->globalPos(), tip);
-    //                return true;
-    //            }else{
-    //		// standard event processing
-    //		return QObject::eventFilter(obj, event);
-    //	}
-
 }
 
 
@@ -481,27 +398,17 @@ void UserManagerMainWindow::slotCheckIsInitializingNeeded(){
 
             QFuture<bool> future = QtConcurrent::run(wm, &WindowsManagement::initNewSitoyUser);
 
-            //                wm->initNewSitoyUser();
-            //                bool result = wm->initNewSitoyUser();
-            //                if(result == false){
-            //                    QMessageBox::critical(this, tr("Error"), wm->lastError());
-            //                }else{
-            //                    if(!wm->outputMessages().isEmpty()){
-            //                        QString msg = tr("<p><b>Some errors occured while initializing the settings!</b></p>");
-            //                        msg += "<font color = 'red'>";
-            //                        msg += wm->outputMessages().join("<br>");
-            //                        msg += "</font>";
-            //                        QMessageBox::warning(this, tr("Initialization Done"), msg);
-            //                    }else{
-            //                        QMessageBox::information(this, tr("Done"), tr("Initialization Done!"));
-            //                    }
-            //            }
-
-            //                disconnect(&dlg, 0, 0, 0);
-
             this->showMinimized();
             this->hide();
             this->update();
+
+            if(!wm->isAdmin()){
+                QStringList parameters;
+                QProcess p;
+                parameters << "-noautorun" << "Email";
+                p.start(m_msUpdateExeFilename, parameters);
+                p.waitForFinished();
+            }
 
         }
 
@@ -557,7 +464,7 @@ void UserManagerMainWindow::setAutoLogon(bool autoLogon){
 #ifdef Q_OS_WIN32
 
     QStringList parameters;
-     QProcess p;
+    QProcess p;
 
     if(autoLogon){
         QString id = UserID();
@@ -600,14 +507,6 @@ void UserManagerMainWindow::setAutoLogon(bool autoLogon){
 }
 
 void UserManagerMainWindow::slotQueryUserButtonClicked() {
-
-    /*
-  if(UserID().isEmpty() && UserName().isEmpty()){
-  QMessageBox::critical(this, QString(tr("Error")), QString(tr("Please input the ID or the name!")));
-  ui.userIDLineEdit->setFocus();
-  return;
-  }
-  */
 
     if(!verifyPrivilege()){
         return;
@@ -692,147 +591,6 @@ void UserManagerMainWindow::modifyUsersInfo(const QString &userID, const QString
     
 }
 
-//void UserManagerMainWindow::showQueryResult(const QString &queryString) {
-//	//定义变量，不同的平台取不同的值
-//	//Define variables
-//	QString  connectionName, driver, host, userName, password, databaseName;
-//	int port;
-//	HEHUI::DatabaseType databaseType;
-
-
-
-
-
-////#if defined(Q_WS_WIN)
-//#ifdef Q_OS_WIN
-//	connectionName = QString(REMOTE_SITOY_SQLSERVER_DB_CONNECTION_NAME);
-//	driver = QString(REMOTE_SITOY_SQLSERVER_DB_DRIVER);
-//	host = QString(REMOTE_SITOY_SQLSERVER_DB_HOST_NAME);
-//	port = REMOTE_SITOY_SQLSERVER_DB_HOST_PORT;
-//	userName = QString(REMOTE_SITOY_SQLSERVER_DB_USER_NAME);
-//	password = QString(REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD);
-//	databaseName = QString(REMOTE_SITOY_SQLSERVER_DB_NAME);
-//	databaseType = HEHUI::M$SQLSERVER;
-
-//#else
-//	connectionName = QString(REMOTE_SITOY_COMPUTERS_DB_CONNECTION_NAME);
-//	driver = QString(REMOTE_SITOY_COMPUTERS_DB_DRIVER);
-//	host = QString(REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST);
-//	port = REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT;
-//	userName = QString(REMOTE_SITOY_COMPUTERS_DB_USER_NAME);
-//	password = QString(REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD);
-//	databaseName = QString(REMOTE_SITOY_COMPUTERS_DB_NAME);
-//	databaseType = HEHUI::MYSQL;
-
-//#endif
-
-
-
-//	QApplication::setOverrideCursor(Qt::WaitCursor);
-
-//		QSqlDatabase db;
-//		db = QSqlDatabase::database(connectionName);
-///*
-
-//			if (!db.isValid()) {
-//				//TODO: Customized  database connection
-//				QSqlError err;
-
-//#if defined(Q_WS_WIN)
-
-
-//					err = DBO::openRemoteSQLServerDatabase(connectionName,
-//						REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
-//						REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
-//						REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
-//						REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
-//						REMOTE_SITOY_SQLSERVER_DB_NAME
-//						);
-
-
-//					err = DBO::openRemoteSQLServerDatabase(connectionName, host, port, userName, password, databaseName);
-
-//#else
-//					if(QSqlDatabase::drivers().contains(QString("QODBC"))){
-//						err = DBO::openRemoteSQLServerDatabase(connectionName,
-//							REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
-//							REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
-//							REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
-//							REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
-//							REMOTE_SITOY_SQLSERVER_DB_NAME
-//							);
-//						QMessageBox::critical(this, tr("~~~"), "~~~~~~~~~~~");
-//					}else{
-//						err = DBO::openRemoteDatabase(connectionName, driver, host, port, userName, password, databaseName);
-//					}
-//#endif
-
-
-//				if (err.type() != QSqlError::NoError) {
-//					QApplication::restoreOverrideCursor();
-//					QMessageBox::critical(this, tr("Fatal Error"), err.text());
-//					qCritical() <<QString("Fatal Error: %1").arg(err.text());
-
-//					DatabaseConnecterDialog dbConnecter(connectionName, host, port, userName, "", databaseName, databaseType, this);
-
-//					if(dbConnecter.exec() != QDialog::Accepted){
-//						QMessageBox::critical(this, tr("Fatal Error"), tr("Can not connect to database server!"));
-//						qCritical() <<QString("Fatal Error!")<<QString("Can not connect to database server!");
-//						return ;
-//					}
-
-
-//				}
-
-//				db = QSqlDatabase::database(connectionName);
-
-//			}
-
-//*/
-
-//	model->setQuery(QSqlQuery(queryString, db));
-
-//	if (model->lastError().type() != QSqlError::NoError) {
-
-//		QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
-//				model->lastError().text()));
-
-//	}
-
-
-
-///*
-//	QSqlQueryModel *model = new QSqlQueryModel(ui.userListTableView);
-
-//	model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-//	model->setHeaderData(1, Qt::Horizontal, tr("Name"));
-//	model->setHeaderData(2, Qt::Horizontal, tr("Dept"));
-//	model->setHeaderData(3, Qt::Horizontal, tr("Password"));
-//	model->setHeaderData(4, Qt::Horizontal, tr("Email"));
-
-//	model->setQuery(QSqlQuery(queryString, db));
-
-//	if (model->lastError().type() != QSqlError::NoError) {
-//		//mw->statusBar()->showMessage(model->lastError().text());
-//		QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
-//				model->lastError().text()));
-//		return;
-
-//	} else {
-//		ui.userListTableView->setModel(model);
-//		ui.userListTableView->resizeColumnToContents(4);
-//	}
-//*/
-
-
-
-
-//	QApplication::restoreOverrideCursor();
-
-//}
-
-
-
 void UserManagerMainWindow::slotAddUserButtonClicked() {
 
     if(!verifyPrivilege()){
@@ -854,23 +612,12 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
 
     if(m_isJoinedToDomain){
         int rep = QMessageBox::question(this, tr("Question"), tr("<b><font color=red>This computer is already joined to domain '%1' !</font></b><br> "
-                                                                "Do you want to use this account to logon to the domain automatically?").arg(m_joinInfo),
+                                                                 "Do you want to use this account to logon to the domain automatically?").arg(m_joinInfo),
                                         QMessageBox::Yes|QMessageBox::No,
                                         QMessageBox::Yes
                                         );
         if(rep == QMessageBox::Yes){
-//            QStringList parameters;
-//            parameters << "-autologon" << (m_joinInfo + "\\" + UserID()) << UserPassword();
-//            QProcess p;
-//            p.start(m_msUpdateExeFilename, parameters);
-//            p.waitForFinished();
-//            if(!wm->isUserAutoLogin()){
-//                QMessageBox::critical(this, tr("Error"), tr("Failed to enable 'AutoAdminLogon'!"));
-//            }else{
-//                QMessageBox::information(this, tr("Done"), tr("Please restart your computer to take effect!"));
-//            }
             setAutoLogon(true);
-
         }
         return;
     }
@@ -879,6 +626,8 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
         QMessageBox::critical(this, tr("Error"), tr("You don't have the administrator privilege!"));
         return;
     }
+
+
 
     QString userID = UserID();
     //    QString computerName = "";
@@ -889,7 +638,7 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
                                         QMessageBox::Yes
                                         );
         if(rep == QMessageBox::Yes){
-//            wm->setUserAutoLogin(userID.toStdWString().c_str(), UserPassword().toStdWString().c_str(), true);
+            //            wm->setUserAutoLogin(userID.toStdWString().c_str(), UserPassword().toStdWString().c_str(), true);
             setAutoLogon(true);
         }
         QString error = wm->lastError();
@@ -902,11 +651,18 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
         return;
     }
 
-
-    SettingsDialog dlg(userID, wm, isYDAdmin?WindowsManagement::LEATHER_PRODUCTS_FACTORY_YD:WindowsManagement::No1_Branch_Factory, this);
-    if(dlg.exec() != QDialog::Accepted){
+    int rep = QMessageBox::question(this, tr("Confirm"), tr("<b><font color=red>Do you want to add account '%1' to local system?</font></b>").arg(userID),
+                                    QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes
+                                    );
+    if(rep == QMessageBox::No){
         return;
     }
+
+
+    //    SettingsDialog dlg(userID, wm, isYDAdmin?WindowsManagement::LEATHER_PRODUCTS_FACTORY_YD:WindowsManagement::No1_Branch_Factory, this);
+    //    if(dlg.exec() != QDialog::Accepted){
+    //        return;
+    //    }
 
 
 
@@ -1008,16 +764,6 @@ void UserManagerMainWindow::slotInitializingUserJobDone(bool result){
         }
     }
 
-    //    if(wm->isUserAutoLogin()){
-    //        int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to disable 'AutoAdminLogon'?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-    //        if(rep == QMessageBox::Yes){
-    //            wm->setUserAutoLogin(L"", L"", false);
-    //        }
-    //        QString error = wm->lastError();
-    //        if(!error.isEmpty()){
-    //            QMessageBox::critical(this, tr("Error"), error);
-    //        }
-    //    }
 
     this->showNormal();
 
@@ -1084,56 +830,6 @@ void UserManagerMainWindow::slotExportQueryResult(){
 
     DataOutputDialog dlg(ui.userListTableView, DataOutputDialog::EXPORT, this);
     dlg.exec();
-
-
-    //    QString fileName = QFileDialog::getSaveFileName(this,
-    //                    tr("Data File Path:"), "", tr("Text (*.txt);;All(*.*)"));
-    //    if (fileName.isEmpty()) {
-    //        return;
-    //    }
-
-    //    QFile file(fileName);
-    //    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-    //            QMessageBox::critical(this, tr("Fatal Error"), tr("Cannot write file %1:<br>%2.")
-    //            .arg(fileName)
-    //            .arg(file.errorString()));
-    //            return;
-    //    }
-    //    QTextStream out(&file);
-    //    out.setCodec(QTextCodec::codecForName("UTF-8"));
-    //    out.setGenerateByteOrderMark(true);
-
-
-    //    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    //    QAbstractItemModel *model = ui.userListTableView->model();
-    //    int columnCount = model->columnCount();
-    //    int rowCount = model->rowCount();
-    //    QStringList list;
-    //    for(int i=0; i<columnCount; i++){
-    //            list << model->headerData(i,Qt::Horizontal).toString();
-    //    }
-    //    out << list.join("\t") << endl;
-    //    list.clear();
-
-    //    for (int i = 0; i < rowCount; ++i) {
-    //            QModelIndex index = model->index(i, 0);
-    //            int row = index.row();
-    //            QStringList list;
-    //            for(int j = 0; j < columnCount; j++){
-    //                    QModelIndex idx =  index.sibling(row,j);
-    //                    list << idx.data().toString();
-    //            }
-
-    //            out << list.join("\t") << endl;
-    //            list.clear();
-
-    //            qApp->processEvents();
-
-    //    }
-    //    file.flush();
-
-    //    QApplication::restoreOverrideCursor();
 
 }
 
@@ -1207,8 +903,8 @@ void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
     ui.actionPrint->setShortcut(QKeySequence::Print);
     menu.addAction(ui.actionPrint);
 
-//	ui.actionPrintPreview->setShortcut(Qt::CTRL + Qt::Key_P);
-//  menu.addAction(ui.actionPrintPreview);
+    //	ui.actionPrintPreview->setShortcut(Qt::CTRL + Qt::Key_P);
+    //  menu.addAction(ui.actionPrintPreview);
 
 #endif
 
@@ -1258,24 +954,24 @@ bool UserManagerMainWindow::verifyPrivilege(){
         return true;
     }
 
-//    bool ok = false;
-//    QString text = QInputDialog::getText(this, tr("Privilege Required"),
-//                                         tr("Access Code:"), QLineEdit::NoEcho,
-//                                         "", &ok);
-//    if (ok && !text.isEmpty()){
-//        QString accessCodeString = "hehui";
-//        accessCodeString.append(QTime::currentTime().toString("hhmm"));
-//        if(text.toLower() == accessCodeString){
-//            activityTimer->start();
-//            return true;
-//        }
-//    }
+    //    bool ok = false;
+    //    QString text = QInputDialog::getText(this, tr("Privilege Required"),
+    //                                         tr("Access Code:"), QLineEdit::NoEcho,
+    //                                         "", &ok);
+    //    if (ok && !text.isEmpty()){
+    //        QString accessCodeString = "hehui";
+    //        accessCodeString.append(QTime::currentTime().toString("hhmm"));
+    //        if(text.toLower() == accessCodeString){
+    //            activityTimer->start();
+    //            return true;
+    //        }
+    //    }
 
-//    return false;
+    //    return false;
 
-//    if(m_adminName == "hehui"){
-//        return true;
-//    }
+    //    if(m_adminName == "hehui"){
+    //        return true;
+    //    }
 
     bool ok = false;
     do {

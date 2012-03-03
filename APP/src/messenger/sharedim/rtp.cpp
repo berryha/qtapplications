@@ -2,7 +2,7 @@
 #include <QDebug>
 #include "rtp.h"
 
-#include "global_shared.h"
+#include "constants_global_shared.h"
 
 namespace HEHUI {
 
@@ -173,8 +173,6 @@ bool RTP::isSocketConnected(int socketID){
     }else{
         connected = m_tcpServer->isConnected(socketID);
     }
-
-    return connected;
 
 }
 

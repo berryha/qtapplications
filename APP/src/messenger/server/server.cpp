@@ -47,7 +47,11 @@ Server::Server(QObject *parent)
 
 
     m_packetHandler = 0;
-    networkManager = 0;
+    resourcesManager = 0;
+    m_udpServer = 0;
+    m_rtp = 0;
+
+
     serverPacketsParser = 0;
     databaseUtility = 0;
     query = 0;
@@ -57,30 +61,28 @@ Server::Server(QObject *parent)
 
     onlineAdminsCount = 0;
 
-    rudpSocket = 0;
 
 }
 
 Server::~Server(){
     qDebug()<<"Server::~Server()";
 
-    if(networkManager){
-        networkManager->closeAllServers();
-    }
 
     delete serverPacketsParser;
     serverPacketsParser = 0;
 
     //TODO:释放资源
-    ServerNetworkManager::cleanInstance();
-    delete networkManager;
-    networkManager = 0;
+    ResourcesManagerInstance::cleanInstance();
+    delete resourcesManager;
+    resourcesManager = 0;
 
     if(m_packetHandler){
         m_packetHandler->clean();
         delete m_packetHandler;
         m_packetHandler = 0;
     }
+    PacketHandlerBase::clean();
+
 
     QList<UserInfo*> clientInfoList = clientInfoHash.values();
     clientInfoHash.clear();
@@ -110,53 +112,35 @@ bool Server::startMainService(){
         return true;
     }
 
-    m_packetHandler = new PacketHandlerBase(this);
-    networkManager->setPacketHandler(m_packetHandler);
 
     //TODO
     if(openDatabase()){
 
     }
 
-    bool result = false;
-    result = networkManager->startIPMCServer();
-    if(result == false){
-        qCritical() << QString("Can not start IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
-        return false;
+
+    QString errorMessage = "";
+    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), &errorMessage);
+    if(!m_udpServer){
+        qCritical()<<QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT).arg(errorMessage);
+        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IM_SERVER_IPMC_LISTENING_PORT), true, &errorMessage);
     }else{
-        qWarning() << QString("Starting IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
+        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
     }
 
-//    int udpPort = 0;
-//    udpPort = networkManager->startUDPServer();
-//    if(udpPort == 0){
-//        QString msg = tr("Can not start UDP listening!");
-//        //QMessageBox::critical(this, tr("Error"), msg);
-//        qCritical()<<msg;
-//        return false;
+//    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
+//    if(!m_udpServer){
+//        logMessage(QString("Can not start UDP listening on port %1! %2").arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
 //    }else{
-//        qWarning() << QString("Starting UDP listening on port %1!").arg(QString::number(udpPort));
-//    }
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, IM_SERVER_RUDP_LISTENING_PORT);
-    if(!rudpSocket){
-        qCritical()<<QString("Can not start RUDP listening!");
-        return false;
-    }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
-    }
-    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
-
-
-//    result = networkManager->startTCPServer();
-//    if(result == false){
-//        qCritical() << QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(IM_SERVER_TCP_LISTENING_PORT);
-//    }else{
-//        qWarning() << QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(IM_SERVER_TCP_LISTENING_PORT);
+//        qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
 //    }
 
-    serverPacketsParser = new ServerPacketsParser(networkManager, this);
+    m_rtp = resourcesManager->startRTP(QHostAddress::Any, IM_SERVER_RTP_LISTENING_PORT, true, &errorMessage);
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+
+
+    serverPacketsParser = new ServerPacketsParser(resourcesManager, this);
 //    serverPacketsParser->setLocalRUDPListeningAddress(QHostAddress::Any);
 //    serverPacketsParser->setLocalRUDPListeningPort(udpPort);
     
@@ -167,10 +151,10 @@ bool Server::startMainService(){
     //Single Process Thread
     //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
     //IMPORTANT For Multi-thread
-    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
-    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
+//    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
+//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
+//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
 //    serverPacketsParser->startCheckIMUsersOnlineStateTimer();
 
 
@@ -347,7 +331,7 @@ void Server::start()
 
 
     m_packetHandler = 0;
-    networkManager = ServerNetworkManager::instance();
+    resourcesManager = ResourcesManagerInstance::instance();
     serverPacketsParser = 0;
 
     databaseUtility = new DatabaseUtility(this);
@@ -355,18 +339,9 @@ void Server::start()
     mainServiceStarted = false;
 
 
-    if(networkManager->isNetworkReady()){
-        qDebug()<<"Network Ready!";
-        startMainService();
+    startMainService();
 
-    }else{
-        //logMessage(QString("Can not find valid IP address! Service startup failed!"), QtServiceBase::Error);
-        qWarning()<<"Can not find valid IP address! Service startup failed!";
 
-        connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(startMainService()));
-        networkManager->startWaitingNetworkReady();
-
-    }
 
 
 
@@ -382,11 +357,19 @@ void Server::stop()
     
     if(serverPacketsParser){
         serverPacketsParser->sendServerOfflinePacket();
-        serverPacketsParser->aboutToQuit();
     }
 
-
+    databaseUtility->closeAllDBConnections();
     DatabaseUtility::closeAllDBConnections();
+
+
+    if(m_udpServer){
+        m_udpServer->close();
+    }
+    if(m_rtp){
+        m_rtp->stopServers();
+    }
+
     
 
 
