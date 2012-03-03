@@ -47,19 +47,19 @@ HEADERS += \
     app_constants_server.h \
     packetmanager/serverpacketsparser.h \
     usersmanager/usersmanager.h \
-    networkmanager/servernetworkmanager.h \
     usersmanager/userinfo.h \
     usersmanager/group.h \
-    serverlib.h
+    serverlib.h \
+    resourcesmanagerinstance.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \
     server.cpp \
     packetmanager/serverpacketsparser.cpp \
     usersmanager/usersmanager.cpp \
-    networkmanager/servernetworkmanager.cpp \
     usersmanager/userinfo.cpp \
-    usersmanager/group.cpp
+    usersmanager/group.cpp \
+    resourcesmanagerinstance.cpp
 FORMS += 
 RESOURCES += resources.qrc
 win32 { 

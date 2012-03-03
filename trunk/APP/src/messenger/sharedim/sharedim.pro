@@ -23,11 +23,19 @@ include(../../HHSharedLibs.pri)
 HEADERS += groupbase.h \
     constants_global_shared.h \
     imuserbase.h \
-    networkmanager/networkmanager.h \
-    sharedimlib.h
+    sharedimlib.h \
+    udtprotocol.h \
+    tcpserver.h \
+    rtp.h \
+    resourcesmanager.h \
+    filemanager.h
 SOURCES += groupbase.cpp \
     imuserbase.cpp \
-    networkmanager/networkmanager.cpp
+    udtprotocol.cpp \
+    tcpserver.cpp \
+    rtp.cpp \
+    resourcesmanager.cpp \
+    filemanager.cpp
 FORMS += 
 RESOURCES += resources.qrc
 

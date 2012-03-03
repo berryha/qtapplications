@@ -88,6 +88,7 @@ private slots:
 
     void slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message);
 
+    void slotProcessLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
     void slotProcessLoginResult(quint8 errorTypeCode);
     void slotProcessContactStateChanged(const QString &contactID, quint8 onlineStateCode, const QString &contactHostAddress, quint16 contactHostPort);
     void slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString);
@@ -124,13 +125,28 @@ private slots:
     void showUserInfo(IMUserBase *user);
 
 
-    void requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort);
+    void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
     void loginTimeout();
 
 
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+    void peerDisconnected(int socketID);
+
+//////////////////////////////
+    //File TX
+    void startFileManager();
+    void processContactRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void processContactRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
+    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
+    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
+    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+
+    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 
 private:
@@ -172,23 +188,32 @@ private:
     ChatWindowManager *chatWindowManager;
 
     PacketHandlerBase *m_packetHandler;
-    ClientResourcesManager *networkManager;
+    ClientResourcesManager *m_resourcesManager;
     ClientPacketsParser *clientPacketsParser;
     bool networkStarted;
 
+
+//    UDPServer *m_udpServer;
+    RTP *m_rtp;
+    int m_socketConnectedToServer;
+
     Search *search;
 
-    bool atuoShowSystemMessage;
+    bool autoShowSystemMessage;
     bool autoShowChatMessageFromContact;
 
     UserInfoTipWindow *m_userInfoTipWindow;
     //ContactInfoWidget *m_ContactInfoWidget;
 
-    RUDPSocket *rudpSocket;
     QHostAddress m_serverHostAddress;
     quint16 m_serverHostPort;
     bool m_serverConnected;
     //    QTimer *m_loginTimer;
+
+    FileManager *m_fileManager;
+    QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
+    QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
+
 
 };
 

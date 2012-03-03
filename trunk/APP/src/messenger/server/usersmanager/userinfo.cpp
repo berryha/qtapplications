@@ -61,6 +61,7 @@ UserInfo::UserInfo(const QString &ipAddress, quint16 port, QObject *parent)
     setLastLoginHostPort(port);
 
 
+
 }
 
 UserInfo::~UserInfo(){
@@ -72,21 +73,23 @@ void UserInfo::init(){
     setPassword("");
     setVerified(false);
 
-//    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
+    //    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
 
     remainingAuthenticationRequestTimes = MAX_AUTHENTICATION_REQUEST_TIMES;
     bannedFromAuthenticationRequest = false;
     timeToLiftTheBan = QDateTime();
-//    timeLastHeartbeatPacketReceived = QDateTime();
+    //    timeLastHeartbeatPacketReceived = QDateTime();
+
+    m_socketID = INVALID_SOCK_ID;
 
 
 }
 
 bool UserInfo::isOnLine(){
-//    if(QDateTime::currentDateTime() < timeLastHeartbeatPacketReceived.addMSecs(ONLINE_STATUS_CHECKING_TIMES*HEARTBEAT_TIMER_INTERVAL)){
-//        return true;
-//    }
-//    return false;
+    //    if(QDateTime::currentDateTime() < timeLastHeartbeatPacketReceived.addMSecs(ONLINE_STATUS_CHECKING_TIMES*HEARTBEAT_TIMER_INTERVAL)){
+    //        return true;
+    //    }
+    //    return false;
 
     if(getOnlineState() == IM::ONLINESTATE_OFFLINE){
         return false;
@@ -153,23 +156,23 @@ void UserInfo::authenticationFailed(){
 
 void UserInfo::setOnline(){
 
-//    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
+    //    remainingOnlineStatusCheckingTimes = ONLINE_STATUS_CHECKING_TIMES;
 
     remainingAuthenticationRequestTimes = MAX_AUTHENTICATION_REQUEST_TIMES;
     bannedFromAuthenticationRequest = false;
     timeToLiftTheBan = QDateTime();
 
-//    timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
-//    setLastLoginTime(timeLastHeartbeatPacketReceived);
+    //    timeLastHeartbeatPacketReceived = QDateTime::currentDateTime();
+    //    setLastLoginTime(timeLastHeartbeatPacketReceived);
 }
 
 void UserInfo::setOffline(){
 
     //QDateTime time = QDateTime::currentDateTime();
     //setLastLoginTime(time);
-//    setLastLoginTime(timeLastHeartbeatPacketReceived);
+    //    setLastLoginTime(timeLastHeartbeatPacketReceived);
 
-//    addUpdatedProperty(IM::PI_LastLoginTime, "'"+timeLastHeartbeatPacketReceived.toString("yyyy-MM-dd hh:mm:ss")+"'");
+    //    addUpdatedProperty(IM::PI_LastLoginTime, "'"+timeLastHeartbeatPacketReceived.toString("yyyy-MM-dd hh:mm:ss")+"'");
 
     //TODO:Save to database
 
@@ -205,16 +208,16 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         
     case IM::PI_PersonalContactGroupsInfoString:
         columnName = "PersonalContactGroupsInfo";
-        break;  
+        break;
     case IM::PI_PersonalContactGroupsInfoVersion:
         columnName = "PersonalContactGroupsInfoVersion";
-        break;         
+        break;
     case IM::PI_InterestGroupsInfoString:
         columnName = "InterestGroupsInfo";
-        break;  
+        break;
     case IM::PI_InterestGroupsInfoVersion:
         columnName = "InterestGroupsInfoVersion";
-        break; 
+        break;
     case IM::PI_BlacklistInfoVersion:
         columnName = "BlacklistInfoVersion";
         break;
@@ -223,7 +226,7 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         break;
     case IM::PI_PersonalInfoVersion:
         columnName = "PersonalInfoVersion";
-        break; 
+        break;
         
 
     case IM::PI_HomeAddress:
@@ -258,7 +261,7 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         break;
     case IM::PI_EmailForSecurity:
         columnName = "EmailForSecurity";
-        break;   
+        break;
 
     case IM::PI_CompanyName:
         columnName = "CompanyName";
@@ -292,14 +295,14 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         break;
     case IM::PI_FriendshipApply:
         columnName = "FriendshipApply";
-        break;    
+        break;
     case IM::PI_ShortTalk:
         columnName = "ShortTalk";
-        break;  
+        break;
 
     case IM::PI_Role:
         columnName = "Role";
-        break;         
+        break;
         
     default:
         columnName = "";
@@ -417,7 +420,7 @@ QString UserInfo::groupNameThatContactBelongsTo(const QString &contactID) const{
 
 //QString UserInfo::getUpdateSQLStatement() const{
 //    QMutexLocker locker(updatedPropertiesMutex);
-    
+
 //    QStringList sqlstatements;
 //    QList<IM::PropertyID> keys = updatedProperties.keys();
 //    foreach (IM::PropertyID propertyID, keys) {
@@ -428,19 +431,19 @@ QString UserInfo::groupNameThatContactBelongsTo(const QString &contactID) const{
 //        }
 //        sqlstatements.append(QString(propertyName + "=" + updatedProperties.value(propertyID)));
 //    }
-    
+
 //    return sqlstatements.join(" , ");
-    
+
 
 
 //}
 
 //void UserInfo::clearUpdatedProperties(){
 //    QMutexLocker locker(updatedPropertiesMutex);
-    
+
 //    updatedProperties.clear();
-    
-    
+
+
 //}
 
 

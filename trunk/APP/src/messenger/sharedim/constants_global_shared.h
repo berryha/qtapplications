@@ -46,17 +46,21 @@
 #define IM_SERVER_IPMC_ADDRESS	"224.224.224.224"
 #endif
 
-#ifndef IM_SERVER_RUDP_LISTENING_PORT
-#define IM_SERVER_RUDP_LISTENING_PORT	54321
-#endif
-
 #ifndef IM_SERVER_IPMC_LISTENING_PORT
 #define IM_SERVER_IPMC_LISTENING_PORT	54320
+#endif
+
+#ifndef IM_SERVER_RTP_LISTENING_PORT
+#define IM_SERVER_RTP_LISTENING_PORT	54321
 #endif
 
 //#ifndef IM_SERVER_TCP_LISTENING_PORT
 //#define IM_SERVER_TCP_LISTENING_PORT	54319
 //#endif
+
+#ifndef INVALID_SOCK_ID
+#define INVALID_SOCK_ID	-1
+#endif
 
 #ifndef CRYPTOGRAPHY_KEY
 #define CRYPTOGRAPHY_KEY "HEHUI"
@@ -200,18 +204,16 @@ enum Command {
     GROUP_CHAT_MESSAGE,
     GROUP_CHAT_MESSAGES_CACHED_ON_SERVER,
 
-    REQUEST_FILE_TRANSMISSION,
-    ACCEPT_FILE_TRANSMISSION,
-    REFUSE_FILE_TRANSMISSION,
-    ABORT_FILE_TRANSMISSION,
-    FILE,
-    VIDEO,
-    AUDIO,
 
-
-
-    //SERVER_MESSAGE_SYSTEM_ANNOUNCEMENT,
-
+    //File TX
+    RequestDownloadFile,
+    RequestUploadFile,
+    ResponseFileDownloadRequest,
+    ResponseFileUploadRequest,
+    RequestFileData,
+    FileData,
+    FileTXStatusChanged,
+    FileTXError,
 
 
 

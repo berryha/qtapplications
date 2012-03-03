@@ -104,16 +104,16 @@ void SettingsDialog::on_comboBoxLocation_currentIndexChanged ( int index ){
 
 void SettingsDialog::on_pushButtonOK_clicked(){
 
-    if(wm){
-        QString computerName =ui.lineEditNewPCName->text().trimmed().toLower();
-        if(((m_userID.toLower() == "sh01") && (computerName.startsWith("sh01", Qt::CaseInsensitive))) || (m_userID.toLower() == computerName)){
-            QMessageBox::critical(this, tr("Error"), tr("Invalid computer name!"));
-            ui.lineEditNewPCName->setFocus();
-            return;
-        }
+//    if(wm){
+//        QString computerName =ui.lineEditNewPCName->text().trimmed().toLower();
+//        if(((m_userID.toLower() == "sh01") && (computerName.startsWith("sh01", Qt::CaseInsensitive))) || (m_userID.toLower() == computerName)){
+//            QMessageBox::critical(this, tr("Error"), tr("Invalid computer name!"));
+//            ui.lineEditNewPCName->setFocus();
+//            return;
+//        }
     
-        wm->setNewComputerNameToBeUsed(computerName);
-    }
+//        wm->setNewComputerNameToBeUsed(computerName);
+//    }
 
     accept();
 

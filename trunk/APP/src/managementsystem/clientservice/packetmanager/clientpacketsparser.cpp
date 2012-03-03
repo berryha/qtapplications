@@ -52,6 +52,8 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *manager, QObjec
 
     m_udtProtocol = m_rtp->getUDTProtocol();
     Q_ASSERT(m_udtProtocol);
+    m_udtProtocol->startWaitingForIOInOneThread(10);
+    //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
     m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);

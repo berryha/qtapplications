@@ -29,16 +29,6 @@
 #include "HHSharedCore/hutilities.h"
 
 
-#ifdef Q_CC_MSVC
-#include <windows.h>
-//#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-#define msleep(x) Sleep(x)
-#endif
-
-#ifdef Q_CC_GNU
-#include <unistd.h>
-#define msleep(x) usleep(x*1000)
-#endif
 
 namespace HEHUI {
 
@@ -113,14 +103,18 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
 
     m_packetHandler = 0;
-    networkManager = 0;
+    m_resourcesManager = 0;
     clientPacketsParser = 0;
     networkStarted = false;
+
+    m_rtp = 0;
+    m_socketConnectedToServer = INVALID_SOCK_ID;
+
     checkNetwork();
 
     search = 0;
 
-    atuoShowSystemMessage = false;
+    autoShowSystemMessage = false;
     autoShowChatMessageFromContact = false;
 
     m_userInfoTipWindow = new UserInfoTipWindow(this);
@@ -133,6 +127,9 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     m_serverHostPort = 0;
     //    m_loginTimer = 0;
     m_serverConnected = false;
+
+    m_fileManager = 0;
+
 
 }
 
@@ -263,21 +260,11 @@ void MainWindow::initUI(){
 void MainWindow::checkNetwork(){
 
     m_packetHandler = 0;
-    networkManager = ClientResourcesManager::instance();
+    m_resourcesManager = ClientResourcesManager::instance();
     clientPacketsParser = 0;
     networkStarted = false;
 
-    if(networkManager->isNetworkReady()){
-        qDebug()<<"Network Ready!";
-        startNetwork();
-
-    }else{
-        qCritical()<<"Can not find valid IP address! Service startup failed!";
-
-        connect(networkManager, SIGNAL(signalNetworkReady()), this, SLOT(startNetwork()));
-        networkManager->startWaitingNetworkReady();
-
-    }
+    startNetwork();
 
 
 }
@@ -289,50 +276,26 @@ void MainWindow::startNetwork(){
         return;
     }
 
-    if(!m_packetHandler){
-        m_packetHandler = new PacketHandlerBase(this);
-        networkManager->setPacketHandler(m_packetHandler);
+
+
+    QString errorMessage = "";
+//    m_udpServer = m_resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
+//    if(!m_udpServer){
+//        logMessage(QString("Can not start UDP listening on port %1! %2").arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
+//    }else{
+//        qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
+//    }
+
+    m_rtp = m_resourcesManager->startRTP(QHostAddress::Any, 0, true, &errorMessage);
+    if(!errorMessage.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), errorMessage);
     }
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
 
-    int port = 0;
-    //port = networkManager->startUDPServer();
-    //port = networkManager->startRUDPServer(QHostAddress::Any, (IM_SERVER_RUDP_LISTENING_PORT+10));
-    rudpSocket = networkManager->startRUDPServer(QHostAddress::Any, (IM_SERVER_RUDP_LISTENING_PORT+10));
-    if(!rudpSocket){
-        QMessageBox::critical(this, tr("Error"), QString("Can not start RUDP listening!"));
-        return;
-    }else{
-        qWarning()<<QString("RUDP listening on address '%1', port %2!").arg(rudpSocket->localAddress().toString()).arg(rudpSocket->localPort());
-    }
-    connect(rudpSocket, SIGNAL(peerConnected(const QHostAddress &, quint16)), this, SLOT(peerConnected(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)), Qt::QueuedConnection);
-    connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16, bool)), this, SLOT(peerDisconnected(const QHostAddress &, quint16, bool)), Qt::QueuedConnection);
 
-    port = rudpSocket->localPort();
-    if(port == 0){
-        QString msg = tr("Can not start UDP listening!");
-        //QMessageBox::critical(this, tr("Error"), msg);
-        qCritical()<<msg;
-        return;
-    }else{
-        //qWarning()<<QString("RUDP listening on port %1!").arg(port);
-    }
-
-    //    result = networkManager->startTCPServer();
-    //    if(result == false){
-    //        logMessage(QString("Can not start TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT), QtServiceBase::Error);
-    //    }else{
-    //        qWarning()<<QString("Starting TCP listening on address '%1', port %2!").arg(networkManager->localTCPListeningAddress().toString()).arg(TCP_LISTENING_PORT);
-    //    }
-
-    clientPacketsParser = new ClientPacketsParser(networkManager, this);
-    clientPacketsParser->setLocalUDPListeningAddress(QHostAddress::Any);
-    clientPacketsParser->setLocalUDPListeningPort(port);
-
-    
-    
-    //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
+    clientPacketsParser = new ClientPacketsParser(m_resourcesManager, this);
+  //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), clientPacketsParser, SLOT(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
@@ -343,6 +306,7 @@ void MainWindow::startNetwork(){
     
     connect(clientPacketsParser, SIGNAL(signalUpdatePasswordResultReceived(quint8, const QString&)), this, SLOT(slotProcessUpdatePasswordResult(quint8, const QString&)), Qt::QueuedConnection);
     
+    connect(clientPacketsParser, SIGNAL(signalLoginServerRedirected(const QString &, quint16, const QString &)), this, SLOT(slotProcessLoginServerRedirected(const QString &, quint16, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalLoginResultReceived(quint8)), this, SLOT(slotProcessLoginResult(quint8)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactStateChangedPacketReceived(const QString &, quint8, const QString &, quint16)), this, SLOT(slotProcessContactStateChanged(const QString &, quint8, const QString &, quint16)));
     connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )));
@@ -368,7 +332,14 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalInterestGroupMembersInfoPacketReceived(const QString &, quint32, quint32 )), this, SLOT(slotProcessInterestGroupMembersInfo(const QString &, quint32, quint32 )), Qt::QueuedConnection);
     
     
-    
+    //File TX
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int, const QString &, const QString &, const QString &)), this, SLOT(processAdminRequestDownloadFilePacket(int, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &,quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
+
     
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)));
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)));
@@ -393,9 +364,9 @@ void MainWindow::startNetwork(){
     //Single Process Thread
     //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
     //IMPORTANT For Multi-thread
-    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
-    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
+//    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+//    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
+//    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
 
 
     //TODO:
@@ -437,32 +408,27 @@ void MainWindow::stopNetwork(){
     //    }
 
     if(clientPacketsParser){
-        clientPacketsParser->logout();
-        clientPacketsParser->aboutToQuit();
+        clientPacketsParser->logout(m_socketConnectedToServer);
         //QTimer::singleShot(1000, clientPacketsParser, SLOT(aboutToQuit()));
+        Utilities::msleep(1000);
+        delete clientPacketsParser;
+        clientPacketsParser = 0;
     }
 
-    while (true) {
-        if(clientPacketsParser->readyToQuit()){
+//    if(m_udpServer){
+//        m_udpServer->close();
+//    }
 
-            //networkManager->closeRUDPServer(0);
-            networkManager->closeAllServers();
-            qDebug()<<"---------------------------------------1----------";
-            delete clientPacketsParser;
-            clientPacketsParser = 0;
-
-            //networkManager->cleanInstance();
-            delete networkManager;
-            networkManager = 0;
-
-            m_packetHandler->clean();
-            delete m_packetHandler;
-            m_packetHandler = 0;
-
-            break;
-        }
+    if(m_rtp){
+        m_rtp->stopServers();
     }
 
+
+    //    ClientResourcesManager::cleanInstance();
+        delete m_resourcesManager;
+        m_resourcesManager = 0;
+
+    PacketHandlerBase::clean();
 
     m_serverConnected = false;
 
@@ -1245,7 +1211,7 @@ void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name,
                     return;
                 }
 
-                clientPacketsParser->renameContactGroup(group_name, newGroupName);
+                clientPacketsParser->renameContactGroup(m_socketConnectedToServer, group_name, newGroupName);
 
                 contactsManager->renameGroupToDatabase(group_name, newGroupName);
                 contactsManager->renameGroupToUI(friendsListView, group_name, newGroupName);
@@ -1259,7 +1225,7 @@ void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name,
             //}
             //TODO:
 
-            clientPacketsParser->createOrDeleteContactGroup(group_name, false);
+            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, group_name, false);
 
             contactsManager->deleteGroupFromDatabase(group_name);
             //TODO?
@@ -1291,7 +1257,7 @@ void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name,
                     return;
                 }
 
-                clientPacketsParser->createOrDeleteContactGroup(newGroupName, true);
+                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, newGroupName, true);
 
                 int groupID = contactsManager->slotAddNewContactGroupToDatabase(newGroupName);
                 contactsManager->slotAddNewContactGroupToUI(friendsListView, groupID, newGroupName);
@@ -1454,7 +1420,7 @@ void MainWindow::slotMoveContactToGroup(){
 
     //contactsManager->slotAddNewContactToDatabase(contact);
 
-    clientPacketsParser->moveContactToGroup(contactID, existingGroupName, newGroupName);
+    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, newGroupName);
 
 
     contactsManager->moveContact(contactID, contactsManager->getPersonalContactGroupID(existingGroupName), groupID);
@@ -1485,7 +1451,7 @@ void MainWindow::slotMoveContactToBlacklist(){
     slotDeleteContact(contactID, existingGroupName);
     imUser->addOrDeleteBlacklistedContact(contactID, true);
 
-    clientPacketsParser->addOrDeleteBlacklistedContact(contactID, true);
+    clientPacketsParser->addOrDeleteBlacklistedContact(m_socketConnectedToServer, contactID, true);
 
     //TODO:
     QListWidgetItem *item = new QListWidgetItem(ImageResource::createIconForContact(contact->getFace()), contact->getNickName(), ui.listWidgetBlacklist);
@@ -1521,7 +1487,7 @@ void MainWindow::slotDeleteContact(const QString &contactID, const QString &exis
     //contactsManager->slotdeleteContactFromDatabase(contact);
     contact->setContactGroupID(0);
     contactsManager->saveContactInfoToDatabase(contactID);
-    clientPacketsParser->deleteContact(contactID, existingGroupName, true);
+    clientPacketsParser->deleteContact(m_socketConnectedToServer, contactID, existingGroupName, true);
 
     contactsManager->addOrDeleteContact(contactID, groupID, false);
     //contactsManager->saveContactGroupsInfoToDatabase();
@@ -1538,6 +1504,10 @@ void MainWindow::slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QSt
     QMessageBox::critical(this, tr("Error"), tr("Password Update Failed!"));
 }
 
+void MainWindow::slotProcessLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName){
+    //TODO
+    QMessageBox::information(this, tr("Redirected"), tr("Redirected"));
+}
 
 void MainWindow::slotProcessLoginResult(quint8 errorTypeCode){
     //TODO:处理登陆结果
@@ -1649,7 +1619,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
             Contact *contact = contactsManager->getUser(contactID);
             if(!contact){
                 contact = new Contact(contactID, 0);
-                clientPacketsParser->requestContactInfo(contactID);
+                clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
                 contactsManager->slotAddNewContactToDatabase(contact);
             }
             contact->setContactGroupID(groupID);
@@ -1696,7 +1666,7 @@ void MainWindow::slotProcessAddContactResult(const QString &userID, const QStrin
         //contactsManager->addContactToUI(friendsListView, imUser->getDefaultGroupName(), userID);
         
 
-        if(atuoShowSystemMessage){
+        if(autoShowSystemMessage){
             getNewContactSettings(userID);
         }else{
             //TODO
@@ -1790,7 +1760,7 @@ void MainWindow::getNewContactSettings(const QString &contactID){
 
     imUser->moveContact(contactID, existingGroupName, groupName);
     imUser->saveMyInfoToLocalDatabase();
-    clientPacketsParser->moveContactToGroup(contactID, existingGroupName, groupName);
+    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, groupName);
     
     contact->setContactGroupID(groupID);
     contactsManager->saveContactInfoToDatabase(contactID);
@@ -1834,7 +1804,7 @@ void MainWindow::slotSearch(){
 
 void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage){
 
-    if(atuoShowSystemMessage){
+    if(autoShowSystemMessage){
         showContactRequestFromUser(userID, userNickName, userFace, verificationMessage);
     }else{
 
@@ -1865,9 +1835,9 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
     AddContactDialog dlg(&user, verificationMessage, this);
     if(dlg.exec() == QDialog::Accepted){
         if(dlg.requestRejected()){
-            clientPacketsParser->responseAddContactRequestFromUser(userID, false, dlg.getMessage());
+            clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, false, dlg.getMessage());
         }else{
-            clientPacketsParser->addContact(userID, dlg.getGroupname());
+            clientPacketsParser->addContact(m_socketConnectedToServer, userID, dlg.getGroupname());
         }
     }
 
@@ -1884,7 +1854,6 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
     if(!contact){return;}
 
     contactsManager->saveContactChatMessageToDatabase(imUser->getUserID(), contactID, message, time);
-
 
     if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
         chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, time);
@@ -1942,14 +1911,14 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
     if(!group){
         group = new InterestGroup(interestGroupID, this);
         //TODO:
-        clientPacketsParser->requestInterestGroupInfo(interestGroupID);
+        clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, interestGroupID);
         contactsManager->addNewInterestGroupToDatabase(group);
     }
 
     Contact *contact = contactsManager->getUser(contactID);
     if(!contact){
         contact = new Contact(contactID, this);
-        clientPacketsParser->requestContactInfo(contactID);
+        clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
         contactsManager->slotAddNewContactToDatabase(contact);
     }
 
@@ -2049,12 +2018,12 @@ void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &m
     if(!contact){return;}
     QString contactID = contact->getUserID();
     if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
-        clientPacketsParser->sendChatMessageToServer(contactID, message);
+        clientPacketsParser->sendChatMessageToServer(m_socketConnectedToServer, contactID, message);
     }else{
         QString contactHostAddress = contact->getLastLoginHostAddress();
         quint16 contactHostPort = contact->getLastLoginHostPort();
-        clientPacketsParser->sendChatMessageToContact(contactID, message, contactHostAddress, contactHostPort);
-        clientPacketsParser->sendImageFileToContact(contactID, imageList, contactHostAddress, contactHostPort);
+        clientPacketsParser->sendChatMessageToContact(m_socketConnectedToServer, contactID, message, contactHostAddress, contactHostPort);
+        clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contactHostAddress, contactHostPort);
     }
 
     contactsManager->saveContactChatMessageToDatabase(imUser->getUserID(), contactID, message);
@@ -2070,7 +2039,7 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
         return;
     }
 
-    clientPacketsParser->sendInterestGroupChatMessageToServer(interestGroup->getGroupID(), message);
+    clientPacketsParser->sendInterestGroupChatMessageToServer(m_socketConnectedToServer, interestGroup->getGroupID(), message);
     //TODO: Send images to server
 
     QStringList members = interestGroup->members();
@@ -2080,8 +2049,8 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
         if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
             //            clientPacketsParser->sendChatMessageToServer(contactID, message);
         }else{
-            clientPacketsParser->sendInterestGroupChatMessageToContact(contactID, interestGroup->getGroupID(), message, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
-            clientPacketsParser->sendImageFileToContact(contactID, imageList, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
+            clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
+            clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
         }
     }
 
@@ -2117,15 +2086,15 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
             qWarning()<<"Local: groupInfoVersion:"<<group->getGroupInfoVersion()<<" memberListInfoVersion:"<<group->getMemberListInfoVersion();
 
             if(groupInfoVersion != group->getGroupInfoVersion()){
-                clientPacketsParser->requestInterestGroupInfo(groupID);
+                clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, groupID);
             }else if(memberListInfoVersion != group->getMemberListInfoVersion()){
-                clientPacketsParser->requestInterestGroupMembersInfo(groupID);
+                clientPacketsParser->requestInterestGroupMembersInfo(m_socketConnectedToServer, groupID);
             }
         }else{
             group = new InterestGroup(groupID, this);
             contactsManager->addNewInterestGroupToDatabase(group);
             //TODO:
-            clientPacketsParser->requestInterestGroupInfo(groupID);
+            clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, groupID);
             
         }
         
@@ -2162,7 +2131,7 @@ void MainWindow::slotProcessInterestGroupInfo(const QString &interestGroupInfoFr
     qWarning()<<"interestGroupInfoFromServer:"<<interestGroupInfoFromServer;
     
     if(oldMembersInfoVersion != interestGroup->getMemberListInfoVersion()){
-        clientPacketsParser->requestInterestGroupMembersInfo(groupID);
+        clientPacketsParser->requestInterestGroupMembersInfo(m_socketConnectedToServer, groupID);
         interestGroup->setMemberListInfoVersion(oldMembersInfoVersion);
     }
 
@@ -2197,11 +2166,11 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
         Contact *contact = contactsManager->getUser(contactID);
         if(!contact){
             contact = new Contact(contactID, this);
-            clientPacketsParser->requestContactInfo(contactID);
+            clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             contactsManager->slotAddNewContactToDatabase(contact);
         }else{
             if(contactInfoVersion > contact->getPersonalInfoVersion()){
-                clientPacketsParser->requestContactInfo(contactID);
+                clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
         }
         
@@ -2248,13 +2217,23 @@ void MainWindow::showUserInfo(IMUserBase *user){
 
 }
 
-void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort){
+void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort){
 
-    Q_ASSERT(rudpSocket);
+    Q_ASSERT(m_rtp);
+
+
+    QString errorMessage;
+    if(m_socketConnectedToServer == INVALID_SOCK_ID){
+        m_socketConnectedToServer = m_rtp->connectToHost(QHostAddress(serverHostAddress), serverPort, 10000, &errorMessage);
+    }
+    if(m_socketConnectedToServer == INVALID_SOCK_ID){
+        qCritical()<<tr("Can not connect to host! %1").arg(errorMessage);
+        return;
+    }
 
     m_serverHostAddress = serverHostAddress;
-    m_serverHostPort = serverHostPort;
-    rudpSocket->connectToPeer(serverHostAddress, serverHostPort);
+    m_serverHostPort = serverPort;
+
 
     QTimer::singleShot(10000, this, SLOT(loginTimeout()));
 
@@ -2279,7 +2258,7 @@ void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort
     qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
     if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
-        clientPacketsParser->requestLogin(m_serverHostAddress, m_serverHostPort);
+        clientPacketsParser->requestLogin(m_socketConnectedToServer);
         m_serverConnected = true;
         //        if(m_loginTimer){
         //            m_loginTimer->stop();
@@ -2315,6 +2294,260 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
     }
 
 }
+
+void MainWindow::peerDisconnected(int socketID){
+    qWarning()<<"Peer Disconnected! Socket ID:"<<socketID;
+
+    if(socketID == m_socketConnectedToServer){
+        m_socketConnectedToServer = INVALID_SOCK_ID;
+        QMessageBox::critical(this, tr("Error"), tr("Disconnected from server!"));
+        return;
+    }
+
+    QList<int> requests = fileTXRequestHash.keys(socketID);
+    foreach (int request, requests) {
+        fileTXRequestHash.remove(request);
+    }
+
+    QList<QByteArray> files = fileTXSocketHash.values(socketID);
+    fileTXSocketHash.remove(socketID);
+    QList<QByteArray> allFiles = fileTXSocketHash.values();
+
+    foreach (QByteArray fileMD5, files) {
+        if(!allFiles.contains(fileMD5)){
+            m_fileManager->closeFile(fileMD5);
+        }
+    }
+
+
+}
+
+void MainWindow::startFileManager(){
+
+    if(!m_fileManager){
+        m_fileManager = ClientResourcesManager::instance()->getFileManager();
+        connect(m_fileManager, SIGNAL(dataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), this, SLOT(fileDataRead(int , const QByteArray &, int , const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(error(int , const QByteArray &, quint8, const QString &)), this, SLOT(fileTXError(int , const QByteArray &, quint8, const QString &)), Qt::QueuedConnection);
+        connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
+
+    }
+
+}
+
+void MainWindow::processContactRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir){
+
+    Contact *contact = contactsManager->getUser(contactID);
+    if(!contact){return;}
+
+    //TODO
+
+
+}
+
+void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir){
+
+    startFileManager();
+
+    QString errorString;
+
+    QFileInfo fi(localBaseDir, fileName);
+    QString absoluteFilePath = fi.absoluteFilePath();
+    if(fi.isDir()){
+        QDir dir(absoluteFilePath);
+
+        QStringList filters;
+        filters << "*" << "*.*";
+
+        foreach(QString file, dir.entryList(filters, QDir::Dirs | QDir::Files | QDir::System | QDir::Hidden | QDir::NoDotAndDotDot))
+        {
+            QString newRemoteDir = remoteFileSaveDir + "/" + fileName;
+            if(remoteFileSaveDir.endsWith('/')){
+                newRemoteDir = remoteFileSaveDir + fileName;
+            }
+            processContactRequestDownloadFilePacket(socketID, absoluteFilePath, file, newRemoteDir);
+
+            qApp->processEvents();
+        }
+
+        return;
+    }
+
+    const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(absoluteFilePath, &errorString);
+    if(!info){
+        clientPacketsParser->denyFileDownloadRequest(socketID, fileName, false, errorString);
+    }
+
+    if(clientPacketsParser->acceptFileDownloadRequest(socketID, fileName, true, info->md5sum, info->size, remoteFileSaveDir)){
+        fileTXSocketHash.insertMulti(socketID, info->md5sum);
+    }else{
+        m_fileManager->closeFile(info->md5sum);
+    }
+
+}
+
+void MainWindow::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
+
+    Q_ASSERT(m_fileManager);
+
+    if( (startPieceIndex == -1) && (endPieceIndex == -1) ){
+        QList<int> completedPieces = m_fileManager->completedPieces(fileMD5);
+        foreach (int pieceIndex, completedPieces) {
+            fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, pieceIndex), socketID);
+            //QCoreApplication::processEvents();
+        }
+
+    }else{
+        Q_ASSERT(endPieceIndex >= startPieceIndex);
+        for(int i=startPieceIndex; i<=endPieceIndex; i++){
+            fileTXRequestHash.insert(m_fileManager->readPiece(fileMD5, i), socketID);
+            //QCoreApplication::processEvents();
+        }
+
+    }
+
+//    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
+//    fileTXRequestHash.insert(id, socketID);
+
+}
+
+void MainWindow::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
+
+    Q_ASSERT(m_fileManager);
+    m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
+
+
+//        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_PIECE_LENGTH);
+
+
+}
+
+void MainWindow::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
+
+    //MS::FileTXStatus status = MS::FileTXStatus(status);
+    switch(status){
+    case quint8(MS::File_TX_Preparing):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Receiving):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Sending):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Progress):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Paused):
+    {
+
+    }
+        break;
+    case quint8(MS::File_TX_Aborted):
+    {
+        QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+        if(sockets.contains(socketID) && sockets.size() <= 1){
+            m_fileManager->closeFile(fileMD5);
+        }
+    }
+        break;
+    case quint8(MS::File_TX_Done):
+    {
+        QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+        if(sockets.contains(socketID) && sockets.size() <= 1){
+            m_fileManager->closeFile(fileMD5);
+        }
+
+    }
+        break;
+    default:
+        break;
+    }
+
+}
+
+void MainWindow::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
+    qDebug()<<"--MainWindow::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
+    qCritical()<<errorString;
+
+}
+
+void MainWindow::fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
+    qDebug()<<"--MainWindow::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
+
+    int socketID = fileTXRequestHash.take(requestID);
+    clientPacketsParser->sendFileData(socketID, fileMD5, pieceIndex, &data, &dataSHA1SUM);
+
+}
+
+void MainWindow::fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
+    qCritical()<<errorString;
+
+    if(requestID){
+        int socketID = fileTXRequestHash.take(requestID);
+        clientPacketsParser->fileTXError(socketID, fileMD5, errorCode, errorString);
+    }else{
+        //TODO:
+    }
+
+
+}
+
+void MainWindow::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress){
+    qDebug()<<"--MainWindow::pieceVerified(...) "<<" pieceIndex:"<<pieceIndex<<" verified:"<<verified<< "verificationProgress:"<<verificationProgress;
+
+    QList<int> sockets = fileTXSocketHash.keys(fileMD5);
+    if(sockets.isEmpty()){
+        //TODO:
+        //m_fileManager->closeFile(fileMD5);
+    }
+
+    if(verified){
+
+        if(verificationProgress == 100){
+            qWarning()<<"Done!";
+            clientPacketsParser->fileTXStatusChanged(sockets.first(), fileMD5, quint8(MS::File_TX_Done));
+        }else{
+            //TODO:
+//            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+//            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
+//            if(uncompletedPieceIndex < 0){
+//                return;
+//            }
+//            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+
+
+            //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+            //    qDebug()<<"----0----pieceIndex:"<<pieceIndex;
+            //    clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + 1, pieceIndex + FILE_PIECES_IN_ONE_REQUEST);
+            //}
+
+            if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+                if(pieceIndex == 0 ){
+                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }else{
+                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
+                }
+            }
+
+        }
+
+
+    }else{
+        qCritical()<<"ERROR! Verification Failed! Piece:"<<pieceIndex;
+        clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex, pieceIndex);
+    }
+
+}
+
+
 
 //void MainWindow::slotChangeContactOnlineState(const QString &contactID, quint8 onlineState, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo){
 

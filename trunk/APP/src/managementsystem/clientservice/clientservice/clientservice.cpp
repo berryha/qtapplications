@@ -33,13 +33,13 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_udpServer = 0;
     m_rtp = 0;
 
-    m_udtProtocol = 0;
+//    m_udtProtocol = 0;
     m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
     m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
     peerSocketThatRequiresDetailedInfo = UDTProtocol::INVALID_UDT_SOCK;
 
 
-    m_udtProtocolForFileTransmission = 0;
+//    m_udtProtocolForFileTransmission = 0;
 
     mainServiceStarted = false;
 
@@ -90,6 +90,7 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_serverInstanceID = 0;
 
     m_fileManager = 0;
+
 //    fileTXWithAdmin = 0;
 //    fileTXWithAdminStatus = MS::File_TX_Done;
 
@@ -201,7 +202,7 @@ bool ClientService::startMainService(){
     m_rtp = resourcesManager->startRTP(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
     connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
-    m_udtProtocol = m_rtp->getUDTProtocol();
+//    m_udtProtocol = m_rtp->getUDTProtocol();
 //    if(!m_udtProtocol){
 //        QString error = tr("Can not start UDT listening on port %1! %2").arg(UDT_LISTENING_PORT).arg(errorMessage);
 //        logMessage(error, QtServiceBase::Error);
@@ -210,7 +211,7 @@ bool ClientService::startMainService(){
 //        qWarning()<<QString("UDT listening on address port %1!").arg(UDT_LISTENING_PORT);
 //    }
 //    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(10);
+//    m_udtProtocol->startWaitingForIOInOneThread(10);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
 
@@ -301,7 +302,7 @@ bool ClientService::startMainService(){
     qWarning()<<"Check Programes!";
     checkProgrames();
 
-//    setupStartupWithSafeMode(true);
+    setupStartupWithSafeMode(true);
 
     QString section = serviceName() + "/LastCheckUpdate";
     QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
@@ -310,6 +311,12 @@ bool ClientService::startMainService(){
 
 #if defined(Q_OS_WIN32)
         wm->modifySystemSettings();
+
+        QSettings computerNameSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\HEHUI", QSettings::NativeFormat, this);
+        QString storedComputerName = computerNameSettings.value("ComputerName", "").toString().trimmed();
+        if(!storedComputerName.isEmpty() && (storedComputerName.toLower() != m_localComputerName) ){
+            wm->setComputerName(storedComputerName);
+        }
 
 #endif
 
@@ -765,7 +772,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     if(m_isJoinedToDomain){
         ok = wm->renameMachineInDomain(newComputerName, DOMAIN_ADMIN_NAME, DOMAIN_ADMIN_PASSWORD);
     }else{
-        ok = wm->setComputerName(newComputerName.toStdWString().c_str());
+        ok = wm->setComputerName(newComputerName);
     }
     QString errorString = wm->lastError();
 
@@ -774,6 +781,8 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
 
     QString log;
     if(ok){
+        QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\HEHUI", QSettings::NativeFormat, this);
+        settings.setValue("ComputerName", newComputerName);
         log = QString("The computer is renamed from '%1' to '%2'! Restart the computer to apply all changes! Admin:%3.").arg(m_localComputerName).arg(newComputerName).arg(adminName);
     }else{
         log = QString("Failed to rename computer! Admin:%1. %2").arg(adminName).arg(errorString);
@@ -1563,7 +1572,7 @@ bool ClientService::checkUsersAccount(){
         qWarning()<<QString("Computer name  '%1' is the same as user name!").arg(m_localComputerName);
         
         QString newComputerName = m_localComputerName + "-" +QDateTime::currentDateTime().toString("zzz");
-        wm->setComputerName(newComputerName.toStdWString().c_str());
+        wm->setComputerName(newComputerName);
     }
     users.removeAll("system$");
     users.removeAll("administrator");
@@ -2110,8 +2119,6 @@ void ClientService::startFileManager(){
         connect(m_fileManager, SIGNAL(pieceVerified(const QByteArray &, int , bool , int )), this, SLOT(pieceVerified(const QByteArray &, int , bool , int )), Qt::QueuedConnection);
 
     }
-
-
 
 }
 

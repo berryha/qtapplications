@@ -35,7 +35,7 @@
 #include <QObject>
 
 
-#include "networkmanager/servernetworkmanager.h"
+
 #include "usersmanager/userinfo.h"
 
 #include "packetmanager/serverpacketsparser.h"
@@ -84,15 +84,17 @@ private:
 private:
 
     PacketHandlerBase *m_packetHandler;
-    ServerNetworkManager *networkManager;
+    ResourcesManagerInstance *resourcesManager;
     ServerPacketsParser *serverPacketsParser;
+
+    UDPServer *m_udpServer;
+    RTP *m_rtp;
 
     bool mainServiceStarted;
 
     DatabaseUtility *databaseUtility;
     QSqlQuery *query;
 
-//    QTimer *sendServerOnlinePacketTimer;
 
     QHash<QString, UserInfo *> clientInfoHash;
 
@@ -103,7 +105,6 @@ private:
     QStringList logs;
 
 
-    RUDPSocket *rudpSocket;
 
 };
 

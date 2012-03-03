@@ -156,13 +156,13 @@ private:
     UDPServer *m_udpServer;
     RTP *m_rtp;
 
-    UDTProtocol *m_udtProtocol;
+//    UDTProtocol *m_udtProtocol;
     int m_socketConnectedToServer;
     int m_socketConnectedToAdmin;
     int peerSocketThatRequiresDetailedInfo;
 
 
-    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+//    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
 
 //    QHash<int /*UDT Socket ID*/, QString /*User Name*/> m_localUserSocketsHash;
 
@@ -204,16 +204,11 @@ private:
     int m_serverInstanceID;
 
     FileManager *m_fileManager;
-
-//    QFile *fileTXWithAdmin;
-//    MS::FileTXStatus fileTXWithAdminStatus;
-
     QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
     QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
 
     QStringList logs;
 
-    //QMutex mutex;
 
 };
 

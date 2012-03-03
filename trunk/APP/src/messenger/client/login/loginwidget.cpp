@@ -150,12 +150,12 @@ void LoginWidget::setupNetworkConfig(){
 
     ui.groupBoxConfiguration->hide();
 
-    ui.comboBoxNetworkType->addItem(tr("LAN"), NetworkManagerBase::LAN);
-    ui.comboBoxNetworkType->addItem(tr("Internet"), NetworkManagerBase::INTERNET);
+    ui.comboBoxNetworkType->addItem(tr("LAN"), ResourcesManager::LAN);
+    ui.comboBoxNetworkType->addItem(tr("Internet"), ResourcesManager::INTERNET);
     ui.comboBoxNetworkType->setCurrentIndex(Settings::instance()->getNetworkType());
 
-    ui.comboBoxProtocol->addItem(tr("P2P"), NetworkManagerBase::P2P);
-    ui.comboBoxProtocol->addItem(tr("C/S"), NetworkManagerBase::CS);
+    ui.comboBoxProtocol->addItem(tr("P2P"), ResourcesManager::P2P);
+    ui.comboBoxProtocol->addItem(tr("C/S"), ResourcesManager::CS);
     ui.comboBoxProtocol->setCurrentIndex(Settings::instance()->getProtocol());
 
 
@@ -462,11 +462,11 @@ void LoginWidget::on_comboBoxNetworkType_currentIndexChanged ( int index )
 {
     uint networkType = ui.comboBoxNetworkType->itemData(index).toUInt();
     switch (networkType) {
-    case NetworkManagerBase::LAN :
-        ClientResourcesManager::instance()->setNetworkType(NetworkManagerBase::LAN);
+    case ResourcesManager::LAN :
+        ClientResourcesManager::instance()->setNetworkType(ResourcesManager::LAN);
         break;
-    case NetworkManagerBase::INTERNET :
-        ClientResourcesManager::instance()->setNetworkType(NetworkManagerBase::INTERNET);
+    case ResourcesManager::INTERNET :
+        ClientResourcesManager::instance()->setNetworkType(ResourcesManager::INTERNET);
         break;
     default:
         break;
