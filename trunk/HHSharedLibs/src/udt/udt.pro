@@ -52,8 +52,13 @@ win32 {
 ######################################
 
     #DEFINES += WIN32  LEGACY_WIN32 NO_UDT_DLL
-    DEFINES += WIN32 _WIN32_WINNT=0x0501 NO_UDT_DLL
-    win32-g++:DEFINES += __MINGW__
+    DEFINES += WIN32 LEGACY_WIN32 _WIN32_WINNT=0x0500 NO_UDT_DLL
+    #win32-g++:DEFINES += __MINGW__
+    win32-g++{
+        DEFINES += __MINGW__
+        INCLUDEPATH += resources/lib/WinAPI_GCC
+        #LIBS += -Lresources/lib/WinAPI_GCC
+    }
 
     HEADERS +=
     SOURCES += 
@@ -64,6 +69,8 @@ win32 {
     #    #-lwsock32 \
     #    -lws2_32 \
     #    -ludt
+
+
 
 }
 unix { 
