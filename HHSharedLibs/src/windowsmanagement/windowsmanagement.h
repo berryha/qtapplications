@@ -160,7 +160,7 @@ public:
 
     QStringList localGroups();
 
-    bool setComputerName(LPCWSTR m_newComputerNameToBeUsed);
+    bool setComputerName(const QString &newComputerName);
     QString getComputerName();
     void getComputerNameInfo(QString *dnsDomain, QString *dnsHostname, QString *netBIOSName);
     bool joinWorkgroup(const QString &workgroup);
@@ -186,7 +186,7 @@ public:
     bool setupIME();
 
     void setLocation(Location location);
-    void setNewComputerNameToBeUsed(const QString &m_newComputerNameToBeUsed);
+//    void setNewComputerNameToBeUsed(const QString &m_newComputerNameToBeUsed);
 
 
 
@@ -221,7 +221,7 @@ private:
     bool m_isAdmin;
 
     Location location;
-    QString m_newComputerNameToBeUsed;
+//    QString m_newComputerNameToBeUsed;
 
 
 

@@ -85,7 +85,7 @@ WindowsManagement::WindowsManagement(QObject *parent) :
     m_isAdmin = isAdmin();
 
     location = No1_Branch_Factory;
-    m_newComputerNameToBeUsed = "";
+//    m_newComputerNameToBeUsed = "";
 
 
     //    test();
@@ -127,7 +127,6 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
     emit signalProgressUpdate(QString(tr("Adding user %1 to local system...").arg(userName)), 0);
     QCoreApplication::processEvents();
     if(!addUserToLocalSystem(id, pwd, cmt)){
-        //QMessageBox::critical(this, tr("Fatal Error"), tr("Can not add user '%1' to local system!").arg(UserID()));
         emit signalAddingUserJobDone(false);
         return false;
     }
@@ -135,7 +134,6 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
     emit signalProgressUpdate(QString(tr("Adding user %1 to local 'Administrators' group...").arg(userName)), 15);
     QCoreApplication::processEvents();
     if(!addUserToLocalGroup(id, L"Administrators")){
-        //QMessageBox::critical (this, tr("Fatal Error"), tr("Can not add user '%1' to local Administrators group!").arg(UserID()));
         emit signalAddingUserJobDone(false);
         return false;
     }
@@ -163,36 +161,14 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
 
     bool ok = false;
 
-    if(!m_newComputerNameToBeUsed.isEmpty()){
-        emit signalProgressUpdate(QString(tr("Update computer name ...")), 45);
-        QCoreApplication::processEvents();
-        //    QString time = QDateTime::currentDateTime ().toString("zzz");
-        //    QString computerName = QString(userName+"-"+time).left(15);
-        //    QString computerName;
-        //    switch(location){
-        //    case No1_Branch_Factory:
-        //        computerName = QString(userName+"-DGLP").left(15);
-        //        break;
-        //    case No2_Branch_Factory:
-        //        computerName = QString(userName+"-DGHB").left(15);
-        //        break;
-        //    case No3_Branch_Factory:
-        //        computerName = QString(userName+"-DGBF3").left(15);
-        //        break;
-        //    case LEATHER_PRODUCTS_FACTORY_YD:
-        //        computerName = QString(userName+"-YD").left(15);
-        //        break;
-        //    default:
-        //        computerName = userName.left(15);
-        //        break;
-        //    }
-
-
-        ok = setComputerName(m_newComputerNameToBeUsed.replace("_", "-").toStdWString().c_str());
-        if(!ok){
-            m_outputMsgs.append(lastErrorString);
-        }
-    }
+//    if(!m_newComputerNameToBeUsed.isEmpty()){
+//        emit signalProgressUpdate(QString(tr("Update computer name ...")), 45);
+//        QCoreApplication::processEvents();
+//        ok = setComputerName(m_newComputerNameToBeUsed.replace("_", "-").toStdWString().c_str());
+//        if(!ok){
+//            m_outputMsgs.append(lastErrorString);
+//        }
+//    }
 
 
 
@@ -219,10 +195,10 @@ bool WindowsManagement::addNewSitoyUserToLocalSystem(const QString &userName, co
     if(!ok){
         m_outputMsgs.append(lastErrorString);
     }
-    ok = setStartupWithWin(QCoreApplication::applicationFilePath(), "", "", true);
-    if(!ok){
-        m_outputMsgs.append(lastErrorString);
-    }
+//    ok = setStartupWithWin(QCoreApplication::applicationFilePath(), "", "", true);
+//    if(!ok){
+//        m_outputMsgs.append(lastErrorString);
+//    }
 
     emit signalProgressUpdate(QString(tr("Done!")), 100);
     QCoreApplication::processEvents();
@@ -719,7 +695,6 @@ bool WindowsManagement::initNewSitoyUser(){
 
     emit signalProgressUpdate(tr("Disable Application Starting with M$ windows ..."), 80);
     setStartupWithWin(QCoreApplication::applicationFilePath(), "", "", false);
-    //setStartupWithWin(runningNT6OS?"wlmail.exe":"msimn.exe" , "", "", false);
     setStartupWithWin("" , "", "Email", false);
 
 
@@ -1700,7 +1675,16 @@ bool WindowsManagement::deleteUserFromLocalGroup(LPWSTR userName,  LPCWSTR group
 
 }
 
-bool WindowsManagement::setComputerName(LPCWSTR computerName) {
+bool WindowsManagement::setComputerName(const QString &newComputerName) {
+
+    lastErrorString = "";
+
+    if(newComputerName.trimmed().isEmpty()){
+        lastErrorString = tr("Invalid computer name!");
+        return false;
+    }
+
+    LPCWSTR computerName = newComputerName.toStdWString().c_str();
 
     AU3_RegWrite(QString("HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\Tcpip\\Parameters").toStdWString().c_str(), L"NV Hostname", L"REG_SZ", computerName);
 
@@ -3364,9 +3348,9 @@ void WindowsManagement::setLocation(Location location){
 
 }
 
-void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
-    this->m_newComputerNameToBeUsed = computerName;
-}
+//void WindowsManagement::setNewComputerNameToBeUsed(const QString &computerName){
+//    this->m_newComputerNameToBeUsed = computerName;
+//}
 
 
 void WindowsManagement::test(){
