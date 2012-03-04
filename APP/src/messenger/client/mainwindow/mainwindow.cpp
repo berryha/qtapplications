@@ -107,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     clientPacketsParser = 0;
     networkStarted = false;
 
+    m_udpServer = 0;
     m_rtp = 0;
     m_socketConnectedToServer = INVALID_SOCK_ID;
 
@@ -279,30 +280,31 @@ void MainWindow::startNetwork(){
 
 
     QString errorMessage = "";
-//    m_udpServer = m_resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
-//    if(!m_udpServer){
-//        logMessage(QString("Can not start UDP listening on port %1! %2").arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
-//    }else{
-//        qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
-//    }
+    m_udpServer = m_resourcesManager->startUDPServer(QHostAddress::Any, 0, true, &errorMessage);
+    if(!m_udpServer){
+        QMessageBox::critical(this, tr("Error"), tr("Can not start UDP listening! %1").arg(errorMessage));
+    }else{
+        qWarning()<<QString("UDP listening on port %1!").arg(m_udpServer->localPort());
+    }
 
     m_rtp = m_resourcesManager->startRTP(QHostAddress::Any, 0, true, &errorMessage);
     if(!errorMessage.isEmpty()){
         QMessageBox::critical(this, tr("Error"), errorMessage);
     }
+    //connect(m_rtp, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(peerConnected(int, const QString &, quint16));
     connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
 
 
-    clientPacketsParser = new ClientPacketsParser(m_resourcesManager, this);
+    clientPacketsParser = new IMClientPacketsParser(m_resourcesManager, this);
   //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
-    connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), clientPacketsParser, SLOT(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
+    connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), this, SLOT(requestRegistration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
     connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
-    connect(this,SIGNAL(signalMyOnlineStateChanged(quint8)), clientPacketsParser, SLOT(changeMyOnlineState(quint8)));
+    connect(this,SIGNAL(signalMyOnlineStateChanged(int, quint8)), clientPacketsParser, SLOT(changeMyOnlineState(int, quint8)));
     
     connect(clientPacketsParser, SIGNAL(signalUpdatePasswordResultReceived(quint8, const QString&)), this, SLOT(slotProcessUpdatePasswordResult(quint8, const QString&)), Qt::QueuedConnection);
     
@@ -333,12 +335,12 @@ void MainWindow::startNetwork(){
     
     
     //File TX
-    connect(clientPacketsParser, SIGNAL(signalAdminRequestUploadFile(int, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processAdminRequestUploadFilePacket(int, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalAdminRequestDownloadFile(int, const QString &, const QString &, const QString &)), this, SLOT(processAdminRequestDownloadFilePacket(int, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int,const QByteArray &, int, int )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QByteArray &,quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QByteArray &, quint8)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalFileTXError(int , const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int , const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalContactRequestUploadFile(int, const QString &, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processContactRequestUploadFilePacket(int, const QString &, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalContactRequestDownloadFile(int, const QString &, const QString &, const QString &, const QString &)), this, SLOT(processContactRequestDownloadFilePacket(int, const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataRequested(int, const QString &, const QByteArray &, int, int )), this, SLOT(processFileDataRequestPacket(int, const QString &, const QByteArray &, int, int )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileDataReceived(int, const QString &, const QByteArray &, int, const QByteArray &, const QByteArray &)), this, SLOT(processFileDataReceivedPacket(int, const QString &, const QByteArray &, int, const QByteArray &, const QByteArray &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXStatusChanged(int, const QString &, const QByteArray &,quint8)), this, SLOT(processFileTXStatusChangedPacket(int, const QString &, const QByteArray &, quint8)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalFileTXError(int, const QString &, const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int, const QString &, const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
     
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)));
@@ -415,18 +417,19 @@ void MainWindow::stopNetwork(){
         clientPacketsParser = 0;
     }
 
-//    if(m_udpServer){
-//        m_udpServer->close();
-//    }
+    if(m_udpServer){
+        m_udpServer->close();
+    }
 
     if(m_rtp){
         m_rtp->stopServers();
     }
+    m_contactSocketsHash.clear();
 
 
     //    ClientResourcesManager::cleanInstance();
-        delete m_resourcesManager;
-        m_resourcesManager = 0;
+    delete m_resourcesManager;
+    m_resourcesManager = 0;
 
     PacketHandlerBase::clean();
 
@@ -970,7 +973,7 @@ void MainWindow::aboutToQuit(){
 
     if(imUser->getOnlineState() != IM::ONLINESTATE_OFFLINE && imUser->getOnlineState() != IM::ONLINESTATE_INVISIBLE){
         imUser->setOnlineState(IM::ONLINESTATE_OFFLINE);
-        emit signalMyOnlineStateChanged(quint8(IM::ONLINESTATE_OFFLINE));
+        emit signalMyOnlineStateChanged(m_socketConnectedToServer, quint8(IM::ONLINESTATE_OFFLINE));
         qDebug() << "----MainWindow::doWorkbeforeQuit()~~IMUser::OFFLINE";
     }
 
@@ -1143,7 +1146,7 @@ void MainWindow::slotUserVerified(){
             //systemTray->resetTrayIcon(ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Normal));
             systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), imUser->getOnlineState()));
 
-            emit signalMyOnlineStateChanged(quint8(imUser->getOnlineState()));
+            emit signalMyOnlineStateChanged(m_socketConnectedToServer, quint8(imUser->getOnlineState()));
         }
     }
 
@@ -1160,7 +1163,7 @@ void MainWindow::slotLockUI(){
     stateBeforeLocking = imUser->getOnlineState();
     if(stateBeforeLocking != IM::ONLINESTATE_INVISIBLE && stateBeforeLocking != IM::ONLINESTATE_AWAY){
         imUser->setOnlineState(IM::ONLINESTATE_AWAY);
-        emit signalMyOnlineStateChanged(quint8(IM::ONLINESTATE_AWAY));
+        emit signalMyOnlineStateChanged(m_socketConnectedToServer, quint8(IM::ONLINESTATE_AWAY));
     }
 
 }
@@ -2254,11 +2257,40 @@ void MainWindow::loginTimeout(){
 
 }
 
-void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
-    qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+void MainWindow::requestRegistration(const QString &serverHostAddress, quint16 serverHostPort, const QString &userID, const QString &password, const QString &email){
 
-    if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
-        clientPacketsParser->requestLogin(m_socketConnectedToServer);
+    int socketID = INVALID_SOCK_ID;
+
+    if(QHostAddress(serverHostAddress) == m_serverHostAddress && serverHostPort == m_serverHostPort && m_rtp->isSocketConnected(m_socketConnectedToServer)){
+        socketID = m_socketConnectedToServer;
+    }else{
+        QString errorMessage;
+        socketID = m_rtp->connectToHost(QHostAddress(serverHostAddress), serverHostPort, 10000, &errorMessage);
+        if(socketID == INVALID_SOCK_ID){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to register! <br>%1").arg(errorMessage));
+            return;
+        }
+        m_rtp->closeSocket(m_socketConnectedToServer);
+    }
+
+    m_serverHostAddress = serverHostAddress;
+    m_serverHostPort = serverHostPort;
+    m_socketConnectedToServer = socketID;
+
+
+    bool ok = clientPacketsParser->registration(m_socketConnectedToServer, userID, password, email);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to send registration request! <br>%1").arg(m_rtp->lastErrorString()));
+    }
+
+}
+
+void MainWindow::peerConnected(int socketID, const QString &peerAddress, quint16 peerPort){
+    qWarning()<<QString("Connected! "+peerAddress+":"+QString::number(peerPort));
+
+    if(QHostAddress(peerAddress) == m_serverHostAddress && peerPort == m_serverHostPort){
+        //clientPacketsParser->requestLogin(m_socketConnectedToServer);
+        m_socketConnectedToServer = socketID;
         m_serverConnected = true;
         //        if(m_loginTimer){
         //            m_loginTimer->stop();
@@ -2266,6 +2298,8 @@ void MainWindow::peerConnected(const QHostAddress &peerAddress, quint16 peerPort
         //            m_loginTimer = 0;
         //        }
         emit signalServerOnlineStateChanged(true);
+    }else{
+
     }
 
 }
@@ -2304,6 +2338,8 @@ void MainWindow::peerDisconnected(int socketID){
         return;
     }
 
+    m_contactSocketsHash.remove(socketID);
+
     QList<int> requests = fileTXRequestHash.keys(socketID);
     foreach (int request, requests) {
         fileTXRequestHash.remove(request);
@@ -2334,17 +2370,18 @@ void MainWindow::startFileManager(){
 
 }
 
-void MainWindow::processContactRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir){
+void MainWindow::processContactRequestUploadFilePacket(int socketID, const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir){
 
     Contact *contact = contactsManager->getUser(contactID);
     if(!contact){return;}
 
     //TODO
+    QMessageBox::information(this, "TODO", "processContactRequestUploadFilePacket");
 
 
 }
 
-void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir){
+void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QString &contactID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir){
 
     startFileManager();
 
@@ -2364,7 +2401,7 @@ void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QSt
             if(remoteFileSaveDir.endsWith('/')){
                 newRemoteDir = remoteFileSaveDir + fileName;
             }
-            processContactRequestDownloadFilePacket(socketID, absoluteFilePath, file, newRemoteDir);
+            processContactRequestDownloadFilePacket(socketID, contactID, absoluteFilePath, file, newRemoteDir);
 
             qApp->processEvents();
         }
@@ -2374,10 +2411,10 @@ void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QSt
 
     const FileManager::FileMetaInfo *info = m_fileManager->tryToSendFile(absoluteFilePath, &errorString);
     if(!info){
-        clientPacketsParser->denyFileDownloadRequest(socketID, fileName, false, errorString);
+        clientPacketsParser->denyFileDownloadRequest(socketID, contactID, fileName, false, errorString);
     }
 
-    if(clientPacketsParser->acceptFileDownloadRequest(socketID, fileName, true, info->md5sum, info->size, remoteFileSaveDir)){
+    if(clientPacketsParser->acceptFileDownloadRequest(socketID, contactID, fileName, true, info->md5sum, info->size, remoteFileSaveDir)){
         fileTXSocketHash.insertMulti(socketID, info->md5sum);
     }else{
         m_fileManager->closeFile(info->md5sum);
@@ -2385,7 +2422,7 @@ void MainWindow::processContactRequestDownloadFilePacket(int socketID, const QSt
 
 }
 
-void MainWindow::processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
+void MainWindow::processFileDataRequestPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex){
 
     Q_ASSERT(m_fileManager);
 
@@ -2410,7 +2447,7 @@ void MainWindow::processFileDataRequestPacket(int socketID, const QByteArray &fi
 
 }
 
-void MainWindow::processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
+void MainWindow::processFileDataReceivedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1){
 
     Q_ASSERT(m_fileManager);
     m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
@@ -2421,36 +2458,36 @@ void MainWindow::processFileDataReceivedPacket(int socketID, const QByteArray &f
 
 }
 
-void MainWindow::processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status){
+void MainWindow::processFileTXStatusChangedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status){
 
-    //MS::FileTXStatus status = MS::FileTXStatus(status);
+    //IM::FileTXStatus status = IM::FileTXStatus(status);
     switch(status){
-    case quint8(MS::File_TX_Preparing):
+    case quint8(IM::File_TX_Preparing):
     {
 
     }
         break;
-    case quint8(MS::File_TX_Receiving):
+    case quint8(IM::File_TX_Receiving):
     {
 
     }
         break;
-    case quint8(MS::File_TX_Sending):
+    case quint8(IM::File_TX_Sending):
     {
 
     }
         break;
-    case quint8(MS::File_TX_Progress):
+    case quint8(IM::File_TX_Progress):
     {
 
     }
         break;
-    case quint8(MS::File_TX_Paused):
+    case quint8(IM::File_TX_Paused):
     {
 
     }
         break;
-    case quint8(MS::File_TX_Aborted):
+    case quint8(IM::File_TX_Aborted):
     {
         QList<int> sockets = fileTXSocketHash.keys(fileMD5);
         if(sockets.contains(socketID) && sockets.size() <= 1){
@@ -2458,7 +2495,7 @@ void MainWindow::processFileTXStatusChangedPacket(int socketID, const QByteArray
         }
     }
         break;
-    case quint8(MS::File_TX_Done):
+    case quint8(IM::File_TX_Done):
     {
         QList<int> sockets = fileTXSocketHash.keys(fileMD5);
         if(sockets.contains(socketID) && sockets.size() <= 1){
@@ -2473,7 +2510,7 @@ void MainWindow::processFileTXStatusChangedPacket(int socketID, const QByteArray
 
 }
 
-void MainWindow::processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
+void MainWindow::processFileTXErrorFromPeer(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString){
     qDebug()<<"--MainWindow::processFileTXErrorFromPeer(...) " <<" socketID:"<<socketID;
     qCritical()<<errorString;
 
@@ -2483,7 +2520,10 @@ void MainWindow::fileDataRead(int requestID, const QByteArray &fileMD5, int piec
     qDebug()<<"--MainWindow::fileDataRead(...) "<<" pieceIndex:"<<pieceIndex<<" size:"<<data.size();
 
     int socketID = fileTXRequestHash.take(requestID);
-    clientPacketsParser->sendFileData(socketID, fileMD5, pieceIndex, &data, &dataSHA1SUM);
+    Contact *contact = m_contactSocketsHash.value(socketID);
+    if(!contact){return;}
+
+    clientPacketsParser->sendFileData(socketID, contact->getUserID(), fileMD5, pieceIndex, &data, &dataSHA1SUM);
 
 }
 
@@ -2492,7 +2532,10 @@ void MainWindow::fileTXError(int requestID, const QByteArray &fileMD5, quint8 er
 
     if(requestID){
         int socketID = fileTXRequestHash.take(requestID);
-        clientPacketsParser->fileTXError(socketID, fileMD5, errorCode, errorString);
+        Contact *contact = m_contactSocketsHash.value(socketID);
+        if(!contact){return;}
+
+        clientPacketsParser->fileTXError(socketID, contact->getUserID(), fileMD5, errorCode, errorString);
     }else{
         //TODO:
     }
@@ -2513,7 +2556,12 @@ void MainWindow::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool v
 
         if(verificationProgress == 100){
             qWarning()<<"Done!";
-            clientPacketsParser->fileTXStatusChanged(sockets.first(), fileMD5, quint8(MS::File_TX_Done));
+            foreach (int socketID, sockets) {
+                Contact *contact = m_contactSocketsHash.value(socketID);
+                if(!contact){continue;}
+                clientPacketsParser->fileTXStatusChanged(socketID, contact->getUserID(), fileMD5, quint8(IM::File_TX_Done));
+            }
+
         }else{
             //TODO:
 //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
@@ -2530,10 +2578,15 @@ void MainWindow::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool v
             //}
 
             if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+                //TODO:P2P
+                int socketID = sockets.first();
+                Contact *contact = m_contactSocketsHash.value(socketID);
+                if(!contact){return;}
+
                 if(pieceIndex == 0 ){
-                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
+                    clientPacketsParser->requestFileData(socketID, contact->getUserID(), fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
                 }else{
-                    clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
+                    clientPacketsParser->requestFileData(socketID, contact->getUserID(), fileMD5, pieceIndex + FILE_PIECES_IN_ONE_REQUEST + 1, pieceIndex + 2 * FILE_PIECES_IN_ONE_REQUEST);
                 }
             }
 
@@ -2541,8 +2594,12 @@ void MainWindow::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool v
 
 
     }else{
+        //TODO:P2P
+        int socketID = sockets.first();
+        Contact *contact = m_contactSocketsHash.value(socketID);
+        if(!contact){return;}
         qCritical()<<"ERROR! Verification Failed! Piece:"<<pieceIndex;
-        clientPacketsParser->requestFileData(sockets.first(), fileMD5, pieceIndex, pieceIndex);
+        clientPacketsParser->requestFileData(socketID, contact->getUserID(), fileMD5, pieceIndex, pieceIndex);
     }
 
 }

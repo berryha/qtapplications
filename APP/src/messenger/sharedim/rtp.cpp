@@ -174,6 +174,8 @@ bool RTP::isSocketConnected(int socketID){
         connected = m_tcpServer->isConnected(socketID);
     }
 
+    return connected;
+
 }
 
 bool RTP::getAddressInfoFromSocket(int socketID, QString *address, quint16 *port, bool getPeerInfo){

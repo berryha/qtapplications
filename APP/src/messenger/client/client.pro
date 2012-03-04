@@ -45,7 +45,6 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     imuser.h \
     settings.h \
     app_constants_client.h \
-    packetmanager/clientpacketsparser.h \
     contactsmanager/contact.h \
     networkmanager/servermanagerwindow.h \
     networkmanager/serverinfo.h \
@@ -63,7 +62,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     login/applyforregistrationwidget.h \
     search/addcontactdialog.h \
     chatwindow/emoticonselecter/emoticonselector.h \
-    contactsmanager/interestgroup.h
+    contactsmanager/interestgroup.h \
+    packetmanager/imclientpacketsparser.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/contactchatwindow.cpp \
@@ -76,7 +76,6 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     imageresource.cpp \
     imuser.cpp \
     settings.cpp \
-    packetmanager/clientpacketsparser.cpp \
     contactsmanager/contact.cpp \
     networkmanager/servermanagerwindow.cpp \
     networkmanager/serverinfo.cpp \
@@ -95,7 +94,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     login/applyforregistrationwidget.cpp \
     search/addcontactdialog.cpp \
     chatwindow/emoticonselecter/emoticonselector.cpp \
-    contactsmanager/interestgroup.cpp
+    contactsmanager/interestgroup.cpp \
+    packetmanager/imclientpacketsparser.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwindow.ui \

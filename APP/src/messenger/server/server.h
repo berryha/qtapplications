@@ -73,6 +73,7 @@ private slots:
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
+    void peerDisconnected(int socketID);
 
 
 private:
@@ -89,6 +90,7 @@ private:
 
     UDPServer *m_udpServer;
     RTP *m_rtp;
+
 
     bool mainServiceStarted;
 

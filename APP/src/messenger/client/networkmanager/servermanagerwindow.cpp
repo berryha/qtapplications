@@ -44,38 +44,38 @@ namespace HEHUI {
 ServerManagerWindow::ServerManagerWindow(QWidget *parent)
     : QWidget(parent)
 {
-	ui.setupUi(this);
+    ui.setupUi(this);
 
-	model = new ServerInfoModel(this);
-	ui.tableViewServers->setModel(model);
-        ui.tableViewServers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-        connect(ui.tableViewServers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotServerSelected(const QModelIndex &)));
-
-
-	clientNetworkManager = ClientResourcesManager::instance();
-        //connect(clientNetworkManager, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
-        
-
-        if(clientNetworkManager->getNetworkType() == ClientResourcesManager::LAN){
-                ui.lineEditIP->setText(QString(IM_SERVER_IPMC_ADDRESS));
-                ui.spinBoxPort->setValue(IM_SERVER_IPMC_LISTENING_PORT);
-		ui.toolButtonSearchServer->show();
-                ui.toolButtonSearchServer->setEnabled(true);
-                ui.toolButtonSearchServer->setFocus();
-                
-		ui.toolButtonAddServer->hide();
-            }else{
-                ui.toolButtonSearchServer->hide();
-                ui.toolButtonAddServer->show();
-            }
+    model = new ServerInfoModel(this);
+    ui.tableViewServers->setModel(model);
+    ui.tableViewServers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    connect(ui.tableViewServers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotServerSelected(const QModelIndex &)));
 
 
-	serversHash.clear();
-	slotLoadServers();
+    clientNetworkManager = ClientResourcesManager::instance();
+    //connect(clientNetworkManager, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
-        ui.lineEditIP->setFocus();
 
-//        clientPacketsParser = 0;
+    if(clientNetworkManager->getNetworkType() == ClientResourcesManager::LAN){
+        ui.lineEditIP->setText(QString(IM_SERVER_IPMC_ADDRESS));
+        ui.spinBoxPort->setValue(IM_SERVER_IPMC_LISTENING_PORT);
+        ui.toolButtonSearchServer->show();
+        ui.toolButtonSearchServer->setEnabled(true);
+        ui.toolButtonSearchServer->setFocus();
+
+        ui.toolButtonAddServer->hide();
+    }else{
+        ui.toolButtonSearchServer->hide();
+        ui.toolButtonAddServer->show();
+    }
+
+
+    serversHash.clear();
+    slotLoadServers();
+
+    ui.lineEditIP->setFocus();
+
+    //        clientPacketsParser = 0;
 
 
 }
@@ -134,14 +134,14 @@ bool ServerManagerWindow::isIPAddressValid(){
             ui.toolButtonSearchServer->setEnabled(false);
             ui.toolButtonSearchServer->hide();
         }
-            return true;
+        return true;
     }else{
-            ui.toolButtonAddServer->setEnabled(false);
-            ui.toolButtonSearchServer->setEnabled(false);
-            QMessageBox::critical(this, tr("Error"), tr("Invalid IP address!"));
-            ui.lineEditIP->setFocus();
-            ui.lineEditIP->end(false);
-            return false;
+        ui.toolButtonAddServer->setEnabled(false);
+        ui.toolButtonSearchServer->setEnabled(false);
+        QMessageBox::critical(this, tr("Error"), tr("Invalid IP address!"));
+        ui.lineEditIP->setFocus();
+        ui.lineEditIP->end(false);
+        return false;
     }
 
 }
@@ -154,9 +154,9 @@ void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serv
 
     ServerInfo *info;
     if(serversHash.contains(serverAddress)){
-            info = serversHash.value(serverAddress);
+        info = serversHash.value(serverAddress);
     }else{
-            info = new ServerInfo(serverAddress, serverRUDPListeningPort, this);
+        info = new ServerInfo(serverAddress, serverRUDPListeningPort, this);
     }
 
     info->setCurState(ServerInfo::TestOK);
@@ -169,31 +169,31 @@ void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serv
 }
 
 void ServerManagerWindow::slotRequestForLANServer(const QString &ip, quint16 port){
-	ui.toolButtonSearchServer->setEnabled(false);
-        ui.toolButtonTestServers->setEnabled(false);
-//	serversHash.clear();
-//	updateModel();
+    ui.toolButtonSearchServer->setEnabled(false);
+    ui.toolButtonTestServers->setEnabled(false);
+    //	serversHash.clear();
+    //	updateModel();
 
-//        if(!clientPacketsParser){
-//            clientPacketsParser = new ClientPacketsParser(this);
-//        }
-//        clientPacketsParser->sendClientLookForServerPacket(QHostAddress(ip), port);
-        emit signalLookForServer(QHostAddress(ip), port);
-        
+    //        if(!clientPacketsParser){
+    //            clientPacketsParser = new ClientPacketsParser(this);
+    //        }
+    //        clientPacketsParser->sendClientLookForServerPacket(QHostAddress(ip), port);
+    emit signalLookForServer(QHostAddress(ip), port);
+
 
 
 }
 
 void ServerManagerWindow::slotTestServers(){
 
-//    if(!clientPacketsParser){
-//        clientPacketsParser = new ClientPacketsParser(this);
-//        connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
-//    }
+    //    if(!clientPacketsParser){
+    //        clientPacketsParser = new ClientPacketsParser(this);
+    //        connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& , quint16, quint16, const QString&, const QString&)), Qt::QueuedConnection);
+    //    }
 
     ui.toolButtonTestServers->setEnabled(false);
     foreach(ServerInfo *info, serversHash.values()){
-//        clientPacketsParser->sendClientLookForServerPacket(QHostAddress(info->getIp()), info->getPort());
+        //        clientPacketsParser->sendClientLookForServerPacket(QHostAddress(info->getIp()), info->getPort());
         info->setCurState(ServerInfo::Testing);
         emit signalLookForServer(QHostAddress(info->getIp()), info->getPort());
     }
@@ -205,45 +205,45 @@ void ServerManagerWindow::slotTestServers(){
 }
 
 void ServerManagerWindow::slotTimeout(){
-	foreach(ServerInfo *info, serversHash.values()){
-		if(info->getCurState() != ServerInfo::TestOK){
-			info->setCurState(ServerInfo::TestFailed);
-		}
-	}
+    foreach(ServerInfo *info, serversHash.values()){
+        if(info->getCurState() != ServerInfo::TestOK){
+            info->setCurState(ServerInfo::TestFailed);
+        }
+    }
 
-	updateModel();
+    updateModel();
 
-	//slotSaveServers();
+    //slotSaveServers();
 
-        ui.toolButtonTestServers->setEnabled(true);
+    ui.toolButtonTestServers->setEnabled(true);
 
 }
 
 
 void ServerManagerWindow::slotSaveServers(){
-	QStringList serverList;
-	foreach(ServerInfo *info, serversHash.values()){
-		//if(info->getCurState() == ServerInfo::TestOK){
-			serverList<<info->getIp() + ":" + QString::number(info->getPort());
-		//}
-	}
+    QStringList serverList;
+    foreach(ServerInfo *info, serversHash.values()){
+        //if(info->getCurState() == ServerInfo::TestOK){
+        serverList<<info->getIp() + ":" + QString::number(info->getPort());
+        //}
+    }
 
-	Settings::instance()->setServers(serverList);
-        Settings::instance()->sync();
+    Settings::instance()->setServers(serverList);
+    Settings::instance()->sync();
 
 }
 
 void ServerManagerWindow::slotLoadServers(){
-	QStringList serverList = Settings::instance()->getServers();
+    QStringList serverList = Settings::instance()->getServers();
 
-	foreach(QString server, serverList){
-		QStringList values = server.split(":");
-		ServerInfo *info = new ServerInfo(values.at(0), values.at(1).toUInt(), this);
-		serversHash.insert(values.at(0), info);
+    foreach(QString server, serverList){
+        QStringList values = server.split(":");
+        ServerInfo *info = new ServerInfo(values.at(0), values.at(1).toUInt(), this);
+        serversHash.insert(values.at(0), info);
 
-	}
+    }
 
-	updateModel();
+    updateModel();
 
 
 }
@@ -283,9 +283,9 @@ void ServerManagerWindow::on_toolButtonAddServer_clicked(){
     quint16 port = ui.spinBoxPort->value();
     ServerInfo *info;
     if(serversHash.contains(ip)){
-            info = serversHash.value(ip);
+        info = serversHash.value(ip);
     }else{
-            info = new ServerInfo(ip, ui.spinBoxPort->value(), this);
+        info = new ServerInfo(ip, ui.spinBoxPort->value(), this);
     }
 
     info->setCurState(ServerInfo::NotTested);
@@ -343,7 +343,7 @@ void ServerManagerWindow::slotServerSelected(const QModelIndex &index){
     slotSaveServers();
     
     QStringList server;
-   
+
     int row = index.row();
     for(int i=0; i<2; i++){
         QModelIndex idx = index.sibling(row, i);

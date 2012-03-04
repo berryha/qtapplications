@@ -136,7 +136,7 @@ bool Server::startMainService(){
 //    }
 
     m_rtp = resourcesManager->startRTP(QHostAddress::Any, IM_SERVER_RTP_LISTENING_PORT, true, &errorMessage);
-    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+    //connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
 
 
@@ -234,6 +234,13 @@ void Server::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort,
         qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress.toString()).arg(peerPort);
 
     }
+
+
+}
+
+void Server::peerDisconnected(int socketID){
+    //TODO
+
 
 
 }

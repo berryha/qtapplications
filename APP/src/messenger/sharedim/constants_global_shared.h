@@ -106,10 +106,13 @@
 #define MAX_MESSAGE_SIZE    470
 #endif
 
-#ifndef IM_RUDP_KEEPALIVE_TIMER_INTERVAL
-#define IM_RUDP_KEEPALIVE_TIMER_INTERVAL 30000 //1 minute
-#endif
+//#ifndef IM_RUDP_KEEPALIVE_TIMER_INTERVAL
+//#define IM_RUDP_KEEPALIVE_TIMER_INTERVAL 30000 //1 minute
+//#endif
 
+#ifndef FILE_PIECES_IN_ONE_REQUEST
+#define FILE_PIECES_IN_ONE_REQUEST 20 //20 Pieces
+#endif
 
 
 namespace HEHUI {
@@ -130,8 +133,8 @@ enum Command {
     ServerOffline,
     ServerAnnouncement, //110
     
-    CLIENT_REQUEST_REGISTRATION,
-    SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION,
+//    CLIENT_REQUEST_REGISTRATION,
+//    SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION,
     CLIENT_REGISTRATION,
     SERVER_RESPONSE_CLIENT_REGISTRATION,
 
@@ -221,6 +224,17 @@ enum Command {
 
 };
 
+enum FileTXStatus{
+    File_TX_Preparing,
+    File_TX_Receiving,
+    File_TX_Sending,
+    //File_TX_Transferring,
+    File_TX_Progress,
+    File_TX_Paused,
+    File_TX_Aborted,
+    File_TX_Done
+};
+
 enum ErrorType {
     ERROR_NoError = 0,
     
@@ -233,7 +247,9 @@ enum ErrorType {
     
     ERROR_Offline,
     ERROR_Timeout,
-    
+    ERROR_ConnectionFailed,
+
+
     ERROR_RequestDenied,
     
     ERROR_AuthenticationNeeded,
