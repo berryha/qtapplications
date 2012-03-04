@@ -1,6 +1,6 @@
 /*
  ****************************************************************************
- * clientpacketsparser.h
+ * imclientpacketsparser.h
  *
  * Created On: 2010-7-13
  *     Author: 贺辉
@@ -22,13 +22,13 @@
 
 /*
  ***************************************************************************
- * Last Modified On: 2010-7-13
+ * Last Modified On: 2012-3-4
  * Last Modified By: 贺辉
  ***************************************************************************
  */
 
-#ifndef CLIENTPACKETSPARSER_H_
-#define CLIENTPACKETSPARSER_H_
+#ifndef IMCLIENTPACKETSPARSER_H_
+#define IMCLIENTPACKETSPARSER_H_
 
 
 
@@ -51,19 +51,20 @@
 namespace HEHUI {
 
 
-class ClientPacketsParser : public QObject{
+class IMClientPacketsParser : public QObject{
     Q_OBJECT
 public:
-    ClientPacketsParser(ClientResourcesManager *resourcesManager, QObject *parent = 0);
-    virtual ~ClientPacketsParser();
+    IMClientPacketsParser(ClientResourcesManager *resourcesManager, QObject *parent = 0);
+    virtual ~IMClientPacketsParser();
 
-    void parseIncomingPacketData(Packet *packet);
 
 
     //    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
     //    void stopHeartbeat();
 
 public slots:
+    void parseIncomingPacketData(Packet *packet);
+
 
 
     //    void sendHeartbeatPacket(){
@@ -127,25 +128,25 @@ public slots:
 
     }
 
-    bool requestRegistration(int serverSocketID){
+//    bool requestRegistration(int serverSocketID){
 
-        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::CLIENT_REQUEST_REGISTRATION));
-        packet->setTransmissionProtocol(TP_RUDP);
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID;
-        packet->setPacketData(ba);
+//        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+//        packet->setPacketType(quint8(IM::CLIENT_REQUEST_REGISTRATION));
+//        packet->setTransmissionProtocol(TP_RUDP);
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_8);
+//        out << m_myUserID;
+//        packet->setPacketData(ba);
 
-        ba.clear();
-        out.device()->seek(0);
-        QVariant v;
-        v.setValue(*packet);
-        out << v;
-        return m_rtp->sendReliableData(serverSocketID, &ba);
+//        ba.clear();
+//        out.device()->seek(0);
+//        QVariant v;
+//        v.setValue(*packet);
+//        out << v;
+//        return m_rtp->sendReliableData(serverSocketID, &ba);
 
-    }
+//    }
 
     bool registration(int serverSocketID, const QString &userID, const QString &password, const QString &email){
         qWarning()<<"--registration(...)";
@@ -1112,6 +1113,7 @@ private slots:
     
 
 
+private slots:
 
 
 
@@ -1177,8 +1179,8 @@ signals:
 
     ///////////////////////////
     //File TX
-    void signalAdminRequestUploadFile(int socketID, const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
-    void signalAdminRequestDownloadFile(int socketID, const QString &contactID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
+    void signalContactRequestUploadFile(int socketID, const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void signalContactRequestDownloadFile(int socketID, const QString &contactID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
     void signalFileDataRequested(int socketID, const QString &contactID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
     void signalFileDataReceived(int socketID, const QString &contactID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
     void signalFileTXStatusChanged(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status);
@@ -1225,8 +1227,9 @@ private:
     TCPServer *m_tcpServer;
 
 
+
 };
 
 }
 
-#endif /* CLIENTPACKETSPARSER_H_ */
+#endif /* IMCLIENTPACKETSPARSER_H_ */

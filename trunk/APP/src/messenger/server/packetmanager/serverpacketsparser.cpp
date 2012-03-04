@@ -33,18 +33,6 @@
 #include "../serverutilities.h"
 
 
-#ifdef Q_CC_MSVC
-#include <windows.h>
-#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-#define msleep(x) Sleep(x)
-#endif
-
-#ifdef Q_CC_GNU
-#include <unistd.h>
-#define msleep(x) usleep(x*1000)
-#endif
-
-
 
 namespace HEHUI {
 
@@ -55,24 +43,25 @@ ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *resourcesMana
 
     Q_ASSERT(resourcesManager);
 
-    m_udpServer = resourcesManager->getUDPServer();
-    Q_ASSERT_X(m_udpServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
+    m_ipmcServer = resourcesManager->getIPMCServer();
+    Q_ASSERT_X(m_ipmcServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
+    connect(m_ipmcServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
     m_rtp = resourcesManager->getRTP();
     Q_ASSERT(m_rtp);
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
     m_udtProtocol = m_rtp->getUDTProtocol();
     Q_ASSERT(m_udtProtocol);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     m_udtProtocol->startWaitingForIOInOneThread(1);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
 
     m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
-
-    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
-    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+
 
 
 
@@ -313,6 +302,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             if(!interestgroupChatMessagesCachedOnServer.isEmpty()){
                 sendCachedInterestGroupChatMessagesPacket(socketID, interestgroupChatMessagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
             }
+
+            m_userSocketsHash.insert(socketID, userInfo);
 
             qWarning()<<QString("User %1 logged in!").arg(userID);
         }else{
@@ -1014,6 +1005,26 @@ bool ServerPacketsParser::decryptData(const QString &userID, QByteArray *destina
 
 }
 
+void ServerPacketsParser::peerDisconnected(int socketID){
+    //TODO
+
+    if(m_userSocketsHash.contains(socketID)){
+
+        UserInfo *info = m_userSocketsHash.value(socketID);
+        if(!info){return;}
+
+        QString peerAddress = info->getLastLoginHostAddress();
+        quint16 peerPort = info->getLastLoginHostPort();
+        processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, peerAddress, peerPort);
+
+        qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress).arg(peerPort);
+
+    }
+
+    //m_userSocketsHash.remove(socketID);
+
+}
+
 //void ServerPacketsParser::startCheckIMUsersOnlineStateTimer(){
 //    qWarning()<<"--startCheckIMUsersOnlineStateTimer()";
     
@@ -1042,47 +1053,6 @@ bool ServerPacketsParser::decryptData(const QString &userID, QByteArray *destina
 
 //}
 
-
-quint16 ServerPacketsParser::getLastReceivedPacketSN(const QString &peerID){
-    quint16 lastpacketSN = 0;
-
-    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
-    if(list.isEmpty()){
-        return lastpacketSN;
-    }
-
-    QDateTime lastpacketTime(QDate(1970, 1, 1));
-    for(int i=0; i<list.size(); i++){
-        QPair<quint16, QDateTime> pair = list.at(i);
-        QDateTime time = pair.second;
-        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-            m_receivedPacketsHash.remove(peerID, pair);
-        }else{
-            if(time > lastpacketTime){
-                lastpacketTime = time;
-                lastpacketSN = pair.first;
-            }
-        }
-    }
-    //    foreach ( QPair<quint16, QDateTime> pair, list) {
-    //        QDateTime time = pair.second;
-    //        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-    //            m_receivedPacketsHash.remove(peerID, pair);
-    //            list.removeOne(pair);
-    //        }else{
-    //            if(time > lastpacketTime){
-    //                lastpacketTime = time;
-    //                lastpacketSN = pair.first;
-    //            }
-    //        }
-    //    }
-
-    //TODO:TX Rate
-
-    return lastpacketSN;
-
-
-}
 
 
 

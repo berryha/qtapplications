@@ -10,7 +10,7 @@
 #include "contactsmanager/contactsmanager.h"
 #include "../chatwindow/chatwindowmanager.h"
 #include "../networkmanager/clientnetworkmanager.h"
-#include "../packetmanager/clientpacketsparser.h"
+#include "../packetmanager/imclientpacketsparser.h"
 #include "../search/search.h"
 
 #include "../../sharedim/constants_global_shared.h"
@@ -51,7 +51,7 @@ protected:
 
 
 signals:
-    void signalMyOnlineStateChanged(quint8 onlineStateCode);
+    void signalMyOnlineStateChanged(int serverSocketID, quint8 onlineStateCode);
     void signalContactOnlineStateChanged(const QString &contactID, quint8 onlineStateCode);
     void signalServerOnlineStateChanged(bool online);
 
@@ -77,6 +77,7 @@ private slots:
     void slotInitPlugin(AbstractPluginInterface *plugin);
     void slotUserVerified();
     void slotLockUI();
+
 
     void slotContextMenuEventOnCategoryOccurs(const QString &group_name, const QPoint &global_mouse_pos, QMenu *contextMenu);
     void slotContextMenuEventOnObjectItemOccurs(const QString &contactID, const QPoint &global_mouse_pos, QMenu *contextMenu);
@@ -128,8 +129,10 @@ private slots:
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
     void loginTimeout();
 
+    void requestRegistration(const QString &serverHostAddress, quint16 serverHostPort, const QString &userID, const QString &password, const QString &email);
 
-    void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
+
+    void peerConnected(int socketID, const QString &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose);
     void peerDisconnected(int socketID);
@@ -137,12 +140,12 @@ private slots:
 //////////////////////////////
     //File TX
     void startFileManager();
-    void processContactRequestUploadFilePacket(int socketID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
-    void processContactRequestDownloadFilePacket(int socketID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
-    void processFileDataRequestPacket(int socketID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
-    void processFileDataReceivedPacket(int socketID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
-    void processFileTXStatusChangedPacket(int socketID, const QByteArray &fileMD5, quint8 status);
-    void processFileTXErrorFromPeer(int socketID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+    void processContactRequestUploadFilePacket(int socketID, const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
+    void processContactRequestDownloadFilePacket(int socketID, const QString &contactID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
+    void processFileDataRequestPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
+    void processFileDataReceivedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+    void processFileTXStatusChangedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status);
+    void processFileTXErrorFromPeer(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
 
     void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
@@ -189,13 +192,15 @@ private:
 
     PacketHandlerBase *m_packetHandler;
     ClientResourcesManager *m_resourcesManager;
-    ClientPacketsParser *clientPacketsParser;
+    IMClientPacketsParser *clientPacketsParser;
     bool networkStarted;
 
 
-//    UDPServer *m_udpServer;
+    UDPServer *m_udpServer;
     RTP *m_rtp;
     int m_socketConnectedToServer;
+    QHash<int/*Socket ID*/, Contact*/*Contact*/> m_contactSocketsHash;
+
 
     Search *search;
 

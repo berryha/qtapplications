@@ -2332,7 +2332,9 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
 
         if(verificationProgress == 100){
             qWarning()<<"Done!";
-            clientPacketsParser->fileTXStatusChanged(sockets.first(), fileMD5, quint8(MS::File_TX_Done));
+            foreach (int socketID, sockets) {
+                clientPacketsParser->fileTXStatusChanged(socketID, fileMD5, quint8(MS::File_TX_Done));
+            }
         }else{
             //TODO:
 //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
@@ -2349,6 +2351,7 @@ void ClientService::pieceVerified(const QByteArray &fileMD5, int pieceIndex, boo
             //}
 
             if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){
+                //TODO:P2P
                 if(pieceIndex == 0 ){
                     clientPacketsParser->requestFileData(sockets.first(), fileMD5, 1, 2 * FILE_PIECES_IN_ONE_REQUEST);
                 }else{

@@ -56,13 +56,13 @@ public:
 
 
 
-    void parseIncomingPacketData(Packet *packet);
 
 
 
 
 
 public slots:
+    void parseIncomingPacketData(Packet *packet);
 
 
 //    void sendHeartbeatPacket(){
@@ -118,7 +118,7 @@ public slots:
         QVariant v;
         v.setValue(*packet);
         out << v;
-        return m_udpServer->sendDatagram(ba, peerAddress, peerPort);
+        return m_ipmcServer->sendDatagram(ba, peerAddress, peerPort);
 
     }
 
@@ -140,7 +140,7 @@ public slots:
         QVariant v;
         v.setValue(*packet);
         out << v;
-        return m_udpServer->sendDatagram(ba, targetAddress, targetPort);
+        return m_ipmcServer->sendDatagram(ba, targetAddress, targetPort);
 
     }
 
@@ -161,7 +161,7 @@ public slots:
         QVariant v;
         v.setValue(*packet);
         out << v;
-        return m_udpServer->sendDatagram(ba, targetAddress, targetPort);
+        return m_ipmcServer->sendDatagram(ba, targetAddress, targetPort);
 
 
     }
@@ -184,7 +184,7 @@ public slots:
         QVariant v;
         v.setValue(*packet);
         out << v;
-        return m_udpServer->sendDatagram(ba, peerAddress, peerPort);
+        return m_ipmcServer->sendDatagram(ba, peerAddress, peerPort);
 
     }
 
@@ -459,6 +459,7 @@ public slots:
             userOffline(userInfo);
             saveUserLastLoginInfo(userInfo, userHostAddress, false);
             //saveUserInfoToDatabase(userInfo);
+            m_userSocketsHash.remove(userInfo->getSocketID());
         }else{
             userOnline(userInfo);
             saveUserLastLoginInfo(userInfo, userHostAddress, true);
@@ -469,7 +470,7 @@ public slots:
         foreach (QString contact, contacts) {
             UserInfo *contactInfo = getOnlineUserInfo(contact);
             if(contactInfo){
-                sendContactOnlineStatusChangedPacket(userInfo->getSocketID(), userInfo->getUserID(), onlineStateCode, contactInfo->getSessionEncryptionKey(), userHostAddress, userHostPort, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendContactOnlineStatusChangedPacket(contactInfo->getSocketID(), userInfo->getUserID(), onlineStateCode, contactInfo->getSessionEncryptionKey(), userHostAddress, userHostPort, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
             }
         }
 
@@ -827,6 +828,8 @@ private slots:
 
 //    void slotCheckIMUsersOnlineStatus();
 
+    void peerDisconnected(int socketID);
+
 
 signals:
     void  signalHeartbeatPacketReceived(const QString &clientAddress, const QString &userID);
@@ -843,7 +846,6 @@ signals:
 
 
 private:
-    quint16 getLastReceivedPacketSN(const QString &peerID);
 
 
 private:
@@ -858,10 +860,12 @@ private:
 //    QTimer *heartbeatTimer;
     //        QTimer *processWaitingForReplyPacketsTimer;
 
-    UDPServer *m_udpServer;
+    UDPServer *m_ipmcServer;
     RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
+    QHash<int/*Socket ID*/, UserInfo*/*UserInfo*/> m_userSocketsHash;
+
 
     UsersManager usersManager;
     Cryptography *cryptography;
@@ -873,7 +877,6 @@ private:
     QTimer *checkIMUsersOnlineStateTimer;
 
 
-    QMultiHash<QString /*Peer ID*/, QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > m_receivedPacketsHash;
 
 
 

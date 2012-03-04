@@ -1,6 +1,6 @@
 /*
  ****************************************************************************
- * clientpacketsparser.cpp
+ * imclientpacketsparser.cpp
  *
  * Created On: 2010-7-13
  *     Author: 贺辉
@@ -22,40 +22,31 @@
 
 /*
  ***************************************************************************
- * Last Modified On: 2010-7-13
+ * Last Modified On: 2012-3-4
  * Last Modified By: 贺辉
  ***************************************************************************
  */
 
 
 
-#include "clientpacketsparser.h"
+#include "imclientpacketsparser.h"
 
-#ifdef Q_CC_MSVC
-#include <windows.h>
-//#include "HHSharedWindowsManagement/hwindowsmanagement.h"
-#define msleep(x) Sleep(x)
-#endif
 
-#ifdef Q_CC_GNU
-#include <unistd.h>
-#define msleep(x) usleep(x*1000)
-#endif
 
 
 namespace HEHUI {
 
 
-ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *resourcesManager, QObject *parent)
+IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesManager, QObject *parent)
     :QObject(parent)
 {
 
 
     Q_ASSERT(resourcesManager);
 
-//    m_udpServer = resourcesManager->getUDPServer();
-//    Q_ASSERT_X(m_udpServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
-    //    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
+    m_udpServer = resourcesManager->getUDPServer();
+    Q_ASSERT_X(m_udpServer, "IMClientPacketsParser::IMClientPacketsParser(...)", "Invalid UDPServer!");
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
     m_rtp = resourcesManager->getRTP();
@@ -70,7 +61,6 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *resourcesManage
     m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
     connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
-
 
 
 
@@ -104,10 +94,10 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *resourcesManage
 
 }
 
-ClientPacketsParser::~ClientPacketsParser() {
+IMClientPacketsParser::~IMClientPacketsParser() {
     // TODO Auto-generated destructor stub
 
-    qDebug()<<"ClientPacketsParser::~ClientPacketsParser() ";
+    qDebug()<<"IMClientPacketsParser::~IMClientPacketsParser() ";
 
     QMutexLocker locker(&mutex);
 
@@ -140,8 +130,8 @@ ClientPacketsParser::~ClientPacketsParser() {
 
 
 
-void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
-    //    qDebug()<<"----ClientPacketsParser::parseIncomingPacketData(Packet *packet)";
+void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
+    //    qDebug()<<"----IMClientPacketsParser::parseIncomingPacketData(Packet *packet)";
 
     //        if((packet->getTransmissionProtocol() == TP_UDP)
     //            && (networkManager->isLocalAddress(packet->getPeerHostAddress()))
@@ -242,8 +232,6 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         
         qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION";
-        
-
         
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         QString message = "";
@@ -732,7 +720,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString localFileSaveDir = "./";
         stream >> fileMD5Sum >> fileName >> size >> localFileSaveDir ;
 
-        emit signalAdminRequestUploadFile(socketID, contactID, fileMD5Sum, fileName, size, localFileSaveDir);
+        emit signalContactRequestUploadFile(socketID, contactID, fileMD5Sum, fileName, size, localFileSaveDir);
 
         qDebug()<<"~~RequestUploadFile";
     }
@@ -751,7 +739,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString localBaseDir, fileName, remoteFileSaveDir;
         stream >> localBaseDir >> fileName >> remoteFileSaveDir;
 
-        emit signalAdminRequestDownloadFile(socketID, contactID, localBaseDir, fileName, remoteFileSaveDir);
+        emit signalContactRequestDownloadFile(socketID, contactID, localBaseDir, fileName, remoteFileSaveDir);
 
         qDebug()<<"~~RequestDownloadFile";
     }
@@ -860,7 +848,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 }
 
 
-//void ClientPacketsParser::startHeartbeat(int interval){
+//void IMClientPacketsParser::startHeartbeat(int interval){
 //    if(NULL == heartbeatTimer){
 //        heartbeatTimer = new QTimer();
 //        heartbeatTimer->setSingleShot(false);
@@ -877,21 +865,21 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 //}
 
-//void ClientPacketsParser::stopHeartbeat(){
+//void IMClientPacketsParser::stopHeartbeat(){
 //    if(heartbeatTimer){
 //        heartbeatTimer->stop();
 //    }
 
 //}
 
-//int ClientPacketsParser::crypto(QByteArray *destination, const QByteArray &source, bool encrypt){
+//int IMClientPacketsParser::crypto(QByteArray *destination, const QByteArray &source, bool encrypt){
 
 //    return cryptography->teaCrypto(destination, source, sessionEncryptionKey, encrypt);
 
 //}
 
 
-quint16 ClientPacketsParser::getLastReceivedPacketSN(const QString &peerID){
+quint16 IMClientPacketsParser::getLastReceivedPacketSN(const QString &peerID){
     quint16 lastpacketSN = 0;
 
     QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
