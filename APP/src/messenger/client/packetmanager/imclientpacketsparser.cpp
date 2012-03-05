@@ -79,8 +79,6 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
     //    localIPMCListeningPort = NetworkManager::instance()->localIPMCListeningPort();
 
     
-    localRUDPListeningAddress = QHostAddress::Any;
-    localRUDPListeningPort = 0;
 
 
     serverLastOnlineTime = QDateTime();
