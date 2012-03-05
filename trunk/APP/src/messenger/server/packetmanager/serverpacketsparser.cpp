@@ -157,10 +157,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qDebug()<<"~~ClientLookForServer";
 
-        quint16 peerRUDPListeningPort = 0;
-        in >> peerRUDPListeningPort;
+        quint16 peerUDPListeningPort = 0;
+        in >> peerUDPListeningPort;
 
-        sendServerDeclarePacket(peerAddress, peerRUDPListeningPort);
+        sendServerDeclarePacket(peerAddress, peerUDPListeningPort);
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
         //qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort;
     }

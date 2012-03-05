@@ -115,7 +115,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID << localRUDPListeningPort;
+        out << m_myUserID << m_udpServer->localPort();
         packet->setPacketData(ba);
 
 
@@ -678,7 +678,7 @@ public slots:
         //        quint16 targetHostPort = contactHostPort;
         //TODO:判断在线状态及加密KEY
 
-        Packet *packet = PacketHandlerBase::getPacket(QHostAddress(contactHostAddress), contactHostPort, localRUDPListeningAddress, localRUDPListeningPort);
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
         packet->setPacketType(quint8(IM::CHAT_MESSAGE_FROM_CONTACT));
         packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
@@ -1193,8 +1193,6 @@ private:
 
 private:
 
-    QHostAddress localRUDPListeningAddress;
-    quint16 localRUDPListeningPort;
 
     QTimer *heartbeatTimer;
     //        QTimer *processWaitingForReplyPacketsTimer;
