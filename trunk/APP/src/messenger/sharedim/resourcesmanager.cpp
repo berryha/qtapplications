@@ -130,7 +130,7 @@ UDPServer * ResourcesManager::startUDPServer(const QHostAddress &address, quint1
         m_udpServer = new UDPServer(this);
     }
 
-    if(m_udpServer->localPort() == startPort){
+    if((startPort != 0) && m_udpServer->localPort() == startPort){
         return m_udpServer;
     }
 

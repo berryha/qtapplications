@@ -146,17 +146,17 @@ bool ServerManagerWindow::isIPAddressValid(){
 
 }
 
-void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serverRUDPListeningPort, const QString &serverName, const QString &version){
+void ServerManagerWindow::serverFound(const QString &serverAddress, quint16 serverRTPListeningPort, const QString &serverName, const QString &version){
 
     qWarning();
-    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" TCP Port:"<<" Name:"<<serverName;
+    qWarning()<<"Server Found!"<<" Address:"<<serverAddress<<" RTP Port:"<<serverRTPListeningPort<<" Name:"<<serverName<<" Version:"<<version;
     qWarning();
 
     ServerInfo *info;
     if(serversHash.contains(serverAddress)){
         info = serversHash.value(serverAddress);
     }else{
-        info = new ServerInfo(serverAddress, serverRUDPListeningPort, this);
+        info = new ServerInfo(serverAddress, serverRTPListeningPort, this);
     }
 
     info->setCurState(ServerInfo::TestOK);
