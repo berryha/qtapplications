@@ -1,4 +1,4 @@
-include(server.pri)
+include(imserver.pri)
 isEmpty(LIB_NAME):LIB_NAME = HHSharedIMServer
 
 # ##
