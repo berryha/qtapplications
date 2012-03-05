@@ -15,7 +15,7 @@ HHSharedLibs += HHSharedCore \
     HHSharedUDT
 include(../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedIMServer
-include(../server/imserver.pri)
+include(../imserver/imserver.pri)
  
 # ###
 DEPENDPATH += 
