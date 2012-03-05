@@ -80,7 +80,7 @@ private:
     WSADATA wsd;
     struct sockaddr_in local,remote,from;
     SOCKET sock,sockM;
-//    char recvbuf[BUFSIZE];
+    //    char recvbuf[BUFSIZE];
 
 };
 
