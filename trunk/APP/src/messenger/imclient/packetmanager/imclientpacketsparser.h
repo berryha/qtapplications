@@ -115,7 +115,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID << m_udpServer->localPort();
+        out << m_myUserID << QString(APP_VERSION);
         packet->setPacketData(ba);
 
 
@@ -128,25 +128,25 @@ public slots:
 
     }
 
-//    bool requestRegistration(int serverSocketID){
+    //    bool requestRegistration(int serverSocketID){
 
-//        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-//        packet->setPacketType(quint8(IM::CLIENT_REQUEST_REGISTRATION));
-//        packet->setTransmissionProtocol(TP_RUDP);
-//        QByteArray ba;
-//        QDataStream out(&ba, QIODevice::WriteOnly);
-//        out.setVersion(QDataStream::Qt_4_8);
-//        out << m_myUserID;
-//        packet->setPacketData(ba);
+    //        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+    //        packet->setPacketType(quint8(IM::CLIENT_REQUEST_REGISTRATION));
+    //        packet->setTransmissionProtocol(TP_RUDP);
+    //        QByteArray ba;
+    //        QDataStream out(&ba, QIODevice::WriteOnly);
+    //        out.setVersion(QDataStream::Qt_4_8);
+    //        out << m_myUserID;
+    //        packet->setPacketData(ba);
 
-//        ba.clear();
-//        out.device()->seek(0);
-//        QVariant v;
-//        v.setValue(*packet);
-//        out << v;
-//        return m_rtp->sendReliableData(serverSocketID, &ba);
+    //        ba.clear();
+    //        out.device()->seek(0);
+    //        QVariant v;
+    //        v.setValue(*packet);
+    //        out << v;
+    //        return m_rtp->sendReliableData(serverSocketID, &ba);
 
-//    }
+    //    }
 
     bool registration(int serverSocketID, const QString &userID, const QString &password, const QString &email){
         qWarning()<<"--registration(...)";

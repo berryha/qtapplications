@@ -48,7 +48,6 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
     Q_ASSERT_X(m_udpServer, "IMClientPacketsParser::IMClientPacketsParser(...)", "Invalid UDPServer!");
     connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
-
     m_rtp = resourcesManager->getRTP();
     Q_ASSERT(m_rtp);
 
@@ -64,7 +63,7 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
 
 
 
-//    heartbeatTimer = 0;
+    //    heartbeatTimer = 0;
     //    processWaitingForReplyPacketsTimer = 0;
 
     //packetHandlerBase = new PacketHandlerBase(this);
@@ -99,13 +98,13 @@ IMClientPacketsParser::~IMClientPacketsParser() {
 
     QMutexLocker locker(&mutex);
 
-//    if(heartbeatTimer){
-//        qDebug()<<"----------------------------33333333";
-//        heartbeatTimer->stop();
-//        qDebug()<<"----------------------------44444444";
-//    }
-//    delete heartbeatTimer;
-//    heartbeatTimer = 0;
+    //    if(heartbeatTimer){
+    //        qDebug()<<"----------------------------33333333";
+    //        heartbeatTimer->stop();
+    //        qDebug()<<"----------------------------44444444";
+    //    }
+    //    delete heartbeatTimer;
+    //    heartbeatTimer = 0;
 
 
     //    if(processWaitingForReplyPacketsTimer){
@@ -162,23 +161,23 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     PacketHandlerBase::recylePacket(packet);
 
     switch(packetType){
-//    case quint8(HEHUI::HeartbeatPacket):
-//    {
-//        QString contactID;
-//        in >> contactID;
-//        emit signalHeartbeatPacketReceived(contactID);
-//        qDebug()<<"~~HeartbeatPacket--"<<" contactID:"<<contactID;
-//    }
-//    break;
-//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-//    {
-//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-//        in >> packetSerialNumber1 >> packetSerialNumber2;
-//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-//        //qDebug()<<"~~ConfirmationOfReceiptPacket:"<<packetSerialNumber;
-//    }
-//    break;
+    //    case quint8(HEHUI::HeartbeatPacket):
+    //    {
+    //        QString contactID;
+    //        in >> contactID;
+    //        emit signalHeartbeatPacketReceived(contactID);
+    //        qDebug()<<"~~HeartbeatPacket--"<<" contactID:"<<contactID;
+    //    }
+    //    break;
+    //    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+    //    {
+    //        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+    //        in >> packetSerialNumber1 >> packetSerialNumber2;
+    //        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+    //        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+    //        //qDebug()<<"~~ConfirmationOfReceiptPacket:"<<packetSerialNumber;
+    //    }
+    //    break;
     case quint8(IM::ServerDeclare):
     {
 
@@ -192,7 +191,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         //qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<address<<" servername:"<<name <<" serverRUDPListeningPort:"<<serverRUDPListeningPort;
     }
-    break;
+        break;
     case quint8(IM::ServerOnline):
     {
         quint16 port;
@@ -203,18 +202,18 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalServerOnlinePacketReceived(peerAddress.toString(), port, peerID);
         qDebug()<<"~~ServerOnline";
     }
-    break;
+        break;
     case quint8(IM::ServerOffline):
     {
         quint16 port;
         in >> port;
 
-//        stopHeartbeat();
+        //        stopHeartbeat();
 
         emit signalServerOfflinePacketReceived(peerAddress.toString(), port, peerID);
         qWarning()<<"~~ServerOffline";
     }
-    break;
+        break;
     case quint8(IM::ServerAnnouncement):
     {
 
@@ -224,7 +223,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalServerAnnouncementPacketReceived(announcement, (mustRead == quint8(0))?false:true);
         qDebug()<<"~~ServerAnnouncement"<<"groupName:"<<groupName<<"computerName:"<<computerName<<"announcement:"<<announcement<<"mustRead:"<<mustRead;
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_REGISTRATION):
     {
@@ -237,7 +236,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalRegistrationResultReceived(errorTypeCode, message);
         
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_REQUEST_UPDATE_PASSWORD):
     {
@@ -251,7 +250,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalUpdatePasswordResultReceived(errorTypeCode, message);
         
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_REQUEST_LOGIN):
     {
@@ -272,7 +271,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_LOGIN";
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_LOGIN_REDIRECTION):
     {
@@ -284,7 +283,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalLoginServerRedirected(serverAddress, serverPort, peerID);
 
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_CLIENT_LOGIN_RESULT):
     {
@@ -330,7 +329,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qWarning()<<"--SERVER_RESPONSE_CLIENT_LOGIN_RESULT";
 
     }
-    break;
+        break;
 
     case quint8(IM::ONLINE_STATE_CHANGED):
     {
@@ -341,7 +340,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString contactID = "", contactHostAddress = "";
@@ -354,7 +353,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qWarning()<<"--ONLINE_STATE_CHANGED";
     }
-    break;
+        break;
 
     case quint8(IM::CONTACTS_ONLINE_INFO):
     {
@@ -367,7 +366,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString contactsOnlineInfoString = "";
@@ -378,7 +377,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalContactsOnlineInfoPacketReceived(contactsOnlineInfoString);
 
     }
-    break;
+        break;
 
 
     case quint8(IM::SERVER_RESPONSE_USER_SUMMARY_INFO):
@@ -394,7 +393,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString userInfo = "";
@@ -411,7 +410,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalUserInfoPacketReceived(userID, userInfo);
 
     }
-    break;
+        break;
 
     case quint8(IM::CONTACT_GROUPS_INFO):
     {
@@ -421,8 +420,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
-       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString groupsInfo = "";
         quint32 personalContactGroupsInfoVersionOnServer = 1;
@@ -435,7 +434,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         qWarning()<<"--CONTACT_GROUPS_INFO";
 
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_SEARCH_CONTACTS):
     {
@@ -446,8 +445,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
-       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString result = "";
         stream >> result;
@@ -456,7 +455,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qWarning()<<"--SERVER_RESPONSE_SEARCH_CONTACTS";
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
     {
@@ -466,7 +465,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString userID = "", userNickName = "", userFace = "", verificationMessage = "";
@@ -476,7 +475,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalAddContactRequestFromUserPacketReceived(userID, userNickName, userFace, verificationMessage);
         
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_RESPONSE_ADD_CONTACT_REQUEST):
     {
@@ -486,7 +485,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString userID = "", userNickName = "", userFace = "", reasonMessage = "";
@@ -498,7 +497,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalAddContactResultPacketReceived(userID, userNickName, userFace, errorTypeCode, reasonMessage);
         
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_INTEREST_GROUPS_LIST):
     {
@@ -510,7 +509,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString interestGroupsListOnServerForUser = "";
@@ -521,7 +520,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalInterestGroupsListPacketReceived(interestGroupsListOnServerForUser, interestGroupsInfoVersionOnServer);
 
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_INTEREST_GROUP_INFO):
     {
@@ -531,7 +530,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         quint32 groupID = 0;
@@ -542,7 +541,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalInterestGroupInfoPacketReceived(interestGroupInfoStringFromServer, groupID);
 
     }
-    break;
+        break;
 
     case quint8(IM::SERVER_RESPONSE_INTEREST_GROUP_MEMBERS_INFO):
     {
@@ -554,7 +553,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString interestGroupMembersInfoStringFromServer = "";
@@ -565,7 +564,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalInterestGroupMembersInfoPacketReceived(interestGroupMembersInfoStringFromServer, interestGroupMembersInfoVersionOnServer, groupID);
 
     }
-    break;
+        break;
 
     case quint8(IM::BLACKLIST_INFO):
     {
@@ -575,7 +574,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString blacklistOnServer = "";
@@ -586,7 +585,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalBlacklistInfoPacketReceived(blacklistOnServer, blacklistInfoVersionOnServer);
 
     }
-    break;
+        break;
 
 
     case quint8(IM::SESSION_ENCRYPTION_KEY_WITH_CONTACT):
@@ -597,7 +596,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString contactID = "";
@@ -607,7 +606,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         sessionEncryptionKeyWithContactHash[contactID] = key;
 
     }
-    break;
+        break;
 
     case quint8(IM::CHAT_MESSAGE_FROM_CONTACT):
     {
@@ -620,7 +619,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
 
@@ -630,7 +629,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalChatMessageReceivedFromContact(contactID, message, "");
 
     }
-    break;
+        break;
 
     case quint8(IM::CHAT_MESSAGES_CACHED_ON_SERVER):
     {
@@ -641,7 +640,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString messagesString = "";
@@ -650,13 +649,13 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalChatMessageCachedOnServerReceived(messagesString.split(QString(UNIT_SEPARTOR)));
 
     }
-    break;
+        break;
 
     case quint8(IM::CHAT_IMAGE):
     {
         //TODO:
     }
-    break;
+        break;
 
     case quint8(IM::GROUP_CHAT_MESSAGES_CACHED_ON_SERVER):
     {
@@ -667,7 +666,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-        //TODO 
+        //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString messagesString = "";
@@ -676,7 +675,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalInterestGroupChatMessagesCachedOnServerReceived(messagesString.split(QString(UNIT_SEPARTOR)));
 
     }
-    break;
+        break;
 
     case quint8(IM::GROUP_CHAT_MESSAGE):
     {
@@ -687,8 +686,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
-        //TODO 
-       QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         quint32 interestGroupID = 0;
         QString message = "";
@@ -697,10 +696,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, contactID, message, "");
 
     }
-    break;
+        break;
 
 
-     //File TX
+        //File TX
     case quint8(IM::RequestUploadFile):
     {
         QByteArray encryptedData;
@@ -722,7 +721,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qDebug()<<"~~RequestUploadFile";
     }
-    break;
+        break;
     case quint8(IM::RequestDownloadFile):
     {
         QByteArray encryptedData;
@@ -741,7 +740,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qDebug()<<"~~RequestDownloadFile";
     }
-    break;
+        break;
     case quint8(IM::RequestFileData):
     {
         QByteArray encryptedData;
@@ -761,7 +760,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qDebug()<<"~~RequestFileData";
     }
-    break;
+        break;
     case quint8(IM::FileData):
     {
         QByteArray encryptedData;
@@ -777,17 +776,17 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         int pieceIndex = 0;
         stream >> fileMD5 >> pieceIndex >> data >>sha1;
 
-//        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
-//            qCritical()<<"ERROR! Data Verification Failed!";
-//            requestFileData(socketID, offset, size);
-//            return;
-//        }
+        //        if(data.size() != size || sha1 != QCryptographicHash::hash(data, QCryptographicHash::Sha1)){
+        //            qCritical()<<"ERROR! Data Verification Failed!";
+        //            requestFileData(socketID, offset, size);
+        //            return;
+        //        }
 
         emit signalFileDataReceived(socketID, contactID, fileMD5, pieceIndex, data, sha1);
 
         //qDebug()<<"~~FileData";
     }
-    break;
+        break;
     case quint8(IM::FileTXStatusChanged):
     {
         QByteArray encryptedData;
@@ -807,7 +806,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qDebug()<<"~~FileTXStatusChanged";
     }
-    break;
+        break;
     case quint8(IM::FileTXError):
     {
         QByteArray encryptedData;
@@ -828,15 +827,15 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         qDebug()<<"~~FileTXStatusChanged";
     }
-    break;
+        break;
 
 
 
 
     default:
         qWarning()<<"Unknown Packet Type:"<<packetType
-                <<" From:"<<peerAddress.toString()
-               <<" Port:"<<peerPort;
+                 <<" From:"<<peerAddress.toString()
+                <<" Port:"<<peerPort;
         break;
 
     }
