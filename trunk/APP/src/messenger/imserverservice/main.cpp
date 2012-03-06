@@ -9,8 +9,8 @@
 #include "app_constants_imserverservice.h"
 #include "serverservice/serverservice.h"
 
-#include "../server/server.h"
-#include "../server/settings.h"
+#include "../imserver/server.h"
+#include "../imserver/settings.h"
 
 #include "HHSharedCore/hlogdebug.h"
 #include "HHSharedCore/hglobal_core.h"

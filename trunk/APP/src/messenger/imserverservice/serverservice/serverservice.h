@@ -32,7 +32,7 @@
 #ifndef SERVERSERVICE_H
 #define SERVERSERVICE_H
 
-#include "../../server/server.h"
+#include "../../imserver/server.h"
 
 #include "HHSharedService/hservice.h"
 
