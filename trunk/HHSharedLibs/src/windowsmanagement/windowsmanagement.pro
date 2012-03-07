@@ -34,7 +34,8 @@ FORMS +=
 SOURCES += windowsmanagement.cpp
 RESOURCES += 
 win32 { 
-    INCLUDEPATH += resources/lib/AutoIt3
+    INCLUDEPATH += resources/lib/AutoIt3 \
+                    resources/lib/WinAPI
     LIBS += -luser32 \
         -lNetAPI32 \
         -lAdvapi32 \
@@ -42,7 +43,9 @@ win32 {
         -lWinspool \
         -lVersion \
         -Lresources/lib/AutoIt3 \
-        -lautoitx3
+        -lautoitx3 \
+        -Lresources/lib/WinAPI \
+        -lWindowsAPI
 
     win32-g++{
         INCLUDEPATH += resources/lib/WinAPI_GCC

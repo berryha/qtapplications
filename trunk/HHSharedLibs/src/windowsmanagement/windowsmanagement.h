@@ -89,7 +89,7 @@ public:
 
     QString getEnvironmentVariable(const QString &environmentVariable);
 
-    bool runAs(const QString &userName, const QString &password, const QString &exeFilePath, const QString &parameters = "", bool show = true, const QString &workingDir = QCoreApplication::applicationDirPath(), bool wait = false);
+    bool runAs(const QString &userName, const QString &dowmainName, const QString &password, const QString &exeFilePath, const QString &parameters = "", bool show = true, const QString &workingDir = QCoreApplication::applicationDirPath(), bool wait = false);
 
     QString getExeFileVersion(const QString &exeFileName);
 
@@ -189,6 +189,13 @@ public:
 //    void setNewComputerNameToBeUsed(const QString &m_newComputerNameToBeUsed);
 
 
+//////////////////////////////////////////////////////
+
+
+    bool runAsForInteractiveService(const QString &userName, const QString &domainName, const QString &password, const QString &exeFilePath, const QString &parameters = "", bool show = true, const QString &workingDir = QCoreApplication::applicationDirPath());
+
+    //////////////////////////////////////////////////////
+
 
 
 
@@ -203,9 +210,6 @@ signals:
     void signalProgressUpdate(const QString &message, int percent);
     void signalProcessOutputUpdated(const QString &message);
 
-    //void signalProgressIncrease(int percent);
-    //void signalNewMessageAvailable();
-
 
 
 private:
@@ -214,14 +218,13 @@ private:
 
 private:
     QMutex mutex;
-    QString lastErrorString;
+    QString m_lastErrorString;
     QStringList m_outputMsgs;
 
     bool runningNT6OS;
     bool m_isAdmin;
 
     Location location;
-//    QString m_newComputerNameToBeUsed;
 
 
 
