@@ -98,8 +98,8 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     }
     connect(ui.comboBoxDepartment, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
 
-    int sn = m_computerName.right(5).toInt();
-    ui.spinBoxSN->setValue(sn);
+    m_sn = m_computerName.right(5).toInt();
+    ui.spinBoxSN->setValue(m_sn);
     connect(ui.spinBoxSN, SIGNAL(valueChanged(int)), this, SLOT(getNewComputerName()));
 
 
@@ -667,7 +667,7 @@ void SystemInfo::slotUploadSystemInfo(){
 
     QSqlQuery query(db);
 
-    QString queryString = QString("SELECT ComputerName FROM assetsinfo s WHERE s.ComputerName = '%1'  ").arg(m_computerName);
+    QString queryString = QString("SELECT SN FROM assetsinfo s WHERE s.SN = '%1'  ").arg(m_sn);
     if(!query.exec(queryString)){
         QMessageBox::critical(this, tr("Error"), tr("Failed to query info! <br>%1").arg(query.lastError().text()));
         return;
@@ -687,10 +687,10 @@ void SystemInfo::slotUploadSystemInfo(){
             return;
         }
 
-        bool ok = query.prepare(QString("UPDATE assetsinfo SET Workgroup = :Workgroup, Users = :Users, OS = :OS, SN = :SN, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
+        bool ok = query.prepare(QString("UPDATE assetsinfo SET ComputerName = :ComputerName, Workgroup = :Workgroup, Users = :Users, OS = :OS, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
                               " InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
                               " NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = NULL, Remark = :Remark "
-                              " WHERE ComputerName = '%1'").arg(m_computerName));
+                              " WHERE SN = '%1'").arg(m_sn));
         if(!ok){
             QMessageBox::critical(this, tr("Error"), tr("Failed to prepare query! <br>%1").arg(query.lastError().text()));
             return;
@@ -710,13 +710,12 @@ void SystemInfo::slotUploadSystemInfo(){
             return;
         }
 
-        query.bindValue(":ComputerName", m_computerName);
     }
-
+    query.bindValue(":ComputerName", m_computerName);
     query.bindValue(":Workgroup", m_workgroup);
     query.bindValue(":Users", m_users);
     query.bindValue(":OS", m_os);
-    query.bindValue(":SN", sn);
+    query.bindValue(":SN", m_sn);
     query.bindValue(":Vender", vender);
     query.bindValue(":Warranty", warranty);
     query.bindValue(":ServiceNumber", serviceNumber);
@@ -1196,7 +1195,7 @@ void SystemInfo::on_pushButtonRenameComputer_clicked(){
 
     m_computerName = ui.lineEditComputerName->text().trimmed();
     m_workgroup = ui.comboBoxDepartment->currentText();
-    sn = ui.spinBoxSN->value();
+    m_sn = ui.spinBoxSN->value();
 
     ui.computerNameLineEdit->setText(m_computerName);
 
