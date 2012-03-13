@@ -1587,7 +1587,7 @@ void SystemManagementWidget::runProgrameAsAdmin(const QString &exeFilePath, cons
         return;
     }
     WindowsManagement wm;
-    bool ok = wm.runAs("administrator", QString(WIN_ADMIN_PASSWORD), exeFilePath, parameters, show);
+    bool ok = wm.runAs("administrator", ".", QString(WIN_ADMIN_PASSWORD), exeFilePath, parameters, show);
     if(!ok){
         QMessageBox::critical(this, tr("Error"), wm.lastError());
         return;

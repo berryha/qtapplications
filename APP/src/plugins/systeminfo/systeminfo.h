@@ -81,6 +81,8 @@ private:
 private:
     Ui::SystemInfoMainWindowUI ui;
 
+    int m_sn;
+
     QString m_adminName;
     QString m_computerName;
     QString m_workgroup;
@@ -147,7 +149,6 @@ private:
     QStringList softwares;
 
     //
-    int sn;
     QString serviceNumber;
     QString vender;
     QString warranty;

@@ -107,8 +107,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 #ifdef Q_OS_WIN32
 
     wm = new WindowsManagement(this);
-    //    wm->test();
-
+//    wm->test();
 
 
 
