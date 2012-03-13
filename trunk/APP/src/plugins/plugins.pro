@@ -1,8 +1,8 @@
 TEMPLATE        = subdirs
 
 SUBDIRS += sqlexplorer \
-        usermanager \
-        systeminfo #\
-        #samplemanagement
+        usermanager
 
-     
+win32{
+        SUBDIRS += systeminfo
+}
