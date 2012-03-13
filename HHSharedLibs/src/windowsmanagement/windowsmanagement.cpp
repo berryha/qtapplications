@@ -3367,11 +3367,23 @@ bool WindowsManagement::runAsForInteractiveService(const QString &userName, cons
     wchar_t cmdLine[32000*sizeof(wchar_t)+1];
     wcscpy(cmdLine, cmdStr.toStdWString().c_str());
 
+//    QStringList loggedonUsers;
+//    getAllUsersLoggedOn(&loggedonUsers);
 
-//    DWORD errorCode = runAsForNT5InteractiveService(name, domain, pwd, NULL, cmdLine, workingDir.toStdWString().c_str(), show);
-    DWORD errorCode = runAsForNT6InteractiveService(name, domain, pwd, NULL, cmdLine, workingDir.toStdWString().c_str(), show);
 
-    qDebug()<<"---errorCode:"<<errorCode;
+
+    DWORD errorCode;
+    if(isNT6OS() && show){
+        DWORD sessionID;
+        if(!getUserSessionID(name, &sessionID)){
+            errorCode = runAsForNT5InteractiveService(name, domain, pwd, NULL, cmdLine, workingDir.toStdWString().c_str(), show);
+        }else{
+            errorCode = runAsForNT6InteractiveService(sessionID, NULL, cmdLine, workingDir.toStdWString().c_str(), show);
+        }
+    }else{
+        errorCode = runAsForNT5InteractiveService(name, domain, pwd, NULL, cmdLine, workingDir.toStdWString().c_str(), show);
+    }
+
 
     if(ERROR_SUCCESS != errorCode){
         m_lastErrorString = tr("Failed to start process '%1' ! Error Code:%2 ").arg(exeFilePath).arg(errorCode);
