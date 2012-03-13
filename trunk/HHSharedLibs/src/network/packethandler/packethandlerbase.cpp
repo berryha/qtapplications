@@ -27,13 +27,19 @@
  ***************************************************************************
  */
 
+#ifndef CACHED_UNUSED_PACKET_COUNT
+#define CACHED_UNUSED_PACKET_COUNT 1000
+#endif
+
 #include <QCoreApplication>
 #include <QMutexLocker>
 #include <QDebug>
 
+
 #include "packethandlerbase.h"
 
 #include "packetstreamoperator.h"
+
 
 
 namespace HEHUI {
@@ -263,7 +269,12 @@ void PacketHandlerBase::recylePacket(Packet *packet){
     QMutexLocker locker(unusedPacketsMutex);
     if(packet){
         packet->resetPacket();
-        unusedPackets->append(packet);
+        if(unusedPackets->count() < CACHED_UNUSED_PACKET_COUNT){
+            unusedPackets->append(packet);
+        }else{
+            delete packet;
+            packet = 0;
+        }
     }
 
 }
@@ -271,7 +282,6 @@ void PacketHandlerBase::recylePacket(Packet *packet){
 int PacketHandlerBase::recyledPacketsCount(){
     QMutexLocker locker(unusedPacketsMutex);
     return unusedPackets->count();
-
 }
 
 void PacketHandlerBase::clean(){
@@ -281,7 +291,6 @@ void PacketHandlerBase::clean(){
         delete unusedPackets->at(i);
     }
     unusedPackets->clear();
-
 
 }
 
