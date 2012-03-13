@@ -191,10 +191,9 @@ public:
 
 //////////////////////////////////////////////////////
 
-
     bool runAsForInteractiveService(const QString &userName, const QString &domainName, const QString &password, const QString &exeFilePath, const QString &parameters = "", bool show = true, const QString &workingDir = QCoreApplication::applicationDirPath());
 
-    //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 
 

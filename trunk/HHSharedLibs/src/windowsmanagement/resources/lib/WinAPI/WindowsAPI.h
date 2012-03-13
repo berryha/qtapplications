@@ -51,11 +51,25 @@ extern "C"
 {
 #endif
 
+	// Functionality:
+	//    Start a interactive process in another user's session. Only for NT5.1 and later system's service.
+	//    The user must have been logged on.
+	// Parameters:
+	//    0) [in] dwSessionID: Session ID of target desktop to show the process window .
+	//	  ...
+	// Returned value:
+	//    Error Code.
+	WINDOWSAPI_API int runAsForNT6InteractiveService(DWORD dwSessionID, LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPCWSTR lpWorkingDir, bool bShowWindow);
 
 
-
-	WINDOWSAPI_API int runAsForNT6InteractiveService(LPWSTR lpszUsername, LPWSTR lpszDomain, LPWSTR lpszPassword, LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPCWSTR lpWorkingDir, bool bShowWindow);
-
+	// Functionality:
+	//    Get User SessionID.
+	// Parameters:
+	//    0) [in] lpszUsername: User Name.
+	//	  1) [in][out] pSessionID: User SessionID.
+	// Returned value:
+	//    true if user SessionID found, or false.
+	WINDOWSAPI_API bool getUserSessionID(LPCWSTR lpszUserName, DWORD *pSessionID);
 
 
 	WINDOWSAPI_API int runAsForNT5InteractiveService(LPWSTR lpszUsername, LPWSTR lpszDomain, LPWSTR lpszPassword, LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPCWSTR lpWorkingDir, bool bShowWindow);
