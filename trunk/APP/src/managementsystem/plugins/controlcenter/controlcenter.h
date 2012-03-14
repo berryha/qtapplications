@@ -164,11 +164,9 @@ private:
     quint16 m_localUDPListeningPort;
 
     RTP *m_rtp;
-    UDTProtocol *m_udtProtocol;
-    quint16 m_localUDTListeningPort;
+    quint16 m_localRTPListeningPort;
     UDTSOCKET m_socketConnectedToServer;
 
-    TCPServer *m_tcpServer;
 
 //    QHash<int/*Socket ID*/, QHostAddress/*IP*/> clientSocketsHash;
 

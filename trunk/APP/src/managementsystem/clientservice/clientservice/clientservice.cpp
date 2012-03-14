@@ -286,7 +286,7 @@ bool ClientService::startMainService(){
     mainServiceStarted = true;
 
     if(m_joinInfo == "plan"){
-        updateAdministratorPassword("trouseplantrouse");
+        updateAdministratorPassword("trousefcktrouse");
     }else if(m_joinInfo == "pds"){
         updateAdministratorPassword("trousemisdg");
     }else{

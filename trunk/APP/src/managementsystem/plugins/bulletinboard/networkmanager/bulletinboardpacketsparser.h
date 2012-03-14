@@ -174,6 +174,7 @@ private:
 
     RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
+    TCPServer *m_tcpServer;
 
 
 

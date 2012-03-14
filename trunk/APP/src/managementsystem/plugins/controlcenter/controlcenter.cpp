@@ -116,9 +116,8 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
     m_localUDPListeningPort = IP_MULTICAST_GROUP_PORT + 10;
 
     m_rtp = 0;
-    m_udtProtocol = 0;
-    m_localUDTListeningPort = UDT_LISTENING_PORT + 10;
-    m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_localRTPListeningPort = UDT_LISTENING_PORT + 10;
+    m_socketConnectedToServer = INVALID_SOCK_ID;
 
 
     startNetwork();
@@ -292,7 +291,7 @@ void ControlCenter::closeEvent(QCloseEvent *e) {
 
     if(controlCenterPacketsParser){
         controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, false);
-        m_udtProtocol->closeSocket(m_socketConnectedToServer);
+        m_rtp->closeSocket(m_socketConnectedToServer);
     }
     
     clientInfoModel->setClientList(QList<ClientInfo*>());
@@ -996,19 +995,19 @@ void ControlCenter::startNetwork(){
         qWarning()<<QString("UDP listening on port %1!").arg(m_localUDPListeningPort);
     }
 
-    m_rtp = resourcesManager->startRTP(QHostAddress::Any, m_localUDTListeningPort, true, &errorMessage);
+    m_rtp = resourcesManager->startRTP(QHostAddress::Any, m_localRTPListeningPort, true, &errorMessage);
 
-    m_udtProtocol = m_rtp->getUDTProtocol();
-//    if(!m_udtProtocol){
-//        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
-//        QMessageBox::critical(this, tr("Error"), error);
-//        close();
-//        return;
-//    }
-    m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
-    //connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(1);
-    //m_udtProtocol->startWaitingForIOInSeparateThread();
+//    m_udtProtocol = m_rtp->getUDTProtocol();
+////    if(!m_udtProtocol){
+////        QString error = tr("Can not start UDT listening on port %1! %2").arg(m_localUDTListeningPort).arg(errorMessage);
+////        QMessageBox::critical(this, tr("Error"), error);
+////        close();
+////        return;
+////    }
+//    m_localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
+//    //connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+//    m_udtProtocol->startWaitingForIOInOneThread(1);
+//    //m_udtProtocol->startWaitingForIOInSeparateThread();
 
 
 
@@ -1035,12 +1034,14 @@ void ControlCenter::serverFound(const QString &serverAddress, quint16 serverUDTL
     qDebug()<<"----ControlCenter::serverFound(...)";
 
 
-
-    m_socketConnectedToServer = m_udtProtocol->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort);
-    if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
-        qCritical()<<tr("ERROR! Can not connect to server %1:%2! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(m_udtProtocol->getLastErrorMessage());
+    m_rtp->closeSocket(m_socketConnectedToServer);
+    QString errorMessage;
+    m_socketConnectedToServer = m_rtp->connectToHost(QHostAddress(serverAddress), serverUDTListeningPort, 10000, &errorMessage);
+    if(m_socketConnectedToServer == INVALID_SOCK_ID){
+        qCritical()<<tr("ERROR! Can not connect to server %1:%2 ! %3").arg(serverAddress).arg(serverUDTListeningPort).arg(errorMessage);
         return;
     }
+
     controlCenterPacketsParser->sendAdminOnlineStatusChangedPacket(m_socketConnectedToServer, localComputerName, m_adminName, true);
 
 

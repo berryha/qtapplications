@@ -59,8 +59,7 @@ private:
     
     quint16 localUDTListeningPort;
     RTP *m_rtp;
-    UDTProtocol *m_udtProtocol;
-    UDTSOCKET m_socketConnectedToLocalServer;
+    int m_socketConnectedToLocalServer;
 //    UDTSOCKET m_socketConnectedToAdmin;
 
     QTimer *m_connectToLocalServerTimer;
