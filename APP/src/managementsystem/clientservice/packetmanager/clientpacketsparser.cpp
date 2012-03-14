@@ -45,6 +45,7 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *manager, QObjec
 
     m_udpServer = m_resourcesManager->getUDPServer();
     Q_ASSERT_X(m_udpServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
+    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
     m_rtp = m_resourcesManager->getRTP();
@@ -54,12 +55,10 @@ ClientPacketsParser::ClientPacketsParser(ClientResourcesManager *manager, QObjec
     Q_ASSERT(m_udtProtocol);
     m_udtProtocol->startWaitingForIOInOneThread(10);
     //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
+    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
     m_tcpServer = m_rtp->getTCPServer();
     Q_ASSERT(m_tcpServer);
-
-    connect(m_udpServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
-    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
     connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 

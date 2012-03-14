@@ -24,8 +24,7 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
     m_rtp = 0;
-    m_udtProtocol = 0;
-    m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_socketConnectedToLocalServer = INVALID_SOCK_ID;
 //    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
 
 
@@ -51,8 +50,8 @@ BulletinBoardObject::~BulletinBoardObject(){
         m_connectToLocalServerTimer = 0;
     }
 
-    if(m_udtProtocol){
-        m_udtProtocol->closeSocket(m_socketConnectedToLocalServer);
+    if(m_rtp){
+        m_rtp->closeSocket(m_socketConnectedToLocalServer);
     }
 
     if(remoteAssistance){
@@ -92,20 +91,22 @@ BulletinBoardObject::~BulletinBoardObject(){
 void BulletinBoardObject::startNetwork(){
     qDebug()<<"--BulletinBoardObject::startNetwork()";
 
-    if(!m_udtProtocol){
+    if(!m_rtp){
         QString errorMessage = "";
 
         m_rtp = resourcesManager->startRTP(QHostAddress::Any, localUDTListeningPort, true, &errorMessage);
-        m_udtProtocol = m_rtp->getUDTProtocol();
-//        if(!m_udtProtocol){
-//            QString error = tr("Can not start UDT listening on port %1! %2").arg(localUDTListeningPort).arg(errorMessage);
-//            qCritical()<< error;
-//            return;
-//        }
-        localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
-//        connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-        m_udtProtocol->startWaitingForIOInOneThread(1000);
-        //m_udtProtocol->startWaitingForIOInSeparateThread(1, 500);
+        connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+        //        m_udtProtocol = m_rtp->getUDTProtocol();
+////        if(!m_udtProtocol){
+////            QString error = tr("Can not start UDT listening on port %1! %2").arg(localUDTListeningPort).arg(errorMessage);
+////            qCritical()<< error;
+////            return;
+////        }
+//        localUDTListeningPort = m_udtProtocol->getUDTListeningPort();
+////        connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+//        m_udtProtocol->startWaitingForIOInOneThread(1000);
+//        //m_udtProtocol->startWaitingForIOInSeparateThread(1, 500);
 
     }
 
@@ -199,8 +200,8 @@ void BulletinBoardObject::newPasswordRetreved(){
 void BulletinBoardObject::peerDisconnected(int socketID){
     qDebug()<<"--BulletinBoardObject::peerDisconnected(...) "<<"socketID:"<<socketID;
 
-    m_udtProtocol->closeSocket(socketID);
-    m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
+    //m_rtp->closeSocket(socketID);
+    m_socketConnectedToLocalServer = INVALID_SOCK_ID;
 
     //QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
 
@@ -213,22 +214,19 @@ void BulletinBoardObject::peerDisconnected(int socketID){
 void BulletinBoardObject::connectToLocalServer(){
     qDebug()<<"--BulletinBoardObject::connectToLocalServer()";
 
-
-    if(m_socketConnectedToLocalServer == UDTProtocol::INVALID_UDT_SOCK){
-        m_socketConnectedToLocalServer = m_udtProtocol->connectToHost(QHostAddress::LocalHost, UDT_LISTENING_PORT);
-    }
-
-    if(!m_udtProtocol->isSocketConnected(m_socketConnectedToLocalServer)){
-        //QTimer::singleShot(60000, this, SLOT(connectToLocalServer()));
-        m_udtProtocol->closeSocket(m_socketConnectedToLocalServer);
-        m_socketConnectedToLocalServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_rtp->closeSocket(m_socketConnectedToLocalServer);
+    QString errorMessage;
+    m_socketConnectedToLocalServer = m_rtp->connectToHost(QHostAddress::LocalHost, UDT_LISTENING_PORT, 10000, &errorMessage);
+    if(m_socketConnectedToLocalServer == INVALID_SOCK_ID){
+        qCritical()<<tr("ERROR! Can not connect to local server! %3").arg(errorMessage);
         m_connectToLocalServerTimer->start();
+        return;
     }else{
         qDebug()<<"m_socketConnectedToLocalServer:"<<m_socketConnectedToLocalServer;
 
         bool ok = bulletinBoardPacketsParser->sendLocalUserOnlinePacket(m_socketConnectedToLocalServer);
         if(!ok){
-            qCritical()<<m_udtProtocol->getLastErrorMessage();
+            qCritical()<<m_rtp->lastErrorString();
         }else{
             m_connectToLocalServerTimer->stop();
         }

@@ -58,8 +58,13 @@ BulletinBoardPacketsParser::BulletinBoardPacketsParser(ResourcesManagerInstance 
 
     m_udtProtocol = m_rtp->getUDTProtocol();
     Q_ASSERT(m_udtProtocol);
-
+    m_udtProtocol->startWaitingForIOInOneThread(1000);
+    //m_udtProtocol->startWaitingForIOInSeparateThread(100, 1000);
    connect(m_udtProtocol, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)));
+
+   m_tcpServer = m_rtp->getTCPServer();
+   Q_ASSERT(m_tcpServer);
+   connect(m_tcpServer, SIGNAL(packetReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 
 
