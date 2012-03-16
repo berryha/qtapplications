@@ -20,9 +20,9 @@
 
 #endif
 
-//#ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
-//#define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/PC"
-//#endif
+#ifndef SITOY_MSSQLSERVER_DB_CONNECTION_NAME
+#define SITOY_MSSQLSERVER_DB_CONNECTION_NAME "200.200.200.2/MIS/AssetsInfo"
+#endif
 
 #ifndef MYSQL_DB_CONNECTION_NAME
 #define MYSQL_DB_CONNECTION_NAME "200.200.200.17/sitoycomputers/systeminfo"
@@ -64,27 +64,27 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     connect(ui.comboBoxLocation, SIGNAL(currentIndexChanged(int)), this, SLOT(getNewComputerName()));
 
     if(departments.isEmpty()){
-        departments.insert("it", tr("IT"));
-        departments.insert("ac", tr("Account"));
-        departments.insert("ad", tr("AdminDept"));
-        departments.insert("co", tr("Cost"));
-        departments.insert("cu", tr("Custom"));
-        departments.insert("gm", tr("GMO"));
-        departments.insert("hr", tr("HR"));
-        departments.insert("ma", tr("Marker"));
-        departments.insert("pd", tr("PDS"));
-        departments.insert("pg", tr("PG"));
-        departments.insert("pl", tr("Plan"));
-        departments.insert("pm", tr("PMC"));
-        departments.insert("pu", tr("Purchase"));
-        departments.insert("qc", tr("QC"));
-        departments.insert("re", tr("Retail"));
-        departments.insert("sa", tr("Sales"));
-        //departmentsHash.insert("", tr("Sample"));
-        departments.insert("se", tr("Secretary"));
-        departments.insert("sh", tr("Ship"));
-        departments.insert("sp", tr("Shop"));
-        departments.insert("wh", tr("WHouse"));
+        departments.insert("it", "IT");
+        departments.insert("ac", "Account");
+        departments.insert("ad", "AdminDept");
+        departments.insert("co", "Cost");
+        departments.insert("cu", "Custom");
+        departments.insert("gm", "GMO");
+        departments.insert("hr", "HR");
+        departments.insert("ma", "Marker");
+        departments.insert("pd", "PDS");
+        departments.insert("pg", "PG");
+        departments.insert("pl", "Plan");
+        departments.insert("pm", "PMC");
+        departments.insert("pu", "Purchase");
+        departments.insert("qc", "QC");
+        departments.insert("re", "Retail");
+        departments.insert("sa", "Sales");
+        //departmentsHash.insert("", "Sample");
+        departments.insert("se", "Secretary");
+        departments.insert("sh", "Ship");
+        departments.insert("sp", "Shop");
+        departments.insert("wh", "WHouse");
     }
     QString department = m_computerName.mid(2, 2).toLower();
     foreach (QString key, departments.keys()) {
@@ -139,7 +139,9 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     process->setProcessChannelMode(QProcess::MergedChannels);
     connect(process, SIGNAL(finished( int , QProcess::ExitStatus)), this, SLOT(slotScannerExit( int , QProcess::ExitStatus )));
 
+
     slotScanSystem();
+
 
 
     statusBar()->showMessage(tr("Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query"));
@@ -178,10 +180,16 @@ SystemInfo::~SystemInfo() {
 //    QSqlDatabase::removeDatabase(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
 
     QSqlDatabase mySQLDB = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
-    if(mySQLDB.isOpen()){
+    if(mySQLDB.isValid() && mySQLDB.isOpen()){
         mySQLDB.close();
     }
     QSqlDatabase::removeDatabase(MYSQL_DB_CONNECTION_NAME);
+
+    QSqlDatabase sitoyDB = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
+    if(sitoyDB.isValid() && sitoyDB.isOpen()){
+        sitoyDB.close();
+    }
+    QSqlDatabase::removeDatabase(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
 
 
 }
@@ -687,7 +695,7 @@ void SystemInfo::slotUploadSystemInfo(){
             return;
         }
 
-        bool ok = query.prepare(QString("UPDATE assetsinfo SET ComputerName = :ComputerName, Workgroup = :Workgroup, Users = :Users, OS = :OS, Vender = :Vender, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
+        bool ok = query.prepare(QString("UPDATE assetsinfo SET ComputerName = :ComputerName, Workgroup = :Workgroup, Users = :Users, OS = :OS, Vender = :Vender, DateOfPurchase = :DateOfPurchase, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
                               " InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
                               " NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = NULL, Remark = :Remark "
                               " WHERE SN = '%1'").arg(m_sn));
@@ -697,10 +705,10 @@ void SystemInfo::slotUploadSystemInfo(){
         }
 
     }else{
-         bool ok = query.prepare("INSERT INTO assetsinfo (ComputerName, Workgroup, Users, OS, SN, Vender, Warranty, ServiceNumber, Registrant, "
+         bool ok = query.prepare("INSERT INTO assetsinfo (ComputerName, Workgroup, Users, OS, SN, Vender, DateOfPurchase, Warranty, ServiceNumber, Registrant, "
                       " InstallationDate, OSKey, CPU, MotherboardName, Chipset, Memory, Storage, Video, Audio, NIC1, NIC2, Monitor, "
                       " UpdateTime, Remark)"
-                      " VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :Warranty, :ServiceNumber, :Registrant, "
+                      " VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :DateOfPurchase, :Warranty, :ServiceNumber, :Registrant, "
                       " :InstallationDate, :OSKey, :CPU, :MotherboardName, :Chipset, :Memory, :Storage, :Video, :Audio, :NIC1, :NIC2, :Monitor, "
                       " NULL, :Remark"
                       ")"
@@ -717,6 +725,7 @@ void SystemInfo::slotUploadSystemInfo(){
     query.bindValue(":OS", m_os);
     query.bindValue(":SN", m_sn);
     query.bindValue(":Vender", vender);
+    query.bindValue(":DateOfPurchase", dateOfPurchase.toString("yyyy-MM-dd"));
     query.bindValue(":Warranty", warranty);
     query.bindValue(":ServiceNumber", serviceNumber);
     query.bindValue(":Registrant", m_adminName);
@@ -777,6 +786,146 @@ void SystemInfo::slotUploadSystemInfo(){
 
 }
 
+void SystemInfo::slotUploadSystemInfoToSitoyDB(){
+    qDebug()<<"SystemInfo::slotUploadSystemInfoToSitoyDB()";
+
+
+    slotGetAllInfo();
+
+    //QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    //DatabaseConnecter dc(this);
+    if(!dc->isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_DRIVER,
+                             REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
+                             REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
+                             REMOTE_SITOY_SQLSERVER_DB_NAME,
+                             HEHUI::M$SQLSERVER
+                             )){
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Error"), tr("Failed to open database!"));
+        qCritical() << QString("Error!Failed to open database!");
+        return;
+    }
+
+
+    QSqlDatabase db;
+    db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
+
+    QSqlQuery query(db);
+
+    QString queryString = QString("SELECT SN FROM AssetsInfo s WHERE s.SN = '%1'  ").arg(m_sn);
+    if(!query.exec(queryString)){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to query info! <br>%1").arg(query.lastError().text()));
+        return;
+    }
+    if(query.first()){
+        recordExists = true;
+    }else{
+        recordExists = false;
+    }
+    query.clear();
+
+
+    if(recordExists){
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Record Already Exists!"), tr("Record Already Exists!<br>Update it?"), QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            return;
+        }
+
+        bool ok = query.prepare(QString("UPDATE AssetsInfo SET ComputerName = :ComputerName, Workgroup = :Workgroup, Users = :Users, OS = :OS, Vender = :Vender, BuyDate = :BuyDate, Warranty = :Warranty, ServiceNumber = :ServiceNumber, Registrant = :Registrant, "
+                              " InstallationDate = :InstallationDate, OSKey = :OSKey, CPU = :CPU, MotherboardName = :MotherboardName, Chipset = :Chipset, Memory = :Memory, Storage = :Storage, Video = :Video, Audio = :Audio, "
+                              " NIC1 = :NIC1, NIC2 = :NIC2, Monitor = :Monitor, UpdateTime = GETDATE(), Remark = :Remark "
+                              " WHERE SN = '%1'").arg(m_sn));
+        if(!ok){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to prepare query! <br>%1").arg(query.lastError().text()));
+            return;
+        }
+
+    }else{
+         bool ok = query.prepare("INSERT INTO AssetsInfo (ComputerName, Workgroup, Users, OS, SN, Vender, BuyDate, Warranty, ServiceNumber, Registrant, "
+                      " InstallationDate, OSKey, CPU, MotherboardName, Chipset, Memory, Storage, Video, Audio, NIC1, NIC2, Monitor, "
+                      " UpdateTime, Remark)"
+                      " VALUES (:ComputerName, :Workgroup, :Users, :OS, :SN,  :Vender, :BuyDate, :Warranty, :ServiceNumber, :Registrant, "
+                      " :InstallationDate, :OSKey, :CPU, :MotherboardName, :Chipset, :Memory, :Storage, :Video, :Audio, :NIC1, :NIC2, :Monitor, "
+                      " GETDATE(), :Remark"
+                      ")"
+                      );
+        if(!ok){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to prepare query! <br>%1").arg(query.lastError().text()));
+            return;
+        }
+
+    }
+    query.bindValue(":ComputerName", m_computerName);
+    query.bindValue(":Workgroup", m_workgroup);
+    query.bindValue(":Users", m_users);
+    query.bindValue(":OS", m_os);
+    query.bindValue(":SN", m_sn);
+    query.bindValue(":Vender", vender);
+    query.bindValue(":BuyDate", dateOfPurchase.toString("yyyy-MM-dd"));
+    query.bindValue(":Warranty", warranty);
+    query.bindValue(":ServiceNumber", serviceNumber);
+    query.bindValue(":Registrant", m_adminName);
+
+    query.bindValue(":InstallationDate", installationDate);
+    query.bindValue(":OSKey", osKey);
+    query.bindValue(":CPU", cpu);
+    query.bindValue(":MotherboardName", motherboardName);
+    query.bindValue(":Chipset", chipset);
+    query.bindValue(":Memory", memory);
+    query.bindValue(":Storage", storagesInfo);
+    query.bindValue(":Video", video);
+    query.bindValue(":Audio", audio);
+    query.bindValue(":NIC1", nic1Info);
+    query.bindValue(":NIC2", nic2Info);
+    query.bindValue(":Monitor", monitor);
+    query.bindValue(":Remark", remark );
+
+
+    if(!query.exec()){
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, QObject::tr("Error"), tr("Can not upload data to server! <br> %1").arg(query.lastError().text()));
+        qCritical()<<QString("Can not upload data to server!");
+        qCritical()<<QString("Error: %1").arg(query.lastError().text());
+        statusBar()->showMessage(tr("Error! Can not upload data to server!"));
+        return;
+    }
+    query.clear();
+
+
+
+//    if(softwares.size()){
+//        QString updateInstalledSoftwaresInfoStatement = QString("START TRANSACTION; delete from AssetsInfoSoftware where ComputerName = '%1'; ").arg(m_computerName);
+//        foreach (QString info, softwares) {
+//            QStringList values = info.split(" | ");
+//            if(values.size() != 5){continue;}
+//            updateInstalledSoftwaresInfoStatement += QString(" insert into AssetsInfoSoftware(ComputerName, SoftwareName, SoftwareVersion, Size, InstallationDate, Publisher) values('%1', '%2', '%3', '%4', '%5', '%6'); ").arg(m_computerName).arg(values.at(0)).arg(values.at(1)).arg(values.at(2)).arg(values.at(3)).arg(values.at(4));
+//        }
+//        updateInstalledSoftwaresInfoStatement += "COMMIT;";
+
+//        if(!query.exec(updateInstalledSoftwaresInfoStatement)){
+//            QApplication::restoreOverrideCursor();
+//            QMessageBox::critical(this, tr("Error"), tr("Failed to upload installed software info to database! <br>%1").arg(query.lastError().text()));
+//        }
+
+//    }
+
+
+
+    QApplication::restoreOverrideCursor();
+
+
+    QMessageBox::information(this, tr("Done"), tr("Data has been uploaded to server!"));
+
+    //isUploaded = true;
+    statusBar()->showMessage(tr("Done! Data has been uploaded to server!"));
+
+
+}
 
 
 void SystemInfo::retranslateUi() {
@@ -912,16 +1061,26 @@ void SystemInfo::slotQuerySystemInfo(){
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    DatabaseConnecter dc(this);
-    if(!dc.isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
-                            REMOTE_SITOY_COMPUTERS_DB_DRIVER,
-                            REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
-                            REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
-                            REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
-                            REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
-                            REMOTE_SITOY_ASSETS_DB_NAME,
-                            HEHUI::MYSQL
-                            )){
+//    DatabaseConnecter dc(this);
+//    if(!dc.isDatabaseOpened(MYSQL_DB_CONNECTION_NAME,
+//                            REMOTE_SITOY_COMPUTERS_DB_DRIVER,
+//                            REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST,
+//                            REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT,
+//                            REMOTE_SITOY_COMPUTERS_DB_USER_NAME,
+//                            REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD,
+//                            REMOTE_SITOY_ASSETS_DB_NAME,
+//                            HEHUI::MYSQL
+//                            )){
+    if(!dc->isDatabaseOpened(SITOY_MSSQLSERVER_DB_CONNECTION_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_DRIVER,
+                             REMOTE_SITOY_SQLSERVER_DB_HOST_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_HOST_PORT,
+                             REMOTE_SITOY_SQLSERVER_DB_USER_NAME,
+                             REMOTE_SITOY_SQLSERVER_DB_USER_PASSWORD,
+                             REMOTE_SITOY_SQLSERVER_DB_NAME,
+                             HEHUI::M$SQLSERVER
+                             )){
+
         QApplication::restoreOverrideCursor();
         QMessageBox::critical(this, tr("Fatal Error"), tr("Database Connection Failed! Query Failed!"));
         qCritical() << QString("Error: Database Connection Failed! Query Failed!");
@@ -930,7 +1089,7 @@ void SystemInfo::slotQuerySystemInfo(){
 
 
     QSqlDatabase db;
-    db = QSqlDatabase::database(MYSQL_DB_CONNECTION_NAME);
+    db = QSqlDatabase::database(SITOY_MSSQLSERVER_DB_CONNECTION_NAME);
 
 
     if(!queryModel){
@@ -938,7 +1097,7 @@ void SystemInfo::slotQuerySystemInfo(){
     }
     queryModel->clear();
 
-    QString queryString = QString("SELECT * FROM assetsinfo s WHERE s.ComputerName = '%1'  ").arg(m_computerName);
+    QString queryString = QString("SELECT * FROM AssetsInfo s WHERE s.ComputerName = '%1'  ").arg(m_computerName);
     queryModel->setQuery(QSqlQuery(queryString, db));
     QApplication::restoreOverrideCursor();
 
@@ -1013,9 +1172,11 @@ void SystemInfo::slotQuerySystemInfo(){
     ui.labelReportCreationTime->setText(tr("Last Update Time: %1").arg(record.value("UpdateTime").toString()));
     ui.spinBoxSN->setValue(record.value("SN").toUInt());
     ui.comboBoxVender->setCurrentIndex(ui.comboBoxVender->findText(record.value("Vender").toString()));
+    ui.dateEditDateOfPurchase->setDate(record.value("BuyDate").toDate());
     ui.lineEditWarranty->setText(record.value("Warranty").toString());
     ui.lineEditDellServiceNumber->setText(record.value("ServiceNumber").toString());
     ui.lineEditRegistrant->setText(record.value("Registrant").toString());
+    ui.lineEditRemark->setText(record.value("Remark").toString());
 
 
     queryModel->clear();
@@ -1097,9 +1258,9 @@ void SystemInfo::slotGetAllInfo()
 
     serviceNumber = ui.lineEditDellServiceNumber->text().trimmed();
     vender = ui.comboBoxVender->currentText();
+    dateOfPurchase = ui.dateEditDateOfPurchase->date();
     warranty = ui.lineEditWarranty->text();
-    remark = ui.textEditRemark->toPlainText();
-
+    remark = ui.lineEditRemark->text();
 
 
 }
@@ -1127,6 +1288,7 @@ void SystemInfo::on_toolButtonUpload_clicked()
         return ;
     }
 
+
     if(ui.comboBoxVender->currentText().startsWith("DELL", Qt::CaseInsensitive)){
         if(ui.lineEditDellServiceNumber->text().trimmed().isEmpty()){
             QMessageBox::critical(this, tr("Error"), tr("Dell Service Number Required!"));
@@ -1135,7 +1297,16 @@ void SystemInfo::on_toolButtonUpload_clicked()
         }
     }
 
-    slotUploadSystemInfo();
+    dateOfPurchase = ui.dateEditDateOfPurchase->date();
+    if(dateOfPurchase > QDate::currentDate() ){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Date Of Purchase!"));
+        ui.dateEditDateOfPurchase->setFocus();
+        return;
+    }
+
+
+    slotUploadSystemInfoToSitoyDB();
+    //slotUploadSystemInfo();
 
 }
 
@@ -1201,6 +1372,8 @@ void SystemInfo::on_pushButtonRenameComputer_clicked(){
 
     QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\HEHUI", QSettings::NativeFormat, this);
     settings.setValue("ComputerName", m_computerName);
+    settings.setValue("Department", m_workgroup);
+    settings.setValue("SN", m_sn);
 
 }
 

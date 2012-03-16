@@ -46,6 +46,8 @@ private slots:
 
 
     void slotUploadSystemInfo();
+    void slotUploadSystemInfoToSitoyDB();
+
 
 //    void slotUploadSystemInfoToSitoyDBServer();
 
@@ -151,6 +153,7 @@ private:
     //
     QString serviceNumber;
     QString vender;
+    QDate dateOfPurchase;
     QString warranty;
     QString registrant;
     QString remark;

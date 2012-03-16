@@ -43,6 +43,10 @@ SystemManagementWidget::SystemManagementWidget(RTP *rtp, ControlCenterPacketsPar
         this->m_peerIPAddress = QHostAddress::LocalHost;
     }
 
+    ui.comboBoxProtocol->addItem(tr("Auto"), quint8(RTP::AUTO));
+    ui.comboBoxProtocol->addItem("UDT", quint8(RTP::UDT));
+    ui.comboBoxProtocol->addItem("TCP", quint8(RTP::TCP));
+
 
 
     m_winDirPath = "";
@@ -463,7 +467,7 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
 
     QString errorMessage;
     if(m_peerSocket == INVALID_SOCK_ID){
-        m_peerSocket = m_rtp->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 5000, &errorMessage);
+        m_peerSocket = m_rtp->connectToHost(m_peerIPAddress, UDT_LISTENING_PORT, 5000, &errorMessage, RTP::Protocol(ui.comboBoxProtocol->itemData(ui.comboBoxProtocol->currentIndex()).toUInt()));
     }
     if(m_peerSocket == INVALID_SOCK_ID){
         QMessageBox::critical(this, tr("Error"), tr("Can not connect to host!<br>%1").arg(errorMessage));
