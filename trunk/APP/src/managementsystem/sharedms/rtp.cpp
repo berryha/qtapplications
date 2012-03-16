@@ -130,28 +130,43 @@ quint16 RTP::getTCPServerPort(){
     return port;
 }
 
-int RTP::connectToHost( const QHostAddress & hostAddress, quint16 port, int waitMsecs, QString *errorMessage){
-
+int RTP::connectToHost( const QHostAddress & hostAddress, quint16 port, int waitMsecs, QString *errorMessage, Protocol protocol){
+    qDebug()<<"-------------------Protocol:"<<protocol;
     int socketID = -1;
     QString err;
 
-    socketID = m_udtProtocol->connectToHost(hostAddress, port, 0, true, waitMsecs);
-    if( (socketID == INVALID_SOCK_ID) || (!m_udtProtocol->isSocketConnected(socketID)) ){
-        err = tr("Can not connect to host %1:%2 via UDT! %3").arg(hostAddress.toString()).arg(port).arg(m_udtProtocol->getLastErrorMessage());
+    if(protocol != TCP){
+        socketID = m_udtProtocol->connectToHost(hostAddress, port, 0, true, waitMsecs);
+        if( (socketID == INVALID_SOCK_ID) || (!m_udtProtocol->isSocketConnected(socketID)) ){
+            err += tr("Can not connect to host %1:%2 via UDT! %3").arg(hostAddress.toString()).arg(port).arg(m_udtProtocol->getLastErrorMessage());
+            qCritical()<<err;
+            if(protocol == UDT){
+                if(errorMessage){
+                    *errorMessage = err;
+                }
+                return socketID;
+            }
+        }else{
+            qDebug()<<QString("Peer %1:%2 connected via UDT! ").arg(hostAddress.toString()).arg(port);
+            return socketID;
+        }
+    }
+
+//    if( (socketID == INVALID_SOCK_ID) || (!m_udtProtocol->isSocketConnected(socketID)) ){
+//        err = tr("Can not connect to host %1:%2 via UDT! %3").arg(hostAddress.toString()).arg(port).arg(m_udtProtocol->getLastErrorMessage());
 
         socketID = m_tcpServer->connectToHost(hostAddress, port, waitMsecs);
         if(!m_tcpServer->isConnected(socketID) ){
             err += tr("\nCan not connect to host %1:%2 via TCP! %3").arg(hostAddress.toString()).arg(port).arg(m_tcpServer->socketErrorString(socketID));
-
+            qCritical()<<err;
             m_tcpServer->abort(socketID);
             socketID = INVALID_SOCK_ID;
         }
-    }
+//    }
 
     if(errorMessage){
         *errorMessage = err;
     }
-    qCritical()<<err;
 
     return socketID;
 

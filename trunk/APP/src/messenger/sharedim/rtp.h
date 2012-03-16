@@ -15,6 +15,7 @@ class SHAREDIMLIB_API RTP : public QObject
 {
     Q_OBJECT
 public:
+    enum Protocol{AUTO = 0, UDT, TCP};
     explicit RTP(QObject *parent = 0);
     ~RTP();
     
@@ -29,7 +30,7 @@ public:
     TCPServer * startTCPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true, QString *errorMessage = 0);
     quint16 getTCPServerPort();
 
-    int connectToHost ( const QHostAddress &hostAddress, quint16 port, int waitMsecs = 0, QString *errorMessage = 0);
+    int connectToHost ( const QHostAddress &hostAddress, quint16 port, int waitMsecs = 0, QString *errorMessage = 0, Protocol protocol= AUTO);
     void closeSocket(int socketID);
     bool isSocketConnected(int socketID);
     bool getAddressInfoFromSocket(int socketID, QString *address, quint16 *port, bool getPeerInfo = true);

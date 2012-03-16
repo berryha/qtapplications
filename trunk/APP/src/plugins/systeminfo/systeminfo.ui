@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>646</height>
+    <width>815</width>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,9 @@
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBoxBasicSettings_2">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="title">
        <string>Basic Info</string>
       </property>
@@ -24,7 +27,7 @@
        <bool>true</bool>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
@@ -752,73 +755,114 @@
        <string>Assets Registration </string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="6">
+       <item row="1" column="7">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Registrant:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelRemark">
+         <property name="text">
+          <string>Remark:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="8">
+        <widget class="QLineEdit" name="lineEditRegistrant">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>DELL Service Number:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="0" column="3" colspan="2">
         <widget class="QLineEdit" name="lineEditDellServiceNumber"/>
        </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Vender:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QComboBox" name="comboBoxVender">
-         <item>
-          <property name="text">
-           <string>DIY</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>DELL Desktop</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>DELL Laptop</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Other</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="5">
+       <item row="0" column="8">
         <widget class="QLineEdit" name="lineEditWarranty"/>
        </item>
-       <item row="0" column="4">
+       <item row="0" column="7">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Warranty:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="7">
-        <widget class="QLineEdit" name="lineEditRegistrant">
-         <property name="readOnly">
-          <bool>true</bool>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Vender:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="8">
-        <widget class="QTextEdit" name="textEditRemark"/>
+       <item row="0" column="5">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Date Of Purchase:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QDateEdit" name="dateEditDateOfPurchase">
+         <property name="maximumDateTime">
+          <datetime>
+           <hour>23</hour>
+           <minute>59</minute>
+           <second>59</second>
+           <year>2015</year>
+           <month>12</month>
+           <day>31</day>
+          </datetime>
+         </property>
+         <property name="minimumDateTime">
+          <datetime>
+           <hour>0</hour>
+           <minute>0</minute>
+           <second>0</second>
+           <year>2003</year>
+           <month>1</month>
+           <day>1</day>
+          </datetime>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="6">
+        <widget class="QLineEdit" name="lineEditRemark"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboBoxVender">
+         <item>
+          <property name="text">
+           <string notr="true">DIY</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string notr="true">DELL Desktop</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string notr="true">DELL Laptop</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string notr="true">Other</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </widget>
