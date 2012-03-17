@@ -591,6 +591,23 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEditComputerName</tabstop>
+  <tabstop>lineEditUserName</tabstop>
+  <tabstop>comboBoxWorkgroup</tabstop>
+  <tabstop>comboBoxUSBSD</tabstop>
+  <tabstop>toolButtonQuery</tabstop>
+  <tabstop>toolButtonfilter</tabstop>
+  <tabstop>lineEditMACAddress</tabstop>
+  <tabstop>lineEditIPAddress</tabstop>
+  <tabstop>comboBoxOSVersion</tabstop>
+  <tabstop>comboBoxPrograms</tabstop>
+  <tabstop>toolButtonManage</tabstop>
+  <tabstop>toolButtonUpdatePassword</tabstop>
+  <tabstop>toolButtonAnnouncement</tabstop>
+  <tabstop>tableViewClientList</tabstop>
+ </tabstops>
  <resources>
   <include location="controlcenter.qrc"/>
  </resources>

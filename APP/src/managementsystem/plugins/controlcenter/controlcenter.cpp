@@ -227,7 +227,8 @@ bool ControlCenter::eventFilter(QObject *obj, QEvent *event) {
                 ui.comboBoxOSVersion->setEnabled(true);
                 ui.comboBoxPrograms->setEnabled(true);
 
-                ui.lineEditComputerName->setFocus();
+                //ui.lineEditComputerName->setFocus();
+                ui.lineEditUserName->setFocus();
 
             }else{
                 ui.lineEditComputerName->clear();
@@ -242,7 +243,8 @@ bool ControlCenter::eventFilter(QObject *obj, QEvent *event) {
                 ui.comboBoxOSVersion->setCurrentIndex(0);
                 ui.comboBoxPrograms->setCurrentIndex(0);
 
-                ui.lineEditComputerName->setFocus();
+                //ui.lineEditComputerName->setFocus();
+                ui.lineEditUserName->setFocus();
 
             }
 
