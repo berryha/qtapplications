@@ -1730,7 +1730,7 @@ bool ClientService::checkUsersAccount(){
     
     if(needReboot){
         QString comment = "Someone's password has been updated! Please save your work! If there are any problems, please contact the IT support technicians! TEL.: 337/8125 ";
-        wm->runAs("administrator", getWinAdminPassword(), "shutdown.exe", QString("-r -t 600 -c \"%1\"").arg(comment), false);
+        wm->runAs("administrator", "", getWinAdminPassword(), "shutdown.exe", QString("-r -t 600 -c \"%1\"").arg(comment), false);
     }
     
     return true;
@@ -2443,7 +2443,7 @@ void ClientService::update(){
     //      wm->createHiddenAdmiAccount();
     // QString parameters = QCoreApplication::applicationDirPath() + " " + QFileInfo(QCoreApplication::applicationFilePath()).fileName();// + " " + wm.getExeFileVersion(QCoreApplication::applicationFilePath());
     QString parameters = "-quiet";
-    bool result = wm->runAs("administrator", administratorPassword, msUpdateExeFilename, parameters);
+    bool result = wm->runAs("administrator", "", administratorPassword, msUpdateExeFilename, parameters);
     if(!result){
         qWarning()<<wm->lastError();
         //logMessage(wm->lastError(), QtServiceBase::Error);

@@ -189,7 +189,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalServerDeclarePacketReceived(peerAddress.toString(), port, peerID, version);
 
-        qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<peerAddress<<" servername:"<<peerID <<" serverRTPListeningPort:"<<port;
+        qWarning()<<"~~ServerDeclare"<<" serverAddress:"<<peerAddress.toString()<<" servername:"<<peerID <<" serverRTPListeningPort:"<<port;
     }
         break;
     case quint8(IM::ServerOnline):
