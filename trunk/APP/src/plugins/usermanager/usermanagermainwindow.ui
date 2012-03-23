@@ -333,6 +333,14 @@
     <string>Auto Logon</string>
    </property>
   </action>
+  <action name="actionCreateEmailAccount">
+   <property name="text">
+    <string>Create Email Account</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Email Account</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>userIDComboBox</tabstop>

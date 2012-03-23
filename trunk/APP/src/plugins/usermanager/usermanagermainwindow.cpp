@@ -51,9 +51,6 @@
 #include "settingsdialog/settingsdialog.h"
 #endif
 
-//#include "../../shared/core/global_core.h"
-//#include "../../shared/core/utilities.h"
-//#include "../../shared/gui/databaseconnecter/databaseconnecter.h"
 
 #include "HHSharedCore/hglobal_core.h"
 #include "HHSharedCore/hutilities.h"
@@ -796,6 +793,9 @@ void UserManagerMainWindow::slotShowUserInfo(const QModelIndex &index) {
     ui.userPSWDLineEdit->setText(list.at(3));
 
     emails = list.at(4) + "," + list.at(5);
+    if(emails.contains("@")){
+        ui.actionCreateEmailAccount->setEnabled(true);
+    }
 
     if(ui.userIDComboBox->isEnabled()){
         ui.userIDComboBox->setEnabled(false);
@@ -876,6 +876,62 @@ void UserManagerMainWindow::slotModifyUserInfo(){
     
 }
 
+void UserManagerMainWindow::slotCreateEmailAccounts(){
+
+    int rep = QMessageBox::question(this, tr("Question"),
+                                    tr("<b><font color=red>Your account settings may be overwritten!</font></b><br> "
+                                        "Do you want to use this email account?"),
+                                    QMessageBox::Yes|QMessageBox::No, QMessageBox::No
+                                    );
+    if(rep == QMessageBox::No){
+        return;
+    }
+
+    QString emailAccount = emails.section("@", 0, 0);
+    bool intMail = false, extMail = false;
+    if(emails.contains("sitoydg.com", Qt::CaseInsensitive)){
+        intMail = true;
+    }
+    if(emails.contains("sitoy.com", Qt::CaseInsensitive)){
+        extMail = true;
+    }
+
+
+    QString outlookInstalledPathString = wm->outlookInstalledPath();
+    if(QFileInfo(outlookInstalledPathString).exists()){
+        if(intMail){wm->addOutlookMailAccount("", "", true, "", emailAccount);}
+        if(extMail){wm->addOutlookMailAccount("", "", false, "", emailAccount);}
+    }else{
+        QString storeRoot;
+        if(wm->getDiskFreeSpace("G:\\")/(1024*1024*1024) > 5){
+            storeRoot = "G:\\Email";
+        }else if(wm->getDiskFreeSpace("F:\\")/(1024*1024*1024) >= 5){
+            storeRoot = "F:\\Email";
+        }else if(wm->getDiskFreeSpace("E:\\")/(1024*1024*1024) >= 5){
+            storeRoot = "E:\\Email";
+        }else if(wm->getDiskFreeSpace("D:\\")/(1024*1024*1024) >= 5){
+            storeRoot = "D:\\Email";
+        }else{
+            storeRoot = "C:\\Email";
+        }
+
+        CreateDirectoryW(storeRoot.toStdWString().c_str(), NULL);
+
+        QString userName = wm->getUserNameOfCurrentThread();
+        if(wm->isNT6OS()){
+            if(intMail){wm->addLiveMailAccount(userName, "", true, storeRoot, emailAccount);}
+            if(extMail){wm->addLiveMailAccount(userName, "", false, storeRoot, emailAccount);}
+        }else{
+            if(intMail){wm->addOEMailAccount(userName, "", true, storeRoot, emailAccount);}
+            if(extMail){wm->addOEMailAccount(userName, "", false, storeRoot, emailAccount);}
+        }
+
+    }
+
+    QMessageBox::information(this, tr("Done"), tr("%1<br>Please check the settings!").arg(wm->lastError()));
+
+}
+
 void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
 
     QTableView *tableView = qobject_cast<QTableView*> (sender());
@@ -890,6 +946,7 @@ void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
     menu.addAction(ui.actionExport);
     menu.addSeparator();
     menu.addAction(ui.actionEdit);
+    menu.addAction(ui.actionCreateEmailAccount);
 
 #ifdef Q_OS_WIN32
     menu.addAction(ui.actionAutoLogon);
