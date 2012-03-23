@@ -44,12 +44,6 @@
 #include "ui_usermanagermainwindow.h"
 
 
-//#include "../../shared/core/user.h"
-//#include "../../shared/core/mysharedlib_global.h"
-//#include "../../shared/gui/progress/progressdlg.h"
-//#include "../../shared/windowsmanagement/windowsmanagement.h"
-
-
 #include "HHSharedCore/huser.h"
 #include "HHSharedCore/hmysharedlib_global.h"
 #include "HHSharedGUI/hprogressdlg.h"
@@ -95,10 +89,12 @@ private slots:
     void on_actionExport_triggered(){slotExportQueryResult();}
     void on_actionPrint_triggered(){slotPrintQueryResult();}
     void on_actionEdit_triggered(){slotModifyUserInfo();}
+    void on_actionCreateEmailAccount_triggered(){slotCreateEmailAccounts();}
     void on_actionAutoLogon_triggered();//{setAutoLogon(true);}
     void slotExportQueryResult();
     void slotPrintQueryResult();
     void slotModifyUserInfo();
+    void slotCreateEmailAccounts();
     void slotShowCustomContextMenu(const QPoint & pos);
     void updateActions();
 
