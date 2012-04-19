@@ -44,13 +44,13 @@ public:
     CommunicationMode getCommunicationMode() const;
 
 
-    UDPServer * getIPMCServer(){return m_ipmcServer;}
+    UDPServer * getIPMCServer(){return this->m_ipmcServer;}
     UDPServer * startIPMCServer(const QHostAddress &ipmcGroupAddress = QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16 ipmcGroupPort = quint16(IM_SERVER_IPMC_LISTENING_PORT), QString *errorMessage = 0);
 
-    UDPServer * getUDPServer(){return m_udpServer;}
+    UDPServer * getUDPServer(){return this->m_udpServer;}
     UDPServer * startUDPServer(const QHostAddress &address = QHostAddress::Any, quint16 port = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
-    RTP * getRTP(){return m_rtp;}
+    RTP * getRTP();
     RTP * startRTP(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
     FileManager *getFileManager();

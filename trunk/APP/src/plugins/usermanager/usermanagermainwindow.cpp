@@ -878,6 +878,8 @@ void UserManagerMainWindow::slotModifyUserInfo(){
 
 void UserManagerMainWindow::slotCreateEmailAccounts(){
 
+#ifdef Q_OS_WIN32
+
     int rep = QMessageBox::question(this, tr("Question"),
                                     tr("<b><font color=red>Your account settings may be overwritten!</font></b><br> "
                                         "Do you want to use this email account?"),
@@ -930,6 +932,10 @@ void UserManagerMainWindow::slotCreateEmailAccounts(){
 
     QMessageBox::information(this, tr("Done"), tr("%1<br>Please check the settings!").arg(wm->lastError()));
 
+
+#endif
+
+
 }
 
 void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
@@ -946,9 +952,9 @@ void UserManagerMainWindow::slotShowCustomContextMenu(const QPoint & pos){
     menu.addAction(ui.actionExport);
     menu.addSeparator();
     menu.addAction(ui.actionEdit);
-    menu.addAction(ui.actionCreateEmailAccount);
 
 #ifdef Q_OS_WIN32
+    menu.addAction(ui.actionCreateEmailAccount);
     menu.addAction(ui.actionAutoLogon);
 #endif
 
