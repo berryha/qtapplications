@@ -64,7 +64,7 @@ void Announcement::on_pushButtonSend_clicked(){
     quint32 announcementID = ui.lineEditAnnouncementID->text().toUInt();
     
     if(targetTypeIndex != 2){
-        QModelIndexList selectedIndexes = m_tableView->selectionModel()->selectedIndexes();
+        QModelIndexList selectedIndexes = m_tableView->selectionModel()->selectedRows();
         
         int selectedIndexesCount = selectedIndexes.count();
         
