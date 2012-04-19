@@ -536,13 +536,17 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
         delete contactsModel;
         return;
     }
+
+    while (model->canFetchMore()) {
+        model->fetchMore();
+    }
+
     
     for (int i=0; i<model->rowCount(); i++) {
         int groupID = QVariant(model->record(i).value("GroupID")).toInt();
         if(contactGroupHash.contains(groupID)){continue;}
         QString groupName = QVariant(model->record(i).value("GroupName")).toString();
         QList<Contact*> list;
-        
         QString contactsQueryString = QString("select * from contacts_detailed_info where ContactGroupID=%1") .arg(groupID);
         
         contactsModel->setQuery(queryDatabase(contactsQueryString, true));
@@ -551,6 +555,10 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
             delete model;
             delete contactsModel;
             return;
+        }
+
+        while (contactsModel->canFetchMore()) {
+            contactsModel->fetchMore();
         }
         
         for (int j=0; j<contactsModel->rowCount(); j++) {
@@ -589,16 +597,16 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
             contact->setRegistrationTime(QVariant(contactsModel->record(j).value("RegistrationTime")).toDateTime());
             contact->setLoginTimes(QVariant(contactsModel->record(j).value("LoginTimes")).toInt());
 
-
             contact->setContactGroupID(groupID);
             contactHash.insert(contactUID, contact);
             list.append(contact);
             qApp->processEvents();
+
         }
         
         ContactGroup *group = new ContactGroup(groupID, groupName, list, this);
         contactGroupHash.insert(groupID, group);
-        
+
         slotLoadContacts(expandListView, groupID, groupName, list);
 
     }
@@ -606,7 +614,7 @@ void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
     
     contactsModel->deleteLater();
     model->deleteLater();
-    
+
 
 }
 
@@ -777,7 +785,7 @@ void ContactsManager::renameGroupToUI(ExpandListView *expandListView, const QStr
 
 
 void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
-    //    qDebug()<<"ContactsManager::slotLoadContacts(...)";
+        qDebug()<<"------------------------------------------------ContactsManager::slotLoadContacts(...)";
 
     //	Category *category = new Category();
     //	category->setID(QString::number(groupID));

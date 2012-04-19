@@ -69,7 +69,7 @@ Contact::~Contact() {
 
 QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     
-    qDebug()<<"--Contact::databaseColumnName(...)";
+//    qDebug()<<"--Contact::databaseColumnName(...)";
     
     QString columnName = "";
     switch(propertyID){

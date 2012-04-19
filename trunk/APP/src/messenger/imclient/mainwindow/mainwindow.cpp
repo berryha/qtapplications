@@ -51,9 +51,15 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     //resize(QSize(0,0));
     //showMinimized();
 
+
+//    expandListViewManager = 0;
+//    friendsListView = 0;
+
     //初始化UI
     //Init the UI
     initUI();
+
+
 
     //创建托盘图标
     //Create the system tray
@@ -72,8 +78,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     imUser = IMUser::instance();
     stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
 
-    expandListViewManager = 0;
-    friendsListView = 0;
+
 
     contactsManager = ContactsManager::instance();
 
@@ -233,7 +238,6 @@ void MainWindow::initUI(){
     menuBar()->insertMenu(ui.menuHelp->menuAction(), pluginsMenu);
 
 
-
     connect(ui.actionBugReport, SIGNAL(triggered()), this, SLOT(slotBugReport()));
 
     connect(ui.actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -254,8 +258,26 @@ void MainWindow::initUI(){
     //Process the signal from 'ui.loginPage'
     connect(ui.loginPage, SIGNAL(signalUserVerified()), this, SLOT(slotUserVerified()));
 
-
     //changeStyle(Settings::instance()->getStyle());
+
+
+    //
+    //if(!expandListViewManager){
+        expandListViewManager = new ExpandListViewManager(this);
+        //TODO
+        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
+        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
+        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
+        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
+    //}
+    //if(!friendsListView){
+        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
+        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
+    //}
+
+
+
+
 }
 
 void MainWindow::checkNetwork(){
@@ -291,7 +313,7 @@ void MainWindow::startNetwork(){
     if(!errorMessage.isEmpty()){
         QMessageBox::critical(this, tr("Error"), errorMessage);
     }
-    //connect(m_rtp, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(peerConnected(int, const QString &, quint16));
+    //connect(m_rtp, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(peerConnected(int, const QString &, quint16)));
     connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
 
 
@@ -1012,18 +1034,18 @@ void MainWindow::savePreferedLanguage(const QString &preferedLanguage){
 void MainWindow::slotUpdateContactsInfo(){
     qDebug()<<"----MainWindow::slotUpdateContactsInfo()";
 
-    if(!expandListViewManager){
-        expandListViewManager = new ExpandListViewManager(this);
-        //TODO
-        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
-        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
-        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
-        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
-    }
-    if(!friendsListView){
-        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
-        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
-    }
+//    if(!expandListViewManager){
+//        expandListViewManager = new ExpandListViewManager(this);
+//        //TODO
+//        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
+//        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
+//        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
+//        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
+//    }
+//    if(!friendsListView){
+//        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
+//        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
+//    }
 
     //contactsManager = new ContactsManager(this);
     //if(!contactsManager){
@@ -1509,7 +1531,10 @@ void MainWindow::slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QSt
 
 void MainWindow::slotProcessLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName){
     //TODO
-    QMessageBox::information(this, tr("Redirected"), tr("Redirected"));
+    QMessageBox::information(this, tr("Redirected"), tr("Redirected to %1:%2").arg(serverAddress).arg(serverPort));
+
+    requestLogin(QHostAddress(serverAddress), serverPort);
+
 }
 
 void MainWindow::slotProcessLoginResult(quint8 errorTypeCode){
@@ -1615,6 +1640,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         int groupID = contactsManager->getPersonalContactGroupID(groupName);
         if(!groupID){
             groupID = contactsManager->slotAddNewContactGroupToDatabase(groupName);
+            contactsManager->slotAddNewContactGroupToUI(friendsListView, groupID, groupName);
         }
         QStringList members = personalContactGroupsHash.value(groupName);
         foreach (QString contactID, members) {
@@ -1624,6 +1650,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 contact = new Contact(contactID, 0);
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
                 contactsManager->slotAddNewContactToDatabase(contact);
+                contactsManager->addContactToUI(friendsListView, groupName, contactID);
             }
             contact->setContactGroupID(groupID);
             contactsManager->saveContactInfoToDatabase(contactID);
@@ -1639,7 +1666,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     
     imUser->saveMyInfoToLocalDatabase();
 
-    slotUpdateContactsInfo();
+//    slotUpdateContactsInfo();
     
 }
 
@@ -2237,6 +2264,9 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
     m_serverHostAddress = serverHostAddress;
     m_serverHostPort = serverPort;
 
+//    peerConnected(m_socketConnectedToServer, serverHostAddress.toString(), serverPort);
+
+    clientPacketsParser->requestLogin(m_socketConnectedToServer);
 
     QTimer::singleShot(10000, this, SLOT(loginTimeout()));
 

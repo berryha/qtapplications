@@ -32,8 +32,8 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     connect(m_connectToLocalServerTimer, SIGNAL(timeout()), this, SLOT(connectToLocalServer()));
     m_connectToLocalServerTimer->start(60000);
 
-//    QTimer::singleShot(5000, this, SLOT(startNetwork()));
-    startNetwork();
+    QTimer::singleShot(5000, this, SLOT(startNetwork()));
+//    startNetwork();
 
 
 

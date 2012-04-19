@@ -30,7 +30,7 @@ UDTProtocol::UDTProtocol(bool stream, const SocketOptions *options, QObject *par
 //}
 
 void UDTProtocol::streamDataReceived(UDTSOCKET socket, QByteArray *data){
-    qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
+    //qDebug()<<"--UDTProtocol::streamDataReceived(...) "<<"socket:"<<socket;
 
     convertDataToPacket(socket, data);
 
