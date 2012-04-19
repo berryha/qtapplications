@@ -132,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     m_serverHostAddress = QHostAddress::Null;
     m_serverHostPort = 0;
     //    m_loginTimer = 0;
-    m_serverConnected = false;
+    m_verified = false;
 
     m_fileManager = 0;
 
@@ -455,7 +455,7 @@ void MainWindow::stopNetwork(){
 
     PacketHandlerBase::clean();
 
-    m_serverConnected = false;
+    m_verified = false;
 
 
 }
@@ -1126,6 +1126,7 @@ void MainWindow::slotUserVerified(){
     qDebug()<<"--MainWindow::slotUserVerified()";
 
     if(ui.loginPage->getState() == LoginWidget::VERIFYING){
+        m_verified = true;
         QString userID = imUser->getUserID();
         Settings::instance()->setCurrentUser(userID);
 
@@ -2281,7 +2282,7 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
 
 void MainWindow::loginTimeout(){
 
-    if(!m_serverConnected && !m_serverHostAddress.isNull()){
+    if(!m_verified){
         ui.loginPage->slotProcessLoginResult(IM::ERROR_Timeout);
     }
 
@@ -2321,7 +2322,7 @@ void MainWindow::peerConnected(int socketID, const QString &peerAddress, quint16
     if(QHostAddress(peerAddress) == m_serverHostAddress && peerPort == m_serverHostPort){
         //clientPacketsParser->requestLogin(m_socketConnectedToServer);
         m_socketConnectedToServer = socketID;
-        m_serverConnected = true;
+
         //        if(m_loginTimer){
         //            m_loginTimer->stop();
         //            delete m_loginTimer;
@@ -2348,7 +2349,7 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
 
     if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
         //TODO
-        m_serverConnected = false;
+        m_verified = false;
         emit signalServerOnlineStateChanged(false);
         systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
 
