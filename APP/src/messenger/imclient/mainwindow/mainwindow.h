@@ -212,7 +212,7 @@ private:
 
     QHostAddress m_serverHostAddress;
     quint16 m_serverHostPort;
-    bool m_serverConnected;
+    bool m_verified;
     //    QTimer *m_loginTimer;
 
     FileManager *m_fileManager;
