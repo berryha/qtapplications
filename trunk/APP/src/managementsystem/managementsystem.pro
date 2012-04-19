@@ -2,7 +2,8 @@ TEMPLATE = subdirs
 CONFIG += ordered \
     debug_and_release
 SUBDIRS += sharedms \
-    mainapp \
+    mainapp \  
+    help \
     clientservice \
     serverservice \
     plugins

@@ -60,7 +60,7 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
         m_localComputerName = wm->getComputerName().toLower();
     }
 
-    m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
+    m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain).toLower();
     if(m_joinInfo.trimmed().isEmpty()){
         qCritical()<< tr("Failed to get join information!");
     }
@@ -302,7 +302,7 @@ bool ClientService::startMainService(){
     qWarning()<<"Check Programes!";
     checkProgrames();
 
-    setupStartupWithSafeMode(true);
+    //setupStartupWithSafeMode(true);
 
     QString section = serviceName() + "/LastCheckUpdate";
     QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
@@ -1026,9 +1026,10 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
 }
 
 void ClientService::processServerAnnouncementPacket(const QString &workgroupName, const QString &computerName, quint32 announcementID, const QString &announcement, const QString &adminName, bool mustRead){
+    //qDebug()<<"--ClientService::processServerAnnouncementPacket(..) "<<" workgroupName:"<<workgroupName<<" computerName:"<<computerName<<" announcement:"<<announcement;
 
 #ifdef Q_OS_WIN
-    
+
     if(!workgroupName.isEmpty()){
         if(workgroupName.toLower() != m_joinInfo){
             return;
@@ -1040,9 +1041,7 @@ void ClientService::processServerAnnouncementPacket(const QString &workgroupName
             return;
         }
     }
-    
     clientPacketsParser->sendAnnouncement(adminName, announcementID, announcement);
-    
     
 #endif
     
@@ -1498,12 +1497,13 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
     //    wm->modifySystemSettings();
 
-    if(!wm->isNT6OS()){
-        wm->showAdministratorAccountInLogonUI(false);
-    }
-    //    else{
-    //        wm->showAdministratorAccountInLogonUI(true);
-    //    }
+//    if(!wm->isNT6OS()){
+//        wm->showAdministratorAccountInLogonUI(false);
+//    }
+//    else{
+//        wm->showAdministratorAccountInLogonUI(true);
+//    }
+    wm->showAdministratorAccountInLogonUI(true);
 
     if(!wm->hiddenAdmiAccountExists()){
         wm->createHiddenAdmiAccount();

@@ -455,8 +455,8 @@ public slots:
     }
     
     void sendAnnouncement(const QString &adminName, quint32 announcementID, const QString &announcement){
-        //qWarning()<<"sendAnnouncement(...)";
-        //qWarning()<<"localUsersHash.size():"<<localUsersHash.size();
+        qDebug()<<"--sendAnnouncement(...)"<<" m_localUserSocketsHash.size():"<<m_localUserSocketsHash.size();
+
         foreach (int socketID, m_localUserSocketsHash.keys()) {
             sendServerAnnouncementPacket(socketID, adminName, announcementID, announcement);
         }
@@ -464,7 +464,7 @@ public slots:
     }
     
     bool sendServerAnnouncementPacket(int userSocketID, const QString &adminName, quint32 announcementID, const QString &serverAnnouncement){
-        //qWarning()<<"sendServerAnnouncementPacket(...)"<<" userAddress:"<<userAddress.toString()<<" Port:"<<userPort;
+        qDebug()<<"--sendServerAnnouncementPacket(...)"<<" userSocketID:"<<userSocketID<<" adminName:"<<adminName<<" serverAnnouncement:"<<serverAnnouncement;
         
         Packet *packet = PacketHandlerBase::getPacket(userSocketID);
         

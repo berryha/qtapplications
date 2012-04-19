@@ -18,13 +18,14 @@ HHSharedLibs += HHSharedCore \
 win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
+
+# ##
+UI_DIR = ./ui
+
 include(../../sharedms/sharedms.pri)
 INCLUDEPATH += $$UI_DIR \
                $$PWD \
                filemanagement
-
-# ##
-UI_DIR = ./ui
 
 # Input
 HEADERS += \
