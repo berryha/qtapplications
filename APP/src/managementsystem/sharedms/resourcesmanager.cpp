@@ -189,6 +189,10 @@ UDPServer * ResourcesManager::startUDPServer(const QHostAddress &address, quint1
 
 //}
 
+RTP * ResourcesManager::getRTP(){
+    return m_rtp;
+}
+
 RTP * ResourcesManager::startRTP(const QHostAddress &localAddress, quint16 localPort, bool tryOtherPort, QString *errorMessage){
 
     if(!m_rtp){

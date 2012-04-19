@@ -3,7 +3,7 @@ CONFIG += ordered \
     debug_and_release
 SUBDIRS += sharedms \
     mainapp \  
-    help \
+    #help \
     clientservice \
     serverservice \
     plugins

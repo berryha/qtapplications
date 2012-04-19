@@ -50,7 +50,7 @@ public:
 //    bool sendReliableData(int socketID, const QByteArray *byteArray);
 
 
-    RTP * getRTP(){return m_rtp;}
+    RTP * getRTP();
     RTP * startRTP(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
 

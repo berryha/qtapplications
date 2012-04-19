@@ -32,8 +32,8 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     connect(m_connectToLocalServerTimer, SIGNAL(timeout()), this, SLOT(connectToLocalServer()));
     m_connectToLocalServerTimer->start(60000);
 
-    QTimer::singleShot(5000, this, SLOT(startNetwork()));
-    //startNetwork();
+//    QTimer::singleShot(5000, this, SLOT(startNetwork()));
+    startNetwork();
 
 
 
@@ -93,9 +93,11 @@ void BulletinBoardObject::startNetwork(){
 
     if(!m_rtp){
         QString errorMessage = "";
-
         m_rtp = resourcesManager->startRTP(QHostAddress::Any, localUDTListeningPort, true, &errorMessage);
         connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+        if(!errorMessage.isEmpty()){
+            qCritical()<<errorMessage;
+        }
 
         //        m_udtProtocol = m_rtp->getUDTProtocol();
 ////        if(!m_udtProtocol){
