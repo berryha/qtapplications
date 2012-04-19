@@ -40,7 +40,7 @@ public:
     QString lastErrorString(){return m_lastErrorString;}
 
 signals:
-    void connected (int socketID, const QString &peerAddress, quint16 peerPort);
+    //void connected (int socketID, const QString &peerAddress, quint16 peerPort);
     void disconnected (int socketID/*, const QString &peerAddress, quint16 peerPort*/);
 
     

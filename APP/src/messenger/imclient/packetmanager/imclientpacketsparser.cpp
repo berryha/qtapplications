@@ -261,7 +261,13 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             QString serverAddress = "";
             quint16 serverPort = 0;
             in >> serverAddress >> serverPort;
-            emit signalLoginServerRedirected(serverAddress, serverPort, peerID);
+            if( serverPort == 0 || ((serverAddress == peerAddress.toString()) && (serverPort == peerPort)) ){
+                if(!login(socketID)){
+                   emit signalLoginResultReceived(quint8(IM::ERROR_UnKnownError));
+                }
+            }else{
+                emit signalLoginServerRedirected(serverAddress, serverPort, peerID);
+            }
         }else{
             quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
             in >> errorTypeCode;
