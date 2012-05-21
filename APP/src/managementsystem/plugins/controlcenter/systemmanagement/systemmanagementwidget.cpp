@@ -461,6 +461,16 @@ void SystemManagementWidget::on_toolButtonVerify_clicked(){
         return;
     }
 
+    m_peerIPAddress = QHostAddress(ui.lineEditIPAddress->text().trimmed());
+    if(localComputer){
+        this->m_peerIPAddress = QHostAddress::LocalHost;
+    }
+    if(m_peerIPAddress.isNull()){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid IP Address!"));
+        ui.lineEditIPAddress->setFocus();
+        return;
+    }
+
     clientResponseAdminConnectionResultPacketReceived = false;
 
     ui.toolButtonVerify->setEnabled(false);
