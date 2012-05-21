@@ -515,7 +515,7 @@ void UserManagerMainWindow::slotQueryUserButtonClicked() {
 void UserManagerMainWindow::slotQueryUser(const QString &userID, const QString &userName,
                                           const QString &userDept) {
 
-    QString queryString = QString("select userid as ID, cname as Name, cgroup as Department, cpassword as Password, mail as Email1, Mail2 as Email2, Old_Password as 'Old Password' from users where userid like '%%1%' and cname like '%%2%' and cgroup like '%%3%' ") .arg(
+    QString queryString = QString("select userid as ID, cname as Name, cgroup as Department, cpassword as Password, mail as Email1, Mail2 as Email2, Old_Password as 'Old Password', UserIDNew as 'AD ID' from users where userid like '%%1%' and cname like '%%2%' and cgroup like '%%3%' ") .arg(
                 userID) .arg(userName) .arg(userDept);
 
     //showQueryResult(queryString);
@@ -606,17 +606,17 @@ void UserManagerMainWindow::slotAddUserButtonClicked() {
     }
 
 
-    if(m_isJoinedToDomain){
-        int rep = QMessageBox::question(this, tr("Question"), tr("<b><font color=red>This computer is already joined to domain '%1' !</font></b><br> "
-                                                                 "Do you want to use this account to logon to the domain automatically?").arg(m_joinInfo),
-                                        QMessageBox::Yes|QMessageBox::No,
-                                        QMessageBox::Yes
-                                        );
-        if(rep == QMessageBox::Yes){
-            setAutoLogon(true);
-        }
-        return;
-    }
+//    if(m_isJoinedToDomain){
+//        int rep = QMessageBox::question(this, tr("Question"), tr("<b><font color=red>This computer is already joined to domain '%1' !</font></b><br> "
+//                                                                 "Do you want to use this account to logon to the domain automatically?").arg(m_joinInfo),
+//                                        QMessageBox::Yes|QMessageBox::No,
+//                                        QMessageBox::Yes
+//                                        );
+//        if(rep == QMessageBox::Yes){
+//            setAutoLogon(true);
+//        }
+//        return;
+//    }
 
     if(!wm->isAdmin()){
         QMessageBox::critical(this, tr("Error"), tr("You don't have the administrator privilege!"));

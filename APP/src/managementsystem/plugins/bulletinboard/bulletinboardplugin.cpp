@@ -44,13 +44,13 @@ namespace HEHUI {
 BulletinBoardPlugin::BulletinBoardPlugin() {
     
 
-        systemSummaryInfoWidgetList = QList<SystemSummaryInfo *> ();
-        
-        actionMain = 0;
-        //QTimer::singleShot(2000, this, SLOT(slotRun()));
-               
+    systemSummaryInfoWidgetList = QList<SystemSummaryInfo *> ();
 
-        bulletinBoardObject = new BulletinBoardObject(this);
+    actionMain = 0;
+    //QTimer::singleShot(2000, this, SLOT(slotRun()));
+
+
+    bulletinBoardObject = new BulletinBoardObject(this);
 
 }
 
@@ -59,11 +59,11 @@ BulletinBoardPlugin::~BulletinBoardPlugin() {
     //unload();
     
     
-//    delete bulletinBoardPacketsParser;
-//    bulletinBoardPacketsParser = 0;
+    //    delete bulletinBoardPacketsParser;
+    //    bulletinBoardPacketsParser = 0;
     
-//    NetworkManager::freeInstance();
-//    networkManager = 0;
+    //    NetworkManager::freeInstance();
+    //    networkManager = 0;
     
     //qWarning()<<"BulletinBoardPlugin::~BulletinBoardPlugin()";
 
@@ -71,12 +71,12 @@ BulletinBoardPlugin::~BulletinBoardPlugin() {
 
 bool BulletinBoardPlugin::isSingle(){
 
-	return true;
+    return true;
 
 }
 
 QString BulletinBoardPlugin::name () const{
-        return QString(tr("Bulletin Board"));
+    return QString(tr("Bulletin Board"));
 }
 
 QString BulletinBoardPlugin::version() const{
@@ -88,16 +88,16 @@ QString BulletinBoardPlugin::description() const{
 }
 
 QIcon BulletinBoardPlugin::icon () const{
-        return QIcon(":/icon/resources/images/bulletinboard.png");
+    return QIcon(":/icon/resources/images/bulletinboard.png");
 
 }
 
 QString BulletinBoardPlugin::whatsThis () const{
-        return QString(tr("Bulletin Board"));
+    return QString(tr("Bulletin Board"));
 }
 
 QString BulletinBoardPlugin::toolTip () const{
-        return QString(tr("Bulletin Board"));
+    return QString(tr("Bulletin Board"));
 }
 
 
@@ -105,7 +105,7 @@ void BulletinBoardPlugin::retranslateUi(){
 
 
     if(actionMain){
-        actionMain->setText(tr("System Summary Info"));    
+        actionMain->setText(tr("System Summary Info"));
     }
 }
 
@@ -113,7 +113,7 @@ void BulletinBoardPlugin::retranslateUi(){
 QAction * BulletinBoardPlugin::mainActionForMenu(){
 
     if(!actionMain){
-        actionMain = new QAction(this);        
+        actionMain = new QAction(this);
         actionMain->setIcon(QIcon(":/icon/resources/images/systemsummaryinfo.png"));
         actionMain->setText(tr("System Summary Info"));
         actionMain->setToolTip(tr("System Summary Info"));
@@ -129,28 +129,28 @@ QAction * BulletinBoardPlugin::mainActionForMenu(){
 bool BulletinBoardPlugin::unload(){
     qDebug()<<"----BulletinBoardPlugin::unload()";
     
-//    if(bulletinBoardPacketsParser){
-//        bulletinBoardPacketsParser->sendUserOfflinePacket();
-//        bulletinBoardPacketsParser->aboutToQuit();
-//    }
+    //    if(bulletinBoardPacketsParser){
+    //        bulletinBoardPacketsParser->sendUserOfflinePacket();
+    //        bulletinBoardPacketsParser->aboutToQuit();
+    //    }
     
-//    if(remoteAssistance){
-//        remoteAssistance->close();
-//        delete remoteAssistance;
-//    }
-//    remoteAssistance = 0;
+    //    if(remoteAssistance){
+    //        remoteAssistance->close();
+    //        delete remoteAssistance;
+    //    }
+    //    remoteAssistance = 0;
     
-//    if(bulletinBoardWidget){
-//        bulletinBoardWidget->close();
-//        delete bulletinBoardWidget;
-//    }
-//    remoteAssistance = 0;
+    //    if(bulletinBoardWidget){
+    //        bulletinBoardWidget->close();
+    //        delete bulletinBoardWidget;
+    //    }
+    //    remoteAssistance = 0;
     
-//    if(updatePasswordWidget){
-//        updatePasswordWidget->close();
-//        delete updatePasswordWidget;
-//    }
-//    remoteAssistance = 0;
+    //    if(updatePasswordWidget){
+    //        updatePasswordWidget->close();
+    //        delete updatePasswordWidget;
+    //    }
+    //    remoteAssistance = 0;
     
     emit signalPluginToBeUnloaded();
 
@@ -176,31 +176,31 @@ bool BulletinBoardPlugin::unload(){
 }
 
 void BulletinBoardPlugin::slotMainActionForMenuTriggered(){
-        if(isSingle() && SystemSummaryInfo::isRunning()){
-		//TODO: Activate the widget
-		return;
-	}
+    if(isSingle() && SystemSummaryInfo::isRunning()){
+        //TODO: Activate the widget
+        return;
+    }
 
-        QWidget *parentWidget = qobject_cast<QWidget *> (parent());
+    QWidget *parentWidget = qobject_cast<QWidget *> (parent());
 
 
-        SystemSummaryInfo *systemSummaryInfo = new SystemSummaryInfo(parentWidget);
-        connect(systemSummaryInfo, SIGNAL(destroyed(QObject *)), SLOT(sloSystemSummaryInfoWidgetDestoryed(QObject *)));
+    SystemSummaryInfo *systemSummaryInfo = new SystemSummaryInfo(parentWidget);
+    connect(systemSummaryInfo, SIGNAL(destroyed(QObject *)), SLOT(sloSystemSummaryInfoWidgetDestoryed(QObject *)));
 
-	if(parentWidget){
-		if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-                    QMdiSubWindow *subWindow = new QMdiSubWindow;
-                         subWindow->setWidget(systemSummaryInfo);
-                         subWindow->setAttribute(Qt::WA_DeleteOnClose);
-                         mdiArea->addSubWindow(subWindow);
-                         connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+    if(parentWidget){
+        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+            QMdiSubWindow *subWindow = new QMdiSubWindow;
+            subWindow->setWidget(systemSummaryInfo);
+            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+            mdiArea->addSubWindow(subWindow);
+            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-                        //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-		}
-	}
+            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
+        }
+    }
 
-        systemSummaryInfo->show();
-        systemSummaryInfoWidgetList.append(systemSummaryInfo);
+    systemSummaryInfo->show();
+    systemSummaryInfoWidgetList.append(systemSummaryInfo);
 }
 
 void BulletinBoardPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj){
@@ -232,24 +232,24 @@ void BulletinBoardPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj){
 //        if(!bulletinBoardPacketsParser){
 //            bulletinBoardPacketsParser = new BulletinBoardPacketsParser();        
 //        }
-        
+
 //        //connect(bulletinBoardPacketsParser, SIGNAL(signalAdminRequestRemoteAssistancePacketReceived(const QString&, quint16, const QString&)), this, SLOT(adminRequestRemoteAssistancePacketReceived(const QString&, quint16, const QString&)), Qt::QueuedConnection);
 //        //connect(bulletinBoardPacketsParser, SIGNAL(signalAdminInformUserNewPasswordPacketReceived(const QString&, quint16, const QString&, const QString&, const QString&)), this, SLOT(AdminInformUserNewPasswordPacketReceived(const QString&, quint16, const QString&, const QString&, const QString&)), Qt::QueuedConnection);
 //        connect(bulletinBoardPacketsParser, SIGNAL(signalAnnouncementPacketReceived(const QString&, const QString&)), this, SLOT(serverAnnouncementPacketReceived(const QString&, const QString&)), Qt::QueuedConnection);
-        
+
 //        connect(bulletinBoardPacketsParser, SIGNAL(signalT(const QString&)), this, SLOT(test(const QString&)));
-        
-        
-        
+
+
+
 //        //IMPORTANT For Multi-thread
 //        QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
 //        QtConcurrent::run(bulletinBoardPacketsParser, &BulletinBoardPacketsParser::run);
-        
-        
+
+
 //        bulletinBoardPacketsParser->sendUserOnlinePacket();
-        
+
 //        m_networkReady = true;
-        
+
 //        bulletinBoardPacketsParser->startHeartbeat();
 
 //        qWarning()<<QString("UDP listening on port %1!").arg(networkManager->localUDPListeningPort());
@@ -269,41 +269,41 @@ void BulletinBoardPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj){
 //    }else {
 //        remoteAssistance->requestRemoteAssistance(adminAddress, adminPort, adminName);
 //    }
-    
+
 //    remoteAssistance->show();
-    
-    
-    
-    
+
+
+
+
 //}
 
 //void BulletinBoardPlugin::AdminInformUserNewPasswordPacketReceived(const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword ){
 
 //    qWarning()<<"BulletinBoardPlugin::AdminInformUserNewPasswordPacketReceived(...)";
-    
+
 //    if(!updatePasswordWidget){
 //        updatePasswordWidget = new UpdatePasswordWidget(adminAddress, adminPort, adminName, oldPassword, newPassword);
 //        connect(updatePasswordWidget, SIGNAL(newPasswordRetreved(const QString&,quint16)), bulletinBoardPacketsParser, SLOT(sendNewPasswordRetrevedByUserPacket(const QString&,quint16)));
 //    }else {
 //        updatePasswordWidget->informNewPassword(adminAddress, adminPort, adminName, oldPassword, newPassword);
 //    }
-    
+
 //    updatePasswordWidget->show();
-    
+
 //}
 
 //void BulletinBoardPlugin::serverAnnouncementPacketReceived(const QString &adminName, const QString &announcement){
 
 //    qWarning()<<"BulletinBoardPlugin::serverAnnouncementPacketReceived(...)";
-    
+
 //    if(!bulletinBoardWidget){
 //        bulletinBoardWidget = new BulletinBoardWidget(adminName, announcement);
 //    }else{
 //        bulletinBoardWidget->showServerAnnouncement(adminName, announcement);
 //    }
-    
+
 //    bulletinBoardWidget->show();
-     
+
 //}
 
 //void BulletinBoardPlugin::test(const QString &msg){

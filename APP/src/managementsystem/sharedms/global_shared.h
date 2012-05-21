@@ -101,13 +101,13 @@
 #endif
 
 #ifndef DOMAIN_NAME
-#define DOMAIN_NAME "sitoygroup.com"
+#define DOMAIN_NAME "sitoy.group"
 #endif
 #ifndef DOMAIN_ADMIN_NAME
 #define DOMAIN_ADMIN_NAME "hehui"
 #endif
 #ifndef DOMAIN_ADMIN_PASSWORD
-#define DOMAIN_ADMIN_PASSWORD "000...~"
+#define DOMAIN_ADMIN_PASSWORD "0000....~"
 #endif
 
 

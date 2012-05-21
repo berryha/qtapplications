@@ -753,7 +753,7 @@ void ControlCenter::slotShowClientInfo(const QModelIndex &index) {
 
     QStringList networkInfoList = list.at(2).split(",").at(0).split("/");
     ui.lineEditIPAddress->setText(networkInfoList.at(0));
-    ui.lineEditMACAddress->setText(networkInfoList.at(1));
+    ui.lineEditMACAddress->setText(networkInfoList.at(1).toLower());
 
     ui.lineEditUserName->setText(list.at(3));
     ui.comboBoxOSVersion->setCurrentIndex(ui.comboBoxOSVersion->findText(list.at(4),Qt::MatchStartsWith));
