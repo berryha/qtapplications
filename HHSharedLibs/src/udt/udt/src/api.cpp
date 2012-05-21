@@ -437,7 +437,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
    CGuard::leaveCS(ls->m_AcceptLock);
 
    // acknowledge users waiting for new connections on the listening socket
-   m_EPoll.enable_read(listen, ls->m_pUDT->m_sPollID);
+   m_EPoll.update_events(listen, ls->m_pUDT->m_sPollID, UDT_EPOLL_IN, true);
 
    CTimer::triggerEvent();
 
@@ -664,7 +664,7 @@ UDTSOCKET CUDTUnited::accept(const UDTSOCKET listen, sockaddr* addr, int* addrle
             pthread_cond_wait(&(ls->m_AcceptCond), &(ls->m_AcceptLock));
 
          if (ls->m_pQueuedSockets->empty())
-            m_EPoll.disable_read(listen, ls->m_pUDT->m_sPollID);
+            m_EPoll.update_events(listen, ls->m_pUDT->m_sPollID, UDT_EPOLL_IN, false);
 
          pthread_mutex_unlock(&(ls->m_AcceptLock));
       }
@@ -697,7 +697,7 @@ UDTSOCKET CUDTUnited::accept(const UDTSOCKET listen, sockaddr* addr, int* addrle
          }
 
          if (ls->m_pQueuedSockets->empty())
-            m_EPoll.disable_read(listen, ls->m_pUDT->m_sPollID);
+            m_EPoll.update_events(listen, ls->m_pUDT->m_sPollID, UDT_EPOLL_IN, false);
       }
    #endif
 

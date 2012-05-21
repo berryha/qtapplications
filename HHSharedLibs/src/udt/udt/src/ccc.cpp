@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*****************************************************************************
 written by
-   Yunhong Gu, last updated 03/17/2011
+   Yunhong Gu, last updated 02/28/2012
 *****************************************************************************/
 
 
@@ -221,12 +221,12 @@ void CUDTCC::onACK(int32_t ack)
 
    // During Slow Start, no rate increase
    if (m_bSlowStart)
-      goto RATE_LIMIT;
+      return;
 
    if (m_bLoss)
    {
       m_bLoss = false;
-      goto RATE_LIMIT;
+      return;
    }
 
    B = (int64_t)(m_iBandwidth - 1000000.0 / m_dPktSndPeriod);
@@ -246,20 +246,6 @@ void CUDTCC::onACK(int32_t ack)
    }
 
    m_dPktSndPeriod = (m_dPktSndPeriod * m_iRCInterval) / (m_dPktSndPeriod * inc + m_iRCInterval);
-
-
-RATE_LIMIT:
-   //set maximum transfer rate
-   if ((NULL != m_pcParam) && (m_iPSize == 8))
-   {
-      int64_t maxSR = *(int64_t*)m_pcParam;
-      if (maxSR <= 0)
-         return;
-
-      double minSP = 1000000.0 / (double(maxSR) / m_iMSS);
-      if (m_dPktSndPeriod < minSP)
-         m_dPktSndPeriod = minSP;
-   }
 }
 
 void CUDTCC::onLoss(const int32_t* losslist, int)

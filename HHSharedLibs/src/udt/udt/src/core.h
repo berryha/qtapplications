@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*****************************************************************************
 written by
-   Yunhong Gu, last updated 05/07/2011
+   Yunhong Gu, last updated 02/28/2012
 *****************************************************************************/
 
 #ifndef __UDT_CORE_H__
@@ -346,6 +346,8 @@ private: // Sending related data
    uint64_t m_ullSndLastAck2Time;               // The time when last ACK2 was sent back
 
    int32_t m_iISN;                              // Initial Sequence Number
+
+   void CCUpdate();
 
 private: // Receiving related data
    CRcvBuffer* m_pRcvBuffer;                    // Receiver buffer

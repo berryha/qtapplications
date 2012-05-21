@@ -165,6 +165,9 @@ public:
    static void sleep();
 
 private:
+   uint64_t getTimeInMicroSec();
+
+private:
    uint64_t m_ullSchedTime;             // next schedulled time
 
    pthread_cond_t m_TickCond;
@@ -176,6 +179,7 @@ private:
 private:
    static uint64_t s_ullCPUFrequency;	// CPU frequency : clock cycles per microsecond
    static uint64_t readCPUFrequency();
+   static bool m_bUseMicroSecond;       // No higher resolution timer available, use gettimeofday().
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -90,14 +90,13 @@ written by
       #define UDT_API
    #endif
 #else
-   #define UDT_API
+   #define UDT_API __attribute__ ((visibility("default")))
 #endif
 
 #ifdef NO_UDT_DLL
 #undef UDT_API
 #define UDT_API
 #endif
-
 #define NO_BUSY_WAITING
 
 #ifdef WIN32
@@ -290,6 +289,7 @@ public: // Error Code
    static const int EASYNCFAIL;
    static const int EASYNCSND;
    static const int EASYNCRCV;
+   static const int ETIMEOUT;
    static const int EPEERERR;
    static const int EUNKNOWN;
 };
