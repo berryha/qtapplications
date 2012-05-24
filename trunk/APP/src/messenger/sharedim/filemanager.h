@@ -19,6 +19,9 @@ class QFile;
 class QTimerEvent;
 QT_END_NAMESPACE
 
+
+namespace HEHUI {
+
 class SHAREDIMLIB_API FileManager : public QThread
 {
     Q_OBJECT
@@ -135,8 +138,8 @@ private:
 
     int readId;
 //    bool startVerification;
-    bool quit;
-    bool wokeUp;
+    bool m_quit;
+    bool m_wokeUp;
 
     QList<WriteRequest> writeRequests;
     QList<ReadRequest> readRequests;
@@ -147,5 +150,7 @@ private:
     mutable QWaitCondition cond;
 
 };
+
+} //namespace HEHUI
 
 #endif

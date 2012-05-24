@@ -49,7 +49,6 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     networkmanager/servermanagerwindow.h \
     networkmanager/serverinfo.h \
     networkmanager/serverinfomodel.h \
-    networkmanager/clientnetworkmanager.h \
     login/loginwidget.h \
     contactsmanager/contactgroup.h \
     chatwindow/chatmessagewindow.h \
@@ -63,7 +62,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     search/addcontactdialog.h \
     chatwindow/emoticonselecter/emoticonselector.h \
     contactsmanager/interestgroup.h \
-    packetmanager/imclientpacketsparser.h
+    packetmanager/imclientpacketsparser.h \
+    networkmanager/clientresourcesmanager.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/contactchatwindow.cpp \
@@ -80,7 +80,6 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     networkmanager/servermanagerwindow.cpp \
     networkmanager/serverinfo.cpp \
     networkmanager/serverinfomodel.cpp \
-    networkmanager/clientnetworkmanager.cpp \
     login/loginwidget.cpp \
     contactsmanager/contactgroup.cpp \
     chatwindow/chatmessagewindow.cpp \
@@ -95,7 +94,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     search/addcontactdialog.cpp \
     chatwindow/emoticonselecter/emoticonselector.cpp \
     contactsmanager/interestgroup.cpp \
-    packetmanager/imclientpacketsparser.cpp
+    packetmanager/imclientpacketsparser.cpp \
+    networkmanager/clientresourcesmanager.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwindow.ui \

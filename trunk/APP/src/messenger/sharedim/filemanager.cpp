@@ -24,16 +24,16 @@
 
 
 
-
+namespace HEHUI {
 
 
 FileManager::FileManager(QObject *parent)
     : QThread(parent)
 {
-    quit = false;
+    m_quit = false;
     readId = 0;
 //    startVerification = false;
-    wokeUp = false;
+    m_wokeUp = false;
 
     //qsrand(QDateTime::currentDateTime().toTime_t());
 
@@ -42,7 +42,7 @@ FileManager::FileManager(QObject *parent)
 
 FileManager::~FileManager()
 {
-    quit = true;
+    m_quit = true;
     cond.wakeOne();
     wait();
 
@@ -73,8 +73,8 @@ int FileManager::readPiece(const QByteArray &fileMD5, int pieceIndex)
     request.id = readId++;
     readRequests << request;
 
-    if (!wokeUp) {
-        wokeUp = true;
+    if (!m_wokeUp) {
+        m_wokeUp = true;
         QMetaObject::invokeMethod(this, "wakeUp", Qt::QueuedConnection);
     }
 
@@ -93,8 +93,8 @@ void FileManager::writePiece(const QByteArray &fileMD5, int pieceIndex, const QB
     QMutexLocker locker(&mutex);
     writeRequests << request;
 
-    if (!wokeUp) {
-        wokeUp = true;
+    if (!m_wokeUp) {
+        m_wokeUp = true;
         QMetaObject::invokeMethod(this, "wakeUp", Qt::QueuedConnection);
     }
 }
@@ -220,7 +220,7 @@ void FileManager::run()
         {
             // Go to sleep if there's nothing to do.
             QMutexLocker locker(&mutex);
-            if (!quit && readRequests.isEmpty() && writeRequests.isEmpty() )
+            if (!m_quit && readRequests.isEmpty() && writeRequests.isEmpty() )
                 cond.wait(&mutex);
         }
 
@@ -251,7 +251,7 @@ void FileManager::run()
         mutex.lock();
         QList<WriteRequest> newWriteRequests = writeRequests;
         writeRequests.clear();
-        while (!quit && !newWriteRequests.isEmpty()) {
+        while (!m_quit && !newWriteRequests.isEmpty()) {
             WriteRequest request = newWriteRequests.takeFirst();
             FileMetaInfo *info = fileMetaInfoHash.value(request.fileMD5) ;
             if(!info){continue;}
@@ -269,7 +269,7 @@ void FileManager::run()
         mutex.unlock();
 //        newPendingVerificationRequests.clear();
 
-    } while (!quit);
+    } while (!m_quit);
 
     // Write pending write requests
     mutex.lock();
@@ -836,6 +836,9 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
 void FileManager::wakeUp()
 {
     QMutexLocker locker(&mutex);
-    wokeUp = false;
+    m_wokeUp = false;
     cond.wakeOne();
 }
+
+
+} //namespace HEHUI

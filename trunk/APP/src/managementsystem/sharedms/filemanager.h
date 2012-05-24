@@ -174,8 +174,8 @@ private:
 
     int readId;
 //    bool startVerification;
-    bool quit;
-    bool wokeUp;
+    bool m_quit;
+    bool m_wokeUp;
 
     QList<WriteRequest> writeRequests;
     QList<ReadRequest> readRequests;

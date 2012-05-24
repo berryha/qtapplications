@@ -68,14 +68,11 @@ ResourcesManager::~ResourcesManager() {
         m_rtp = 0;
     }
 
-
     if(m_fileManager){
         m_fileManager->exit();
         delete m_fileManager;
         m_fileManager = 0;
     }
-
-
 
 }
 
@@ -228,10 +225,11 @@ RTP * ResourcesManager::startRTP(const QHostAddress &localAddress, quint16 local
 }
 
 FileManager * ResourcesManager::getFileManager(){
+
     if(!m_fileManager){
         m_fileManager = new FileManager(this);
-        m_fileManager->start(QThread::LowestPriority);
     }
+    m_fileManager->start(QThread::LowestPriority);
 
     return m_fileManager;
 
