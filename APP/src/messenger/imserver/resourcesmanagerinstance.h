@@ -5,8 +5,8 @@
  *      Author: 贺辉
  */
 
-#ifndef RESOURCEMANAGERINSTANCE_H_
-#define RESOURCEMANAGERINSTANCE_H_
+#ifndef SERVERRESOURCEMANAGERINSTANCE_H_
+#define SERVERRESOURCEMANAGERINSTANCE_H_
 
 #include <QObject>
 
@@ -49,4 +49,4 @@ private:
 
 } //namespace HEHUI
 
-#endif /* NETWORKMANAGERINSTANCE_H_ */
+#endif /* SERVERRESOURCEMANAGERINSTANCE_H_ */

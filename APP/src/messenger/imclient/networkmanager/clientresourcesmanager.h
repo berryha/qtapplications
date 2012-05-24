@@ -5,8 +5,8 @@
  *      Author: 贺辉
  */
 
-#ifndef CLIENTNETWORKMANAGER_H_
-#define CLIENTNETWORKMANAGER_H_
+#ifndef CLIENTRESOURCEMANAGER_H_
+#define CLIENTRESOURCEMANAGER_H_
 
 #include <QObject>
 
@@ -50,4 +50,4 @@ private:
 
 } //namespace HEHUI
 
-#endif /* CLIENTNETWORKMANAGER_H_ */
+#endif /* CLIENTRESOURCEMANAGER_H_ */

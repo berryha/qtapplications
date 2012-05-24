@@ -11,7 +11,7 @@
 #include <QNetworkInterface>
 #include <QHostAddress>
 
-#include "clientnetworkmanager.h"
+#include "clientresourcesmanager.h"
 #include "../contactsmanager/contactsmanager.h"
 
 //#include "../../shared/core/user.h"
