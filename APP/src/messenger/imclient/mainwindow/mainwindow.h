@@ -9,7 +9,7 @@
 #include "../ui/ui_mainwindow.h"
 #include "contactsmanager/contactsmanager.h"
 #include "../chatwindow/chatwindowmanager.h"
-#include "../networkmanager/clientnetworkmanager.h"
+#include "../networkmanager/clientresourcesmanager.h"
 #include "../packetmanager/imclientpacketsparser.h"
 #include "../search/search.h"
 

@@ -37,7 +37,7 @@
 #include <QtGui/QWidget>
 #include "ui_servermanagerwindow.h"
 
-#include "clientnetworkmanager.h"
+#include "clientresourcesmanager.h"
 #include "serverinfo.h"
 #include "serverinfomodel.h"
 //#include "../packetmanager/clientpacketsparser.h"
