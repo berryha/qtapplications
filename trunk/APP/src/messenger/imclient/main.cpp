@@ -4,11 +4,10 @@
 #include <QSplashScreen>
 #include <iostream>
 
-
-#include "login/login.h"
 #include "./mainwindow/mainwindow.h"
-#include "./networkmanager/clientnetworkmanager.h"
 
+//#include "login/login.h"
+//#include "./networkmanager/clientresourcesmanager.h"
 
 #include "HHSharedCore/hlogdebug.h"
 

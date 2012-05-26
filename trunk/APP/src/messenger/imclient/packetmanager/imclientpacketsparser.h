@@ -39,7 +39,7 @@
 
 
 #include "../sharedim/constants_global_shared.h"
-#include "../networkmanager/clientnetworkmanager.h"
+#include "../networkmanager/clientresourcesmanager.h"
 #include "imuser.h"
 
 

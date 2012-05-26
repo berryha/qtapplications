@@ -1792,18 +1792,18 @@ void ClientService::checkUSBSD(){
 
     bool usbsdEnabled = settings->value("USBSD", 0).toBool();
     if(usbsdEnabled){
-        QStringList storedUsers = settings->value("USBSDUsers").toStringList();
-        QStringList createdUsers = wm->localCreatedUsers();
-        if(storedUsers.size() == createdUsers.size()){
-            foreach(QString user, createdUsers){
-                if(!storedUsers.contains(user, Qt::CaseInsensitive)){
-                    disableUSBSD();
-                    break;
-                }
-            }
-        }else{
-            disableUSBSD();
-        }
+//        QStringList storedUsers = settings->value("USBSDUsers").toStringList();
+//        QStringList createdUsers = wm->localCreatedUsers();
+//        if(storedUsers.size() == createdUsers.size()){
+//            foreach(QString user, createdUsers){
+//                if(!storedUsers.contains(user, Qt::CaseInsensitive)){
+//                    disableUSBSD();
+//                    break;
+//                }
+//            }
+//        }else{
+//            disableUSBSD();
+//        }
 
 
     }else{
