@@ -3227,9 +3227,23 @@ bool WindowsManagement::setupUSBSD(bool enable){
     if(enable){
         ret1 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS");
         ret2 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"3");
+
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"3");
+
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"3");
+
     }else{
         ret1 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS-");
         ret2 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"4");
+
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS-");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"4");
+
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS-");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"4");
+
     }
 
     if(!ret1 || !ret2){
