@@ -951,7 +951,9 @@ void CUDT::close()
    if (m_bConnected)
       m_pSndQueue->m_pSndUList->remove(this);
 
-   // remove itself from all epoll monitoring
+   // trigger any pending IO events.
+   s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_ERR, true);
+   // then remove itself from all epoll monitoring
    try
    {
       for (set<int>::iterator i = m_sPollID.begin(); i != m_sPollID.end(); ++ i)

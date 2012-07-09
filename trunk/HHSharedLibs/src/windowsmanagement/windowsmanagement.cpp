@@ -2823,10 +2823,13 @@ void WindowsManagement::modifySystemSettings(){
 
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\seclogon", L"Start", L"REG_DWORD", L"2");
 
+    //Disable Firewall
     if(isNT6OS()){
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\SharedAccess\\Parameters\\FirewallPolicy\\FirewallRules", L"RemoteDesktop-In-TCP", L"REG_SZ", L"v2.10|Action=Allow|Active=TRUE|Dir=In|Protocol=6|LPort=3389|App=System|Name=@FirewallAPI.dll,-28753|Desc=@FirewallAPI.dll,-28756|EmbedCtxt=@FirewallAPI.dll,-28752|");
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile", L"EnableFirewall", L"REG_DWORD", L"0");
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile", L"EnableFirewall", L"REG_DWORD", L"0");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile", L"EnableFirewall", L"REG_DWORD", L"0");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\MpsSvc", L"Start", L"REG_DWORD", L"4");
 
     }else{
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile", L"EnableFirewall", L"REG_DWORD", L"0");
@@ -2856,7 +2859,7 @@ void WindowsManagement::modifySystemSettings(){
     }
 
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\tvnserver", L"Start", L"REG_DWORD", L"2");
-    AU3_RegDeleteVal(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", L"tvncontrol");
+    //AU3_RegDeleteVal(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", L"tvncontrol");
     
     //Disable AVG IDS Agent
     AU3_RegDeleteKey(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\AVGIDSAgent");
