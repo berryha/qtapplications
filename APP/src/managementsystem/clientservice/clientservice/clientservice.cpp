@@ -297,7 +297,7 @@ bool ClientService::startMainService(){
     checkUsersAccount();
 
     qWarning()<<"Check USB SD!";
-    checkUSBSD();
+    //checkUSBSD();
 
     qWarning()<<"Check Programes!";
     checkProgrames();
