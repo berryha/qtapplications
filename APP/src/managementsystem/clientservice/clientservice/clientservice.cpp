@@ -460,7 +460,9 @@ void ClientService::processServerRequestClientInfoPacket(const QString &groupNam
     }
 
     if(!userName.isEmpty()){
-        if(!wm->localUsers().contains(userName, Qt::CaseInsensitive)){
+        QStringList users = wm->localUsers();
+        wm->getAllUsersLoggedOn(&users);
+        if(!users.contains(userName, Qt::CaseInsensitive)){
             return;
         }
     }
@@ -1337,14 +1339,11 @@ void ClientService::uploadClientSummaryInfo(int socketID){
     //WindowsManagement wm;
     //QString computerName = localComputerName;
 
-    QStringList users = wm->localUsers();
-    users.removeAll("system$");
-    users.removeAll("administrator");
-    users.removeAll("guest");
-    users.removeAll("helpassistant");
-    users.removeAll("support_388945a0");
-    users.removeAll("aspnet");
-    users.removeAll("homegroupuser$");
+    QStringList users = wm->localCreatedUsers();
+    wm->getAllUsersLoggedOn(&users);
+    users.removeDuplicates();
+    users.removeAll(wm->getComputerName() + "$");
+
     QString usersInfo = users.join(",");
 
     QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();
@@ -1402,14 +1401,11 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
     //WindowsManagement wm;
     //QString computerName = m_localComputerName;
 
-    QStringList users = wm->localUsers();
-    users.removeAll("system$");
-    users.removeAll("administrator");
-    users.removeAll("guest");
-    users.removeAll("helpassistant");
-    users.removeAll("support_388945a0");
-    users.removeAll("aspnet");
-    users.removeAll("homegroupuser$");
+    QStringList users = wm->localCreatedUsers();
+    wm->getAllUsersLoggedOn(&users);
+    users.removeDuplicates();
+    users.removeAll(wm->getComputerName() + "$");
+
     QString usersInfo = users.join(",");
 
     QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();

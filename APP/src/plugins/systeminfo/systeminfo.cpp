@@ -90,6 +90,7 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     foreach (QString key, departments.keys()) {
         ui.comboBoxDepartment->addItem(departments.value(key), key);
     }
+    ui.comboBoxDepartment->setCurrentIndex(-1);
     for(int i=0; i<ui.comboBoxDepartment->count(); i++){
         if(ui.comboBoxDepartment->itemData(i) == department){
             ui.comboBoxDepartment->setCurrentIndex(i);
@@ -1324,7 +1325,7 @@ void SystemInfo::getNewComputerName(){
     QString newName = location + dept + sn;
     ui.lineEditComputerName->setText(newName.toUpper());
 
-    ui.pushButtonRenameComputer->setEnabled((newName.size() == 9) && (m_computerName != newName));
+    ui.pushButtonRenameComputer->setEnabled((!dept.trimmed().isNull()) && (newName.size() == 9) && (m_computerName != newName));
 
 }
 

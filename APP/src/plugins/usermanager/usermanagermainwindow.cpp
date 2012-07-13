@@ -985,6 +985,8 @@ void UserManagerMainWindow::updateActions() {
     ui.actionPrint->setEnabled(enableExp);
 
 #ifdef Q_OS_WIN32
+    ui.actionCreateEmailAccount->setEnabled(enableExp);
+
     ui.actionAutoLogon->setEnabled(enableExp);
     if(!m_isJoinedToDomain){
         ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;

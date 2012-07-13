@@ -170,6 +170,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonRenameComputer">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Rename Computer</string>
          </property>
