@@ -806,8 +806,9 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     }
 
 
-#endif
+#else
     qWarning()<<"This function works on M$ Windows only!";
+#endif
 
 }
 
@@ -854,9 +855,10 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
     uploadClientSummaryInfo(m_socketConnectedToAdmin);
 
 
+#else
+    qWarning()<<"This function works on M$ Windows only!";
 #endif
 
-    qWarning()<<"This function works on M$ Windows only!";
 
 }
 

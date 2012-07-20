@@ -496,9 +496,10 @@ void UserManagerMainWindow::setAutoLogon(bool autoLogon){
     }
 
 
+#else
+    qWarning()<<"This function works on M$ Windows only!";
 #endif
 
-    qWarning()<<"This function works on M$ Windows only!";
 
 }
 
