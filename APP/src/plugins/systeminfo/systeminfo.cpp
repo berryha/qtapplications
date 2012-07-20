@@ -1411,9 +1411,10 @@ void SystemInfo::setComputerName(const QString &newName){
 
 
 
+#else
+    qWarning()<<"This function works on M$ Windows only!";
 #endif
 
-    qWarning()<<"This function works on M$ Windows only!";
 
 }
 

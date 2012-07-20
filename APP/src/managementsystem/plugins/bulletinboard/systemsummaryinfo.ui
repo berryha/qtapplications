@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>304</height>
+    <width>572</width>
+    <height>310</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,12 +20,21 @@
    <string>System Summary Information</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QGridLayout" name="gridLayout_3">
-    <property name="sizeConstraint">
-     <enum>QLayout::SetFixedSize</enum>
-    </property>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="title">
        <string>OS</string>
       </property>
@@ -103,6 +112,12 @@
     </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBox_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="title">
        <string>Network</string>
       </property>
@@ -275,8 +290,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>576</width>
-     <height>17</height>
+     <width>572</width>
+     <height>23</height>
     </rect>
    </property>
   </widget>
