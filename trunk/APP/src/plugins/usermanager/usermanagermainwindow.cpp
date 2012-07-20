@@ -549,9 +549,18 @@ void UserManagerMainWindow::querySitoyUsersInfo(const QString &queryString){
 
     model->setQuery(QSqlQuery(queryString, db));
 
-    if (model->lastError().type() != QSqlError::NoError) {
+    QSqlError error = model->lastError();
+    if (error.type() != QSqlError::NoError) {
+        QApplication::restoreOverrideCursor();
+        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(error.text()));
 
-        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(model->lastError().text()));
+        //重新连接MSSQL数据库
+        if(error.number() == 11){
+            db.close();
+            QSqlDatabase::removeDatabase(databaseConnectionName);
+            return;
+        }
+
     }
 
 
@@ -579,8 +588,7 @@ void UserManagerMainWindow::modifyUsersInfo(const QString &userID, const QString
 
     if (model->lastError().type() != QSqlError::NoError) {
 
-        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(
-                                  model->lastError().text()));
+        QMessageBox::critical(this, tr("Fatal Error"), tr("%1") .arg(model->lastError().text()));
 
     }
     
