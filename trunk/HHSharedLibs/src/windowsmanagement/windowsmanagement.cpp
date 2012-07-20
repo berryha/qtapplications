@@ -1808,7 +1808,7 @@ bool WindowsManagement::joinWorkgroup(const QString &workgroup){
 }
 
 bool WindowsManagement::joinDomain(const QString &domainName, const QString &accountName, const QString &password, const QString &serverName){
-    qWarning()<<"--WindowsManagement::joinDomain(...) "<<"domainName:"<<domainName<<" accountName:"<<accountName<<" password:"<<password;
+    qDebug()<<"--WindowsManagement::joinDomain(...) "<<"domainName:"<<domainName<<" accountName:"<<accountName<<" password:"<<password;
 
     m_lastErrorString = "";
 
