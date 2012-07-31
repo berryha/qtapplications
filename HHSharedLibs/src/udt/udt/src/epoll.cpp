@@ -151,6 +151,7 @@ int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 
    p->second.m_sUDTSocksIn.erase(u);
    p->second.m_sUDTSocksOut.erase(u);
+   p->second.m_sUDTSocksEx.erase(u);
 
    return 0;
 }
