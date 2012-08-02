@@ -182,7 +182,7 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
         freeaddrinfo(localAddressInfo);
 
         //TODO:Close the socket
-        //UDT::close(serverSocket);
+        UDT::close(serverSocket);
         serverSocket = UDT::INVALID_SOCK;
         return UDT::INVALID_SOCK;
     }
@@ -196,12 +196,23 @@ UDTSOCKET UDTProtocolBase::listen(quint16 port, const QHostAddress &localAddress
         //cout << "listen: " << UDT::getlasterror().getErrorMessage() << endl;
 
         //TODO:Close the socket
-        //UDT::close(serverSocket);
+        UDT::close(serverSocket);
         serverSocket = UDT::INVALID_SOCK;
         return UDT::INVALID_SOCK;
     }
 
     epollID = UDT::epoll_create();
+    if(epollID < 0){
+        m_errorMessage = tr("Failed to start listening! ") + UDT::getlasterror().getErrorMessage();
+        qDebug()<<m_errorMessage;
+        //cout << "UDT::epoll_create: " << UDT::getlasterror().getErrorMessage() << endl;
+
+        epollID = 0;
+        //TODO:Close the socket
+        UDT::close(serverSocket);
+        serverSocket = UDT::INVALID_SOCK;
+        return UDT::INVALID_SOCK;
+    }
     //UDT::epoll_add_usock(epollID, serverSocket);
 
 
@@ -427,7 +438,7 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
         freeaddrinfo(peer);
 
         //TODO:Close the socket
-        //UDT::close(client);
+        UDT::close(client);
         return UDT::INVALID_SOCK;
     }
     freeaddrinfo(local);
@@ -475,14 +486,17 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 }
 
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
-    qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket;
+    qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
+
+    UDT::epoll_remove_usock(epollID, socket);
 
     if( (UDT::INVALID_SOCK == socket) || (UDT::getsockstate(socket) == NONEXIST) ){
+        qDebug()<<"INVALID_SOCK";
+
         return;
     }
 
     UDT::close(socket);
-    UDT::epoll_remove_usock(epollID, socket);
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
     recycleCachedData(data);
@@ -689,7 +703,7 @@ void UDTProtocolBase::waitForReading(int msecTimeout){
 
         count = UDT::epoll_wait(epollID, &readfds, NULL, msecTimeout);
         if(count > 0){
-            qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set").arg(count).arg(readfds.size());
+            //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set").arg(count).arg(readfds.size());
             //printf("epoll returned %d sockets ready to IO | %d in read set\n", count, readfds.size());
 
             for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
@@ -942,7 +956,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         UDT::epoll_remove_usock(epollID, socket);
 
         emit disconnected(socket);
-        qDebug()<<"BROKEN";
+        qDebug()<<"socket:"<<socket<<" BROKEN";
     }
         break;
     case CLOSING: //7
@@ -953,10 +967,13 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
     case CLOSED: //8
     {
 
-        //UDT::close(socket);
+        UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
+        qDebug()<<"----------1----------"<<" socketID:"<<socket<<" Time:"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
         emit disconnected(socket);
-        qDebug()<<"CLOSED";
+        qDebug()<<"----------2----------"<<" socketID:"<<socket<<" Time:"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
+
+        qDebug()<<"socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
     }
         break;
     case NONEXIST: //9
@@ -964,7 +981,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         //UDT::close(socket);
 
         UDT::epoll_remove_usock(epollID, socket);
-        qDebug()<<"NONEXIST";
+        qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
     }
         break;
     default:
