@@ -58,7 +58,7 @@ public:
 
 
 private:
-    UDTProtocolForFileTransmission * getUDTProtocolForFileTransmission();
+//    UDTProtocolForFileTransmission * getUDTProtocolForFileTransmission();
 
 
 private:
@@ -72,7 +72,7 @@ private:
 
     FileManager *m_fileManager;
 
-    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
+//    UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
     
 
 };
