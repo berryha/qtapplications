@@ -34,7 +34,7 @@ ResourcesManager::ResourcesManager(QObject *parent)
 
     m_fileManager = 0;
 
-    m_udtProtocolForFileTransmission = 0;
+//    m_udtProtocolForFileTransmission = 0;
 
 
     //注册自定义类型，必须重载“<<”和“>>”, 见"packetstreamoperator.h"
@@ -214,18 +214,18 @@ FileManager * ResourcesManager::getFileManager(){
 
 }
 
-UDTProtocolForFileTransmission * ResourcesManager::getUDTProtocolForFileTransmission(){
+//UDTProtocolForFileTransmission * ResourcesManager::getUDTProtocolForFileTransmission(){
 
-    if(!m_udtProtocolForFileTransmission){
-        m_udtProtocolForFileTransmission = new UDTProtocolForFileTransmission(this);
-        m_udtProtocolForFileTransmission->listen(UDT_FILE_LISTENING_PORT);
-        m_udtProtocolForFileTransmission->startWaitingForNewConnectionInOneThread(50);
+//    if(!m_udtProtocolForFileTransmission){
+//        m_udtProtocolForFileTransmission = new UDTProtocolForFileTransmission(this);
+//        m_udtProtocolForFileTransmission->listen(UDT_FILE_LISTENING_PORT);
+//        m_udtProtocolForFileTransmission->startWaitingForNewConnectionInOneThread(50);
 
-    }
+//    }
 
-    return m_udtProtocolForFileTransmission;
+//    return m_udtProtocolForFileTransmission;
 
-}
+//}
 
 
 

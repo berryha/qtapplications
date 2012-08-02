@@ -146,7 +146,7 @@ bool ServerService::startMainService(){
 
 
     m_rtp = resourcesManager->startRTP(QHostAddress::Any, UDT_LISTENING_PORT, true, &errorMessage);
-    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+    connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)), Qt::QueuedConnection);
 
     m_udtProtocol = m_rtp->getUDTProtocol();
 
@@ -158,7 +158,7 @@ bool ServerService::startMainService(){
 //        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
 //    }
 //    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(50);
+    m_udtProtocol->startWaitingForIOInOneThread(40);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
 
@@ -801,7 +801,7 @@ void ServerService::getRecordsInDatabase(){
 //}
 
 void ServerService::processClientOnlineStatusChangedPacket(int socketID, const QString &clientName, bool online){
-
+    qDebug()<<"ServerService::processClientOnlineStatusChangedPacket(...)"<<" socketID:"<<socketID<<" clientName:"<<clientName<<" online:"<<online;
 
     QString ip = "";
     quint16 port = 0;
@@ -815,7 +815,14 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
 
         if(clientSocketsHash.values().contains(clientName)){
             int preSocketID = clientSocketsHash.key(clientName);
-            peerDisconnected(preSocketID);
+            qDebug()<<"---------preSocketID:"<<preSocketID<<" socketID:"<<socketID;
+            if(preSocketID != socketID){
+                m_rtp->closeSocket(preSocketID);
+                //peerDisconnected(preSocketID);
+                clientSocketsHash.remove(preSocketID);
+                adminSocketsHash.remove(preSocketID);
+            }
+
 //            clientSocketsHash.remove(preSocketID);
 //            m_udtProtocol->closeSocket(preSocketID);
         }
@@ -900,8 +907,10 @@ void ServerService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 }
 
 void ServerService::peerDisconnected(int socketID){
+    qDebug()<<"ServerService::peerDisconnected(...)"<<" socketID:"<<socketID;
+    qDebug()<<"----------3----------"<<" socketID:"<<socketID<<" Time:"<<QDateTime::currentDateTime().toString("mm:ss:zzz")<<" ThreadID:"<<QThread::currentThreadId();
 
-    m_rtp->closeSocket(socketID);
+//    m_rtp->closeSocket(socketID);
 
     if(clientSocketsHash.contains(socketID)){
         QString address = "Unknown Address";

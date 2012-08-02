@@ -45,6 +45,8 @@
 
 #include "rudp/rudp.h"
 #include "tcp/tcpwidget.h"
+#include "udt/udt.h"
+
 
 namespace HEHUI {
 
@@ -113,6 +115,7 @@ private:
 
     TCPWidget *tcpWidget;
 
+    UDTWidget *udtWidget;
 
 
 
