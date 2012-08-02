@@ -33,12 +33,13 @@ DEPENDPATH += $${INCLUDEPATH}
 # RCC_DIR = ./tmp
 # Input
 HEADERS += \
-    udtprotocolbase.h \
-    udtprotocolforfiletransmission.h \
-    udtlib.h
+    udtlib.h \
+    udtprotocolbase.h #\
+    #udtprotocolforfiletransmission.h \
+
 SOURCES += \
-    udtprotocolbase.cpp \
-    udtprotocolforfiletransmission.cpp
+    udtprotocolbase.cpp #\
+    #udtprotocolforfiletransmission.cpp
 RESOURCES += 
 
 

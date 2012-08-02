@@ -373,7 +373,7 @@ void TCPBase::processSocketError(QAbstractSocket::SocketError error){
     Q_ASSERT(socket > 0);
 
 
-    qDebug()<<"Socket Error! "<<error;
+    qDebug()<<"TCP Socket Error! "<<error<<" socketID:"<<socketID;
 
     emit socketError(socketID, error);
 
