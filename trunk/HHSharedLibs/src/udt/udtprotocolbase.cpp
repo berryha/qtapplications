@@ -488,6 +488,9 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
 
+
+    QMutexLocker locker(&m_epollMutex);
+
     UDT::epoll_remove_usock(epollID, socket);
 
     if( (UDT::INVALID_SOCK == socket) || (UDT::getsockstate(socket) == NONEXIST) ){
@@ -858,54 +861,59 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     }
 
 
-//    UDTSTATUS status = UDT::getsockstate(socket);
-//    switch(status){
-//    case INIT: //1
-//    case OPENED: //2
-//    case LISTENING: //3
-//    case CONNECTING: //4
-//    case CONNECTED: //5
-//    {
-//        //qDebug()<<"";
-//    }
-//        break;
-//    case BROKEN: //6
-//    {
+    UDTSTATUS status = UDT::getsockstate(socket);
+    switch(status){
+    case INIT: //1
+    case OPENED: //2
+    case LISTENING: //3
+    case CONNECTING: //4
+    case CONNECTED: //5
+    {
+        //qDebug()<<"";
+    }
+        break;
+    case BROKEN: //6
+    {
+        removeSocketFromEpoll(socket);
 //        UDT::close(socket);
 //        UDT::epoll_remove_usock(epollID, socket);
 
-//        emit disconnected(socket);
-//        qDebug()<<"socket:"<<socket<<" BROKEN";
-//        return;
-//    }
-//        break;
-//    case CLOSING: //7
-//    {
-//        //qDebug()<<"CLOSING";
-//        return;
-//    }
-//        break;
-//    case CLOSED: //8
-//    {
+        emit disconnected(socket);
+        qDebug()<<"---------------socket:"<<socket<<" BROKEN";
+        return;
+    }
+        break;
+    case CLOSING: //7
+    {
+        //qDebug()<<"CLOSING";
+        return;
+    }
+        break;
+    case CLOSED: //8
+    {
+        removeSocketFromEpoll(socket);
 //        UDT::close(socket);
 //        UDT::epoll_remove_usock(epollID, socket);
-//        emit disconnected(socket);
 
-//        qDebug()<<"socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
-//        return;
-//    }
-//        break;
-//    case NONEXIST: //9
-//    {
-//        UDT::epoll_remove_usock(epollID, socket);
-//        qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
-//        return;
-//    }
-//        break;
-//    default:
-//        break;
+        emit disconnected(socket);
 
-//    }
+        qDebug()<<"--------------socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
+        return;
+    }
+        break;
+    case NONEXIST: //9
+    {
+//        removeSocketFromEpoll(socket);
+
+        //UDT::epoll_remove_usock(epollID, socket);
+        qDebug()<<"--------------socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
+        return;
+    }
+        break;
+    default:
+        break;
+
+    }
 
 
 
@@ -1005,8 +1013,9 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        UDT::close(socket);
-        UDT::epoll_remove_usock(epollID, socket);
+        removeSocketFromEpoll(socket);
+//        UDT::close(socket);
+//        UDT::epoll_remove_usock(epollID, socket);
 
         emit disconnected(socket);
         qDebug()<<"socket:"<<socket<<" BROKEN";
@@ -1019,9 +1028,9 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case CLOSED: //8
     {
-
-        UDT::close(socket);
-        UDT::epoll_remove_usock(epollID, socket);
+        removeSocketFromEpoll(socket);
+//        UDT::close(socket);
+//        UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"----------1----------"<<" socketID:"<<socket<<" Time:"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
         emit disconnected(socket);
         qDebug()<<"----------2----------"<<" socketID:"<<socket<<" Time:"<<QDateTime::currentDateTime().toString("mm:ss:zzz");
@@ -1031,7 +1040,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
-        UDT::epoll_remove_usock(epollID, socket);
+//        UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
     }
         break;
@@ -1145,6 +1154,22 @@ inline void UDTProtocolBase::msleep(int msec){
 #else
     usleep(msec*1000);
 #endif
+
+}
+
+void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket){
+    qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
+
+
+    QMutexLocker locker(&m_epollMutex);
+
+    UDT::epoll_remove_usock(epollID, socket);
+
+
+    UDT::close(socket);
+
+    QByteArray *data = m_cachedDataInfoHash.take(socket);
+    recycleCachedData(data);
 
 }
 
