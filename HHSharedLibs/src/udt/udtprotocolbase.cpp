@@ -858,6 +858,59 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     }
 
 
+//    UDTSTATUS status = UDT::getsockstate(socket);
+//    switch(status){
+//    case INIT: //1
+//    case OPENED: //2
+//    case LISTENING: //3
+//    case CONNECTING: //4
+//    case CONNECTED: //5
+//    {
+//        //qDebug()<<"";
+//    }
+//        break;
+//    case BROKEN: //6
+//    {
+//        UDT::close(socket);
+//        UDT::epoll_remove_usock(epollID, socket);
+
+//        emit disconnected(socket);
+//        qDebug()<<"socket:"<<socket<<" BROKEN";
+//        return;
+//    }
+//        break;
+//    case CLOSING: //7
+//    {
+//        //qDebug()<<"CLOSING";
+//        return;
+//    }
+//        break;
+//    case CLOSED: //8
+//    {
+//        UDT::close(socket);
+//        UDT::epoll_remove_usock(epollID, socket);
+//        emit disconnected(socket);
+
+//        qDebug()<<"socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
+//        return;
+//    }
+//        break;
+//    case NONEXIST: //9
+//    {
+//        UDT::epoll_remove_usock(epollID, socket);
+//        qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
+//        return;
+//    }
+//        break;
+//    default:
+//        break;
+
+//    }
+
+
+
+    qDebug()<<"-------------!!!--------------"<<"socket:"<<socket<<" state:"<<UDT::getsockstate(socket);
+
     int size = MAX_DATA_BLOCK_SIZE + 4;
 
     QByteArray byteArray;
@@ -886,7 +939,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
             //qDebug()<<"totalReceivedSize:"<<totalReceivedSize;
         }
         if (0 == totalReceivedSize){
-            qDebug()<<"No data received!";
+            qDebug()<<"No data received! "<<" socket:"<<socket;
             return;
         }
 
@@ -952,7 +1005,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        //UDT::close(socket);
+        UDT::close(socket);
         UDT::epoll_remove_usock(epollID, socket);
 
         emit disconnected(socket);
@@ -978,8 +1031,6 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
-        //UDT::close(socket);
-
         UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
     }
