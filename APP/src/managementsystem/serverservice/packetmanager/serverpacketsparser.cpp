@@ -273,7 +273,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 logType = 0;
         in >> users >> logType >> log >> clientTime;
         emit signalClientLogReceived(peerID, users, packet->getPeerHostAddress().toString(), logType, log, clientTime);
-        qDebug()<<"~~UpdateAdministratorPasswordFailed";
+        qDebug()<<"~~ClientLog";
     }
     break;
     default:
