@@ -903,6 +903,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
+        removeSocketFromEpoll(socket);
 //        removeSocketFromEpoll(socket);
 
         //UDT::epoll_remove_usock(epollID, socket);
@@ -978,7 +979,8 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
 void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
 //    qDebug()<<"--UDTProtocolBase::writeDataToSocket() "<<"socket:"<<socket;
 
-    //return;
+    qCritical()<<"Function Disabled!";
+    return;
 
     UDTSTATUS status = UDT::getsockstate(socket);
 //    qDebug()<<"socket:"<<socket<<" status:"<<status;
@@ -1040,6 +1042,7 @@ void UDTProtocolBase::writeDataToSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
+        removeSocketFromEpoll(socket);
 //        UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
     }
