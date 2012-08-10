@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QHostAddress>
+#include <QMutex>
 
 
 
@@ -212,6 +213,10 @@ private:
 
     void msleep(int msec);
 
+    void removeSocketFromEpoll(UDTSOCKET socket);
+
+
+
 
 private:
     int epollID;
@@ -231,6 +236,8 @@ private:
     QString m_errorMessage;
 
     int m_threadCount;
+
+    QMutex m_epollMutex;
 
 
 };
