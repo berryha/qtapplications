@@ -2035,7 +2035,7 @@ void ClientService::peerDisconnected(int socketID){
 
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";
-        m_rtp->closeSocket(m_socketConnectedToServer);
+        //m_rtp->closeSocket(m_socketConnectedToServer);
         m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
         m_serverAddress = QHostAddress::Null;
         m_serverUDTListeningPort = 0;
