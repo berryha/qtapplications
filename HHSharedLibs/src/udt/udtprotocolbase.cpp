@@ -445,7 +445,11 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 
 
     if(monitor){
-        UDT::epoll_add_usock(epollID, client);
+        //UDT::epoll_add_usock(epollID, client);
+        if(!addSocketToEpoll(client)){
+            UDT::close(client);
+            return UDT::INVALID_SOCK;
+        }
     }
 
 
@@ -658,11 +662,11 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             }
             readfds.clear();
 
-            for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
-                //TODO:Process
-                //QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
-                writeDataToSocket(*it);
-            }
+//            for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
+//                //TODO:Process
+//                //QtConcurrent::run(this, &UDTProtocolBase::writeDataToSocket, *it);
+//                writeDataToSocket(*it);
+//            }
             writefds.clear();
         }
 
@@ -839,9 +843,13 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
     //cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
     qDebug()<<QString("New Connection:%1:%2, UDTSOCKET:%3").arg(peerAddress).arg(peerPort).arg(peer);
 
-    if(UDT::epoll_add_usock(epollID, peer, NULL) < 0){
-        qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
-        //fprintf(stderr, "epoll_add_usock error\n");
+//    if(UDT::epoll_add_usock(epollID, peer, NULL) < 0){
+//        qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
+//        //fprintf(stderr, "epoll_add_usock error\n");
+//        UDT::close(peer);
+//        return UDT::INVALID_SOCK;
+//    }
+    if(!addSocketToEpoll(peer)){
         UDT::close(peer);
         return UDT::INVALID_SOCK;
     }
@@ -869,7 +877,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     case CONNECTING: //4
     case CONNECTED: //5
     {
-        //qDebug()<<"";
+        qDebug()<<"---------- NO Valid Data! ----------";
     }
         break;
     case BROKEN: //6
@@ -903,8 +911,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
-        removeSocketFromEpoll(socket);
-//        removeSocketFromEpoll(socket);
+        removeSocketFromEpoll(socket, false);
 
         //UDT::epoll_remove_usock(epollID, socket);
         qDebug()<<"--------------socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
@@ -915,7 +922,6 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
         break;
 
     }
-
 
 
     qDebug()<<"-------------!!!--------------"<<"socket:"<<socket<<" state:"<<UDT::getsockstate(socket);
@@ -1160,14 +1166,39 @@ inline void UDTProtocolBase::msleep(int msec){
 
 }
 
-void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket){
-    qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
+
+bool UDTProtocolBase::addSocketToEpoll(UDTSOCKET socket){
+    qDebug()<<"--UDTProtocolBase::addSocketToEpoll(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
+
+    QMutexLocker locker(&m_epollMutex);
+
+    if(UDT::epoll_add_usock(epollID, socket, NULL) < 0){
+        qWarning()<<"ERROR! epoll_add_usock Failed! "<< UDT::getlasterror().getErrorMessage();
+        //fprintf(stderr, "epoll_add_usock error\n");
+        //UDT::close(peer);
+        return false;
+    }
+
+    return true;
+
+}
+
+void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket, bool socketExists){
+    qDebug()<<"--UDTProtocolBase::removeSocketFromEpoll(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
 
 
     QMutexLocker locker(&m_epollMutex);
 
-    UDT::epoll_remove_usock(epollID, socket);
+    if(UDT::epoll_remove_usock(epollID, socket) < 0){
+        qWarning()<<"ERROR! epoll_remove_usock Failed! "<< UDT::getlasterror().getErrorMessage();
+        //fprintf(stderr, "epoll_remove_usock error\n");
+        return;
+    }
+    //UDT::epoll_remove_usock(epollID, socket);
 
+    if(!socketExists){
+        return;
+    }
 
     UDT::close(socket);
 

@@ -213,7 +213,8 @@ private:
 
     void msleep(int msec);
 
-    void removeSocketFromEpoll(UDTSOCKET socket);
+    bool addSocketToEpoll(UDTSOCKET socket);
+    void removeSocketFromEpoll(UDTSOCKET socket, bool socketExists = true);
 
 
 
