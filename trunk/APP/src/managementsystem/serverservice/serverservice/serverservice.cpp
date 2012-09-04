@@ -158,7 +158,7 @@ bool ServerService::startMainService(){
 //        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
 //    }
 //    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(40);
+    m_udtProtocol->startWaitingForIOInOneThread(50);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
 

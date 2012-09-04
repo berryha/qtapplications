@@ -280,7 +280,7 @@ bool ClientService::startMainService(){
     lookForServerTimer = new QTimer(this);
     lookForServerTimer->setSingleShot(true);
     connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
-    lookForServerTimer->start(30000);
+    lookForServerTimer->start(60000);
 
 
     mainServiceStarted = true;
