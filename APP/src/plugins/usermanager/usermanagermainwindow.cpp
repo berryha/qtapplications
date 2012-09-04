@@ -107,7 +107,6 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 //    wm->test();
 
 
-
     m_joinInfo = wm->getJoinInformation(&m_isJoinedToDomain);
     if(m_joinInfo.trimmed().isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Failed to get join information!"));
@@ -557,7 +556,7 @@ void UserManagerMainWindow::querySitoyUsersInfo(const QString &queryString){
         //重新连接MSSQL数据库
         if(error.number() == 11){
             db.close();
-            QSqlDatabase::removeDatabase(databaseConnectionName);
+            //QSqlDatabase::removeDatabase(databaseConnectionName);
             return;
         }
 
