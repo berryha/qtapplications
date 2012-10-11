@@ -89,10 +89,10 @@ CONFIG( debug, debug|release ) {
 
 #set INCLUDEPATH
 INCLUDEPATH += $${OUT_PWD} \
-                $$UI_DIR \
-              $$MOC_DIR \
-              $$RCC_DIR  \
-              $$OBJECTS_DIR
+               $$UI_DIR \
+               $$MOC_DIR \
+               $$RCC_DIR  \
+               $$OBJECTS_DIR
 
 DEPENDPATH += $$INCLUDEPATH
 
@@ -136,3 +136,4 @@ DEFINES	*= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\"" \
 
 
 win32-g++:QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
+win32-g++:QMAKE_CXXFLAGS_EXCEPTIONS_OFF =
