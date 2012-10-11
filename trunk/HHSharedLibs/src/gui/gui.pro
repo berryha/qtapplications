@@ -20,6 +20,7 @@ include( ../buildlib_config.pri )
 HHSharedLibs += HHSharedCore
 include(../core/core.pri)
 
+
 DEFINES += GUI_LIBRARY_EXPORT
 
 # DEPENDPATH += . \
@@ -36,6 +37,7 @@ DEFINES += GUI_LIBRARY_EXPORT
 # LIBS += -L$$SHARED_LIB_FOLDER -lHHSharedCore
 # define link libs
 # LIBS += -L$$SHARED_LIB_FOLDER
+
 CONFIG( debug, debug|release ):
 
 # Debug
@@ -43,7 +45,6 @@ CONFIG( debug, debug|release ):
 # win32:LIBS += -lHHSharedCored$${VER_MAJ}
 # mac:LIBS += -lHHSharedCored
 else:
-
 # Release
 # win32:LIBS += -lHHSharedCore$${VER_MAJ}
 # else:LIBS += -lHHSharedCore
@@ -54,6 +55,7 @@ else:
 # CONFIG -= build_all
 # CONFIG += release
 # }
+
 # ##
 UI_DIR = ./ui
 
@@ -125,9 +127,9 @@ SOURCES += screenshot/screenshot.cpp \
     dataprint.cpp \
     widgetbase/mainwindowbase.cpp \
     widgetbase/widgetbase.cpp
-RESOURCES += widgetbase/expandlistview/expandlistview.qrc \
-    gui.qrc
 
+RESOURCES += widgetbase/expandlistview/expandlistview.qrc \
+            gui.qrc
 # ##
 # DESTDIR = $${LIB_PATH}
 # DLLDESTDIR = ../../bin
