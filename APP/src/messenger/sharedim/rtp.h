@@ -16,6 +16,7 @@ class SHAREDIMLIB_API RTP : public QObject
     Q_OBJECT
 public:
     enum Protocol{AUTO = 0, UDT, TCP};
+
     explicit RTP(QObject *parent = 0);
     ~RTP();
     

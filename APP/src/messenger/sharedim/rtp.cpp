@@ -41,10 +41,10 @@ void RTP::startServers(const QHostAddress &localAddress, quint16 localPort, bool
     QString err;
 
     UDTSOCKET socket = m_udtProtocol->listen(localPort, localAddress);
-    if(socket == UDTProtocol::INVALID_UDT_SOCK && tryOtherPort){
+    if(socket == INVALID_SOCK_ID && tryOtherPort){
         socket = m_udtProtocol->listen();
     }
-    if(socket == UDTProtocol::INVALID_UDT_SOCK){
+    if(socket == INVALID_SOCK_ID){
         err = m_udtProtocol->getLastErrorMessage();
     }
 

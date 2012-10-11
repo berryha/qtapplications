@@ -540,9 +540,7 @@ void SystemManagementWidget::on_pushButtonPrograms_clicked(){
 
     QString text = tr("Do you really want to <font color = 'red'><b>%1</b></font> the Programes on the computer?").arg(m_programesEnabled?tr("disable"):tr("enable"));
 
-    int ret = QMessageBox::question(this, tr("Question"), text,
-                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No
-                                    );
+    int ret = QMessageBox::question(this, tr("Question"), text,QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if(ret == QMessageBox::No){
         return;
     }

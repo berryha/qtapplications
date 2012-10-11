@@ -9,5 +9,5 @@ SUBDIRS += managementsystem \
     messenger \
     test
 
-TRANSLATIONS += ts_zh_CN.ts \
-    ts_zh_TW.ts
+#TRANSLATIONS += ts_zh_CN.ts \
+#    ts_zh_TW.ts

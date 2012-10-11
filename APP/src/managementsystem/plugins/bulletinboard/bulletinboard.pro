@@ -1,6 +1,6 @@
 # ##
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin shared
 TARGET = bulletinboard
 
 # VERSION = 2009.09.08.1055
@@ -19,11 +19,12 @@ win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
 include(../../sharedms/sharedms.pri)
+# ##
+UI_DIR = ./ui
 INCLUDEPATH += $$UI_DIR \
     $$PWD
 
-# ##
-UI_DIR = ./ui
+
 
 # Input
 HEADERS += \

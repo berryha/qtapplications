@@ -45,7 +45,7 @@ HEADERS += rudp/clientpacketsparser.h \
     screenshot/selecttargetimagewidget.h \
     screenshot/screenshot.h \
     rudp/rudp.h \
-    shared/global_app.h \
+    #shared/global_app.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h \
