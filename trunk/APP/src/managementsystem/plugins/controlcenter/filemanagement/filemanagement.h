@@ -149,7 +149,7 @@ private:
 
 
 //    UDTProtocol *m_udtProtocol;
-    UDTSOCKET m_peerSocket;
+    int m_peerSocket;
     //UDTProtocolForFileTransmission *m_udtProtocolForFileTransmission;
     //UDTSOCKET m_peerFileTransmissionSocket;
 

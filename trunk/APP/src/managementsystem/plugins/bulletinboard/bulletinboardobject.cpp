@@ -25,7 +25,7 @@ BulletinBoardObject::BulletinBoardObject(QObject *parent) :
     localUDTListeningPort = UDT_LISTENING_PORT + 20;
     m_rtp = 0;
     m_socketConnectedToLocalServer = INVALID_SOCK_ID;
-//    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
+//    m_socketConnectedToAdmin = INVALID_SOCK_ID;
 
 
     m_connectToLocalServerTimer = new QTimer(this);

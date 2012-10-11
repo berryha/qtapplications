@@ -1,6 +1,6 @@
 # ##
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin shared
 TARGET = controlcenter
 
 # VERSION = 2009.09.08.1055
@@ -18,11 +18,10 @@ HHSharedLibs += HHSharedCore \
 win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
-
+include(../../sharedms/sharedms.pri)
 # ##
 UI_DIR = ./ui
 
-include(../../sharedms/sharedms.pri)
 INCLUDEPATH += $$UI_DIR \
                $$PWD \
                filemanagement

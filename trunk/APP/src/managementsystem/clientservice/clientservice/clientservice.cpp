@@ -34,9 +34,9 @@ ClientService::ClientService(int argc, char **argv, const QString &serviceName, 
     m_rtp = 0;
 
 //    m_udtProtocol = 0;
-    m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
-    m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
-    peerSocketThatRequiresDetailedInfo = UDTProtocol::INVALID_UDT_SOCK;
+    m_socketConnectedToServer = INVALID_SOCK_ID;
+    m_socketConnectedToAdmin = INVALID_SOCK_ID;
+    peerSocketThatRequiresDetailedInfo = INVALID_SOCK_ID;
 
 
 //    m_udtProtocolForFileTransmission = 0;
@@ -274,13 +274,11 @@ bool ClientService::startMainService(){
 
 
     //TODO:
-    //clientPacketsParser->sendClientLookForServerPacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName(), getServerLastUsed());
     clientPacketsParser->sendClientLookForServerPacket(getServerLastUsed());
-    //QTimer::singleShot(15000, this, SLOT(checkHasAnyServerBeenFound()));
     lookForServerTimer = new QTimer(this);
     lookForServerTimer->setSingleShot(true);
     connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
-    lookForServerTimer->start(60000);
+    lookForServerTimer->start(300000);
 
 
     mainServiceStarted = true;
@@ -366,7 +364,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
         return;
     }
     m_rtp->closeSocket(m_socketConnectedToServer);
-    m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+    m_socketConnectedToServer = INVALID_SOCK_ID;
     m_serverAddress = QHostAddress::Null;
     m_serverUDTListeningPort = 0;
     m_serverName = "";
@@ -410,7 +408,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
 
 #ifdef Q_OS_WIN
     if(Utilities::versionCompare(version, QString(APP_VERSION)) == 1){       
-        QTimer::singleShot(30*msec, this, SLOT(update()));
+        QTimer::singleShot(60*msec, this, SLOT(update()));
         //update();
     }
 
@@ -551,7 +549,7 @@ void ClientService::scanFinished(bool ok, const QString &message){
         qCritical()<<tr("ERROR! Can not upload system info to peer! %3").arg(m_rtp->lastErrorString());
     }
 
-    if(m_socketConnectedToServer != UDTProtocol::INVALID_UDT_SOCK && peerSocketThatRequiresDetailedInfo != m_socketConnectedToServer){
+    if(m_socketConnectedToServer != INVALID_SOCK_ID && peerSocketThatRequiresDetailedInfo != m_socketConnectedToServer){
         bool ret = clientPacketsParser->sendClientResponseClientDetailedInfoPacket(m_socketConnectedToServer, systemInfoFile);
         if(!ret){
             qCritical()<<tr("ERROR! Can not upload system info to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -613,7 +611,7 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
     }
 
     QString log = QString("USB SD %1! Admin:%2").arg(ret).arg(adminName);
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupUSBSD), log);
         if(!ok){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -672,7 +670,7 @@ void ClientService::processSetupProgramesPacket(const QString &computerName, con
 
     QString log = QString("Programes %1! Admin:%2").arg(ret).arg(adminName);
     bool sent = false;
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, localUsers.join(","), quint8(MS::LOG_AdminSetupProgrames), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -747,7 +745,7 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
 
     QString log = QString("User '%1' %2 Administrators Group! Admin:%3").arg(userName).arg(ret).arg(adminName);
     bool sent = false;
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -791,7 +789,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
     }
 
     bool sent = false;
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -837,7 +835,7 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
     }
 
     bool sent = false;
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -921,7 +919,7 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
     //m_udtProtocol->closeSocket(adminSocketID);
 #endif
 
-    if( (previousSocketConnectedToAdmin != UDTProtocol::INVALID_UDT_SOCK) && (previousSocketConnectedToAdmin != m_socketConnectedToAdmin) ){
+    if( (previousSocketConnectedToAdmin != INVALID_SOCK_ID) && (previousSocketConnectedToAdmin != m_socketConnectedToAdmin) ){
         clientPacketsParser->sendClientMessagePacket(previousSocketConnectedToAdmin, QString("Another administrator has logged on from %1!").arg(m_adminAddress), quint8(MS::MSG_Critical));
         clientPacketsParser->sendClientOnlineStatusChangedPacket(previousSocketConnectedToAdmin, m_joinInfo, false);
         m_rtp->closeSocket(previousSocketConnectedToAdmin);
@@ -1007,7 +1005,7 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
     uploadClientSummaryInfo(adminAddress, adminPort);
 
 //    m_socketConnectedToAdmin = m_udtProtocol->connectToHost(QHostAddress(adminAddress), adminPort);
-//    if(m_socketConnectedToServer == UDTProtocol::INVALID_UDT_SOCK){
+//    if(m_socketConnectedToServer == INVALID_SOCK_ID){
 //        qCritical()<<tr("ERROR! Can not connect to Admin %1:%2! %3").arg(adminAddress).arg(adminPort).arg(m_rtp->lastErrorString());
 //        return;
 //    }
@@ -1120,7 +1118,7 @@ void ClientService::processAdminRequestRemoteAssistancePacket(const QString &com
     //    //process2.terminate();
 
     QString log = QString("Remote Assistance! Admin:%1").arg(adminName);
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminRequestRemoteAssistance), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -1145,7 +1143,7 @@ void ClientService::processAdminRequestUpdateMSUserPasswordPacket(const QString 
     checkUsersAccount();
 
     QString log = QString("Update Password! Admin:%1").arg(adminName);
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminInformUserNewPassword), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -1332,7 +1330,7 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 void ClientService::uploadClientSummaryInfo(int socketID){
     qDebug()<<"--ClientService::uploadClientSummaryInfo(...) socketID:"<<socketID;
 
-    if(UDTProtocol::INVALID_UDT_SOCK == socketID){
+    if(INVALID_SOCK_ID == socketID){
         return;
     }
 
@@ -1474,7 +1472,7 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
     if(!wm->updateUserPassword("administrator", administratorPassword, true)){
         QString error = wm->lastError();
-        if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+        if(INVALID_SOCK_ID != m_socketConnectedToServer){
             bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
             if(!sent){
                 qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -1484,7 +1482,7 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
     }
 
 
-    if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+    if(INVALID_SOCK_ID != m_socketConnectedToServer){
         bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), QString("Administrator's password updated to '%1'!").arg(administratorPassword));
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
@@ -1712,7 +1710,7 @@ bool ClientService::checkUsersAccount(){
 
     }
 
-    if(logs.size() && (UDTProtocolBase::INVALID_UDT_SOCK != m_socketConnectedToServer) ){
+    if(logs.size() && (INVALID_SOCK_ID != m_socketConnectedToServer) ){
         bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, users.join(","), quint8(MS::LOG_CheckMSUsersAccount), logs.join(" | "));
         if(ok){
             logs.clear();
@@ -2036,7 +2034,7 @@ void ClientService::peerDisconnected(int socketID){
     if(socketID == m_socketConnectedToServer){
         qWarning()<<"Server Offline!";
         //m_rtp->closeSocket(m_socketConnectedToServer);
-        m_socketConnectedToServer = UDTProtocol::INVALID_UDT_SOCK;
+        m_socketConnectedToServer = INVALID_SOCK_ID;
         m_serverAddress = QHostAddress::Null;
         m_serverUDTListeningPort = 0;
         m_serverName = "";
@@ -2051,7 +2049,7 @@ void ClientService::peerDisconnected(int socketID){
 
     }else if(socketID == m_socketConnectedToAdmin){
         qWarning()<<"Admin Offline!";
-        m_socketConnectedToAdmin = UDTProtocol::INVALID_UDT_SOCK;
+        m_socketConnectedToAdmin = INVALID_SOCK_ID;
         m_adminAddress = "";
         m_adminPort = 0;
 
@@ -2445,7 +2443,7 @@ void ClientService::update(){
     if(!result){
         qWarning()<<wm->lastError();
         //logMessage(wm->lastError(), QtServiceBase::Error);
-        if(UDTProtocol::INVALID_UDT_SOCK != m_socketConnectedToServer){
+        if(INVALID_SOCK_ID != m_socketConnectedToServer){
             bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
             if(!sent){
                 qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());

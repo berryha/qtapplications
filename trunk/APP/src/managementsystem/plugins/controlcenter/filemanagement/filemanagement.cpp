@@ -459,9 +459,9 @@ FileManagement::FileManagement(QWidget *parent) :
 
 
 //    m_udtProtocol = 0;
-    m_peerSocket = UDTProtocol::INVALID_UDT_SOCK;
+    m_peerSocket = INVALID_SOCK_ID;
 //    m_udtProtocolForFileTransmission = 0;
-//    m_peerFileTransmissionSocket = UDTProtocol::INVALID_UDT_SOCK;
+//    m_peerFileTransmissionSocket = INVALID_SOCK_ID;
 
     m_fileManager = 0;
 
@@ -815,11 +815,11 @@ void FileManagement::fileSystemInfoReceived(int socketID, const QString &parentD
 
 void FileManagement::requestUploadFilesToRemote(const QString &localBaseDir, const QStringList &localFiles, const QString &remoteDir){
 
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+    if(m_peerSocket == INVALID_SOCK_ID){
 //        on_toolButtonVerify_clicked();
         //TODO:
     }
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+    if(m_peerSocket == INVALID_SOCK_ID){
         QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
         return;
     }
@@ -878,11 +878,11 @@ void FileManagement::requestUploadFilesToRemote(const QString &localBaseDir, con
 
 void FileManagement::requestDownloadFileFromRemote(const QString &remoteBaseDir, const QStringList &remoteFiles, const QString &localDir){
 
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+    if(m_peerSocket == INVALID_SOCK_ID){
         //TODO:
 //        on_toolButtonVerify_clicked();
     }
-    if(m_peerSocket == UDTProtocol::INVALID_UDT_SOCK){
+    if(m_peerSocket == INVALID_SOCK_ID){
         QMessageBox::critical(this, tr("Error"), tr("Connection is not made!<br>Please connect to peer first!") );
         return;
     }

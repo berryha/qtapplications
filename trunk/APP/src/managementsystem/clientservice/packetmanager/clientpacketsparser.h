@@ -428,7 +428,7 @@ public slots:
     bool sendInformUpdatePasswordPacket(const QString &userName, const QString &adminAddress, quint16 adminPort, const QString &adminName, const QString &oldPassword, const QString &newPassword){
         //qWarning()<<"sendInformUpdatePasswordPacket(...)"<<" userName:"<<userName<<" Port:"<<localUsersHash.value(userName) << " newPassword:"<<newPassword;
         
-        int socketID = UDTProtocol::INVALID_UDT_SOCK;
+        int socketID = INVALID_SOCK_ID;
         if(!m_localUserSocketsHash.values().contains(userName)){
             return false;
         }

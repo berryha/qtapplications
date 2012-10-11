@@ -1,6 +1,6 @@
 # ##
 TEMPLATE = lib
-CONFIG += plugin
+CONFIG += plugin shared
 TARGET = usermanager
 
 # VERSION = 2009.09.08.1055
