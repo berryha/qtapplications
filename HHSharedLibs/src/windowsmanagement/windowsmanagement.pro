@@ -29,9 +29,11 @@ UI_DIR = ./ui
 # Input
 HEADERS += \
     windowsmanagement.h \
-    wmlib.h
+    wmlib.h \
+    adsi.h
 FORMS += 
-SOURCES += windowsmanagement.cpp
+SOURCES += windowsmanagement.cpp \
+    adsi.cpp
 RESOURCES += 
 win32 { 
     INCLUDEPATH += resources/lib/AutoIt3 \
