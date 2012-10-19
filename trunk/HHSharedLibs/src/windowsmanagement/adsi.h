@@ -57,6 +57,7 @@ public:
     void AD_Close();
     long AD_GetLastErrorCode();
     QString AD_GetLastErrorString();
+    QString AD_DefaultNamingContext();
     bool AD_ObjectExists(const QString &object, const QString &property);
     bool AD_RenameObject(const QString &object, const QString &cn);
     bool AD_MoveObject(const QString &ou, const QString &object, const QString &cn);
@@ -93,6 +94,9 @@ private:
 
    typedef LPWSTR (* AD_GetLastErrorStringFunction)();
    AD_GetLastErrorStringFunction m_AD_GetLastErrorString;
+
+   typedef LPWSTR (* AD_DefaultNamingContextFunction)();
+   AD_DefaultNamingContextFunction m_AD_DefaultNamingContext;
 
    typedef long (* AD_ObjectExistsFunction)(LPCWSTR, LPCWSTR);
    AD_ObjectExistsFunction m_AD_ObjectExists;
