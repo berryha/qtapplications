@@ -28,7 +28,9 @@ UI_DIR = ./ui
 HEADERS += usermanagerplugin.h \
     usermanagermainwindow.h \
     modifyuserinfo/modifyuserinfodialog.h \
-    aduserinfo/aduserinfo.h
+    aduserinfo/aduserinfomodel.h \
+    aduserinfo/aduserinfowidget.h \
+    aduserinfo/aduser.h
 FORMS +=  \
     modifyuserinfo/modifyuserinfodialog.ui \
     usermanagermainwindow.ui \
@@ -36,7 +38,9 @@ FORMS +=  \
 SOURCES += usermanagerplugin.cpp \
     usermanagermainwindow.cpp \
     modifyuserinfo/modifyuserinfodialog.cpp \
-    aduserinfo/aduserinfo.cpp
+    aduserinfo/aduserinfomodel.cpp \
+    aduserinfo/aduserinfowidget.cpp \
+    aduserinfo/aduser.cpp
 RESOURCES += usermanager.qrc
 
 win32 {

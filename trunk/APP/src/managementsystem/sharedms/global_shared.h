@@ -104,10 +104,10 @@
 #define DOMAIN_NAME "sitoy.group"
 #endif
 #ifndef DOMAIN_ADMIN_NAME
-#define DOMAIN_ADMIN_NAME "hehui"
+#define DOMAIN_ADMIN_NAME "dgadmin"
 #endif
 #ifndef DOMAIN_ADMIN_PASSWORD
-#define DOMAIN_ADMIN_PASSWORD "0000....~"
+#define DOMAIN_ADMIN_PASSWORD "dmsto&*("
 #endif
 
 
