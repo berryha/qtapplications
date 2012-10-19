@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabDB">
        <attribute name="title">
@@ -299,7 +299,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="ADUserInfo" name="tabAD">
+      <widget class="ADUserInfoWidget" name="tabAD">
        <attribute name="title">
         <string>Active Directory</string>
        </attribute>
@@ -363,9 +363,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ADUserInfo</class>
+   <class>ADUserInfoWidget</class>
    <extends>QWidget</extends>
-   <header>aduserinfo/aduserinfo.h</header>
+   <header>aduserinfo/aduserinfowidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
