@@ -46,6 +46,7 @@ ADSI::ADSI(QObject *parent) :
     m_AD_Close = 0;
     m_AD_GetLastErrorCode = 0;
     m_AD_GetLastErrorString = 0;
+    m_AD_DefaultNamingContext = 0;
     m_AD_ObjectExists = 0;
     m_AD_RenameObject = 0;
     m_AD_MoveObject = 0;
@@ -108,6 +109,13 @@ bool ADSI::loadLibrary(const QString &fileName){
     m_AD_GetLastErrorString = (AD_GetLastErrorStringFunction) adsiLibrary->resolve("AD_GetLastErrorString");
     if(!m_AD_GetLastErrorString){
         m_lastErrorString = "Failed to resolve function  'AD_GetLastErrorString' !" ;
+        qCritical()<<m_lastErrorString;
+        return false;
+    }
+
+    m_AD_DefaultNamingContext = (AD_DefaultNamingContextFunction) adsiLibrary->resolve("AD_DefaultNamingContext");
+    if(!m_AD_DefaultNamingContext){
+        m_lastErrorString = "Failed to resolve function  'AD_DefaultNamingContext' !" ;
         qCritical()<<m_lastErrorString;
         return false;
     }
@@ -285,6 +293,10 @@ long ADSI::AD_GetLastErrorCode(){
 
 QString ADSI::AD_GetLastErrorString(){
     return QString::fromWCharArray( m_AD_GetLastErrorString() );
+}
+
+QString ADSI::AD_DefaultNamingContext(){
+    return QString::fromWCharArray(m_AD_DefaultNamingContext());
 }
 
 bool ADSI::AD_ObjectExists(const QString &object, const QString &property){
