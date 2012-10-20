@@ -1511,7 +1511,7 @@ End Function   '==>AD_GetAllOUs
 '                  sAD_FilterParam - Optional: An additional LDAP filter if required (default = "(name=*)")
 '                  sAD_DataToRetrieveParam -  A comma-seperated list of attributes to retrieve (default = "sAMAccountName").
 '                  |More than one attribute will create a 2-dimensional array
-'                  sAD_ItemSeparatorParam - Single character to separate the items (default = ";")
+'                  sAD_ItemSeparatorParam - Single character to separate the items (default = $CRLF)
 '                  sAD_AttributeSeparatorParam - Single character to separate the item attributes (default = "|")
 
 '						  $sAD_SortBy - Optional: name of the attribute the resulting array will be sorted upon (default = "sAMAccountName").
@@ -1584,8 +1584,9 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstri
 	'if sAD_Filter = "" THEN sAD_Filter = "(name=*)"
 	if sAD_Filter = "" THEN sAD_Filter = "(sAMAccountName=*)"
 	if sAD_DataToRetrieve = "" THEN sAD_DataToRetrieve =  "sAMAccountName"
-	If sAD_ItemSeparator <= "" Or Len(sAD_ItemSeparator) > 1 Then sAD_ItemSeparator = ";"
-	If sAD_AttributeSeparator <= "" or sAD_AttributeSeparator = "," Or Len(sAD_AttributeSeparator) > 1 Then sAD_AttributeSeparator = "|"
+	'If sAD_ItemSeparator <= "" Or sAD_ItemSeparator <= "," or sAD_ItemSeparator <= ";" or Len(sAD_ItemSeparator) > 1 Then sAD_ItemSeparator = $crlf
+	If sAD_ItemSeparator <= "" Or sAD_ItemSeparator <= "," or sAD_ItemSeparator <= ";" Then sAD_ItemSeparator = $crlf
+	If sAD_AttributeSeparator <= "" or sAD_AttributeSeparator = "," or sAD_AttributeSeparator = ";" Or Len(sAD_AttributeSeparator) > 2 Then sAD_AttributeSeparator = "|"
 	
 	'if iAD_SearchScope = 0 THEN iAD_SearchScope = 2
 	'if sAD_SortBy = "" THEN sAD_SortBy = "sAMAccountName"
@@ -1696,8 +1697,10 @@ End Function   '==>AD_GetObjectsInOU
 ' Example .......: Yes
 ' ===============================================================================================================================
 function convertADOVariantToString(byref vValue as variant, byval sAD_Attribute as wstring ) as wstring
-	local variantType as long, result as wstring
+
+	local variantType as long, result as wstring, valuesArraySeparator as wstring
 	variantType = variantvt(vValue)
+	valuesArraySeparator = ";"
 	
 	select CASE variantType
 		case %VT_BSTR
@@ -1755,15 +1758,15 @@ function convertADOVariantToString(byref vValue as variant, byval sAD_Attribute 
 			lb = valuesArray.LBound(1)
 			ub = valuesArray.UBound(1)
 			subscripts = valuesArray.SUBSCRIPTS()
-			MSGBOX "SUBSCRIPTS:" & STR$(SUBSCRIPTS) & "  LBOUND: " & STR$(lb ) & "  UBound: " & STR$(ub )
+			'MSGBOX "SUBSCRIPTS:" & STR$(SUBSCRIPTS) & "  LBOUND: " & STR$(lb ) & "  UBound: " & STR$(ub )
 
 
 			local a AS VARIANT, n AS LONG
 			FOR n = lb TO ub
 				valuesArray.ValueGet(BYREF a, n)
 				'MSGBOX "VariantVT:" & STR$(VARIANTVT(a)) & "       " &  STR$( VARIANT#(a) )
-				if sAD_Attribute = "objectClass" THEN
-					result = result & variant$$(a) & ","
+				if sAD_Attribute = "objectClass" or sAD_Attribute = "memberOf" THEN
+					result = result & variant$$(a) & valuesArraySeparator
 				elseif sAD_Attribute = "dSCorePropagationData" then
 					LOCAL dSCorePropagationDataTime AS IAfxTime
 					dSCorePropagationDataTime = NewAfxTime()
