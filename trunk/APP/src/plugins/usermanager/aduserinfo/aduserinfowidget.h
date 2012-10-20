@@ -33,10 +33,15 @@
 #define ADUSERINFO_H
 
 #include "ui_aduserinfo.h"
+#include "aduserinfomodel.h"
 
 #ifdef Q_OS_WIN32
 #include "HHSharedWindowsManagement/hadsi.h"
 #endif
+
+
+
+namespace HEHUI {
 
 class ADUserInfoWidget : public QWidget
 {
@@ -67,10 +72,14 @@ private:
 
     //QString m_defaultNamingContext;
 
+    ADUserInfoModel *m_userInfoModel;
+    ADUserInfoSortFilterProxyModel *m_sortFilterProxyModel;
 
 
 
 
 };
+
+} //namespace HEHUI
 
 #endif // ADUSERINFO_H

@@ -57,6 +57,7 @@
 #include "aduserinfowidget.h"
 
 
+namespace HEHUI {
 
 ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     QWidget(parent)
@@ -69,6 +70,11 @@ ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     m_adOpened = false;
 
     //m_defaultNamingContext = "";
+
+    m_userInfoModel = new ADUserInfoModel(this);
+    m_sortFilterProxyModel = new ADUserInfoSortFilterProxyModel(this);
+    m_sortFilterProxyModel->setSourceModel(m_userInfoModel);
+    ui.tableViewADUsers->setModel(m_sortFilterProxyModel);
 
     ui.comboBoxQueryMode->setCurrentIndex(0);
     ui.stackedWidget->setCurrentWidget(ui.pageSimpleQuery);
@@ -145,11 +151,13 @@ void ADUserInfoWidget::on_comboBoxQueryMode_currentIndexChanged( int index ){
 
 void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
 
+    QString itemSeparator = "\\", attributeSeparator = "|";
+
     QString filter, dataToRetrieve;
     if(ui.comboBoxQueryMode->currentIndex() == 0){
         QString displayName = ui.lineEditDisplayName->text();
         filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=%1*)").arg(displayName));
-        dataToRetrieve = "sAMAccountName,displayName";
+        dataToRetrieve = "sAMAccountName,displayName,userWorkstations,telephoneNumber,description,objectGUID,objectSid";
     }else{
         filter = ui.lineEditFilter->text();
         dataToRetrieve = ui.lineEditDataToRetrieve->text().trimmed();
@@ -159,15 +167,15 @@ void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
     if(ouString.contains("\\")){
         QStringList ousList = ouString.split("\\");
         ouString = "";
-        for(int i=ousList.size();i>0;i--){
-            ouString = "OU=" + ousList.at(i) + ",";
+        while (!ousList.isEmpty()) {
+            ouString = ouString + "OU=" + ousList.takeLast() + ",";
         }
         ouString += DOMAIN_DEFAULTNAMINGCONTEXT;
     }else if(!ouString.isEmpty()){
         ouString = ouString + "," + DOMAIN_DEFAULTNAMINGCONTEXT;
     }
 
-    QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, ";", "|");
+    QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, itemSeparator, attributeSeparator);
     if(resultString.isEmpty()){
         QString error = m_adsi->AD_GetLastErrorString();
         if(!error.isEmpty()){
@@ -176,9 +184,21 @@ void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
         }
     }
 
-//TODO
-    QMessageBox::information(this, "resultString", resultString);
 
+//QMessageBox::information(this, "resultString", resultString);
+
+    QStringList itemStrings = resultString.split(itemSeparator);
+    QList<QStringList> items;
+    foreach (QString itemString, itemStrings) {
+        QStringList attributes = itemString.split(attributeSeparator);
+        items.append(attributes);
+    }
+
+    m_userInfoModel->setADUserItems(dataToRetrieve.split(","), items);
+
+    ui.tableViewADUsers->horizontalHeader ()->resizeSections(QHeaderView::ResizeToContents);
+    //ui.tableViewADUsers->resizeColumnToContents(0);
+    //ui.tableViewADUsers->setColumnHidden(3, true);
 
 
 }
@@ -187,3 +207,15 @@ void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
 void ADUserInfoWidget::reset(){
 
 }
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
