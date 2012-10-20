@@ -54,6 +54,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QMenu>
 
 #include "aduserinfowidget.h"
 
@@ -90,6 +91,9 @@ ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     ui.toolButtonConnect->setFocus();
 
     this->installEventFilter(this);
+
+    connect(ui.tableViewADUsers, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowCustomContextMenu(QPoint)));
+
 }
 
 bool ADUserInfoWidget::eventFilter(QObject *obj, QEvent *event) {
@@ -317,6 +321,62 @@ void ADUserInfoWidget::slotModifyUserInfo(){
 
 
 }
+
+void ADUserInfoWidget::slotShowCustomContextMenu(const QPoint & pos){
+
+    QTableView *tableView = qobject_cast<QTableView*> (sender());
+
+    if (!tableView){
+        return;
+    }
+
+    updateActions();
+
+    QMenu menu(this);
+    menu.addAction(ui.actionExport);
+
+#ifndef QT_NO_PRINTER
+
+    menu.addSeparator();
+
+    ui.actionPrint->setShortcut(QKeySequence::Print);
+    menu.addAction(ui.actionPrint);
+
+    //	ui.actionPrintPreview->setShortcut(Qt::CTRL + Qt::Key_P);
+    //  menu.addAction(ui.actionPrintPreview);
+
+#endif
+
+#ifdef Q_OS_WIN32
+    menu.addSeparator();
+    menu.addAction(ui.actionEdit);
+#endif
+
+    menu.exec(tableView->viewport()->mapToGlobal(pos));
+
+}
+
+void ADUserInfoWidget::updateActions() {
+    //bool enableIns = qobject_cast<QSqlQueryModel *>(ui.userListTableView->model());
+    bool enableExp = ui.tableViewADUsers->currentIndex().isValid() && ui.tableViewADUsers->selectionModel()->selectedIndexes().size();
+    //bool enableModify =  enableIns&& enableExp;
+
+    ui.actionExport->setEnabled(enableExp);
+    ui.actionPrint->setEnabled(enableExp);
+
+#ifdef Q_OS_WIN32
+    ui.actionEdit->setEnabled(enableExp);
+
+    ui.actionResetPassword->setEnabled(enableExp);
+    ui.actionDisableAccount->setEnabled(enableExp);
+
+//    if(!m_isJoinedToDomain){
+//        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
+//    }
+#endif
+
+}
+
 
 
 

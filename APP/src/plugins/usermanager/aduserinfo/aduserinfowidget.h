@@ -64,6 +64,10 @@ private slots:
     void slotPrintQueryResult();
     void slotModifyUserInfo();
 
+    void slotShowCustomContextMenu(const QPoint & pos);
+    void updateActions();
+
+
 
 
 private:
