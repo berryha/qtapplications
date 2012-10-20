@@ -51,6 +51,7 @@ public:
     explicit ADUserInfoWidget(QWidget *parent = 0);
     
 protected:
+    bool eventFilter(QObject *obj, QEvent *event);
     void changeEvent(QEvent *e);
 
 
@@ -58,6 +59,10 @@ private slots:
     void on_toolButtonConnect_clicked();
     void on_comboBoxQueryMode_currentIndexChanged( int index );
     void on_toolButtonQueryAD_clicked();
+
+    void slotExportQueryResult();
+    void slotPrintQueryResult();
+    void slotModifyUserInfo();
 
 
 

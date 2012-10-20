@@ -53,8 +53,13 @@
 
 #include <QMessageBox>
 #include <QDebug>
+#include <QKeyEvent>
 
 #include "aduserinfowidget.h"
+
+#include "HHSharedGUI/hdataoutputdialog.h"
+
+
 
 
 namespace HEHUI {
@@ -82,6 +87,88 @@ ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     ui.lineEditFilter->setText("(&(objectcategory=person)(objectclass=user)(sAMAccountName=*)(displayName=*))");
     ui.lineEditDataToRetrieve->setText("sAMAccountName,displayName");
 
+    ui.toolButtonConnect->setFocus();
+
+    this->installEventFilter(this);
+}
+
+bool ADUserInfoWidget::eventFilter(QObject *obj, QEvent *event) {
+
+    switch(event->type()){
+    case QEvent::KeyRelease:
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
+
+        if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
+            ADUser * user = m_userInfoModel->getADUser(ui.tableViewADUsers->currentIndex());
+            if(user){
+                QMessageBox::information(this, "sAMAccountName", user->getAttribute("sAMAccountName"));
+            }
+        }
+
+        if(keyEvent->key() == Qt::Key_Escape){
+
+            if(!ui.comboBoxQueryMode->currentIndex() == 0){
+                if(ui.lineEditAccountName->hasFocus()){
+                    ui.lineEditAccountName->clear();
+                    ui.lineEditDisplayName->clear();
+                    ui.comboBoxOU->setCurrentIndex(0);
+                }//else{
+                    ui.lineEditAccountName->setFocus();
+                //}
+            }else{
+                if(ui.lineEditFilter->hasFocus()){
+                    ui.lineEditFilter->clear();
+                    ui.lineEditDataToRetrieve->clear();
+                    ui.comboBoxOU->setCurrentIndex(0);
+                }//else{
+                    ui.lineEditFilter->setFocus();
+                //}
+            }
+
+        }
+
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
+            slotExportQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
+            slotPrintQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
+            slotModifyUserInfo();
+        }
+
+        //activityTimer->start();
+        return true;
+    }
+        break;
+        //    case QEvent::MouseButtonRelease:
+        //        {
+        //            activityTimer->start();
+        //            qWarning()<<"MouseButtonRelease";
+        //            return QObject::eventFilter(obj, event);
+        //        }
+        //        break;
+//    case QEvent::ToolTip:
+//    {
+//        if(obj == ui.userPSWDLineEdit){
+//            QString pwd = ui.userPSWDLineEdit->text();
+//            if(pwd.isEmpty()){pwd = tr("Password");}
+//            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+//            QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
+//            QToolTip::showText(helpEvent->globalPos(), tip);
+//            return true;
+//        }
+
+//    }
+//        break;
+    default:
+        return QObject::eventFilter(obj, event);
+
+
+    }
+
+    return QObject::eventFilter(obj, event);
 
 }
 
@@ -138,6 +225,7 @@ void ADUserInfoWidget::on_toolButtonConnect_clicked(){
 
     ui.groupBoxADUsersList->setEnabled(true);
 
+    ui.lineEditAccountName->setFocus();
 
 }
 
@@ -203,6 +291,38 @@ void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
 
 
 }
+
+void ADUserInfoWidget::slotExportQueryResult(){
+
+    DataOutputDialog dlg(ui.tableViewADUsers, DataOutputDialog::EXPORT, this);
+    dlg.exec();
+
+}
+
+void ADUserInfoWidget::slotPrintQueryResult(){
+
+#ifndef QT_NO_PRINTER
+    //TODO
+    DataOutputDialog dlg(ui.tableViewADUsers, DataOutputDialog::PRINT, this);
+    dlg.exec();
+#endif
+
+}
+
+void ADUserInfoWidget::slotModifyUserInfo(){
+
+
+
+
+
+
+}
+
+
+
+
+
+
 
 
 void ADUserInfoWidget::reset(){

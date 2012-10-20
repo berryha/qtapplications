@@ -26,6 +26,7 @@ public:
     QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
     void setADUserItems(const QStringList &attributeNames, const QList<QStringList/*Attribute Values*/> &userItems);
+    ADUser * getADUser(const QModelIndex & index);
 
 private:
     void clear();
