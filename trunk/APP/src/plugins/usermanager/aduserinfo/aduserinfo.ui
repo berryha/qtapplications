@@ -288,7 +288,46 @@
     </widget>
    </item>
   </layout>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>Print</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionResetPassword">
+   <property name="text">
+    <string>Reset Password</string>
+   </property>
+  </action>
+  <action name="actionDisableAccount">
+   <property name="text">
+    <string>Disable Account</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>lineEditServerIP</tabstop>
+  <tabstop>lineEditADAdminName</tabstop>
+  <tabstop>lineEditPassword</tabstop>
+  <tabstop>toolButtonConnect</tabstop>
+  <tabstop>tableViewADUsers</tabstop>
+  <tabstop>comboBoxQueryMode</tabstop>
+  <tabstop>lineEditAccountName</tabstop>
+  <tabstop>lineEditDisplayName</tabstop>
+  <tabstop>comboBoxOU</tabstop>
+  <tabstop>toolButtonQueryAD</tabstop>
+  <tabstop>lineEditFilter</tabstop>
+  <tabstop>lineEditDataToRetrieve</tabstop>
+ </tabstops>
  <resources>
   <include location="../usermanager.qrc"/>
  </resources>

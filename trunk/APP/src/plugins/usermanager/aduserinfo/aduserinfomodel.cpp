@@ -99,6 +99,14 @@ void ADUserInfoModel::clear(){
 
 }
 
+ADUser * ADUserInfoModel::getADUser(const QModelIndex & index){
+    if(!index.isValid()){
+        return 0;
+    }
+
+    return usersList.at(index.row());
+}
+
 ////////////////////////////////////////////////////////////
 
 ADUserInfoSortFilterProxyModel::ADUserInfoSortFilterProxyModel(QObject *parent)
