@@ -179,6 +179,7 @@ void ADUserInfoWidget::on_toolButtonQueryAD_clicked(){
     if(resultString.isEmpty()){
         QString error = m_adsi->AD_GetLastErrorString();
         if(!error.isEmpty()){
+            m_userInfoModel->setADUserItems(dataToRetrieve.split(","), QList<QStringList>());
             QMessageBox::critical(this, tr("Error"), tr("Failed to query!\r\n%1").arg(error) );
             return;
         }

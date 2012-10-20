@@ -64,7 +64,7 @@ QVariant ADUserInfoModel::headerData ( int section, Qt::Orientation orientation,
 
 void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QList<QStringList/*Attribute Values*/> &userItems){
 
-    clearADUsers();
+    clear();
     m_attributeNames =attributeNames;
 
     foreach (QStringList attributeValues, userItems) {
@@ -84,7 +84,9 @@ void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QL
 
 }
 
-void ADUserInfoModel::clearADUsers(){
+void ADUserInfoModel::clear(){
+
+    //beginResetModel();
 
     foreach (ADUser *user, usersList) {
         delete user;
@@ -92,6 +94,8 @@ void ADUserInfoModel::clearADUsers(){
     }
     usersList.clear();
     m_attributeNames.clear();
+
+    //endResetModel();
 
 }
 

@@ -28,7 +28,8 @@ public:
     void setADUserItems(const QStringList &attributeNames, const QList<QStringList/*Attribute Values*/> &userItems);
 
 private:
-    void clearADUsers();
+    void clear();
+
 
 private:
     QList<ADUser *> usersList;
