@@ -299,7 +299,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="ADUserInfoWidget" name="tabAD">
+      <widget class="HEHUI::ADUserInfoWidget" name="tabAD">
        <attribute name="title">
         <string>Active Directory</string>
        </attribute>
@@ -363,7 +363,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ADUserInfoWidget</class>
+   <class>HEHUI::ADUserInfoWidget</class>
    <extends>QWidget</extends>
    <header>aduserinfo/aduserinfowidget.h</header>
    <container>1</container>
