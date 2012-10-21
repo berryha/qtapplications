@@ -60,13 +60,26 @@ private slots:
     void on_comboBoxQueryMode_currentIndexChanged( int index );
     void on_toolButtonQueryAD_clicked();
 
+    void on_actionExport_triggered(){slotExportQueryResult();}
+    void on_actionPrint_triggered(){slotPrintQueryResult();}
+    void on_actionEdit_triggered(){slotModifyADUserInfo();}
+    void on_actionResetPassword_triggered(){slotResetADUserPassword();}
+    void on_actionDisableAccount_triggered(){slotDisableADUserAccount();}
+
+
     void slotExportQueryResult();
     void slotPrintQueryResult();
-    void slotModifyUserInfo();
+
+    void slotViewADUserInfo();
+    void slotModifyADUserInfo();
+
+    void slotResetADUserPassword();
+    void slotDisableADUserAccount();
+
 
     void slotShowCustomContextMenu(const QPoint & pos);
     void updateActions();
-
+    void getSelectedADUser(const QModelIndex &index);
 
 
 
@@ -78,6 +91,7 @@ private:
 
     ADSI *m_adsi;
     bool m_adOpened;
+    ADUser *m_selectedADUser;
 
     //QString m_defaultNamingContext;
 

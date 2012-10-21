@@ -55,6 +55,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QInputDialog>
 
 #include "aduserinfowidget.h"
 
@@ -75,6 +76,8 @@ ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     m_adsi = new ADSI(this);
     m_adOpened = false;
 
+    m_selectedADUser = 0;
+
     //m_defaultNamingContext = "";
 
     m_userInfoModel = new ADUserInfoModel(this);
@@ -93,6 +96,9 @@ ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
     this->installEventFilter(this);
 
     connect(ui.tableViewADUsers, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowCustomContextMenu(QPoint)));
+    connect(ui.tableViewADUsers, SIGNAL(clicked(const QModelIndex &)), this, SLOT(getSelectedADUser(const QModelIndex &)));
+    //connect(ui.tableViewADUsers->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
+    connect(ui.tableViewADUsers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotViewADUserInfo()));
 
 }
 
@@ -104,10 +110,7 @@ bool ADUserInfoWidget::eventFilter(QObject *obj, QEvent *event) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
 
         if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
-            ADUser * user = m_userInfoModel->getADUser(ui.tableViewADUsers->currentIndex());
-            if(user){
-                QMessageBox::information(this, "sAMAccountName", user->getAttribute("sAMAccountName"));
-            }
+            getSelectedADUser(ui.tableViewADUsers->currentIndex());
         }
 
         if(keyEvent->key() == Qt::Key_Escape){
@@ -139,7 +142,8 @@ bool ADUserInfoWidget::eventFilter(QObject *obj, QEvent *event) {
             slotPrintQueryResult();
         }
         if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
-            slotModifyUserInfo();
+            getSelectedADUser(ui.tableViewADUsers->currentIndex());
+            slotModifyADUserInfo();
         }
 
         //activityTimer->start();
@@ -313,14 +317,71 @@ void ADUserInfoWidget::slotPrintQueryResult(){
 
 }
 
-void ADUserInfoWidget::slotModifyUserInfo(){
+void ADUserInfoWidget::slotViewADUserInfo(){
+
+}
+
+void ADUserInfoWidget::slotModifyADUserInfo(){
+
+}
+
+void ADUserInfoWidget::slotResetADUserPassword(){
+    QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
+    if(sAMAccountName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
+        return;
+    }
+
+    QString newPassword = "";
+    bool ok = false;
+    do {
+        QString text = QInputDialog::getText(this, tr("Reset Password"),
+                                             tr("New Password(8 Characters MIN.):"), QLineEdit::Password,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            newPassword = text.trimmed();
+            if(newPassword.size() < 8){
+                QMessageBox::critical(this, tr("Error"), "At least 8 characters are required fro the password!");
+            }else{
+                break;
+            }
+        }else{
+            return;
+        }
+
+    } while (ok);
+
+    ok = false;
+    do {
+        QString text = QInputDialog::getText(this, tr("Reset Password"),
+                                             tr("Confirm Password:"), QLineEdit::Password,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            if(newPassword != text.trimmed() ){
+                QMessageBox::critical(this, tr("Error"), "Passwords do not match!");
+            }else{
+                break;
+            }
+        }else{
+            return;
+        }
+
+    } while (ok);
 
 
-
-
+    if(!m_adsi->AD_SetPassword(sAMAccountName, newPassword)){
+        QMessageBox::critical(this, tr("Error"), QString("Failed to reset password for user '%1'! \r\\\n%2").arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+    }else{
+        QMessageBox::information(this, tr("OK"), QString("Password has been reset for user '%1'!").arg(sAMAccountName) );
+    }
 
 
 }
+
+void ADUserInfoWidget::slotDisableADUserAccount(){
+
+}
+
 
 void ADUserInfoWidget::slotShowCustomContextMenu(const QPoint & pos){
 
@@ -347,10 +408,22 @@ void ADUserInfoWidget::slotShowCustomContextMenu(const QPoint & pos){
 
 #endif
 
-#ifdef Q_OS_WIN32
+//#ifdef Q_OS_WIN32
     menu.addSeparator();
-    menu.addAction(ui.actionEdit);
-#endif
+    //menu.addAction(ui.actionEdit);
+
+    QMenu accountMenu(tr("Account"), this);
+    accountMenu.addAction(ui.actionEdit);
+    accountMenu.addAction(ui.actionDisableAccount);
+    menu.addMenu(&accountMenu);
+
+    QMenu passwordMenu(tr("Password"), this);
+    passwordMenu.addAction(ui.actionResetPassword);
+    menu.addMenu(&passwordMenu);
+
+
+
+//#endif
 
     menu.exec(tableView->viewport()->mapToGlobal(pos));
 
@@ -360,6 +433,8 @@ void ADUserInfoWidget::updateActions() {
     //bool enableIns = qobject_cast<QSqlQueryModel *>(ui.userListTableView->model());
     bool enableExp = ui.tableViewADUsers->currentIndex().isValid() && ui.tableViewADUsers->selectionModel()->selectedIndexes().size();
     //bool enableModify =  enableIns&& enableExp;
+
+
 
     ui.actionExport->setEnabled(enableExp);
     ui.actionPrint->setEnabled(enableExp);
@@ -374,6 +449,17 @@ void ADUserInfoWidget::updateActions() {
 //        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
 //    }
 #endif
+
+}
+
+void ADUserInfoWidget::getSelectedADUser(const QModelIndex &index){
+
+    if(!index.isValid()){
+        m_selectedADUser = 0;
+        return;
+    }
+
+    m_selectedADUser = m_userInfoModel->getADUser(index);
 
 }
 
