@@ -1,0 +1,488 @@
+/*
+ ****************************************************************************
+ * ADUserManagerWidget.cpp
+ *
+ * Created on: 2012-10-19
+ *     Author: 贺辉
+ *    License: LGPL
+ *    Comment:
+ *
+ *
+ *    =============================  Usage  =============================
+ *|
+ *|
+ *    ===================================================================
+ *
+ *
+ * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ ****************************************************************************
+ */
+
+/*
+ ***************************************************************************
+ * Last Modified on: 2012-10-19
+ * Last Modified by: 贺辉
+ ***************************************************************************
+ */
+
+
+
+#ifndef DOMAIN_NAME
+#define DOMAIN_NAME "sitoy.group"
+#endif
+#ifndef DOMAIN_DEFAULTNAMINGCONTEXT
+#define DOMAIN_DEFAULTNAMINGCONTEXT "DC=test,DC=local"
+#endif
+
+#ifndef DOMAIN_DC_IP
+#define DOMAIN_DC_IP "200.200.200.106"
+#endif
+#ifndef DOMAIN_ADMIN_NAME
+#define DOMAIN_ADMIN_NAME "dgadmin"
+#endif
+#ifndef DOMAIN_ADMIN_PASSWORD
+#define DOMAIN_ADMIN_PASSWORD "dmsto&*("
+#endif
+
+#ifndef ADSI_LIB
+#define ADSI_LIB "adsi.dll"
+#endif
+
+
+#include <QMessageBox>
+#include <QDebug>
+#include <QKeyEvent>
+#include <QMenu>
+#include <QInputDialog>
+
+#include "adusermanagerwidget.h"
+
+#include "HHSharedGUI/hdataoutputdialog.h"
+
+
+
+
+namespace HEHUI {
+
+ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
+    QWidget(parent)
+{
+    ui.setupUi(this);
+
+    ui.lineEditServerIP->setText(DOMAIN_DC_IP);
+
+    m_adsi = new ADSI(this);
+    m_adOpened = false;
+
+    m_selectedADUser = 0;
+
+    //m_defaultNamingContext = "";
+
+    m_userInfoModel = new ADUserInfoModel(this);
+    m_sortFilterProxyModel = new ADUserInfoSortFilterProxyModel(this);
+    m_sortFilterProxyModel->setSourceModel(m_userInfoModel);
+    ui.tableViewADUsers->setModel(m_sortFilterProxyModel);
+
+    ui.comboBoxQueryMode->setCurrentIndex(0);
+    ui.stackedWidget->setCurrentWidget(ui.pageSimpleQuery);
+
+    ui.lineEditFilter->setText("(&(objectcategory=person)(objectclass=user)(sAMAccountName=*)(displayName=*))");
+    ui.lineEditDataToRetrieve->setText("sAMAccountName,displayName");
+
+    ui.toolButtonConnect->setFocus();
+
+    this->installEventFilter(this);
+
+    connect(ui.tableViewADUsers, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowCustomContextMenu(QPoint)));
+    connect(ui.tableViewADUsers, SIGNAL(clicked(const QModelIndex &)), this, SLOT(getSelectedADUser(const QModelIndex &)));
+    //connect(ui.tableViewADUsers->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
+    connect(ui.tableViewADUsers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotViewADUserInfo()));
+
+}
+
+bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
+
+    switch(event->type()){
+    case QEvent::KeyRelease:
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *> (event);
+
+        if(keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down){
+            getSelectedADUser(ui.tableViewADUsers->currentIndex());
+        }
+
+        if(keyEvent->key() == Qt::Key_Escape){
+
+            if(!ui.comboBoxQueryMode->currentIndex() == 0){
+                if(ui.lineEditAccountName->hasFocus()){
+                    ui.lineEditAccountName->clear();
+                    ui.lineEditDisplayName->clear();
+                    ui.comboBoxOU->setCurrentIndex(0);
+                }//else{
+                    ui.lineEditAccountName->setFocus();
+                //}
+            }else{
+                if(ui.lineEditFilter->hasFocus()){
+                    ui.lineEditFilter->clear();
+                    ui.lineEditDataToRetrieve->clear();
+                    ui.comboBoxOU->setCurrentIndex(0);
+                }//else{
+                    ui.lineEditFilter->setFocus();
+                //}
+            }
+
+        }
+
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_O){
+            slotExportQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_P){
+            slotPrintQueryResult();
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
+            getSelectedADUser(ui.tableViewADUsers->currentIndex());
+            slotModifyADUserInfo();
+        }
+
+        //activityTimer->start();
+        return true;
+    }
+        break;
+        //    case QEvent::MouseButtonRelease:
+        //        {
+        //            activityTimer->start();
+        //            qWarning()<<"MouseButtonRelease";
+        //            return QObject::eventFilter(obj, event);
+        //        }
+        //        break;
+//    case QEvent::ToolTip:
+//    {
+//        if(obj == ui.userPSWDLineEdit){
+//            QString pwd = ui.userPSWDLineEdit->text();
+//            if(pwd.isEmpty()){pwd = tr("Password");}
+//            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+//            QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
+//            QToolTip::showText(helpEvent->globalPos(), tip);
+//            return true;
+//        }
+
+//    }
+//        break;
+    default:
+        return QObject::eventFilter(obj, event);
+
+
+    }
+
+    return QObject::eventFilter(obj, event);
+
+}
+
+void ADUserManagerWidget::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        ui.retranslateUi(this);
+        break;
+    default:
+        break;
+    }
+}
+
+void ADUserManagerWidget::on_toolButtonConnect_clicked(){
+    qDebug()<<"--ADUserInfo::on_ui_toolButtonConnect_clicked()";
+    if(m_adOpened){
+        m_adsi->AD_Close();
+        m_adsi->unloadLibrary();
+        reset();
+        ui.groupBoxADUsersList->setEnabled(false);
+        ui.comboBoxOU->clear();
+        m_adOpened = false;
+        return;
+    }
+
+    QString serverIP = ui.lineEditServerIP->text().trimmed();
+    QString adminName = ui.lineEditADAdminName->text().trimmed();
+    if(adminName.isEmpty()){adminName = DOMAIN_ADMIN_NAME;}
+    QString password = ui.lineEditPassword->text().trimmed();
+    if(password.isEmpty()){password = DOMAIN_ADMIN_PASSWORD;}
+
+    if (!m_adsi->loadLibrary(ADSI_LIB)){
+        QMessageBox::critical(this, tr("Error"), m_adsi->lastErrorString());
+        m_adsi->unloadLibrary();
+        return;
+    }
+
+    m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 0);
+    if(!m_adOpened){
+        QMessageBox::critical(this, tr("Error"), m_adsi->lastErrorString());
+        return;
+    }
+
+    //m_defaultNamingContext = m_adsi->AD_DefaultNamingContext();
+
+    ui.comboBoxOU->addItem("");
+
+    QString ous = m_adsi->AD_GetAllOUs("", ";", "\\");
+    QStringList ouList = ous.split(";");
+    ouList.sort();
+    ui.comboBoxOU->addItems(ouList);
+
+    ui.groupBoxADUsersList->setEnabled(true);
+
+    ui.lineEditAccountName->setFocus();
+
+}
+
+void ADUserManagerWidget::on_comboBoxQueryMode_currentIndexChanged( int index ){
+    if(index == 0){
+        ui.stackedWidget->setCurrentWidget(ui.pageSimpleQuery);
+    }else{
+        ui.stackedWidget->setCurrentWidget(ui.pageCustomQuery);
+    }
+}
+
+void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
+
+    QString itemSeparator = "\\", attributeSeparator = "|";
+
+    QString filter, dataToRetrieve;
+    if(ui.comboBoxQueryMode->currentIndex() == 0){
+        QString displayName = ui.lineEditDisplayName->text();
+        filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=%1*)").arg(displayName));
+        dataToRetrieve = "sAMAccountName,displayName,userWorkstations,telephoneNumber,description,objectGUID,objectSid";
+    }else{
+        filter = ui.lineEditFilter->text();
+        dataToRetrieve = ui.lineEditDataToRetrieve->text().trimmed();
+    }
+
+    QString ouString = ui.comboBoxOU->currentText();
+    if(ouString.contains("\\")){
+        QStringList ousList = ouString.split("\\");
+        ouString = "";
+        while (!ousList.isEmpty()) {
+            ouString = ouString + "OU=" + ousList.takeLast() + ",";
+        }
+        ouString += DOMAIN_DEFAULTNAMINGCONTEXT;
+    }else if(!ouString.isEmpty()){
+        ouString = ouString + "," + DOMAIN_DEFAULTNAMINGCONTEXT;
+    }
+
+    QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, itemSeparator, attributeSeparator);
+    if(resultString.isEmpty()){
+        QString error = m_adsi->AD_GetLastErrorString();
+        if(!error.isEmpty()){
+            m_userInfoModel->setADUserItems(dataToRetrieve.split(","), QList<QStringList>());
+            QMessageBox::critical(this, tr("Error"), tr("Failed to query!\r\n%1").arg(error) );
+            return;
+        }
+    }
+
+
+//QMessageBox::information(this, "resultString", resultString);
+
+    QStringList itemStrings = resultString.split(itemSeparator);
+    QList<QStringList> items;
+    foreach (QString itemString, itemStrings) {
+        QStringList attributes = itemString.split(attributeSeparator);
+        items.append(attributes);
+    }
+
+    m_userInfoModel->setADUserItems(dataToRetrieve.split(","), items);
+
+    ui.tableViewADUsers->horizontalHeader ()->resizeSections(QHeaderView::ResizeToContents);
+    //ui.tableViewADUsers->resizeColumnToContents(0);
+    //ui.tableViewADUsers->setColumnHidden(3, true);
+
+
+}
+
+void ADUserManagerWidget::slotExportQueryResult(){
+
+    DataOutputDialog dlg(ui.tableViewADUsers, DataOutputDialog::EXPORT, this);
+    dlg.exec();
+
+}
+
+void ADUserManagerWidget::slotPrintQueryResult(){
+
+#ifndef QT_NO_PRINTER
+    //TODO
+    DataOutputDialog dlg(ui.tableViewADUsers, DataOutputDialog::PRINT, this);
+    dlg.exec();
+#endif
+
+}
+
+void ADUserManagerWidget::slotViewADUserInfo(){
+
+}
+
+void ADUserManagerWidget::slotModifyADUserInfo(){
+
+}
+
+void ADUserManagerWidget::slotResetADUserPassword(){
+    QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
+    if(sAMAccountName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
+        return;
+    }
+
+    QString newPassword = "";
+    bool ok = false;
+    do {
+        QString text = QInputDialog::getText(this, tr("Reset Password"),
+                                             tr("New Password(8 Characters MIN.):"), QLineEdit::Password,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            newPassword = text.trimmed();
+            if(newPassword.size() < 8){
+                QMessageBox::critical(this, tr("Error"), "At least 8 characters are required fro the password!");
+            }else{
+                break;
+            }
+        }else{
+            return;
+        }
+
+    } while (ok);
+
+    ok = false;
+    do {
+        QString text = QInputDialog::getText(this, tr("Reset Password"),
+                                             tr("Confirm Password:"), QLineEdit::Password,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            if(newPassword != text.trimmed() ){
+                QMessageBox::critical(this, tr("Error"), "Passwords do not match!");
+            }else{
+                break;
+            }
+        }else{
+            return;
+        }
+
+    } while (ok);
+
+
+    if(!m_adsi->AD_SetPassword(sAMAccountName, newPassword)){
+        QMessageBox::critical(this, tr("Error"), QString("Failed to reset password for user '%1'! \r\\\n%2").arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+    }else{
+        QMessageBox::information(this, tr("OK"), QString("Password has been reset for user '%1'!").arg(sAMAccountName) );
+    }
+
+
+}
+
+void ADUserManagerWidget::slotDisableADUserAccount(){
+
+}
+
+
+void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
+
+    QTableView *tableView = qobject_cast<QTableView*> (sender());
+
+    if (!tableView){
+        return;
+    }
+
+    updateActions();
+
+    QMenu menu(this);
+    menu.addAction(ui.actionExport);
+
+#ifndef QT_NO_PRINTER
+
+    menu.addSeparator();
+
+    ui.actionPrint->setShortcut(QKeySequence::Print);
+    menu.addAction(ui.actionPrint);
+
+    //	ui.actionPrintPreview->setShortcut(Qt::CTRL + Qt::Key_P);
+    //  menu.addAction(ui.actionPrintPreview);
+
+#endif
+
+//#ifdef Q_OS_WIN32
+    menu.addSeparator();
+    //menu.addAction(ui.actionEdit);
+
+    QMenu accountMenu(tr("Account"), this);
+    accountMenu.addAction(ui.actionEdit);
+    accountMenu.addAction(ui.actionDisableAccount);
+    menu.addMenu(&accountMenu);
+
+    QMenu passwordMenu(tr("Password"), this);
+    passwordMenu.addAction(ui.actionResetPassword);
+    menu.addMenu(&passwordMenu);
+
+
+
+//#endif
+
+    menu.exec(tableView->viewport()->mapToGlobal(pos));
+
+}
+
+void ADUserManagerWidget::updateActions() {
+    //bool enableIns = qobject_cast<QSqlQueryModel *>(ui.userListTableView->model());
+    bool enableExp = ui.tableViewADUsers->currentIndex().isValid() && ui.tableViewADUsers->selectionModel()->selectedIndexes().size();
+    //bool enableModify =  enableIns&& enableExp;
+
+
+
+    ui.actionExport->setEnabled(enableExp);
+    ui.actionPrint->setEnabled(enableExp);
+
+#ifdef Q_OS_WIN32
+    ui.actionEdit->setEnabled(enableExp);
+
+    ui.actionResetPassword->setEnabled(enableExp);
+    ui.actionDisableAccount->setEnabled(enableExp);
+
+//    if(!m_isJoinedToDomain){
+//        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
+//    }
+#endif
+
+}
+
+void ADUserManagerWidget::getSelectedADUser(const QModelIndex &index){
+
+    if(!index.isValid()){
+        m_selectedADUser = 0;
+        return;
+    }
+
+    m_selectedADUser = m_userInfoModel->getADUser(index);
+
+}
+
+
+
+
+
+
+
+
+
+void ADUserManagerWidget::reset(){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
