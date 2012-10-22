@@ -77,6 +77,7 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     m_adOpened = false;
 
     m_selectedADUser = 0;
+    m_adUserInfoWidget = 0;
 
     //m_defaultNamingContext = "";
 
@@ -324,13 +325,30 @@ void ADUserManagerWidget::slotPrintQueryResult(){
 }
 
 void ADUserManagerWidget::slotViewADUserInfo(){
+    showADUserInfoWidget(false);
 
 }
 
 void ADUserManagerWidget::slotModifyADUserInfo(){
 
-    ADUserInfoWidget wgt(m_adsi, this);
-    wgt.show();
+    showADUserInfoWidget(false);
+}
+
+void ADUserManagerWidget::showADUserInfoWidget(bool createNewUser){
+
+    QDialog dlg(this);
+    QVBoxLayout vbl(&dlg);
+
+    ADUserInfoWidget wgt(m_adsi, createNewUser, &dlg);
+//    connect(this, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), &wgt, SLOT(slotProcessRegistrationResult(quint8, const QString&))/*, Qt::QueuedConnection*/);
+//    connect(&wgt, SIGNAL(registration(const QString &, const QString &, const QString &)), this, SLOT(slotRegistration(const QString &, const QString &, const QString &)));
+//    connect(&wgt, SIGNAL(canceled()), &dlg, SLOT(accept()));
+
+    vbl.addWidget(&wgt);
+    dlg.setLayout(&vbl);
+    dlg.updateGeometry();
+    dlg.setWindowTitle(tr("AD User Info"));
+    dlg.exec();
 
 }
 

@@ -24,11 +24,14 @@ class ADUserInfoWidget : public QWidget
     Q_OBJECT
     
 public:
-    explicit ADUserInfoWidget(ADSI *adsi, QWidget *parent = 0);
+    explicit ADUserInfoWidget(ADSI *adsi, bool createNewUser = false, QWidget *parent = 0);
     ~ADUserInfoWidget();
     
 private:
     Ui::ADUserInfoWidgetUI ui;
+
+    bool m_createNewUser;
+    ADSI *m_adsi;
 
 
 
