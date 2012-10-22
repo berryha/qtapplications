@@ -34,6 +34,7 @@
 
 #include "ui_adusermanagerwidget.h"
 #include "aduserinfomodel.h"
+#include "aduserinfowidget.h"
 
 #ifdef Q_OS_WIN32
 #include "HHSharedWindowsManagement/hadsi.h"
@@ -87,7 +88,7 @@ private:
     void reset();
 
 private:
-    Ui::ADUserManagerWidgetClass ui;
+    Ui::ADUserManagerWidgetUI ui;
 
     ADSI *m_adsi;
     bool m_adOpened;

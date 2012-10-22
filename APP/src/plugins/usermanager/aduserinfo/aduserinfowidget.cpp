@@ -1,14 +1,33 @@
 #include "aduserinfowidget.h"
 #include "ui_aduserinfowidget.h"
 
-ADUserInfoWidget::ADUserInfoWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ADUserInfoWidget)
+
+
+namespace HEHUI {
+
+ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, QWidget *parent) :
+    QWidget(parent)
 {
-    ui->setupUi(this);
+    ui.setupUi(this);
+
+
+
 }
 
 ADUserInfoWidget::~ADUserInfoWidget()
 {
-    delete ui;
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+} //namespace HEHUI
