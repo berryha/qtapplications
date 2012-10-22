@@ -29,18 +29,21 @@ HEADERS += usermanagerplugin.h \
     usermanagermainwindow.h \
     modifyuserinfo/modifyuserinfodialog.h \
     aduserinfo/aduserinfomodel.h \
-    aduserinfo/aduserinfowidget.h \
-    aduserinfo/aduser.h
+    aduserinfo/aduser.h \
+    aduserinfo/adusermanagerwidget.h \
+    aduserinfo/aduserinfowidget.h
 FORMS +=  \
     modifyuserinfo/modifyuserinfodialog.ui \
     usermanagermainwindow.ui \
-    aduserinfo/aduserinfo.ui
+    aduserinfo/adusermanagerwidget.ui \
+    aduserinfo/aduserinfowidget.ui
 SOURCES += usermanagerplugin.cpp \
     usermanagermainwindow.cpp \
     modifyuserinfo/modifyuserinfodialog.cpp \
     aduserinfo/aduserinfomodel.cpp \
-    aduserinfo/aduserinfowidget.cpp \
-    aduserinfo/aduser.cpp
+    aduserinfo/aduser.cpp \
+    aduserinfo/adusermanagerwidget.cpp \
+    aduserinfo/aduserinfowidget.cpp
 RESOURCES += usermanager.qrc
 
 win32 {
