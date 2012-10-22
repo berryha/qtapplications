@@ -183,9 +183,7 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_Pa
     IF FAILED(hr) THEN
         SetError(3, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-        MSGBOX OBJRESULT$(hr) & $CRLF & "Code:" & STR$(hr), %MB_ICONERROR, "Error"
-        'MsgBox FORMAT$(hr)
-
+		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
         FUNCTION = 0
         EXIT FUNCTION
     END IF
@@ -206,9 +204,7 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_Pa
     IF FAILED(hr) THEN
         SetError(4, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-        MSGBOX OBJRESULT$(hr) & $CRLF & "Code:" & STR$(hr), %MB_ICONERROR, "Error"
-        'MsgBox FORMAT$(hr)
-
+		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
         FUNCTION = 0
         EXIT FUNCTION
     END IF
