@@ -194,6 +194,10 @@ void ADUserManagerWidget::changeEvent(QEvent *e)
 
 void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     qDebug()<<"--ADUserInfo::on_ui_toolButtonConnect_clicked()";
+
+    ui.toolButtonConnect->setEnabled(false);
+    qApp->processEvents();
+
     if(m_adOpened){
         m_adsi->AD_Close();
         m_adsi->unloadLibrary();
@@ -211,14 +215,16 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     if(password.isEmpty()){password = DOMAIN_ADMIN_PASSWORD;}
 
     if (!m_adsi->loadLibrary(ADSI_LIB)){
-        QMessageBox::critical(this, tr("Error"), m_adsi->lastErrorString());
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load ADSI library! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
         m_adsi->unloadLibrary();
+        ui.toolButtonConnect->setEnabled(true);
         return;
     }
 
     m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 0);
     if(!m_adOpened){
-        QMessageBox::critical(this, tr("Error"), m_adsi->lastErrorString());
+        QMessageBox::critical(this, tr("Error"), tr("Failed to connect to DC! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
+        ui.toolButtonConnect->setEnabled(true);
         return;
     }
 
@@ -322,6 +328,9 @@ void ADUserManagerWidget::slotViewADUserInfo(){
 }
 
 void ADUserManagerWidget::slotModifyADUserInfo(){
+
+    ADUserInfoWidget wgt(m_adsi, this);
+    wgt.show();
 
 }
 
