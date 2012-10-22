@@ -5,8 +5,8 @@
 
 namespace HEHUI {
 
-ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, QWidget *parent) :
-    QWidget(parent)
+ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, bool createNewUser, QWidget *parent) :
+    QWidget(parent), m_adsi(adsi), m_createNewUser(createNewUser)
 {
     ui.setupUi(this);
 

@@ -73,6 +73,7 @@ private slots:
 
     void slotViewADUserInfo();
     void slotModifyADUserInfo();
+    void showADUserInfoWidget(bool createNewUser);
 
     void slotResetADUserPassword();
     void slotDisableADUserAccount();
@@ -93,6 +94,8 @@ private:
     ADSI *m_adsi;
     bool m_adOpened;
     ADUser *m_selectedADUser;
+    ADUserInfoWidget *m_adUserInfoWidget;
+
 
     //QString m_defaultNamingContext;
 
