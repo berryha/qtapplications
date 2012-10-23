@@ -1218,7 +1218,7 @@ END FUNCTION '==>AD_GetObjectAttribute
 ' Syntax.........: AD_ModifyAttribute(sAD_Object, sAD_Attribute[, sAD_Value = ""[, iAD_Option = 1]])
 ' Parameters ....: sAD_Object - Object (user, group ...) to add/delete/modify an attribute (sAMAccountName or FQDN)
 '                  sAD_Attribute - Attribute to add/delete/modify
-'                  sAD_Value - Optional: Value to modify the attribute to. Use a blank string ("") to delete the attribute (default).
+'                  sAD_ValueParam - Optional: Value to modify the attribute to. Use a blank string ("") to delete the attribute (default).
 '                  +sAD_Value can be a single value (as a string) or a multi-value (as a one-dimensional array)
 '                  iAD_Option - Optional: Indicates the mode of modification: Append, Replace, Remove, and Delete
 '                  |1 - CLEAR: remove all the property value(s) from the object (default when $sAD_value = "")
@@ -1237,14 +1237,14 @@ END FUNCTION '==>AD_GetObjectAttribute
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa746353(VS.85).aspx (ADS_PROPERTY_OPERATION_ENUM Enumeration)
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING, BYVAL sAD_Value AS WSTRING, OPT BYVAL iAD_Option AS LONG) EXPORT AS LONG
+FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING, BYVAL sAD_ValueParam AS WSTRING, OPT BYVAL iAD_Option AS LONG) EXPORT AS LONG
 
    SetError(0, "")
 
-   DIM sAD_Object AS WSTRINGZ * 512
+   DIM sAD_Object AS WSTRINGZ * 512, sAD_Attribute AS WSTRINGZ * 256, sAD_Value as WSTRINGZ * 512
    sAD_Object = sAD_ObjectParam
-   DIM sAD_Attribute AS WSTRINGZ * 256
    sAD_Attribute = sAD_AttributeParam
+	sAD_Value = sAD_ValueParam
 
     IF AD_ObjectExists(sAD_Object, "") = 0 THEN
       SetError(1, "Object '" & sAD_Object & "' could not be found!")
@@ -1296,7 +1296,7 @@ FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYVAL sAD_ObjectParam AS
    END IF
 
 
-    FUNCTION = 1
+   FUNCTION = 1
 
 END FUNCTION   '==>AD_ModifyAttribute
 
@@ -1576,7 +1576,7 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstri
 		end if
 			
 	End If
-	
+
 	'if sAD_Filter = "" THEN sAD_Filter = "(name=*)"
 	if sAD_Filter = "" THEN sAD_Filter = "(sAMAccountName=*)"
 	if sAD_DataToRetrieve = "" THEN sAD_DataToRetrieve =  "sAMAccountName"
@@ -1761,7 +1761,7 @@ function convertADOVariantToString(byref vValue as variant, byval sAD_Attribute 
 			FOR n = lb TO ub
 				valuesArray.ValueGet(BYREF a, n)
 				'MSGBOX "VariantVT:" & STR$(VARIANTVT(a)) & "       " &  STR$( VARIANT#(a) )
-				if sAD_Attribute = "objectClass" or sAD_Attribute = "memberOf" THEN
+				if sAD_Attribute = "objectClass" or sAD_Attribute = "memberOf" or sAD_Attribute = "description" THEN
 					result = result & variant$$(a) & valuesArraySeparator
 				elseif sAD_Attribute = "dSCorePropagationData" then
 					LOCAL dSCorePropagationDataTime AS IAfxTime
