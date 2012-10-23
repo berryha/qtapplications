@@ -63,7 +63,7 @@ private slots:
 
     void on_actionExport_triggered(){slotExportQueryResult();}
     void on_actionPrint_triggered(){slotPrintQueryResult();}
-    void on_actionEdit_triggered(){slotModifyADUserInfo();}
+    void on_actionCreateNewAccount_triggered(){slotCreateADUser(0);}
     void on_actionResetPassword_triggered(){slotResetADUserPassword();}
     void on_actionDisableAccount_triggered(){slotDisableADUserAccount();}
 
@@ -71,9 +71,9 @@ private slots:
     void slotExportQueryResult();
     void slotPrintQueryResult();
 
-    void slotViewADUserInfo();
-    void slotModifyADUserInfo();
-    void showADUserInfoWidget(bool createNewUser);
+    void slotViewADUserInfo(const QModelIndex &index);
+    void slotCreateADUser(ADUser *adUser);
+    void showADUserInfoWidget(ADUser *adUser);
 
     void slotResetADUserPassword();
     void slotDisableADUserAccount();

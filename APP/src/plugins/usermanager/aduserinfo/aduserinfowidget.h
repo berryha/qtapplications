@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "ui_aduserinfowidget.h"
+#include "aduser.h"
 
 #ifdef Q_OS_WIN32
 #include "HHSharedWindowsManagement/hadsi.h"
@@ -24,14 +25,45 @@ class ADUserInfoWidget : public QWidget
     Q_OBJECT
     
 public:
-    explicit ADUserInfoWidget(ADSI *adsi, bool createNewUser = false, QWidget *parent = 0);
+    explicit ADUserInfoWidget(ADSI *adsi, ADUser *adUser, QWidget *parent = 0);
     ~ADUserInfoWidget();
     
+signals:
+    void signalCloseWidget();
+
+private slots:
+    void on_pushButtonEdit_clicked();
+    void on_pushButtonClose_clicked();
+
+    void saveChanges();
+
+private:
+    void initUI();
+    void switchToEditMode();
+    void switchToViewMode();
+
+
 private:
     Ui::ADUserInfoWidgetUI ui;
 
-    bool m_createNewUser;
     ADSI *m_adsi;
+    ADUser *m_adUser;
+
+
+    QString m_accountName;
+    QString m_displayName;
+    QString m_description;
+    QString m_userWorkstations;
+    QString m_telephone;
+    QString m_guid;
+    QString m_sid;
+
+//    QString m_cn;
+//    QString m_distinguishedName;
+    QString m_simpleOUString;
+    QString m_fullOUString;
+
+
 
 
 

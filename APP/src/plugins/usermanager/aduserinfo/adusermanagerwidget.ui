@@ -301,9 +301,9 @@
     <string>Print</string>
    </property>
   </action>
-  <action name="actionEdit">
+  <action name="actionCreateNewAccount">
    <property name="text">
-    <string>Edit</string>
+    <string>Create New Account</string>
    </property>
   </action>
   <action name="actionResetPassword">
