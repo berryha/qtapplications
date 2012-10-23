@@ -1,5 +1,7 @@
 #include "aduserinfomodel.h"
 
+
+
 namespace HEHUI {
 
 ADUserInfoModel::ADUserInfoModel(QObject *parent)
