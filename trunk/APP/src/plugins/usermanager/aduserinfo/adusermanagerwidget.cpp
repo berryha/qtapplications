@@ -99,7 +99,7 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     connect(ui.tableViewADUsers, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowCustomContextMenu(QPoint)));
     connect(ui.tableViewADUsers, SIGNAL(clicked(const QModelIndex &)), this, SLOT(getSelectedADUser(const QModelIndex &)));
     //connect(ui.tableViewADUsers->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
-    connect(ui.tableViewADUsers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotViewADUserInfo()));
+    connect(ui.tableViewADUsers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotViewADUserInfo(const QModelIndex &)));
 
 }
 
@@ -143,8 +143,8 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
             slotPrintQueryResult();
         }
         if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_E){
-            getSelectedADUser(ui.tableViewADUsers->currentIndex());
-            slotModifyADUserInfo();
+            //getSelectedADUser(ui.tableViewADUsers->currentIndex());
+            slotViewADUserInfo(ui.tableViewADUsers->currentIndex());
         }
 
         //activityTimer->start();
@@ -229,7 +229,8 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
         return;
     }
 
-    //m_defaultNamingContext = m_adsi->AD_DefaultNamingContext();
+    //QString adDefaultNamingContext = m_adsi->AD_DefaultNamingContext();
+    ADUser::setADDefaultNamingContext( DOMAIN_DEFAULTNAMINGCONTEXT );
 
     ui.comboBoxOU->addItem("");
 
@@ -237,6 +238,7 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     QStringList ouList = ous.split(";");
     ouList.sort();
     ui.comboBoxOU->addItems(ouList);
+    ADUser::setOUList(ouList);
 
     ui.groupBoxADUsersList->setEnabled(true);
 
@@ -324,25 +326,28 @@ void ADUserManagerWidget::slotPrintQueryResult(){
 
 }
 
-void ADUserManagerWidget::slotViewADUserInfo(){
-    showADUserInfoWidget(false);
+void ADUserManagerWidget::slotViewADUserInfo(const QModelIndex &index){
+    if(!index.isValid()){
+        return;
+    }
+
+    getSelectedADUser(index);
+    showADUserInfoWidget(m_selectedADUser);
 
 }
 
-void ADUserManagerWidget::slotModifyADUserInfo(){
-
-    showADUserInfoWidget(false);
+void ADUserManagerWidget::slotCreateADUser(ADUser *adUser){
+    showADUserInfoWidget(adUser);
 }
 
-void ADUserManagerWidget::showADUserInfoWidget(bool createNewUser){
+void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
 
     QDialog dlg(this);
     QVBoxLayout vbl(&dlg);
+    vbl.setContentsMargins(1, 1, 1, 1);
 
-    ADUserInfoWidget wgt(m_adsi, createNewUser, &dlg);
-//    connect(this, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), &wgt, SLOT(slotProcessRegistrationResult(quint8, const QString&))/*, Qt::QueuedConnection*/);
-//    connect(&wgt, SIGNAL(registration(const QString &, const QString &, const QString &)), this, SLOT(slotRegistration(const QString &, const QString &, const QString &)));
-//    connect(&wgt, SIGNAL(canceled()), &dlg, SLOT(accept()));
+    ADUserInfoWidget wgt(m_adsi, adUser, &dlg);
+    connect(&wgt, SIGNAL(signalCloseWidget()), &dlg, SLOT(accept()));
 
     vbl.addWidget(&wgt);
     dlg.setLayout(&vbl);
@@ -440,7 +445,7 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
     //menu.addAction(ui.actionEdit);
 
     QMenu accountMenu(tr("Account"), this);
-    accountMenu.addAction(ui.actionEdit);
+    accountMenu.addAction(ui.actionCreateNewAccount);
     accountMenu.addAction(ui.actionDisableAccount);
     menu.addMenu(&accountMenu);
 
@@ -467,7 +472,7 @@ void ADUserManagerWidget::updateActions() {
     ui.actionPrint->setEnabled(enableExp);
 
 #ifdef Q_OS_WIN32
-    ui.actionEdit->setEnabled(enableExp);
+    ui.actionCreateNewAccount->setEnabled(enableExp);
 
     ui.actionResetPassword->setEnabled(enableExp);
     ui.actionDisableAccount->setEnabled(enableExp);

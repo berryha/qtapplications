@@ -5,6 +5,9 @@ namespace HEHUI {
 
 
 QHash<QString/*AD Attribute Name*/, QString/*Common Attribute Name*/> *ADUser::commonAttributeNameHash = 0;
+QStringList ADUser::m_ouList = QStringList();
+QString ADUser::m_ADDefaultNamingContext = "";
+
 
 ADUser::ADUser(QObject *parent) :
     QObject(parent)
@@ -70,6 +73,22 @@ QString ADUser::CommonAttributeName(const QString &attributeName){
     }
 
     return name;
+}
+
+void ADUser::setOUList(const QStringList &ouList){
+    m_ouList = ouList;
+}
+
+QStringList ADUser::getOUList(){
+    return m_ouList;
+}
+
+void ADUser::setADDefaultNamingContext(const QString &adDefaultNamingContext){
+    m_ADDefaultNamingContext = adDefaultNamingContext;
+}
+
+QString ADUser::getADDefaultNamingContext(){
+    return m_ADDefaultNamingContext;
 }
 
 
