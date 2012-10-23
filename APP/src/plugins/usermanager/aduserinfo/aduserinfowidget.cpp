@@ -128,7 +128,7 @@ void ADUserInfoWidget::saveChanges(){
     switchToViewMode();
 
     if(m_displayName != displayName){
-        ok = m_adsi->AD_ModifyAttribute(accountName, "displayName", displayName, 2);
+        ok = m_adsi->AD_ModifyAttribute(accountName, "displayName", displayName, 0);
         if(!ok){
             m_displayName = m_adsi->AD_GetObjectAttribute(accountName, "displayName");
             ui.lineEditDisplayName->setText(m_displayName);
@@ -139,7 +139,7 @@ void ADUserInfoWidget::saveChanges(){
     }
 
     if(m_description != description){
-        ok = m_adsi->AD_ModifyAttribute(accountName, "description", description);
+        ok = m_adsi->AD_ModifyAttribute(accountName, "description", description, 0);
         if(!ok){
             m_description = m_adsi->AD_GetObjectAttribute(accountName, "description");
             ui.lineEditDescription->setText(m_description);
@@ -161,7 +161,7 @@ void ADUserInfoWidget::saveChanges(){
     }
 
     if(m_telephone != telephone){
-        ok = m_adsi->AD_ModifyAttribute(accountName, "telephoneNumber", userWorkstations);
+        ok = m_adsi->AD_ModifyAttribute(accountName, "telephoneNumber", telephone, 0);
         if(!ok){
             m_telephone = m_adsi->AD_GetObjectAttribute(accountName, "telephoneNumber");
             ui.lineEditTelephone->setText(m_telephone);
