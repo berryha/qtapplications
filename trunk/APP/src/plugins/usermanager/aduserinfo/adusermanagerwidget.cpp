@@ -309,6 +309,47 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
 
 }
 
+void ADUserManagerWidget::on_actionExport_triggered(){
+    slotExportQueryResult();
+}
+
+void ADUserManagerWidget::on_actionPrint_triggered(){
+    slotPrintQueryResult();
+}
+
+void ADUserManagerWidget::on_actionUnlockAccount_triggered(){
+    slotUnlockAccount();
+}
+
+void ADUserManagerWidget::on_actionDisableAccount_triggered(){
+    slotDisableADUserAccount();
+}
+
+void ADUserManagerWidget::on_actionCreateNewAccount_triggered(){
+    slotCreateADUser(0);
+}
+
+void ADUserManagerWidget::on_actionProperties_triggered(){
+    slotViewADUserInfo(ui.tableViewADUsers->currentIndex());
+}
+
+void ADUserManagerWidget::on_actionResetPassword_triggered(){
+    slotResetADUserPassword();
+}
+
+void ADUserManagerWidget::on_actionUserMustChangePassword_triggered(){
+    slotUserMustChangePassword();
+}
+
+void ADUserManagerWidget::on_actionUserCannotChangePassword_triggered(){
+    //TODO
+}
+
+void ADUserManagerWidget::on_actionPasswordNeverExpires_triggered(){
+    //TODO
+}
+
+
 void ADUserManagerWidget::slotExportQueryResult(){
 
     DataOutputDialog dlg(ui.tableViewADUsers, DataOutputDialog::EXPORT, this);
@@ -347,6 +388,7 @@ void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
     vbl.setContentsMargins(1, 1, 1, 1);
 
     ADUserInfoWidget wgt(m_adsi, adUser, &dlg);
+    connect(&wgt, SIGNAL(signalChangesSaved()), this, SLOT(on_toolButtonQueryAD_clicked()));
     connect(&wgt, SIGNAL(signalCloseWidget()), &dlg, SLOT(accept()));
 
     vbl.addWidget(&wgt);
@@ -354,6 +396,37 @@ void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
     dlg.updateGeometry();
     dlg.setWindowTitle(tr("AD User Info"));
     dlg.exec();
+
+}
+
+void ADUserManagerWidget::slotUnlockAccount(){
+
+    QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
+    if(sAMAccountName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
+        return;
+    }
+
+    bool ok = m_adsi->AD_UnlockObject(sAMAccountName);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), QString("Failed to unlock user '%1'! \r\n %2").arg(sAMAccountName).arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+    }
+
+}
+
+void ADUserManagerWidget::slotDisableADUserAccount(){
+
+    QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
+    if(sAMAccountName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
+        return;
+    }
+
+    bool disabled = m_adsi->AD_IsObjectDisabled(sAMAccountName);
+    bool ok = m_adsi->AD_EnableObject(sAMAccountName, disabled);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), QString("Failed to %1 user '%2'! \r\n %3").arg(disabled?tr("enable"):tr("disable")).arg(sAMAccountName).arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+    }
 
 }
 
@@ -402,7 +475,7 @@ void ADUserManagerWidget::slotResetADUserPassword(){
 
 
     if(!m_adsi->AD_SetPassword(sAMAccountName, newPassword)){
-        QMessageBox::critical(this, tr("Error"), QString("Failed to reset password for user '%1'! \r\\\n%2").arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+        QMessageBox::critical(this, tr("Error"), QString("Failed to reset password for user '%1'! \r\n %2").arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
     }else{
         QMessageBox::information(this, tr("OK"), QString("Password has been reset for user '%1'!").arg(sAMAccountName) );
     }
@@ -410,9 +483,22 @@ void ADUserManagerWidget::slotResetADUserPassword(){
 
 }
 
-void ADUserManagerWidget::slotDisableADUserAccount(){
+void ADUserManagerWidget::slotUserMustChangePassword(){
+
+    QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
+    if(sAMAccountName.isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
+        return;
+    }
+
+    bool ok = m_adsi->AD_ModifyAttribute(sAMAccountName, "pwdLastSet", "0");
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), QString("Operation Failed! \r\n %1").arg(sAMAccountName).arg(m_adsi->AD_GetLastErrorString()) );
+    }
 
 }
+
+
 
 
 void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
@@ -430,7 +516,7 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 
 #ifndef QT_NO_PRINTER
 
-    menu.addSeparator();
+    //menu.addSeparator();
 
     ui.actionPrint->setShortcut(QKeySequence::Print);
     menu.addAction(ui.actionPrint);
@@ -445,12 +531,19 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
     //menu.addAction(ui.actionEdit);
 
     QMenu accountMenu(tr("Account"), this);
-    accountMenu.addAction(ui.actionCreateNewAccount);
+    accountMenu.addAction(ui.actionUnlockAccount);
     accountMenu.addAction(ui.actionDisableAccount);
+    accountMenu.addSeparator();
+    accountMenu.addAction(ui.actionCreateNewAccount);
+    accountMenu.addAction(ui.actionProperties);
     menu.addMenu(&accountMenu);
 
     QMenu passwordMenu(tr("Password"), this);
     passwordMenu.addAction(ui.actionResetPassword);
+    passwordMenu.addSeparator();
+    passwordMenu.addAction(ui.actionUserMustChangePassword);
+    passwordMenu.addAction(ui.actionPasswordNeverExpires);
+    passwordMenu.addAction(ui.actionUserCannotChangePassword);
     menu.addMenu(&passwordMenu);
 
 
@@ -466,16 +559,39 @@ void ADUserManagerWidget::updateActions() {
     bool enableExp = ui.tableViewADUsers->currentIndex().isValid() && ui.tableViewADUsers->selectionModel()->selectedIndexes().size();
     //bool enableModify =  enableIns&& enableExp;
 
+    bool enableModify = false;
+    bool userDisabled = true;
+    if(m_selectedADUser){
+        QString accountName = m_selectedADUser->getAttribute("sAMAccountName");
+        if(!accountName.isEmpty()){
+            QString distinguishedName = m_adsi->AD_GetObjectAttribute(accountName, "distinguishedName");
+            if(!distinguishedName.contains("CN=Users")){
+                enableModify = true;
+            }
+            userDisabled = m_adsi->AD_IsObjectDisabled(accountName);
+
+        }
+    }
 
 
     ui.actionExport->setEnabled(enableExp);
     ui.actionPrint->setEnabled(enableExp);
 
 #ifdef Q_OS_WIN32
-    ui.actionCreateNewAccount->setEnabled(enableExp);
+    ui.actionCreateNewAccount->setEnabled(false);
 
-    ui.actionResetPassword->setEnabled(enableExp);
-    ui.actionDisableAccount->setEnabled(enableExp);
+    ui.actionUnlockAccount->setEnabled(enableModify);
+    ui.actionDisableAccount->setEnabled(enableModify);
+    if(userDisabled){
+        ui.actionDisableAccount->setText(tr("Enable Account"));
+    }else{
+        ui.actionDisableAccount->setText(tr("Disable Account"));
+    }
+
+    ui.actionResetPassword->setEnabled(enableModify);
+    ui.actionUserMustChangePassword->setEnabled(enableModify);
+    ui.actionPasswordNeverExpires->setEnabled(false);
+    ui.actionUserCannotChangePassword->setEnabled(false);
 
 //    if(!m_isJoinedToDomain){
 //        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;

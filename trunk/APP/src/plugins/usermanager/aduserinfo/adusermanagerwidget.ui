@@ -316,6 +316,37 @@
     <string>Disable Account</string>
    </property>
   </action>
+  <action name="actionUnlockAccount">
+   <property name="text">
+    <string>Unlock Account</string>
+   </property>
+  </action>
+  <action name="actionUserCannotChangePassword">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>User cannot change password</string>
+   </property>
+  </action>
+  <action name="actionPasswordNeverExpires">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Password never expires</string>
+   </property>
+  </action>
+  <action name="actionUserMustChangePassword">
+   <property name="text">
+    <string>User must change password at next logon</string>
+   </property>
+  </action>
+  <action name="actionProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>lineEditServerIP</tabstop>

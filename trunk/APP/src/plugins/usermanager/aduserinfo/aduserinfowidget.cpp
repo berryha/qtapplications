@@ -29,6 +29,7 @@ ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, ADUser *adUser, QWidget *parent) 
     m_telephone = "";
     m_guid = "";
     m_sid = "";
+//    m_distinguishedName = "";
     m_simpleOUString = "";
     m_fullOUString = "";
 
@@ -105,7 +106,7 @@ void ADUserInfoWidget::saveChanges(){
         }
         m_fullOUString += ADUser::getADDefaultNamingContext();
     }else if(!m_fullOUString.isEmpty()){
-        m_fullOUString = m_fullOUString + "," + ADUser::getADDefaultNamingContext();
+        m_fullOUString = "OU=" + m_fullOUString + "," + ADUser::getADDefaultNamingContext();
     }
 
     bool ok = false;
@@ -172,13 +173,19 @@ void ADUserInfoWidget::saveChanges(){
     }
 
     if(m_simpleOUString != ouString){
-        ok = m_adsi->AD_MoveObject(m_fullOUString, accountName, "");
+        ok = m_adsi->AD_MoveObject(m_fullOUString, accountName);
         if(!ok){
+            ui.comboBoxOU->setCurrentIndex(ui.comboBoxOU->findText(m_simpleOUString));
             QMessageBox::critical(this, tr("Error"), tr("Failed to move user! \r\n %1").arg(m_adsi->AD_GetLastErrorString()));
         }else{
             m_simpleOUString = ouString;
         }
     }
+
+    ui.pushButtonEdit->setEnabled(true);
+    ui.pushButtonEdit->setVisible(true);
+
+    emit signalChangesSaved();
 
 
 }
@@ -240,6 +247,10 @@ void ADUserInfoWidget::initUI(){
         m_simpleOUString = temp;
 
         ui.comboBoxOU->setCurrentIndex(ui.comboBoxOU->findText(temp) );
+    }
+    if(m_distinguishedName.contains(",CN=Users")){
+        ui.pushButtonEdit->setEnabled(false);
+        ui.pushButtonEdit->setVisible(false);
     }
 
 
