@@ -51,6 +51,7 @@ ADSI::ADSI(QObject *parent) :
     m_AD_RenameObject = 0;
     m_AD_MoveObject = 0;
     m_AD_DeleteObject = 0;
+    m_AD_UnlockObject = 0;
     m_AD_EnableObject = 0;
     m_AD_IsObjectDisabled = 0;
     m_AD_SetAccountExpire = 0;
@@ -144,6 +145,13 @@ bool ADSI::loadLibrary(const QString &fileName){
     m_AD_DeleteObject = (AD_DeleteObjectFunction) adsiLibrary->resolve("AD_DeleteObject");
     if(!m_AD_DeleteObject){
         m_lastErrorString = "Failed to resolve function  'AD_DeleteObject' !" ;
+        qCritical()<<m_lastErrorString;
+        return false;
+    }
+
+    m_AD_UnlockObject = (AD_UnlockObjectFunction) adsiLibrary->resolve("AD_UnlockObject");
+    if(!m_AD_UnlockObject){
+        m_lastErrorString = "Failed to resolve function  'AD_UnlockObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
     }
@@ -257,6 +265,7 @@ bool ADSI::unloadLibrary(){
     m_AD_RenameObject = 0;
     m_AD_MoveObject = 0;
     m_AD_DeleteObject = 0;
+    m_AD_UnlockObject = 0;
     m_AD_EnableObject = 0;
     m_AD_IsObjectDisabled = 0;
     m_AD_SetAccountExpire = 0;
@@ -313,6 +322,10 @@ bool ADSI::AD_MoveObject(const QString &ou, const QString &object, const QString
 
 bool ADSI::AD_DeleteObject(const QString &object, const QString &objectClass){
     return m_AD_DeleteObject(object.toStdWString().c_str(), objectClass.toStdWString().c_str());
+}
+
+bool ADSI::AD_UnlockObject(const QString &object){
+    return m_AD_UnlockObject(object.toStdWString().c_str());
 }
 
 bool ADSI::AD_EnableObject(const QString &object, bool enable){

@@ -497,7 +497,7 @@ End Function   '==>AD_RenameObject
 ' Name...........: AD_MoveObject
 ' Description ...: Moves an object to another OU.
 ' Syntax.........: AD_MoveObject($sAD_OU, $sAD_Object[, $sAD_DisplayName = ""])
-' Parameters ....: sAD_OU - Target OU for the object move (FQDN)
+' Parameters ....: sAD_OUParam - Target OU for the object move (FQDN)
 '                  sAD_ObjectParam - Object (user, group, computer) to move (FQDN or sAMAccountName)
 '                  sAD_CNParam - Optional: New Name of the object in the target OU. Common Name or RDN (Relative Distinguished Name) like "Lastname Firstname" without leading "CN="
 ' Return values .: Success - 1
@@ -513,31 +513,31 @@ End Function   '==>AD_RenameObject
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa705991(v=VS.85).aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OU as wstring, byval sAD_ObjectParam as wstring, opt byval sAD_CNParam as wstring) export as long
+Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OUParam as wstring, byval sAD_ObjectParam as wstring, opt byval sAD_CNParam as wstring) export as long
 
    SetError(0, "")
 
-   LOCAL sAD_Object AS WSTRINGZ * 512, sAD_CN as WSTRINGZ * 512
+   LOCAL sAD_OU AS WSTRINGZ * 512, sAD_Object AS WSTRINGZ * 512, sAD_CN as WSTRINGZ * 512
+	sAD_OU = sAD_OUParam
    sAD_Object = sAD_ObjectParam
 	sAD_CN = sAD_CNParam
 
 	IF ISFALSE AD_ObjectExists(sAD_OU, "distinguishedName") THEN
       SetError(1, "OU '" & sAD_OU & "' does not exist!")
       #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
-      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
+      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error-" & FUNCNAME$
       FUNCTION = 0
       EXIT FUNCTION
    END IF
-	
+
    IF ISFALSE AD_ObjectExists(sAD_Object, "") THEN
       SetError(2, "Object '" & sAD_Object & "' does not exist!")
       #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
-      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
+      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error-" & FUNCNAME$
       FUNCTION = 0
       EXIT FUNCTION
    END IF
 	
-
 	If Mid$(sAD_Object, 3, 1) <> "=" Then sAD_Object = AD_SamAccountNameToFQDN(sAD_Object) ' sAMAccountName provided
 	If sAD_CN = "" Then
 		sAD_CN = "CN=" & AD_GetObjectAttribute(sAD_Object, "cn")
@@ -548,7 +548,7 @@ Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OU as wstring, byval sAD
 	If AD_ObjectExists(sAD_CN & "," & sAD_OU, "distinguishedName") Then 
 		SetError(3, "Object '" & sAD_Object & "' already exists in the target OU!")
       #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
-      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
+      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error-" & FUNCNAME$
       FUNCTION = 0
       EXIT FUNCTION
 	end if
@@ -614,6 +614,51 @@ FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRI
 
 END FUNCTION   '==>AD_DeleteObject
 
+
+' #FUNCTION# ====================================================================================================================
+' Name...........: AD_UnlockObject
+' Description ...: Unlocks an AD object (user account, computer account).
+' Syntax.........: AD_UnlockObject($sAD_Object)
+' Parameters ....: sAD_ObjectParam - User account or computer account to unlock (sAMAccountName or FQDN)
+' Return values .: Success - 1
+'                  Failure - 0, sets @error to:
+'                  |1 - $sAD_Object does not exist
+'                  |x - Error returned by SetInfo function (Missing permission etc.)
+' Author ........: water
+' Modified.......:
+' Remarks .......:
+' Related .......: AD_IsObjectLocked, AD_GetObjectsLocked
+' Link ..........: http://www.rlmueller.net/Programs/IsUserLocked.txt
+' Example .......: Yes
+' ===============================================================================================================================
+Function AD_UnlockObject alias "AD_UnlockObject" (byval sAD_ObjectParam as wstring) export as long
+
+   SetError(0, "")
+
+   LOCAL sAD_Object AS WSTRINGZ * 512
+   sAD_Object = sAD_ObjectParam
+
+   IF ISFALSE AD_ObjectExists(sAD_Object, "") THEN
+      SetError(1, "Object '" & sAD_Object & "' does not exist!")
+      #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
+      'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
+      FUNCTION = 0
+      EXIT FUNCTION
+   END IF
+	
+	If Mid$(sAD_Object, 3, 1) <> "=" Then sAD_Object = AD_SamAccountNameToFQDN(sAD_Object) ' sAMAccountName provided
+	local oAD_Object as IADsUser, iAD_UAC as long
+	oAD_Object = AD_ObjGet("LDAP://" & sAD_HostServer & "/" & sAD_Object, $IID_IADsUser)
+	oAD_Object.IsAccountLocked = %False
+	oAD_Object.SetInfo
+	
+   IF OBJRESULT <> 0 THEN
+      FUNCTION = 0
+   END IF
+
+   FUNCTION = 1
+
+End Function   '==>_AD_UnlockObject
 
 
 ' #FUNCTION# ====================================================================================================================
@@ -1024,7 +1069,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYVAL sAD_ObjectPa
     IF FAILED(hr) THEN
           SetError(3, OBJRESULT$(hr))
           #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-          MSGBOX OBJRESULT$(hr) & $CRLF & "Code:" & STR$(hr), %MB_ICONERROR, "Error"
+          'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
           FUNCTION = ""
           EXIT FUNCTION
     END IF
@@ -1036,7 +1081,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYVAL sAD_ObjectPa
     IF NOT ISOBJECT(oAD_PropertyEntry) THEN
         SetError(4, "No values for the specified property '" & sAD_Property & "'.")
         #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
-        MSGBOX OBJRESULT$(hr) & $CRLF & "Code:" & STR$(hr), %MB_ICONERROR, "Error"
+        'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
         FUNCTION = ""
         EXIT FUNCTION
     END IF
