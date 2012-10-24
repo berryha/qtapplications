@@ -71,6 +71,10 @@ ADSI::ADSI(QObject *parent) :
 
 }
 
+ADSI::~ADSI(){
+    unloadLibrary();
+}
+
 bool ADSI::loadLibrary(const QString &fileName){
 
     if(!adsiLibrary){
@@ -288,7 +292,10 @@ QString ADSI::lastErrorString() const{
     return m_lastErrorString;
 }
 
-bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, quint16 securityFlag){
+bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
+//    long open = 0;
+//    open = m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
+//    return open;
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 }
 

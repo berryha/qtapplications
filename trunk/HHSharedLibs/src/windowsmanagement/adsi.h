@@ -48,12 +48,13 @@ class WM_LIB_API ADSI : public QObject
     Q_OBJECT
 public:
     explicit ADSI(QObject *parent = 0);
+    ~ADSI();
 
     bool loadLibrary(const QString &fileName);
     bool unloadLibrary();
     QString lastErrorString() const;
 
-    bool AD_Open(const QString &userID, const QString &password, const QString &serverHost, quint16 securityFlag);
+    bool AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag);
     void AD_Close();
     long AD_GetLastErrorCode();
     QString AD_GetLastErrorString();
