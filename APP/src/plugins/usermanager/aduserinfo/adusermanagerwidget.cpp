@@ -33,11 +33,11 @@
 #define DOMAIN_NAME "sitoy.group"
 #endif
 #ifndef DOMAIN_DEFAULTNAMINGCONTEXT
-#define DOMAIN_DEFAULTNAMINGCONTEXT "DC=test,DC=local"
+#define DOMAIN_DEFAULTNAMINGCONTEXT "DC=sitoy,DC=group"
 #endif
 
 #ifndef DOMAIN_DC_IP
-#define DOMAIN_DC_IP "200.200.200.106"
+#define DOMAIN_DC_IP "200.200.200.118"
 #endif
 #ifndef DOMAIN_ADMIN_NAME
 #define DOMAIN_ADMIN_NAME "dgadmin"
@@ -277,7 +277,7 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         }
         ouString += DOMAIN_DEFAULTNAMINGCONTEXT;
     }else if(!ouString.isEmpty()){
-        ouString = ouString + "," + DOMAIN_DEFAULTNAMINGCONTEXT;
+        ouString = "OU=" + ouString + "," + DOMAIN_DEFAULTNAMINGCONTEXT;
     }
 
     QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, itemSeparator, attributeSeparator);

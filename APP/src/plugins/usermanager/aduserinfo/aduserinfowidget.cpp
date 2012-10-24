@@ -235,7 +235,9 @@ void ADUserInfoWidget::initUI(){
     QString m_cn = m_adsi->AD_GetObjectAttribute(m_accountName, "cn");
     QString m_distinguishedName = m_adsi->AD_GetObjectAttribute(m_accountName, "distinguishedName");
     if(m_distinguishedName.contains("OU=")){
-        QString temp = m_distinguishedName.remove("CN=" + m_cn + "," ) ;
+        int idx =  m_distinguishedName.indexOf("OU=");
+        QString temp = m_distinguishedName.replace(0, idx, "");
+        //QString temp = m_distinguishedName.remove("CN=" + m_cn + "," ) ;
         temp = temp.remove("," + ADUser::getADDefaultNamingContext());
         temp = temp.remove("OU=");
         QStringList templist = temp.split(",");
