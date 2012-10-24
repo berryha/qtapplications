@@ -28,7 +28,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEditServerIP"/>
+       <widget class="QLineEdit" name="lineEditServerIP">
+        <property name="toolTip">
+         <string>Server IP Address</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="labelADAdminName">
@@ -38,7 +42,11 @@
        </widget>
       </item>
       <item row="0" column="3">
-       <widget class="QLineEdit" name="lineEditADAdminName"/>
+       <widget class="QLineEdit" name="lineEditADAdminName">
+        <property name="toolTip">
+         <string>Administrator Name</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="4">
        <widget class="QLabel" name="labelPassword">
@@ -49,6 +57,9 @@
       </item>
       <item row="0" column="5">
        <widget class="QLineEdit" name="lineEditPassword">
+        <property name="toolTip">
+         <string>Password</string>
+        </property>
         <property name="echoMode">
          <enum>QLineEdit::Password</enum>
         </property>
@@ -105,6 +116,9 @@
         </property>
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
+        </property>
+        <property name="toolTip">
+         <string>Users</string>
         </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
