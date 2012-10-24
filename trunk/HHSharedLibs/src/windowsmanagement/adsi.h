@@ -60,8 +60,9 @@ public:
     QString AD_DefaultNamingContext();
     bool AD_ObjectExists(const QString &object, const QString &property);
     bool AD_RenameObject(const QString &object, const QString &cn);
-    bool AD_MoveObject(const QString &ou, const QString &object, const QString &cn);
+    bool AD_MoveObject(const QString &ou, const QString &object, const QString &cn = "");
     bool AD_DeleteObject(const QString &object, const QString &objectClass);
+    bool AD_UnlockObject(const QString &object);
     bool AD_EnableObject(const QString &object, bool enable);
     bool AD_IsObjectDisabled(const QString &object);
     bool AD_SetAccountExpire(const QString &object, const QString &expireDateTime);
@@ -109,6 +110,9 @@ private:
 
    typedef long (* AD_DeleteObjectFunction)(LPCWSTR, LPCWSTR);
    AD_DeleteObjectFunction m_AD_DeleteObject;
+
+   typedef long (* AD_UnlockObjectFunction)(LPCWSTR);
+   AD_UnlockObjectFunction m_AD_UnlockObject;
 
    typedef long (* AD_EnableObjectFunction)(LPCWSTR, long);
    AD_EnableObjectFunction m_AD_EnableObject;
