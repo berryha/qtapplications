@@ -54,7 +54,7 @@ public:
     bool unloadLibrary();
     QString lastErrorString() const;
 
-    bool AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag);
+    bool AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag = 1);
     void AD_Close();
     long AD_GetLastErrorCode();
     QString AD_GetLastErrorString();
