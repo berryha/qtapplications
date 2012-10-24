@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     //a.addLibraryPath(QCoreApplication::applicationDirPath());
     a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(PLUGINS_MAIN_DIR));
     a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(MYLIBS_DIR));
-    qWarning()<<"----main(....)~~Library Paths"<<a.libraryPaths ();
+    qDebug()<<"--Library Paths:"<<a.libraryPaths ();
 
 
     //创建Splash Screen

@@ -117,4 +117,4 @@ INCLUDEPATH += $${OUT_PWD} \
 
 
 win32-g++:QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
-
+#win32-g++:QMAKE_CXXFLAGS_EXCEPTIONS_OFF =
