@@ -30,6 +30,7 @@ public:
     
 signals:
     void signalCloseWidget();
+    void signalChangesSaved();
 
 private slots:
     void on_pushButtonEdit_clicked();
