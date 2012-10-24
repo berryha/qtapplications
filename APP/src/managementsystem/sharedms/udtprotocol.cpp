@@ -43,7 +43,7 @@ void UDTProtocol::messageDataReceived(UDTSOCKET socket, QByteArray *data){
 
 }
 
-inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data){
+void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data){
 
     QString ip = "";
     quint16 port = 0;

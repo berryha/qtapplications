@@ -792,7 +792,7 @@ void FileManagement::peerDisconnected(bool normalClose){
 
 ////////////////////////////////////////
 
-inline void FileManagement::requestFileSystemInfo(const QString &parentDirPath){
+void FileManagement::requestFileSystemInfo(const QString &parentDirPath){
 
     if(!controlCenterPacketsParser->requestFileSystemInfo(m_peerSocket, parentDirPath)){
         ui.textEditLogs->append(tr("Error! Can not send request! %1").arg(controlCenterPacketsParser->lastErrorMessage()));

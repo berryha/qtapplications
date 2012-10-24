@@ -223,11 +223,13 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     }
 
     m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 0);
+    qWarning()<<"-----1";
     if(!m_adOpened){
         QMessageBox::critical(this, tr("Error"), tr("Failed to connect to DC! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
         ui.toolButtonConnect->setEnabled(true);
         return;
     }
+
 
     //QString adDefaultNamingContext = m_adsi->AD_DefaultNamingContext();
     ADUser::setADDefaultNamingContext( DOMAIN_DEFAULTNAMINGCONTEXT );

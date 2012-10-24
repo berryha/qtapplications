@@ -19,6 +19,7 @@ win32:HHSharedLibs += HHSharedWindowsManagement
 include(../../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedMS
 include(../../sharedms/sharedms.pri)
+
 # ##
 UI_DIR = ./ui
 
