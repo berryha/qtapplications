@@ -527,8 +527,14 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 #endif
 
 //#ifdef Q_OS_WIN32
+
+    if(ui.comboBoxQueryMode->currentIndex() == 1){
+        menu.exec(tableView->viewport()->mapToGlobal(pos));
+        return;
+    }
+
+
     menu.addSeparator();
-    //menu.addAction(ui.actionEdit);
 
     QMenu accountMenu(tr("Account"), this);
     accountMenu.addAction(ui.actionUnlockAccount);
