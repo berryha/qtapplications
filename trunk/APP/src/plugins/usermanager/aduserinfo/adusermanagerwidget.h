@@ -104,8 +104,7 @@ private:
     ADUser *m_selectedADUser;
     ADUserInfoWidget *m_adUserInfoWidget;
 
-
-    //QString m_defaultNamingContext;
+    QString m_defaultNamingContext;
 
     ADUserInfoModel *m_userInfoModel;
     ADUserInfoSortFilterProxyModel *m_sortFilterProxyModel;
