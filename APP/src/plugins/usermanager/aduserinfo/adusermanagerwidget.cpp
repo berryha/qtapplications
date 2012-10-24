@@ -29,12 +29,12 @@
 
 
 
-#ifndef DOMAIN_NAME
-#define DOMAIN_NAME "sitoy.group"
-#endif
-#ifndef DOMAIN_DEFAULTNAMINGCONTEXT
-#define DOMAIN_DEFAULTNAMINGCONTEXT "DC=sitoy,DC=group"
-#endif
+//#ifndef DOMAIN_NAME
+//#define DOMAIN_NAME "sitoy.group"
+//#endif
+//#ifndef DOMAIN_DEFAULTNAMINGCONTEXT
+//#define DOMAIN_DEFAULTNAMINGCONTEXT "DC=sitoy,DC=group"
+//#endif
 
 #ifndef DOMAIN_DC_IP
 #define DOMAIN_DC_IP "200.200.200.118"
@@ -79,7 +79,7 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     m_selectedADUser = 0;
     m_adUserInfoWidget = 0;
 
-    //m_defaultNamingContext = "";
+    m_defaultNamingContext = "";
 
     m_userInfoModel = new ADUserInfoModel(this);
     m_sortFilterProxyModel = new ADUserInfoSortFilterProxyModel(this);
@@ -122,7 +122,7 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
                     ui.lineEditDisplayName->clear();
                     ui.comboBoxOU->setCurrentIndex(0);
                 }//else{
-                    ui.lineEditAccountName->setFocus();
+                ui.lineEditAccountName->setFocus();
                 //}
             }else{
                 if(ui.lineEditFilter->hasFocus()){
@@ -130,7 +130,7 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
                     ui.lineEditDataToRetrieve->clear();
                     ui.comboBoxOU->setCurrentIndex(0);
                 }//else{
-                    ui.lineEditFilter->setFocus();
+                ui.lineEditFilter->setFocus();
                 //}
             }
 
@@ -158,19 +158,19 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
         //            return QObject::eventFilter(obj, event);
         //        }
         //        break;
-//    case QEvent::ToolTip:
-//    {
-//        if(obj == ui.userPSWDLineEdit){
-//            QString pwd = ui.userPSWDLineEdit->text();
-//            if(pwd.isEmpty()){pwd = tr("Password");}
-//            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-//            QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
-//            QToolTip::showText(helpEvent->globalPos(), tip);
-//            return true;
-//        }
+        //    case QEvent::ToolTip:
+        //    {
+        //        if(obj == ui.userPSWDLineEdit){
+        //            QString pwd = ui.userPSWDLineEdit->text();
+        //            if(pwd.isEmpty()){pwd = tr("Password");}
+        //            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+        //            QString tip = QString("<b><h1>%1</h1></b>").arg(pwd);
+        //            QToolTip::showText(helpEvent->globalPos(), tip);
+        //            return true;
+        //        }
 
-//    }
-//        break;
+        //    }
+        //        break;
     default:
         return QObject::eventFilter(obj, event);
 
@@ -197,7 +197,7 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     qDebug()<<"--ADUserInfo::on_ui_toolButtonConnect_clicked()";
 
     ui.toolButtonConnect->setEnabled(false);
-    qApp->processEvents();
+    //    qApp->processEvents();
 
     if(m_adOpened){
         m_adsi->AD_Close();
@@ -222,8 +222,7 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
         return;
     }
 
-    m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 0);
-    qWarning()<<"-----1";
+    m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 1);
     if(!m_adOpened){
         QMessageBox::critical(this, tr("Error"), tr("Failed to connect to DC! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
         ui.toolButtonConnect->setEnabled(true);
@@ -231,8 +230,8 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     }
 
 
-    //QString adDefaultNamingContext = m_adsi->AD_DefaultNamingContext();
-    ADUser::setADDefaultNamingContext( DOMAIN_DEFAULTNAMINGCONTEXT );
+    m_defaultNamingContext = m_adsi->AD_DefaultNamingContext();
+    ADUser::setADDefaultNamingContext( m_defaultNamingContext );
 
     ui.comboBoxOU->addItem("");
 
@@ -277,9 +276,9 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         while (!ousList.isEmpty()) {
             ouString = ouString + "OU=" + ousList.takeLast() + ",";
         }
-        ouString += DOMAIN_DEFAULTNAMINGCONTEXT;
+        ouString += m_defaultNamingContext;
     }else if(!ouString.isEmpty()){
-        ouString = "OU=" + ouString + "," + DOMAIN_DEFAULTNAMINGCONTEXT;
+        ouString = "OU=" + ouString + "," + m_defaultNamingContext;
     }
 
     QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, itemSeparator, attributeSeparator);
@@ -293,7 +292,7 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
     }
 
 
-//QMessageBox::information(this, "resultString", resultString);
+    //QMessageBox::information(this, "resultString", resultString);
 
     QStringList itemStrings = resultString.split(itemSeparator);
     QList<QStringList> items;
@@ -528,7 +527,7 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 
 #endif
 
-//#ifdef Q_OS_WIN32
+    //#ifdef Q_OS_WIN32
 
     if(ui.comboBoxQueryMode->currentIndex() == 1){
         menu.exec(tableView->viewport()->mapToGlobal(pos));
@@ -556,7 +555,7 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 
 
 
-//#endif
+    //#endif
 
     menu.exec(tableView->viewport()->mapToGlobal(pos));
 
@@ -601,9 +600,9 @@ void ADUserManagerWidget::updateActions() {
     ui.actionPasswordNeverExpires->setEnabled(false);
     ui.actionUserCannotChangePassword->setEnabled(false);
 
-//    if(!m_isJoinedToDomain){
-//        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
-//    }
+    //    if(!m_isJoinedToDomain){
+    //        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
+    //    }
 #endif
 
 }
