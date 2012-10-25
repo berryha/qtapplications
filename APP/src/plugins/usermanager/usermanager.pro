@@ -27,30 +27,34 @@ UI_DIR = ./ui
 # Input
 HEADERS += usermanagerplugin.h \
     usermanagermainwindow.h \
-    modifyuserinfo/modifyuserinfodialog.h \
-    aduserinfo/aduserinfomodel.h \
-    aduserinfo/aduser.h \
-    aduserinfo/adusermanagerwidget.h \
-    aduserinfo/aduserinfowidget.h
+    modifyuserinfo/modifyuserinfodialog.h
+
 FORMS +=  \
     modifyuserinfo/modifyuserinfodialog.ui \
-    usermanagermainwindow.ui \
-    aduserinfo/adusermanagerwidget.ui \
-    aduserinfo/aduserinfowidget.ui
+    usermanagermainwindow.ui
+
 SOURCES += usermanagerplugin.cpp \
     usermanagermainwindow.cpp \
-    modifyuserinfo/modifyuserinfodialog.cpp \
-    aduserinfo/aduserinfomodel.cpp \
-    aduserinfo/aduser.cpp \
-    aduserinfo/adusermanagerwidget.cpp \
-    aduserinfo/aduserinfowidget.cpp
+    modifyuserinfo/modifyuserinfodialog.cpp
+
 RESOURCES += usermanager.qrc
 
 win32 {
-    HEADERS += settingsdialog/settingsdialog.h
-    SOURCES += settingsdialog/settingsdialog.cpp
-    FORMS += settingsdialog/settingsdialog.ui
-    HHSharedLibs += HHSharedWindowsManagement
+    HEADERS += settingsdialog/settingsdialog.h \
+            aduserinfo/aduserinfomodel.h \
+            aduserinfo/aduser.h \
+            aduserinfo/adusermanagerwidget.h \
+            aduserinfo/aduserinfowidget.h
+    SOURCES += settingsdialog/settingsdialog.cpp \
+            aduserinfo/aduserinfomodel.cpp \
+            aduserinfo/aduser.cpp \
+            aduserinfo/adusermanagerwidget.cpp \
+            aduserinfo/aduserinfowidget.cpp
+    FORMS += settingsdialog/settingsdialog.ui \
+            aduserinfo/adusermanagerwidget.ui \
+            aduserinfo/aduserinfowidget.ui
+
+    #HHSharedLibs += HHSharedWindowsManagement
 }
 
 

@@ -103,6 +103,9 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
 #ifdef Q_OS_WIN32
 
+    m_adUserManagerWidget = new ADUserManagerWidget(ui.tabWidget);
+    ui.tabWidget->addTab(m_adUserManagerWidget, tr("Active Directory"));
+
     wm = new WindowsManagement(this);
 //    wm->test();
 

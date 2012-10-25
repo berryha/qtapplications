@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabDB">
        <attribute name="title">
@@ -299,11 +299,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="HEHUI::ADUserManagerWidget" name="tabAD">
-       <attribute name="title">
-        <string>Active Directory</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -361,14 +356,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HEHUI::ADUserManagerWidget</class>
-   <extends>QWidget</extends>
-   <header>aduserinfo/adusermanagerwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>userIDComboBox</tabstop>
   <tabstop>userDeptComboBox</tabstop>
