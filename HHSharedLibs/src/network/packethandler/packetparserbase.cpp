@@ -222,7 +222,7 @@ void PacketsParserBase::processOutgoingPackets() {
                 m_packetHandlerBase->recylePacket(packet);
             }
 
-            qWarning()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
+            qCritical()<<"Packet Sent Failed! Peer Address:"<<packet->getPeerHostAddress().toString()<<":"<<packet->getPeerHostPort();
         }
         //        else if (transmissionProtocol == TP_UDP) {
         //            packet->setLastTransmissionTime(QDateTime::currentDateTime());

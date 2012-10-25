@@ -211,7 +211,7 @@ UDPServer * NetworkManagerBase::startUDPServerListening(const QHostAddress &loca
     UDPServer *udpServer = getUDPServer(localPort, localAddress);
     if(udpServer){
         m_errorString = tr("UDP Server has already started!");
-        qWarning() << m_errorString;
+        qCritical() << m_errorString;
         return udpServer;
     }else{
         udpServer = new UDPServer(this);
@@ -246,7 +246,7 @@ UDPServer * NetworkManagerBase::startIPMulticastServerListening(const QHostAddre
 
     UDPServer *udpServer = getUDPServer(ipMulticastGroupPort, QHostAddress::Any);
     if(udpServer){
-        qWarning("IP Multicast Server has already started!");
+        qCritical("IP Multicast Server has already started!");
         return udpServer;
     }else{
         udpServer = new UDPServer(this);
@@ -309,7 +309,7 @@ RUDPServer * NetworkManagerBase::startRUDPServerListening(const QHostAddress &lo
     RUDPServer *rudpServer = getRUDPServer(localPort, localAddress);
     if(rudpServer){
         m_errorString = tr("RUDP Server has already started!");
-        qWarning()<<m_errorString;
+        qCritical()<<m_errorString;
         return rudpServer;
     }else{
         rudpServer = new RUDPServer(m_packetHandlerBase, keepAliveTimerInterval, this);
