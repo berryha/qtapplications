@@ -247,16 +247,11 @@ bool ADSI::loadLibrary(const QString &fileName){
 
 
 
-
-
-
-
-
-
     return true;
 }
 
 bool ADSI::unloadLibrary(){
+
     if(adsiLibrary){
         adsiLibrary->unload();
     }
@@ -293,11 +288,6 @@ QString ADSI::lastErrorString() const{
 }
 
 bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
-//    qWarning();
-
-//    long open = 0;
-//    open = m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
-//    return open;
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 }
 
