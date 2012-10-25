@@ -1,4 +1,4 @@
-#ifndef ADUSER_H
+﻿#ifndef ADUSER_H
 #define ADUSER_H
 
 #include <QObject>

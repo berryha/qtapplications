@@ -1,4 +1,4 @@
-#ifndef ADUSERINFOWIDGET_H
+﻿#ifndef ADUSERINFOWIDGET_H
 #define ADUSERINFOWIDGET_H
 
 #include <QWidget>
