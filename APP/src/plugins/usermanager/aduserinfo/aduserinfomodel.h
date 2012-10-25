@@ -1,4 +1,4 @@
-#ifndef ADUSERINFOMODEL_H
+﻿#ifndef ADUSERINFOMODEL_H
 #define ADUSERINFOMODEL_H
 
 #include <QObject>
