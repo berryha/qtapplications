@@ -48,6 +48,7 @@
 #include "HHSharedCore/hmysharedlib_global.h"
 #include "HHSharedGUI/hprogressdlg.h"
 #ifdef Q_OS_WIN32
+#include "aduserinfo/adusermanagerwidget.h"
 #include "HHSharedWindowsManagement/hwindowsmanagement.h"
 #endif
 
@@ -153,6 +154,8 @@ private:
     bool m_isJoinedToDomain;
     QString m_joinInfo;
 #ifdef Q_OS_WIN32
+    ADUserManagerWidget *m_adUserManagerWidget;
+
     WindowsManagement *wm;
     QString m_msUpdateExeFilename;
 #endif
