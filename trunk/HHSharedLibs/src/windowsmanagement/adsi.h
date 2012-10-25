@@ -1,4 +1,4 @@
-/*
+﻿/*
  ****************************************************************************
  * adsi.h
  *
@@ -84,6 +84,7 @@ public slots:
 private:
    QLibrary * adsiLibrary;
    QString m_lastErrorString;
+
 
    typedef long (* AD_OpenFunction)(LPCWSTR, LPCWSTR, LPCWSTR, DWORD);
    AD_OpenFunction m_AD_Open;

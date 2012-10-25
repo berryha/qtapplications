@@ -374,7 +374,7 @@ bool TreeWidget::loadContents(const QString &contents)
     QString errorMessage;
     CategoryList cat_list;
     if (!readCategories(m_file_name, contents, &cat_list, &errorMessage)) {
-        qWarning()<<errorMessage;
+        qCritical()<<errorMessage;
         return false;
     }
 
@@ -920,7 +920,7 @@ void TreeWidget::addObjectItem(int cat_idx, const ObjectItem &item)
     if (!categoryView->containsObjectItem(item.id())){
         categoryView->addObjectItem(item, iconForObjectItem(item.iconName(), item.iconMode()), scratch);
     }else{
-        qWarning()<<"ERROR! Item "<<item.id()<<" already exists!";
+        qCritical()<<"ERROR! Item "<<item.id()<<" already exists!";
     }
 
     adjustSubListSize(cat_item);

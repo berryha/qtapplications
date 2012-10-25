@@ -126,7 +126,7 @@ bool Utilities::changeLangeuage(const QString &translationFilesDir, const QStrin
     QMutexLocker locker(translatorsMutex);
 
     if(qmLocale.size() != 5){
-        qWarning()<<"Invalid local name! It should be a string of the form 'language_country', where language is a lowercase, two-letter ISO 639 language code, and country is an uppercase, two-letter ISO 3166 country code.";
+        qCritical()<<"Invalid local name! It should be a string of the form 'language_country', where language is a lowercase, two-letter ISO 639 language code, and country is an uppercase, two-letter ISO 3166 country code.";
         return false;
     }
 

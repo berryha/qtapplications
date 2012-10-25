@@ -1596,7 +1596,6 @@ bool WindowsManagement::addUserToLocalGroup(LPWSTR userName,  LPCWSTR groupName)
     case ERROR_MEMBER_IN_ALIAS:
         qWarning()<<QString("User '%1' is already in Local '%2' Group. Error code:%3 ").arg(QString::fromStdWString(userName)).arg(QString::fromStdWString(groupName)).arg(err);
         
-        //qWarning()<<"User '"<<userName<<"' is already in Local "<<groupName<<" Group.\n";
         //printf("User already in Local Group.\n");
 
         m_lastErrorString = tr("User is already in Local '%1' Group").arg(QString::fromWCharArray(groupName));
@@ -1605,7 +1604,6 @@ bool WindowsManagement::addUserToLocalGroup(LPWSTR userName,  LPCWSTR groupName)
     default:
         qWarning()<<QString("An error occured while adding '%1' to Local '%2' Group. Error code:%3 ").arg(QString::fromStdWString(userName)).arg(QString::fromStdWString(groupName)).arg(err);
         
-        //qWarning()<<"An error occured while adding '"<<QString::fromStdWString(userName)<<"' to Local "<<QString::fromStdWString(groupName)<<" Group. Error code: "<<err;
         //printf("An error occured while adding User to Local Group '%s' Error code: %d\n", groupName, err);
 
         m_lastErrorString = tr("An error occured while adding user '%1' to local group '%2'! Error code: %3").arg(QString::fromWCharArray(userName)).arg(QString::fromWCharArray(groupName)).arg(err);
@@ -1695,7 +1693,7 @@ bool WindowsManagement::setComputerName(const QString &newComputerName) {
         m_lastErrorString = "";
         return true;
     }else{
-        qWarning()<< "Can not set computer name to " << computerName;
+        qCritical()<< "Can not set computer name to " << computerName;
         m_lastErrorString = tr("Can not set computer name to '%1'").arg(QString::fromWCharArray(computerName));
         return false;
     }
@@ -2883,7 +2881,7 @@ QString WindowsManagement::getFileSystemName(const QString &rootPath){
         path = rxp.cap(0);
     }else{
         m_lastErrorString = tr("Invalid Root Path '%1' !").arg(rootPath);
-        qWarning()<<QString("Invalid Root Path '%1' !").arg(rootPath)<<"--"<<rxp.errorString();
+        qCritical()<<QString("Invalid Root Path '%1' !").arg(rootPath)<<" "<<rxp.errorString();
         return "";
     }
 
@@ -2899,7 +2897,7 @@ QString WindowsManagement::getFileSystemName(const QString &rootPath){
     QString fileSystemName = QString::fromWCharArray(fileSystemNameBuffer);
     delete [] fileSystemNameBuffer;
 
-    qWarning()<<QString("File System Name Of '%1':").arg(path)<<fileSystemName;
+    qDebug()<<QString("File System Name Of '%1':").arg(path)<<fileSystemName;
 
     return fileSystemName;
 
@@ -2928,10 +2926,10 @@ bool WindowsManagement::getTokenByProcessName(HANDLE &hToken, const QString &pro
                                               pe32.th32ProcessID);
                 bRet = OpenProcessToken(hProcess, justQuery?TOKEN_QUERY:TOKEN_ALL_ACCESS, &hToken);
                 CloseHandle(hProcessSnap);
-                qWarning()<<"~~~~~~~~~~~~~~~~~~~~~~~";
+                //qWarning()<<"~~~~~~~~~~~~~~~~~~~~~~~";
                 return (bRet);
             }
-            qWarning()<<"~~~"<<QString::fromWCharArray(pe32.szExeFile);
+            //qWarning()<<"~~~"<<QString::fromWCharArray(pe32.szExeFile);
         } while (Process32Next(hProcessSnap, &pe32));
         bRet = TRUE;
     } else
@@ -2969,7 +2967,7 @@ QList<HANDLE> WindowsManagement::getTokenListByProcessName(const QString &proces
                 if(bRet){
                     tokenList.append(hToken);
                 }else{
-                    qWarning()<<tr("Error! Process Found, but can not get the token!");
+                    qCritical()<<"Error! Process Found, but can not get the token!";
                 }
                 qDebug()<<"--tokenList.size():"<<tokenList.size();
             }
@@ -3080,7 +3078,7 @@ bool WindowsManagement::createHiddenAdmiAccount(){
         if(usersKeysValueString.startsWith("00")){
             usersKeys.append(usersKeysValueString);
         }else{
-            qWarning()<<"Invalid Key1:"<<usersKeysValueString;
+            //qWarning()<<"Invalid usersKeysValueString:"<<usersKeysValueString;
             break;
         }
 
@@ -3113,7 +3111,7 @@ bool WindowsManagement::createHiddenAdmiAccount(){
         delete [] usersKeysValue;
         return false;
     }
-    qWarning()<<"Key Of System$:"<<systemAccountKey;
+    //qWarning()<<"Key Of System$:"<<systemAccountKey;
     LPCWSTR valueFName = L"F";
 
     LPCWSTR adminKey = L"HKEY_LOCAL_MACHINE\\SAM\\SAM\\Domains\\Account\\Users\\000001F4";
@@ -3252,7 +3250,7 @@ bool WindowsManagement::setupUSBSD(bool enable){
 
     if(!ret1 || !ret2){
         m_lastErrorString = tr("Can not write registry!");
-        qWarning()<<m_lastErrorString;
+        qCritical()<<m_lastErrorString;
         return false;
     }
 

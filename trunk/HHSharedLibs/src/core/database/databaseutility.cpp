@@ -328,9 +328,9 @@ QSqlError DatabaseUtility::excuteSQLScriptFromFile(const QSqlDatabase &database,
         if(line.endsWith(";") || in.atEnd()){
             if(!query.exec(statement)){
                 error = query.lastError();
-                qWarning();
+                qDebug();
                 qCritical("Can not excute SQL statement:\n%s\n%s", qPrintable(statement), qPrintable(error.text()));
-                qWarning();
+                qDebug();
 
                 if(stopOnError){
                     if(q){
