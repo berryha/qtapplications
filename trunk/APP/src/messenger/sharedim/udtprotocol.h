@@ -27,10 +27,10 @@ private slots:
     void streamDataReceived(UDTSOCKET socket, QByteArray *data) ;
     void messageDataReceived(UDTSOCKET socket, QByteArray *data) ;
 
-    void convertDataToPacket(UDTSOCKET socket, QByteArray *data);
 
 
 private:
+    inline void convertDataToPacket(UDTSOCKET socket, QByteArray *data);
 
 
 
