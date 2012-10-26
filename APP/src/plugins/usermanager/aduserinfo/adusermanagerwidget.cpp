@@ -209,20 +209,21 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
         return;
     }
 
+
+    if (!m_adsi->loadLibrary(ADSI_LIB)){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load ADSI library! \r\n %1").arg(m_adsi->lastErrorString()) );
+        m_adsi->unloadLibrary();
+        ui.toolButtonConnect->setEnabled(true);
+        return;
+    }
+
     QString serverIP = ui.lineEditServerIP->text().trimmed();
     QString adminName = ui.lineEditADAdminName->text().trimmed();
     if(adminName.isEmpty()){adminName = DOMAIN_ADMIN_NAME;}
     QString password = ui.lineEditPassword->text().trimmed();
     if(password.isEmpty()){password = DOMAIN_ADMIN_PASSWORD;}
 
-    if (!m_adsi->loadLibrary(ADSI_LIB)){
-        QMessageBox::critical(this, tr("Error"), tr("Failed to load ADSI library! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
-        m_adsi->unloadLibrary();
-        ui.toolButtonConnect->setEnabled(true);
-        return;
-    }
-
-    m_adOpened = m_adsi->AD_Open(adminName, password, serverIP, 1);
+    m_adOpened = m_adsi->AD_Open(adminName, password, serverIP);
     if(!m_adOpened){
         QMessageBox::critical(this, tr("Error"), tr("Failed to connect to DC! \r\n %1").arg(m_adsi->AD_GetLastErrorString()) );
         ui.toolButtonConnect->setEnabled(true);
@@ -291,8 +292,6 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         }
     }
 
-
-    //QMessageBox::information(this, "resultString", resultString);
 
     QStringList itemStrings = resultString.split(itemSeparator);
     QList<QStringList> items;
