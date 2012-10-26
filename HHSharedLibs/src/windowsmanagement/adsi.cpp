@@ -288,7 +288,11 @@ QString ADSI::lastErrorString() const{
 }
 
 bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
+    qWarning();
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
+    //wstring id = userID.toStdWString(), pwd = password.toStdWString(), ip = serverHost.toStdWString();
+    //return m_AD_Open(id.c_str(), pwd.c_str(), ip.c_str(), securityFlag );
+
 }
 
 void ADSI::AD_Close(){

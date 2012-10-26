@@ -38,10 +38,11 @@
 #include <QLibrary>
 
 #include <windows.h>
+#include <string.h>
 
 #include "wmlib.h"
 
-
+using namespace std;
 
 
 class WM_LIB_API ADSI : public QObject
@@ -96,10 +97,10 @@ private:
    typedef long (* AD_GetLastErrorCodeFunction)();
    AD_GetLastErrorCodeFunction m_AD_GetLastErrorCode;
 
-   typedef LPWSTR (* AD_GetLastErrorStringFunction)();
+   typedef LPCWSTR (* AD_GetLastErrorStringFunction)();
    AD_GetLastErrorStringFunction m_AD_GetLastErrorString;
 
-   typedef LPWSTR (* AD_DefaultNamingContextFunction)();
+   typedef LPCWSTR (* AD_DefaultNamingContextFunction)();
    AD_DefaultNamingContextFunction m_AD_DefaultNamingContext;
 
    typedef long (* AD_ObjectExistsFunction)(LPCWSTR, LPCWSTR);
@@ -132,7 +133,7 @@ private:
    typedef long (* AD_SetUserPasswordChangeFunction)(LPCWSTR, long);
    AD_SetUserPasswordChangeFunction m_AD_SetUserPasswordChange;
 
-   typedef LPWSTR (* AD_GetObjectAttributeFunction)(LPCWSTR, LPCWSTR);
+   typedef LPCWSTR (* AD_GetObjectAttributeFunction)(LPCWSTR, LPCWSTR);
    AD_GetObjectAttributeFunction m_AD_GetObjectAttribute;
 
    typedef long (* AD_ModifyAttributeFunction)(LPCWSTR, LPCWSTR, LPCWSTR, long);
@@ -141,10 +142,10 @@ private:
    typedef long (* AD_CreateOUFunction)(LPCWSTR, LPCWSTR);
    AD_CreateOUFunction m_AD_CreateOU;
 
-   typedef LPWSTR (* AD_GetAllOUsFunction)(LPCWSTR, LPCWSTR, LPCWSTR);
+   typedef LPCWSTR (* AD_GetAllOUsFunction)(LPCWSTR, LPCWSTR, LPCWSTR);
    AD_GetAllOUsFunction m_AD_GetAllOUs;
 
-   typedef LPWSTR (* AD_GetObjectsInOUFunction)(LPCWSTR, LPCWSTR, LPCWSTR, LPCWSTR, LPCWSTR);
+   typedef LPCWSTR (* AD_GetObjectsInOUFunction)(LPCWSTR, LPCWSTR, LPCWSTR, LPCWSTR, LPCWSTR);
    AD_GetObjectsInOUFunction m_AD_GetObjectsInOU;
 
    typedef long (* AD_CreateUserFunction)(LPCWSTR, LPCWSTR, LPCWSTR);
@@ -152,6 +153,7 @@ private:
 
    typedef long (* AD_SetPasswordFunction)(LPCWSTR, LPCWSTR, long);
    AD_SetPasswordFunction m_AD_SetPassword;
+
 
 
 

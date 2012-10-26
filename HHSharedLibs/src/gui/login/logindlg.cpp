@@ -22,7 +22,8 @@ LoginDlg::LoginDlg(User *user, const QString &windowTitle, QWidget *parent) :
 
     setUser(user);
 
-    ui.userIDComboBox->setEditText(user->getUserID());
+    //ui.userIDComboBox->setEditText(user->getUserID());
+    //ui.passwordLineEdit->setText(user->getPassword());
 
 }
 
@@ -53,7 +54,7 @@ void LoginDlg::keyPressEvent(QKeyEvent *e) {
         //Whether enter RestoreMode
         if(ui.loginButton->hasFocus()){
             bool ok = false;
-            QString text = QInputDialog::getText(this, tr("Privilege Required"),
+            QString text = QInputDialog::getText(this, tr("Authentication Required"),
                                                  tr("Access Code:"), QLineEdit::NoEcho,
                                                  "", &ok);
             if (ok && !text.isEmpty()){
@@ -77,6 +78,10 @@ void LoginDlg::keyPressEvent(QKeyEvent *e) {
 
 void LoginDlg::languageChange() {
     ui.retranslateUi(this);
+}
+
+void LoginDlg::setUser(User *user){
+    this->user = user;
 }
 
 inline QString LoginDlg::userID() const {

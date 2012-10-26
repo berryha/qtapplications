@@ -163,7 +163,7 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
             emit signalPluginLoaded(pluginFilePath);
 
             error = tr("Plug-in '%1' loaded!").arg(pluginFilePath);
-            qCritical() << error;
+            qDebug()<< error;
             if(errorString){
                 *errorString = error;
             }

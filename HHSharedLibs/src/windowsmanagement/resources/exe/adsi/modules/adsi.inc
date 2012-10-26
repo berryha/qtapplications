@@ -96,7 +96,8 @@ GLOBAL oAD_RootContainer AS IADsContainer
 ' Link ..........: http://msdn.microsoft.com/en-us/library/cc223499(PROT.10).aspx (Simple Authentication), http://msdn.microsoft.com/en-us/library/aa746471(VS.85).aspx (ADO)
 ' Example .......:
 ' ===============================================================================================================================
-FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_PasswordParam AS WSTRING, BYVAL sAD_HostServerParam AS WSTRING, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
+'FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_PasswordParam AS WSTRING, BYVAL sAD_HostServerParam AS WSTRING, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
+FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_PasswordParam AS WSTRINGz, BYREF sAD_HostServerParam AS WSTRINGz, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
 
 
     sAD_UserId = sAD_UserIdParam
@@ -106,7 +107,7 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_Pa
     DIM iAD_Security AS DWORD
     iAD_Security = iAD_SecurityParam
 
-	'msgbox "sAD_UserIdParam: " & sAD_UserId & $CRLF & "sAD_PasswordParam: " & sAD_Password & $CRLF & "sAD_HostServerParam: " & sAD_HostServer 
+	'msgbox "sAD_UserId " & sAD_UserId & $CRLF & "sAD_Password " & sAD_Password & $CRLF & "sAD_HostServer " & sAD_HostServer 
 
 '''''''''''''''''''''''''''''''''''''
 
@@ -122,16 +123,16 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_Pa
     DIM adoConnectionString AS WSTRING
     adoConnectionString = "Provider=ADsDSOObject"
     'oAD_Connection.ConnectionString = "Provider=ADsDSOObject" ' Sets Service providertype
-    IF sAD_UserIdParam <> "" THEN
-        IF sAD_PasswordParam = "" THEN
+    IF sAD_UserId <> "" THEN
+        IF sAD_Password = "" THEN
             SetError(2, "Parameter sAD _PasswordParam is required when sAD _UserIdParam is specified")
             FUNCTION = 0
             EXIT FUNCTION
         END IF
 
 
-        'oAD_Connection.Properties("User ID") = sAD_UserIdParam 'Authenticate User
-        'oAD_Connection.Properties("Password") = sAD_PasswordParam ' Authenticate User
+        'oAD_Connection.Properties("User ID") = sAD_UserId 'Authenticate User
+        'oAD_Connection.Properties("Password") = sAD_Password ' Authenticate User
         'oAD_Connection.Properties("Encrypt Password") = 1 ' Encrypts userid and password
         adoConnectionString = "Provider=ADsDSOObject;User ID=" & sAD_UserId & ";Password=" & sAD_Password
 
@@ -229,11 +230,6 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_Pa
 
 
 
-
-
-
-
-
     FUNCTION = 1
 
 END FUNCTION
@@ -261,16 +257,16 @@ END FUNCTION
 
 
 FUNCTION AD_GetLastErrorCode ALIAS "AD_GetLastErrorCode" () EXPORT AS LONG
-    FUNCTION = lAD_LastErrorCode
+   FUNCTION = lAD_LastErrorCode
 END FUNCTION
 
 FUNCTION AD_GetLastErrorString ALIAS "AD_GetLastErrorString" () EXPORT AS WSTRING
-    FUNCTION = sAD_LastErrorString
+   FUNCTION = sAD_LastErrorString
 END FUNCTION
 
 FUNCTION SetError(BYVAL errorCode AS LONG, BYVAL errorString AS WSTRING) AS LONG
-    lAD_LastErrorCode = errorCode
-    sAD_LastErrorString = errorString
+   lAD_LastErrorCode = errorCode
+   sAD_LastErrorString = errorString
 END FUNCTION
 
 
@@ -315,11 +311,12 @@ END FUNCTION
 
 
 ' #INTERNAL_USE_ONLY#============================================================================================================
-' Name...........: _AD_ObjGet
+' Name...........: AD_ObjGet
 ' Description ...: Returns an LDAP object from a FQDN.
 '                  Will use the alternative credentials $sAD_UserId/$sAD_Password if they are set.
-' Syntax.........: _AD_ObjGet($sAD_FQDN)
-' Parameters ....: $sAD_FQDN - Fully Qualified Domain name of the object for which the LDAP object will be returned.
+' Syntax.........: AD_ObjGet(sAD_FQDN, riidParam)
+' Parameters ....: sAD_FQDN - Fully Qualified Domain name of the object for which the LDAP object will be returned.
+'                  riidParam - OPTIONAL: object GUID
 ' Return values .: LDAP object
 ' Author ........: Jonathan Clelland
 ' Modified.......: water
@@ -328,17 +325,18 @@ END FUNCTION
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa772247(VS.85).aspx (ADS_AUTHENTICATION_ENUM Enumeration)
 ' Example .......:
 ' ===============================================================================================================================
-FUNCTION AD_ObjGet(BYVAL sAD_FQDN AS WSTRING, OPTIONAL BYVAL riid AS GUID) AS IDISPATCH
+FUNCTION AD_ObjGet(BYVAL sAD_FQDN AS WSTRING, OPTIONAL BYVAL riidParam AS GUID) AS IDISPATCH
 
-     IF riid = GUID$("{00000000-0000-0000-0000-000000000000}") THEN
-          riid = $IID_IADs
-          'MSGBOX "riid: " & GUIDTXT$(riid)
-     END IF
 
-     LOCAL obj AS IDISPATCH
-     'LOCAL obj AS IADs
-     LOCAL adsPatch AS WSTRINGZ * 256
-     adsPatch = sAD_FQDN
+
+   LOCAL obj AS IDISPATCH
+   LOCAL adsPatch AS WSTRINGZ * 256, riid as GUID
+   adsPatch = sAD_FQDN
+	riid = riidParam
+	IF riid = GUID$("{00000000-0000-0000-0000-000000000000}") THEN
+      riid = $IID_IADs
+      'MSGBOX "riid: " & GUIDTXT$(riid)
+   END IF
 
 '    If sAD_UserId = "" Then
 '        Return ADsGetObject(sAD_FQDN, $IID_IADs, ByRef obj)
@@ -571,7 +569,7 @@ End Function   '==>AD_MoveObject
 ' Description ...: Deletes the specified object.
 ' Syntax.........: AD_DeleteObject($sAD_Object, $sAD_Class)
 ' Parameters ....: sAD_ObjectParam - Object (user, group, computer etc.) to delete (FQDN or sAMAccountName)
-'                  sAD_Class - The schema class object to delete ("user", "computer", "group", "contact" etc). Can be derived using _AD_GetObjectClass().
+'                  sAD_ClassParam - The schema class object to delete ("user", "computer", "group", "contact" etc). Can be derived using _AD_GetObjectClass().
 ' Return values .: Success - 1
 '                  Failure - 0, sets @error to:
 '                  |1 - $sAD_Object does not exist
@@ -583,12 +581,13 @@ End Function   '==>AD_MoveObject
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa705988(v=VS.85).aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_Class AS WSTRING) EXPORT AS LONG
+FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_ClassParam AS WSTRING) EXPORT AS LONG
 
    SetError(0, "")
 
-   LOCAL sAD_Object AS WSTRINGZ * 512
+   LOCAL sAD_Object AS WSTRINGZ * 512, sAD_Class AS WSTRINGZ * 256
    sAD_Object = sAD_ObjectParam
+	sAD_Class = sAD_ClassParam
 
    IF ISFALSE AD_ObjectExists(sAD_Object, "") THEN
       SetError(1, "Object '" & sAD_Object & "' does not exist!")
@@ -766,7 +765,7 @@ End Function   '==>AD_IsObjectDisabled
 ' Description ...: Modifies the specified user or computer account expiration date or sets the account to never expire.
 ' Syntax.........: AD_SetAccountExpire($sAD_Object, $sAD_DateTime)
 ' Parameters ....: sAD_ObjectParam - User or computer account to set expiration date/time (sAMAccountName or FQDN)
-'                  sAD_DateTime - Expiration date in format: yyyy-mm-dd (local time) or "01/01/1970" to never expire
+'                  sAD_DateTimeParam - Expiration date in format: yyyy-mm-dd (local time) or "01/01/1970" to never expire
 ' Return values .: Success - 1
 '                  Failure - 0, sets @error to:
 '                  |1 - $sAD_Object does not exist
@@ -781,12 +780,13 @@ End Function   '==>AD_IsObjectDisabled
 ' Link ..........: http://www.rlmueller.net/AccountExpires.htm
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_SetAccountExpire alias "AD_SetAccountExpire" (byval sAD_ObjectParam as wstring, byval sAD_DateTime as wstring) export as long
+Function AD_SetAccountExpire alias "AD_SetAccountExpire" (byval sAD_ObjectParam as wstring, byval sAD_DateTimeParam as wstring) export as long
 
    SetError(0, "")
 
-   LOCAL sAD_Object AS WSTRINGZ * 512
+   LOCAL sAD_Object AS WSTRINGZ * 512, sAD_DateTime as WSTRINGZ * 512
    sAD_Object = sAD_ObjectParam
+	sAD_DateTime = sAD_DateTimeParam
 
    IF ISFALSE AD_ObjectExists(sAD_Object, "") THEN
       SetError(1, "Object '" & sAD_Object & "' does not exist!")
@@ -1588,8 +1588,8 @@ End Function   '==>AD_GetAllOUs
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstring, byval sAD_FilterParam as wstring,  byval sAD_DataToRetrieveParam as wstring, _
-																			 byval sAD_ItemSeparatorParam as wstring, byval sAD_AttributeSeparatorParam as wstring ) export as wstring
+Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstring, BYVAL sAD_FilterParam as wstring,  BYVAL sAD_DataToRetrieveParam as wstring, _
+																			 BYVAL sAD_ItemSeparatorParam as wstring, BYVAL sAD_AttributeSeparatorParam as wstring ) export as wstring
                                                      ' byval sAD_SortByParam as wstring, byval iAD_SearchScopeParam as long) export as wstring
 														  
 	SetError(0, "")
@@ -1650,7 +1650,7 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstri
 		FUNCTION = ""
 		EXIT FUNCTION  
 	end if
-		
+	
 	Local iCount1 as long
 	iCount1 = oAD_RecordSet.RecordCount
 	If iCount1 = 0 Then 
@@ -1678,13 +1678,13 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstri
 		'dim aAD_Objects(1 to iCount1) as wstring
 		dim vValue as variant
 		iCount2 = 1
-		
+	
 		oAD_RecordSet.MoveFirst
 		Do Until oAD_RecordSet.EOF
 			dim tempString as wstring
 			For iCount1 = 0 To PARSECOUNT(sAD_DataToRetrieve)-1
 				fld = oAD_RecordSet.fields.Item(iCount1)
-				vValue = fld.Value
+				'vValue = fld.Value
 				tempString = tempString & convertADOVariantToString(fld.Value, aAD_DataToRetrieveArray(iCount1)) & sAD_AttributeSeparator
 			Next iCount1
 			tempString = CLIP$(RIGHT tempString, 1) 
@@ -1700,18 +1700,19 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (byval sAD_OUParam as wstri
 		'aAD_Objects[0] = UBound(aAD_Objects) - 1
 		iCount2 = 1
 		oAD_RecordSet.MoveFirst
+
 		Do Until oAD_RecordSet.EOF
+
 			fld = oAD_RecordSet.fields.Item(0)
-			vValue = fld.Value
-			aAD_Objects(iCount2) = convertADOVariantToString(fld.Value, sAD_DataToRetrieveParam)
+			'vValue = fld.Value
+			aAD_Objects(iCount2) = convertADOVariantToString(fld.Value, sAD_DataToRetrieve)
 			
 			oAD_RecordSet.MoveNext
 			iCount2 += 1
 		loop
-		
+	
 	End If
 	'oAD_Command.Properties("Sort On") = "" ' Reset sort property
-	
 	
 	
 	function = JOIN$(aAD_Objects(), sAD_ItemSeparator)     
@@ -1737,12 +1738,12 @@ End Function   '==>AD_GetObjectsInOU
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-function convertADOVariantToString(byref vValue as variant, byval sAD_Attribute as wstring ) as wstring
+function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute as wstring ) as wstring
 
 	local variantType as long, result as wstring, valuesArraySeparator as wstring
 	variantType = variantvt(vValue)
 	valuesArraySeparator = ";"
-	
+
 	select CASE variantType
 		case %VT_BSTR
 			result = variant$$(vValue)
@@ -2138,239 +2139,6 @@ END FUNCTION   '==>AD_SamAccountNameToFQDN
 
 
 
-'$USER_CHANGE_PASSWORD = "{ab721a53-1e2f-11d0-9819-00aa0040529b}" ' See: http://msdn.microsoft.com/en-us/library/cc223637(PROT.13).aspx
-'$SELF_MEMBERSHIP = "{bf9679c0-0de6-11d0-a285-00aa003049e2}" ' See: http://msdn.microsoft.com/en-us/library/cc223513(PROT.10).aspx
-'$ALLOWED_TO_AUTHENTICATE = "{68B1D179-0D15-4d4f-AB71-46152E79A7BC}" ' See: http://msdn.microsoft.com/en-us/library/ms684300(VS.85).aspx
-'$RECEIVE_AS = "{AB721A56-1E2f-11D0-9819-00AA0040529B}" ' See: http://msdn.microsoft.com/en-us/library/ms684402(VS.85).aspx
-'$SEND_AS = "{AB721A54-1E2f-11D0-9819-00AA0040529B}" ' See: http://msdn.microsoft.com/en-us/library/ms684406(VS.85).aspx
-'$USER_FORCE_CHANGE_PASSWORD = "{00299570-246D-11D0-A768-00AA006E0529}" ' See: http://msdn.microsoft.com/en-us/library/ms684414(VS.85).aspx
-'%ADS_FLAG_OBJECT_TYPE_PRESENT = 1
-'%ADS_ACETYPE_ACCESS_ALLOWED_OBJECT = 5
-'%ADS_ACETYPE_ACCESS_DENIED_OBJECT = 6
-'%ADS_RIGHT_DS_CONTROL_ACCESS = 256
-
-'Function AD_EnablePasswordChange alias "AD_EnablePasswordChange" (byval sAD_ObjectParam as wstring) export as long
-
-'   SetError(0, "")
-
-'   DIM sAD_Object AS WSTRINGZ * 256
-'   sAD_Object = sAD_ObjectParam
-
-'   If isfalse AD_ObjectExists(sAD_Object, "") Then
-'       SetError(1, "Object does not exist!")
-'       #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-'      MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-'      FUNCTION = 0
-'      EXIT FUNCTION
-'   end if
-
-'   If Mid$(sAD_Object, 3, 1) <> "=" Then
-'       sAD_Object = AD_SamAccountNameToFQDN(sAD_Object) ' sAMAccountName provided
-'   end if
-
-'   local bAD_Self, bAD_Everyone, bAD_Modified as integer
-'   local sAD_Self, sAD_Everyone as wstring
-'   sAD_Self = "NT AUTHORITY\SELF"
-'   sAD_Everyone = "EVERYONE"
-
-
-
-'   ' Get the language dependant well known accounts for SELF and EVERYONE
-'   local sDomainName as wstring
-'   AfxGetCurrentUserAndDomain("S-1-5-10", byval strptr(sDomainName))
-'   sAD_Self = sDomainName & "\" & AfxGetAccountNameFromStringSid("S-1-5-10")
-
-'   sAD_Everyone = AfxGetAccountNameFromStringSid("S-1-1-0")
-
-'   LOCAL oAD_Object AS IADsUser
-'   oAD_Object = AD_ObjGet("LDAP://" & sAD_HostServer & "/" & sAD_Object, $IID_IADsUser)
-'   local oAD_SD as  IADsSecurityDescriptor, tempVariant as Variant
-'   tempVariant = oAD_Object.Get("nTSecurityDescriptor")
-'   oAD_SD = tempVariant
-'   Local oAD_DACL as IADsAccessControlList 'IADsAccessControlList
-'   oAD_DACL = oAD_SD.DiscretionaryAcl
-'   ' Search for ACE's for Change Password and modify
-'   bAD_Self = 0
-'   bAD_Everyone = 0
-'   bAD_Modified = 0
-
-'   local oAD_ACE as  IADsAccessControlEntry
-'   local aceCount as long
-'   aceCount = oAD_DACL.AceCount
-
-'   local  pDisp as IDispatch, pUnk as IUnknown, pEnum as IEnumVARIANT, iid AS GUID, hr as long, varValue as variant, nFetch as long
-'   pUnk = oAD_DACL.NewEnum_
-'   iid = $IID_IEnumVARIANT
-'   hr = pUnk.QueryInterface(byref iid, byref pEnum )
-'   IF FAILED(hr) THEN
-'      SetError(2, OBJRESULT$(hr))
-'      #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-'      MSGBOX OBJRESULT$(hr) & $CRLF & "Code:" & STR$(hr), %MB_ICONERROR, "Error"
-'      FUNCTION = 0
-'      EXIT FUNCTION
-'   END IF
-
-'   hr = pEnum.Next(1, varValue, nFetch)
-
-'   while (hr = %S_OK)
-'       if nFetch = 1 THEN
-'           if variantvt(varValue) <> %VT_DISPATCH THEN
-'               exit loop
-'           END IF
-
-'         pDisp = varValue
-'			iid = $IID_IADsAccessControlEntry
-'         hr = pDisp.QueryInterface(byref iid, byref oAD_ACE)
-'           if SUCCEEDED(hr) THEN
-'               If UCASE$(oAD_ACE.objectType) = UCASE$($USER_CHANGE_PASSWORD) Then
-'                   If UCASE$(oAD_ACE.Trustee) = sAD_Self Then
-'                       If oAD_ACE.AceType = %ADS_ACETYPE_ACCESS_DENIED_OBJECT Then
-'                           oAD_ACE.AceType = %ADS_ACETYPE_ACCESS_ALLOWED_OBJECT
-'                           bAD_Modified = 1
-'                       End If
-'                       bAD_Self = 1
-'                   End If
-'                   If UCASE$(oAD_ACE.Trustee) = sAD_Everyone Then
-'                       If oAD_ACE.AceType = %ADS_ACETYPE_ACCESS_DENIED_OBJECT Then
-'                           oAD_ACE.AceType = %ADS_ACETYPE_ACCESS_ALLOWED_OBJECT
-'                           bAD_Modified = 1
-'                       End If
-'                       bAD_Everyone = 1
-'                   End If
-'               End If
-
-'           END IF
-'           VariantClear(varValue)
-
-'       END IF
-
-'       hr = pEnum.Next(1, varValue, nFetch)
-'   WEND
-
-
-
-'   ' If ACE's found and modified, save changes and return
-'   If bAD_Self And bAD_Everyone Then
-'       If bAD_Modified Then
-'           'oAD_SD.discretionaryACL = AD_ReorderACE(oAD_DACL)
-'           'oAD_Object.Put("ntSecurityDescriptor", oAD_SD)
-'				'tempVariant = oAD_SD 
-'			  oAD_Object.Put("ntSecurityDescriptor", oAD_SD)
-'           oAD_Object.SetInfo
-'       End If
-'   Else
-'       ' If ACE's not found, add to DACL
-'       If bAD_Self = 0 Then
-'           ' Create the ACE for Self
-'           local oAD_ACESelf as  IADsAccessControlEntry
-'           oAD_ACESelf = NEWCOM "AccessControlEntry"
-'           oAD_ACESelf.Trustee = sAD_Self
-'           oAD_ACESelf.AceFlags = 0
-'           oAD_ACESelf.AceType = %ADS_ACETYPE_ACCESS_ALLOWED_OBJECT
-'           oAD_ACESelf.Flags = %ADS_FLAG_OBJECT_TYPE_PRESENT
-'           oAD_ACESelf.objectType = $USER_CHANGE_PASSWORD
-'           oAD_ACESelf.AccessMask = %ADS_RIGHT_DS_CONTROL_ACCESS
-'           oAD_DACL.AddAce(oAD_ACESelf)
-'       End If
-'       If bAD_Everyone = 0 Then
-'           ' Create the ACE for Everyone
-'           local oAD_ACEEveryone as  IADsAccessControlEntry
-'           oAD_ACEEveryone = NEWCOM "AccessControlEntry"
-'           oAD_ACEEveryone.Trustee = sAD_Everyone
-'           oAD_ACEEveryone.AceFlags = 0
-'           oAD_ACEEveryone.AceType = %ADS_ACETYPE_ACCESS_ALLOWED_OBJECT
-'           oAD_ACEEveryone.Flags = %ADS_FLAG_OBJECT_TYPE_PRESENT
-'           oAD_ACEEveryone.objectType = $USER_CHANGE_PASSWORD
-'           oAD_ACEEveryone.AccessMask = %ADS_RIGHT_DS_CONTROL_ACCESS
-'           oAD_DACL.AddAce(oAD_ACEEveryone)
-'       End If
-'       'oAD_SD.discretionaryACL = AD_ReorderACE(oAD_DACL)
-'       ' Update the user object
-'		' tempVariant = oAD_SD 
-'       oAD_Object.Put("ntSecurityDescriptor", oAD_SD)
-'       oAD_Object.SetInfo
-'   End If
-
-'   function = 1
-
-'End Function   '==>AD_EnablePasswordChange
-
-
-
-' #INTERNAL_USE_ONLY#============================================================================================================
-' Name...........: AD_ReorderACE
-' Description ...: Reorders the ACEs in a DACL to meet MS recommandations.
-' Syntax.........: __AD_ReorderACE(oAD_DACL)
-' Parameters ....: oAD_DACL - Discretionary Access Control List
-' Return values .: A reordered DACL according to MS recommandation
-' Author ........: water (based on VB code by Richard L. Mueller)
-' Modified.......:
-' Remarks .......: This function is used internally
-'+
-'                  The Active Directory Service Interfaces (ADSI) property cache on Microsoft Windows Server 2003 and on Microsoft Windows XP
-'                  will correctly order the DACL before writing it back to the object. Reordering is only required on Microsoft Windows 2000.
-'                  The proper order of ACEs in an ACL is as follows:
-'                    Access-denied ACEs that apply to the object itself
-'                    Access-denied ACEs that apply to a child of the object, such as a property set or property
-'                    Access-allowed ACEs that apply to the object itself
-'                    Access-allowed ACEs that apply to a child of the object, such as a property set or property
-'                    All inherited ACEs
-' Related .......:
-' Link ..........: http://support.microsoft.com/kb/269159/en-us
-' Example .......:
-' ===============================================================================================================================
-'Function AD_ReorderACE(byval oAD_DACL as IADsAccessControlList) as IADsAccessControlList
-
-'	' Reorder ACE's in DACL
-'	Local oAD_NewDACL, oAD_InheritedDACL, oAD_AllowDACL, oAD_DenyDACL, oAD_AllowObjectDACL, oAD_DenyObjectDACL as IADsAccessControlList, oAD_ACE as IADsAccessControlEntry
-
-'	oAD_NewDACL = newcom ("AccessControlList")
-'	oAD_InheritedDACL = newcom("AccessControlList")
-'	oAD_AllowDACL = newcom("AccessControlList")
-'	oAD_DenyDACL = newcom("AccessControlList")
-'	oAD_AllowObjectDACL = newcom("AccessControlList")
-'	oAD_DenyObjectDACL = newcom("AccessControlList")
-
-'	For oAD_ACE In oAD_DACL
-'		If (oAD_ACE.AceFlags And %ADS_ACEFLAG_INHERITED_ACE) = %ADS_ACEFLAG_INHERITED_ACE Then
-'			oAD_InheritedDACL.AddAce(oAD_ACE)
-'		Else
-'			select case oAD_ACE.AceType
-'				Case %ADS_ACETYPE_ACCESS_ALLOWED
-'					oAD_AllowDACL.AddAce(oAD_ACE)
-'				Case %ADS_ACETYPE_ACCESS_DENIED
-'					oAD_DenyDACL.AddAce(oAD_ACE)
-'				Case %ADS_ACETYPE_ACCESS_ALLOWED_OBJECT
-'					oAD_AllowObjectDACL.AddAce(oAD_ACE)
-'				Case %ADS_ACETYPE_ACCESS_DENIED_OBJECT
-'					oAD_DenyObjectDACL.AddAce(oAD_ACE)
-'				Case Else
-'			End select
-'		End If
-'	Next
-'	For oAD_ACE In oAD_DenyDACL
-'		oAD_NewDACL.AddAce(oAD_ACE)
-'	Next
-'	For oAD_ACE In oAD_DenyObjectDACL
-'		oAD_NewDACL.AddAce(oAD_ACE)
-'	Next
-'	For oAD_ACE In oAD_AllowDACL
-'		oAD_NewDACL.AddAce(oAD_ACE)
-'	Next
-'	For oAD_ACE In oAD_AllowObjectDACL
-'		oAD_NewDACL.AddAce(oAD_ACE)
-'	Next
-'	For oAD_ACE In oAD_InheritedDACL
-'		oAD_NewDACL.AddAce(oAD_ACE)
-'	Next
-'	oAD_NewDACL.ACLRevision = oAD_DACL.ACLRevision
-	
-'	function = oAD_NewDACL
-
-'End Function   '==>__AD_ReorderACE
-
-
-''---------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -2380,10 +2148,23 @@ END FUNCTION   '==>AD_SamAccountNameToFQDN
 
 
 
+FUNCTION ComputerName ALIAS "ComputerName" () EXPORT AS WSTRING
 
+  LOCAL szTmp AS STRINGZ * %MAX_PATH
+  LOCAL sTmp AS WSTRING
 
+  HOST NAME TO sTmp
+  sTmp = TRIM$(sTmp)
 
+  IF LEN(sTmp) = 0 THEN
+     GetComputerName szTmp, 48
+     sTmp = szTmp
+  END IF
 
+  'Function = LCase$(sTmp)
+  FUNCTION = sTmp
+
+END FUNCTION
 
 
 
@@ -2419,115 +2200,115 @@ END FUNCTION
 
 
 
-FUNCTION ADs_AddUserToGroup (strComputer AS STRING, strUser AS STRING, strGroup AS STRING) AS LONG
-  LOCAL hr AS LONG
-  LOCAL colAccounts AS IADsContainer
-  LOCAL objGroup AS IADsGroup
-  LOCAL objUser AS IADsUser
-  LOCAL strADsPath AS STRING
+'FUNCTION ADs_AddUserToGroup (strComputer AS STRING, strUser AS STRING, strGroup AS STRING) AS LONG
+'  LOCAL hr AS LONG
+'  LOCAL colAccounts AS IADsContainer
+'  LOCAL objGroup AS IADsGroup
+'  LOCAL objUser AS IADsUser
+'  LOCAL strADsPath AS STRING
 
-  strADsPath = UCODE$("WinNT://" & strComputer & "")
-  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, colAccounts)
-  IF hr <> 0 THEN
-     FUNCTION = hr
-     EXIT FUNCTION
-  END IF
+'  strADsPath = UCODE$("WinNT://" & strComputer & "")
+'  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, colAccounts)
+'  IF hr <> 0 THEN
+'     FUNCTION = hr
+'     EXIT FUNCTION
+'  END IF
 
-  objUser = colAccounts.GetObject(UCODE$("user"), UCODE$(strUser))
-  IF ISFALSE(ISOBJECT(objUser)) THEN
-     FUNCTION = -1
-     EXIT FUNCTION
-  END IF
+'  objUser = colAccounts.GetObject(UCODE$("user"), UCODE$(strUser))
+'  IF ISFALSE(ISOBJECT(objUser)) THEN
+'     FUNCTION = -1
+'     EXIT FUNCTION
+'  END IF
 
-  objGroup = colAccounts.GetObject(UCODE$("group"), UCODE$(strGroup))
-  IF ISFALSE(ISOBJECT(objGroup)) THEN
-     FUNCTION = -2
-     EXIT FUNCTION
-  END IF
+'  objGroup = colAccounts.GetObject(UCODE$("group"), UCODE$(strGroup))
+'  IF ISFALSE(ISOBJECT(objGroup)) THEN
+'     FUNCTION = -2
+'     EXIT FUNCTION
+'  END IF
 
-  IF objGroup.IsMember(objUser.ADsPath) = 0 THEN
-     objGroup.Add(objUser.ADsPath)
-  END IF
+'  IF objGroup.IsMember(objUser.ADsPath) = 0 THEN
+'     objGroup.Add(objUser.ADsPath)
+'  END IF
 
-  IF objGroup.IsMember(objUser.ADsPath) = -1 THEN
-     FUNCTION = 0
-  ELSE
-     FUNCTION = -3
-  END IF
+'  IF objGroup.IsMember(objUser.ADsPath) = -1 THEN
+'     FUNCTION = 0
+'  ELSE
+'     FUNCTION = -3
+'  END IF
 
-  SET objUser = NOTHING
-  SET objGroup = NOTHING
-  SET colAccounts = NOTHING
+'  SET objUser = NOTHING
+'  SET objGroup = NOTHING
+'  SET colAccounts = NOTHING
 
-END FUNCTION
-
-
-FUNCTION ADs_RemoveUserFromGroup (strComputer AS STRING, strUser AS STRING, strGroup AS STRING) AS LONG
-  LOCAL hr AS LONG
-  LOCAL colAccounts AS IADsContainer
-  LOCAL objGroup AS IADsGroup
-  LOCAL objUser AS IADsUser
-  LOCAL strADsPath AS STRING
-
-  strADsPath = UCODE$("WinNT://" & strComputer & "")
-  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, colAccounts)
-  IF hr <> 0 THEN
-     FUNCTION = hr
-     EXIT FUNCTION
-  END IF
-
-  objUser = colAccounts.GetObject(UCODE$("user"), UCODE$(strUser))
-  IF ISFALSE(ISOBJECT(objUser)) THEN
-     FUNCTION = -1
-     EXIT FUNCTION
-  END IF
-
-  objGroup = colAccounts.GetObject(UCODE$("group"), UCODE$(strGroup))
-  IF ISFALSE(ISOBJECT(objGroup)) THEN
-     FUNCTION = -2
-     EXIT FUNCTION
-  END IF
-
-  IF objGroup.IsMember(objUser.ADsPath) = -1 THEN
-     objGroup.Remove(objUser.ADsPath)
-  END IF
-
-  IF objGroup.IsMember(objUser.ADsPath) = 0 THEN
-     FUNCTION = 0
-  ELSE
-     FUNCTION = -3
-  END IF
-
-  SET objUser = NOTHING
-  SET objGroup = NOTHING
-  SET colAccounts = NOTHING
-
-END FUNCTION
+'END FUNCTION
 
 
-FUNCTION ADs_DeleteUser (strComputer AS STRING, strUser AS STRING) AS LONG
-  LOCAL hr AS LONG
-  LOCAL objComp AS IADsContainer
-  LOCAL strADsPath AS STRING
+'FUNCTION ADs_RemoveUserFromGroup (strComputer AS STRING, strUser AS STRING, strGroup AS STRING) AS LONG
+'  LOCAL hr AS LONG
+'  LOCAL colAccounts AS IADsContainer
+'  LOCAL objGroup AS IADsGroup
+'  LOCAL objUser AS IADsUser
+'  LOCAL strADsPath AS STRING
 
-  strADsPath = UCODE$("WinNT://" & strComputer & "")
-  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, objComp)
-  IF hr <> 0 THEN
-     FUNCTION = hr
-     EXIT FUNCTION
-  END IF
+'  strADsPath = UCODE$("WinNT://" & strComputer & "")
+'  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, colAccounts)
+'  IF hr <> 0 THEN
+'     FUNCTION = hr
+'     EXIT FUNCTION
+'  END IF
 
-  objComp.Delete (UCODE$("user"), UCODE$(strUser))
+'  objUser = colAccounts.GetObject(UCODE$("user"), UCODE$(strUser))
+'  IF ISFALSE(ISOBJECT(objUser)) THEN
+'     FUNCTION = -1
+'     EXIT FUNCTION
+'  END IF
 
-  IF OBJRESULT = 0 THEN
-     FUNCTION = 0
-  ELSE
-     FUNCTION = -1
-  END IF
+'  objGroup = colAccounts.GetObject(UCODE$("group"), UCODE$(strGroup))
+'  IF ISFALSE(ISOBJECT(objGroup)) THEN
+'     FUNCTION = -2
+'     EXIT FUNCTION
+'  END IF
 
-  SET objComp = NOTHING
+'  IF objGroup.IsMember(objUser.ADsPath) = -1 THEN
+'     objGroup.Remove(objUser.ADsPath)
+'  END IF
 
-END FUNCTION
+'  IF objGroup.IsMember(objUser.ADsPath) = 0 THEN
+'     FUNCTION = 0
+'  ELSE
+'     FUNCTION = -3
+'  END IF
+
+'  SET objUser = NOTHING
+'  SET objGroup = NOTHING
+'  SET colAccounts = NOTHING
+
+'END FUNCTION
+
+
+'FUNCTION ADs_DeleteUser (strComputer AS STRING, strUser AS STRING) AS LONG
+'  LOCAL hr AS LONG
+'  LOCAL objComp AS IADsContainer
+'  LOCAL strADsPath AS STRING
+
+'  strADsPath = UCODE$("WinNT://" & strComputer & "")
+'  hr = ADsGetObject(BYVAL STRPTR(strADsPath), $IID_IADsContainer, objComp)
+'  IF hr <> 0 THEN
+'     FUNCTION = hr
+'     EXIT FUNCTION
+'  END IF
+
+'  objComp.Delete (UCODE$("user"), UCODE$(strUser))
+
+'  IF OBJRESULT = 0 THEN
+'     FUNCTION = 0
+'  ELSE
+'     FUNCTION = -1
+'  END IF
+
+'  SET objComp = NOTHING
+
+'END FUNCTION
 
 
 'FUNCTION GenName (nLength AS INTEGER, nSymbol AS INTEGER) AS STRING
@@ -2557,23 +2338,6 @@ END FUNCTION
 '  FUNCTION = LEFT$(s, nLength)
 'END FUNCTION
 
-FUNCTION ComputerName ALIAS "ComputerName" () EXPORT AS WSTRING
-
-  LOCAL szTmp AS STRINGZ * %MAX_PATH
-  LOCAL sTmp AS WSTRING
-
-  HOST NAME TO sTmp
-  sTmp = TRIM$(sTmp)
-
-  IF LEN(sTmp) = 0 THEN
-     GetComputerName szTmp, 48
-     sTmp = szTmp
-  END IF
-
-  'Function = LCase$(sTmp)
-  FUNCTION = sTmp
-
-END FUNCTION
 
 
 

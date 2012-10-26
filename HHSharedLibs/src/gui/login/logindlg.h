@@ -23,7 +23,7 @@ public:
     ~LoginDlg();
 
 
-    void setUser(User *u){user = u;}
+    void setUser(User *user);
 
 
 private:
