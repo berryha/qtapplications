@@ -46,6 +46,9 @@ QVariant ADUserInfoModel::data ( const QModelIndex & index, int role) const{
             ADUser *info = static_cast<ADUser *> (usersList.at(row));
             return info->getAttribute(m_attributeNames.at(index.column()));
     }
+    if(role == Qt::UserRole){
+        return row;
+    }
 
     return QVariant();
 
@@ -118,7 +121,7 @@ ADUser * ADUserInfoModel::getADUser(const QModelIndex & index){
         return 0;
     }
 
-    return usersList.at(index.row());
+    return usersList.at(index.data(Qt::UserRole).toInt());
 }
 
 ////////////////////////////////////////////////////////////
