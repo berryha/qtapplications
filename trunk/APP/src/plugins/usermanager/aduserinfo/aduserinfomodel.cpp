@@ -67,7 +67,14 @@ QVariant ADUserInfoModel::headerData ( int section, Qt::Orientation orientation,
 void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QList<QStringList/*Attribute Values*/> &userItems){
 
     clear();
+
+    if(attributeNames.isEmpty() || userItems.isEmpty()){
+        return;
+    }
+
     m_attributeNames =attributeNames;
+
+    beginResetModel();
 
     foreach (QStringList attributeValues, userItems) {
         Q_ASSERT(attributeNames.size() == attributeValues.size());
@@ -79,8 +86,8 @@ void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QL
         usersList.append(user);
     }
 
-    beginResetModel();
-    this->usersList = usersList;
+    //beginResetModel();
+    //this->usersList = usersList;
     endResetModel();
 
 
@@ -88,16 +95,21 @@ void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QL
 
 void ADUserInfoModel::clear(){
 
-    //beginResetModel();
+    if(usersList.isEmpty()){
+        return;
+    }
+
+    beginResetModel();
+
+    m_attributeNames.clear();
 
     foreach (ADUser *user, usersList) {
         delete user;
         user = 0;
     }
     usersList.clear();
-    m_attributeNames.clear();
 
-    //endResetModel();
+    endResetModel();
 
 }
 
