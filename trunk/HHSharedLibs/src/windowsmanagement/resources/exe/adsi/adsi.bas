@@ -1,5 +1,5 @@
 
-  '  #COMPILE EXE
+  ' #COMPILE EXE
 
     #COMPILE DLL
 
@@ -11,6 +11,8 @@ REM #COMPILE DLL
 '''----------------------------------------------------------
 
 FUNCTION testADSI () AS LONG
+
+
 
      'IF ad_open("hehui", "000...", "200.200.200.106", 0 ) = 0 THEN
      IF ad_open("dgadmin", "dmsto&*(", "200.200.200.106", 0 ) = 0 THEN
@@ -60,11 +62,11 @@ FUNCTION testADSI () AS LONG
 
    ' AD_SetUserPasswordChange("test1", 0)
 
-   'msgbox AD_GetAllOUs("")
+   MSGBOX AD_GetAllOUs("")
 
    'MSGBOX AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(cn=" & "test" & "*))" , "sAMAccountName,distinguishedName,objectSid", ";", "|")
    ' MSGBOX AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*)(displayName=Tes*))" , "memberOf", ";", "|")
-     MSGBOX AD_GetObjectsInOU("OU=OU1,OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*))" , "displayName", ";", "|")
+  '   MSGBOX AD_GetObjectsInOU("OU=OU1,OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*))" , "displayName", ";", "|")
 
 
 
