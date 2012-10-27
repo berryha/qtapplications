@@ -263,7 +263,7 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
     QString filter, dataToRetrieve;
     if(ui.comboBoxQueryMode->currentIndex() == 0){
         QString displayName = ui.lineEditDisplayName->text();
-        filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=*%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=*%1*)").arg(displayName));
+        filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=%1*)").arg(displayName));
         dataToRetrieve = "sAMAccountName,displayName,userWorkstations,telephoneNumber,description,objectGUID,objectSid";
     }else{
         filter = ui.lineEditFilter->text();
