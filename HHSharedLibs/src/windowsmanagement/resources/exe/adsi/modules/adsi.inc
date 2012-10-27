@@ -264,7 +264,8 @@ FUNCTION AD_GetLastErrorString ALIAS "AD_GetLastErrorString" () EXPORT AS WSTRIN
    FUNCTION = sAD_LastErrorString
 END FUNCTION
 
-FUNCTION SetError(BYVAL errorCode AS LONG, BYVAL errorString AS WSTRING) AS LONG
+'FUNCTION SetError(BYVAL errorCode AS LONG, BYVAL errorString AS WSTRING) AS LONG
+FUNCTION SetError(BYVAL errorCode AS LONG, BYREF errorString AS WSTRINGz) AS LONG
    lAD_LastErrorCode = errorCode
    sAD_LastErrorString = errorString
 END FUNCTION
@@ -1027,7 +1028,8 @@ End Function   '==>AD_SetUserPasswordChange
 ' Link ..........:
 ' Example .......:
 ' ===============================================================================================================================
-FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING) EXPORT AS WSTRING
+'FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING) EXPORT AS WSTRING
+FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectParam AS WSTRINGz, BYREF sAD_AttributeParam AS WSTRINGz) EXPORT AS WSTRING
 
     SetError(0, "")
 
@@ -1467,11 +1469,12 @@ END FUNCTION   '==>AD_CreateOU
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_GetAllOUs alias "AD_GetAllOUs" (byval sAD_RootParam as wstring, opt byval sAD_SeparatorParam as wstring, byval sAD_SubOUSeparatorParam as wstring ) export as wstring
+'Function AD_GetAllOUs alias "AD_GetAllOUs" (byval sAD_RootParam as wstring, opt byval sAD_SeparatorParam as wstring, byval sAD_SubOUSeparatorParam as wstring ) export as wstring
+Function AD_GetAllOUs alias "AD_GetAllOUs" (BYREF sAD_RootParam as wstringz, opt BYREF sAD_SeparatorParam as wstringz, BYREF sAD_SubOUSeparatorParam as wstringz ) export as wstring
 
     SetError(0, "")
 
-    local sAD_Root AS WSTRINGZ * 256, sAD_Separator AS WSTRINGZ * 2, sAD_SubOUSeparator AS WSTRINGZ * 2
+    local sAD_Root AS WSTRINGZ * 256, sAD_Separator AS WSTRINGZ * 4, sAD_SubOUSeparator AS WSTRINGZ * 4
     sAD_Root = sAD_RootParam
     sAD_Separator = sAD_SeparatorParam
 	 sAD_SubOUSeparator = sAD_SubOUSeparatorParam
@@ -1537,7 +1540,7 @@ Function AD_GetAllOUs alias "AD_GetAllOUs" (byval sAD_RootParam as wstring, opt 
 		iCount2 += 1
 		oAD_RecordSet.MoveNext
 	loop
-
+  
 	
 	function = JOIN$(aAD_OUs(), sAD_Separator)     
 
@@ -1588,10 +1591,12 @@ End Function   '==>AD_GetAllOUs
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstring, BYVAL sAD_FilterParam as wstring,  BYVAL sAD_DataToRetrieveParam as wstring, _
-																			 BYVAL sAD_ItemSeparatorParam as wstring, BYVAL sAD_AttributeSeparatorParam as wstring ) export as wstring
-                                                     ' byval sAD_SortByParam as wstring, byval iAD_SearchScopeParam as long) export as wstring
-														  
+'Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstring, BYVAL sAD_FilterParam as wstring,  BYVAL sAD_DataToRetrieveParam as wstring, _
+'																			 BYVAL sAD_ItemSeparatorParam as wstring, BYVAL sAD_AttributeSeparatorParam as wstring ) export as wstring
+'                                                     ' byval sAD_SortByParam as wstring, byval iAD_SearchScopeParam as long) export as wstring
+Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstringz, BYREF sAD_FilterParam as wstringz,  BYREF sAD_DataToRetrieveParam as wstringz, _
+																			 BYREF sAD_ItemSeparatorParam as wstringz, BYREF sAD_AttributeSeparatorParam as wstringz ) export as wstring														  
+	
 	SetError(0, "")
 
     local sAD_OU AS WSTRINGZ * 256, sAD_Filter AS WSTRINGZ * 256, sAD_DataToRetrieve as WSTRINGZ * 256
@@ -1632,14 +1637,14 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstri
 	'if iAD_SearchScope = 0 THEN iAD_SearchScope = 2
 	'if sAD_SortBy = "" THEN sAD_SortBy = "sAMAccountName"
 
-		
+	
 	'Local iCount2 as long
 	'sAD_DataToRetrieve = StringStripWS(sAD_DataToRetrieve, 8)
 	REPLACE " " WITH "" IN sAD_DataToRetrieve
 
 	'oAD_Command.Properties("Searchscope") = iAD_SearchScope
 	oAD_Command.CommandText = "<LDAP://" & sAD_HostServer & "/" & sAD_OU & ">;" & sAD_Filter & ";" & sAD_DataToRetrieve '& ";subtree"
- 
+
 	'oAD_Command.Properties("Sort On") = sAD_SortBy
 	LOCAL oAD_RecordSet AS ADORecordset 
 	oAD_RecordSet = oAD_Command.Execute
@@ -1650,14 +1655,14 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstri
 		FUNCTION = ""
 		EXIT FUNCTION  
 	end if
-	
+
 	Local iCount1 as long
-	iCount1 = oAD_RecordSet.RecordCount
+	iCount1 = oAD_RecordSet.RecordCount	
 	If iCount1 = 0 Then 
 		SetError(3, "No records returned from Active Directory! sAD_Filter didn't return a record")
 		#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 		'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-		FUNCTION = ""
+		FUNCTION = ""	
 		EXIT FUNCTION
 	end if
 
