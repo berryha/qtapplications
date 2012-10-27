@@ -235,7 +235,6 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     ADUser::setADDefaultNamingContext( m_defaultNamingContext );
 
     ui.comboBoxOU->addItem("");
-
     QString ous = m_adsi->AD_GetAllOUs("", ";", "\\");
     QStringList ouList = ous.split(";");
     ouList.sort();
@@ -282,14 +281,15 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         ouString = "OU=" + ouString + "," + m_defaultNamingContext;
     }
 
+    QStringList attributeNames = dataToRetrieve.split(",");
+
     QString resultString = m_adsi->AD_GetObjectsInOU(ouString, filter, dataToRetrieve, itemSeparator, attributeSeparator);
     if(resultString.isEmpty()){
         QString error = m_adsi->AD_GetLastErrorString();
-        if(!error.isEmpty()){
-            m_userInfoModel->setADUserItems(dataToRetrieve.split(","), QList<QStringList>());
-            QMessageBox::critical(this, tr("Error"), tr("Failed to query!\r\n%1").arg(error) );
-            return;
-        }
+        m_userInfoModel->setADUserItems(attributeNames, QList<QStringList>());
+        QMessageBox::critical(this, tr("Error"), tr("Failed to query AD!\r\n%1").arg(error) );
+
+        return;
     }
 
 
@@ -300,7 +300,7 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         items.append(attributes);
     }
 
-    m_userInfoModel->setADUserItems(dataToRetrieve.split(","), items);
+    m_userInfoModel->setADUserItems(attributeNames, items);
 
     ui.tableViewADUsers->horizontalHeader ()->resizeSections(QHeaderView::ResizeToContents);
     //ui.tableViewADUsers->resizeColumnToContents(0);
@@ -382,6 +382,7 @@ void ADUserManagerWidget::slotCreateADUser(ADUser *adUser){
 }
 
 void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
+    qDebug()<<"--ADUserManagerWidget::showADUserInfoWidget(...)";
 
     QDialog dlg(this);
     QVBoxLayout vbl(&dlg);
