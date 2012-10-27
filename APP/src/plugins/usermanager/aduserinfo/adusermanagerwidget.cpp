@@ -86,6 +86,7 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     m_sortFilterProxyModel->setSourceModel(m_userInfoModel);
     ui.tableViewADUsers->setModel(m_sortFilterProxyModel);
 
+
     ui.comboBoxQueryMode->setCurrentIndex(0);
     ui.stackedWidget->setCurrentWidget(ui.pageSimpleQuery);
 
@@ -613,6 +614,7 @@ void ADUserManagerWidget::getSelectedADUser(const QModelIndex &index){
         m_selectedADUser = 0;
         return;
     }
+
 
     m_selectedADUser = m_userInfoModel->getADUser(index);
 
