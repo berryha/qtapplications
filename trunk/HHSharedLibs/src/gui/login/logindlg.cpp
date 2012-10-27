@@ -22,7 +22,7 @@ LoginDlg::LoginDlg(User *user, const QString &windowTitle, QWidget *parent) :
 
     setUser(user);
 
-    //ui.userIDComboBox->setEditText(user->getUserID());
+    ui.userIDComboBox->setEditText(user->getUserID());
     //ui.passwordLineEdit->setText(user->getPassword());
 
 }
