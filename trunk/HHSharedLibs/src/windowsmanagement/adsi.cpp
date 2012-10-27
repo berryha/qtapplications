@@ -290,7 +290,9 @@ QString ADSI::lastErrorString() const{
 bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
     qDebug()<<"--ADSI::AD_Open(...)";
 
+    qWarning();
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
+
 }
 
 void ADSI::AD_Close(){
@@ -324,7 +326,11 @@ bool ADSI::AD_RenameObject(const QString &object, const QString &cn){
 }
 
 bool ADSI::AD_MoveObject(const QString &ou, const QString &object, const QString &cn){
+    qDebug()<<"ADSI::AD_MoveObject(...)";
+
+    qWarning();
     return m_AD_MoveObject(ou.toStdWString().c_str(), object.toStdWString().c_str(), cn.toStdWString().c_str());
+
 }
 
 bool ADSI::AD_DeleteObject(const QString &object, const QString &objectClass){
@@ -340,6 +346,7 @@ bool ADSI::AD_EnableObject(const QString &object, bool enable){
 }
 
 bool ADSI::AD_IsObjectDisabled(const QString &object){
+    qWarning();
     return m_AD_IsObjectDisabled(object.toStdWString().c_str());
 }
 
@@ -398,6 +405,7 @@ bool ADSI::AD_CreateUser(const QString &ou, const QString &userName, const QStri
 }
 
 bool ADSI::AD_SetPassword(const QString &userName, const QString &password, bool expire){
+    qWarning();
     return m_AD_SetPassword(userName.toStdWString().c_str(), password.toStdWString().c_str(), expire?1:0);
 }
 

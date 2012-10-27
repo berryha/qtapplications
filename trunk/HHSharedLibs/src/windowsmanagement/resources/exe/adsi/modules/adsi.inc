@@ -326,7 +326,8 @@ END FUNCTION
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa772247(VS.85).aspx (ADS_AUTHENTICATION_ENUM Enumeration)
 ' Example .......:
 ' ===============================================================================================================================
-FUNCTION AD_ObjGet(BYVAL sAD_FQDN AS WSTRING, OPTIONAL BYVAL riidParam AS GUID) AS IDISPATCH
+'FUNCTION AD_ObjGet(BYVAL sAD_FQDN AS WSTRING, OPTIONAL BYVAL riidParam AS GUID) AS IDISPATCH
+FUNCTION AD_ObjGet(BYREF sAD_FQDN AS WSTRINGz, OPTIONAL BYVAL riidParam AS GUID) AS IDISPATCH
 
 
 
@@ -388,6 +389,7 @@ END FUNCTION   '==>AD_ObjGet
 ' Example .......:
 ' ===============================================================================================================================
 FUNCTION AD_ObjectExists alias "AD_ObjectExists" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_PropertyParam AS WSTRING) export AS LONG
+'FUNCTION AD_ObjectExists alias "AD_ObjectExists" (BYREF sAD_ObjectParam AS WSTRINGZ, BYREF sAD_PropertyParam AS WSTRINGZ) export AS LONG
 
     SetError(0, "")
 
@@ -459,7 +461,8 @@ END FUNCTION   '==>AD_ObjectExists
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa705991(v=VS.85).aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_RenameObject alias "AD_RenameObject" (byval sAD_ObjectParam as wstring, byval sAD_CNParam as wstring) export as long
+'Function AD_RenameObject alias "AD_RenameObject" (byval sAD_ObjectParam as wstring, byval sAD_CNParam as wstring) export as long
+Function AD_RenameObject alias "AD_RenameObject" (BYREF sAD_ObjectParam as wstringz, BYREF sAD_CNParam as wstringz) export as long
 
    SetError(0, "")
 
@@ -483,11 +486,11 @@ Function AD_RenameObject alias "AD_RenameObject" (byval sAD_ObjectParam as wstri
    sAD_CN = "CN=" & sAD_CN
    oAD_OU.MoveHere("LDAP://" & sAD_HostServer & "/" & sAD_Object, sAD_CN)
 	
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>AD_RenameObject
 
@@ -512,7 +515,8 @@ End Function   '==>AD_RenameObject
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa705991(v=VS.85).aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OUParam as wstring, byval sAD_ObjectParam as wstring, opt byval sAD_CNParam as wstring) export as long
+'Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OUParam as wstring, byval sAD_ObjectParam as wstring, opt byval sAD_CNParam as wstring) export as long
+Function AD_MoveObject alias "AD_MoveObject" (BYREF sAD_OUParam as wstringz, BYREF sAD_ObjectParam as wstringz, opt BYREF sAD_CNParam as wstringz) export as long
 
    SetError(0, "")
 
@@ -536,7 +540,7 @@ Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OUParam as wstring, byva
       FUNCTION = 0
       EXIT FUNCTION
    END IF
-	
+
 	If Mid$(sAD_Object, 3, 1) <> "=" Then sAD_Object = AD_SamAccountNameToFQDN(sAD_Object) ' sAMAccountName provided
 	If sAD_CN = "" Then
 		sAD_CN = "CN=" & AD_GetObjectAttribute(sAD_Object, "cn")
@@ -556,11 +560,11 @@ Function AD_MoveObject alias "AD_MoveObject" (byval sAD_OUParam as wstring, byva
 	oAD_OU = AD_ObjGet("LDAP://" & sAD_HostServer & "/" & sAD_OU, $IID_IADsContainer) ' Pointer to the destination container
 	oAD_OU.MoveHere("LDAP://" & sAD_HostServer & "/" & sAD_Object, sAD_CN)
 	
-   IF OBJRESULT <> 0 THEN
+ 	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>AD_MoveObject
 
@@ -582,7 +586,8 @@ End Function   '==>AD_MoveObject
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa705988(v=VS.85).aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_ClassParam AS WSTRING) EXPORT AS LONG
+'FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_ClassParam AS WSTRING) EXPORT AS LONG
+FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYREF sAD_ObjectParam AS WSTRINGz, BYREF sAD_ClassParam AS WSTRINGz) EXPORT AS LONG
 
    SetError(0, "")
 
@@ -606,11 +611,11 @@ FUNCTION AD_DeleteObject ALIAS "AD_DeleteObject" (BYVAL sAD_ObjectParam AS WSTRI
    sAD_CN = "CN=" & AD_GetObjectAttribute(sAD_Object, "cn")
    oAD_OU.Delete(sAD_Class, sAD_CN)
 
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 END FUNCTION   '==>AD_DeleteObject
 
@@ -631,7 +636,8 @@ END FUNCTION   '==>AD_DeleteObject
 ' Link ..........: http://www.rlmueller.net/Programs/IsUserLocked.txt
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_UnlockObject alias "AD_UnlockObject" (byval sAD_ObjectParam as wstring) export as long
+'Function AD_UnlockObject alias "AD_UnlockObject" (byval sAD_ObjectParam as wstring) export as long
+Function AD_UnlockObject alias "AD_UnlockObject" (BYREF sAD_ObjectParam as wstringz) export as long
 
    SetError(0, "")
 
@@ -652,11 +658,11 @@ Function AD_UnlockObject alias "AD_UnlockObject" (byval sAD_ObjectParam as wstri
 	oAD_Object.IsAccountLocked = %False
 	oAD_Object.SetInfo
 	
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>_AD_UnlockObject
 
@@ -678,7 +684,8 @@ End Function   '==>_AD_UnlockObject
 ' Link ..........: http://www.wisesoft.co.uk/scripts/vbscript_enable-disable_user_account_1.aspx
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_EnableObject alias "AD_EnableObject" (byval sAD_ObjectParam as wstring, byval bEnableObject as long) export as long
+'Function AD_EnableObject alias "AD_EnableObject" (byval sAD_ObjectParam as wstring, byval bEnableObject as long) export as long
+Function AD_EnableObject alias "AD_EnableObject" (BYREF sAD_ObjectParam as wstringz, byval bEnableObject as long) export as long
 
    SetError(0, "")
 
@@ -705,11 +712,11 @@ Function AD_EnableObject alias "AD_EnableObject" (byval sAD_ObjectParam as wstri
 	END IF 
 	oAD_Object.SetInfo
 	
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>_AD_DisableObject
 
@@ -729,7 +736,8 @@ End Function   '==>_AD_DisableObject
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_IsObjectDisabled alias "AD_IsObjectDisabled" (byval sAD_ObjectParam as wstring)  export as long
+'Function AD_IsObjectDisabled alias "AD_IsObjectDisabled" (byval sAD_ObjectParam as wstring)  export as long
+Function AD_IsObjectDisabled alias "AD_IsObjectDisabled" (BYREF sAD_ObjectParam as wstringz)  export as long
 
    SetError(0, "")
 
@@ -781,7 +789,8 @@ End Function   '==>AD_IsObjectDisabled
 ' Link ..........: http://www.rlmueller.net/AccountExpires.htm
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_SetAccountExpire alias "AD_SetAccountExpire" (byval sAD_ObjectParam as wstring, byval sAD_DateTimeParam as wstring) export as long
+'Function AD_SetAccountExpire alias "AD_SetAccountExpire" (byval sAD_ObjectParam as wstring, byval sAD_DateTimeParam as wstring) export as long
+Function AD_SetAccountExpire alias "AD_SetAccountExpire" (BYREF sAD_ObjectParam as wstringz, BYREF sAD_DateTimeParam as wstringz) export as long
 
    SetError(0, "")
 
@@ -808,11 +817,11 @@ Function AD_SetAccountExpire alias "AD_SetAccountExpire" (byval sAD_ObjectParam 
 	oAD_Object.AccountExpirationDate = afxTime.ToVariantDate() 
 	oAD_Object.SetInfo
 	
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>AD_SetAccountExpire
 
@@ -834,7 +843,8 @@ End Function   '==>AD_SetAccountExpire
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_SetPasswordExpire alias "AD_SetPasswordExpire" (byval sAD_ObjectParam as wstring, byval bEnableExpire as long) export as long
+'Function AD_SetPasswordExpire alias "AD_SetPasswordExpire" (byval sAD_ObjectParam as wstring, byval bEnableExpire as long) export as long
+Function AD_SetPasswordExpire alias "AD_SetPasswordExpire" (BYREF sAD_ObjectParam as wstringz, byval bEnableExpire as long) export as long
 
    SetError(0, "")
 
@@ -861,11 +871,11 @@ Function AD_SetPasswordExpire alias "AD_SetPasswordExpire" (byval sAD_ObjectPara
 	END IF 
 	oAD_Object.SetInfo
 	
-   IF OBJRESULT <> 0 THEN
+	IF OBJRESULT <> 0 THEN
       FUNCTION = 0
+	else
+		function = 1	
    END IF
-
-   FUNCTION = 1
 
 End Function   '==>AD_SetPasswordExpire
 
@@ -889,7 +899,8 @@ End Function   '==>AD_SetPasswordExpire
 ' Link ..........: Example VBS see: http://gallery.technet.microsoft.com/ScriptCenter/en-us/ced14c6c-d16a-4cd8-b7d1-90d716c0445f or How to use Visual Basic and ADsSecurity.dll to properly order ACEs in an ACL.
 ' Example .......: Yes
 ' ===============================================================================================================================
-Function AD_SetUserPasswordChange alias "AD_SetUserPasswordChange" (byval sAD_ObjectParam as wstring, byval bCanChangePassword as long) export as long
+'Function AD_SetUserPasswordChange alias "AD_SetUserPasswordChange" (byval sAD_ObjectParam as wstring, byval bCanChangePassword as long) export as long
+Function AD_SetUserPasswordChange alias "AD_SetUserPasswordChange" (BYREF sAD_ObjectParam as wstringz, byval bCanChangePassword as long) export as long
 
 	local USER_CHANGE_PASSWORD as wstring
 	USER_CHANGE_PASSWORD = "{ab721a53-1e2f-11d0-9819-00aa0040529b}" ' See: http://msdn.microsoft.com/en-us/library/cc223637(PROT.13).aspx
@@ -1284,7 +1295,8 @@ END FUNCTION '==>AD_GetObjectAttribute
 ' Link ..........: http://msdn.microsoft.com/en-us/library/aa746353(VS.85).aspx (ADS_PROPERTY_OPERATION_ENUM Enumeration)
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING, BYVAL sAD_ValueParam AS WSTRING, OPT BYVAL iAD_Option AS LONG) EXPORT AS LONG
+'FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYVAL sAD_ObjectParam AS WSTRING, BYVAL sAD_AttributeParam AS WSTRING, BYVAL sAD_ValueParam AS WSTRING, OPT BYVAL iAD_Option AS LONG) EXPORT AS LONG
+FUNCTION AD_ModifyAttribute ALIAS "AD_ModifyAttribute" (BYREF sAD_ObjectParam AS WSTRINGz, BYREF sAD_AttributeParam AS WSTRINGz, BYREF sAD_ValueParam AS WSTRINGz, OPT BYVAL iAD_Option AS LONG) EXPORT AS LONG
 
    SetError(0, "")
 
@@ -1369,8 +1381,8 @@ END FUNCTION   '==>AD_ModifyAttribute
 ' Link ..........:
 ' Example .......: AD_CreateOU("OU=ParentOU", "ChildOU")
 ' ===============================================================================================================================
-FUNCTION AD_CreateOU ALIAS "AD_CreateOU" (BYVAL sParentOUDN AS WSTRING, BYVAL sOUName AS WSTRING) EXPORT AS LONG
-
+'FUNCTION AD_CreateOU ALIAS "AD_CreateOU" (BYVAL sParentOUDN AS WSTRING, BYVAL sOUName AS WSTRING) EXPORT AS LONG
+FUNCTION AD_CreateOU ALIAS "AD_CreateOU" (BYREF sParentOUDN AS WSTRINGz, BYREF sOUName AS WSTRINGz) EXPORT AS LONG
 
     SetError(0, "")
 
@@ -1744,6 +1756,7 @@ End Function   '==>AD_GetObjectsInOU
 ' Example .......: Yes
 ' ===============================================================================================================================
 function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute as wstring ) as wstring
+'function convertADOVariantToString(byval vValue as variant, BYREF sAD_Attribute as wstringz ) as wstring
 
 	local variantType as long, result as wstring, valuesArraySeparator as wstring
 	variantType = variantvt(vValue)
@@ -1923,7 +1936,8 @@ end function   '==>convertADOVariantToString
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_CreateUser ALIAS "AD_CreateUser" (BYVAL sAD_OU AS WSTRING, BYVAL sAD_User AS WSTRING, OPT BYVAL sAD_CNParam AS WSTRING) EXPORT AS LONG
+'FUNCTION AD_CreateUser ALIAS "AD_CreateUser" (BYVAL sAD_OU AS WSTRING, BYVAL sAD_User AS WSTRING, OPT BYVAL sAD_CNParam AS WSTRING) EXPORT AS LONG
+FUNCTION AD_CreateUser ALIAS "AD_CreateUser" (BYREF sAD_OU AS WSTRINGz, BYREF sAD_User AS WSTRINGz, OPT BYREF sAD_CNParam AS WSTRINGz) EXPORT AS LONG
 
    SetError(0, "")
 
@@ -1999,6 +2013,7 @@ FUNCTION AD_CreateUser ALIAS "AD_CreateUser" (BYVAL sAD_OU AS WSTRING, BYVAL sAD
     oAD_User.SetInfo
     IF OBJRESULT <> 0 THEN
         FUNCTION = 0
+		  exit function
     END IF
 
 
@@ -2010,15 +2025,18 @@ FUNCTION AD_CreateUser ALIAS "AD_CreateUser" (BYVAL sAD_OU AS WSTRING, BYVAL sAD
 
 
     oAD_User.SetInfo
-    IF OBJRESULT <> 0 THEN
-        FUNCTION = 0
-    END IF
+	 
+	 
+	IF OBJRESULT <> 0 THEN
+      FUNCTION = 0
+	else
+		function = 1	
+   END IF
 
     SET oAD_User = NOTHING
     SET oAD_OU = NOTHING
 
 
-    FUNCTION = 1
 
 END FUNCTION   '==>AD_CreateUser
 
@@ -2041,7 +2059,8 @@ END FUNCTION   '==>AD_CreateUser
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_SetPassword ALIAS "AD_SetPassword" (BYVAL sAD_UserParam AS WSTRING, BYVAL sAD_Password AS WSTRING, OPT BYVAL iAD_Expired AS long) EXPORT AS LONG
+'FUNCTION AD_SetPassword ALIAS "AD_SetPassword" (BYVAL sAD_UserParam AS WSTRING, BYVAL sAD_Password AS WSTRING, OPT BYVAL iAD_Expired AS long) EXPORT AS LONG
+FUNCTION AD_SetPassword ALIAS "AD_SetPassword" (BYREF sAD_UserParam AS WSTRINGz, BYREF sAD_Password AS WSTRINGz, OPT BYVAL iAD_Expired AS long) EXPORT AS LONG
 
     SetError(0, "")
 
@@ -2077,11 +2096,11 @@ FUNCTION AD_SetPassword ALIAS "AD_SetPassword" (BYVAL sAD_UserParam AS WSTRING, 
     IF iAD_Expired THEN oAD_User.Put("pwdLastSet", 0)
     oAD_User.SetInfo()
 	 
-    IF OBJRESULT <> 0 THEN
-        FUNCTION = 0
-    END IF
-
-    FUNCTION = 1
+	IF OBJRESULT <> 0 THEN
+      FUNCTION = 0
+	else
+		function = 1	
+   END IF
 
 END FUNCTION   '==>AD_SetPassword
 
@@ -2103,7 +2122,8 @@ END FUNCTION   '==>AD_SetPassword
 ' Link ..........:
 ' Example .......: Yes
 ' ===============================================================================================================================
-FUNCTION AD_SamAccountNameToFQDN(BYVAL sAD_SamAccountName AS WSTRING) AS WSTRING
+'FUNCTION AD_SamAccountNameToFQDN(BYVAL sAD_SamAccountName AS WSTRING) AS WSTRING
+FUNCTION AD_SamAccountNameToFQDN(BYREF sAD_SamAccountName AS WSTRINGz) AS WSTRING
 
     IF MID$(sAD_SamAccountName, 3, 1) = "=" THEN
         FUNCTION = sAD_SamAccountName ' already a FQDN. Return unchanged
@@ -2192,7 +2212,7 @@ END FUNCTION
 
 
 
-
+ 
 
 
 
