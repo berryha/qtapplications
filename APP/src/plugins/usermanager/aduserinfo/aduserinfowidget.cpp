@@ -16,7 +16,7 @@ namespace HEHUI {
 
 
 ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, ADUser *adUser, QWidget *parent) :
-    QWidget(parent), m_adsi(adsi), m_adUser(adUser)
+    QWidget(parent), m_adsi(adsi)
 {
     ui.setupUi(this);
 
@@ -32,6 +32,8 @@ ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, ADUser *adUser, QWidget *parent) 
 //    m_distinguishedName = "";
     m_simpleOUString = "";
     m_fullOUString = "";
+
+    m_adUser = *adUser;
 
     initUI();
 
@@ -119,8 +121,8 @@ void ADUserInfoWidget::saveChanges(){
         }
 
         m_accountName = accountName;
-        m_guid = m_adUser->getAttribute("objectGUID");
-        m_sid = m_adUser->getAttribute("objectSid");
+        m_guid = m_adUser.getAttribute("objectGUID");
+        m_sid = m_adUser.getAttribute("objectSid");
         ui.lineEditGUID->setText(m_guid);
         ui.lineEditSID->setText(m_sid);
 
@@ -182,18 +184,16 @@ void ADUserInfoWidget::saveChanges(){
         }
     }
 
-    ui.pushButtonEdit->setEnabled(true);
-    ui.pushButtonEdit->setVisible(true);
-
     emit signalChangesSaved();
-
 
 }
 
 
 void ADUserInfoWidget::initUI(){
 
-    if(!m_adUser){
+    m_accountName = m_adUser.getAttribute("sAMAccountName");
+
+    if(m_accountName.isEmpty()){
         ui.lineEditSAMAccount->setReadOnly(false);
         switchToEditMode();
         ui.pushButtonEdit->setEnabled(false);
@@ -201,8 +201,8 @@ void ADUserInfoWidget::initUI(){
         return;
     }
 
-    m_guid = m_adUser->getAttribute("objectGUID");
-    m_sid = m_adUser->getAttribute("objectSid");
+    m_guid = m_adUser.getAttribute("objectGUID");
+    m_sid = m_adUser.getAttribute("objectSid");
     if(m_guid.isEmpty()){
         switchToEditMode();
         ui.lineEditDisplayName->setFocus();
@@ -214,19 +214,18 @@ void ADUserInfoWidget::initUI(){
         ui.pushButtonClose->setFocus();
     }
 
-    m_accountName = m_adUser->getAttribute("sAMAccountName");
     ui.lineEditSAMAccount->setText(m_accountName);
 
-    m_displayName = m_adUser->getAttribute("displayName");
+    m_displayName = m_adUser.getAttribute("displayName");
     ui.lineEditDisplayName->setText(m_displayName);
 
-    m_userWorkstations = m_adUser->getAttribute("userWorkstations").toUpper();
+    m_userWorkstations = m_adUser.getAttribute("userWorkstations").toUpper();
     ui.lineEditUserWorkstations->setText(m_userWorkstations);
 
-    m_description = m_adUser->getAttribute("description");
+    m_description = m_adUser.getAttribute("description");
     ui.lineEditDescription->setText(m_description);
 
-    m_telephone = m_adUser->getAttribute("telephoneNumber");
+    m_telephone = m_adUser.getAttribute("telephoneNumber");
     ui.lineEditTelephone->setText(m_telephone);
 
     ui.comboBoxOU->addItem("");

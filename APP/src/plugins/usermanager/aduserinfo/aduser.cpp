@@ -1,4 +1,7 @@
-﻿#include "aduser.h"
+﻿
+#include <QObject>
+
+#include "aduser.h"
 
 
 namespace HEHUI {
@@ -9,46 +12,45 @@ QStringList ADUser::m_ouList = QStringList();
 QString ADUser::m_ADDefaultNamingContext = "";
 
 
-ADUser::ADUser(QObject *parent) :
-    QObject(parent)
+ADUser::ADUser()
 {
 
     if(!commonAttributeNameHash){
         commonAttributeNameHash = new QHash<QString, QString>();
-        commonAttributeNameHash->insert("accountExpires", tr("Account Expires"));
-        commonAttributeNameHash->insert("badPasswordTime", tr("Bad Password Time"));
-        commonAttributeNameHash->insert("badPwdCount", tr("Bad Password Count"));
-        commonAttributeNameHash->insert("cn", tr("Common Name"));
-        commonAttributeNameHash->insert("codePage", tr("Code Page"));
-        commonAttributeNameHash->insert("countryCode", tr("Country Code"));
-        commonAttributeNameHash->insert("description", tr("Description"));
-        commonAttributeNameHash->insert("displayName", tr("Display Name"));
-        commonAttributeNameHash->insert("distinguishedName", tr("Distinguished Name"));
-        commonAttributeNameHash->insert("dSCorePropagationData", tr("Core Propagation Data"));
-        commonAttributeNameHash->insert("instanceType", tr("Instance Type"));
-        commonAttributeNameHash->insert("lastLogoff", tr("Last Logoff"));
-        commonAttributeNameHash->insert("lastLogon", tr("Last Logon"));
-        commonAttributeNameHash->insert("logonCount", tr("Logon Count"));
-        commonAttributeNameHash->insert("mail", tr("E-mail"));
-        commonAttributeNameHash->insert("memberOf", tr("Member Of"));
-        commonAttributeNameHash->insert("name", tr("Name"));
-        commonAttributeNameHash->insert("nTSecurityDescriptor", tr("NT Security Descriptor"));
-        commonAttributeNameHash->insert("objectCategory", tr("Object Category"));
-        commonAttributeNameHash->insert("objectClass", tr("Object Class"));
-        commonAttributeNameHash->insert("objectGUID", tr("Object GUID"));
-        commonAttributeNameHash->insert("objectSid", tr("Object SID"));
-        commonAttributeNameHash->insert("primaryGroupID", tr("Primary Group ID"));
-        commonAttributeNameHash->insert("pwdLastSet", tr("Password Last Set"));
-        commonAttributeNameHash->insert("sAMAccountName", tr("SAM Account Name"));
-        commonAttributeNameHash->insert("sAMAccountType", tr("SAM Account Type"));
-        commonAttributeNameHash->insert("telephoneNumber", tr("Telephone Number"));
-        commonAttributeNameHash->insert("userAccountControl", tr("User Account Control"));
-        commonAttributeNameHash->insert("userPrincipalName", tr("User Principal Name"));
-        commonAttributeNameHash->insert("userWorkstations", tr("User Workstations"));
-        commonAttributeNameHash->insert("uSNChanged", tr("USN Changed"));
-        commonAttributeNameHash->insert("uSNCreated", tr("USN Created"));
-        commonAttributeNameHash->insert("whenChanged", tr("When Changed"));
-        commonAttributeNameHash->insert("whenCreated", tr("When Created"));
+        commonAttributeNameHash->insert("accountExpires", QObject::tr("Account Expires"));
+        commonAttributeNameHash->insert("badPasswordTime", QObject::tr("Bad Password Time"));
+        commonAttributeNameHash->insert("badPwdCount", QObject::tr("Bad Password Count"));
+        commonAttributeNameHash->insert("cn", QObject::tr("Common Name"));
+        commonAttributeNameHash->insert("codePage", QObject::tr("Code Page"));
+        commonAttributeNameHash->insert("countryCode", QObject::tr("Country Code"));
+        commonAttributeNameHash->insert("description", QObject::tr("Description"));
+        commonAttributeNameHash->insert("displayName", QObject::tr("Display Name"));
+        commonAttributeNameHash->insert("distinguishedName", QObject::tr("Distinguished Name"));
+        commonAttributeNameHash->insert("dSCorePropagationData", QObject::tr("Core Propagation Data"));
+        commonAttributeNameHash->insert("instanceType", QObject::tr("Instance Type"));
+        commonAttributeNameHash->insert("lastLogoff", QObject::tr("Last Logoff"));
+        commonAttributeNameHash->insert("lastLogon", QObject::tr("Last Logon"));
+        commonAttributeNameHash->insert("logonCount", QObject::tr("Logon Count"));
+        commonAttributeNameHash->insert("mail", QObject::tr("E-mail"));
+        commonAttributeNameHash->insert("memberOf", QObject::tr("Member Of"));
+        commonAttributeNameHash->insert("name", QObject::tr("Name"));
+        commonAttributeNameHash->insert("nTSecurityDescriptor", QObject::tr("NT Security Descriptor"));
+        commonAttributeNameHash->insert("objectCategory", QObject::tr("Object Category"));
+        commonAttributeNameHash->insert("objectClass", QObject::tr("Object Class"));
+        commonAttributeNameHash->insert("objectGUID", QObject::tr("Object GUID"));
+        commonAttributeNameHash->insert("objectSid", QObject::tr("Object SID"));
+        commonAttributeNameHash->insert("primaryGroupID", QObject::tr("Primary Group ID"));
+        commonAttributeNameHash->insert("pwdLastSet", QObject::tr("Password Last Set"));
+        commonAttributeNameHash->insert("sAMAccountName", QObject::tr("SAM Account Name"));
+        commonAttributeNameHash->insert("sAMAccountType", QObject::tr("SAM Account Type"));
+        commonAttributeNameHash->insert("telephoneNumber", QObject::tr("Telephone Number"));
+        commonAttributeNameHash->insert("userAccountControl", QObject::tr("User Account Control"));
+        commonAttributeNameHash->insert("userPrincipalName", QObject::tr("User Principal Name"));
+        commonAttributeNameHash->insert("userWorkstations", QObject::tr("User Workstations"));
+        commonAttributeNameHash->insert("uSNChanged", QObject::tr("USN Changed"));
+        commonAttributeNameHash->insert("uSNCreated", QObject::tr("USN Created"));
+        commonAttributeNameHash->insert("whenChanged", QObject::tr("When Changed"));
+        commonAttributeNameHash->insert("whenCreated", QObject::tr("When Created"));
 
 
     }

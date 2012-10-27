@@ -82,7 +82,7 @@ void ADUserInfoModel::setADUserItems(const QStringList &attributeNames, const QL
     foreach (QStringList attributeValues, userItems) {
         Q_ASSERT(attributeNames.size() == attributeValues.size());
 
-        ADUser *user = new ADUser(this);
+        ADUser *user = new ADUser();
         for(int i=0;i<attributeNames.size();i++){
             user->setAttribute(attributeNames.at(i), attributeValues.at(i));
         }

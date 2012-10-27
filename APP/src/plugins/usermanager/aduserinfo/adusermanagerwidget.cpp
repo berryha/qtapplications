@@ -263,7 +263,7 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
     QString filter, dataToRetrieve;
     if(ui.comboBoxQueryMode->currentIndex() == 0){
         QString displayName = ui.lineEditDisplayName->text();
-        filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=%1*)").arg(displayName));
+        filter = QString("(&(objectcategory=person)(objectclass=user)(sAMAccountName=*%1*)%2)").arg(ui.lineEditAccountName->text()).arg(displayName.trimmed().isEmpty()?"":QString("(displayName=*%1*)").arg(displayName));
         dataToRetrieve = "sAMAccountName,displayName,userWorkstations,telephoneNumber,description,objectGUID,objectSid";
     }else{
         filter = ui.lineEditFilter->text();
@@ -373,6 +373,10 @@ void ADUserManagerWidget::slotViewADUserInfo(const QModelIndex &index){
         return;
     }
 
+    if(ui.comboBoxQueryMode->currentIndex() != 0 ){
+        return;
+    }
+
     getSelectedADUser(index);
     showADUserInfoWidget(m_selectedADUser);
 
@@ -433,6 +437,7 @@ void ADUserManagerWidget::slotDisableADUserAccount(){
 }
 
 void ADUserManagerWidget::slotResetADUserPassword(){
+
     QString sAMAccountName = m_selectedADUser->getAttribute("sAMAccountName");
     if(sAMAccountName.isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Failed to find SAM AccountName"));
@@ -577,10 +582,8 @@ void ADUserManagerWidget::updateActions() {
                 enableModify = true;
             }
             userDisabled = m_adsi->AD_IsObjectDisabled(accountName);
-
         }
     }
-
 
     ui.actionExport->setEnabled(enableExp);
     ui.actionPrint->setEnabled(enableExp);
@@ -605,6 +608,7 @@ void ADUserManagerWidget::updateActions() {
     //        ui.actionAutoLogon->setEnabled(enableExp && (wm->localUsers().contains(UserID(), Qt::CaseInsensitive)) ) ;
     //    }
 #endif
+
 
 }
 

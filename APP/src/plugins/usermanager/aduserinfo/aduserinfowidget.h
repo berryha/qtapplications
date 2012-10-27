@@ -48,7 +48,7 @@ private:
     Ui::ADUserInfoWidgetUI ui;
 
     ADSI *m_adsi;
-    ADUser *m_adUser;
+    ADUser m_adUser;
 
 
     QString m_accountName;

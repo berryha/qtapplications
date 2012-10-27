@@ -1,7 +1,6 @@
 ﻿#ifndef ADUSER_H
 #define ADUSER_H
 
-#include <QObject>
 #include <QHash>
 #include <QStringList>
 
@@ -10,11 +9,11 @@
 namespace HEHUI {
 
 
-class ADUser : public QObject
+class ADUser
 {
-    Q_OBJECT
+
 public:
-    explicit ADUser(QObject *parent = 0);
+    explicit ADUser();
 
     static QString CommonAttributeName(const QString &attributeName);
 
@@ -29,13 +28,6 @@ public:
     QString getAttribute(const QString &attributeName);
 
 
-
-
-
-signals:
-
-
-public slots:
 
 
 private:
