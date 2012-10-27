@@ -110,11 +110,6 @@
         <property name="duplicatesEnabled">
          <bool>false</bool>
         </property>
-        <item>
-         <property name="text">
-          <string>hehui</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="1" column="0">
@@ -142,7 +137,7 @@
          <string>Password</string>
         </property>
         <property name="text">
-         <string notr="true">iamhehui~</string>
+         <string notr="true"/>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::NoEcho</enum>
