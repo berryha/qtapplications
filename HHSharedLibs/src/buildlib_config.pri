@@ -135,15 +135,15 @@ DEFINES	*= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\"" \
         "APP_COPYRIGHTS=\"\\\"$${QMAKE_TARGET_COPYRIGHT}\\\"\""
 
 
-win32-g++:QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
+win32-g++:QMAKE_CXXFLAGS_RELEASE = -o1
+#win32-g++:QMAKE_LFLAGS = -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc
 win32-g++:QMAKE_CXXFLAGS_EXCEPTIONS_OFF =
 
-#Release Builed With Debug Info
+#####Release Builed With Debug Info####
 #win32-g++:QMAKE_CXXFLAGS_RELEASE += -g
 #win32-g++:QMAKE_CFLAGS_RELEASE += -g
 #win32-g++:QMAKE_LFLAGS_RELEASE =
-
-win32-msvc2010:QMAKE_CXXFLAGS_RELEASE += /Zi /Od /DEBUG
-win32-msvc2010:QMAKE_CFLAGS_RELEASE += /Zi /Od /DEBUG
-win32-msvc2010:QMAKE_LFLAGS_RELEASE =
+#win32-msvc2010:QMAKE_CXXFLAGS_RELEASE += /Zi /Od /DEBUG
+#win32-msvc2010:QMAKE_CFLAGS_RELEASE += /Zi /Od /DEBUG
+#win32-msvc2010:QMAKE_LFLAGS_RELEASE = /DEBUG
 
