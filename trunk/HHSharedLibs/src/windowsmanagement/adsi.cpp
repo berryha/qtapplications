@@ -288,9 +288,9 @@ QString ADSI::lastErrorString() const{
 }
 
 bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
-    qDebug()<<"--ADSI::AD_Open(...)";
+//    qDebug()<<"--ADSI::AD_Open(...)";
 
-    qWarning();
+//    qWarning();
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 
 }
