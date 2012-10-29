@@ -110,6 +110,10 @@
 #define DOMAIN_ADMIN_PASSWORD "dmsto&*("
 #endif
 
+#ifndef DEFAULT_MS_SERVER_HOST_NAME
+#define DEFAULT_MS_SERVER_HOST_NAME "DGIT01234"
+#endif
+
 
 #include "HHSharedNetwork/hglobal_network.h"
 

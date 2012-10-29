@@ -278,7 +278,7 @@ bool ClientService::startMainService(){
     lookForServerTimer = new QTimer(this);
     lookForServerTimer->setSingleShot(true);
     connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
-    lookForServerTimer->start(300000);
+    lookForServerTimer->start(120000);
 
 
     mainServiceStarted = true;
@@ -350,6 +350,29 @@ bool ClientService::startMainService(){
     qWarning();
 
     return true;
+
+}
+
+void ClientService::serverLookedUp(const QHostInfo &host)
+ {
+    qDebug()<<"--ClientService::serverLookedUp(...)";
+
+    if (host.error() != QHostInfo::NoError) {
+        qDebug() << "Server Lookup failed:" << host.errorString();
+        return;
+    }
+
+    if(host.addresses().isEmpty()){return;}
+    //     foreach (const QHostAddress &address, host.addresses()){
+    //         qDebug() << "Found default server's address:" << address.toString();
+    //     }
+
+
+    QString address = host.addresses().first().toString();
+    qDebug() << "Found default server's address:" << address;
+    if(!m_rtp->isSocketConnected(m_socketConnectedToServer)){
+        clientPacketsParser->sendClientLookForServerPacket(address.toString());
+    }
 
 }
 
@@ -1725,7 +1748,7 @@ bool ClientService::checkUsersAccount(){
     
     
     if(needReboot){
-        QString comment = "Someone's password has been updated! Please save your work! If there are any problems, please contact the IT support technicians! TEL.: 337/8125 ";
+        QString comment = "Someone's password has been updated! Please save your work! If there are any problems, please contact the IT support technicians! TEL.: 8333/8337 ";
         wm->runAs("administrator", "", getWinAdminPassword(), "shutdown.exe", QString("-r -t 600 -c \"%1\"").arg(comment), false);
     }
     
@@ -1858,18 +1881,18 @@ void  ClientService::checkProgrames(){
 #if defined(Q_OS_WIN32)
     bool programesEnabled = settings->value("Programes", 0).toBool();
     if(programesEnabled){
-        QStringList storedUsers = settings->value("ProgramesUsers").toStringList();
-        QStringList createdUsers = wm->localCreatedUsers();
-        if(storedUsers.size() == createdUsers.size()){
-            foreach(QString user, createdUsers){
-                if(!storedUsers.contains(user, Qt::CaseInsensitive)){
-                    disableProgrames();
-                    break;
-                }
-            }
-        }else{
-            disableProgrames();
-        }
+//        QStringList storedUsers = settings->value("ProgramesUsers").toStringList();
+//        QStringList createdUsers = wm->localCreatedUsers();
+//        if(storedUsers.size() == createdUsers.size()){
+//            foreach(QString user, createdUsers){
+//                if(!storedUsers.contains(user, Qt::CaseInsensitive)){
+//                    disableProgrames();
+//                    break;
+//                }
+//            }
+//        }else{
+//            disableProgrames();
+//        }
 
 
     }else{
@@ -1970,8 +1993,10 @@ void ClientService::checkHasAnyServerBeenFound(){
 
         int interval = lookForServerTimer->interval();
         interval *= 2;
-        if(interval > 300000){
-            interval = 300000;
+        if(interval > 300000 && interval < 1800000){
+            QHostInfo::lookupHost(DEFAULT_MS_SERVER_HOST_NAME, this, SLOT(serverLookedUp(QHostInfo)));
+        }else if(interval > 1800000){
+            interval = 1800000;
             clientPacketsParser->sendClientLookForServerPacket("255.255.255.255");
             //clientPacketsParser->sendClientLookForServerPacket();
         }else{
