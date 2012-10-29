@@ -291,8 +291,8 @@ bool ADSI::AD_Open(const QString &userID, const QString &password, const QString
 //    qDebug()<<"--ADSI::AD_Open(...)";
 
 //    qWarning();
-    return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 
+    return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 }
 
 void ADSI::AD_Close(){
@@ -306,10 +306,10 @@ long ADSI::AD_GetLastErrorCode(){
 QString ADSI::AD_GetLastErrorString(){
     qDebug()<<"--ADSI::AD_GetLastErrorString()";
 
-//    return QString::fromWCharArray( m_AD_GetLastErrorString() );
+    return QString::fromWCharArray( m_AD_GetLastErrorString() );
 
-    const wchar_t *temp = m_AD_GetLastErrorString();
-    return QString::fromWCharArray(temp);
+//    const wchar_t *temp = m_AD_GetLastErrorString();
+//    return QString::fromWCharArray(temp);
 
 }
 
@@ -365,10 +365,10 @@ bool ADSI::AD_SetUserPasswordChange(const QString &object, bool enableChange){
 QString ADSI::AD_GetObjectAttribute(const QString &object, const QString &attribute){
     qDebug()<<"ADSI::AD_GetObjectAttribute(...)";
 
-//    return QString::fromWCharArray(m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str()));
+    return QString::fromWCharArray(m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str()));
 
-    const wchar_t *temp = m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str());
-    return QString::fromWCharArray(temp);
+//    const wchar_t *temp = m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str());
+//    return QString::fromWCharArray(temp);
 
 }
 
@@ -383,20 +383,20 @@ bool ADSI::AD_CreateOU(const QString &parentOU, const QString &ouName){
 QString ADSI::AD_GetAllOUs(const QString &root, const QString &separator, const QString &subOUSeparator){
     qDebug()<<"--ADSI::AD_GetAllOUs(...)";
 
-//    return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
+    return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
 
-    const wchar_t *temp = m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str());
-    return QString::fromWCharArray(temp);
+//    const wchar_t *temp = m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str());
+//    return QString::fromWCharArray(temp);
 
 }
 
 QString ADSI::AD_GetObjectsInOU(const QString &ou, const QString &filter, const QString &dataToRetrieve, const QString &itemSeparator, const QString &attributeSeparator){
     qDebug()<<"--ADSI::AD_GetObjectsInOU(...)";
 
-//    return QString::fromWCharArray( m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str()));
+    return QString::fromWCharArray( m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str()));
 
-    const wchar_t *temp = m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str());
-    return QString::fromWCharArray(temp);
+//    const wchar_t *temp = m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str());
+//    return QString::fromWCharArray(temp);
 
 }
 
