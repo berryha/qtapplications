@@ -49,6 +49,8 @@ signals:
 private slots:
     bool startMainService();
 
+    void serverLookedUp(const QHostInfo &host);
+
     void serverFound(const QString &serverAddress, quint16 serverUDTListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version, int serverInstanceID);
 
     void processServerRequestClientInfoPacket(const QString &groupName, const QString &computerName, const QString &userName/*, const QString &address*/);

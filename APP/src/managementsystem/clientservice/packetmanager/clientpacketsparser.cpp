@@ -104,7 +104,7 @@ void ClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     PacketHandlerBase::recylePacket(packet);
 
-//    qDebug()<<"--ClientPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" packetSerialNumber:"<<packetSerialNumber<<" packetType:"<<packetType;
+//    qDebug()<<"--ClientPacketsParser::parseIncomingPacketData(...) "<<" peerName:"<<peerName<<" peerAddress:"<<peerAddress<<" peerPort:"<<peerPort<<" socketID:"<<socketID<<" packetType:"<<packetType;
 
     switch(packetType){
 
