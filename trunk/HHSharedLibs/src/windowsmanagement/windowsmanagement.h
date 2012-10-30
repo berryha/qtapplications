@@ -157,6 +157,8 @@ public:
     bool addUserToLocalGroup(LPWSTR userName, LPCWSTR groupName);
     bool deleteUserFromLocalGroup(const QString &userName, const QString &groupName);
     bool deleteUserFromLocalGroup(LPWSTR userName,  LPCWSTR groupName);
+    QStringList getMembersOfLocalGroup(const QString &serverName, const QString &groupName);
+
 
     QStringList localGroups();
 
