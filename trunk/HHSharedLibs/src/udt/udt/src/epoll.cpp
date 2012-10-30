@@ -117,6 +117,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 
 #ifdef LINUX
    epoll_event ev;
+   memset(&ev, 0, sizeof(epoll_event));
 
    if (NULL == events)
       ev.events = EPOLLIN | EPOLLOUT | EPOLLERR;
