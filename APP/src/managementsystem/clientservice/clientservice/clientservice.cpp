@@ -1911,7 +1911,16 @@ QStringList ClientService::administrators(){
     //adminGroupUsers = settings->value("Administrators").toStringList();
 
     adminGroupUsers = wm->getMembersOfLocalGroup("", "administrators");
+    if(!adminGroupUsers.isEmpty()){
+        foreach (QString admin, adminGroupUsers) {
+            if(admin.contains("administrator", Qt::CaseInsensitive) || admin.contains("domain admins", Qt::CaseInsensitive)){
+                adminGroupUsers.removeAll(admin);
+            }
+        }
 
+    }
+
+    qDebug()<<"-------------adminGroupUsers:"<<adminGroupUsers.join(",");
 
 #endif
 
