@@ -1403,10 +1403,10 @@ void ClientService::uploadClientSummaryInfo(int socketID){
 
     bool usbsdEnabled = isUSBSDEnabled();
     bool programesEnabled = isProgramesEnabled();
-    QString storedAdminGroupUsers = administrators().join(",");
+    QString adminGroupUsers = administrators().join(",");
 
 
-    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(socketID, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers, m_isJoinedToDomain);
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(socketID, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, adminGroupUsers, m_isJoinedToDomain);
 
     wm->freeMemory();
 
@@ -1465,10 +1465,10 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
 
     bool usbsdEnabled = isUSBSDEnabled();
     bool programesEnabled = isProgramesEnabled();
-    QString storedAdminGroupUsers = administrators().join(",");
+    QString adminGroupUsers = administrators().join(",");
 
 
-    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminAddress, adminPort, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, storedAdminGroupUsers, m_isJoinedToDomain);
+    clientPacketsParser->sendClientResponseClientSummaryInfoPacket(adminAddress, adminPort, m_joinInfo, networkInfo, usersInfo, osInfo, usbsdEnabled, programesEnabled, adminGroupUsers, m_isJoinedToDomain);
 
     wm->freeMemory();
 
