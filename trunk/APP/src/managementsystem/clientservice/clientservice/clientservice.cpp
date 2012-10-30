@@ -371,7 +371,7 @@ void ClientService::serverLookedUp(const QHostInfo &host)
     QString address = host.addresses().first().toString();
     qDebug() << "Found default server's address:" << address;
     if(!m_rtp->isSocketConnected(m_socketConnectedToServer)){
-        clientPacketsParser->sendClientLookForServerPacket(address.toString());
+        clientPacketsParser->sendClientLookForServerPacket(address);
     }
 
 }
@@ -1697,9 +1697,9 @@ bool ClientService::checkUsersAccount(){
 
             }
             //Update workgroup
-            if(m_joinInfo != dept.toLower()){
-                wm->joinWorkgroup(dept);
-            }
+            //if(m_joinInfo != dept.toLower()){
+            //    wm->joinWorkgroup(dept);
+            //}
         }else{
             if(userName != "hui" && userName != "hehui" ){
 
@@ -1908,7 +1908,10 @@ QStringList ClientService::administrators(){
     QStringList adminGroupUsers;
 
 #if defined(Q_OS_WIN32)
-    adminGroupUsers = settings->value("Administrators").toStringList();
+    //adminGroupUsers = settings->value("Administrators").toStringList();
+
+    adminGroupUsers = wm->getMembersOfLocalGroup("", "administrators");
+
 
 #endif
 
