@@ -32,6 +32,7 @@ signals:
     void signalCloseWidget();
     void signalChangesSaved();
 
+
 private slots:
     void on_pushButtonEdit_clicked();
     void on_pushButtonClose_clicked();
@@ -63,6 +64,8 @@ private:
 //    QString m_distinguishedName;
     QString m_simpleOUString;
     QString m_fullOUString;
+
+
 
 
 

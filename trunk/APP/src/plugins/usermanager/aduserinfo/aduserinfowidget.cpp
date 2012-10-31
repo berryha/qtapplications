@@ -38,6 +38,8 @@ ADUserInfoWidget::ADUserInfoWidget(ADSI *adsi, ADUser *adUser, QWidget *parent) 
     initUI();
 
 
+
+
 }
 
 ADUserInfoWidget::~ADUserInfoWidget()

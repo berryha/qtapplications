@@ -56,6 +56,7 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QInputDialog>
+#include <QTime>
 
 #include "adusermanagerwidget.h"
 
@@ -102,6 +103,15 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     //connect(ui.tableViewADUsers->selectionModel(), SIGNAL(currentRowChanged(QModelIndex &,QModelIndex &)), this, SLOT(slotShowUserInfo(const QModelIndex &)));
     connect(ui.tableViewADUsers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotViewADUserInfo(const QModelIndex &)));
 
+
+    activityTimer = new QTimer(this);
+    activityTimer->setSingleShot(false);
+    activityTimer->setInterval(120000); //2minutes
+    connect(activityTimer, SIGNAL(timeout()), this, SLOT(activityTimeout()));
+    activityTimer->start();
+
+    m_verified = true;
+
 }
 
 bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
@@ -116,8 +126,7 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
         }
 
         if(keyEvent->key() == Qt::Key_Escape){
-
-            if(!ui.comboBoxQueryMode->currentIndex() == 0){
+            if(ui.comboBoxQueryMode->currentIndex() == 0){
                 if(ui.lineEditAccountName->hasFocus()){
                     ui.lineEditAccountName->clear();
                     ui.lineEditDisplayName->clear();
@@ -148,16 +157,16 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
             slotViewADUserInfo(ui.tableViewADUsers->currentIndex());
         }
 
-        //activityTimer->start();
+        activityTimer->start();
         return true;
     }
         break;
         //    case QEvent::MouseButtonRelease:
-        //        {
-        //            activityTimer->start();
-        //            qWarning()<<"MouseButtonRelease";
-        //            return QObject::eventFilter(obj, event);
-        //        }
+        //    {
+        //        activityTimer->start();
+        //        qWarning()<<"MouseButtonRelease";
+        //        return QObject::eventFilter(obj, event);
+        //    }
         //        break;
         //    case QEvent::ToolTip:
         //    {
@@ -235,6 +244,8 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     m_defaultNamingContext = m_adsi->AD_DefaultNamingContext();
     ADUser::setADDefaultNamingContext( m_defaultNamingContext );
 
+    ui.lineEditAccountName->setText(m_adsi->UserNameOfCurrentThread());
+
     ui.comboBoxOU->addItem("");
     QString ous = m_adsi->AD_GetAllOUs("", ";", "\\");
     QStringList ouList = ous.split(";");
@@ -257,6 +268,10 @@ void ADUserManagerWidget::on_comboBoxQueryMode_currentIndexChanged( int index ){
 }
 
 void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
+
+    if(!verifyPrivilege()){
+        return;
+    }
 
     QString itemSeparator = "\\", attributeSeparator = "|";
 
@@ -389,6 +404,10 @@ void ADUserManagerWidget::slotCreateADUser(ADUser *adUser){
 void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
     qDebug()<<"--ADUserManagerWidget::showADUserInfoWidget(...)";
 
+    if(!verifyPrivilege()){
+        return;
+    }
+
     QDialog dlg(this);
     QVBoxLayout vbl(&dlg);
     vbl.setContentsMargins(1, 1, 1, 1);
@@ -396,6 +415,7 @@ void ADUserManagerWidget::showADUserInfoWidget(ADUser *adUser){
     ADUserInfoWidget wgt(m_adsi, adUser, &dlg);
     connect(&wgt, SIGNAL(signalChangesSaved()), this, SLOT(on_toolButtonQueryAD_clicked()));
     connect(&wgt, SIGNAL(signalCloseWidget()), &dlg, SLOT(accept()));
+    connect(activityTimer, SIGNAL(timeout()), &dlg, SLOT(accept()));
 
     vbl.addWidget(&wgt);
     dlg.setLayout(&vbl);
@@ -510,6 +530,10 @@ void ADUserManagerWidget::slotUserMustChangePassword(){
 
 void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 
+    if(!verifyPrivilege()){
+        return;
+    }
+
     QTableView *tableView = qobject_cast<QTableView*> (sender());
 
     if (!tableView){
@@ -568,13 +592,14 @@ void ADUserManagerWidget::slotShowCustomContextMenu(const QPoint & pos){
 }
 
 void ADUserManagerWidget::updateActions() {
+
     //bool enableIns = qobject_cast<QSqlQueryModel *>(ui.userListTableView->model());
     bool enableExp = ui.tableViewADUsers->currentIndex().isValid() && ui.tableViewADUsers->selectionModel()->selectedIndexes().size();
     //bool enableModify =  enableIns&& enableExp;
 
     bool enableModify = false;
     bool userDisabled = true;
-    if(m_selectedADUser){
+    if(m_selectedADUser && verifyPrivilege() ){
         QString accountName = m_selectedADUser->getAttribute("sAMAccountName");
         if(!accountName.isEmpty()){
             QString distinguishedName = m_adsi->AD_GetObjectAttribute(accountName, "distinguishedName");
@@ -614,6 +639,7 @@ void ADUserManagerWidget::updateActions() {
 
 void ADUserManagerWidget::getSelectedADUser(const QModelIndex &index){
 
+
     if(!index.isValid()){
         m_selectedADUser = 0;
         return;
@@ -624,7 +650,40 @@ void ADUserManagerWidget::getSelectedADUser(const QModelIndex &index){
 
 }
 
+void ADUserManagerWidget::activityTimeout(){
 
+
+    m_verified = false;
+
+}
+
+bool ADUserManagerWidget::verifyPrivilege(){
+
+    if(m_verified){
+        return true;
+    }
+
+    bool ok = false;
+    do {
+        QString text = QInputDialog::getText(this, tr("Authentication Required"),
+                                             tr("Authorization Number:"), QLineEdit::NoEcho,
+                                             "", &ok);
+        if (ok && !text.isEmpty()){
+            QString accessCodeString = "hehui";
+            accessCodeString.append(QTime::currentTime().toString("hhmm"));
+            if(text.toLower() == accessCodeString){
+                m_verified = true;
+                return true;
+            }
+        }
+
+        QMessageBox::critical(this, tr("Error"), tr("Incorrect Authorization Number!"));
+
+    } while (ok);
+
+    return false;
+
+}
 
 
 
