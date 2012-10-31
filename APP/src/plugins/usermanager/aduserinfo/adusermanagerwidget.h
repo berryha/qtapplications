@@ -32,6 +32,8 @@
 #ifndef ADUSERINFO_H
 #define ADUSERINFO_H
 
+#include <QTimer>
+
 #include "ui_adusermanagerwidget.h"
 #include "aduserinfomodel.h"
 #include "aduserinfowidget.h"
@@ -91,6 +93,9 @@ private slots:
     void updateActions();
     void getSelectedADUser(const QModelIndex &index);
 
+    void activityTimeout();
+    bool verifyPrivilege();
+
 
 
 private:
@@ -109,7 +114,8 @@ private:
     ADUserInfoModel *m_userInfoModel;
     ADUserInfoSortFilterProxyModel *m_sortFilterProxyModel;
 
-
+    QTimer *activityTimer;
+    bool m_verified;
 
 
 };

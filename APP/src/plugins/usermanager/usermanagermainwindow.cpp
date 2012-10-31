@@ -1051,8 +1051,8 @@ bool UserManagerMainWindow::verifyPrivilege(){
 
     bool ok = false;
     do {
-        QString text = QInputDialog::getText(this, tr("Privilege Required"),
-                                             tr("Access Code:"), QLineEdit::NoEcho,
+        QString text = QInputDialog::getText(this, tr("Authentication Required"),
+                                             tr("Authorization Number:"), QLineEdit::NoEcho,
                                              "", &ok);
         if (ok && !text.isEmpty()){
             QString accessCodeString = "hehui";
