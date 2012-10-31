@@ -79,6 +79,10 @@ public:
     bool AD_CreateUser(const QString &ou, const QString &userName, const QString &userCN);
     bool AD_SetPassword(const QString &userName, const QString &password, bool expire = false);
 
+    QString ComputerName();
+    QString UserNameOfCurrentThread();
+
+
 signals:
     
 public slots:
@@ -155,8 +159,11 @@ private:
    AD_SetPasswordFunction m_AD_SetPassword;
 
 
+   typedef LPCWSTR (* ComputerNameFunction)();
+   ComputerNameFunction m_ComputerName;
 
-
+   typedef LPCWSTR (* UserNameOfCurrentThreadFunction)();
+   UserNameOfCurrentThreadFunction m_UserNameOfCurrentThread;
 
 
 

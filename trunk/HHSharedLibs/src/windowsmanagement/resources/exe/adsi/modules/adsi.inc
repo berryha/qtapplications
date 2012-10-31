@@ -2192,6 +2192,15 @@ FUNCTION ComputerName ALIAS "ComputerName" () EXPORT AS WSTRING
 END FUNCTION
 
 
+function UserNameOfCurrentThread alias "UserNameOfCurrentThread" () export as wstring
+
+	local buff as wstringz*(512)
+   GetUserNameW(buff, SIZEOF(buff))
+   FUNCTION = buff
+
+END FUNCTION
+
+
 
 FUNCTION test ALIAS "test" () EXPORT AS LONG
 

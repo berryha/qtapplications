@@ -65,6 +65,9 @@ ADSI::ADSI(QObject *parent) :
     m_AD_CreateUser = 0;
     m_AD_SetPassword = 0;
 
+    m_ComputerName = 0;
+    m_UserNameOfCurrentThread = 0;
+
 
 
 
@@ -245,6 +248,21 @@ bool ADSI::loadLibrary(const QString &fileName){
     }
 
 
+    m_ComputerName = (ComputerNameFunction) adsiLibrary->resolve("ComputerName");
+    if(!m_ComputerName){
+        m_lastErrorString = "Failed to resolve function  'ComputerName' !" ;
+        qCritical()<<m_lastErrorString;
+        return false;
+    }
+
+    m_UserNameOfCurrentThread = (UserNameOfCurrentThreadFunction) adsiLibrary->resolve("UserNameOfCurrentThread");
+    if(!m_UserNameOfCurrentThread){
+        m_lastErrorString = "Failed to resolve function  'UserNameOfCurrentThread' !" ;
+        qCritical()<<m_lastErrorString;
+        return false;
+    }
+
+
 
 
     return true;
@@ -277,6 +295,11 @@ bool ADSI::unloadLibrary(){
     m_AD_GetObjectsInOU = 0;
     m_AD_CreateUser = 0;
     m_AD_SetPassword = 0;
+
+    m_ComputerName = 0;
+    m_UserNameOfCurrentThread = 0;
+
+
 
     m_lastErrorString = "";
 
@@ -407,6 +430,15 @@ bool ADSI::AD_CreateUser(const QString &ou, const QString &userName, const QStri
 bool ADSI::AD_SetPassword(const QString &userName, const QString &password, bool expire){
     qWarning();
     return m_AD_SetPassword(userName.toStdWString().c_str(), password.toStdWString().c_str(), expire?1:0);
+}
+
+
+QString ADSI::ComputerName(){
+    return QString::fromWCharArray(m_ComputerName());
+}
+
+QString ADSI::UserNameOfCurrentThread(){
+    return QString::fromWCharArray(m_UserNameOfCurrentThread());
 }
 
 
