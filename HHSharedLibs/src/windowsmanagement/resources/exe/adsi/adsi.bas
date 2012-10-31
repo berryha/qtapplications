@@ -25,18 +25,24 @@
 
 
 
-  ' #COMPILE EXE
+ '  #COMPILE EXE
 
     #COMPILE DLL
 
-REM #COMPILE DLL
+
+''''''''''''''''''----------''''''''''''''''''''''''''
 #DIM ALL
 %USEMACROS = 1
 #INCLUDE ONCE "modules\adsi.inc"
+''''''''''''''''''----------''''''''''''''''''''''''''
 
-'''----------------------------------------------------------
 
 FUNCTION testADSI () AS LONG
+
+    MSGBOX ComputerName()
+    MSGBOX UserNameOfCurrentThread()
+    EXIT FUNCTION
+
 
 
 
