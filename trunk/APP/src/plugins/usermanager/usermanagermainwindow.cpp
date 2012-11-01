@@ -140,14 +140,9 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
     }
 
 
-    QStringList users = wm->localUsers();
-    users.removeAll("administrator");
-    users.removeAll("guest");
-    users.removeAll("system$");
-
+    QStringList users = wm->localCreatedUsers();
     wm->getAllUsersLoggedOn(&users);
     users.removeDuplicates();
-    users.removeAll(wm->getComputerName() + "$");
 
     ui.userIDComboBox->addItems(users);
     //ui.userIDComboBox->setCurrentIndex(ui.userIDComboBox->findText(username));
