@@ -76,7 +76,6 @@ void ADUserInfoWidget::on_pushButtonClose_clicked(){
                 || m_description != description || m_userWorkstations != userWorkstations
                 || m_telephone != telephone || m_simpleOUString != ouString){
 
-
             int rep = QMessageBox::question(this, tr("Question"), tr("Do you want to save changes before quit?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
             if(rep == QMessageBox::Yes){
                 saveChanges();
@@ -93,12 +92,56 @@ void ADUserInfoWidget::on_pushButtonClose_clicked(){
 
 void ADUserInfoWidget::saveChanges(){
 
+    int pos = 0;
+    QRegExpValidator rxValidator(this);
+    QRegExp rx;
+
+
     QString accountName = ui.lineEditSAMAccount->text().trimmed();
+    rx.setPattern("^\\w+$");
+    rxValidator.setRegExp(rx);
+    if(rxValidator.validate(accountName, pos) != QValidator::Acceptable){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Account Name!"));
+        ui.lineEditSAMAccount->setFocus();
+        return ;
+    }
+
     QString displayName = ui.lineEditDisplayName->text();
+    if(displayName.contains(";") || displayName.contains("|")){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Display Name!"));
+        ui.lineEditDisplayName->setFocus();
+        return ;
+    }
+
     QString description = ui.lineEditDescription->text();
+    if(description.contains(";") || description.contains("|")){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Description!"));
+        ui.lineEditDescription->setFocus();
+        return ;
+    }
+
     QString userWorkstations = ui.lineEditUserWorkstations->text().trimmed();
+    rx.setPattern("^(\\w+,*)+$");
+    rxValidator.setRegExp(rx);
+    if(rxValidator.validate(userWorkstations, pos) != QValidator::Acceptable){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Workstations!"));
+        ui.lineEditUserWorkstations->setFocus();
+        return ;
+    }
+
     QString telephone = ui.lineEditTelephone->text();
+    if(telephone.contains(";") || telephone.contains("|")){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid Telephone Number!"));
+        ui.lineEditTelephone->setFocus();
+        return ;
+    }
+
     QString ouString = ui.comboBoxOU->currentText();
+    if( (!m_simpleOUString.isEmpty()) && (ouString.isEmpty()) ){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid OU!"));
+        ui.comboBoxOU->setFocus();
+        return ;
+    }
 
 
     m_fullOUString = ouString;
@@ -176,7 +219,7 @@ void ADUserInfoWidget::saveChanges(){
         }
     }
 
-    if(m_simpleOUString != ouString){
+    if( (m_simpleOUString != ouString) && (!ouString.isEmpty()) ){
         ok = m_adsi->AD_MoveObject(m_fullOUString, accountName);
         if(!ok){
             ui.comboBoxOU->setCurrentIndex(ui.comboBoxOU->findText(m_simpleOUString));

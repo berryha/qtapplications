@@ -156,6 +156,9 @@ bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
             //getSelectedADUser(ui.tableViewADUsers->currentIndex());
             slotViewADUserInfo(ui.tableViewADUsers->currentIndex());
         }
+//        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Return){
+//            on_toolButtonQueryAD_clicked();
+//        }
 
         activityTimer->start();
         return true;

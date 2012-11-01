@@ -90,7 +90,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
     initStatusBar();
     //slotResetStatusBar(true);
-    statusBar()->showMessage(tr("Ctrl+Return: Query    F9: Add"));
+    statusBar()->showMessage(tr("Ctrl+Return: Query"));
 
 
     ui.userIDComboBox->clear();
@@ -260,6 +260,9 @@ bool UserManagerMainWindow::eventFilter(QObject *obj, QEvent *event) {
             slotShowUserInfo(ui.userListTableView->currentIndex());
             slotModifyUserInfo();
         }
+//        if(QApplication::keyboardModifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Return){
+//            slotQueryUserButtonClicked();
+//        }
 
         activityTimer->start();
         return true;
