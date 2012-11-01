@@ -2099,9 +2099,12 @@ void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &s
                     if(wkui1_username == computerName + "$"){continue;}
 
                     QString wkui1_logon_domain = QString::fromWCharArray(pTmpBuf->wkui1_logon_domain).toLower();
-                    //if(wkui1_logon_domain == computerName){continue;}
+                    if(wkui1_logon_domain == computerName){
+                        users->append(wkui1_username);
+                    }else{
+                        users->append(wkui1_logon_domain + "\\" + wkui1_username);
+                    }
 
-                    users->append(wkui1_logon_domain + "\\" + wkui1_username);
                     //users->append(QString::fromWCharArray(pTmpBuf->wkui1_username).toLower());
 
                     pTmpBuf++;
