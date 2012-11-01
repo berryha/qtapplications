@@ -436,7 +436,7 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     }
 
     if(logs.size()){
-        bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_CheckMSUsersAccount), logs.join(" | "));
+        bool ok = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_CheckMSUsersAccount), logs.join(" | "));
         if(ok){
             logs.clear();
         }
@@ -481,9 +481,8 @@ void ClientService::processServerRequestClientInfoPacket(const QString &groupNam
     }
 
     if(!userName.isEmpty()){
-        QStringList users = wm->localUsers();
-        wm->getAllUsersLoggedOn(&users);
-        if(!users.contains(userName, Qt::CaseInsensitive)){
+        QString usersInfo = usersOnLocalComputer().join(",");
+        if(!usersInfo.contains(userName, Qt::CaseInsensitive)){
             return;
         }
     }
@@ -604,13 +603,12 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
         }
     }
 
-    QStringList localUsers = wm->localCreatedUsers();
-
-    if(!users.isEmpty()){
-        if(localUsers.join(",") != users){
-            return;
-        }
-    }
+    QStringList localUsers = usersOnLocalComputer();
+//    if(!users.isEmpty()){
+//        if(localUsers.join(",") != users){
+//            return;
+//        }
+//    }
 
     if(!enable){
         disableUSBSD();
@@ -654,6 +652,7 @@ void ClientService::processSetupUSBSDPacket(const QString &computerName, const Q
 }
 
 void ClientService::processSetupProgramesPacket(const QString &computerName, const QString &users, bool enable, bool temporarilyAllowed, const QString &adminName, const QString &adminAddress, quint16 adminPort){
+    qWarning()<<"ClientService::processSetupProgramesPacket(...) " <<" computerName:"<<computerName<<" users:"<<users;
 
 #ifdef Q_OS_WIN
 
@@ -663,13 +662,12 @@ void ClientService::processSetupProgramesPacket(const QString &computerName, con
         }
     }
 
-    QStringList localUsers = wm->localCreatedUsers();
-
-    if(!users.isEmpty()){
-        if(localUsers.join(",") != users){
-            return;
-        }
-    }
+    QStringList localUsers = usersOnLocalComputer();
+//    if(!users.isEmpty()){
+//        if(localUsers.join(",") != users){
+//            return;
+//        }
+//    }
 
     if(!enable){
         disableProgrames();
@@ -720,13 +718,12 @@ void ClientService::processShowAdminPacket(const QString &computerName, const QS
         }
     }
 
-    QStringList localUsers = wm->localCreatedUsers();
-
-    if(!users.isEmpty()){
-        if(localUsers.join(",") != users){
-            return;
-        }
-    }
+//    QStringList localUsers = wm->localCreatedUsers();
+//    if(!users.isEmpty()){
+//        if(localUsers.join(",") != users){
+//            return;
+//        }
+//    }
 
     wm->showAdministratorAccountInLogonUI(show);
 
@@ -746,13 +743,12 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
         }
     }
 
-    QStringList users = wm->localCreatedUsers();
-
-    if(!userName.isEmpty()){
-        if(!users.contains(userName, Qt::CaseInsensitive)){
-            return;
-        }
-    }
+//    QStringList users = wm->localCreatedUsers();
+//    if(!userName.isEmpty()){
+//        if(!users.contains(userName, Qt::CaseInsensitive)){
+//            return;
+//        }
+//    }
 
     modifyAdminGroupUser(userName, addToAdminGroup);
 
@@ -769,7 +765,7 @@ void ClientService::processModifyAdminGroupUserPacket(const QString &computerNam
     QString log = QString("User '%1' %2 Administrators Group! Admin:%3").arg(userName).arg(ret).arg(adminName);
     bool sent = false;
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -813,7 +809,7 @@ void ClientService::processRenameComputerPacketReceived(const QString &newComput
 
     bool sent = false;
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -859,7 +855,7 @@ void ClientService::processJoinOrUnjoinDomainPacketReceived(const QString &admin
 
     bool sent = false;
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
+        sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_AdminSetupOSAdministrators), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -906,11 +902,11 @@ void ClientService::processAdminRequestConnectionToClientPacket(int adminSocketI
         }
     }
 
-    QString usersInfo = wm->localCreatedUsers().join(",");
-    if( !users.trimmed().isEmpty() && (!usersInfo.contains(users, Qt::CaseInsensitive)) ){
-        message = QString("The users information does not match!<br>Expected Value:%1").arg(usersInfo);
-        result = false;
-    }
+//    QString usersInfo = usersOnLocalComputer().join(",");
+//    if( !users.trimmed().isEmpty() && (!usersInfo.contains(users, Qt::CaseInsensitive)) ){
+//        message = QString("The users information does not match!<br>Expected Value:%1").arg(usersInfo);
+//        result = false;
+//    }
 
 
     if(!result){
@@ -963,9 +959,8 @@ void ClientService::processAdminSearchClientPacket(const QString &adminAddress, 
     }
     
     if(!userName.trimmed().isEmpty()){
-        QStringList users = wm->localUsers();
-        wm->getAllUsersLoggedOn(&users);
-        if(!users.contains(userName.toLower())){
+        QString usersInfo = usersOnLocalComputer().join(",");
+        if(!usersInfo.contains(userName, Qt::CaseInsensitive)){
             return;
         }
     }
@@ -1142,7 +1137,7 @@ void ClientService::processAdminRequestRemoteAssistancePacket(const QString &com
 
     QString log = QString("Remote Assistance! Admin:%1").arg(adminName);
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminRequestRemoteAssistance), log);
+        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_AdminRequestRemoteAssistance), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -1167,7 +1162,7 @@ void ClientService::processAdminRequestUpdateMSUserPasswordPacket(const QString 
 
     QString log = QString("Update Password! Admin:%1").arg(adminName);
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_AdminInformUserNewPassword), log);
+        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_AdminInformUserNewPassword), log);
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -1350,6 +1345,17 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 
 }
 
+QStringList ClientService::usersOnLocalComputer(){
+
+    QStringList users = wm->localCreatedUsers();
+    wm->getAllUsersLoggedOn(&users);
+    users.removeDuplicates();
+    //users.removeAll(wm->getComputerName() + "$");
+
+    return users;
+
+}
+
 void ClientService::uploadClientSummaryInfo(int socketID){
     qDebug()<<"--ClientService::uploadClientSummaryInfo(...) socketID:"<<socketID;
 
@@ -1362,11 +1368,7 @@ void ClientService::uploadClientSummaryInfo(int socketID){
     //WindowsManagement wm;
     //QString computerName = localComputerName;
 
-    QStringList users = wm->localCreatedUsers();
-    wm->getAllUsersLoggedOn(&users);
-    users.removeDuplicates();
-    users.removeAll(wm->getComputerName() + "$");
-
+    QStringList users = usersOnLocalComputer();
     QString usersInfo = users.join(",");
 
     QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();
@@ -1424,12 +1426,9 @@ void ClientService::uploadClientSummaryInfo(const QString &adminAddress, quint16
     //WindowsManagement wm;
     //QString computerName = m_localComputerName;
 
-    QStringList users = wm->localCreatedUsers();
-    wm->getAllUsersLoggedOn(&users);
-    users.removeDuplicates();
-    users.removeAll(wm->getComputerName() + "$");
-
+    QStringList users = usersOnLocalComputer();
     QString usersInfo = users.join(",");
+
 
     QList<QHostAddress> ips = NetworkUtilities::validIPAddresses();
     QString networkInfo = "";
@@ -1493,10 +1492,13 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
         setWinAdminPassword(administratorPassword);
     }
 
+    QStringList users = usersOnLocalComputer();
+    QString usersInfo = users.join(",");
+
     if(!wm->updateUserPassword("administrator", administratorPassword, true)){
         QString error = wm->lastError();
         if(INVALID_SOCK_ID != m_socketConnectedToServer){
-            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), error);
+            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersInfo, quint8(MS::LOG_UpdateMSUserPassword), error);
             if(!sent){
                 qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
             }
@@ -1506,7 +1508,7 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
 
 
     if(INVALID_SOCK_ID != m_socketConnectedToServer){
-        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_UpdateMSUserPassword), QString("Administrator's password updated to '%1'!").arg(administratorPassword));
+        bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersInfo, quint8(MS::LOG_UpdateMSUserPassword), QString("Administrator's password updated to '%1'!").arg(administratorPassword));
         if(!sent){
             qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
         }
@@ -1769,7 +1771,7 @@ bool ClientService::enableUSBSD(bool temporary){
     //WindowsManagement wm;
     wm->setupUSBSD(true);
     if(!temporary){
-        QStringList createdUsers = wm->localCreatedUsers();
+        QStringList createdUsers = usersOnLocalComputer();
         settings->setValue("USBSD", 1);
         settings->setValue("USBSDUsers", createdUsers);
     }
@@ -1839,7 +1841,7 @@ bool ClientService::enableProgrames(bool temporary){
     //WindowsManagement wm;
     wm->setupProgrames(true);
     if(!temporary){
-        QStringList createdUsers = wm->localCreatedUsers();
+        QStringList createdUsers = usersOnLocalComputer();
         settings->setValue("Programes", 1);
         settings->setValue("ProgramesUsers", createdUsers);
     }
@@ -2481,7 +2483,7 @@ void ClientService::update(){
         qWarning()<<wm->lastError();
         //logMessage(wm->lastError(), QtServiceBase::Error);
         if(INVALID_SOCK_ID != m_socketConnectedToServer){
-            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, wm->localCreatedUsers().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
+            bool sent = clientPacketsParser->sendClientLogPacket(m_socketConnectedToServer, usersOnLocalComputer().join(","), quint8(MS::LOG_ClientUpdate), wm->lastError());
             if(!sent){
                 qCritical()<<tr("ERROR! Can not send log to server %1:%2! %3").arg(m_serverAddress.toString()).arg(m_serverUDTListeningPort).arg(m_rtp->lastErrorString());
             }

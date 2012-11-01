@@ -82,7 +82,7 @@ private slots:
 
     void processLocalUserOnlineStatusChanged(int socketID, const QString &userName, bool online);
 
-
+    QStringList usersOnLocalComputer();
     void uploadClientSummaryInfo(int socketID);
     void uploadClientSummaryInfo(const QString &adminAddress, quint16 adminPort);
 
