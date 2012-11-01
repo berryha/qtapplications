@@ -2034,9 +2034,9 @@ void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &s
         return;
     }
 
-    LPWKSTA_USER_INFO_0 pBuf = NULL;
-    LPWKSTA_USER_INFO_0 pTmpBuf;
-    DWORD dwLevel = 0;
+    LPWKSTA_USER_INFO_1 pBuf = NULL;
+    LPWKSTA_USER_INFO_1 pTmpBuf;
+    DWORD dwLevel = 1;
     DWORD dwPrefMaxLen = MAX_PREFERRED_LENGTH;
     DWORD dwEntriesRead = 0;
     DWORD dwTotalEntries = 0;
@@ -2052,6 +2052,7 @@ void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &s
     wchar_t serverNameArray[MaxGroupNameLength * sizeof(wchar_t) + 1];
     wcscpy(serverNameArray, serverName.toStdWString().c_str());
 
+    QString computerName = this->getComputerName();
 
     //
     // Call the NetWkstaUserEnum function, specifying level 0.
@@ -2094,7 +2095,14 @@ void WindowsManagement::getAllUsersLoggedOn(QStringList *users, const QString &s
                     // Print the user logged on to the workstation.
                     //
                     //wprintf(L"\t-- %s\n", pTmpBuf->wkui0_username);
-                    users->append(QString::fromWCharArray(pTmpBuf->wkui0_username).toLower());
+                    QString wkui1_username = QString::fromWCharArray(pTmpBuf->wkui1_username).toLower();
+                    if(wkui1_username == computerName + "$"){continue;}
+
+                    QString wkui1_logon_domain = QString::fromWCharArray(pTmpBuf->wkui1_logon_domain).toLower();
+                    //if(wkui1_logon_domain == computerName){continue;}
+
+                    users->append(wkui1_logon_domain + "\\" + wkui1_username);
+                    //users->append(QString::fromWCharArray(pTmpBuf->wkui1_username).toLower());
 
                     pTmpBuf++;
                     dwTotalCount++;
