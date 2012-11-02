@@ -34,6 +34,7 @@
 
 #include <QTimer>
 
+
 #include "ui_adusermanagerwidget.h"
 #include "aduserinfomodel.h"
 #include "aduserinfowidget.h"
@@ -58,6 +59,7 @@ protected:
     void changeEvent(QEvent *e);
 
 
+
 private slots:
     void on_toolButtonConnect_clicked();
     void on_comboBoxQueryMode_currentIndexChanged( int index );
@@ -75,6 +77,7 @@ private slots:
     void on_actionUserMustChangePassword_triggered();
     void on_actionUserCannotChangePassword_triggered();
     void on_actionPasswordNeverExpires_triggered();
+
 
     void slotExportQueryResult();
     void slotPrintQueryResult();
@@ -116,6 +119,8 @@ private:
 
     QTimer *activityTimer;
     bool m_verified;
+
+
 
 
 };
