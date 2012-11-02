@@ -112,6 +112,18 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
 
     m_verified = true;
 
+
+//    QStringList wordList;
+//    wordList << "accountExpires" << "badPasswordTime" << "badPwdCount" << "cn" << "codePage" << "countryCode";
+//    wordList << "description" << "displayName" << "distinguishedName" << "dSCorePropagationData";
+//    wordList << "instanceType" << "lastLogoff" << "lastLogon" << "lastLogonTimestamp" << "lockoutTime" << "logonCount";
+//    wordList << "mail" << "memberOf" << "msDS-SupportedEncryptionTypes" << "name" << "nTSecurityDescriptor" ;
+//    wordList << "objectCategory" << "objectClass" << "objectGUID" << "objectSid" << "primaryGroupID" << "pwdLastSet";
+//    wordList << "sAMAccountName" << "sAMAccountType" << "userAccountControl" << "userPrincipalName" << "userWorkstations";
+//    wordList << "uSNChanged" << "uSNCreated" << "whenChanged" << "whenCreated";
+
+
+
 }
 
 bool ADUserManagerWidget::eventFilter(QObject *obj, QEvent *event) {
@@ -285,7 +297,9 @@ void ADUserManagerWidget::on_toolButtonQueryAD_clicked(){
         dataToRetrieve = "sAMAccountName,displayName,userWorkstations,telephoneNumber,description,objectGUID,objectSid";
     }else{
         filter = ui.lineEditFilter->text();
+        if(filter.trimmed().isEmpty()){filter = "(&(objectcategory=person)(objectclass=user)(sAMAccountName=*)(displayName=*))";}
         dataToRetrieve = ui.lineEditDataToRetrieve->text().trimmed();
+        if(dataToRetrieve.trimmed().isEmpty()){dataToRetrieve = "sAMAccountName,displayName";}
     }
 
     QString ouString = ui.comboBoxOU->currentText();
