@@ -1778,8 +1778,9 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
                     EXIT FUNCTION
                 END IF
 
-                IF sAD_Attribute = "accountExpires" OR sAD_Attribute = "badPasswordTime" OR sAD_Attribute = "lastLogoff" OR sAD_Attribute = "lastLogon" _
-                      OR sAD_Attribute = "pwdLastSet" OR sAD_Attribute = "uSNChanged" OR sAD_Attribute = "uSNCreated" OR sAD_Attribute = "whenChanged" OR sAD_Attribute = "whenCreated" THEN
+                IF sAD_Attribute = "accountExpires" OR sAD_Attribute = "badPasswordTime" _ 
+							OR sAD_Attribute = "lastLogoff" OR sAD_Attribute = "lastLogon"  OR sAD_Attribute = "lastLogonTimestamp" OR sAD_Attribute = "lockoutTime"  _
+                     OR sAD_Attribute = "pwdLastSet" OR sAD_Attribute = "uSNChanged" OR sAD_Attribute = "uSNCreated" OR sAD_Attribute = "whenChanged" OR sAD_Attribute = "whenCreated" THEN
 
                     DIM pFileTime AS FILETIME
                     pFileTime.dwHighDateTime = HiPart

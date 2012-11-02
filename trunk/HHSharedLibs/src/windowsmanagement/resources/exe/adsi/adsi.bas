@@ -1,7 +1,7 @@
 #RESOURCE VERSIONINFO
 
 #RESOURCE FILEFLAGS %VS_FF_SPECIALBUILD
-#RESOURCE FILEVERSION 2012, 10, 29, 1
+#RESOURCE FILEVERSION 2012, 11, 2, 1
 '#RESOURCE PRODUCTVERSION 2012, 10, 29, 1
 
 #RESOURCE STRINGINFO "0804", "04B0"
@@ -16,7 +16,7 @@
 #RESOURCE VERSION$ "OriginalFilename", "ADSI.DLL"
 '#RESOURCE VERSION$ "PrivateBuild",     "Private info"
 #RESOURCE VERSION$ "ProductName",      "ADSI Wrapper"
-#RESOURCE VERSION$ "ProductVersion",   "2012.10.29.1"
+#RESOURCE VERSION$ "ProductVersion",   "2012.11.2.1"
 '#RESOURCE VERSION$ "SpecialBuild",     "Special info"
 
 
@@ -25,7 +25,7 @@
 
 
 
- '  #COMPILE EXE
+  ' #COMPILE EXE
 
     #COMPILE DLL
 
@@ -39,9 +39,9 @@
 
 FUNCTION testADSI () AS LONG
 
-    MSGBOX ComputerName()
-    MSGBOX UserNameOfCurrentThread()
-    EXIT FUNCTION
+'    MSGBOX ComputerName()
+ '   MSGBOX UserNameOfCurrentThread()
+  '  EXIT FUNCTION
 
 
 
@@ -94,11 +94,11 @@ FUNCTION testADSI () AS LONG
 
    ' AD_SetUserPasswordChange("test1", 0)
 
-   MSGBOX AD_GetAllOUs("")
+  ' MSGBOX AD_GetAllOUs("")
 
    'MSGBOX AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(cn=" & "test" & "*))" , "sAMAccountName,distinguishedName,objectSid", ";", "|")
    ' MSGBOX AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*)(displayName=Tes*))" , "memberOf", ";", "|")
-  '   MSGBOX AD_GetObjectsInOU("OU=OU1,OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*))" , "displayName", ";", "|")
+     MSGBOX AD_GetObjectsInOU("DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "he" & "*))" , "lastLogon", ";", "|")
 
 
 
