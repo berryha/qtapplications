@@ -1347,8 +1347,15 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 
 QStringList ClientService::usersOnLocalComputer(){
 
-    QStringList users = wm->localCreatedUsers();
+    QStringList users = wm->localUsers();
     wm->getAllUsersLoggedOn(&users);
+    users.removeAll("system$");
+    users.removeAll("administrator");
+    users.removeAll("guest");
+    users.removeAll("helpassistant");
+    users.removeAll("support_388945a0");
+    users.removeAll("aspnet");
+    users.removeAll("homegroupuser$");
     users.removeDuplicates();
     //users.removeAll(wm->getComputerName() + "$");
 
@@ -1922,7 +1929,7 @@ QStringList ClientService::administrators(){
 
     }
 
-    qDebug()<<"-------------adminGroupUsers:"<<adminGroupUsers.join(",");
+    //qWarning()<<"-------------adminGroupUsers:"<<adminGroupUsers.join(",");
 
 #endif
 
