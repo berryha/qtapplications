@@ -290,7 +290,9 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
             //info->setNetwork(networkInfo);
         }
         if(usersInfo != info->getUsers()){
-            statement += QString(", Users = '%1' ").arg(usersInfo);
+            QString tempUsersInfo = usersInfo;
+            tempUsersInfo.replace("\\", "\\\\");
+            statement += QString(", Users = '%1' ").arg(tempUsersInfo);
             //info->setUsers(usersInfo);
         }
         if(osInfo != info->getOs()){
@@ -308,7 +310,9 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
         statement += QString(", JoinedToDomain = %1 ").arg(QVariant(isJoinedToDomain).toUInt());
 
         if(admins != info->getAdministrators()){
-            statement += QString(", Administrators = '%1' ").arg(admins);
+            QString tempAdmins = admins;
+            tempAdmins.replace("\\", "\\\\");
+            statement += QString(", Administrators = '%1' ").arg(tempAdmins);
             //info->setAdministrators(admins);
         }
         if(clientVersion != info->getClientVersion()){
@@ -335,6 +339,7 @@ void ServerService::updateOrSaveClientSummaryInfo(const QString &computerName, c
 
         statement += "COMMIT;";
     }
+
 
     info->setSummaryInfoSavedTODatabase(false);
     info->setUpdateSummaryInfoStatement(statement);
@@ -420,7 +425,9 @@ bool ServerService::updateOrSaveClientInfoToDatabase(ClientInfo *info){
             QString msg = QString("Can not write client summary info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
             logMessage(msg, QtServiceBase::Error);
             qCritical()<<msg;
-
+            qCritical()<<"summaryStatement:";
+            qCritical()<<summaryStatement;
+            qCritical()<<"";
             //MySQL数据库重启，重新连接
             if(error.number() == 2006){
                 query->clear();
