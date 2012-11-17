@@ -64,22 +64,23 @@ SOURCES += \
     rudp/rudpsocket.cpp \
     tcp/tcpbase.cpp
 
-RESOURCES += 
-win32 { 
-    HEADERS += udp/multicast/multicastwin.h
-    SOURCES += udp/multicast/multicastwin.cpp
+#win32 {
+#    HEADERS += udp/multicast/multicastwin.h
+#    SOURCES += udp/multicast/multicastwin.cpp
     
-    LIBS += -lws2_32
+#    LIBS += -lws2_32
 
-    win32-g++{
-        LIBS += -Lresources/lib \
-        -lwsock32
-    }
-}
-unix { 
-    HEADERS += udp/multicast/multicastlinux.h
-    SOURCES += udp/multicast/multicastlinux.cpp
-}
+#    win32-g++{
+#        LIBS += -Lresources/lib \
+#        -lwsock32
+#    }
+#}
+#unix {
+#    HEADERS += udp/multicast/multicastlinux.h
+#    SOURCES += udp/multicast/multicastlinux.cpp
+#}
+
+RESOURCES +=
 
 # ##
 # DESTDIR = $${LIB_PATH}

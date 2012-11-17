@@ -49,7 +49,7 @@ UDPSocket::UDPSocket(QObject *parent)
 
     connect(this, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 
-    ipMulticastSocket = 0;
+//    ipMulticastSocket = 0;
 
     listeningState = NotListening;
 
@@ -62,10 +62,10 @@ UDPSocket::UDPSocket(QObject *parent)
 UDPSocket::~UDPSocket() {
     qDebug()<<"UDPSocket::~UDPSocket()";
 
-    if(ipMulticastSocket){
-        delete ipMulticastSocket;
-        ipMulticastSocket = 0;
-    }
+//    if(ipMulticastSocket){
+//        delete ipMulticastSocket;
+//        ipMulticastSocket = 0;
+//    }
 
     datagram->clear();
     datagram->resize(0);
@@ -76,9 +76,9 @@ UDPSocket::~UDPSocket() {
 
 }
 
-const IPMulticastSocket * UDPSocket::getIPMulticastSocket() const{
-    return ipMulticastSocket;
-}
+//const IPMulticastSocket * UDPSocket::getIPMulticastSocket() const{
+//    return ipMulticastSocket;
+//}
 
 UDPSocket::ListeningState UDPSocket::getListeningState() const{
     return this->listeningState;
@@ -86,16 +86,16 @@ UDPSocket::ListeningState UDPSocket::getListeningState() const{
 
 bool UDPSocket::startSimpleListening(const QHostAddress &localAddress, quint16 localPort){
 
-    if(ipMulticastSocket){
-        if((ipMulticastSocket->getUdpSocket()->localAddress() == localAddress) && (ipMulticastSocket->getPort() == localPort)){
-            qWarning("Server already started!");
-            return true;
-        }
+//    if(ipMulticastSocket){
+//        if((ipMulticastSocket->getUdpSocket()->localAddress() == localAddress) && (ipMulticastSocket->getPort() == localPort)){
+//            qWarning("Server already started!");
+//            return true;
+//        }
 
-        if(ipMulticastSocket->isBound()){
-            ipMulticastSocket->leaveGroup();
-        }
-    }
+//        if(ipMulticastSocket->isBound()){
+//            ipMulticastSocket->leaveGroup();
+//        }
+//    }
 
     close();
 
@@ -117,25 +117,33 @@ bool UDPSocket::startSimpleListening(const QHostAddress &localAddress, quint16 l
 
 bool UDPSocket::startIPMulticastListening(const QHostAddress &ipMulticastGroupAddress, quint16 ipMulticastGroupPort){
 
-    if(!ipMulticastSocket){
-        ipMulticastSocket = new IPMulticastSocket(this);
+//    if(!ipMulticastSocket){
+//        ipMulticastSocket = new IPMulticastSocket(this);
 
-    }else{
-        if((ipMulticastSocket->getMulticastGroupAddress() == ipMulticastGroupAddress) && (ipMulticastSocket->getPort() == ipMulticastGroupPort)){
-            qWarning("Server already started!");
-            return true;
-        }
-        ipMulticastSocket->leaveGroup();
-    }
+//    }else{
+//        if((ipMulticastSocket->getMulticastGroupAddress() == ipMulticastGroupAddress) && (ipMulticastSocket->getPort() == ipMulticastGroupPort)){
+//            qWarning("Server already started!");
+//            return true;
+//        }
+//        ipMulticastSocket->leaveGroup();
+//    }
+
+//    close();
+//    ipMulticastSocket->setUdpSocket(this);
+
+//    bool bound = ipMulticastSocket->startIPMulticastListening(ipMulticastGroupAddress, ipMulticastGroupPort);
 
     close();
-    ipMulticastSocket->setUdpSocket(this);
+    listeningState = NotListening;
 
-    bool bound = ipMulticastSocket->startIPMulticastListening(ipMulticastGroupAddress, ipMulticastGroupPort);
+    bool bound = bind(ipMulticastGroupPort, QUdpSocket::ShareAddress);
+    if(!bound){
+        return bound;
+    }
+
+    bound = joinMulticastGroup(ipMulticastGroupAddress);
     if(bound){
         listeningState = IPMulticastListening;
-    }else{
-        listeningState = NotListening;
     }
 
     return bound;
