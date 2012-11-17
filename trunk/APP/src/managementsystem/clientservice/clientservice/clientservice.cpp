@@ -298,7 +298,7 @@ bool ClientService::startMainService(){
     //checkUSBSD();
 
     qWarning()<<"Check Programes!";
-    checkProgrames();
+    //checkProgrames();
 
     //setupStartupWithSafeMode(true);
 
