@@ -33,8 +33,9 @@
 #define UDPSOCKET_H_
 
 #include <QObject>
+#include <QUdpSocket>
 
-#include "multicast/ipmulticast.h"
+//#include "multicast/ipmulticast.h"
 #include "../packethandler/packethandlerbase.h"
 
 #include "../networklib.h"
@@ -50,7 +51,7 @@ public:
     UDPSocket(QObject *parent);
     virtual ~UDPSocket();
 
-    const IPMulticastSocket * getIPMulticastSocket() const;
+//    const IPMulticastSocket * getIPMulticastSocket() const;
 
     ListeningState getListeningState() const;
 
@@ -74,7 +75,7 @@ private:
 
     QByteArray *datagram;
 
-    IPMulticastSocket *ipMulticastSocket;
+//    IPMulticastSocket *ipMulticastSocket;
 
     ListeningState listeningState;
 
