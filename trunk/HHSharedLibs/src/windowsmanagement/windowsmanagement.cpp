@@ -3314,6 +3314,19 @@ bool WindowsManagement::setupUSBSD(bool enable){
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS");
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet002\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"3");
 
+        //Policies
+        //CD-ROM
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}", L"Deny_Read", L"REG_DWORD", L"0");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}", L"Deny_Write", L"REG_DWORD", L"0");
+        //Removable Disk
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}", L"Deny_Read", L"REG_DWORD", L"0");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}", L"Deny_Write", L"REG_DWORD", L"0");
+        //Portable Storage Devices
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{6AC27878-A6FA-4155-BA85-F98F491D4F33}", L"Deny_Read", L"REG_DWORD", L"0");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\RemovableStorageDevices\\{6AC27878-A6FA-4155-BA85-F98F491D4F33}", L"Deny_Write", L"REG_DWORD", L"0");
+
+
+
     }else{
         ret1 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"ImagePath", L"REG_EXPAND_SZ", L"system32\\DRIVERS\\USBSTOR.SYS-");
         ret2 = AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\USBSTOR", L"Start", L"REG_DWORD", L"4");
