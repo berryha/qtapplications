@@ -291,13 +291,13 @@ bool ClientService::startMainService(){
         updateAdministratorPassword("trousetrouse");
     }
 
-    qWarning()<<"Check User Account!";
-    checkUsersAccount();
+    //qWarning()<<"Check User Account!";
+    //checkUsersAccount();
 
-    qWarning()<<"Check USB SD!";
+    //qWarning()<<"Check USB SD!";
     //checkUSBSD();
 
-    qWarning()<<"Check Programes!";
+    //qWarning()<<"Check Programes!";
     //checkProgrames();
 
     //setupStartupWithSafeMode(true);
