@@ -3,9 +3,9 @@
 include( ../config_global.pri )
 
 
-VER_MAJ = 2012
-VER_MIN = 11
-VER_PAT = 23
+VER_MAJ = 2013
+VER_MIN = 1
+VER_PAT = 14
 VER_CMP = 1
 
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}.$${VER_CMP}
@@ -17,7 +17,7 @@ win32:win32-g++:DEFINES += __MINGW__
 QMAKE_TARGET_COMPANY	= "He Hui"
 QMAKE_TARGET_PRODUCT	= "Management System"
 QMAKE_TARGET_DESCRIPTION    = "Crossplatform Tools Based On Qt Of LGPL Edition"
-QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2010 He Hui"
+QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2013 He Hui"
 
 APP_ORG = "He Hui"
 APP_AUTHOR = "He Hui"

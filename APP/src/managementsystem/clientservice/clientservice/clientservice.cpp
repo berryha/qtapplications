@@ -283,13 +283,13 @@ bool ClientService::startMainService(){
 
     mainServiceStarted = true;
 
-    if(m_joinInfo == "plan"){
-        updateAdministratorPassword("trousefcktrouse");
-    //}else if(m_joinInfo == "pds"){
-    //    updateAdministratorPassword("trousemisdg");
-    }else{
-        updateAdministratorPassword("trousetrouse");
-    }
+//    if(m_joinInfo == "plan"){
+//        updateAdministratorPassword("trousefcktrouse");
+//    //}else if(m_joinInfo == "pds"){
+//    //    updateAdministratorPassword("trousemisdg");
+//    }else{
+        updateAdministratorPassword(WIN_ADMIN_PASSWORD);
+//    }
 
     //qWarning()<<"Check User Account!";
     //checkUsersAccount();
@@ -1531,7 +1531,7 @@ bool ClientService::updateAdministratorPassword(const QString &newPassword){
 //    else{
 //        wm->showAdministratorAccountInLogonUI(true);
 //    }
-    wm->showAdministratorAccountInLogonUI(true);
+//    wm->showAdministratorAccountInLogonUI(true);
 
     if(!wm->hiddenAdmiAccountExists()){
         wm->createHiddenAdmiAccount();
