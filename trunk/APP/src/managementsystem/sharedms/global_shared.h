@@ -77,7 +77,7 @@
 #endif
 
 #ifndef WIN_ADMIN_PASSWORD
-#define WIN_ADMIN_PASSWORD "trousetrouse" //"computermisdg"
+#define WIN_ADMIN_PASSWORD "trouse@trouse" //"computermisdg"
 #endif
 
 #ifndef CRYPTOGRAPHY_KEY
