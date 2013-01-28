@@ -1347,6 +1347,8 @@ void ClientService::processLocalUserOnlineStatusChanged(int socketID, const QStr
 
 QStringList ClientService::usersOnLocalComputer(){
 
+#ifdef Q_OS_WIN
+
     QStringList users = wm->localUsers();
     wm->getAllUsersLoggedOn(&users);
     users.removeAll("system$");
@@ -1360,6 +1362,9 @@ QStringList ClientService::usersOnLocalComputer(){
     //users.removeAll(wm->getComputerName() + "$");
 
     return users;
+#else
+    return QStringList();
+#endif
 
 }
 
