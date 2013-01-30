@@ -181,14 +181,15 @@ private:
     IMUser *imUser;
     IM::OnlineState stateBeforeLocking;
 
+    ContactsManager *contactsManager;
+    ChatWindowManager *chatWindowManager;
+
     ExpandListViewManager *expandListViewManager;
     ExpandListView *friendsListView;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
 
-    ContactsManager *contactsManager;
 
-    ChatWindowManager *chatWindowManager;
 
     PacketHandlerBase *m_packetHandler;
     ClientResourcesManager *m_resourcesManager;

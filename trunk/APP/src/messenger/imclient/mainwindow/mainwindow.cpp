@@ -52,8 +52,14 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     //showMinimized();
 
 
-//    expandListViewManager = 0;
-//    friendsListView = 0;
+
+
+
+    contactsManager = ContactsManager::instance();
+    chatWindowManager = ChatWindowManager::instance();
+
+    expandListViewManager = 0;
+    friendsListView = 0;
 
     //初始化UI
     //Init the UI
@@ -80,9 +86,6 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
 
 
-    contactsManager = ContactsManager::instance();
-
-    chatWindowManager = ChatWindowManager::instance();
 
 
 
