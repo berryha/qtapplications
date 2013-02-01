@@ -2933,13 +2933,15 @@ void WindowsManagement::modifySystemSettings(){
     
     if(QSysInfo::windowsVersion() == QSysInfo::WV_WINDOWS7){
         AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\iphlpsvc", L"Start", L"REG_DWORD", L"4");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\CscService", L"Start", L"REG_DWORD", L"4");
+        AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\SSDPSRV", L"Start", L"REG_DWORD", L"4");
     }
 
     AU3_RegWrite(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\Services\\tvnserver", L"Start", L"REG_DWORD", L"2");
     //AU3_RegDeleteVal(L"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", L"tvncontrol");
     
     //Disable AVG IDS Agent
-    AU3_RegDeleteKey(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\AVGIDSAgent");
+    //AU3_RegDeleteKey(L"HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet001\\services\\AVGIDSAgent");
 
 
 }
