@@ -580,6 +580,8 @@ void CUDT::connect(const sockaddr* serv_addr)
    if (m_bConnecting || m_bConnected)
       throw CUDTException(5, 2, 0);
 
+   m_bConnecting = true;
+
    // record peer/server address
    delete m_pPeerAddr;
    m_pPeerAddr = (AF_INET == m_iIPversion) ? (sockaddr*)new sockaddr_in : (sockaddr*)new sockaddr_in6;
@@ -625,8 +627,6 @@ void CUDT::connect(const sockaddr* serv_addr)
    request.setLength(hs_size);
    m_pSndQueue->sendto(serv_addr, request);
    m_llLastReqTime = CTimer::getTime();
-
-   m_bConnecting = true;
 
    // asynchronous connect, return immediately
    if (!m_bSynRecving)
@@ -731,6 +731,7 @@ int CUDT::connect(const CPacket& response) throw ()
       // set cookie
       if (1 == m_ConnRes.m_iReqType)
       {
+
          m_ConnReq.m_iReqType = -1;
          m_ConnReq.m_iCookie = m_ConnRes.m_iCookie;
          m_llLastReqTime = 0;
@@ -2462,7 +2463,7 @@ int CUDT::listen(sockaddr* addr, CPacket& packet)
    char clienthost[NI_MAXHOST];
    char clientport[NI_MAXSERV];
    getnameinfo(addr, (AF_INET == m_iVersion) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6), clienthost, sizeof(clienthost), clientport, sizeof(clientport), NI_NUMERICHOST|NI_NUMERICSERV);
-   int64_t timestamp = (CTimer::getTime() - m_StartTime) / 60000000; // secret changes every one minute
+   int64_t timestamp = (CTimer::getTime() - m_StartTime) / 60000000;  // secret changes every one minute
    stringstream cookiestr;
    cookiestr << clienthost << ":" << clientport << ":" << timestamp;
    unsigned char cookie[16];
