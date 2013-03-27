@@ -1,9 +1,0 @@
- 
-#ifndef HHSHAREDSERVICE_MODULE_H
-#define HHSHAREDSERVICE_MODULE_H
-
-#include "hmysharedlib_global.h"
-#include "hservice.h"
-
-
-#endif
