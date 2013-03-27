@@ -1,0 +1,47 @@
+/*
+ * contentprovider.h
+ *
+ *  Created on: 2009-10-27
+ *      Author: 贺辉
+ */
+
+#ifndef CONTENTPROVIDER_H_
+#define CONTENTPROVIDER_H_
+
+#include <QObject>
+#include <QList>
+
+#include "abstractexpandlistviewInterface.h"
+
+namespace HEHUI {
+
+class ContentProvider :public QObject{
+	Q_OBJECT
+public:
+    typedef ExpandListViewInterface::ObjectItem ObjectItem;
+    typedef ExpandListViewInterface::Category Category;
+    typedef ExpandListViewInterface::CategoryList CategoryList;
+
+	ContentProvider(QObject *parent = 0);
+	virtual ~ContentProvider();
+
+
+	//virtual CategoryList* getCategoryList(QList<QObject *> list) = 0;
+
+	virtual CategoryList getCategoryList() = 0;
+
+	//Category* getCategory(const QString &categoryID);
+
+//	QList<QObject*> getInputObjectList() const;
+//	void setInputObjectList(QList<QObject*> inputObjectList);
+
+private:
+	//QList<QObject *> inputObjectList;
+
+
+
+};
+
+} //namespace HEHUI
+
+#endif /* CONTENTPROVIDER_H_ */
