@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UserManagerMainWindowUI</class>
+ <widget class="QMainWindow" name="UserManagerMainWindowUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>709</width>
+    <height>398</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>User Manager</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabDB">
+       <attribute name="title">
+        <string>Database</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="userListGroupBox">
+          <property name="title">
+           <string>User List</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="userNameLineEdit">
+             <property name="toolTip">
+              <string>User Name</string>
+             </property>
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string>User Name</string>
+             </property>
+             <property name="text">
+              <string notr="true">Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="6">
+            <widget class="QToolButton" name="queryToolButton">
+             <property name="toolTip">
+              <string>Query</string>
+             </property>
+             <property name="whatsThis">
+              <string>Query</string>
+             </property>
+             <property name="text">
+              <string>Query</string>
+             </property>
+             <property name="icon">
+              <iconset resource="usermanager.qrc">
+               <normaloff>:/resources/images/find.png</normaloff>:/resources/images/find.png</iconset>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+Return</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="5">
+            <widget class="QLineEdit" name="userPSWDLineEdit">
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string>User Password</string>
+             </property>
+             <property name="text">
+              <string notr="true">Password</string>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="7">
+            <widget class="QToolButton" name="addUserToolButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Add New User</string>
+             </property>
+             <property name="whatsThis">
+              <string>Add New User</string>
+             </property>
+             <property name="text">
+              <string>Add</string>
+             </property>
+             <property name="icon">
+              <iconset resource="usermanager.qrc">
+               <normaloff>:/resources/images/user.png</normaloff>:/resources/images/user.png</iconset>
+             </property>
+             <property name="shortcut">
+              <string>F9</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="8">
+            <widget class="QTableView" name="userListTableView">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="toolTip">
+              <string>User List</string>
+             </property>
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string>User List</string>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QComboBox" name="userDeptComboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Department</string>
+             </property>
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string>Department</string>
+             </property>
+             <item>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Account</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">AdminDept</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Cost</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Custom</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">GMO</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">HR</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Marker</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>MIS</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PDS</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Plan</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PMC</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Purchase</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">QC</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Retail</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Sales</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Sample</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Secretary</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Ship</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Shop</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">WHouse</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="userIDComboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>User ID</string>
+             </property>
+             <property name="whatsThis">
+              <string>User ID</string>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <action name="actionExport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Query Result</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit User Info</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Print</string>
+   </property>
+   <property name="toolTip">
+    <string>Print Query Result</string>
+   </property>
+  </action>
+  <action name="actionAutoLogon">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Auto Logon</string>
+   </property>
+   <property name="toolTip">
+    <string>Auto Logon</string>
+   </property>
+  </action>
+  <action name="actionCreateEmailAccount">
+   <property name="text">
+    <string>Create Email Account</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Email Account</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>userIDComboBox</tabstop>
+  <tabstop>userDeptComboBox</tabstop>
+  <tabstop>userNameLineEdit</tabstop>
+  <tabstop>userPSWDLineEdit</tabstop>
+  <tabstop>userListTableView</tabstop>
+  <tabstop>queryToolButton</tabstop>
+  <tabstop>addUserToolButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="usermanager.qrc"/>
+ </resources>
+ <connections/>
+</ui>

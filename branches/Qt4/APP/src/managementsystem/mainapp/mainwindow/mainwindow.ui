@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindowUIClass</class>
+ <widget class="QMainWindow" name="MainWindowUIClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="whatsThis">
+   <string>Main Window</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QMdiArea" name="mdiArea">
+      <property name="acceptDrops">
+       <bool>false</bool>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="viewMode">
+       <enum>QMdiArea::SubWindowView</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuSystem">
+    <property name="title">
+     <string>&amp;System</string>
+    </property>
+    <addaction name="actionSystemConfigure"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionShowMinimized"/>
+    <addaction name="actionShowMaximized"/>
+    <addaction name="actionShowFullScreen"/>
+    <addaction name="actionShowNormal"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelp"/>
+    <addaction name="actionBugReport"/>
+    <addaction name="actionAboutQt"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+    <widget class="QMenu" name="menuSubWindows">
+     <property name="title">
+      <string>Subwindows</string>
+     </property>
+    </widget>
+    <addaction name="actionCloseSubWindow"/>
+    <addaction name="actionCloseAllSubWindows"/>
+    <addaction name="separator"/>
+    <addaction name="actionTitleSubWindows"/>
+    <addaction name="actionCascadeSubWindows"/>
+    <addaction name="separator"/>
+    <addaction name="actionNextSubWindow"/>
+    <addaction name="actionPreviousSubWindow"/>
+    <addaction name="separator"/>
+    <addaction name="menuSubWindows"/>
+   </widget>
+   <addaction name="menuSystem"/>
+   <addaction name="menuView"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarSystem">
+   <property name="windowTitle">
+    <string>System</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSystemConfigure"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarPlugins">
+   <property name="windowTitle">
+    <string>Plug-ins</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBarHelp">
+   <property name="windowTitle">
+    <string>Help</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionHelp"/>
+   <addaction name="actionBugReport"/>
+   <addaction name="actionAbout"/>
+  </widget>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit</string>
+   </property>
+   <property name="statusTip">
+    <string>Quit</string>
+   </property>
+   <property name="whatsThis">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionLanguageDefaultEnglish">
+   <property name="text">
+    <string>Default(English)</string>
+   </property>
+   <property name="statusTip">
+    <string>Default(English)</string>
+   </property>
+   <property name="whatsThis">
+    <string>Default(English)</string>
+   </property>
+  </action>
+  <action name="actionStylePlastique">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Plastique</string>
+   </property>
+   <property name="toolTip">
+    <string>Plastique Style</string>
+   </property>
+   <property name="statusTip">
+    <string>Plastique Style</string>
+   </property>
+   <property name="whatsThis">
+    <string>Plastique Style</string>
+   </property>
+  </action>
+  <action name="actionStyleCleanlooks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Cleanlooks</string>
+   </property>
+   <property name="toolTip">
+    <string>Cleanlooks Style</string>
+   </property>
+   <property name="statusTip">
+    <string>Cleanlooks Style</string>
+   </property>
+   <property name="whatsThis">
+    <string>Cleanlooks Style</string>
+   </property>
+  </action>
+  <action name="actionUseStylesPalette">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use Style's Palette</string>
+   </property>
+   <property name="statusTip">
+    <string>Use Style's Palette</string>
+   </property>
+   <property name="whatsThis">
+    <string>Use Style's Palette</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/images/about.png</normaloff>:/resources/images/about.png</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="toolTip">
+    <string>About</string>
+   </property>
+   <property name="statusTip">
+    <string>About</string>
+   </property>
+   <property name="whatsThis">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionBugReport">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/images/bugreport.png</normaloff>:/resources/images/bugreport.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bug Report</string>
+   </property>
+   <property name="toolTip">
+    <string>Bug Report</string>
+   </property>
+   <property name="statusTip">
+    <string>Bug Report</string>
+   </property>
+   <property name="whatsThis">
+    <string>Bug Report</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/images/help.png</normaloff>:/resources/images/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="statusTip">
+    <string>Help</string>
+   </property>
+   <property name="whatsThis">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="actionSystemConfigure">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/resources/images/configure.png</normaloff>:/resources/images/configure.png</iconset>
+   </property>
+   <property name="text">
+    <string>System Configure</string>
+   </property>
+   <property name="toolTip">
+    <string>System Configure</string>
+   </property>
+   <property name="statusTip">
+    <string>System Configure</string>
+   </property>
+   <property name="whatsThis">
+    <string>System Configure</string>
+   </property>
+  </action>
+  <action name="actionCloseSubWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Close the active window</string>
+   </property>
+   <property name="statusTip">
+    <string>Close the active window</string>
+   </property>
+   <property name="whatsThis">
+    <string>Close the active window</string>
+   </property>
+  </action>
+  <action name="actionCloseAllSubWindows">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close All Windows</string>
+   </property>
+   <property name="toolTip">
+    <string>Close all the windows</string>
+   </property>
+   <property name="statusTip">
+    <string>Close all the windows</string>
+   </property>
+   <property name="whatsThis">
+    <string>Close all the windows</string>
+   </property>
+  </action>
+  <action name="actionTitleSubWindows">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Tile</string>
+   </property>
+   <property name="toolTip">
+    <string>Arranges all child windows in a tile pattern.</string>
+   </property>
+   <property name="statusTip">
+    <string>Arranges all child windows in a tile pattern.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Arranges all child windows in a tile pattern.</string>
+   </property>
+  </action>
+  <action name="actionCascadeSubWindows">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Cascade</string>
+   </property>
+   <property name="toolTip">
+    <string>Arranges all the child windows in a cascade pattern.</string>
+   </property>
+   <property name="statusTip">
+    <string>Arranges all the child windows in a cascade pattern.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Arranges all the child windows in a cascade pattern.</string>
+   </property>
+  </action>
+  <action name="actionNextSubWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Next</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the focus to the next window</string>
+   </property>
+   <property name="statusTip">
+    <string>Move the focus to the next window</string>
+   </property>
+   <property name="whatsThis">
+    <string>Move the focus to the next window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Right</string>
+   </property>
+  </action>
+  <action name="actionPreviousSubWindow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Previous</string>
+   </property>
+   <property name="toolTip">
+    <string>Move the focus to the previous window</string>
+   </property>
+   <property name="statusTip">
+    <string>Move the focus to the previous window</string>
+   </property>
+   <property name="whatsThis">
+    <string>Move the focus to the previous window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Left</string>
+   </property>
+  </action>
+  <action name="actionShowMinimized">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Minimized</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the widget minimized, as an icon.</string>
+   </property>
+   <property name="statusTip">
+    <string>Shows the widget minimized, as an icon.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Shows the widget minimized, as an icon.</string>
+   </property>
+  </action>
+  <action name="actionShowMaximized">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Maximized</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the widget maximized.</string>
+   </property>
+   <property name="statusTip">
+    <string>Shows the widget maximized.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Shows the widget maximized.</string>
+   </property>
+  </action>
+  <action name="actionShowNormal">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Normal</string>
+   </property>
+   <property name="toolTip">
+    <string>Restores the widget after it has been maximized or minimized.</string>
+   </property>
+   <property name="statusTip">
+    <string>Restores the widget after it has been maximized or minimized.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Restores the widget after it has been maximized or minimized.</string>
+   </property>
+  </action>
+  <action name="actionShowFullScreen">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Full-Screen</string>
+   </property>
+   <property name="toolTip">
+    <string>Shows the widget in full-screen mode.</string>
+   </property>
+   <property name="statusTip">
+    <string>Shows the widget in full-screen mode.</string>
+   </property>
+   <property name="whatsThis">
+    <string>Shows the widget in full-screen mode.</string>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+   <property name="toolTip">
+    <string>About Qt</string>
+   </property>
+   <property name="statusTip">
+    <string>About Qt</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowUIClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionTitleSubWindows</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>tileSubWindows()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCascadeSubWindows</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>cascadeSubWindows()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCloseSubWindow</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>closeActiveSubWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCloseAllSubWindows</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>closeAllSubWindows()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNextSubWindow</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>activateNextSubWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPreviousSubWindow</sender>
+   <signal>triggered()</signal>
+   <receiver>mdiArea</receiver>
+   <slot>activatePreviousSubWindow()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShowMaximized</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowUIClass</receiver>
+   <slot>showMaximized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShowMinimized</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowUIClass</receiver>
+   <slot>showMinimized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShowNormal</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowUIClass</receiver>
+   <slot>showNormal()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShowFullScreen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowUIClass</receiver>
+   <slot>showFullScreen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ControlCenterClass</class>
+ <widget class="QMainWindow" name="ControlCenterClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>862</width>
+    <height>515</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Control Center</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tabClientsList">
+       <attribute name="title">
+        <string>Clients List</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Query</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelComputerName">
+             <property name="text">
+              <string>&amp;Computer Name:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditComputerName</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEditComputerName">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="5">
+            <widget class="QComboBox" name="comboBoxOSVersion">
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>WIN_2000</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>WIN_XP</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>WIN_7</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="4">
+            <widget class="QLabel" name="labelOS">
+             <property name="text">
+              <string>&amp;OS Version:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxOSVersion</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="5">
+            <widget class="QComboBox" name="comboBoxWorkgroup">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Department</string>
+             </property>
+             <property name="statusTip">
+              <string/>
+             </property>
+             <property name="whatsThis">
+              <string>Department</string>
+             </property>
+             <item>
+              <property name="text">
+               <string notr="true"/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Account</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">AdminDept</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Cost</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Custom</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>GMO</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">HR</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Marker</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PDS</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Plan</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">PMC</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Purchase</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">QC</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Retail</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Sales</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Sample</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Secretary</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Ship</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">Shop</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string notr="true">WHouse</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QLabel" name="labelWorkgroup">
+             <property name="text">
+              <string>&amp;Workgroup:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxWorkgroup</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLabel" name="labelUserName">
+             <property name="text">
+              <string>&amp;User Name:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditUserName</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="lineEditUserName">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelMACAddress">
+             <property name="text">
+              <string>&amp;MAC Address:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditMACAddress</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="lineEditMACAddress">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLabel" name="labelIPAddress">
+             <property name="text">
+              <string>&amp;IP Address:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>lineEditIPAddress</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QLineEdit" name="lineEditIPAddress">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="6">
+            <widget class="QLabel" name="labelUSBSD">
+             <property name="text">
+              <string>USB &amp;SD:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxUSBSD</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="7">
+            <widget class="QComboBox" name="comboBoxUSBSD">
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Disabled</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="6">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>&amp;Programs:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="buddy">
+              <cstring>comboBoxPrograms</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="7">
+            <widget class="QComboBox" name="comboBoxPrograms">
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Disabled</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="8">
+            <widget class="QToolButton" name="toolButtonQuery">
+             <property name="toolTip">
+              <string/>
+             </property>
+             <property name="text">
+              <string>Query</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/querydatabase.png</normaloff>:/icon/resources/images/querydatabase.png</iconset>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+Return</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="8">
+            <widget class="QToolButton" name="toolButtonManage">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Remote Management</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/connect.png</normaloff>:/icon/resources/images/connect.png</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="10">
+            <widget class="QToolButton" name="toolButtonAnnouncement">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Update All Clients' Info</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/announcement.png</normaloff>:/icon/resources/images/announcement.png</iconset>
+             </property>
+             <property name="shortcut">
+              <string>F5</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="9">
+            <widget class="QToolButton" name="toolButtonUpdatePassword">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="statusTip">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="text">
+              <string>Update Windows Logon Password</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/password.png</normaloff>:/icon/resources/images/password.png</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="9">
+            <widget class="QToolButton" name="toolButtonfilter">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="toolTip">
+              <string>Filter Data</string>
+             </property>
+             <property name="statusTip">
+              <string>Filter Data</string>
+             </property>
+             <property name="text">
+              <string>Filter</string>
+             </property>
+             <property name="icon">
+              <iconset resource="controlcenter.qrc">
+               <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTableView" name="tableViewClientList">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>862</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionPrint">
+   <property name="text">
+    <string>Print</string>
+   </property>
+   <property name="toolTip">
+    <string>Print Data</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export Data</string>
+   </property>
+  </action>
+  <action name="actionRemoteDesktop">
+   <property name="text">
+    <string>M$ Remote Desktop</string>
+   </property>
+  </action>
+  <action name="actionQueryDatabase">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/querydatabase.png</normaloff>:/icon/resources/images/querydatabase.png</iconset>
+   </property>
+   <property name="text">
+    <string>Query Database</string>
+   </property>
+  </action>
+  <action name="actionSearchNetwork">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/searchnetwork.png</normaloff>:/icon/resources/images/searchnetwork.png</iconset>
+   </property>
+   <property name="text">
+    <string>Search Network</string>
+   </property>
+  </action>
+  <action name="actionUpdatePassword">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/password.png</normaloff>:/icon/resources/images/password.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update Password</string>
+   </property>
+  </action>
+  <action name="actionInformNewPassword">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/informnewpassword.png</normaloff>:/icon/resources/images/informnewpassword.png</iconset>
+   </property>
+   <property name="text">
+    <string>Inform New Password</string>
+   </property>
+  </action>
+  <action name="actionAnnouncement">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/announcement.png</normaloff>:/icon/resources/images/announcement.png</iconset>
+   </property>
+   <property name="text">
+    <string>Announcement</string>
+   </property>
+  </action>
+  <action name="actionFilter">
+   <property name="icon">
+    <iconset resource="controlcenter.qrc">
+     <normaloff>:/icon/resources/images/filter.png</normaloff>:/icon/resources/images/filter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEditComputerName</tabstop>
+  <tabstop>lineEditUserName</tabstop>
+  <tabstop>comboBoxWorkgroup</tabstop>
+  <tabstop>comboBoxUSBSD</tabstop>
+  <tabstop>toolButtonQuery</tabstop>
+  <tabstop>toolButtonfilter</tabstop>
+  <tabstop>lineEditMACAddress</tabstop>
+  <tabstop>lineEditIPAddress</tabstop>
+  <tabstop>comboBoxOSVersion</tabstop>
+  <tabstop>comboBoxPrograms</tabstop>
+  <tabstop>toolButtonManage</tabstop>
+  <tabstop>toolButtonUpdatePassword</tabstop>
+  <tabstop>toolButtonAnnouncement</tabstop>
+  <tabstop>tableViewClientList</tabstop>
+ </tabstops>
+ <resources>
+  <include location="controlcenter.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ADUserManagerWidgetUI</class>
+ <widget class="QWidget" name="ADUserManagerWidgetUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>781</width>
+    <height>355</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AD User Manager</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBoxServerInfo">
+     <property name="title">
+      <string>Server</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelServerIP">
+        <property name="text">
+         <string>Server IP:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditServerIP">
+        <property name="toolTip">
+         <string>Server IP Address</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="labelADAdminName">
+        <property name="text">
+         <string>Admin Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="lineEditADAdminName">
+        <property name="toolTip">
+         <string>Administrator Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="labelPassword">
+        <property name="text">
+         <string>Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLineEdit" name="lineEditPassword">
+        <property name="toolTip">
+         <string>Password</string>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QToolButton" name="toolButtonConnect">
+        <property name="toolTip">
+         <string>Open AD</string>
+        </property>
+        <property name="whatsThis">
+         <string>Open AD</string>
+        </property>
+        <property name="text">
+         <string>Connect</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../usermanager.qrc">
+          <normaloff>:/resources/images/connect.png</normaloff>:/resources/images/connect.png</iconset>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Return</string>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxADUsersList">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>AD Users List</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QTableView" name="tableViewADUsers">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>2</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
+        </property>
+        <property name="toolTip">
+         <string>Users</string>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="groupBoxQuery">
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="margin">
+          <number>3</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QComboBox" name="comboBoxQueryMode">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Query Mode</string>
+           </property>
+           <property name="whatsThis">
+            <string>Query Mode</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Simple Query</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Custom Query</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QStackedWidget" name="stackedWidget">
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="pageSimpleQuery">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="labelAccountName">
+               <property name="text">
+                <string>Account Name:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditAccountName">
+               <property name="toolTip">
+                <string>SAM Account Name</string>
+               </property>
+               <property name="whatsThis">
+                <string>SAM Account Name</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelDisplayName">
+               <property name="text">
+                <string>Display Name:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditDisplayName">
+               <property name="toolTip">
+                <string>Display Name</string>
+               </property>
+               <property name="whatsThis">
+                <string>Display Name</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="pageCustomQuery">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="labelFilter">
+               <property name="text">
+                <string>Filter:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditFilter">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelDataToRetrieve">
+               <property name="text">
+                <string>Data To Retrieve:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditDataToRetrieve">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="labelOU">
+           <property name="text">
+            <string>OU:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QComboBox" name="comboBoxOU">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Organization Unit</string>
+           </property>
+           <property name="whatsThis">
+            <string>Organization Unit</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QToolButton" name="toolButtonQueryAD">
+           <property name="toolTip">
+            <string>Query AD</string>
+           </property>
+           <property name="whatsThis">
+            <string>Query AD</string>
+           </property>
+           <property name="text">
+            <string>Query</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../usermanager.qrc">
+             <normaloff>:/resources/images/find.png</normaloff>:/resources/images/find.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+Return</string>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>Print</string>
+   </property>
+  </action>
+  <action name="actionCreateNewAccount">
+   <property name="text">
+    <string>Create New Account</string>
+   </property>
+  </action>
+  <action name="actionResetPassword">
+   <property name="text">
+    <string>Reset Password</string>
+   </property>
+  </action>
+  <action name="actionDisableAccount">
+   <property name="text">
+    <string>Disable Account</string>
+   </property>
+  </action>
+  <action name="actionUnlockAccount">
+   <property name="text">
+    <string>Unlock Account</string>
+   </property>
+  </action>
+  <action name="actionUserCannotChangePassword">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>User cannot change password</string>
+   </property>
+  </action>
+  <action name="actionPasswordNeverExpires">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Password never expires</string>
+   </property>
+  </action>
+  <action name="actionUserMustChangePassword">
+   <property name="text">
+    <string>User must change password at next logon</string>
+   </property>
+  </action>
+  <action name="actionProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>lineEditServerIP</tabstop>
+  <tabstop>lineEditADAdminName</tabstop>
+  <tabstop>lineEditPassword</tabstop>
+  <tabstop>toolButtonConnect</tabstop>
+  <tabstop>tableViewADUsers</tabstop>
+  <tabstop>comboBoxQueryMode</tabstop>
+  <tabstop>lineEditAccountName</tabstop>
+  <tabstop>lineEditDisplayName</tabstop>
+  <tabstop>comboBoxOU</tabstop>
+  <tabstop>toolButtonQueryAD</tabstop>
+  <tabstop>lineEditFilter</tabstop>
+  <tabstop>lineEditDataToRetrieve</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../usermanager.qrc"/>
+ </resources>
+ <connections/>
+</ui>

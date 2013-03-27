@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/">
+    <file>resources/images/backup.png</file>
+    <file>resources/images/cleaner.png</file>
+    <file>resources/images/systeminfo.png</file>
+    <file>resources/images/querydatabase.png</file>
+    <file>resources/images/scansystem.png</file>
+    <file>resources/images/uploadtodatabase.png</file>
+    <file>resources/images/rescan.png</file>
+  </qresource>
+</RCC>

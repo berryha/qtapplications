@@ -1,0 +1,20 @@
+<RCC>
+  <qresource prefix="/icon">
+    <file>resources/images/filter.png</file>
+    <file>resources/images/rescan.png</file>
+    <file>resources/images/querydatabase.png</file>
+    <file>resources/images/informnewpassword.png</file>
+    <file>resources/images/password.png</file>
+    <file>resources/images/connect.png</file>
+    <file>resources/images/scansystem.png</file>
+    <file>resources/images/console.png</file>
+    <file>resources/images/searchnetwork.png</file>
+    <file>resources/images/closetab.png</file>
+    <file>resources/images/addtab.png</file>
+    <file>resources/images/announcement.png</file>
+    <file>resources/images/backup.png</file>
+    <file>resources/images/start.png</file>
+    <file>resources/images/stop.png</file>
+    <file>resources/images/controlcenter.png</file>
+  </qresource>
+</RCC>
