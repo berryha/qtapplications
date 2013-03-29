@@ -6,12 +6,13 @@
  */
 
 
-#include "udtprotocolbase.h"
-
 #include <QCoreApplication>
+#include <QDataStream>
 #include <QtConcurrentRun>
 #include <QDebug>
 #include <QFile>
+
+#include "udtprotocolbase.h"
 
 
 //#ifndef Q_OS_WIN32
