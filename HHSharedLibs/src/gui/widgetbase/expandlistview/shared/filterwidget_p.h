@@ -55,9 +55,9 @@
 
 
 
-#include <QtGui/QWidget>
-#include <QtGui/QLineEdit>
-#include <QtGui/QColor>
+#include <QWidget>
+#include <QLineEdit>
+#include <QColor>
 
 QT_BEGIN_NAMESPACE
 

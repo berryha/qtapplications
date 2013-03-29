@@ -32,7 +32,7 @@
 #ifndef PROGRESSDLG_H
 #define PROGRESSDLG_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QCloseEvent>
 
 #include "../ui/ui_progressdlg.h"

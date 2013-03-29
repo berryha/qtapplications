@@ -55,8 +55,8 @@
 #define SHEET_DELEGATE_H
 
 
-#include <QtGui/QItemDelegate>
-#include <QtGui/QTreeView>
+#include <QItemDelegate>
+#include <QTreeView>
 
 QT_BEGIN_NAMESPACE
 

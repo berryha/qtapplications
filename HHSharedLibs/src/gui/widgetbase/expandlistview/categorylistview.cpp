@@ -45,11 +45,11 @@
 
 #include <QtXml/QDomDocument>
 
-#include <QtGui/QIcon>
-#include <QtGui/QListView>
-#include <QtGui/QLineEdit>
-#include <QtGui/QItemDelegate>
-#include <QtGui/QSortFilterProxyModel>
+#include <QIcon>
+#include <QListView>
+#include <QLineEdit>
+#include <QItemDelegate>
+#include <QSortFilterProxyModel>
 
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QList>
@@ -168,11 +168,19 @@ QListView::ViewMode ExpandListViewCategoryModel::viewMode() const
 
 void ExpandListViewCategoryModel::setViewMode(QListView::ViewMode vm)
 {
-    if (m_viewMode == vm)
+    if (m_viewMode == vm){
         return;
+    }
+    //TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    beginResetModel();
     m_viewMode = vm;
-    if (!m_categoryEntries.empty())
-        reset();
+    endResetModel();
+
+    if (!m_categoryEntries.empty()){
+//        this->reset();
+    }
+
+
 }
 
 int ExpandListViewCategoryModel::indexOfObjectItem(const QString &item_id)
@@ -198,6 +206,8 @@ bool ExpandListViewCategoryModel::removeCustomObjectItems()
     // Typically, we are a whole category of custom widgets, so, remove all
     // and do reset.
     bool changed = false;
+    beginResetModel();
+
     for (ExpandListViewCategoryEntries::iterator it = m_categoryEntries.begin(); it != m_categoryEntries.end(); )
         if (it->objectItem.type() == ExpandListViewInterface::ObjectItem::Custom) {
             it = m_categoryEntries.erase(it);
@@ -205,8 +215,11 @@ bool ExpandListViewCategoryModel::removeCustomObjectItems()
         } else {
             ++it;
         }
-    if (changed)
-        reset();
+
+    endResetModel();
+
+//    if (changed)
+//        reset();
     return changed;
 }
 

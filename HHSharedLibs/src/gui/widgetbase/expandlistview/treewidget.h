@@ -45,8 +45,8 @@
 #include "shared/expandlistviewbase.h"
 //#include "expandlistviewmanager.h"
 
-#include <QtGui/QTreeWidget>
-#include <QtGui/QIcon>
+#include <QTreeWidget>
+#include <QIcon>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QXmlStreamReader> // Cannot forward declare them on Mac

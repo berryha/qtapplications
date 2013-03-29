@@ -40,8 +40,8 @@
 ****************************************************************************/
 
 #include <QtCore/QFile>
-#include <QtGui/QIcon>
-#include <QtGui/QPixmap>
+#include <QIcon>
+#include <QPixmap>
 #include <QDebug>
 
 #include "iconloader_p.h"

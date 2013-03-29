@@ -54,13 +54,13 @@
 
 
 
-#include <QtGui/QHeaderView>
-#include <QtGui/QApplication>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QAction>
-#include <QtGui/QActionGroup>
-#include <QtGui/QMenu>
+#include <QHeaderView>
+#include <QApplication>
+#include <QTreeWidgetItem>
+#include <QContextMenuEvent>
+#include <QAction>
+#include <QActionGroup>
+#include <QMenu>
 
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
@@ -110,7 +110,7 @@ TreeWidget::TreeWidget(ExpandListViewManager *core, QWidget *parent) :
     setRootIsDecorated(false);
     setColumnCount(1);
     header()->hide();
-    header()->setResizeMode(QHeaderView::Stretch);
+    header()->setSectionResizeMode(QHeaderView::Stretch);
     setTextElideMode(Qt::ElideMiddle);
     setVerticalScrollMode(ScrollPerPixel);
 

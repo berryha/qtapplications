@@ -35,7 +35,7 @@
 #ifndef PREFERENCESWINDOW_H
 #define PREFERENCESWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "../ui/ui_preferenceswindow.h"
 
 namespace HEHUI {

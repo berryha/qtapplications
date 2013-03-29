@@ -3,6 +3,7 @@
 #include <QStandardItemModel>
 #include <QApplication>
 #include <QDialog>
+#include <QInputDialog>
 #include <QFileDialog>
 #include <QWidget>
 #include <QRegExp>
