@@ -1,7 +1,7 @@
 #ifndef UDTPWidget_H
 #define UDTPWidget_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ui_udt.h"
 

@@ -1,7 +1,7 @@
 ﻿#ifndef SYSTEMMANAGEMENTWIDGET_H
 #define SYSTEMMANAGEMENTWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QCloseEvent>
 #include <QMenu>
 #include <QSqlQueryModel>

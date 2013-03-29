@@ -34,7 +34,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTranslator>
 
 //#include "../ui/ui_mainwindow.h"

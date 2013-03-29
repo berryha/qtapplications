@@ -1,7 +1,7 @@
 #ifndef REMOTEASSISTANCE_H
 #define REMOTEASSISTANCE_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTimer>
 #include <QCloseEvent>
 

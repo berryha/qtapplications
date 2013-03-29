@@ -1,7 +1,7 @@
 #ifndef CONTACTWIDGET_H
 #define CONTACTWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_contactwidget.h"
 
 class ContactWidget : public QWidget

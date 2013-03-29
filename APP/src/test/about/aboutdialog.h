@@ -33,7 +33,7 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "../ui/ui_aboutdialog.h"
 //#include "ui_aboutdialog.h"
 

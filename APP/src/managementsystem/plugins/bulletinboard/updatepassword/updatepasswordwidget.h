@@ -1,7 +1,7 @@
 #ifndef UPDATEPASSWORDWIDGET_H
 #define UPDATEPASSWORDWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QCloseEvent>
 
 

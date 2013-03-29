@@ -1,7 +1,7 @@
 #ifndef CHATWINDOWMANAGER_H
 #define CHATWINDOWMANAGER_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QList>
 #include <QPair>
 #include <QCloseEvent>

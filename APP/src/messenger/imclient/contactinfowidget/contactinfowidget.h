@@ -1,7 +1,7 @@
 #ifndef CONTACTINFOWIDGET_H
 #define CONTACTINFOWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_contactinfowidget.h"
 
 #include "../../sharedim/imuserbase.h"

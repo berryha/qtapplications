@@ -1,7 +1,7 @@
 #ifndef TASKINFOVIEWWIDGET_H
 #define TASKINFOVIEWWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_taskinfoviewwidget.h"
 
 class TaskInfoViewWidget : public QWidget

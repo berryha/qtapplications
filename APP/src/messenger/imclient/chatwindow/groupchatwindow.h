@@ -1,7 +1,7 @@
 #ifndef GROUPCHATWINDOW_H
 #define GROUPCHATWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_groupchatwindow.h"
 
 namespace HEHUI {

@@ -1,7 +1,7 @@
 #ifndef ANNOUNCEMENT_H
 #define ANNOUNCEMENT_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTableView>
 
 #include "ui_announcement.h"

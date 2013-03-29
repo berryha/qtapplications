@@ -34,7 +34,7 @@
 #ifndef USERMANAGERMAINWINDOW_H
 #define USERMANAGERMAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QLabel>
 #include <QProgressBar>
 #include <QSqlQueryModel>

@@ -34,7 +34,7 @@
 #ifndef SERVERMANAGERWINDOW_H
 #define SERVERMANAGERWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_servermanagerwindow.h"
 
 #include "clientresourcesmanager.h"

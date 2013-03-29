@@ -1,7 +1,7 @@
 #ifndef SELECTTARGETIMAGEWIDGET_H
 #define SELECTTARGETIMAGEWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QResizeEvent>

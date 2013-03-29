@@ -1,7 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "ui_search.h"
 
 #include "userinfomodel.h"

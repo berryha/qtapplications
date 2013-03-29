@@ -1,3 +1,5 @@
+#include <QDataStream>
+
 #include "tcpserver.h"
 
 #include "HHSharedNetwork/hpackethandlerbase.h"

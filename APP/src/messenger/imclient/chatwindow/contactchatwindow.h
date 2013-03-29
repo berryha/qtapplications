@@ -1,7 +1,7 @@
 #ifndef CONTACTCHATWINDOW_H
 #define CONTACTCHATWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include "ui_contactchatwindow.h"
 
 

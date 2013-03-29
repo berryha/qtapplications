@@ -1,7 +1,7 @@
 #ifndef SCREENSHOT_H
 #define SCREENSHOT_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QEvent>
 
 
