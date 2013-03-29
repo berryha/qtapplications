@@ -33,7 +33,6 @@
 #define SETTINGSBASE_H
 
 #include <QSettings>
-#include <QApplication>
 #include <QMainWindow>
 
 //#include "../core/settingscore.h"
