@@ -23,7 +23,7 @@ static void closeDebugLog()
         return;
     QString ps(QTime::currentTime().toString("HH:mm:ss.zzz ") + QLatin1String("--- DEBUG LOG CLOSED ---\n\n"));
     //QString ps(QDateTime::currentDateTime().toString("yyyy.MM.dd HH:mm:ss.zzz ") + QLatin1String("--- DEBUG LOG CLOSED ---\n\n"));
-    file->write(ps.toAscii());
+    file->write(ps.toLatin1());
     file->flush();
     file->close();
     delete file;
@@ -57,7 +57,7 @@ void logDebug(QtMsgType type, const char* msg)
         }
         //QString ps(QLatin1String("\n") + s + QLatin1String("--- DEBUG LOG OPENED ---\n"));
         QString ps(QDateTime::currentDateTime().toString("yyyy.MM.dd ") + QLatin1String("\n") + s + QLatin1String("--- DEBUG LOG OPENED ---\n"));
-        file->write(ps.toAscii());
+        file->write(ps.toLatin1());
     }
 
     switch (type) {
@@ -81,7 +81,7 @@ void logDebug(QtMsgType type, const char* msg)
     s += msg;
     s += QLatin1String("\n");
 
-    file->write(s.toAscii());
+    file->write(s.toLatin1());
     file->flush();
 
     if (type == QtFatalMsg) {

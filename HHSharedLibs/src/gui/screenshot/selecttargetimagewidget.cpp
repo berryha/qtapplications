@@ -251,7 +251,7 @@ void SelectTargetImageWidget::saveScreenshot()
                                                     tr("%1 Files (*.%2);;All Files (*)").arg(format.toUpper()).arg(format));
 
     if (!fileName.isEmpty()){
-        if(!m_resultImage.save(fileName, format.toAscii())){
+        if(!m_resultImage.save(fileName, format.toLatin1())){
             QMessageBox::critical(this, tr("Error"), tr("Can not save image!"));
         }
     }

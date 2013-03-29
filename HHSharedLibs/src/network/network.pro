@@ -10,7 +10,8 @@ TARGET = $${LIB_NAME}
 
 # VERSION = 2009.09.08.1055
 QT += core \
-    network
+    network \
+    concurrent
 QT -= gui
 
 # include config file
@@ -30,38 +31,38 @@ DEFINES += NETWORK_LIBRARY_EXPORT
 # RCC_DIR = ./tmp
 # Input
 HEADERS += \
-    rudp/rudppacket.h \
-    rudp/rudp_global.h \
-    rudp/rudpchannel.h \
-    rudp/rudppacketstreamoperator.h \
+#    rudp/rudpsocket.h \
+#    rudp/rudppacket.h \
+#    rudp/rudp_global.h \
+#    rudp/rudpchannel.h \
+#    rudp/rudppacketstreamoperator.h \
+#    packethandler/packetparserbase.h \
+#    networkmanagerbase.h \
     packethandler/packetstreamoperator.h \
     udp/udpsocket.h \
     udp/multicast/ipmulticast.h \
     udp/multicast/ipmulticastsocketbase.h \
-    packethandler/packetparserbase.h \
     packethandler/packet.h \
     packethandler/packethandlerbase.h \
     networkutilities.h \
     global_network.h \
-    networkmanagerbase.h \
-    rudp/rudpsocket.h \
     networklib.h \
     tcp/tcpbase.h
 
 FORMS += 
 SOURCES += \
-    rudp/rudppacket.cpp \
-    rudp/rudpchannel.cpp \
-    rudp/rudppacketstreamoperator.cpp \
+#    rudp/rudpsocket.cpp \
+#    rudp/rudppacket.cpp \
+#    rudp/rudpchannel.cpp \
+#    rudp/rudppacketstreamoperator.cpp \
+#    packethandler/packetparserbase.cpp \
+#    networkmanagerbase.cpp \
     udp/udpsocket.cpp \
     udp/multicast/ipmulticastsocketbase.cpp \
-    packethandler/packetparserbase.cpp \
     packethandler/packet.cpp \
     packethandler/packethandlerbase.cpp \
     networkutilities.cpp \
-    networkmanagerbase.cpp \
     packethandler/packetstreamoperator.cpp \
-    rudp/rudpsocket.cpp \
     tcp/tcpbase.cpp
 
 #win32 {

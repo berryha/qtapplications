@@ -31,6 +31,7 @@
 
 
 #include <QCoreApplication>
+#include <QDataStream>
 #include <QDebug>
 
 #include "packetparserbase.h"

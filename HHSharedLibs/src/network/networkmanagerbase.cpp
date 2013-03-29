@@ -57,7 +57,7 @@ NetworkManagerBase::NetworkManagerBase(PacketHandlerBase *packetHandlerBase, Net
     //Q_ASSERT_X(m_packetHandlerBase, "NetworkManagerBase::NetworkManagerBase(...)", "Invalid PacketHandlerBase!");
 
 
-    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+//    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
     qRegisterMetaType<QHostAddress>("QHostAddress");
 
     m_errorString = "";

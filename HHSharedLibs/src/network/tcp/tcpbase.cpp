@@ -1,5 +1,6 @@
 
 #include <QtConcurrentRun>
+#include <QDataStream>
 
 #include "tcpbase.h"
 
