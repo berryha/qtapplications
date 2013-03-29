@@ -10,18 +10,19 @@ TARGET = $${LIB_NAME}
 
 # VERSION = 2009.09.08.1055
 QT += core \
-    network
+    network \
+    concurrent
 QT -= gui
 
 # include config file
 include( ../buildlib_config.pri )
 #UDT
-include( ./udt/build_with_udt.pri )
+#include( ./udt/build_with_udt.pri )
+include( ./build_with_udt.pri )
 
 DEFINES += UDT_LIBRARY_EXPORT
 
 INCLUDEPATH += . \
-    UI_DIR \
     ./udt \
     ./udt/src
 DEPENDPATH += $${INCLUDEPATH}
