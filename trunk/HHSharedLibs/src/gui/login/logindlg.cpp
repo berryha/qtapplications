@@ -2,6 +2,7 @@
 #include <QtSql>
 #include <QSqlQueryModel>
 #include <QFileInfo>
+#include <QInputDialog>
 
 #include "logindlg.h"
 //#include "../../shared/core/settings.h"

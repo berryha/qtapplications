@@ -46,7 +46,7 @@
 #include "shared/abstractexpandlistviewInterface.h"
 #include "expandlistviewmanager.h"
 
-#include <QtGui/QListWidget>
+#include <QListWidget>
 #include <QtCore/QList>
 
 QT_BEGIN_NAMESPACE

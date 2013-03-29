@@ -12,6 +12,8 @@ TARGET = $${LIB_NAME}
 # ##
 QT += core \
     gui \
+    widgets \
+    printsupport \
     sql \
     xml
 

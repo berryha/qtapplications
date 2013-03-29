@@ -32,6 +32,7 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QtWidgets>
 
 #include "../../core/plugin/abstractplugininterface.h"
 #include "../guilib.h"

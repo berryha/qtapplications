@@ -44,8 +44,8 @@
 
 
 #include <QtCore/QMetaType>
-#include <QtGui/QWidget>
-#include <QtGui/QIcon>
+#include <QWidget>
+#include <QIcon>
 
 
 

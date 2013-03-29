@@ -51,11 +51,11 @@
 #include "shared/abstractexpandlistviewInterface.h"
 //#include <shared/filterwidget_p.h>
 
-#include <QtGui/QDropEvent>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QApplication>
-#include <QtGui/QToolBar>
-#include <QtGui/QIcon>
+#include <QDropEvent>
+#include <QVBoxLayout>
+#include <QApplication>
+#include <QToolBar>
+#include <QIcon>
 #include <QAction>
 #include <QMessageBox>
 

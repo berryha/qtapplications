@@ -61,8 +61,8 @@ public:
 
 
 protected:
-    void languageChange() = 0;
-    void closeEvent ( QCloseEvent * event ) = 0;
+    virtual void languageChange() = 0;
+    virtual void closeEvent ( QCloseEvent * event ) = 0;
 
 private:
 

@@ -28,8 +28,9 @@
  */
 
 
-#include <QtCore>
-#include <QtGui>
+#include <QWidget>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QDebug>
 #include <QKeyEvent>
 

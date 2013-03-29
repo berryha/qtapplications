@@ -30,7 +30,7 @@ static void closeDebugLog()
     file = 0;
 }
 
-void logDebug(QtMsgType type, const char* msg)
+void logDebug(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     static QMutex mutex;
     QMutexLocker locker(&mutex);
@@ -57,37 +57,38 @@ void logDebug(QtMsgType type, const char* msg)
         }
         //QString ps(QLatin1String("\n") + s + QLatin1String("--- DEBUG LOG OPENED ---\n"));
         QString ps(QDateTime::currentDateTime().toString("yyyy.MM.dd ") + QLatin1String("\n") + s + QLatin1String("--- DEBUG LOG OPENED ---\n"));
-        file->write(ps.toLatin1());
+        file->write(ps.toUtf8());
     }
 
+
+    //QByteArray localMsg = msg.toUtf8();
     switch (type) {
+    case QtDebugMsg:
+        //fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        s += QString("Debug: %1 (%2:%3, %4)\n").arg(msg).arg(context.file).arg(context.line).arg(context.function);
+        break;
     case QtWarningMsg:
-        s += QLatin1String("WARNING: ");
+        //fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        s += QString("Warning: %1 (%2:%3, %4)\n").arg(msg).arg(context.file).arg(context.line).arg(context.function);
         break;
     case QtCriticalMsg:
-        s += QLatin1String("CRITICAL: ");
+        //fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        s += QString("Critical: %1 (%2:%3, %4)\n").arg(msg).arg(context.file).arg(context.line).arg(context.function);
         break;
     case QtFatalMsg:
-        s+= QLatin1String("FATAL: ");
-        break;
-    case QtDebugMsg:
-        s += QLatin1String("DEBUG: ");
-        break;
-    default:
-        // Nothing
-        break;
+        //fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        s += QString("Fatal: %1 (%2:%3, %4)\n").arg(msg).arg(context.file).arg(context.line).arg(context.function);
+        //abort();
     }
 
-    s += msg;
-    s += QLatin1String("\n");
-
-    file->write(s.toLatin1());
+    file->write(s.toUtf8());
     file->flush();
 
     if (type == QtFatalMsg) {
         closeDebugLog();
-        exit(1);
+        abort();
     }
+
 }
 
 //#endif

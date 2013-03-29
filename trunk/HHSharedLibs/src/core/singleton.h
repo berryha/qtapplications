@@ -27,6 +27,7 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
+#include <QObject>
 #include <QHash>
 #include <QMetaObject>
 
