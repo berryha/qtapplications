@@ -124,7 +124,7 @@ private:
 
 } //namespace HEHUI
 
-Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
+//Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 
 
 #endif /* NETWORKMANAGERBASE_H_ */

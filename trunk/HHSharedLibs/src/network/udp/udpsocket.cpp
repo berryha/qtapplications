@@ -30,6 +30,7 @@
 
 
 #include <QUdpSocket>
+#include <QDataStream>
 #include <QDebug>
 
 #include "udpsocket.h"
