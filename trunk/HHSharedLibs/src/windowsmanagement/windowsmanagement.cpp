@@ -40,7 +40,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QImage>
-#include <QDesktopServices>
+#include <QStandardPaths>
 
 #include <QDebug>
 
@@ -3409,7 +3409,7 @@ bool WindowsManagement::setDeskWallpaper(const QString &wallpaperPath){
     //        QString(QDir::rootPath() + "windows").toWCharArray(windowsDir);
     //    }
     //    QString targetDirPath = QString::fromWCharArray(windowsDir) ;
-    QString targetDirPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QString targetDirPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     if(!QDir(targetDirPath).exists()){
         targetDirPath = QDir::homePath();
     }
