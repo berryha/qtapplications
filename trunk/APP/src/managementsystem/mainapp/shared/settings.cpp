@@ -1,6 +1,5 @@
 #include <QDir>
 #include <QFile>
-#include <QMainWindow>
 
 #include "settings.h"
 

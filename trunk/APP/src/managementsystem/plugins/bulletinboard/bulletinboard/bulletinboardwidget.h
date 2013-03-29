@@ -1,7 +1,7 @@
 #ifndef BULLETINBOARD_H
 #define BULLETINBOARD_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QCloseEvent>
 #include <QMenu>
 

@@ -37,7 +37,7 @@
 #define SETTINGSDIALOG_H
 
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "ui_settingsdialog.h"
 
 #ifdef Q_OS_WIN32

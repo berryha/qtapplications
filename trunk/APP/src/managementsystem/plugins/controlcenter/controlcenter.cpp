@@ -1,7 +1,7 @@
 
 
 
-
+#include <QObject>
 #include <QtSql>
 #include <QString>
 #include <QDir>
@@ -319,7 +319,7 @@ void ControlCenter::slotInitTabWidget(){
     connect(ui.tabWidget, SIGNAL(currentChanged(int)),
             this, SLOT(slotTabPageChanged()));
 
-    QTabBar *tabBar = qFindChild<QTabBar*>(ui.tabWidget);
+    QTabBar *tabBar = ui.tabWidget->tabBar();
     QStyleOptionTab opt;
     if (tabBar) {
         opt.init(tabBar);

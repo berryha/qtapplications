@@ -1,8 +1,8 @@
 
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QLabel>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QLabel>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 

@@ -1,7 +1,7 @@
 #ifndef RUDPWidget_H
 #define RUDPWidget_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ui_rudp.h"
 

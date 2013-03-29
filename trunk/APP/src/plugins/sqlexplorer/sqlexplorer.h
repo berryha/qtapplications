@@ -1,7 +1,7 @@
 #ifndef SQLEXPLORER_H
 #define SQLEXPLORER_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 //#include "../ui/ui_sqlexplorer.h"
 #include "ui_sqlexplorer.h"
 

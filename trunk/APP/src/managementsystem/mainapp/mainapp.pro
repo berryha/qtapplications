@@ -3,6 +3,7 @@ TARGET = ms
 TEMPLATE = app
 QT += core \
     gui \
+    widgets \
     sql
 
 # include config file

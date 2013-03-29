@@ -1,8 +1,8 @@
 #ifndef SYSTEMISUMMARYNFO_H
 #define SYSTEMISUMMARYNFO_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QMainWindow>
+#include <QWidget>
+#include <QMainWindow>
 #include <QLabel>
 #include <QProgressBar>
 #include <QSqlQueryModel>

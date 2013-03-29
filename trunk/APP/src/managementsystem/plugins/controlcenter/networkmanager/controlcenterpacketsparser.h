@@ -31,7 +31,7 @@
 #define CONTROLCENTERPACKETSPARSER_H_
 
 
-
+#include <QDataStream>
 #include <QHostAddress>
 #include <QDebug>
 

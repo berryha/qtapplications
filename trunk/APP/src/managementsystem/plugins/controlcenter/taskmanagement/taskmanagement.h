@@ -1,7 +1,7 @@
 #ifndef TASKMANAGEMENT_H
 #define TASKMANAGEMENT_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_taskmanagement.h"
 
 class TaskManagement : public QWidget

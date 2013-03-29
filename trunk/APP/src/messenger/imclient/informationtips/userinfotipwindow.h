@@ -1,7 +1,7 @@
 #ifndef USERINFOTIPWINDOW_H
 #define USERINFOTIPWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "ui_userinfotipwindow.h"
 
 

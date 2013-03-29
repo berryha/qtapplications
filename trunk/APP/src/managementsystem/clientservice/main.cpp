@@ -1,8 +1,8 @@
 
 
-//#include <QtGui/QApplication>
-//#include <QtGui/QDesktopWidget>
-//#include <QtGui/QLabel>
+//#include <QApplication>
+//#include <QDesktopWidget>
+//#include <QLabel>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 
@@ -32,11 +32,11 @@ int main(int argc, char **argv)
     cout<<qPrintable(QString(APP_NAME) + " Build " + QString(APP_VERSION))<<endl<<endl;
 
     //reset the message handler
-    qInstallMsgHandler(0);
+    qInstallMessageHandler(0);
 
     for(int i = 0; i < argc; i++){
         if(QString(argv[i]).toLower() == "-log"){
-            qInstallMsgHandler(logDebug);
+            qInstallMessageHandler(logDebug);
             qAddPostRoutine(closeDebugLog);
         }else if(QString(argv[i]).toLower() == "-setwallpaper"){
             QString imagePath = "";

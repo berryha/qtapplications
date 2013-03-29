@@ -34,7 +34,7 @@
 #ifndef MODIFYUSERINFODIALOG_H
 #define MODIFYUSERINFODIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "ui_modifyuserinfodialog.h"
 
 

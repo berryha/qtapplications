@@ -1,7 +1,7 @@
 #ifndef LOGINWIDGET_H
 #define LOGINWIDGET_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QSqlError>
 #include <QDialog>
 #include <QMessageBox>

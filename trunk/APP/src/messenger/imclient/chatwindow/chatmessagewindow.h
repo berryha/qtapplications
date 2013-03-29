@@ -2,7 +2,7 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "../ui/ui_chatmessagewindow.h"
 #include "./emoticonselecter/emoticonselector.h"
 #include "../contactsmanager/contact.h"

@@ -1,7 +1,7 @@
 #ifndef TCPPWidget_H
 #define TCPPWidget_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ui_tcpwidget.h"
 

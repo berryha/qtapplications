@@ -31,7 +31,7 @@
 #define CLIENTPACKETSPARSER_H_
 
 
-
+#include <QDataStream>
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QDebug>
