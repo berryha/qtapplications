@@ -6,28 +6,40 @@
  */
 
 
+
+
+
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QtConcurrentRun>
 #include <QDebug>
 #include <QFile>
+#include <QDateTime>
+
+
+#ifdef Q_OS_WIN32
+//if compiling on VC6.0 or pre-WindowsXP systems
+//use -DLEGACY_WIN32
+//if compiling with MinGW, UDT only works on XP or above
+//use -D_WIN32_WINNT=0x0501
+    //#include <windows.h>
+    #include <ws2tcpip.h>
+    #include <winsock2.h>
+    #ifdef LEGACY_WIN32
+        #include <wspiapi.h>
+    #endif
+#else
+    #include <unistd.h>
+    #include <cstdlib>
+    #include <cstring>
+    #include <netdb.h>
+#endif
+
 
 #include "udtprotocolbase.h"
 
 
-//#ifndef Q_OS_WIN32
-//   #include <unistd.h>
-//   #include <cstdlib>
-//   #include <cstring>
-//   #include <netdb.h>
-//#else
-//   #include <windows.h>
-//   #include <winsock2.h>
-//   #include <ws2tcpip.h>
-//    //#ifdef LEGACY_WIN32
-//     //   #include <wspiapi.h>
-//    //#endif
-//#endif
+
 
 //#ifdef Q_CC_MSVC
 //#include <windows.h>
@@ -40,7 +52,7 @@
 //#endif
 
 
-#include <QDateTime>
+
 
 namespace HEHUI {
 
@@ -1145,7 +1157,7 @@ void UDTProtocolBase::setSocketOptions(UDTSOCKET socket, SocketOptions *options)
     UDT::setsockopt(socket, 0, UDT_RCVBUF, &(opts->UDT_RCVBUF), sizeof(int));
     UDT::setsockopt(socket, 0, UDP_SNDBUF, &(opts->UDP_SNDBUF), sizeof(int));
     UDT::setsockopt(socket, 0, UDP_RCVBUF, &(opts->UDP_RCVBUF), sizeof(int));
-    UDT::setsockopt(socket, 0, UDT_LINGER, &(opts->UDT_LINGER), sizeof(linger));
+    //UDT::setsockopt(socket, 0, UDT_LINGER, &(opts->UDT_LINGER), sizeof(linger));
     UDT::setsockopt(socket, 0, UDT_RENDEZVOUS, &(opts->UDT_RENDEZVOUS), sizeof(bool));
     UDT::setsockopt(socket, 0, UDT_SNDTIMEO, &(opts->UDT_SNDTIMEO), sizeof(int));
     UDT::setsockopt(socket, 0, UDT_RCVTIMEO, &(opts->UDT_RCVTIMEO), sizeof(int));

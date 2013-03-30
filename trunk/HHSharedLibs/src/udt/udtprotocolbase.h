@@ -14,23 +14,23 @@
 
 
 
-#ifdef Q_OS_WIN32
-//if compiling on VC6.0 or pre-WindowsXP systems
-//use -DLEGACY_WIN32
-//if compiling with MinGW, UDT only works on XP or above
-//use -D_WIN32_WINNT=0x0501
-    //#include <windows.h>
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
-    #ifdef LEGACY_WIN32
-        #include <wspiapi.h>
-    #endif
-#else
-    #include <unistd.h>
-    #include <cstdlib>
-    #include <cstring>
-    #include <netdb.h>
-#endif
+//#ifdef Q_OS_WIN32
+////if compiling on VC6.0 or pre-WindowsXP systems
+////use -DLEGACY_WIN32
+////if compiling with MinGW, UDT only works on XP or above
+////use -D_WIN32_WINNT=0x0501
+//    //#include <windows.h>
+//    #include <ws2tcpip.h>
+//    #include <winsock2.h>
+//    #ifdef LEGACY_WIN32
+//        #include <wspiapi.h>
+//    #endif
+//#else
+//    #include <unistd.h>
+//    #include <cstdlib>
+//    #include <cstring>
+//    #include <netdb.h>
+//#endif
 
 #ifndef MIN_THREAD_COUNT
 #define MIN_THREAD_COUNT 10
@@ -83,7 +83,7 @@ public:
             UDP_SNDBUF = 1024000; //UDT Default:1M
             UDP_RCVBUF = 1024000;
 
-            UDT_LINGER.l_linger = 180;
+            //UDT_LINGER.l_linger = 180;
             UDT_RENDEZVOUS = false;
 
             UDT_SNDTIMEO = 1000; //UDT Default:-1
@@ -108,7 +108,7 @@ public:
         int UDP_SNDBUF;
         int UDP_RCVBUF;
 
-        linger UDT_LINGER;
+        //linger UDT_LINGER;
         bool UDT_RENDEZVOUS;
 
         int UDT_SNDTIMEO;
