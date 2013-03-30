@@ -344,7 +344,7 @@ void BulletinBoardPlugin::sloSystemSummaryInfoWidgetDestoryed(QObject * obj){
 
 
 
-Q_EXPORT_PLUGIN2(bulletinBoardPlugin, BulletinBoardPlugin)
+//Q_EXPORT_PLUGIN2(bulletinBoardPlugin, BulletinBoardPlugin)
 
 
 } //namespace HEHUI

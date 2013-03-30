@@ -2,6 +2,7 @@
 #define HIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
+#include <QTextEdit>
 
 class Highlighter : public QSyntaxHighlighter
 {

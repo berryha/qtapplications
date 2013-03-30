@@ -201,6 +201,6 @@ void UserManagerPlugin::slotUserManagerWidgetDestoryed(QObject *obj){
 
 
 
-Q_EXPORT_PLUGIN2(userManagerPlugin, UserManagerPlugin)
+//Q_EXPORT_PLUGIN2(userManagerPlugin, UserManagerPlugin)
 
 } //namespace HEHUI

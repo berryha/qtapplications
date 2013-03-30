@@ -1,4 +1,4 @@
-#include <QtGui>
+
 #include <QFile>
 #include <QCompleter>
 #include <QKeyEvent>
@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QModelIndex>
 #include <QAbstractItemModel>
+#include <QAbstractItemView>
 #include <QScrollBar>
 #include <QTextCursor>
 

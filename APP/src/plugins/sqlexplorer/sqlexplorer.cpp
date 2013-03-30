@@ -1,4 +1,4 @@
-#include <QtGui>
+#include <QtWidgets>
 #include <QtSql>
 
 #include "sqlexplorer.h"
@@ -57,7 +57,8 @@ void SqlExplorer::initUI(){
     connect(ui.tabWidget, SIGNAL(currentChanged(int)),
             this, SLOT(slotTabPageChanged()));
 
-    QTabBar *tabBar = qFindChild<QTabBar*>(ui.tabWidget);
+    //QTabBar *tabBar = qFindChild<QTabBar*>(ui.tabWidget);
+    QTabBar *tabBar = ui.tabWidget->tabBar();
     QStyleOptionTab opt;
     if (tabBar) {
         opt.init(tabBar);

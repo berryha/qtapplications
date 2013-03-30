@@ -1,6 +1,5 @@
 ﻿
  #include <QtCore>
-//#include <QWidget>
 #include <QDebug>
 
 #include <QHostInfo>

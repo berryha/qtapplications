@@ -6,8 +6,10 @@ TARGET = bulletinboard
 # VERSION = 2009.09.08.1055
 QT += core \
     gui \
+    widgets \
     sql \
-    network
+    network \
+    concurrent
 
 # include config file
 include( ../../config.pri )

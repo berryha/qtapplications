@@ -20,7 +20,7 @@
 #include "HHSharedService/hservice.h"
 #include "HHSharedCore/hdatabaseutility.h"
 
-#include "HHSharedUDT/hudtprotocolforfiletransmission.h"
+//#include "HHSharedUDT/hudtprotocolforfiletransmission.h"
 
 #ifdef Q_OS_WIN32
     #include "HHSharedWindowsManagement/hwindowsmanagement.h"
