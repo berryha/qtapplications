@@ -188,7 +188,7 @@ void ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj){
 }
 
 
-Q_EXPORT_PLUGIN2(controlCenterPlugin, ControlCenterPlugin);
+//Q_EXPORT_PLUGIN2(controlCenterPlugin, ControlCenterPlugin);
 
 
 } //namespace HEHUI

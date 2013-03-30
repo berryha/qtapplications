@@ -42,6 +42,7 @@
 #include <QInputDialog>
 #include <QToolTip>
 #include <QMenu>
+#include <QtConcurrent>
 
 
 

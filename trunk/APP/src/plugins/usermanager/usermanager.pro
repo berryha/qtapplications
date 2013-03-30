@@ -6,6 +6,8 @@ TARGET = usermanager
 # VERSION = 2009.09.08.1055
 QT += core \
     gui \
+    widgets \
+    concurrent \
     sql
 
 # include config file

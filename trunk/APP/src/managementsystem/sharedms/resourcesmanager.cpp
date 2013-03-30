@@ -1,4 +1,4 @@
-/*
+﻿/*
  * networkmanager.cpp
  *
  *  Created on: 2010-7-21

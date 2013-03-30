@@ -194,7 +194,7 @@ void SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj){
 }
 
 
-Q_EXPORT_PLUGIN2(systemInfoPlugin, SystemInfoPlugin)
+//Q_EXPORT_PLUGIN2(systemInfoPlugin, SystemInfoPlugin)
 
 
 } //namespace HEHUI

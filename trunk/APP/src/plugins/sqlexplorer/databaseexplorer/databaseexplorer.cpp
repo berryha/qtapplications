@@ -1,6 +1,7 @@
-#include <QtGui>
+
 #include <QtSql>
 #include <QtDebug>
+#include <QMenu>
 
 
 #include "databaseexplorer.h"
@@ -26,7 +27,7 @@ void DatabaseExplorer::languageChange()
 void DatabaseExplorer::initUI(){
 	ui.databaseList->setUniformRowHeights(true);
 	ui.databaseList->header()->setStretchLastSection(false);
-	ui.databaseList->header()->setResizeMode(QHeaderView::ResizeToContents);
+    ui.databaseList->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui.databaseList->setItemHidden(ui.databaseList->headerItem(), true);
 
 //        itemPopupMenu = new QMenu(this);

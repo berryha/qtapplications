@@ -31,7 +31,7 @@
 #define BULLETINBOARDPACKETSPARSER_H_
 
 
-
+#include <QDataStream>
 #include <QHostAddress>
 #include <QDebug>
 

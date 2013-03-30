@@ -3,8 +3,8 @@ TEMPLATE = app
 CONFIG += qt \
     console
 QT += core \
-    sql \
-    network
+    network \
+    sql
 QT -= gui
 
 # include config file
@@ -38,6 +38,7 @@ HEADERS += \
     packetmanager/clientpacketsparser.h \
     clientservice/clientservice.h \
     clientresourcesmanager.h
+
 
 
 # win32:RC_FILE = iconresource.rc

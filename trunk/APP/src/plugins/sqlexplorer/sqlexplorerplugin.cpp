@@ -185,7 +185,7 @@ void SqlExplorerPlugin::slotSqlExplorerWidgetDestoryed(QObject * obj){
 
 
 
-Q_EXPORT_PLUGIN2(sqlExplorerPlugin, SqlExplorerPlugin)
+//Q_EXPORT_PLUGIN2(sqlExplorerPlugin, SqlExplorerPlugin)
 
 
 } //namespace HEHUI {

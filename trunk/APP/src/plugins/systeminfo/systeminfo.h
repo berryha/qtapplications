@@ -1,6 +1,7 @@
 #ifndef SYSINFODLG_H
 #define SYSINFODLG_H
 
+
 #include <QMainWindow>
 #include <QProcess>
 #include <QProgressBar>

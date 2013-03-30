@@ -1,6 +1,8 @@
 
-#include <QtGui>
- #include <QObject>
+#include <QtWidgets>
+#include <QObject>
+
+
 #include "sqlconsole.h"
 
 //#include "mainwindow.h"

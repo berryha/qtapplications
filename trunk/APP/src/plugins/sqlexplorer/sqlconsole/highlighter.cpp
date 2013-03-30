@@ -1,6 +1,6 @@
 
 
-
+#include <QTextEdit>
 #include <QFile>
 #include <QApplication>
 #include "highlighter.h"
