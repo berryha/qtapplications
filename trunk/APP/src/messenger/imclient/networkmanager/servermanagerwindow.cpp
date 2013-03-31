@@ -48,7 +48,7 @@ ServerManagerWindow::ServerManagerWindow(QWidget *parent)
 
     model = new ServerInfoModel(this);
     ui.tableViewServers->setModel(model);
-    ui.tableViewServers->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    ui.tableViewServers->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     connect(ui.tableViewServers, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotServerSelected(const QModelIndex &)));
 
 

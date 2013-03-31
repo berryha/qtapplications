@@ -1,5 +1,5 @@
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QtSql>
 #include <QSqlQueryModel>
 #include <QFileInfo>

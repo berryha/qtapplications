@@ -7,7 +7,8 @@ QT += core \
     sql \
     network \
     xml \
-    webkit
+    webkit \
+    webkitwidgets
 
 # include config file
 include( ../config.pri )
