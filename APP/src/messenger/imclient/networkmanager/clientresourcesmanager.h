@@ -26,8 +26,8 @@ class ClientResourcesManager: public ResourcesManager, public Singleton<ClientRe
     friend class Singleton<ClientResourcesManager> ;
 
 public:
-
-    ClientResourcesManager(NetworkType type = LAN, CommunicationMode mode = P2P, QObject *parent = 0);
+    ClientResourcesManager(QObject *parent = 0);
+//    ClientResourcesManager(NetworkType type, CommunicationMode mode, QObject *parent);
     virtual ~ClientResourcesManager();
 
 

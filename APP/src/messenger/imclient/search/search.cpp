@@ -44,7 +44,7 @@ Search::Search(QWidget *parent)
         
         userInfoModel = new UserInfoModel(this);
         ui.tableViewUsersResult->setModel(userInfoModel);
-        ui.tableViewUsersResult->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+        ui.tableViewUsersResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
         
         
         connect(ui.tableViewUsersResult, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotUserSelected(const QModelIndex &)));

@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
     for(int i = 0; i < argc; i++){
         if(QString(argv[i]).toLower() == "-log"){
-            qInstallMsgHandler(logDebug);
+            qInstallMessageHandler(logDebug);
             qAddPostRoutine(closeDebugLog);
         }
     }

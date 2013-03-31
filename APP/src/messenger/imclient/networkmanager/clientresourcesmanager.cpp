@@ -22,15 +22,21 @@
 
 namespace HEHUI {
 
-
-ClientResourcesManager::ClientResourcesManager(NetworkType type, CommunicationMode mode, QObject *parent)
-    :ResourcesManager(parent)//, mainWindow(mainWindow)
+ClientResourcesManager::ClientResourcesManager(QObject *parent)
+    :ResourcesManager(parent)
 {
-
-    setNetworkType(type);
-    setCommunicationMode(mode);
-
+    setNetworkType(LAN);
+    setCommunicationMode(P2P);
 }
+
+//ClientResourcesManager::ClientResourcesManager(NetworkType type, CommunicationMode mode, QObject *parent)
+//    :ResourcesManager(parent)//, mainWindow(mainWindow)
+//{
+
+//    setNetworkType(type);
+//    setCommunicationMode(mode);
+
+//}
 
 ClientResourcesManager::~ClientResourcesManager() {
     // TODO Auto-generated destructor stub
