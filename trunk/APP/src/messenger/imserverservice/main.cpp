@@ -1,8 +1,6 @@
 
 
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QLabel>
+#include <QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
     }
 
     if(arguments.contains("-log", Qt::CaseInsensitive)){
-        qInstallMsgHandler(logDebug);
+        qInstallMessageHandler(logDebug);
         qAddPostRoutine(closeDebugLog);
     }
 
@@ -235,7 +233,7 @@ int main(int argc, char **argv)
     }
 
     //reset the message handler     
-    qInstallMsgHandler(0);   
+    qInstallMessageHandler(0);
 
     return service.exec();
 }
