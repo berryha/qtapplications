@@ -1,4 +1,5 @@
 
+#include <QDataStream>
 #include <QDebug>
 
 #include "udtprotocol.h"

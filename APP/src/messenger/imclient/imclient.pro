@@ -3,6 +3,7 @@ TEMPLATE = app
 TARGET = messenger
 QT += core \
     gui \
+    widgets \
     sql \
     network \
     xml \

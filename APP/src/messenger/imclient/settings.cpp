@@ -130,7 +130,6 @@ QString Settings::getUserPrivateDataFilePath(const QString &userID) const
 
 void Settings::setRecentUser(const QString &userName){
     setValue("MainWindow/RecentUser", userName);
-
 }
 
 QString Settings::getRecentUser() const{

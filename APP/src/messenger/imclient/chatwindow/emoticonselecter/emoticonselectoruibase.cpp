@@ -74,7 +74,7 @@ EmoticonSelectorUIBase::EmoticonSelectorUIBase( QWidget* parent, const QString &
    // addFaceToolButton->setPalette(palette);
     //addFaceToolButton->setPalette(foregroundPalette);
 
-    addFaceToolButton->setAutoRaise( TRUE );
+    addFaceToolButton->setAutoRaise( true );
     bottomHBoxLayout->addWidget( addFaceToolButton );
 
    // useShortcutCheckBox = new QCheckBox( this, "useShortcutCheckBox" );
