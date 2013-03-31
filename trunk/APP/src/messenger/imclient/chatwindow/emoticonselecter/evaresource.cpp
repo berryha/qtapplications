@@ -32,7 +32,6 @@
 //#include "evauser.h"
 
 #include <qapplication.h>
-#include <qhttp.h>
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qdatastream.h>
