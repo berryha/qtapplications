@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include <QtWebKit>
+#include <QtWebKitWidgets>
 
 #include "./chatmessagewindow.h"
 #include "../contactsmanager/contact.h"
@@ -570,7 +571,7 @@ void ChatMessageWindow::screenshotDone(const QImage &image){
     QString format = "png";
     QString fileName = imageCachePath + QString("/Screenshot%1.%2").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss")).arg(format);
 
-    if(!img.save(fileName, format.toAscii())){
+    if(!img.save(fileName, format.toLatin1())){
         qWarning()<<"Save Image Failed!";
         return;
     }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * contactsmanager.h
  *
  *  Created on: 2009-9-12
@@ -102,7 +102,7 @@ public slots:
         bool moveContact(const QString &contactID, int oldGroupID, int newGroupID);
 
 
-	//联系人在线状态改变
+        //联系人在线状态改变
         void slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo);
 
         bool slotAddNewContactToDatabase(Contact *contact);
