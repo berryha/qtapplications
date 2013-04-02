@@ -104,7 +104,7 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
 
     if (pluginsHash.contains(pluginFilePath)) {
         error = tr("Plugin '%1' has already been loaded!").arg(pluginFilePath);
-        qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
+        qCritical()<<"ERROR! "<<error;
         if(errorString){
             *errorString = error;
         }
