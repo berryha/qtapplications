@@ -52,8 +52,14 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     //showMinimized();
 
 
-//    expandListViewManager = 0;
-//    friendsListView = 0;
+
+    chatWindowManager = 0;
+    expandListViewManager = 0;
+    friendsListView = 0;
+    m_userInfoTipWindow = 0;
+
+
+
 
     //初始化UI
     //Init the UI
@@ -75,16 +81,12 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     loadPlugins();
 
-    imUser = IMUser::instance();
-    stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
-
 
 
     contactsManager = ContactsManager::instance();
 
-    chatWindowManager = ChatWindowManager::instance();
-
-
+    imUser = IMUser::instance();
+    stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
 
 
 
@@ -107,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 */
 
 
+
     m_packetHandler = 0;
     m_resourcesManager = 0;
     clientPacketsParser = 0;
@@ -123,8 +126,6 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     autoShowSystemMessage = false;
     autoShowChatMessageFromContact = false;
 
-    m_userInfoTipWindow = new UserInfoTipWindow(this);
-    connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
 
     //m_ContactInfoWidget = new ContactInfoWidget(this);
@@ -261,9 +262,13 @@ void MainWindow::initUI(){
     //changeStyle(Settings::instance()->getStyle());
 
 
+    chatWindowManager = ChatWindowManager::instance();
+
     //
     //if(!expandListViewManager){
+
         expandListViewManager = new ExpandListViewManager(this);
+        qDebug()<<"--------------chatWindowManager:"<<chatWindowManager;
         connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
         connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
         connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
@@ -274,6 +279,9 @@ void MainWindow::initUI(){
         ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
     //}
 
+
+        m_userInfoTipWindow = new UserInfoTipWindow(this);
+        connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
 
 

@@ -30,33 +30,33 @@ public:
     ~ChatWindowManager();
 
 protected:
-	void closeEvent(QCloseEvent *);
+    void closeEvent(QCloseEvent *);
 
 signals:
-        void signalSendChatMessageToCantact(Contact *contact, const QString &message, const QStringList &imageList);
-        void signalSendChatMessageToInterestGroup(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
+    void signalSendChatMessageToCantact(Contact *contact, const QString &message, const QStringList &imageList);
+    void signalSendChatMessageToInterestGroup(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
 
-        void signalChatImageReceived(const QString &imageName);
-        
+    void signalChatImageReceived(const QString &imageName);
+
 public slots:
-        void slotNewChatWithContact(const QString &contactID);
-        void slotNewMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
+    void slotNewChatWithContact(const QString &contactID);
+    void slotNewMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
 
-        void slotNewChatWithInterestGroup(quint32 interestGroupID);
-        void slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
+    void slotNewChatWithInterestGroup(quint32 interestGroupID);
+    void slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
 
- 
+
 private slots:
-        void chatWindowClosed();
-        
+    void chatWindowClosed();
+
 private:
-//	bool isChatWindowOpened(Contact *contact);
+    //	bool isChatWindowOpened(Contact *contact);
 
-        ContactChatWindow *createContactChatWindow(Contact *contact);
-        QMdiSubWindow* findChatWithContactWindow(Contact *contact);
+    ContactChatWindow *createContactChatWindow(Contact *contact);
+    QMdiSubWindow* findChatWithContactWindow(Contact *contact);
 
-        GroupChatWindow* createGroupChatWindow(InterestGroup *group);
-        QMdiSubWindow* findChatWithInterestGroupWindow(InterestGroup *group);
+    GroupChatWindow* createGroupChatWindow(InterestGroup *group);
+    QMdiSubWindow* findChatWithInterestGroupWindow(InterestGroup *group);
 
 
 
@@ -70,5 +70,8 @@ private:
 
 
 };
+
 } //namespace HEHUI
+
+
 #endif // CHATWINDOWMANAGER_H
