@@ -81,37 +81,8 @@ void PluginManager::loadPlugins(const QString &pluginsDirPath) {
     foreach(QString fileName, pluginsDir.entryList(QDir::Files))
     {
         QString absoluteFilePath = pluginsDir.absoluteFilePath(fileName);
+        qDebug()<<"--------------absoluteFilePath:"<<absoluteFilePath;
         loadPlugin(absoluteFilePath);
-
-        //			if (pluginsHash.contains(absoluteFilePath)) {
-        //				qDebug()<<QString("Plugin '%1' has already been loaded!").arg(absoluteFilePath);
-        //				break;
-        //			}
-        //
-        //			qDebug() << QString("~~ Testing library %1").arg(absoluteFilePath);
-        //
-        //			QPluginLoader pluginLoader(absoluteFilePath);
-        //                        QObject *pluginInstance = pluginLoader.instance();
-        //                        if (pluginInstance) {
-        //                                AbstractPluginInterface *plugin = qobject_cast<AbstractPluginInterface *> (
-        //                                                pluginInstance);
-        //                                if (plugin) {
-        //                                        pluginsHash.insert(absoluteFilePath, plugin);
-        //					//corePlugins.append(coreInterface);
-        //                                        qDebug() << QString("~~ Loading Plugin %1").arg(
-        //							fileName);
-        //
-        //				} else {
-        //                                    qCritical() << QString("XX Unknown Plugin: %1").arg(absoluteFilePath);
-        //					break;
-        //				}
-        //
-        //			} else {
-        //				qDebug() << QString(
-        //						"XX An error occurred while loading plugin : %1").arg(
-        //						pluginLoader.errorString());
-        //			}
-
     }
 
 }
@@ -124,7 +95,6 @@ AbstractPluginInterface * PluginManager::loadPlugin(const QString &pluginFilePat
 
     if (!QFileInfo(pluginFilePath).exists()) {
         error = tr("File '%1' does not exist!").arg(pluginFilePath);
-        //qCritical("File '%s' does not exist!", qPrintable(pluginFilePath));
         qCritical()<<"ERROR! An error occurred while loading plugin! "<<error;
         if(errorString){
             *errorString = error;
