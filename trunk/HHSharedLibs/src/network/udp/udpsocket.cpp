@@ -137,7 +137,8 @@ bool UDPSocket::startIPMulticastListening(const QHostAddress &ipMulticastGroupAd
     close();
     listeningState = NotListening;
 
-    bool bound = bind(ipMulticastGroupPort, QUdpSocket::ShareAddress);
+    //bool bound = bind(ipMulticastGroupPort, QUdpSocket::ShareAddress);
+    bool bound = bind(QHostAddress::AnyIPv4, ipMulticastGroupPort, QUdpSocket::ShareAddress);
     if(!bound){
         return bound;
     }
