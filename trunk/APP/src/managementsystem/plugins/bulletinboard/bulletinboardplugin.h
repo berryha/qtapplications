@@ -53,6 +53,10 @@ namespace HEHUI {
 class BulletinBoardPlugin : public GUIPluginBase/*, public QObject*/   {
 	Q_OBJECT
 
+    //Export Plugin
+    Q_PLUGIN_METADATA(IID AbstractPluginInterface_IID)
+    Q_PLUGIN_METADATA(IID GUIInterface_IID)
+
     
 public:
     BulletinBoardPlugin();
