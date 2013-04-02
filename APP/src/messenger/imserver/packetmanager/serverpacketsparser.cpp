@@ -44,7 +44,7 @@ ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *resourcesMana
     Q_ASSERT(resourcesManager);
 
     m_ipmcServer = resourcesManager->getIPMCServer();
-    Q_ASSERT_X(m_ipmcServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid UDPServer!");
+    Q_ASSERT_X(m_ipmcServer, "ClientPacketsParser::ClientPacketsParser(...)", "Invalid IP MC Server!");
     connect(m_ipmcServer, SIGNAL(signalNewUDPPacketReceived(Packet*)), this, SLOT(parseIncomingPacketData(Packet*)), Qt::QueuedConnection);
 
 

@@ -45,7 +45,7 @@ public slots:
         void slotNewChatWithInterestGroup(quint32 interestGroupID);
         void slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
 
-
+ 
 private slots:
         void chatWindowClosed();
         

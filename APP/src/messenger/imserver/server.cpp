@@ -123,7 +123,7 @@ bool Server::startMainService(){
     m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), &errorMessage);
     if(!m_udpServer){
         qCritical()<<QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT).arg(errorMessage);
-        m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IM_SERVER_IPMC_LISTENING_PORT), true, &errorMessage);
+        m_udpServer = resourcesManager->startUDPServer(QHostAddress::AnyIPv4, quint16(IM_SERVER_IPMC_LISTENING_PORT), true, &errorMessage);
     }else{
         qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
     }

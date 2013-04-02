@@ -46,7 +46,10 @@ namespace HEHUI {
 
 class SystemInfoPlugin : public GUIPluginBase/*, public QObject*/   {
 	Q_OBJECT
-	//Q_INTERFACES(AppInterface)
+
+    //Export Plugin
+    Q_PLUGIN_METADATA(IID AbstractPluginInterface_IID)
+    Q_PLUGIN_METADATA(IID GUIInterface_IID)
 
 public:
 	SystemInfoPlugin();

@@ -43,32 +43,37 @@
 namespace HEHUI {
 
 class SqlExplorerPlugin : public GUIPluginBase {
-	Q_OBJECT
+    Q_OBJECT
+
+    //Export Plugin
+    Q_PLUGIN_METADATA(IID AbstractPluginInterface_IID)
+    Q_PLUGIN_METADATA(IID GUIInterface_IID)
+
 
 public:
-	SqlExplorerPlugin();
-	virtual ~SqlExplorerPlugin();
+    SqlExplorerPlugin();
+    virtual ~SqlExplorerPlugin();
 
-	bool isSingle();
-	QString name () const;
-        QString version() const;
-        QString description() const;
+    bool isSingle();
+    QString name () const;
+    QString version() const;
+    QString description() const;
 
-	QIcon icon () const;
-	QString whatsThis () const;
-	QString toolTip () const;
+    QIcon icon () const;
+    QString whatsThis () const;
+    QString toolTip () const;
 
-        bool unload();
+    bool unload();
 
-        bool verifyUser();
+    bool verifyUser();
 
 
 private slots:
-	void slotMainActionForMenuTriggered();
-        void slotSqlExplorerWidgetDestoryed(QObject * obj );
+    void slotMainActionForMenuTriggered();
+    void slotSqlExplorerWidgetDestoryed(QObject * obj );
 
 private:
-        QList<SqlExplorer *> sqlExplorerWidgetList;
+    QList<SqlExplorer *> sqlExplorerWidgetList;
 
 
 
