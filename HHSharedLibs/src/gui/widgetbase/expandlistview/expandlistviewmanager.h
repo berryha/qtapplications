@@ -39,7 +39,6 @@ private:
 signals:
 
     void itemActivated(const QModelIndex & index );
-    //void itemActivated(ExpandListViewInterface::ObjectItem *wgt);
     void signalContactItemActivated(const QString &id);
 
     void itemDoubleClicked(const QModelIndex & index);

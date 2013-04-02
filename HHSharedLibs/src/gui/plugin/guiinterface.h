@@ -74,7 +74,10 @@ public:
 
 } //namespace HEHUI
 
-Q_DECLARE_INTERFACE(HEHUI::GUIInterface, "org.hehui.Interface.GUIInterface/2012.1")
+
+#define GUIInterface_IID "org.hehui.Interface.GUIInterface/2013.1"
+Q_DECLARE_INTERFACE(HEHUI::GUIInterface, GUIInterface_IID)
+
 
 #endif /* GUIINTERFACE_H_ */
 
