@@ -175,20 +175,20 @@ private:
 
     SystemTrayIconBase *systemTray;
     QMenu *trayMenu;
-
     QMenu *pluginsMenu;
 
-    IMUser *imUser;
-    IM::OnlineState stateBeforeLocking;
-
+    ChatWindowManager *chatWindowManager;
     ExpandListViewManager *expandListViewManager;
     ExpandListView *friendsListView;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
 
-    ContactsManager *contactsManager;
+    UserInfoTipWindow *m_userInfoTipWindow;
+    //ContactInfoWidget *m_ContactInfoWidget;
 
-    ChatWindowManager *chatWindowManager;
+    ContactsManager *contactsManager;
+    IMUser *imUser;
+    IM::OnlineState stateBeforeLocking;
 
     PacketHandlerBase *m_packetHandler;
     ClientResourcesManager *m_resourcesManager;
@@ -207,8 +207,7 @@ private:
     bool autoShowSystemMessage;
     bool autoShowChatMessageFromContact;
 
-    UserInfoTipWindow *m_userInfoTipWindow;
-    //ContactInfoWidget *m_ContactInfoWidget;
+
 
     QHostAddress m_serverHostAddress;
     quint16 m_serverHostPort;
