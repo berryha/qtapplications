@@ -65,7 +65,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     chatwindow/emoticonselecter/emoticonselector.h \
     contactsmanager/interestgroup.h \
     packetmanager/imclientpacketsparser.h \
-    networkmanager/clientresourcesmanager.h
+    networkmanager/clientresourcesmanager.h \
+    contractstree/contractstree.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/contactchatwindow.cpp \
@@ -97,7 +98,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     chatwindow/emoticonselecter/emoticonselector.cpp \
     contactsmanager/interestgroup.cpp \
     packetmanager/imclientpacketsparser.cpp \
-    networkmanager/clientresourcesmanager.cpp
+    networkmanager/clientresourcesmanager.cpp \
+    contractstree/contractstree.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwindow.ui \
