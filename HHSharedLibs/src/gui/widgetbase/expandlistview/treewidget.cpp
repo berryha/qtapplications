@@ -44,8 +44,8 @@
 #include "categorylistview.h"
 
 // shared
-#include "./shared/iconloader_p.h"
-#include "./shared/sheet_delegate_p.h"
+#include "./shared/iconloader.h"
+#include "./shared/sheet_delegate.h"
 
 //#include <ui4_p.h>
 //#include <qdesigner_utils_p.h>
@@ -114,9 +114,10 @@ TreeWidget::TreeWidget(ExpandListViewManager *core, QWidget *parent) :
     setTextElideMode(Qt::ElideMiddle);
     setVerticalScrollMode(ScrollPerPixel);
 
-    setItemDelegate(new SheetDelegate(this, this));
+    setItemDelegate(new SheetDelegate2(this, this));
 
     //connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(handleMousePress(QTreeWidgetItem*)));
+
 }
 
 QIcon TreeWidget::iconForObjectItem(QString iconName, QIcon::Mode iconMode) const
@@ -351,7 +352,6 @@ bool TreeWidget::load(CategoryList *cat_list)
         return false;
     }
 
-
     foreach(const Category &cat, *cat_list)
         addCategory(cat);
 
@@ -403,11 +403,11 @@ void TreeWidget::addCustomCategories(bool replace)
         addCategory(*it);
 }
 
-static inline QString msgXmlError(const QString &fileName, const QXmlStreamReader &r)
-{
-    return ExpandListViewBase::tr("An error has been encountered at line %1 of %2: %3")
-            .arg(r.lineNumber()).arg(fileName, r.errorString());
-}
+//static inline QString msgXmlError(const QString &fileName, const QXmlStreamReader &r)
+//{
+//    return ExpandListViewBase::tr("An error has been encountered at line %1 of %2: %3")
+//            .arg(r.lineNumber()).arg(fileName, r.errorString());
+//}
 
 bool TreeWidget::readCategories(const QString &fileName, const QString &contents,
                                 CategoryList *cats, QString *errorMessage)
@@ -502,10 +502,10 @@ bool TreeWidget::readCategories(const QString &fileName, const QString &contents
         }
     }
 
-    if (reader.hasError()) {
-        *errorMessage = msgXmlError(fileName, reader);
-        return false;
-    }
+//    if (reader.hasError()) {
+//        *errorMessage = msgXmlError(fileName, reader);
+//        return false;
+//    }
 
     return true;
 }
@@ -748,7 +748,6 @@ void TreeWidget::adjustSubListSize(QTreeWidgetItem *cat_item)
     const int height = qMax(list_widget->contentsSize().height(), 1);
     list_widget->setFixedHeight(height);
     list_widget->setFlow(QListView::TopToBottom);
-
 
     embedItem->setSizeHint(0, QSize(-1, height - 1));
 
@@ -1180,71 +1179,71 @@ void TreeWidget::contextMenuEvent(QContextMenuEvent *e)
 
 }
 
-void TreeWidget::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list)
-{
-    /*
-    QTreeWidgetItem *scratch_item = 0;
-    CategoryListView *categoryView = 0;
-    bool added = false;
+//void TreeWidget::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list)
+//{
+//    /*
+//    QTreeWidgetItem *scratch_item = 0;
+//    CategoryListView *categoryView = 0;
+//    bool added = false;
 
-    foreach (QDesignerDnDItemInterface *item, item_list) {
-        QWidget *w = item->objectItem();
-        if (w == 0)
-            continue;
+//    foreach (QDesignerDnDItemInterface *item, item_list) {
+//        QWidget *w = item->objectItem();
+//        if (w == 0)
+//            continue;
 
-        DomUI *dom_ui = item->domUi();
-        if (dom_ui == 0)
-            continue;
+//        DomUI *dom_ui = item->domUi();
+//        if (dom_ui == 0)
+//            continue;
 
-        const int scratch_idx = ensureScratchpad();
-        scratch_item = topLevelItem(scratch_idx);
-        categoryView = categoryViewAt(scratch_idx);
+//        const int scratch_idx = ensureScratchpad();
+//        scratch_item = topLevelItem(scratch_idx);
+//        categoryView = categoryViewAt(scratch_idx);
 
-        // Temporarily remove the fake toplevel in-between
-        DomWidget *fakeTopLevel = dom_ui->takeElementWidget();
-        DomWidget *firstWidget = 0;
-        if (fakeTopLevel && !fakeTopLevel->elementWidget().isEmpty()) {
-            firstWidget = fakeTopLevel->elementWidget().first();
-            dom_ui->setElementWidget(firstWidget);
-        } else {
-            dom_ui->setElementWidget(fakeTopLevel);
-            continue;
-        }
+//        // Temporarily remove the fake toplevel in-between
+//        DomWidget *fakeTopLevel = dom_ui->takeElementWidget();
+//        DomWidget *firstWidget = 0;
+//        if (fakeTopLevel && !fakeTopLevel->elementWidget().isEmpty()) {
+//            firstWidget = fakeTopLevel->elementWidget().first();
+//            dom_ui->setElementWidget(firstWidget);
+//        } else {
+//            dom_ui->setElementWidget(fakeTopLevel);
+//            continue;
+//        }
 
-        // Serialize to XML
-        QString xml;
-        {
-            QXmlStreamWriter writer(&xml);
-            writer.setAutoFormatting(true);
-            writer.setAutoFormattingIndent(1);
-            writer.writeStartDocument();
-            dom_ui->write(writer);
-            writer.writeEndDocument();
-        }
+//        // Serialize to XML
+//        QString xml;
+//        {
+//            QXmlStreamWriter writer(&xml);
+//            writer.setAutoFormatting(true);
+//            writer.setAutoFormattingIndent(1);
+//            writer.writeStartDocument();
+//            dom_ui->write(writer);
+//            writer.writeEndDocument();
+//        }
 
-        // Insert fake toplevel again
-        dom_ui->takeElementWidget();
-        dom_ui->setElementWidget(fakeTopLevel);
+//        // Insert fake toplevel again
+//        dom_ui->takeElementWidget();
+//        dom_ui->setElementWidget(fakeTopLevel);
 
-        const ObjectItem wgt = ObjectItem(w->objectName(), xml);
-        categoryView->addObjectItem(wgt, iconForObjectItem(wgt.iconName()), true);
-        setItemExpanded(scratch_item, true);
-        added = true;
-    }
+//        const ObjectItem wgt = ObjectItem(w->objectName(), xml);
+//        categoryView->addObjectItem(wgt, iconForObjectItem(wgt.iconName()), true);
+//        setItemExpanded(scratch_item, true);
+//        added = true;
+//    }
 
-    if (added) {
-        save();
-        QApplication::setActiveWindow(this);
-        // Is the new item visible in filtered mode?
-        const CategoryListView::AccessMode am = CategoryListView::FilteredAccess;
-        if (const int count = categoryView->count(am))
-            categoryView->setCurrentItem(am, count - 1);
-        categoryView->adjustSize(); // XXX
-        adjustSubListSize(scratch_item);
-    }
-  */
+//    if (added) {
+//        save();
+//        QApplication::setActiveWindow(this);
+//        // Is the new item visible in filtered mode?
+//        const CategoryListView::AccessMode am = CategoryListView::FilteredAccess;
+//        if (const int count = categoryView->count(am))
+//            categoryView->setCurrentItem(am, count - 1);
+//        categoryView->adjustSize(); // XXX
+//        adjustSubListSize(scratch_item);
+//    }
+//  */
 
-}
+//}
 
 void TreeWidget::filter(const QString &f)
 {

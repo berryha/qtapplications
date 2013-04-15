@@ -47,7 +47,7 @@
 
 
 
-#include "./shared/iconloader_p.h"
+#include "./shared/iconloader.h"
 #include "shared/abstractexpandlistviewInterface.h"
 //#include <shared/filterwidget_p.h>
 
@@ -74,7 +74,7 @@ ExpandListView::ExpandListView(ExpandListViewManager *core, QWidget *parent, Qt:
     vBoxLayout->setSpacing(0);
 
     // Prevent the filter from grabbing focus since Our view has Qt::NoFocus
-    /*FilterWidget **/filterWidget = new FilterWidget(0, FilterWidget::LayoutAlignNone);
+    /*FilterWidget **/filterWidget = new FilterWidget2(0, FilterWidget2::LayoutAlignNone);
     filterWidget->setRefuseFocus(true);
     connect(filterWidget, SIGNAL(filterChanged(QString)), m_treeWidget, SLOT(filter(QString)));
     vBoxLayout->addWidget(filterWidget);
@@ -255,10 +255,10 @@ void ExpandListView::moveObjectItem(const QString &old_cat_name, const QString &
     m_treeWidget->moveObjectItem(old_cat_name, new_cat_name, item_id);
 }
 
-void ExpandListView::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list, const QPoint&)
-{
-    m_treeWidget->dropObjectItems(item_list);
-}
+//void ExpandListView::dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list, const QPoint&)
+//{
+//    m_treeWidget->dropObjectItems(item_list);
+//}
 
 void ExpandListView::setFileName(const QString &file_name)
 {

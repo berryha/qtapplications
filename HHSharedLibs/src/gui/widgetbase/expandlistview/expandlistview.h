@@ -46,7 +46,7 @@
 #include "shared/expandlistviewbase.h"
 #include "treewidget.h"
 //#include "expandlistviewmanager.h"
-#include "shared/filterwidget_p.h"
+#include "shared/filterwidget.h"
 
 #include <QTimer>
 
@@ -95,7 +95,7 @@ public:
     virtual void moveObjectItem(int old_cat_idx, int new_cat_idx, const QString &item_id);
     virtual void moveObjectItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id);
 
-    void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list, const QPoint &global_mouse_pos);
+//    void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list, const QPoint &global_mouse_pos);
 
     virtual void setFileName(const QString &file_name);
     virtual QString fileName() const;
@@ -128,7 +128,7 @@ private:
 
     TreeWidget *m_treeWidget;
 
-    FilterWidget *filterWidget;
+    FilterWidget2 *filterWidget;
 
     //QTimer *autoHideTimer;
 

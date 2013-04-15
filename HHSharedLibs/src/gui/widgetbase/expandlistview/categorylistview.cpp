@@ -295,17 +295,12 @@ QVariant ExpandListViewCategoryModel::data(const QModelIndex &index, int role) c
 bool ExpandListViewCategoryModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     const int row = index.row();
-
     if ( row < 0 || row >=  m_categoryEntries.size() ){
         return false;
     }
 
-
     //if (role != Qt::EditRole || row < 0 || row >=  m_categoryEntries.size() || value.type() != QVariant::String)
     //   return false;
-
-
-
 
     ExpandListViewCategoryEntry &categoryEntry = m_categoryEntries[row];
 
@@ -313,12 +308,12 @@ bool ExpandListViewCategoryModel::setData(const QModelIndex &index, const QVaria
         const QString newName = value.toString();
         categoryEntry.objectItem.setName(newName);
 
-        const QDomDocument doc = stringToDom(CategoryListView::objectItemDomXml(categoryEntry.objectItem));
-        QDomElement widget_elt = doc.firstChildElement(QLatin1String(widgetElementC));
-        if (!widget_elt.isNull()) {
-            widget_elt.setAttribute(QLatin1String(nameAttributeC), newName);
-            categoryEntry.objectItem.setDomXml(domToString(widget_elt));
-        }
+//        const QDomDocument doc = stringToDom(CategoryListView::objectItemDomXml(categoryEntry.objectItem));
+//        QDomElement widget_elt = doc.firstChildElement(QLatin1String(widgetElementC));
+//        if (!widget_elt.isNull()) {
+//            widget_elt.setAttribute(QLatin1String(nameAttributeC), newName);
+//            categoryEntry.objectItem.setDomXml(domToString(widget_elt));
+//        }
     }
 
     if(role == Qt::DecorationRole){
@@ -329,11 +324,7 @@ bool ExpandListViewCategoryModel::setData(const QModelIndex &index, const QVaria
             categoryEntry.objectItem.setIconName(newIconName);
             categoryEntry.icon = QIcon(newIconName);
         }
-
-
     }
-
-
 
     emit dataChanged(index, index);
     return true;
@@ -744,19 +735,6 @@ void CategoryListView::addObjectItem(const ExpandListViewInterface::ObjectItem &
 //    m_model->removeObjectItem(item_id);
 //}
 
-QString CategoryListView::objectItemDomXml(const ExpandListViewInterface::ObjectItem &item)
-{
-    QString domXml = item.domXml();
-
-    if (domXml.isEmpty()) {
-        domXml = QLatin1String(uiOpeningTagC);
-        domXml += QLatin1String("<widget class=\"");
-        domXml += item.name();
-        domXml += QLatin1String("\"/>");
-        domXml += QLatin1String(uiClosingTagC);
-    }
-    return domXml;
-}
 
 void CategoryListView::filter(const QRegExp &re)
 {
