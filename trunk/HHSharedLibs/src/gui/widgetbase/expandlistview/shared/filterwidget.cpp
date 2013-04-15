@@ -39,7 +39,7 @@
 **
 ****************************************************************************/
 
-#include "filterwidget_p.h"
+#include "filterwidget.h"
 #include "iconloader_p.h"
 
 #include <QVBoxLayout>
@@ -58,7 +58,7 @@ QT_BEGIN_NAMESPACE
 
 namespace HEHUI {
 
-HintLineEdit::HintLineEdit(QWidget *parent) :
+HintLineEdit2::HintLineEdit2(QWidget *parent) :
     QLineEdit(parent),
     m_defaultFocusPolicy(focusPolicy()),
     m_hintColor(QColor(0xbbbbbb)),
@@ -67,12 +67,12 @@ HintLineEdit::HintLineEdit(QWidget *parent) :
 {
 }
 
-bool HintLineEdit::refuseFocus() const
+bool HintLineEdit2::refuseFocus() const
 {
     return m_refuseFocus;
 }
 
-void HintLineEdit::setRefuseFocus(bool v)
+void HintLineEdit2::setRefuseFocus(bool v)
 {
     if (v == m_refuseFocus)
         return;
@@ -80,7 +80,7 @@ void HintLineEdit::setRefuseFocus(bool v)
     setFocusPolicy(m_refuseFocus ? Qt::NoFocus : m_defaultFocusPolicy);
 }
 
-void HintLineEdit::mousePressEvent(QMouseEvent *e)
+void HintLineEdit2::mousePressEvent(QMouseEvent *e)
 {
     if (debugFilter)
         qDebug() << Q_FUNC_INFO;
@@ -90,7 +90,7 @@ void HintLineEdit::mousePressEvent(QMouseEvent *e)
     QLineEdit::mousePressEvent(e);
 }
 
-void HintLineEdit::focusInEvent(QFocusEvent *e)
+void HintLineEdit2::focusInEvent(QFocusEvent *e)
 {
     if (debugFilter)
         qDebug() << Q_FUNC_INFO;
@@ -115,7 +115,7 @@ void HintLineEdit::focusInEvent(QFocusEvent *e)
     QLineEdit::focusInEvent(e);
 }
 
-void HintLineEdit::focusOutEvent(QFocusEvent *e)
+void HintLineEdit2::focusOutEvent(QFocusEvent *e)
 {
     if (debugFilter)
         qDebug() << Q_FUNC_INFO;
@@ -124,12 +124,12 @@ void HintLineEdit::focusOutEvent(QFocusEvent *e)
     QLineEdit::focusOutEvent(e);
 }
 
-QString HintLineEdit::hintText() const
+QString HintLineEdit2::hintText() const
 {
     return m_hintText;
 }
 
-void HintLineEdit::setHintText(const QString &ht)
+void HintLineEdit2::setHintText(const QString &ht)
 {
     if (ht == m_hintText)
         return;
@@ -139,7 +139,7 @@ void HintLineEdit::setHintText(const QString &ht)
         showHintText();
 }
 
-void HintLineEdit::showHintText(bool force)
+void HintLineEdit2::showHintText(bool force)
 {
     if (m_showingHintText || m_hintText.isEmpty())
         return;
@@ -149,7 +149,7 @@ void HintLineEdit::showHintText(bool force)
         setTextColor(m_hintColor, &m_textColor);
     }
 }
-void HintLineEdit::hideHintText()
+void HintLineEdit2::hideHintText()
 {
     if (m_showingHintText && !m_hintText.isEmpty()) {
         m_showingHintText = false;
@@ -158,17 +158,17 @@ void HintLineEdit::hideHintText()
     }
 }
 
-bool  HintLineEdit::isShowingHintText() const
+bool  HintLineEdit2::isShowingHintText() const
 {
     return m_showingHintText;
 }
 
-QString  HintLineEdit::typedText() const
+QString  HintLineEdit2::typedText() const
 {
     return m_showingHintText ? QString() : text();
 }
 
-void HintLineEdit::setTextColor(const QColor &newColor, QColor *oldColor)
+void HintLineEdit2::setTextColor(const QColor &newColor, QColor *oldColor)
 {
     QPalette pal = palette();
     if (oldColor)
@@ -177,10 +177,10 @@ void HintLineEdit::setTextColor(const QColor &newColor, QColor *oldColor)
     setPalette(pal);}
 
 // ------------------- FilterWidget
-FilterWidget::FilterWidget(QWidget *parent, LayoutMode lm)  :
+FilterWidget2::FilterWidget2(QWidget *parent, LayoutMode lm)  :
     QWidget(parent),
     m_button(new QPushButton),
-    m_editor(new HintLineEdit)
+    m_editor(new HintLineEdit2)
 {
     m_editor->setHintText(tr("<Filter>"));
     QHBoxLayout *l = new QHBoxLayout(this);
@@ -202,17 +202,17 @@ FilterWidget::FilterWidget(QWidget *parent, LayoutMode lm)  :
     connect(m_editor, SIGNAL(textEdited(QString)), this, SIGNAL(filterChanged(QString)));
 }
 
-QString FilterWidget::text() const
+QString FilterWidget2::text() const
 {
     return m_editor->typedText();
 }
 
-void FilterWidget::checkButton(const QString &)
+void FilterWidget2::checkButton(const QString &)
 {
     m_button->setEnabled(!text().isEmpty());
 }
 
-void FilterWidget::reset()
+void FilterWidget2::reset()
 {
     if (debugFilter)
         qDebug() << Q_FUNC_INFO;
@@ -223,20 +223,19 @@ void FilterWidget::reset()
     }
 }
 
-bool FilterWidget::refuseFocus() const
+bool FilterWidget2::refuseFocus() const
 {
     return m_editor->refuseFocus();
 }
 
-void FilterWidget::setRefuseFocus(bool v)
+void FilterWidget2::setRefuseFocus(bool v)
 {
     m_editor->setRefuseFocus(v);
 }
 
 
-void FilterWidget::setFocusToEditor(){
+void FilterWidget2::setFocusToEditor(){
 	m_editor->setFocus();
-
 }
 
 

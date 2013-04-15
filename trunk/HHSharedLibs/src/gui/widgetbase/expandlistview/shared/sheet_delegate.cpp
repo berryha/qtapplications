@@ -39,7 +39,7 @@
 **
 ****************************************************************************/
 
-#include "sheet_delegate_p.h"
+#include "sheet_delegate.h"
 
 #include <QtCore/QAbstractItemModel>
 #include <QTreeView>
@@ -50,13 +50,13 @@ QT_BEGIN_NAMESPACE
 
 namespace HEHUI {
 
-SheetDelegate::SheetDelegate(QTreeView *view, QWidget *parent)
+SheetDelegate2::SheetDelegate2(QTreeView *view, QWidget *parent)
     : QItemDelegate(parent),
       m_view(view)
 {
 }
 
-void SheetDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void SheetDelegate2::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     const QAbstractItemModel *model = index.model();
     Q_ASSERT(model);
@@ -100,7 +100,7 @@ void SheetDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     }
 }
 
-QSize SheetDelegate::sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &index) const
+QSize SheetDelegate2::sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
     QStyleOptionViewItem option = opt;
     //QSize sz = QItemDelegate::sizeHint(opt, index) + QSize(2, 2);

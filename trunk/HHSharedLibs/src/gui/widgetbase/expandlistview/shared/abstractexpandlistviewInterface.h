@@ -53,8 +53,7 @@ QT_BEGIN_HEADER
 
 QT_BEGIN_NAMESPACE
 
-//class DomUI;
-class QDesignerDnDItemInterface;
+
 
 class /*QDESIGNER_SDK_EXPORT*/ ExpandListViewInterface : public QWidget
 {
@@ -148,8 +147,8 @@ public:
 
     int findOrInsertCategory(const QString &categoryName);
 
-    virtual void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list,
-                                const QPoint &global_mouse_pos) = 0;
+//    virtual void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list,
+//                                const QPoint &global_mouse_pos) = 0;
 
     virtual void setFileName(const QString &file_name) = 0;
     virtual QString fileName() const = 0;

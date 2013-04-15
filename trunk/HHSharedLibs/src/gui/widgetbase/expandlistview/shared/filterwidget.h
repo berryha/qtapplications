@@ -50,8 +50,8 @@
 // We mean it.
 //
 
-#ifndef FILTERWIDGET_H
-#define FILTERWIDGET_H
+#ifndef FILTERWIDGET__H
+#define FILTERWIDGET__H
 
 
 
@@ -76,10 +76,10 @@ namespace HEHUI {
  * policy and focusses explicitly on click (note that setting Qt::ClickFocus
  * is not sufficient for that as an ActivationFocus will occur). */
 
-class  HintLineEdit : public QLineEdit {
+class  HintLineEdit2 : public QLineEdit {
     Q_OBJECT
 public:
-    explicit HintLineEdit(QWidget *parent = 0);
+    explicit HintLineEdit2(QWidget *parent = 0);
 
     QString hintText() const;
 
@@ -114,7 +114,7 @@ private:
 
 // FilterWidget: For filtering item views, with reset button Uses HintLineEdit.
 
-class   FilterWidget : public QWidget
+class   FilterWidget2 : public QWidget
 {
     Q_OBJECT
 public:
@@ -125,7 +125,7 @@ public:
         LayoutAlignNone
     };
 
-    explicit FilterWidget(QWidget *parent = 0, LayoutMode lm = LayoutAlignRight);
+    explicit FilterWidget2(QWidget *parent = 0, LayoutMode lm = LayoutAlignRight);
 
     QString text() const;
 
@@ -144,7 +144,7 @@ private slots:
 
 private:
     QPushButton *m_button;
-    HintLineEdit *m_editor;
+    HintLineEdit2 *m_editor;
 };
 
 } // namespace HEHUI

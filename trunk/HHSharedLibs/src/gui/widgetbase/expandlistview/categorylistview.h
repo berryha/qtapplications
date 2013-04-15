@@ -74,7 +74,7 @@ public:
     explicit CategoryListView(ExpandListViewManager *core, QWidget *parent = 0);
     void setViewMode(ViewMode vm);
 
-    void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list);
+//    void dropObjectItems(const QList<QDesignerDnDItemInterface*> &item_list);
 
     using QListView::contentsSize;
 
@@ -96,8 +96,6 @@ public:
     ExpandListViewInterface::Category category() const;
     bool removeCustomObjectItems();
 
-    // Helper: Ensure a <ui> tag in the case of empty XML
-    static QString objectItemDomXml(const ExpandListViewInterface::ObjectItem &item);
 
     bool updateObjectItemName(const QString &item_id, const QString &name);
     bool updateObjectItemIcon(const QString &item_id, const QIcon &icon);

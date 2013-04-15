@@ -39,85 +39,46 @@
 **
 ****************************************************************************/
 
-#include <QtCore/QFile>
-#include <QIcon>
-#include <QPixmap>
-#include <QDebug>
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists for the convenience
+// of Qt Designer.  This header
+// file may change from version to version without notice, or even be removed.
+//
+// We mean it.
+//
 
-#include "iconloader.h"
+
+#ifndef SHEET_DELEGATE__H
+#define SHEET_DELEGATE__H
 
 
+#include <QItemDelegate>
+#include <QTreeView>
 
 QT_BEGIN_NAMESPACE
 
+class QTreeView;
+
 namespace HEHUI {
 
-/*
- QIcon createIconSet(const QString &name)
+class  SheetDelegate2: public QItemDelegate
 {
-    QStringList candidates = QStringList()
-        << (QString::fromUtf8(":/trolltech/formeditor/images/") + name)
-#ifdef Q_WS_MAC
-        << (QString::fromUtf8(":/trolltech/formeditor/images/mac/") + name)
-#else
-        << (QString::fromUtf8(":/trolltech/formeditor/images/win/") + name)
-#endif
-        << (QString::fromUtf8(":/trolltech/formeditor/images/designer_") + name);
+    Q_OBJECT
+public:
+    SheetDelegate2(QTreeView *view, QWidget *parent);
 
-    foreach (QString f, candidates) {
-        if (QFile::exists(f))
-            return QIcon(f);
-    }
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &index) const;
 
-    //return QIcon();
-    return emptyIcon();
-}
-
- QIcon emptyIcon()
-{
-    static const QIcon empty_icon(QLatin1String(":/trolltech/formeditor/images/emptyicon.png"));
-    return  empty_icon;
-}
-*/
-
-
-
-QIcon createIconSet(const QString &iconFileName, const QString &defaultIconName,  QIcon::Mode mode){
-
-	QString file;
-	if(QFile::exists(iconFileName)){
-		file = iconFileName;
-	}else if(QFile::exists(defaultIconName)){
-		file = defaultIconName;
-	}else{
-		file = QString(":/resources/images/emptyicon.png");
-	}
-
-
-
-	if(mode == QIcon::Disabled){
-		QIcon icon;
-		QSize size = QImage(file).size();
-		QPixmap pixmap = QIcon(file).pixmap(size, mode);
-		icon.addPixmap(pixmap);
-		return icon;
-	}
-
-
-
-//	QImage image(file);
-//	if(!image.isNull()){
-//		icon.addPixmap(QPixmap::fromImage(image), QIcon::Disabled, QIcon::Off);
-//	}
-
-
-
-	return QIcon(file);
-
-}
-
+private:
+    QTreeView *m_view;
+};
 
 } // namespace HEHUI
 
 QT_END_NAMESPACE
 
+#endif // SHEET_DELEGATE_H

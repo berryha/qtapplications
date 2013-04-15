@@ -62,7 +62,7 @@ public slots:
     void slotTooltipEventOnObjectItemOccurs(const QString &item_id, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
 
 
-private slots:
+
 
 
 

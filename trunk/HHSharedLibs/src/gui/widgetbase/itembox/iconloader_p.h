@@ -50,35 +50,26 @@
 // We mean it.
 //
 
+#ifndef ICONLOADER_H
+#define ICONLOADER_H
 
-#ifndef SHEET_DELEGATE_H
-#define SHEET_DELEGATE_H
+#include <QString>
+#include <QIcon>
 
 
-#include <QItemDelegate>
-#include <QTreeView>
-
-QT_BEGIN_NAMESPACE
-
-class QTreeView;
+class QString;
+class QIcon;
 
 namespace HEHUI {
 
-class  SheetDelegate: public QItemDelegate
-{
-    Q_OBJECT
-public:
-    SheetDelegate(QTreeView *view, QWidget *parent);
+// QIcon createIconSet(const QString &name);
+// QIcon emptyIcon();
 
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &index) const;
+	 QIcon createIconSet(const QString &iconFileName, const QString &defaultIconName = "", QIcon::Mode mode = QIcon::Disabled);
+	 QIcon emptyIcon();
 
-private:
-    QTreeView *m_view;
-};
 
 } // namespace HEHUI
 
-QT_END_NAMESPACE
 
-#endif // SHEET_DELEGATE_H
+#endif // ICONLOADER_H

@@ -22,6 +22,7 @@ include( ../buildlib_config.pri )
 HHSharedLibs += HHSharedCore
 include(../core/core.pri)
 
+include (./widgetbase/itembox/itembox.pri)
 
 DEFINES += GUI_LIBRARY_EXPORT
 
@@ -80,9 +81,6 @@ HEADERS += screenshot/screenshot.h \
     widgetbase/expandlistview/expandlistviewmanager.h \
     widgetbase/expandlistview/shared/abstractexpandlistviewInterface.h \
     widgetbase/expandlistview/shared/expandlistviewbase.h \
-    widgetbase/expandlistview/shared/filterwidget_p.h \
-    widgetbase/expandlistview/shared/iconloader_p.h \
-    widgetbase/expandlistview/shared/sheet_delegate_p.h \
     widgetbase/expandlistview/treewidget.h \
     plugin/guipluginbase.h \
     login/loginbase.h \
@@ -93,7 +91,10 @@ HEADERS += screenshot/screenshot.h \
     dataprint.h \
     widgetbase/mainwindowbase.h \
     widgetbase/widgetbase.h \
-    guilib.h
+    guilib.h \
+    widgetbase/expandlistview/shared/filterwidget.h \
+    widgetbase/expandlistview/shared/sheet_delegate.h \
+    widgetbase/expandlistview/shared/iconloader.h
 FORMS += screenshot/screenshot.ui \
     screenshot/selecttargetimagewidget.ui \
     dataexport/dataoutputdialog.ui \

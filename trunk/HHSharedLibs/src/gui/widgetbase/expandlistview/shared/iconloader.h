@@ -39,85 +39,39 @@
 **
 ****************************************************************************/
 
-#include <QtCore/QFile>
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists for the convenience
+// of Qt Designer.  This header
+// file may change from version to version without notice, or even be removed.
+//
+// We mean it.
+//
+
+#ifndef ICONLOADER__H
+#define ICONLOADER__H
+
+#include <QString>
 #include <QIcon>
-#include <QPixmap>
-#include <QDebug>
-
-#include "iconloader.h"
-
-
 
 QT_BEGIN_NAMESPACE
 
+class QString;
+class QIcon;
+
 namespace HEHUI {
 
-/*
- QIcon createIconSet(const QString &name)
-{
-    QStringList candidates = QStringList()
-        << (QString::fromUtf8(":/trolltech/formeditor/images/") + name)
-#ifdef Q_WS_MAC
-        << (QString::fromUtf8(":/trolltech/formeditor/images/mac/") + name)
-#else
-        << (QString::fromUtf8(":/trolltech/formeditor/images/win/") + name)
-#endif
-        << (QString::fromUtf8(":/trolltech/formeditor/images/designer_") + name);
+// QIcon createIconSet(const QString &name);
+// QIcon emptyIcon();
 
-    foreach (QString f, candidates) {
-        if (QFile::exists(f))
-            return QIcon(f);
-    }
-
-    //return QIcon();
-    return emptyIcon();
-}
-
- QIcon emptyIcon()
-{
-    static const QIcon empty_icon(QLatin1String(":/trolltech/formeditor/images/emptyicon.png"));
-    return  empty_icon;
-}
-*/
-
-
-
-QIcon createIconSet(const QString &iconFileName, const QString &defaultIconName,  QIcon::Mode mode){
-
-	QString file;
-	if(QFile::exists(iconFileName)){
-		file = iconFileName;
-	}else if(QFile::exists(defaultIconName)){
-		file = defaultIconName;
-	}else{
-		file = QString(":/resources/images/emptyicon.png");
-	}
-
-
-
-	if(mode == QIcon::Disabled){
-		QIcon icon;
-		QSize size = QImage(file).size();
-		QPixmap pixmap = QIcon(file).pixmap(size, mode);
-		icon.addPixmap(pixmap);
-		return icon;
-	}
-
-
-
-//	QImage image(file);
-//	if(!image.isNull()){
-//		icon.addPixmap(QPixmap::fromImage(image), QIcon::Disabled, QIcon::Off);
-//	}
-
-
-
-	return QIcon(file);
-
-}
+	 QIcon createIconSet(const QString &iconFileName, const QString &defaultIconName = "", QIcon::Mode mode = QIcon::Disabled);
+	 QIcon emptyIcon();
 
 
 } // namespace HEHUI
 
 QT_END_NAMESPACE
 
+#endif // ICONLOADER_H
