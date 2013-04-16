@@ -23,7 +23,7 @@
 //#include "../../shared/gui/widgetbase/expandlistview/expandlistview.h"
 #include "HHSharedCore/hglobal_core.h"
 #include "HHSharedCore/hsingleton.h"
-#include "HHSharedGUI/hexpandlistview.h"
+#include "HHSharedGUI/ItemBox"
 
 
 namespace HEHUI {
@@ -33,132 +33,132 @@ class ContactsManager : public QObject, public Singleton<ContactsManager>{
     friend class Singleton<ContactsManager>;
 
 public:
-    typedef ExpandListViewInterface::ObjectItem ObjectItem;
-    typedef ExpandListViewInterface::ObjectItemList ObjectItemList;
-    typedef ExpandListViewInterface::Category Category;
-    typedef ExpandListViewInterface::CategoryList CategoryList;
+    typedef ItemBoxWidget::Item ObjectItem;
+    typedef ItemBoxWidget:: ItemList ObjectItemList;
+    typedef ItemBoxWidget::Category Category;
+    typedef ItemBoxWidget::CategoryList CategoryList;
 
-	ContactsManager(QObject *parent = 0);
-	virtual ~ContactsManager();
+    ContactsManager(QObject *parent = 0);
+    virtual ~ContactsManager();
 
 
 
-         QStringList contactGroups() const;
-         QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    QStringList contactGroups() const;
+    QString groupNameThatContactBelongsTo(const QString &contactID) const;
 
-         
-         QString getContactGroupsInfoString() const;
-         ContactGroup * getContactGroup(int personalContactGroupID);
 
-         bool hasContact(const QString &contactID);
-         bool hasUserInfo(const QString &userID);
-         Contact * getUser(const QString &contactID);
+    QString getContactGroupsInfoString() const;
+    ContactGroup * getContactGroup(int personalContactGroupID);
 
-         QList<Contact*> getContactGroupMembers(const QString &contactGroupName);
-         QStringList getContacts() const;
-         QStringList getStrangers() const;
-         QStringList getUsers() const;
+    bool hasContact(const QString &contactID);
+    bool hasUserInfo(const QString &userID);
+    Contact * getUser(const QString &contactID);
 
-         
-         
-         
-         bool loadInterestGroups();
-         InterestGroup * getInterestGroup(quint32 groupID);         
-         bool addNewInterestGroupToDatabase(InterestGroup *interestGroup);
-         bool leaveInterestGroup(quint32 groupID);
-         bool saveInterestGroupInfoToDatabase(InterestGroup *interestGroup);
-         QList<InterestGroup *> getInterestGroupsList();
-         bool saveInterestGroupMemberToDatabase(quint32 groupID, const QString &userID, quint32 memberRole);
-         
-         bool saveInterestGroupMembersToDatabase(InterestGroup *interestGroup);
+    QList<Contact*> getContactGroupMembers(const QString &contactGroupName);
+    QStringList getContacts() const;
+    QStringList getStrangers() const;
+    QStringList getUsers() const;
 
-         bool saveContactChatMessageToDatabase(const QString &senderID, const QString &receiverID, const QString &message, const QString &time = "");
-         bool saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time = "");
 
-         
+
+
+    bool loadInterestGroups();
+    InterestGroup * getInterestGroup(quint32 groupID);
+    bool addNewInterestGroupToDatabase(InterestGroup *interestGroup);
+    bool leaveInterestGroup(quint32 groupID);
+    bool saveInterestGroupInfoToDatabase(InterestGroup *interestGroup);
+    QList<InterestGroup *> getInterestGroupsList();
+    bool saveInterestGroupMemberToDatabase(quint32 groupID, const QString &userID, quint32 memberRole);
+
+    bool saveInterestGroupMembersToDatabase(InterestGroup *interestGroup);
+
+    bool saveContactChatMessageToDatabase(const QString &senderID, const QString &receiverID, const QString &message, const QString &time = "");
+    bool saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time = "");
+
+
 
 
 
 public slots:
-	//void slotUpdateContactsInfo2();
-	void slotFetchContactsInfo(ExpandListView *expandListView);
-        void slotFetchStrangersInfo();
+    //void slotUpdateContactsInfo2();
+    void slotFetchContactsInfo(ItemBoxWidget *expandListView);
+    void slotFetchStrangersInfo();
 
 
-        void slotAddNewContactGroupToUI(ExpandListView *expandListView, int personalContactGroupID, const QString &groupName);       
-        void slotDeleteContactGroupFromUI(ExpandListView *expandListView, const QString &groupName);       
-        
-        void addContactToUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID);
-        void deleteContactFromUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID);
-        void moveContactToUI(ExpandListView *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID);
-        void updateContactToUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID);
-        void updateContactToUI(ExpandListView *expandListView, int personalContactGroupID, const QString &contactID);
-        
-        
-        void renameGroupToUI(ExpandListView *expandListView, const QString &old_groupName, const QString &new_groupName);
+    void slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName);
+    void slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName);
+
+    void addContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
+    void deleteContactFromUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
+    void moveContactToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID);
+    void updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
+    void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 
 
-        bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
-        bool moveContact(const QString &contactID, int oldGroupID, int newGroupID);
+    void renameGroupToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName);
 
 
-        //联系人在线状态改变
-        void slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo);
-
-        bool slotAddNewContactToDatabase(Contact *contact);
-        bool slotdeleteContactFromDatabase(Contact *contact);
+    bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
+    bool moveContact(const QString &contactID, int oldGroupID, int newGroupID);
 
 
-        
-        int getPersonalContactGroupID(const QString &groupName);
-        QString getPersonalContactGroupName(int personalContactGroupID) ;
-        int slotAddNewContactGroupToDatabase(const QString &groupName);
-        bool renameGroupToDatabase(const QString &old_groupName, const QString &new_groupName);
-        bool deleteGroupFromDatabase(const QString &groupName);
+    //联系人在线状态改变
+    void slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo);
 
-        
-        bool getMyInfoFormLocalDatabase();
-        bool saveMyInfoToDatabase();
-        
-        bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
-        bool getContactInfoFormLocalDatabase(const QString &contactID);
-        bool saveContactInfoToDatabase(const QString &contactID);
-        
-        bool saveContactGroupsInfoToDatabase();
-        
-        
-        bool openDatabase(bool reopen = false);
-        bool initLocalDatabase(QString *errorMessage = 0);
+    bool slotAddNewContactToDatabase(Contact *contact);
+    bool slotdeleteContactFromDatabase(Contact *contact);
 
- 
+
+
+    int getPersonalContactGroupID(const QString &groupName);
+    QString getPersonalContactGroupName(int personalContactGroupID) ;
+    int slotAddNewContactGroupToDatabase(const QString &groupName);
+    bool renameGroupToDatabase(const QString &old_groupName, const QString &new_groupName);
+    bool deleteGroupFromDatabase(const QString &groupName);
+
+
+    bool getMyInfoFormLocalDatabase();
+    bool saveMyInfoToDatabase();
+
+    bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
+    bool getContactInfoFormLocalDatabase(const QString &contactID);
+    bool saveContactInfoToDatabase(const QString &contactID);
+
+    bool saveContactGroupsInfoToDatabase();
+
+
+    bool openDatabase(bool reopen = false);
+    bool initLocalDatabase(QString *errorMessage = 0);
+
+
 
 private slots:
-	//void slotSetupContacts(bool loadFromFile, const QString &string);
-	//void slotLoadContacts(ExpandListView *widgetBox, bool loadFromFile = true, const QString &string = "");
-        void slotLoadContacts(ExpandListView *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
-	//void slotLoadContacts(ExpandListView *expandListView,ContactGroup *contactGroup);
+    //void slotSetupContacts(bool loadFromFile, const QString &string);
+    //void slotLoadContacts(ItemBoxWidget *widgetBox, bool loadFromFile = true, const QString &string = "");
+    void slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
+    //void slotLoadContacts(ItemBoxWidget *expandListView,ContactGroup *contactGroup);
 
 private:
-	QSqlQuery queryDatabase(const QString & queryString, bool localConfigDatabase) ;
+    QSqlQuery queryDatabase(const QString & queryString, bool localConfigDatabase) ;
 
-	QSqlQuery queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
-			const QString &host, int port, const QString &user, const QString &passwd,
-			const QString &databaseName, HEHUI::DatabaseType databaseType) ;
+    QSqlQuery queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
+                            const QString &host, int port, const QString &user, const QString &passwd,
+                            const QString &databaseName, HEHUI::DatabaseType databaseType) ;
 
 private:
-        
-        
-        //QSqlQuery *query;
-        QString userPrivateDataFilePath;
-        QSqlDatabase localUserDataDB;
-        
-        QHash<int/*Grup ID*/, ContactGroup*> contactGroupHash;
-        QHash<QString/*Contact ID*/, Contact*> contactHash;
 
-        QHash<int/*Grup ID*/, InterestGroup*> interestGroupsHash;
 
-        IMUser *m_imUser;
-        
+    //QSqlQuery *query;
+    QString userPrivateDataFilePath;
+    QSqlDatabase localUserDataDB;
+
+    QHash<int/*Grup ID*/, ContactGroup*> contactGroupHash;
+    QHash<QString/*Contact ID*/, Contact*> contactHash;
+
+    QHash<int/*Grup ID*/, InterestGroup*> interestGroupsHash;
+
+    IMUser *m_imUser;
+
 
 
 };

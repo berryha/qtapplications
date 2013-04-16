@@ -16,3 +16,7 @@
 4.widgetbase/mainwindowbase.cpp:86:9: error: ‘PluginManager’ has not been declared
   ‘PluginManager’ 类的头文件已经引入!
   ----‘PluginManager’类具有命名空间‘HEHUI’，而mainwindowbase没有这个空间，加入命名空间‘HEHUI’后解决！
+  
+Q: QDateTime => not enough actual parameters for macro ‘min’ & ‘max’  
+A: 修改qdatetime.h 中的“nullJd()”　为： static inline qint64 nullJd() { return (std::numeric_limits<qint64>::min)(); }
+    #define NOMINMAX before including windows.h header.
