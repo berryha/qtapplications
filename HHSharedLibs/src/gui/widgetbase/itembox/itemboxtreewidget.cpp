@@ -1099,8 +1099,8 @@ void ItemBoxTreeWidget::contextMenuEvent(QContextMenuEvent *e)
 
 }
 
-void ItemBoxTreeWidget::dropItems(const QList<ItemBoxWidgetInterface *> &item_list)
-{
+//void ItemBoxTreeWidget::dropItems(const QList<ItemBoxWidgetInterface *> &item_list)
+//{
 //    QTreeWidgetItem *scratch_item = 0;
 //    ItemBoxCategoryListView *categoryView = 0;
 //    bool added = false;
@@ -1127,7 +1127,7 @@ void ItemBoxTreeWidget::dropItems(const QList<ItemBoxWidgetInterface *> &item_li
 //        categoryView->adjustSize(); // XXX
 //        adjustSubListSize(scratch_item);
 //    }
-}
+//}
 
 void ItemBoxTreeWidget::filter(const QString &f)
 {

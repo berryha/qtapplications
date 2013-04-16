@@ -1,5 +1,1 @@
-<RCC>
-    <qresource prefix="/qt-project.org/widgetbox">
-        <file>widgetbox.xml</file>
-    </qresource>
-</RCC>
+<RCC/>
