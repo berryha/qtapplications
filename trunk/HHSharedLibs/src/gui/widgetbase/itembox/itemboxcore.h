@@ -5,10 +5,12 @@
 #include <QModelIndex>
 #include <QMenu>
 
+#include "itemboxlib.h"
+
 namespace HEHUI {
 
 
-class ItemBoxCore : public QObject
+class ITEMBOX_LIB_API ItemBoxCore : public QObject
 {
     Q_OBJECT
 public:

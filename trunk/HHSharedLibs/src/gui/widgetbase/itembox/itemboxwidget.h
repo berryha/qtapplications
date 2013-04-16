@@ -43,10 +43,9 @@
 #define ITEMBOXWIDGET_H
 
 
-
+#include "itemboxlib.h"
 #include "itemboxwidgetbase_p.h"
 #include "itemboxcore.h"
-
 
 
 namespace HEHUI {
@@ -55,7 +54,7 @@ namespace HEHUI {
 class ItemBoxTreeWidget;
 class FilterWidget;
 
-class ItemBoxWidget : public ItemBoxWidgetBase
+class ITEMBOX_LIB_API ItemBoxWidget : public ItemBoxWidgetBase
 {
     Q_OBJECT
 public:
@@ -85,7 +84,7 @@ public:
     virtual void moveItem(int old_cat_idx, int new_cat_idx, const QString &item_id);
     virtual void moveItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id);
 
-    void dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint &global_mouse_pos);
+//    void dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint &global_mouse_pos);
 
 //    virtual void setFileName(const QString &file_name);
 //    virtual QString fileName() const;

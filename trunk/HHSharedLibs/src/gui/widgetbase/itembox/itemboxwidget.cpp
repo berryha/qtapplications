@@ -204,10 +204,10 @@ void ItemBoxWidget::moveItem(const QString &old_cat_name, const QString &new_cat
     m_treeWidget->moveItem(old_cat_name, new_cat_name, item_id);
 }
 
-void ItemBoxWidget::dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint&)
-{
-    m_treeWidget->dropItems(item_list);
-}
+//void ItemBoxWidget::dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint&)
+//{
+//    m_treeWidget->dropItems(item_list);
+//}
 
 //void ItemBoxWidget::setFileName(const QString &file_name)
 //{

@@ -11,7 +11,8 @@ SOURCES +=  $$PWD/itemboxcore.cpp \
             $$PWD/filterwidget.cpp \
             $$PWD/iconloader.cpp
 
-HEADERS +=  $$PWD/itemboxcore.h \
+HEADERS +=  $$PWD/itemboxlib.h \
+            $$PWD/itemboxcore.h \
             $$PWD/itemboxcategorylistview.h \
             $$PWD/itemboxtreewidget.h \
             $$PWD/itemboxwidget.h \
@@ -22,3 +23,5 @@ HEADERS +=  $$PWD/itemboxcore.h \
             $$PWD/iconloader_p.h
 
 RESOURCES += $$PWD/itembox.qrc
+
+DEFINES += ITEMBOX_LIBRARY_EXPORT

@@ -97,7 +97,7 @@ public:
     void moveItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id);
 
 
-    void dropItems(const QList<ItemBoxWidgetInterface *> &item_list);
+//    void dropItems(const QList<ItemBoxWidgetInterface *> &item_list);
 
 //    void setFileName(const QString &file_name);
 //    QString fileName() const;

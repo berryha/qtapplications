@@ -76,12 +76,6 @@ HEADERS += screenshot/screenshot.h \
     progress/progressdlg.h \
     widgetbase/systemtrayiconbase.h \
     imageresourcebase.h \
-    widgetbase/expandlistview/categorylistview.h \
-    widgetbase/expandlistview/expandlistview.h \
-    widgetbase/expandlistview/expandlistviewmanager.h \
-    widgetbase/expandlistview/shared/abstractexpandlistviewInterface.h \
-    widgetbase/expandlistview/shared/expandlistviewbase.h \
-    widgetbase/expandlistview/treewidget.h \
     plugin/guipluginbase.h \
     login/loginbase.h \
     settingsbase.h \
@@ -91,10 +85,7 @@ HEADERS += screenshot/screenshot.h \
     dataprint.h \
     widgetbase/mainwindowbase.h \
     widgetbase/widgetbase.h \
-    guilib.h \
-    widgetbase/expandlistview/shared/filterwidget.h \
-    widgetbase/expandlistview/shared/sheet_delegate.h \
-    widgetbase/expandlistview/shared/iconloader.h
+    guilib.h
 FORMS += screenshot/screenshot.ui \
     screenshot/selecttargetimagewidget.ui \
     dataexport/dataoutputdialog.ui \
@@ -112,15 +103,6 @@ SOURCES += screenshot/screenshot.cpp \
     progress/progressdlg.cpp \
     widgetbase/systemtrayiconbase.cpp \
     imageresourcebase.cpp \
-    widgetbase/expandlistview/categorylistview.cpp \
-    widgetbase/expandlistview/expandlistview.cpp \
-    widgetbase/expandlistview/expandlistviewmanager.cpp \
-    widgetbase/expandlistview/shared/abstractexpandlistviewInterface.cpp \
-    widgetbase/expandlistview/shared/expandlistviewbase.cpp \
-    widgetbase/expandlistview/shared/filterwidget.cpp \
-    widgetbase/expandlistview/shared/iconloader.cpp \
-    widgetbase/expandlistview/shared/sheet_delegate.cpp \
-    widgetbase/expandlistview/treewidget.cpp \
     plugin/guipluginbase.cpp \
     login/loginbase.cpp \
     settingsbase.cpp \
@@ -131,7 +113,7 @@ SOURCES += screenshot/screenshot.cpp \
     widgetbase/mainwindowbase.cpp \
     widgetbase/widgetbase.cpp
 
-RESOURCES += widgetbase/expandlistview/expandlistview.qrc \
+RESOURCES += \
             gui.qrc
 # ##
 # DESTDIR = $${LIB_PATH}
