@@ -21,7 +21,7 @@
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedGUI/hmainwindowbase.h"
 #include "HHSharedGUI/hsystemtrayiconbase.h"
-#include "HHSharedGUI/hexpandlistviewmanager.h"
+#include "HHSharedGUI/ItemBox"
 
 
 
@@ -30,7 +30,7 @@
 namespace HEHUI {
 
 
-class MainWindow: public MainWindowBase {
+class MainWindow: public MainWindowBase  {
     Q_OBJECT
 
 public:
@@ -178,8 +178,9 @@ private:
     QMenu *pluginsMenu;
 
     ChatWindowManager *chatWindowManager;
-    ExpandListViewManager *expandListViewManager;
-    ExpandListView *friendsListView;
+//    ExpandListViewManager *expandListViewManager;
+    ItemBoxCore *m_boxCore;
+    ItemBoxWidget *friendBox;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
 

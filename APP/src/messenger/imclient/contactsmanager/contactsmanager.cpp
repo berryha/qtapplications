@@ -521,7 +521,7 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 }
 
 
-void ContactsManager::slotFetchContactsInfo(ExpandListView *expandListView){
+void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
     qDebug()<<"ContactsManager::slotFetchContactsInfo(...)";
 
     QString groupQueryString = QString("select * from contactgroups");
@@ -680,7 +680,7 @@ void ContactsManager::slotFetchStrangersInfo(){
 }
 
 
-void ContactsManager::slotAddNewContactGroupToUI(ExpandListView *expandListView, int personalContactGroupID, const QString &groupName){
+void ContactsManager::slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName){
     qDebug()<<"--ContactsManager::slotAddNewContactGroupToUI(...)";
 
     //    Category *category = new Category();
@@ -691,16 +691,16 @@ void ContactsManager::slotAddNewContactGroupToUI(ExpandListView *expandListView,
     Category category;
     category.setID(QString::number(personalContactGroupID));
     category.setName(groupName);
-    expandListView->load(&category);
+    expandListView->addCategory(category);
 
 }
 
-void ContactsManager::slotDeleteContactGroupFromUI(ExpandListView *expandListView, const QString &groupName){
+void ContactsManager::slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName){
 
     expandListView->removeCategory(groupName);
 }
 
-void ContactsManager::addContactToUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID){
+void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
     qDebug()<<"--ContactsManager::addContactToUI(...)  groupName:"<<groupName<<" contactID:"<<contactID;
 
     Contact *contact = 0;
@@ -720,31 +720,31 @@ void ContactsManager::addContactToUI(ExpandListView *expandListView, const QStri
 
     objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
 
-    expandListView->addObjectItem(groupName, objectItem);
+    expandListView->addItem(groupName, objectItem);
 
 
 }
 
-void ContactsManager::deleteContactFromUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID){
+void ContactsManager::deleteContactFromUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
 
-    expandListView->removeObjectItem(groupName, contactID);
+    expandListView->removeItem(groupName, contactID);
 
 }
 
-void ContactsManager::moveContactToUI(ExpandListView *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID){
+void ContactsManager::moveContactToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID){
     qDebug()<<"moveContactToUI(...)";
 
     if(!contactHash.contains(contactID)){
         return;
     }
-    expandListView->moveObjectItem(old_groupName, new_groupName, contactID);
+    expandListView->moveItem(old_groupName, new_groupName, contactID);
 
     //expandListView->update();
     //expandListView->updateGeometry();
 
 }
 
-void ContactsManager::updateContactToUI(ExpandListView *expandListView, const QString &groupName, const QString &contactID){
+void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
     qDebug()<<"--ContactsManager::updateContactToUI(...)  groupName:"<<groupName<<" contactID:"<<contactID;
 
     Contact *contact = 0;
@@ -760,14 +760,14 @@ void ContactsManager::updateContactToUI(ExpandListView *expandListView, const QS
 
 }
 
-void ContactsManager::updateContactToUI(ExpandListView *expandListView, int personalContactGroupID, const QString &contactID){
+void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID){
 
     updateContactToUI(expandListView, getPersonalContactGroupName(personalContactGroupID), contactID);
 
 }
 
 
-void ContactsManager::renameGroupToUI(ExpandListView *expandListView, const QString &old_groupName, const QString &new_groupName){
+void ContactsManager::renameGroupToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName){
 
     //    ContactGroup *contactGroup = 0;
     //    int groupID = getGroup(group_name);
@@ -784,7 +784,7 @@ void ContactsManager::renameGroupToUI(ExpandListView *expandListView, const QStr
 }
 
 
-void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
+void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
         qDebug()<<"------------------------------------------------ContactsManager::slotLoadContacts(...)";
 
     //	Category *category = new Category();
@@ -811,12 +811,12 @@ void ContactsManager::slotLoadContacts(ExpandListView *expandListView, int group
         //objectItem.setIconMode(QIcon::Disabled);
         //objectItem.setCategoryID(groupName);
 
-        category.addObjectItem(objectItem);
+        category.addItem(objectItem);
 
         qApp->processEvents();
     }
 
-    expandListView->load(&category);
+    expandListView->addCategory(category);
 
 }
 
@@ -1687,7 +1687,7 @@ query.clear();
 
 
 /*
- void ContactsManager::slotLoadContacts(ExpandListView *widgetBox, bool loadFromFile, const QString &string){
+ void ContactsManager::slotLoadContacts(ItemBoxWidget *widgetBox, bool loadFromFile, const QString &string){
 
  QString file; // = QApplication::applicationDirPath()+QDir::separator()+"contacts.xml";
 
