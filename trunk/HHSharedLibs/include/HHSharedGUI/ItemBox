@@ -1,0 +1,4 @@
+
+#include "../../src/gui/widgetbase/itembox/itemboxcore.h"
+#include "../../src/gui/widgetbase/itembox/itemboxwidget.h"
+#include "../../src/gui/widgetbase/itembox/itemboxlib.h"
