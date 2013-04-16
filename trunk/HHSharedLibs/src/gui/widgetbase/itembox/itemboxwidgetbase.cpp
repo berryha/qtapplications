@@ -98,7 +98,7 @@ QString ItemBoxWidgetInterface::Item::id() const
     return m_data->m_id;
 }
 
-void ItemBoxWidgetInterface::Item::setId(const QString &aid){
+void ItemBoxWidgetInterface::Item::setID(const QString &aid){
     m_data->m_id = aid;
 }
 

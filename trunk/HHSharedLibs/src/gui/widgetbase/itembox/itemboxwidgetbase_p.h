@@ -72,7 +72,7 @@ public:
     LoadMode loadMode() const;
     void setLoadMode(LoadMode lm);
 
-    virtual bool loadContents(const QString &contents) = 0;
+//    virtual bool loadContents(const QString &contents) = 0;
 
     // Convenience to access the widget box icon of a widget. Empty category
     // matches all
