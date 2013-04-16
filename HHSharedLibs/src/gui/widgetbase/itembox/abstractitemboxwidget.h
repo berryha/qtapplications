@@ -48,6 +48,8 @@
 #include <QtWidgets/QWidget>
 #include <QtGui/QIcon>
 
+#include "itemboxlib.h"
+
 
 
 namespace HEHUI {
@@ -55,11 +57,11 @@ namespace HEHUI {
 
 class ItemBoxItemData;
 
-class ItemBoxWidgetInterface : public QWidget
+class ITEMBOX_LIB_API ItemBoxWidgetInterface : public QWidget
 {
     Q_OBJECT
 public:
-    class  Item {
+    class ITEMBOX_LIB_API Item {
     public:
         enum Type { Default, Custom };
         Item(const QString &aname = QString(), const QString &xml = QString(),
@@ -69,7 +71,7 @@ public:
         Item &operator=(const Item &w);
 
         QString id() const;
-        void setId(const QString &aid);
+        void setID(const QString &aid);
         QString name() const;
         void setName(const QString &aname);
         QString iconName() const;
@@ -96,7 +98,7 @@ public:
             : m_id(aid), m_name(aname), m_type(atype) {}
 
         QString id() const { return m_id; }
-        void setId(const QString &id){ m_id = id; }
+        void setID(const QString &id){ m_id = id; }
         QString name() const { return m_name; }
         void setName(const QString &aname) { m_name = aname; }
         int itemCount() const { return m_item_list.size(); }
@@ -131,8 +133,7 @@ public:
 
 //    int findOrInsertCategory(const QString &categoryName);
 
-    virtual void dropItems(const QList<ItemBoxWidgetInterface*> &item_list,
-                                const QPoint &global_mouse_pos) = 0;
+//    virtual void dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint &global_mouse_pos) = 0;
 
 //    virtual void setFileName(const QString &file_name) = 0;
 //    virtual QString fileName() const = 0;
