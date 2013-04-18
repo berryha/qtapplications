@@ -1,4 +1,4 @@
-/*
+﻿/*
  ****************************************************************************
  * user.h
  *
@@ -35,7 +35,7 @@
 #include <QMetaObject>
 #include <QCoreApplication>
 #include <QDateTime>
-
+  
 #include "userbase.h"
 
 #include "mysharedlib_global.h"
