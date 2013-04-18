@@ -1,4 +1,4 @@
-/*
+﻿/*
  * contactsmanager.cpp
  *
  *  Created on: 2009-9-12

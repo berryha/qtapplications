@@ -34,21 +34,17 @@ namespace HEHUI {
 Contact::Contact(QObject *parent)
     :IMUserBase(parent)
 {
-
     contactGroupID = 0;
     interestGroupID = 0;
     systemGroupID = 0;
-    
 }
 
 Contact::Contact(const QString &contactID, QObject *parent)
     :IMUserBase(contactID, parent)
 {
-
     contactGroupID = 0;
     interestGroupID = 0;
     systemGroupID = 0;
-    
 }
 
 Contact::Contact(const QString &contactID, const QString &nickname, QObject *parent)
