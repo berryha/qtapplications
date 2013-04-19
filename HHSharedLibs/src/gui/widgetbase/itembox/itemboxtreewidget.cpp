@@ -288,7 +288,7 @@ ItemBoxCategoryListView *ItemBoxTreeWidget::addCategoryView(QTreeWidgetItem *par
     categoryView->setFlow(iconMode ? QListView::TopToBottom:QListView::LeftToRight);
 
 //    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
-    connect(categoryView, SIGNAL(pressed(QString,QString,QPoint)), this, SIGNAL(pressed(QString,QString,QPoint)));
+//    connect(categoryView, SIGNAL(pressed(QString,QString,QPoint)), this, SIGNAL(pressed(QString,QString,QPoint)));
     connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
     connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
 
