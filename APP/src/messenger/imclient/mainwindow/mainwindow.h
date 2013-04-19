@@ -30,7 +30,7 @@
 namespace HEHUI {
 
 
-class MainWindow: public MainWindowBase  {
+class MainWindow: public MainWindowBase, public ItemBoxEventHandler  {
     Q_OBJECT
 
 public:
@@ -79,9 +79,16 @@ private slots:
     void slotLockUI();
 
 
-    void slotContextMenuEventOnCategoryOccurs(const QString &group_name, const QPoint &global_mouse_pos, QMenu *contextMenu);
-    void slotContextMenuEventOnObjectItemOccurs(const QString &contactID, const QPoint &global_mouse_pos, QMenu *contextMenu);
-    void slotTooltipEventOnObjectItemOccurs(const QString &contactID, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+    //ItemBoxEventHandler
+//    void handleItemPressed(const QString &item_id, const QPoint &globalPos);
+//    void handleItemDoubleClicked(const QModelIndex & index);
+//    void handleItemEntered(const QModelIndex & index );
+
+    void handleItemActivated(const QString &id);
+    void handleContextMenuEventOnCategory(const QString &cat_name, const QPoint &global_mouse_pos, QMenu *contextMenu);
+    void handleContextMenuEventOnItem(const QString &item_id, const QPoint &global_mouse_pos, QMenu *contextMenu);
+    void handleTooltipEventOnItem(const QString &item_id, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+
 
     void slotMoveContactToGroup();
     void slotMoveContactToBlacklist();
@@ -179,7 +186,7 @@ private:
 
     ChatWindowManager *chatWindowManager;
 //    ExpandListViewManager *expandListViewManager;
-    ItemBoxCore *m_boxCore;
+//    ItemBoxEventHandler *m_boxCore;
     ItemBoxWidget *friendBox;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
