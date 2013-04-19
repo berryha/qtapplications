@@ -43,7 +43,7 @@
 #define WIDGETBOXCATEGORYLISTVIEW_H
 
 #include "abstractitemboxwidget.h"
-#include "itemboxcore.h"
+#include "itemboxeventhandler.h"
 
 #include <QtWidgets/QListView>
 #include <QtCore/QList>
@@ -67,7 +67,7 @@ public:
     // Whether to access the filtered or unfiltered view
     enum AccessMode { FilteredAccess, UnfilteredAccess };
 
-    explicit ItemBoxCategoryListView(ItemBoxCore *core, QWidget *parent = 0);
+    explicit ItemBoxCategoryListView(ItemBoxEventHandler *core, QWidget *parent = 0);
     void setViewMode(ViewMode vm);
 
     void dropItems(const QList<ItemBoxWidgetInterface*> &item_list);
@@ -120,7 +120,7 @@ private:
     int mapRowToSource(int filterRow) const;
 
 private:
-    ItemBoxCore *m_core;
+    ItemBoxEventHandler *m_core;
     QSortFilterProxyModel *m_proxyModel;
     ItemBoxCategoryModel *m_model;
 

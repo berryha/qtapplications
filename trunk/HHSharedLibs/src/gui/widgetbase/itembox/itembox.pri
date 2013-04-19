@@ -1,7 +1,7 @@
 
 INCLUDEPATH += $$PWD
 
-SOURCES +=  $$PWD/itemboxcore.cpp \
+SOURCES +=  $$PWD/itemboxeventhandler.cpp \
             $$PWD/itemboxcategorylistview.cpp \
             $$PWD/itemboxtreewidget.cpp \
             $$PWD/itemboxwidget.cpp \
@@ -12,7 +12,7 @@ SOURCES +=  $$PWD/itemboxcore.cpp \
             $$PWD/iconloader.cpp
 
 HEADERS +=  $$PWD/itemboxlib.h \
-            $$PWD/itemboxcore.h \
+            $$PWD/itemboxeventhandler.h \
             $$PWD/itemboxcategorylistview.h \
             $$PWD/itemboxtreewidget.h \
             $$PWD/itemboxwidget.h \

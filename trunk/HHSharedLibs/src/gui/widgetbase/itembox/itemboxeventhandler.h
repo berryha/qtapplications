@@ -1,7 +1,7 @@
-#ifndef ITEMBOXCORE_H
-#define ITEMBOXCORE_H
+#ifndef ITEMBOXEVENTHANDLER_H
+#define ITEMBOXEVENTHANDLER_H
 
-#include <QObject>
+#include <QString>
 #include <QModelIndex>
 #include <QMenu>
 
@@ -10,19 +10,18 @@
 namespace HEHUI {
 
 
-class ITEMBOX_LIB_API ItemBoxCore : public QObject
+class ITEMBOX_LIB_API ItemBoxEventHandler
 {
-    Q_OBJECT
+
 public:
-    explicit ItemBoxCore(QObject *parent = 0);
+    explicit ItemBoxEventHandler();
     
 
 signals:
 
     
-public slots:
+public /*slots*/:
     virtual void handleItemPressed(const QString &item_id, const QPoint &globalPos);
-
     virtual void handleItemActivated(const QModelIndex & index);
     virtual void handleItemActivated(const QString &id);
     virtual void handleItemDoubleClicked(const QModelIndex & index);
@@ -38,4 +37,4 @@ public slots:
 
 } //namespace HEHUI
 
-#endif // ITEMBOXCORE_H
+#endif // ITEMBOXEVENTHANDLER_H

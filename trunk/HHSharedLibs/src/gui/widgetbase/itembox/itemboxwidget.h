@@ -45,7 +45,7 @@
 
 #include "itemboxlib.h"
 #include "itemboxwidgetbase_p.h"
-#include "itemboxcore.h"
+#include "itemboxeventhandler.h"
 
 
 namespace HEHUI {
@@ -58,10 +58,10 @@ class ITEMBOX_LIB_API ItemBoxWidget : public ItemBoxWidgetBase
 {
     Q_OBJECT
 public:
-    explicit ItemBoxWidget(ItemBoxCore *core, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    explicit ItemBoxWidget(ItemBoxEventHandler *core, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~ItemBoxWidget();
 
-    ItemBoxCore *core() const;
+    ItemBoxEventHandler *core() const;
 
     virtual int categoryCount() const;
     virtual Category category(int cat_idx) const;
@@ -109,7 +109,7 @@ private slots:
 //    void handleMousePress(const QString &name, const QString &xml, const QPoint &global_mouse_pos);
 
 private:
-    ItemBoxCore *m_core;
+    ItemBoxEventHandler *m_core;
     ItemBoxTreeWidget *m_treeWidget;
 
     FilterWidget *filterWidget;

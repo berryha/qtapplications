@@ -61,7 +61,7 @@ namespace HEHUI {
 
 
 
-ItemBoxWidget::ItemBoxWidget(ItemBoxCore *core, QWidget *parent, Qt::WindowFlags flags)
+ItemBoxWidget::ItemBoxWidget(ItemBoxEventHandler *core, QWidget *parent, Qt::WindowFlags flags)
     : ItemBoxWidgetBase(parent, flags),
       m_core(core),
       m_treeWidget(new ItemBoxTreeWidget(m_core))
@@ -121,7 +121,7 @@ bool ItemBoxWidget::eventFilter(QObject *o, QEvent *e)
     return QWidget::eventFilter(o, e);
 }
 
-ItemBoxCore *ItemBoxWidget::core() const
+ItemBoxEventHandler *ItemBoxWidget::core() const
 {
     return m_core;
 }
