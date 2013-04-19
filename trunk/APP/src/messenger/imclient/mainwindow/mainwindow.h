@@ -109,6 +109,9 @@ private slots:
     void slotProcessBlacklistInfo(const QString &blacklistOnServer, quint32 blacklistInfoVersionOnServer);
 
     void slotSearch();
+    void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    void addContact(const QString &userID, const QString &verificationMessage);
+
     void slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void showContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
 
