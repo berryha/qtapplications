@@ -79,7 +79,7 @@ static TopLevelRole topLevelRole(const  QTreeWidgetItem *item)
 
 
 
-ItemBoxTreeWidget::ItemBoxTreeWidget(ItemBoxCore *core, QWidget *parent) :
+ItemBoxTreeWidget::ItemBoxTreeWidget(ItemBoxEventHandler *core, QWidget *parent) :
     QTreeWidget(parent),
     m_core(core),
     m_iconMode(false),

@@ -53,7 +53,7 @@
 
 namespace HEHUI {
 
-class ItemBoxCore;
+class ItemBoxEventHandler;
 
 class ItemBoxCategoryListView;
 
@@ -68,7 +68,7 @@ public:
     typedef ItemBoxWidgetInterface::Category Category;
     typedef ItemBoxWidgetInterface::CategoryList CategoryList;
 
-    explicit ItemBoxTreeWidget(ItemBoxCore *core, QWidget *parent = 0);
+    explicit ItemBoxTreeWidget(ItemBoxEventHandler *core, QWidget *parent = 0);
     ~ItemBoxTreeWidget();
 
 
@@ -156,7 +156,7 @@ private:
 //    void restoreExpandedState();
     void updateViewMode();
 
-    ItemBoxCore *m_core;
+    ItemBoxEventHandler *m_core;
 //    QString m_file_name;
     typedef QHash<QString, QIcon> IconCache;
     mutable IconCache m_pluginIcons;

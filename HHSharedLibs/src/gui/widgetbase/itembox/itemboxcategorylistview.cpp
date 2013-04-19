@@ -99,7 +99,7 @@ ItemBoxCategoryEntry::ItemBoxCategoryEntry(const ItemBoxWidgetInterface::Item &w
 
 class ItemBoxCategoryModel : public QAbstractListModel {
 public:
-    explicit ItemBoxCategoryModel(ItemBoxCore *core, QObject *parent = 0);
+    explicit ItemBoxCategoryModel(ItemBoxEventHandler *core, QObject *parent = 0);
 
     // QAbstractListModel
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -134,12 +134,12 @@ private:
     typedef QList<ItemBoxCategoryEntry> ItemBoxCategoryEntrys;
 
     QRegExp m_classNameRegExp;
-    ItemBoxCore *m_core;
+    ItemBoxEventHandler *m_core;
     ItemBoxCategoryEntrys m_categoryentrys;
     QListView::ViewMode m_viewMode;
 };
 
-ItemBoxCategoryModel::ItemBoxCategoryModel(ItemBoxCore *core, QObject *parent) :
+ItemBoxCategoryModel::ItemBoxCategoryModel(ItemBoxEventHandler *core, QObject *parent) :
     QAbstractListModel(parent),
     m_classNameRegExp(QStringLiteral("<widget +class *= *\"([^\"]+)\"")),
     m_core(core),
@@ -464,7 +464,7 @@ QWidget *ItemBoxCategoryEntryDelegate::createEditor(QWidget *parent,
 
 ItemBoxCategoryListView *ItemBoxCategoryListView::lastFocusedCategoryListView = 0;
 
-ItemBoxCategoryListView::ItemBoxCategoryListView(ItemBoxCore *core, QWidget *parent) :
+ItemBoxCategoryListView::ItemBoxCategoryListView(ItemBoxEventHandler *core, QWidget *parent) :
     QListView(parent),
     m_core(core),
     m_proxyModel(new QSortFilterProxyModel(this)),
