@@ -48,6 +48,11 @@ public slots:
 
 private slots:
     void chatWindowClosed();
+    void showContextMenu(const QPoint &pos);
+
+    void switchToSubWindowView();
+    void switchToTabbedView();
+
 
 private:
     //	bool isChatWindowOpened(Contact *contact);

@@ -14,6 +14,7 @@ ChatWindowManager::ChatWindowManager(QWidget *parent)
 {
 	ui.setupUi(this);
 
+    connect(ui.mdiArea, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
 
 }
 
@@ -212,6 +213,32 @@ void ChatWindowManager::chatWindowClosed(){
         hide();
     }
     
+}
+
+void ChatWindowManager::showContextMenu(const QPoint &pos){
+
+    QMenu menu;
+
+    if(ui.mdiArea->viewMode() == QMdiArea::SubWindowView){
+        menu.addAction(tr("Cascade Windows"), ui.mdiArea, SLOT(cascadeSubWindows()));
+        menu.addAction(tr("Tile Windows"), ui.mdiArea, SLOT(tileSubWindows()));
+        menu.addSeparator();
+//        menu.addAction(tr("Tabbed View"), this, SLOT(switchToTabbedView()));
+    }else{
+//        menu.addAction(tr("SubWindow View"), this, SLOT(switchToSubWindowView()));
+    }
+
+
+    menu.exec(mapToGlobal(pos));
+
+}
+
+void ChatWindowManager::switchToSubWindowView(){
+    ui.mdiArea->setViewMode(QMdiArea::SubWindowView);
+}
+
+void ChatWindowManager::switchToTabbedView(){
+    ui.mdiArea->setViewMode(QMdiArea::TabbedView);
 }
 
 ContactChatWindow * ChatWindowManager::createContactChatWindow(Contact *contact){

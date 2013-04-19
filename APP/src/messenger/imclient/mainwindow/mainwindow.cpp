@@ -1836,8 +1836,8 @@ void MainWindow::slotProcessBlacklistInfo(const QString &blacklistOnServer, quin
 void MainWindow::slotSearch(){
     if(!search){
         search = new Search(this);
-        connect(search, SIGNAL(signalSearchContact(const QString &, bool, bool)), clientPacketsParser, SLOT(searchContact(const QString &, bool, bool)), Qt::QueuedConnection);
-        connect(search, SIGNAL(signalAddContact(const QString&, const QString&)), clientPacketsParser, SLOT(addContact(const QString&, const QString&)));
+        connect(search, SIGNAL(signalSearchContact(const QString &, bool, bool)), this, SLOT(searchContact(const QString &, bool, bool)), Qt::QueuedConnection);
+        connect(search, SIGNAL(signalAddContact(const QString&, const QString&)), this, SLOT(addContact(const QString&, const QString&)));
 
         connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QStringList &)), search, SLOT(slotSearchContactsResultPacketReceived(const QStringList &)), Qt::QueuedConnection);
 
@@ -1846,6 +1846,14 @@ void MainWindow::slotSearch(){
 
     search->show();
 
+}
+
+void MainWindow::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
+    clientPacketsParser->searchContact(m_socketConnectedToServer, propertiesString, matchExactly, searchOnlineUsersOnly);
+}
+
+void MainWindow::addContact(const QString &userID, const QString &verificationMessage){
+    clientPacketsParser->addContact(m_socketConnectedToServer, userID, verificationMessage);
 }
 
 void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage){
