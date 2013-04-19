@@ -34,7 +34,8 @@ namespace HEHUI {
 
 
 MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
-    MainWindowBase(parent) {
+    MainWindowBase(parent), ItemBoxEventHandler()
+{
     
     ui.setupUi(this);
 
@@ -55,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     chatWindowManager = 0;
 //    expandListViewManager = 0;
-    m_boxCore = 0;
     friendBox = 0;
     m_userInfoTipWindow = 0;
 
@@ -277,8 +277,8 @@ void MainWindow::initUI(){
         //}
     //if(!friendsListView){
 //        friendBox = expandListViewManager->createExpandListView(ui.friendsPage);
-        m_boxCore = new ItemBoxCore();
-        friendBox = new ItemBoxWidget(m_boxCore, ui.friendsPage);
+//        m_boxCore = new ItemBoxCore();
+        friendBox = new ItemBoxWidget(this, ui.friendsPage);
         ui.friendsPageGridLayout->addWidget(friendBox, 0, 0, 1, 1);
     //}
 
@@ -1201,8 +1201,13 @@ void MainWindow::slotLockUI(){
 
 }
 
-void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name, const QPoint &global_mouse_pos, QMenu *contextMenu){
-    qDebug()<<"--MainWindow::slotContextMenuEventOnCategoryOccurs(...)";
+
+void MainWindow::handleItemActivated(const QString &id){
+    chatWindowManager->slotNewChatWithContact(id);
+}
+
+void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, const QPoint &global_mouse_pos, QMenu *contextMenu){
+    qDebug()<<"--MainWindow::handleContextMenuEventOnCategory(...)";
 
     m_userInfoTipWindow->hideUserInfoTip();
 
@@ -1305,8 +1310,8 @@ void MainWindow::slotContextMenuEventOnCategoryOccurs(const QString &group_name,
 
 }
 
-void MainWindow::slotContextMenuEventOnObjectItemOccurs(const QString &contactID, const QPoint &global_mouse_pos, QMenu *contextMenu){
-    qDebug()<<"--MainWindow::slotContextMenuEventOnObjectItemOccurs(...)";
+void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QPoint &global_mouse_pos, QMenu *contextMenu){
+    qDebug()<<"--MainWindow::handleContextMenuEventOnItem(...)";
 
     m_userInfoTipWindow->hideUserInfoTip();
 
@@ -1382,9 +1387,9 @@ void MainWindow::slotContextMenuEventOnObjectItemOccurs(const QString &contactID
 
 }
 
-void MainWindow::slotTooltipEventOnObjectItemOccurs(const QString &contactID, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
+void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
 
-    qDebug()<<"--MainWindow::slotTooltipEventOnObjectItemOccurs()--contactID:"<<contactID;
+    qDebug()<<"--MainWindow::handleTooltipEventOnItem()--contactID:"<<contactID;
 
     //    if(!m_userInfoTipWindow){
     //        m_userInfoTipWindow = new UserInfoTipWindow(this);
