@@ -40,7 +40,8 @@ HEADERS += \
 RESOURCES += resources.qrc
 
 # win32:RC_FILE = iconresource.rc
-win32:APP_ICON = resources/images/app.ico
+#win32:APP_ICON = resources/images/app.ico
+win32:RC_ICONS = resources/images/app.ico
 mac:ICON = ./resources/images/app.icns
 
 # define some usefull values

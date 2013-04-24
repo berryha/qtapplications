@@ -14,7 +14,7 @@
 void showSplashMessage(QSplashScreen *s, const QString &str){
     s->showMessage(str, Qt::AlignRight | Qt::AlignBottom, Qt::darkGreen);
 }
- 
+
 
 int main(int argc, char *argv[])
 {
