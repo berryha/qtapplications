@@ -85,6 +85,7 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
     {
         foreach (QMdiSubWindow *window, ui.mdiArea->subWindowList()) {
             ui.mdiArea->removeSubWindow(window);
+            window->widget()->setParent(0);
             window->deleteLater();
         }
 
