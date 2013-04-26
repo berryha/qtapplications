@@ -10,10 +10,12 @@ class ContactChatWidget : public QWidget
     Q_OBJECT
 
 public:
-    ContactChatWidget(Contact *contact, QWidget *parent = 0);
+    ContactChatWidget(Contact *contact = 0, QWidget *parent = 0);
     ~ContactChatWidget();
 
-    Contact * contact(){return m_contact;}
+    void setContact(Contact *contact);
+    Contact * contact();
+    QString displayName() const;
 
 signals:
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
@@ -28,6 +30,8 @@ private:
     Ui::ContactChatWidgetClass ui;
 
     Contact *m_contact;
+
+    QString m_displayName;
 
 
 
