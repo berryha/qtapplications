@@ -36,7 +36,6 @@ INCLUDEPATH += . \
 # Input
 HEADERS += contactinfowidget/contactinfowidget.h \
     informationtips/userinfotipwindow.h \
-    chatwindow/contactchatwindow.h \
     chatwindow/groupchatwindow.h \
     chatwindow/emoticonselecter/emoticonselectoruibase.h \
     chatwindow/emoticonselecter/customface.h \
@@ -66,10 +65,10 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     contactsmanager/interestgroup.h \
     packetmanager/imclientpacketsparser.h \
     networkmanager/clientresourcesmanager.h \
-    contractstree/contractstree.h
+    contractstree/contractstree.h \
+    chatwindow/contactchatwidget.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
-    chatwindow/contactchatwindow.cpp \
     chatwindow/groupchatwindow.cpp \
     chatwindow/emoticonselecter/emoticonselectoruibase.cpp \
     chatwindow/emoticonselecter/customface.cpp \
@@ -99,10 +98,11 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     contactsmanager/interestgroup.cpp \
     packetmanager/imclientpacketsparser.cpp \
     networkmanager/clientresourcesmanager.cpp \
-    contractstree/contractstree.cpp
+    contractstree/contractstree.cpp \
+    chatwindow/contactchatwidget.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
-    chatwindow/contactchatwindow.ui \
+    chatwindow/contactchatwidget.ui \
     chatwindow/groupchatwindow.ui \
     search/search.ui \
     networkmanager/servermanagerwindow.ui \
