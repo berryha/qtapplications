@@ -173,6 +173,12 @@ QWebView *ChatMessageWindow::messageBrowser() {
 void ChatMessageWindow::setContact(Contact *c){
     m_contact = c;
     m_chatMessageWindowType = CMWT_Contact;
+
+    if(m_contact){
+        ui.sendMsgPushButton->setEnabled(true);
+    }else{
+        ui.sendMsgPushButton->setEnabled(false);
+    }
 }
 
 Contact * ChatMessageWindow::getContact(){
@@ -182,6 +188,12 @@ Contact * ChatMessageWindow::getContact(){
 void ChatMessageWindow::setInterestGroup(InterestGroup *group){
     m_interestGroup = group;
     m_chatMessageWindowType = CMWT_InterestGroup;
+
+    if(m_interestGroup){
+        ui.sendMsgPushButton->setEnabled(true);
+    }else{
+        ui.sendMsgPushButton->setEnabled(false);
+    }
 }
 
 InterestGroup * ChatMessageWindow::getInterestGroup(){
