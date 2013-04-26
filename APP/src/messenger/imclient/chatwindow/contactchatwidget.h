@@ -1,17 +1,17 @@
 #ifndef CONTACTCHATWINDOW_H
 #define CONTACTCHATWINDOW_H
 
-#include <QMainWindow>
-#include "ui_contactchatwindow.h"
+#include <QWidget>
+#include "ui_contactchatwidget.h"
 
 
-class ContactChatWindow : public QMainWindow
+class ContactChatWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    ContactChatWindow(Contact *contact, QWidget *parent = 0);
-    ~ContactChatWindow();
+    ContactChatWidget(Contact *contact, QWidget *parent = 0);
+    ~ContactChatWidget();
 
     Contact * contact(){return m_contact;}
 
@@ -25,7 +25,7 @@ public slots:
 
 
 private:
-    Ui::ContactChatWindowClass ui;
+    Ui::ContactChatWidgetClass ui;
 
     Contact *m_contact;
 

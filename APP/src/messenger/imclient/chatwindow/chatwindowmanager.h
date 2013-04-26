@@ -11,7 +11,7 @@
 #include "../contactsmanager/contact.h"
 //#include "chatmessagewindow.h"
 #include "groupchatwindow.h"
-#include "contactchatwindow.h"
+#include "contactchatwidget.h"
 
 //#include "../../shared/core/singleton.h"
 #include "HHSharedCore/hsingleton.h"
@@ -57,7 +57,7 @@ private slots:
 private:
     //	bool isChatWindowOpened(Contact *contact);
 
-    ContactChatWindow *createContactChatWindow(Contact *contact);
+    ContactChatWidget *createContactChatWindow(Contact *contact);
     QMdiSubWindow* findChatWithContactWindow(Contact *contact);
 
     GroupChatWindow* createGroupChatWindow(InterestGroup *group);

@@ -63,7 +63,7 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
 
 
     if(!subWindow){
-        ContactChatWindow *contactChatWindow = createContactChatWindow(contact);
+        ContactChatWidget *contactChatWindow = createContactChatWindow(contact);
         //                connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(const QString &, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(const QString &, const QString &, const QStringList &)));
         //                connect(this, SIGNAL(signalChatImageReceived(const QString&)), contactChatWindow, SLOT(updateImage(const QString&)));
 
@@ -94,12 +94,12 @@ void ChatWindowManager::slotNewMessageReceivedFromContact(const QString &contact
     }
 
     QMdiSubWindow * subWindow = findChatWithContactWindow(contact);
-    ContactChatWindow *contactChatWindow;
+    ContactChatWidget *contactChatWindow;
 
     if(!subWindow){
         contactChatWindow = createContactChatWindow(contact);
     }else{
-        contactChatWindow = qobject_cast<ContactChatWindow *>(subWindow->widget());
+        contactChatWindow = qobject_cast<ContactChatWidget *>(subWindow->widget());
     }
 
     if(!contactChatWindow){
@@ -241,8 +241,8 @@ void ChatWindowManager::switchToTabbedView(){
     ui.mdiArea->setViewMode(QMdiArea::TabbedView);
 }
 
-ContactChatWindow * ChatWindowManager::createContactChatWindow(Contact *contact){
-        ContactChatWindow *contactChatWindow = new ContactChatWindow(contact);
+ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact){
+        ContactChatWidget *contactChatWindow = new ContactChatWidget(contact);
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
         connect(this, SIGNAL(signalChatImageReceived(const QString&)), contactChatWindow, SLOT(updateImage(const QString&)));
 
@@ -260,7 +260,7 @@ ContactChatWindow * ChatWindowManager::createContactChatWindow(Contact *contact)
 QMdiSubWindow* ChatWindowManager::findChatWithContactWindow(Contact *contact){
 
 	foreach (QMdiSubWindow *window, ui.mdiArea->subWindowList()) {
-                ContactChatWindow *messageWindow = qobject_cast<ContactChatWindow *>(window->widget());
+                ContactChatWidget *messageWindow = qobject_cast<ContactChatWidget *>(window->widget());
                 if(!messageWindow){continue;}
                 if(messageWindow->contact() == contact){
 			return window;

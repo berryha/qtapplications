@@ -1,7 +1,8 @@
-#include "contactchatwindow.h"
+#include "contactchatwidget.h"
 
-ContactChatWindow::ContactChatWindow(Contact *contact, QWidget *parent)
-    : QMainWindow(parent), m_contact(contact)
+
+ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
+    : QWidget(parent), m_contact(contact)
 {
 	ui.setupUi(this);
 
@@ -22,15 +23,15 @@ ContactChatWindow::ContactChatWindow(Contact *contact, QWidget *parent)
 
 }
 
-ContactChatWindow::~ContactChatWindow()
+ContactChatWidget::~ContactChatWidget()
 {
 
 }
 
-void ContactChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){
+void ContactChatWidget::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){
     ui.chatMessageWindow->appendMessageReceivedFromContact(message, contact, datetime);
 }
 
-void ContactChatWindow::updateImage(const QString &imageName){
+void ContactChatWidget::updateImage(const QString &imageName){
     ui.chatMessageWindow->updateImage(imageName);
 }
