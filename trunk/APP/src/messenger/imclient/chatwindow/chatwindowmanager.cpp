@@ -16,10 +16,12 @@ ChatWindowManager::ChatWindowManager(QWidget *parent)
 
     connect(ui.mdiArea, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
 
-    m_chatWindowDisplayStyle = MDIChatWindow;
-    ui.stackedWidget->setCurrentWidget(ui.pageMdiArea);
-
     initTabWidget();
+
+
+    m_chatWindowDisplayStyle = TabbedChatWindow;
+    ui.stackedWidget->setCurrentWidget(ui.pageTabWidget);
+
 
 }
 
@@ -94,7 +96,7 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
         hide();
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         foreach (ContactChatWidget *ccw, m_contactChatWidgetHash.values()) {
             ccw->hide();
@@ -153,7 +155,7 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
         raise();
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         foreach (ContactChatWidget *ccw, m_contactChatWidgetHash.values()) {
             ccw->showNormal();
@@ -211,7 +213,7 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
         }
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         ccw = m_contactChatWidgetHash.value(contactID);
         if(!ccw){
@@ -281,7 +283,7 @@ void ChatWindowManager::slotNewMessageReceivedFromContact(const QString &contact
         raise();
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         contactChatWindow = m_contactChatWidgetHash.value(contactID);
         if(!contactChatWindow){
@@ -342,7 +344,7 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
         }
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         groupChatWindow = m_groupChatWidgetHash.value(interestGroupID);
         if(!groupChatWindow){
@@ -418,7 +420,7 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
         raise();
     }
         break;
-    case SeparateChatWindow:
+    case SeparatedChatWindow:
     {
         groupChatWindow = m_groupChatWidgetHash.value(interestGroupID);
         if(!groupChatWindow){
@@ -500,16 +502,26 @@ void ChatWindowManager::slotTabPageChanged(){
 
 void ChatWindowManager::slotNewTab(){
 
-    switchChatWindowDisplayStyle(TabbedChatWindow);
+    if(m_chatWindowDisplayStyle != TabbedChatWindow) {
+        return;
+    }
 
+    QWidget *cornerWidget = ui.tabWidget->cornerWidget(Qt::TopLeftCorner);
+    QPoint pos = cornerWidget->mapToGlobal(QPoint(0, 0));
+    pos.setY(pos.y() + cornerWidget->height());
 
-    //    slotRemoteManagement();
-    //    updateGeometry();
+    QMenu menu;
+    QMenu *historymenu = chatHistoryMenu();
+    menu.addMenu(historymenu);
+    menu.addSeparator();
+    menu.addAction(tr("Sub Window View"), this, SLOT(switchToSubWindowView()));
+    menu.addAction(tr("Separated Window View"), this, SLOT(switchToSeparatedView()));
 
-    //    QString localComputerName = QHostInfo::localHostName();
-    //    SystemManagementWidget *systemManagementWidget = new SystemManagementWidget(m_adminName, controlCenterPacketsParser, localComputerName, "", "127.0.0.1", "");
-    //    ui.tabWidget->addTab(systemManagementWidget, tr("Computer"));
-    //    ui.tabWidget->setCurrentWidget(systemManagementWidget);
+    menu.exec(pos);
+    qDebug()<<"------------1";
+    historymenu->deleteLater();
+    qDebug()<<"------------2";
+
 
 }
 
@@ -577,13 +589,13 @@ void ChatWindowManager::handleChatWindowClosed(){
     ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(sender());
     if(ccw){
         m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
-        qDebug()<<"-----------contact:"<<ccw->contact()->getUserID();
+        //qDebug()<<"-----------contact:"<<ccw->contact()->getUserID();
     }
 
     GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(sender());
     if(gcw){
         m_groupChatWidgetHash.remove(gcw->interestGroup()->getGroupID());
-        qDebug()<<"--------------group id:"<<gcw->interestGroup()->getGroupID();
+        //qDebug()<<"--------------group id:"<<gcw->interestGroup()->getGroupID();
     }
 
     if(((m_chatWindowDisplayStyle == MDIChatWindow) && (!ui.mdiArea->subWindowList().size()))
@@ -597,44 +609,65 @@ void ChatWindowManager::handleChatWindowClosed(){
 
 void ChatWindowManager::showContextMenu(const QPoint &pos){
 
-    if(m_chatWindowDisplayStyle == TabbedChatWindow || m_chatWindowDisplayStyle == SeparateChatWindow) {
+    if(m_chatWindowDisplayStyle != MDIChatWindow) {
         return;
     }
 
 
     QMenu menu;
-    if(ui.mdiArea->viewMode() == QMdiArea::SubWindowView){
-        menu.addAction(tr("Cascade Windows"), ui.mdiArea, SLOT(cascadeSubWindows()));
-        menu.addAction(tr("Tile Windows"), ui.mdiArea, SLOT(tileSubWindows()));
-        menu.addSeparator();
-//        menu.addAction(tr("Tabbed View"), this, SLOT(switchToTabbedView()));
-                menu.addAction(tr("Tabbed View"), this, SLOT(slotNewTab()));
-
-    }else{
-//        menu.addAction(tr("SubWindow View"), this, SLOT(switchToSubWindowView()));
-    }
+    QMenu *historymenu = chatHistoryMenu();
+    menu.addMenu(historymenu);
+    menu.addSeparator();
+    menu.addAction(tr("Cascade Windows"), ui.mdiArea, SLOT(cascadeSubWindows()));
+    menu.addAction(tr("Tile Windows"), ui.mdiArea, SLOT(tileSubWindows()));
+    menu.addSeparator();
+    menu.addAction(tr("Tabbed Window View"), this, SLOT(switchToTabbedView()));
+    menu.addAction(tr("Separated Window View"), this, SLOT(switchToSeparatedView()));
 
 
     menu.exec(mapToGlobal(pos));
 
 }
 
+void ChatWindowManager::handleContactChatHistoryMenuAction(){
+    QAction *act = qobject_cast<QAction *>(sender());
+    QString contactID = act->data().toString();
+    slotNewChatWithContact(contactID);
+
+}
+
+void ChatWindowManager::handleGroupChatHistoryMenuAction(){
+    QAction *act = qobject_cast<QAction *>(sender());
+    quint32 groupID = act->data().toUInt();
+    slotNewChatWithInterestGroup(groupID);
+
+}
+
 void ChatWindowManager::switchToSubWindowView(){
-    ui.mdiArea->setViewMode(QMdiArea::SubWindowView);
+    switchChatWindowDisplayStyle(MDIChatWindow);
 }
 
 void ChatWindowManager::switchToTabbedView(){
-    ui.mdiArea->setViewMode(QMdiArea::TabbedView);
+    switchChatWindowDisplayStyle(TabbedChatWindow);
+}
+
+void ChatWindowManager::switchToSeparatedView(){
+    switchChatWindowDisplayStyle(SeparatedChatWindow);
 }
 
 ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact){
+
         ContactChatWidget *contactChatWindow = new ContactChatWidget(contact);
+        contactChatWindow->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
         connect(this, SIGNAL(signalChatImageReceived(const QString&)), contactChatWindow, SLOT(updateImage(const QString&)));
 
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
         m_contactChatWidgetHash.insert(contact->getUserID(), contactChatWindow);
+
+        m_contactChatHistoryList.append(contact->getUserID());
 
 //        QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(contactChatWindow);
 //        //subWindow->setWindowIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH) + "/" +contact->getFace()), contact->getOnlineState()));
@@ -683,6 +716,8 @@ GroupChatWindow* ChatWindowManager::createGroupChatWindow(InterestGroup *group){
     }
 
     GroupChatWindow *groupChatWindow = new GroupChatWindow(group);
+    groupChatWindow->setWindowIcon(ImageResource::createIconForInterestGroup());
+
     connect(groupChatWindow, SIGNAL(sendMsgButtonClicked(InterestGroup *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup *, const QString &, const QStringList &)));
     connect(this, SIGNAL(signalChatImageReceived(const QString&)), groupChatWindow, SLOT(updateImage(const QString&)));
 
@@ -690,6 +725,7 @@ GroupChatWindow* ChatWindowManager::createGroupChatWindow(InterestGroup *group){
 
     m_groupChatWidgetHash.insert(group->getGroupID(), groupChatWindow);
 
+    m_groupChatHistoryList.append(group->getGroupID());
 
 
 //    QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(groupChatWindow);
@@ -725,6 +761,44 @@ GroupChatWindow * ChatWindowManager::findInterestGroupChatTabWidget(InterestGrou
     }
 
     return 0;
+
+}
+
+QMenu *ChatWindowManager::chatHistoryMenu(){
+
+    QMenu *menu = new QMenu(tr("History"));
+    m_contactChatHistoryList.removeDuplicates();
+
+    foreach (QString  contactID, m_contactChatHistoryList) {
+        Contact *contact = ContactsManager::instance()->getUser(contactID);
+        if(!contact){
+            m_contactChatHistoryList.removeAll(contactID);
+            continue;
+        }
+        QString displayName = contact->getNickName();
+        if (displayName.isEmpty()) {
+            displayName = contactID;
+        }else if(contactID != displayName){
+            displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
+        }
+
+        QAction *act = menu->addAction(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()), displayName, this, SLOT(handleContactChatHistoryMenuAction()));
+        act->setData(QVariant(contactID));
+    }
+
+    foreach (quint32 groupID, m_groupChatHistoryList) {
+        InterestGroup *group = ContactsManager::instance()->getInterestGroup(groupID);
+        if(!group){
+            m_groupChatHistoryList.removeAll(groupID);
+            continue;
+        }
+        QAction *act = menu->addAction(ImageResource::createIconForInterestGroup(), group->getGroupName(), this, SLOT(handleGroupChatHistoryMenuAction()));
+        act->setData(QVariant(groupID));
+
+    }
+
+    return menu;
+
 
 }
 

@@ -1,4 +1,4 @@
- /***************************************************************************
+/***************************************************************************
  *   Copyright (C) 2006 by yunfan                                          *
  *   yunfan_zg@163.com                                                     *
  *                                                                         *
@@ -47,19 +47,19 @@ using namespace HEHUI;
 
 class EmoticonPanel : public QFrame
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	EmoticonPanel(int groupIndex, const QString &groupName, QWidget* parent = 0);
-	
-        virtual ~EmoticonPanel();
-	int numPages() { return m_Surfaces.count();}
-	int page() { return m_CurrPage; }
-	void setPage(int index);
+    EmoticonPanel(int groupIndex, const QString &groupName, QWidget* parent = 0);
 
-        
-        void loadSystemEmoticons(const QString &resourcePath, const QStringList &imageFiles);
-        void loadCustomEmoticons(const QString &baseDirPath);
+    virtual ~EmoticonPanel();
+    int numPages() { return m_Surfaces.count();}
+    int page() { return m_CurrPage; }
+    void setPage(int index);
+
+
+    void loadSystemEmoticons(const QString &resourcePath, const QStringList &imageFiles);
+    void loadCustomEmoticons(const QString &baseDirPath);
 
 
 private:
@@ -67,65 +67,65 @@ private:
     void addEmoticonsPanel(int iStartIndex = 0);
     
 protected:
-	virtual void paintEvent( QPaintEvent *e);	
-        virtual void mouseReleaseEvent( QMouseEvent * e);
+    virtual void paintEvent( QPaintEvent *e);
+    virtual void mouseReleaseEvent( QMouseEvent * e);
     
 signals:
     void signalEmoticonSelected(const QString &iconPath, bool isSystemEmoticon);
     
 
 private:
-	QString m_groupName;
-	int m_groupIndex;
-        QPixmap m_CurrSurface;
-	int m_CurrPage;
-        QList<QPixmap> m_Surfaces;
-	QMap<int, QString> files; // index, original file name
-        //int m_sysIndex[QQ_SMILEY_AMOUNT];
-        
-        QString m_baseDirPath;
-        bool m_systememoticon;
+    QString m_groupName;
+    int m_groupIndex;
+    QPixmap m_CurrSurface;
+    int m_CurrPage;
+    QList<QPixmap> m_Surfaces;
+    QMap<int, QString> files; // index, original file name
+    //int m_sysIndex[QQ_SMILEY_AMOUNT];
+
+    QString m_baseDirPath;
+    bool m_systememoticon;
 
 
 
-        
+
 };
 
 class EmoticonSelector : public EmoticonSelectorUIBase
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
     EmoticonSelector( QWidget* parent = 0,
-                     const QString &objectName = "",
-                     Qt::WindowFlags fl = Qt::Popup | Qt::FramelessWindowHint);
+                      const QString &objectName = "",
+                      Qt::WindowFlags fl = Qt::Popup | Qt::FramelessWindowHint);
     
     
     ~EmoticonSelector();
     
 private:
-    void loadSystemEmoticons(); 
+    void loadSystemEmoticons();
     void loadCustomEmoticons();
     
 
 signals:
     void signalEmoticonSelected(const QString &iconPath, bool isSystemEmoticon);
 
-	void addSmileyClicked();
+    void addSmileyClicked();
 
 private slots:
 
-	void slotAddSmileyClicked();
-	void slotUseShortcutClicked();
-	void slotPrevClicked();
-	void slotNextClicked();
-	void slotPanelChanged(int index);
-        
-        
+    void slotAddSmileyClicked();
+    void slotUseShortcutClicked();
+    void slotPrevClicked();
+    void slotNextClicked();
+    void slotPanelChanged(int index);
+
+
 protected:
-	virtual void paintEvent( QPaintEvent *e);
-	virtual void mouseReleaseEvent( QMouseEvent * e);
-        
+    virtual void paintEvent( QPaintEvent *e);
+    virtual void mouseReleaseEvent( QMouseEvent * e);
+
 private:
 
 
