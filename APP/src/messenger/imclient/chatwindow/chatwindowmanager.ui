@@ -20,7 +20,13 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_centralwidget">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -35,11 +41,23 @@
     </property>
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
        <number>1</number>
       </property>
       <widget class="QWidget" name="pageMdiArea">
-       <layout class="QGridLayout" name="gridLayout_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_pageMdiArea">
         <property name="leftMargin">
          <number>1</number>
         </property>
@@ -89,7 +107,13 @@
        </layout>
       </widget>
       <widget class="QWidget" name="pageTabWidget">
-       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_pageTabwidget">
         <property name="leftMargin">
          <number>1</number>
         </property>
@@ -109,6 +133,12 @@
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
            <number>-1</number>
+          </property>
+          <property name="elideMode">
+           <enum>Qt::ElideMiddle</enum>
+          </property>
+          <property name="movable">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
