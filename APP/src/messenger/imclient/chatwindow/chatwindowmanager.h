@@ -26,7 +26,7 @@ class ChatWindowManager : public QMainWindow, public Singleton<ChatWindowManager
     friend class Singleton<ChatWindowManager>;
 
 public:
-    enum ChatWindowDisplayStyle{TabbedChatWindow = 0, MDIChatWindow, SeparateChatWindow};
+    enum ChatWindowDisplayStyle{TabbedChatWindow = 0, MDIChatWindow, SeparatedChatWindow};
     ChatWindowManager(QWidget *parent = 0);
     ~ChatWindowManager();
 
@@ -63,9 +63,13 @@ private slots:
 
     void handleChatWindowClosed();
     void showContextMenu(const QPoint &pos);
+    void handleContactChatHistoryMenuAction();
+    void handleGroupChatHistoryMenuAction();
+
 
     void switchToSubWindowView();
     void switchToTabbedView();
+    void switchToSeparatedView();
 
 
 private:
@@ -80,6 +84,7 @@ private:
     QMdiSubWindow* findChatWithInterestGroupMdiSubWindow(InterestGroup *group);
     GroupChatWindow * findInterestGroupChatTabWidget(InterestGroup *group);
 
+    QMenu * chatHistoryMenu();
 
 private:
     Ui::ChatWindowManagerClass ui;
@@ -90,6 +95,8 @@ private:
     QHash<QString/*Contact ID*/, ContactChatWidget *> m_contactChatWidgetHash;
     QHash<quint32/*Group ID*/, GroupChatWindow *> m_groupChatWidgetHash;
 
+    QStringList m_contactChatHistoryList;
+    QList<quint32> m_groupChatHistoryList;
 
 
     //QList<QPair<Contact*, QMdiSubWindow*> > pairList;
