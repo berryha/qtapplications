@@ -6,6 +6,8 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
 {
 	ui.setupUi(this);
 
+    setAttribute(Qt::WA_DeleteOnClose);
+
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)));
 
 
@@ -61,7 +63,7 @@ QString ContactChatWidget::displayName() const{
 
 ContactChatWidget::~ContactChatWidget()
 {
-
+    emit toBeDstroyed();
 }
 
 void ContactChatWidget::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){

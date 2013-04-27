@@ -72,9 +72,10 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
     switch (m_chatWindowDisplayStyle) {
     case TabbedChatWindow:
     {
-        int tabPages = ui.tabWidget->count();
-        for(int i = tabPages; i >= 0; --i){
-            ui.tabWidget->removeTab(i);
+        while (ui.tabWidget->count()) {
+            QWidget *wgt = ui.tabWidget->currentWidget();
+            ui.tabWidget->removeTab(ui.tabWidget->indexOf(wgt));
+            wgt->setParent(0);
         }
 
         showMinimized();
@@ -499,7 +500,7 @@ void ChatWindowManager::slotTabPageChanged(){
 
 void ChatWindowManager::slotNewTab(){
 
-    switchChatWindowDisplayStyle(SeparateChatWindow);
+    switchChatWindowDisplayStyle(TabbedChatWindow);
 
 
     //    slotRemoteManagement();
@@ -576,14 +577,17 @@ void ChatWindowManager::handleChatWindowClosed(){
     ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(sender());
     if(ccw){
         m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
+        qDebug()<<"-----------contact:"<<ccw->contact()->getUserID();
     }
 
     GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(sender());
     if(gcw){
         m_groupChatWidgetHash.remove(gcw->interestGroup()->getGroupID());
+        qDebug()<<"--------------group id:"<<gcw->interestGroup()->getGroupID();
     }
 
-    if(((m_chatWindowDisplayStyle == MDIChatWindow) && (!ui.mdiArea->subWindowList().size())) || ((m_chatWindowDisplayStyle == TabbedChatWindow) && (!ui.tabWidget->count())) ){
+    if(((m_chatWindowDisplayStyle == MDIChatWindow) && (!ui.mdiArea->subWindowList().size()))
+            || ((m_chatWindowDisplayStyle == TabbedChatWindow) && (!ui.tabWidget->count())) ){
         showMinimized();
         hide();
     }
@@ -628,7 +632,7 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
         connect(this, SIGNAL(signalChatImageReceived(const QString&)), contactChatWindow, SLOT(updateImage(const QString&)));
 
-        connect(contactChatWindow, SIGNAL(destroyed()), this, SLOT(handleChatWindowClosed()));
+        connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
         m_contactChatWidgetHash.insert(contact->getUserID(), contactChatWindow);
 
@@ -682,7 +686,7 @@ GroupChatWindow* ChatWindowManager::createGroupChatWindow(InterestGroup *group){
     connect(groupChatWindow, SIGNAL(sendMsgButtonClicked(InterestGroup *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup *, const QString &, const QStringList &)));
     connect(this, SIGNAL(signalChatImageReceived(const QString&)), groupChatWindow, SLOT(updateImage(const QString&)));
 
-    connect(groupChatWindow, SIGNAL(destroyed()), this, SLOT(handleChatWindowClosed()));
+    connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
     m_groupChatWidgetHash.insert(group->getGroupID(), groupChatWindow);
 
