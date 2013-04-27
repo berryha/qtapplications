@@ -194,7 +194,7 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
         ccw = findContactChatTabWidget(contact);
         if(!ccw){
             ccw = createContactChatWindow(contact);
-            ui.tabWidget->addTab(ccw, ccw->displayName());
+            ui.tabWidget->addTab(ccw, ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()), ccw->displayName());
         }
         ui.tabWidget->setCurrentWidget(ccw);
     }
@@ -325,7 +325,7 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
         groupChatWindow = findInterestGroupChatTabWidget(group);
         if(!groupChatWindow){
             groupChatWindow = createGroupChatWindow(group);
-            ui.tabWidget->addTab(groupChatWindow, group->getGroupName());
+            ui.tabWidget->addTab(groupChatWindow, ImageResource::createIconForInterestGroup(), group->getGroupName());
         }
         ui.tabWidget->setCurrentWidget(groupChatWindow);
     }
@@ -518,25 +518,26 @@ void ChatWindowManager::slotNewTab(){
     menu.addAction(tr("Separated Window View"), this, SLOT(switchToSeparatedView()));
 
     menu.exec(pos);
-    qDebug()<<"------------1";
     historymenu->deleteLater();
-    qDebug()<<"------------2";
 
 
 }
 
 void ChatWindowManager::slotcloseTab(){
 
+    QWidget *wgt = ui.tabWidget->currentWidget();
 
-    ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(ui.tabWidget->currentWidget());
+    ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(wgt);
     if(ccw){
         ui.tabWidget->removeTab(ui.tabWidget->currentIndex());
         ccw->close();
         ccw->deleteLater();
+        wgt = 0;
         m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
     }
 
-    GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(ui.tabWidget->currentWidget());
+
+    GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(wgt);
     if(gcw){
         ui.tabWidget->removeTab(ui.tabWidget->currentIndex());
         gcw->close();
@@ -589,13 +590,11 @@ void ChatWindowManager::handleChatWindowClosed(){
     ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(sender());
     if(ccw){
         m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
-        //qDebug()<<"-----------contact:"<<ccw->contact()->getUserID();
     }
 
     GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(sender());
     if(gcw){
         m_groupChatWidgetHash.remove(gcw->interestGroup()->getGroupID());
-        //qDebug()<<"--------------group id:"<<gcw->interestGroup()->getGroupID();
     }
 
     if(((m_chatWindowDisplayStyle == MDIChatWindow) && (!ui.mdiArea->subWindowList().size()))
@@ -626,6 +625,7 @@ void ChatWindowManager::showContextMenu(const QPoint &pos){
 
 
     menu.exec(mapToGlobal(pos));
+    historymenu->deleteLater();
 
 }
 
@@ -665,9 +665,12 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
 
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
-        m_contactChatWidgetHash.insert(contact->getUserID(), contactChatWindow);
+        QString contactID = contact->getUserID();
+        m_contactChatWidgetHash.insert(contactID, contactChatWindow);
 
-        m_contactChatHistoryList.append(contact->getUserID());
+        if(!m_contactChatHistoryList.contains(contactID, Qt::CaseInsensitive)){
+            m_contactChatHistoryList.append(contactID);
+        }
 
 //        QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(contactChatWindow);
 //        //subWindow->setWindowIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH) + "/" +contact->getFace()), contact->getOnlineState()));
@@ -723,9 +726,12 @@ GroupChatWindow* ChatWindowManager::createGroupChatWindow(InterestGroup *group){
 
     connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
-    m_groupChatWidgetHash.insert(group->getGroupID(), groupChatWindow);
+    quint32 groutID = group->getGroupID();
+    m_groupChatWidgetHash.insert(groutID, groupChatWindow);
 
-    m_groupChatHistoryList.append(group->getGroupID());
+    if(!m_groupChatHistoryList.contains(groutID)){
+        m_groupChatHistoryList.append(groutID);
+    }
 
 
 //    QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(groupChatWindow);
@@ -767,7 +773,6 @@ GroupChatWindow * ChatWindowManager::findInterestGroupChatTabWidget(InterestGrou
 QMenu *ChatWindowManager::chatHistoryMenu(){
 
     QMenu *menu = new QMenu(tr("History"));
-    m_contactChatHistoryList.removeDuplicates();
 
     foreach (QString  contactID, m_contactChatHistoryList) {
         Contact *contact = ContactsManager::instance()->getUser(contactID);
@@ -798,7 +803,6 @@ QMenu *ChatWindowManager::chatHistoryMenu(){
     }
 
     return menu;
-
 
 }
 
