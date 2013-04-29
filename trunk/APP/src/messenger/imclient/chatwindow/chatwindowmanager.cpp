@@ -45,17 +45,18 @@ void ChatWindowManager::closeEvent(QCloseEvent *e) {
     case MDIChatWindow:
     {
         foreach (QMdiSubWindow *window, ui.mdiArea->subWindowList()) {
-            ContactChatWidget *messageWindow = qobject_cast<ContactChatWidget *>(window->widget());
-            if(messageWindow && messageWindow->close()){
-                window->close();
-                continue;
-            }
+            window->close();
+//            ContactChatWidget *messageWindow = qobject_cast<ContactChatWidget *>(window->widget());
+//            if(messageWindow && messageWindow->close()){
+//                window->close();
+//                continue;
+//            }
 
-            GroupChatWindow *groupChatWindow = qobject_cast<GroupChatWindow *>(window->widget());
-            if(!groupChatWindow){continue;}
-            if(groupChatWindow && groupChatWindow->close()){
-                window->close();
-            }
+//            GroupChatWindow *groupChatWindow = qobject_cast<GroupChatWindow *>(window->widget());
+//            if(!groupChatWindow){continue;}
+//            if(groupChatWindow && groupChatWindow->close()){
+//                window->close();
+//            }
         }
     }
     default:
