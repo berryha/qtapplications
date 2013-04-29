@@ -1063,6 +1063,7 @@ void ItemBoxTreeWidget::resizeEvent(QResizeEvent *e)
 void ItemBoxTreeWidget::contextMenuEvent(QContextMenuEvent *e)
 {
     QTreeWidgetItem *item = itemAt(e->pos());
+    if(!item){return;}
 
     const bool scratchpad_menu = item != 0
                             && item->parent() != 0

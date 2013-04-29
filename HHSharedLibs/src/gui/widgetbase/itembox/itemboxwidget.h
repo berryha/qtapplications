@@ -98,6 +98,10 @@ public:
     bool updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon);
     bool updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName);
 
+
+    void setFilterWidgetVisible(bool visible);
+    void clearFilterWidget();
+
 protected:
     bool eventFilter(QObject *o, QEvent *e);
 
@@ -113,6 +117,7 @@ private:
     ItemBoxTreeWidget *m_treeWidget;
 
     FilterWidget *filterWidget;
+
 };
 
 
