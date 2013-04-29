@@ -18,7 +18,7 @@ Drop Table If Exists [contacts_detailed_info];
 CREATE TABLE "contacts_detailed_info"(
 [UserID] varchar(16) PRIMARY KEY UNIQUE NOT NULL
 ,[TrueName] varchar(20) DEFAULT NULL
-,[NickName] varchar(20) DEFAULT NULL
+,[NickName] varchar(32) DEFAULT NULL
 ,[Gender] char(1) DEFAULT NULL
 ,[Age] tinyint DEFAULT 0
 ,[Face] varchar(255) DEFAULT NULL
@@ -44,6 +44,7 @@ CREATE TABLE "contacts_detailed_info"(
 ,[BusinessEmailAddress] varchar(255) DEFAULT NULL
 ,[RegistrationTime] datetime DEFAULT NULL
 ,[Role] int(10) DEFAULT '3'
+,[RemarkName] varchar(32) DEFAULT NULL
    
 );
 Drop Table If Exists [interestgroupchatmessages];

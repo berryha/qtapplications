@@ -811,11 +811,9 @@ QMenu *ChatWindowManager::chatHistoryMenu(){
             m_contactChatHistoryList.removeAll(contactID);
             continue;
         }
-        QString displayName = contact->getNickName();
-        if (displayName.isEmpty()) {
-            displayName = contactID;
-        }else if(contactID != displayName){
-            displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
+        QString displayName = contact->displayName();
+        if(contactID != displayName){
+            displayName = displayName + "("  + contactID + ")";
         }
 
         QAction *act = menu->addAction(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()), displayName, this, SLOT(handleContactChatHistoryMenuAction()));

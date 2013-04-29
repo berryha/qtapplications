@@ -1793,6 +1793,7 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     AddContactDialog dlg(contact, false, this);
     dlg.exec();
     QString groupName = dlg.getGroupname();
+    QString remarkName = dlg.getNewName();
     qDebug()<<"---------existingGroupName:"<<existingGroupName<<"  groupName"<<groupName;
     if(existingGroupName == groupName){return;}
 
@@ -1809,6 +1810,7 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, groupName);
     
     contact->setContactGroupID(groupID);
+    contact->setRemarkName(remarkName);
     contactsManager->saveContactInfoToDatabase(contactID);
     contactsManager->moveContact(contactID, contactsManager->getPersonalContactGroupID(existingGroupName), groupID);
     //contactsManager->saveContactGroupsInfoToDatabase();

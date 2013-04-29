@@ -313,7 +313,6 @@ void Search::on_pushButtonAddAsContact_clicked(){
     AddContactDialog dlg(user, true, this);
     if(dlg.exec()  == QDialog::Accepted){
         emit signalAddContact(user->getUserID(), dlg.getMessage());
-    
     }
     
     

@@ -596,6 +596,7 @@ void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
             contact->setBusinessEmailAddress(QVariant(contactsModel->record(j).value("BusinessEmailAddress")).toString());
             contact->setRegistrationTime(QVariant(contactsModel->record(j).value("RegistrationTime")).toDateTime());
             contact->setLoginTimes(QVariant(contactsModel->record(j).value("LoginTimes")).toInt());
+            contact->setRemarkName(QVariant(contactsModel->record(j).value("RemarkName")).toString());
 
             contact->setContactGroupID(groupID);
             contactHash.insert(contactUID, contact);
@@ -666,6 +667,7 @@ void ContactsManager::slotFetchStrangersInfo(){
         contact->setBusinessEmailAddress(QVariant(contactsModel->record(j).value("BusinessEmailAddress")).toString());
         contact->setRegistrationTime(QVariant(contactsModel->record(j).value("RegistrationTime")).toDateTime());
         contact->setLoginTimes(QVariant(contactsModel->record(j).value("LoginTimes")).toInt());
+        contact->setRemarkName(QVariant(contactsModel->record(j).value("RemarkName")).toString());
 
 
         contact->setContactGroupID(0);
@@ -708,15 +710,19 @@ void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, const QStrin
         return;
     }
     contact = contactHash.value(contactID);
+    Q_ASSERT(contact);
 
     ObjectItem objectItem;
-    objectItem.setID(contact->getUserID());
+    objectItem.setID(contactID);
 
-    QString name = contact->getNickName();
-    if(name.isEmpty()){
-        name = contact->getUserID();
-    }
-    objectItem.setName(name);
+//    QString name = contact->getRemarkName();
+//    if(name.isEmpty()){
+//        name = contact->getNickName();
+//    }
+//    if(name.isEmpty()){
+//        name = contact->getUserID();
+//    }
+    objectItem.setName(contact->displayName());
 
     objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
 
@@ -752,8 +758,9 @@ void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, const QSt
         return;
     }
     contact = contactHash.value(contactID);
+    Q_ASSERT(contact);
 
-    expandListView->updateObjectItemName(groupName, contactID, contact->getNickName());
+    expandListView->updateObjectItemName(groupName, contactID, contact->displayName());
     //expandListView->updateObjectItemIcon(groupName, contactID, contact->getFace());
     expandListView->updateObjectItemIcon(groupName, contactID, ImageResource::getIconFilePathForContact(contact->getFace(), contact->getOnlineState()));
 
@@ -801,11 +808,14 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
         ObjectItem objectItem;
         objectItem.setID(contact->getUserID());
 
-        QString name = contact->getNickName();
-        if(name.isEmpty()){
-            name = contact->getUserID();
-        }
-        objectItem.setName(name);
+//        QString name = contact->getRemarkName();
+//        if(name.isEmpty()){
+//            name = contact->getNickName();
+//        }
+//        if(name.isEmpty()){
+//            name = contact->getUserID();
+//        }
+        objectItem.setName(contact->displayName());
 
         objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
         //objectItem.setIconMode(QIcon::Disabled);
@@ -1369,6 +1379,9 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
     contact->setRegistrationTime(QVariant(query.value(record.indexOf("RegistrationTime"))).toDateTime());
     contact->setLoginTimes(QVariant(query.value(record.indexOf("LoginTimes"))).toInt());
 
+    contact->setRemarkName(QVariant(query.value(record.indexOf("RemarkName"))).toString());
+
+
     contact->clearUpdatedProperties();
 
     return true;
@@ -1400,9 +1413,7 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
         return false;
     }
     
-    QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);
-
-    
+    QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);   
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save contact info to database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());

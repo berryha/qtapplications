@@ -44,15 +44,15 @@ namespace HEHUI {
 class Contact: public HEHUI::IMUserBase {
     Q_OBJECT
 public:
-        Contact(QObject *parent = 0);
-        Contact(const QString &contactID = "", QObject *parent = 0);
-        Contact(const QString &contactID = "", const QString &nickname = "", QObject *parent = 0);
-	virtual ~Contact();
+    Contact(QObject *parent = 0);
+    Contact(const QString &contactID = "", QObject *parent = 0);
+    Contact(const QString &contactID = "", const QString &nickname = "", QObject *parent = 0);
+    virtual ~Contact();
 
-        QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
-        
-        
-        
+    QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
+
+
+
 
     quint32 getContactGroupID() const
     {
@@ -64,19 +64,38 @@ public:
         addUpdatedProperty(IM::PI_ContactGroupID, QString::number(contactGroupID));
     }
 
-//    quint32 getInterestGroupID() const
-//    {
-//    	return interestGroupID;
-//    }
-//    void setInterestGroupID(quint32 interestGroupID)
-//    {
-//    	this->interestGroupID = interestGroupID;
-//        addUpdatedProperty(IM::PI_InterestGroupID, QString::number(interestGroupID));
-        
-//    }
+    //    quint32 getInterestGroupID() const
+    //    {
+    //    	return interestGroupID;
+    //    }
+    //    void setInterestGroupID(quint32 interestGroupID)
+    //    {
+    //    	this->interestGroupID = interestGroupID;
+    //        addUpdatedProperty(IM::PI_InterestGroupID, QString::number(interestGroupID));
+
+    //    }
+
+    QString getRemarkName(){
+        return m_remarkName;
+    }
+    void setRemarkName(const QString &remarkName){
+        this->m_remarkName = remarkName;
+        addUpdatedProperty(IM::PI_RemarkName, "'" + m_remarkName + "'");
+    }
 
 
-
+    void setShowRemarkName(bool show){m_showRemarkName = show;}
+    QString displayName() const{
+        if(m_showRemarkName && !m_remarkName.trimmed().isEmpty()){
+            return m_remarkName;
+        }
+        QString nickName = getNickName();
+        if(nickName.trimmed().isEmpty()){
+            return getUserID();
+        }else{
+            return nickName;
+        }
+    }
 
 
 private:
@@ -85,6 +104,9 @@ private:
     quint32 interestGroupID;
     quint32 systemGroupID;
     
+    QString m_remarkName;
+    bool m_showRemarkName;
+
 
 
 

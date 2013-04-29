@@ -321,6 +321,7 @@ enum PropertyIDOfUser{
     //For Contact
 //    PI_InterestGroupID,
     PI_ContactGroupID,
+    PI_RemarkName
 
 
 

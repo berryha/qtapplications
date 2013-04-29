@@ -37,6 +37,10 @@ Contact::Contact(QObject *parent)
     contactGroupID = 0;
     interestGroupID = 0;
     systemGroupID = 0;
+
+    m_remarkName = "";
+    m_showRemarkName= true;
+
 }
 
 Contact::Contact(const QString &contactID, QObject *parent)
@@ -45,6 +49,10 @@ Contact::Contact(const QString &contactID, QObject *parent)
     contactGroupID = 0;
     interestGroupID = 0;
     systemGroupID = 0;
+
+    m_remarkName = "";
+    m_showRemarkName= true;
+
 }
 
 Contact::Contact(const QString &contactID, const QString &nickname, QObject *parent)
@@ -56,6 +64,9 @@ Contact::Contact(const QString &contactID, const QString &nickname, QObject *par
     contactGroupID = 0;
     interestGroupID = 0;
     systemGroupID = 0;
+
+    m_remarkName = "";
+    m_showRemarkName= true;
 
 }
 
@@ -94,9 +105,7 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_InterestGroupID :
 //        columnName = "InterestGroupID";
 //        break;         
-    case IM::PI_ContactGroupID :
-        columnName = "ContactGroupID";
-        break;                 
+
     case IM::PI_PersonalInfoVersion:
         columnName = "PersonalInfoVersion";
         break; 
@@ -172,7 +181,15 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 
     case IM::PI_Role:
         columnName = "Role";
-        break;         
+        break;
+
+
+    case IM::PI_ContactGroupID :
+        columnName = "ContactGroupID";
+        break;
+    case IM::PI_RemarkName :
+        columnName = "RemarkName";
+        break;
         
     default:
         columnName = "";
