@@ -45,6 +45,10 @@ public:
 
     void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
 
+
+protected:
+    void closeEvent(QCloseEvent * event);
+
 private:
     void initUI();
     void getStyleString();

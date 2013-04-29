@@ -32,9 +32,35 @@ ChatWindowManager::~ChatWindowManager()
 
 void ChatWindowManager::closeEvent(QCloseEvent *e) {
 
-    ui.mdiArea->closeAllSubWindows();
-    showMinimized();
-    hide();
+    switch (m_chatWindowDisplayStyle) {
+    case TabbedChatWindow:
+    {
+        int tabPages = ui.tabWidget->count();
+        for(int i = tabPages-1; i >= 0; i--){
+            ui.tabWidget->setCurrentIndex(i);
+            slotcloseTab();
+        }
+    }
+        break;
+    case MDIChatWindow:
+    {
+        foreach (QMdiSubWindow *window, ui.mdiArea->subWindowList()) {
+            ContactChatWidget *messageWindow = qobject_cast<ContactChatWidget *>(window->widget());
+            if(messageWindow && messageWindow->close()){
+                window->close();
+                continue;
+            }
+
+            GroupChatWindow *groupChatWindow = qobject_cast<GroupChatWindow *>(window->widget());
+            if(!groupChatWindow){continue;}
+            if(groupChatWindow && groupChatWindow->close()){
+                window->close();
+            }
+        }
+    }
+    default:
+        break;
+    }
 
     e->ignore();
 
@@ -529,20 +555,24 @@ void ChatWindowManager::slotcloseTab(){
 
     ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(wgt);
     if(ccw){
+        if(!ccw->close()){
+            return;
+        }
         ui.tabWidget->removeTab(ui.tabWidget->currentIndex());
-        ccw->close();
         ccw->deleteLater();
         wgt = 0;
-        m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
+        //m_contactChatWidgetHash.remove(ccw->contact()->getUserID());
     }
 
 
     GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(wgt);
     if(gcw){
+        if(!gcw->close()){
+            return;
+        }
         ui.tabWidget->removeTab(ui.tabWidget->currentIndex());
-        gcw->close();
         gcw->deleteLater();
-        m_groupChatWidgetHash.remove(gcw->interestGroup()->getGroupID());
+        //m_groupChatWidgetHash.remove(gcw->interestGroup()->getGroupID());
     }
 
 //    if(ui.tabWidget->count() == 0){
@@ -699,7 +729,7 @@ QMdiSubWindow* ChatWindowManager::findChatWithContactMdiSubWindow(Contact *conta
 ContactChatWidget * ChatWindowManager::findContactChatTabWidget(Contact *contact){
 
     int tabPages = ui.tabWidget->count();
-    for(int i = tabPages; i >= 0; --i){
+    for(int i = tabPages-1; i >= 0; i--){
         ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(ui.tabWidget->widget(i));
         if(!ccw){continue;}
         if(ccw->contact() == contact){
@@ -758,7 +788,7 @@ QMdiSubWindow* ChatWindowManager::findChatWithInterestGroupMdiSubWindow(Interest
 GroupChatWindow * ChatWindowManager::findInterestGroupChatTabWidget(InterestGroup *group){
 
     int tabPages = ui.tabWidget->count();
-    for(int i = tabPages; i >= 0; --i){
+    for(int i = tabPages-1; i >= 0; i--){
         GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(ui.tabWidget->widget(i));
         if(!gcw){continue;}
         if(gcw->interestGroup() == group){

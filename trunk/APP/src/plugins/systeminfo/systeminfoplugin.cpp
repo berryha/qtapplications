@@ -44,59 +44,59 @@ namespace HEHUI {
 
 SystemInfoPlugin::SystemInfoPlugin() {
 
-        systeminfoWidgetList = QList<SystemInfo *> ();
+    systeminfoWidgetList = QList<SystemInfo *> ();
 
 }
 
 SystemInfoPlugin::~SystemInfoPlugin() {
-        unload();
+    unload();
 }
 
 
 /*
 bool SystemInfoPlugin::init( QWidget * parentWidget, QMenu *menu, QToolBar *toolBar, QSystemTrayIcon *systemTrayIcon, const QString& pName, const QString& pVersion  ){
-	setParent(parentWidget);
-	this->parentWidget = parentWidget;
-	this->systemTrayIcon = systemTrayIcon;
-	QAction *action = new QAction(icon(), name(), parentWidget);
-	action->setToolTip(toolTip());
-	action->setStatusTip(toolTip());
-	action->setWhatsThis(whatsThis());
-	connect(action, SIGNAL(triggered()), this, SLOT(slotRun()));
+    setParent(parentWidget);
+    this->parentWidget = parentWidget;
+    this->systemTrayIcon = systemTrayIcon;
+    QAction *action = new QAction(icon(), name(), parentWidget);
+    action->setToolTip(toolTip());
+    action->setStatusTip(toolTip());
+    action->setWhatsThis(whatsThis());
+    connect(action, SIGNAL(triggered()), this, SLOT(slotRun()));
 
-	if(menu){
-		menu->addAction(action);
-	}
+    if(menu){
+        menu->addAction(action);
+    }
 
-	if(toolBar){
-		toolBar->addAction(action);
-	}
+    if(toolBar){
+        toolBar->addAction(action);
+    }
 
-	if(systemTrayIcon){
-		//TODO:
-		//systemTrayMenu->addAction(action);
-	}
+    if(systemTrayIcon){
+        //TODO:
+        //systemTrayMenu->addAction(action);
+    }
 
-	return true;
+    return true;
 
 }
 
 
 QWidget * SystemInfoPlugin::parentWidgetOfPlugin(){
 
-	return parentWidget;
+    return parentWidget;
 }
 
 */
 
 bool SystemInfoPlugin::isSingle(){
 
-	return true;
+    return true;
 
 }
 
 QString SystemInfoPlugin::name () const{
-	return QString(tr("System Information"));
+    return QString(tr("System Information"));
 }
 
 QString SystemInfoPlugin::version() const{
@@ -108,16 +108,16 @@ QString SystemInfoPlugin::description() const{
 }
 
 QIcon SystemInfoPlugin::icon () const{
-	return QIcon(":/resources/images/systeminfo.png");
+    return QIcon(":/resources/images/systeminfo.png");
 
 }
 
 QString SystemInfoPlugin::whatsThis () const{
-	return QString(tr("System Information"));
+    return QString(tr("System Information"));
 }
 
 QString SystemInfoPlugin::toolTip () const{
-	return QString(tr("System Information"));
+    return QString(tr("System Information"));
 }
 
 bool SystemInfoPlugin::unload(){
@@ -143,44 +143,44 @@ bool SystemInfoPlugin::unload(){
 }
 
 void SystemInfoPlugin::slotMainActionForMenuTriggered(){
-	if(isSingle() && SystemInfo::isRunning()){
-		//TODO: Activate the widget
-		return;
-	}
+    if(isSingle() && SystemInfo::isRunning()){
+        //TODO: Activate the widget
+        return;
+    }
 
-        QWidget *parentWidget = qobject_cast<QWidget *> (parent());
+    QWidget *parentWidget = qobject_cast<QWidget *> (parent());
 
-        HEHUI::User user;
-        HEHUI::LoginBase login(&user, name(), parentWidget);
-        if (!login.isVerified()) {
-                return ;
+    HEHUI::User user;
+    HEHUI::LoginBase login(&user, name(), parentWidget);
+    if (!login.isVerified()) {
+        return ;
+    }
+
+    bool isYDAdmin = false;
+    if(user.getBusinessAddress() == "DG"){
+        isYDAdmin = false;
+    }else if(user.getBusinessAddress() == "YD"){
+        isYDAdmin = true;
+    }
+
+    SystemInfo *systemInfo = new SystemInfo(user.getUserID(), parentWidget);
+    connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
+
+    if(parentWidget){
+        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+            QMdiSubWindow *subWindow = new QMdiSubWindow;
+            subWindow->setWidget(systemInfo);
+            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+            mdiArea->addSubWindow(subWindow);
+            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+
+            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
+
         }
+    }
 
-        bool isYDAdmin = false;
-        if(user.getBusinessAddress() == "DG"){
-            isYDAdmin = false;
-        }else if(user.getBusinessAddress() == "YD"){
-            isYDAdmin = true;
-        }
-
-        SystemInfo *systemInfo = new SystemInfo(user.getUserID(), parentWidget);
-        connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
-
-	if(parentWidget){
-		if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-                    QMdiSubWindow *subWindow = new QMdiSubWindow;
-                         subWindow->setWidget(systemInfo);
-                         subWindow->setAttribute(Qt::WA_DeleteOnClose);
-                         mdiArea->addSubWindow(subWindow);
-                         connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
-
-                        //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-
-		}
-	}
-
-	systemInfo->show();
-        systeminfoWidgetList.append(systemInfo);
+    systemInfo->show();
+    systeminfoWidgetList.append(systemInfo);
 }
 
 void SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj){

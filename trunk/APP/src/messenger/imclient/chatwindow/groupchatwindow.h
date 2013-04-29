@@ -16,6 +16,9 @@ public:
 
     InterestGroup * interestGroup();
 
+protected:
+    void closeEvent(QCloseEvent * event);
+
 signals:
     void sendMsgButtonClicked(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
     void toBeDstroyed();

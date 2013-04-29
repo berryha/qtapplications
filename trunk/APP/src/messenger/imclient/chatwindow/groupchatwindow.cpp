@@ -46,6 +46,15 @@ GroupChatWindow::~GroupChatWindow()
     emit toBeDstroyed();
 }
 
+void GroupChatWindow::closeEvent(QCloseEvent * event){
+
+    if(ui.chatMessageWindow->close()){
+        event->accept();
+    }else{
+        event->ignore();
+    }
+}
+
 InterestGroup * GroupChatWindow::interestGroup(){
     return m_interestGroup;
 }
