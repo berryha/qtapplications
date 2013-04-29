@@ -225,6 +225,7 @@ void FilterWidget::reset()
         m_editor->clear();
         emit filterChanged(QString());
     }
+
 }
 
 void FilterWidget::setFocusToEditor(){

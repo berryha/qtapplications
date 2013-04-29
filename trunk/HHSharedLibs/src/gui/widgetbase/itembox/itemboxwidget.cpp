@@ -76,11 +76,13 @@ ItemBoxWidget::ItemBoxWidget(ItemBoxEventHandler *core, QWidget *parent, Qt::Win
     filterWidget->setRefuseFocus(true);
     connect(filterWidget, SIGNAL(filterChanged(QString)), m_treeWidget, SLOT(filter(QString)));
 
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->addWidget(filterWidget);
-    l->addWidget(toolBar);
+    l->addWidget(filterWidget);
+    filterWidget->hide();
 
-    toolBar->hide();
+//    QToolBar *toolBar = new QToolBar(this);
+//    toolBar->addWidget(filterWidget);
+//    l->addWidget(toolBar);
+//    toolBar->hide();
 
     // View
 //    connect(m_treeWidget, SIGNAL(pressed(QString,QString,QPoint)), this, SLOT(handleMousePress(QString,QString,QPoint)));
@@ -89,6 +91,9 @@ ItemBoxWidget::ItemBoxWidget(ItemBoxEventHandler *core, QWidget *parent, Qt::Win
     setAcceptDrops (true);
 
     installEventFilter(this);
+
+    m_treeWidget->setFocusPolicy(Qt::StrongFocus);
+    m_treeWidget->setFocus();
 
 }
 
@@ -103,16 +108,12 @@ bool ItemBoxWidget::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(e);
         if ((ke->modifiers() & Qt::ControlModifier) && ke->key() == Qt::Key_F) {
-            if(!filterWidget->isVisible()){
-                filterWidget->show();
-            }
-            filterWidget->setFocusToEditor();
+            setFilterWidgetVisible(!filterWidget->isVisible());
             //autoHideTimer->start();
             //keyPressEvent(ke);
             return true;
         }else if(ke->key() == Qt::Key_Escape){
-            filterWidget->reset();
-            filterWidget->hide();
+            setFilterWidgetVisible(false);
             return true;
         }
 
@@ -131,7 +132,7 @@ ItemBoxEventHandler *ItemBoxWidget::core() const
 //    if (QApplication::mouseButtons() != Qt::LeftButton)
 //        return;
 
-////    m_core->formWindowManager()->dragItems(item_list);
+//    //m_core->formWindowManager()->dragItems(item_list);
 //}
 
 int ItemBoxWidget::categoryCount() const
@@ -277,6 +278,21 @@ bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_name, const QString 
 
 bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName){
     return m_treeWidget->updateItemIcon(cat_name, item_id, iconName);
+}
+
+void ItemBoxWidget::setFilterWidgetVisible(bool visible){
+    filterWidget->setVisible(visible);
+    if(visible){
+        filterWidget->setFocusToEditor();
+    }else{
+        filterWidget->reset();
+        filterWidget->clearFocus();
+    }
+
+}
+
+void ItemBoxWidget::clearFilterWidget(){
+    filterWidget->reset();
 }
 
 

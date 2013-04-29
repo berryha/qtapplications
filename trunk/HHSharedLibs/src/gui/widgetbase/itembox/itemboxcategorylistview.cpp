@@ -491,6 +491,8 @@ ItemBoxCategoryListView::ItemBoxCategoryListView(ItemBoxEventHandler *core, QWid
     m_proxyModel->setFilterRole(FilterRole);
     setModel(m_proxyModel);
 //    connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SIGNAL(scratchPadChanged()));
+
+
 }
 
 void ItemBoxCategoryListView::setViewMode(ViewMode vm)
@@ -678,6 +680,7 @@ bool ItemBoxCategoryListView::event(QEvent *event){
 
         QString itemID = "";
         QModelIndex index = indexAt(e->pos());
+        if(!index.isValid()){return false;}
         ItemBoxWidgetInterface::Item item = itemAt(UnfilteredAccess, index);
         if(!item.isNull()){
             itemID = item.id();
@@ -695,6 +698,7 @@ bool ItemBoxCategoryListView::event(QEvent *event){
 
         QString itemID = "";
         QModelIndex index = indexAt(helpEvent->pos());
+        if(!index.isValid()){return false;}
         ItemBoxWidgetInterface::Item item = itemAt(UnfilteredAccess, index);
         if(item.isNull()){
             return false;
