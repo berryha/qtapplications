@@ -53,6 +53,11 @@ void ContactChatWidget::setContact(Contact *contact){
 
 }
 
+ContactChatWidget::~ContactChatWidget()
+{
+    emit toBeDstroyed();
+}
+
 Contact * ContactChatWidget::contact(){
     return m_contact;
 }
@@ -61,10 +66,16 @@ QString ContactChatWidget::displayName() const{
     return m_displayName;
 }
 
-ContactChatWidget::~ContactChatWidget()
-{
-    emit toBeDstroyed();
+void ContactChatWidget::closeEvent(QCloseEvent * event){
+
+    if(ui.chatMessageWindow->close()){
+        event->accept();
+    }else{
+        event->ignore();
+    }
 }
+
+
 
 void ContactChatWidget::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){
     ui.chatMessageWindow->appendMessageReceivedFromContact(message, contact, datetime);

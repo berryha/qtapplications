@@ -17,6 +17,9 @@ public:
     Contact * contact();
     QString displayName() const;
 
+protected:
+    void closeEvent(QCloseEvent * event);
+
 signals:
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void toBeDstroyed();

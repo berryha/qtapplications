@@ -50,6 +50,22 @@ ChatMessageWindow::~ChatMessageWindow() {
 
 }
 
+void ChatMessageWindow::closeEvent(QCloseEvent * event){
+
+    if(!ui.textEdit->toPlainText().trimmed().isEmpty()){
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, tr("Question"), tr("Message Not Sent! <br> Close the window?"),
+                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            event->ignore();
+            return;
+        }
+    }
+
+    event->accept();
+
+}
+
 void ChatMessageWindow::initUI(){
 
     ui.setupUi(this);
