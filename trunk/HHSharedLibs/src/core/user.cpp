@@ -32,48 +32,48 @@
 namespace HEHUI {
 
 User::User(const QString &userID, const QString & userName, const QString &password, QObject *parent) :
-        UserBase(userID, userName, password, parent) {
+    UserBase(userID, userName, password, parent) {
 
-	setVerified(false);
+    setVerified(false);
 
-	rootMode = false;
+    rootMode = false;
 
-	trueName = "";
-	nickName = "";
-	gender = GENDER_UNKNOWN;
+    trueName = "";
+    nickName = "";
+    gender = GENDER_UNKNOWN;
 
-	homeAddress = "";
-	homePhoneNumber = "";
-	homeZipCode = "";
-	personalHomepage = "";
-	personalEmailAddress = "";
+    homeAddress = "";
+    homePhoneNumber = "";
+    homeZipCode = "";
+    personalHomepage = "";
+    personalEmailAddress = "";
 
-	lastLoginTime = QDateTime();
-	lastLoginHostAddress = "";
-        lastLoginHostPort = 0;
+    lastLoginTime = QDateTime();
+    lastLoginHostAddress = "";
+    lastLoginHostPort = 0;
 
-	questionForSecurity = "";
-	answerForSecurity = "";
-        face = "";
+    questionForSecurity = "";
+    answerForSecurity = "";
+    face = "";
 
-	companyName = "";
-	jobTitle = "";
-	businessAddress = "";
-	businessPhoneNumber = "";
-	businessZipCode = "";
-	businessFaxNumber = "";
-	businessHomepage = "";
-	businessEmailAddress = "";
+    companyName = "";
+    jobTitle = "";
+    businessAddress = "";
+    businessPhoneNumber = "";
+    businessZipCode = "";
+    businessFaxNumber = "";
+    businessHomepage = "";
+    businessEmailAddress = "";
 
-	registrationTime = QDateTime();
-	loginTimes = 0;
+    registrationTime = QDateTime();
+    loginTimes = 0;
 
-        description = "";
+    description = "";
 
 }
 
 User::~User() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 

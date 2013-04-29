@@ -35,7 +35,7 @@
 #include <QMetaObject>
 #include <QCoreApplication>
 #include <QDateTime>
-  
+
 #include "userbase.h"
 
 #include "mysharedlib_global.h"
@@ -343,44 +343,44 @@ public:
 
 
 private:
-	//还原模式，不需要密码//Restore Mode, No Password Required
-	bool rootMode;
+    //还原模式，不需要密码//Restore Mode, No Password Required
+    bool rootMode;
 
-	QString trueName;
-	QString nickName;
-	Gender gender;
-        quint8 age;
-        QDate birthday;
-        QString face;
-        
-	QString homeAddress;
-	QString homePhoneNumber;
-	QString homeZipCode;
-	QString personalHomepage;
-	QString personalEmailAddress;
+    QString trueName;
+    QString nickName;
+    Gender gender;
+    quint8 age;
+    QDate birthday;
+    QString face;
 
-	QDateTime lastLoginTime;
-        QString lastLoginHostAddress;
-        quint16 lastLoginHostPort;
+    QString homeAddress;
+    QString homePhoneNumber;
+    QString homeZipCode;
+    QString personalHomepage;
+    QString personalEmailAddress;
 
-	QString questionForSecurity;
-	QString answerForSecurity;
-        QString emailForSecurity;
+    QDateTime lastLoginTime;
+    QString lastLoginHostAddress;
+    quint16 lastLoginHostPort;
+
+    QString questionForSecurity;
+    QString answerForSecurity;
+    QString emailForSecurity;
 
 
-	QString companyName;
-	QString jobTitle;
-	QString businessAddress;
-	QString businessPhoneNumber;
-	QString businessZipCode;
-	QString businessFaxNumber;
-	QString businessHomepage;
-	QString businessEmailAddress;
+    QString companyName;
+    QString jobTitle;
+    QString businessAddress;
+    QString businessPhoneNumber;
+    QString businessZipCode;
+    QString businessFaxNumber;
+    QString businessHomepage;
+    QString businessEmailAddress;
 
-	QDateTime registrationTime;
-	int loginTimes;
+    QDateTime registrationTime;
+    int loginTimes;
 
-        QString description;
+    QString description;
 
 };
 
