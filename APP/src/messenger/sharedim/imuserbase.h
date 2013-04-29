@@ -52,7 +52,7 @@ namespace HEHUI {
 
 class SHAREDIMLIB_API IMUserBase : public User//, public Singleton<IMUserBase>
 {
-    Q_OBJECT;
+    Q_OBJECT
     //friend class Singleton<IMUserBase>;
 
 public:
@@ -121,17 +121,17 @@ public:
     QStringList getInterestGroups() const
     {
         return interestGroups;
-    } 
-       
+    }
+
     quint32 getPersonalInfoVersion() const
     {
         return personalInfoVersion;
     }
 
-//    QHash<quint32,QString> getPersonalInterestGroupsHash() const
-//    {
-//        return personalInterestGroupsHash;
-//    }
+    //    QHash<quint32,QString> getPersonalInterestGroupsHash() const
+    //    {
+    //        return personalInterestGroupsHash;
+    //    }
 
     QByteArray getSessionEncryptionKey() const
     {
@@ -143,10 +143,10 @@ public:
         return shortTalk;
     }
 
-//    QHash<quint32,QString> getSystemGroups() const
-//    {
-//        return systemGroupsHash;
-//    }
+    //    QHash<quint32,QString> getSystemGroups() const
+    //    {
+    //        return systemGroupsHash;
+    //    }
 
     int getUserRole() const
     {
@@ -190,7 +190,7 @@ public:
         addUpdatedProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
 
     }
-   
+
     
     void setInterestGroupsStringFromDatabase(const QString &interestGroupsStringFromDatabase)
     {
@@ -202,10 +202,10 @@ public:
         this->personalInfoVersion = personalInfoVersion;
     }
 
-//    void setPersonalInterestGroupsHash(QHash<quint32,QString> personalInterestGroups)
-//    {
-//        this->personalInterestGroupsHash = personalInterestGroups;
-//    }
+    //    void setPersonalInterestGroupsHash(QHash<quint32,QString> personalInterestGroups)
+    //    {
+    //        this->personalInterestGroupsHash = personalInterestGroups;
+    //    }
 
     void setSessionEncryptionKey(const QByteArray &sessionEncryptionKey)
     {
@@ -253,8 +253,8 @@ public slots:
     QString getBlacklistInfoString();
     void setBlacklistInfoString(const QString &blacklistInfoString);
 
-//    bool hasContact(const QString &contactID);
-//    QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    //    bool hasContact(const QString &contactID);
+    //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
     
 
 
@@ -262,11 +262,11 @@ private:
 
     int userRole;
 
-//    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
-//    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
+    //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
+    //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
     QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
 
-//    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
+    //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
 
 
     quint32 blacklistInfoVersion;

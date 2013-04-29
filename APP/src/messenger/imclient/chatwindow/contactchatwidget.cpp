@@ -42,12 +42,10 @@ void ContactChatWidget::setContact(Contact *contact){
 
     ui.chatMessageWindow->setContact(contact);
 
-    m_displayName = contact->getNickName();
+    m_displayName = contact->displayName();
     QString contactID = contact->getUserID();
-    if (m_displayName.isEmpty()) {
-        m_displayName = contactID;
-    }else if(contactID != m_displayName){
-        m_displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
+    if(contactID != m_displayName){
+        m_displayName = m_displayName + "("  + contactID + ")";
     }
     setWindowTitle(m_displayName);
 
