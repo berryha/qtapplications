@@ -156,9 +156,9 @@ QStringList IMUser::getContacts() const{
 }
 
 
-bool IMUser::hasContact(const QString &contactID){
+bool IMUser::hasFriendContact(const QString &contactID){
 
-    return ContactsManager::instance()->hasContact(contactID);
+    return ContactsManager::instance()->hasFriendContact(contactID);
 }
 
 QString IMUser::groupNameThatContactBelongsTo(const QString &contactID) const{

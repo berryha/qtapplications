@@ -1396,13 +1396,19 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
     //    }
 
 
-    Contact *contact = 0;
-    if(imUser->hasContact(contactID)){
-        contact = contactsManager->getUser(contactID);
-    }else{
+//    Contact *contact = 0;
+//    if(imUser->hasFriendContact(contactID)){
+//        contact = contactsManager->getUser(contactID);
+//    }else{
+//        m_userInfoTipWindow->hideUserInfoTip();
+//        return;
+//    }
+    Contact *contact = contactsManager->getUser(contactID);
+    if(!contact){
         m_userInfoTipWindow->hideUserInfoTip();
         return;
     }
+
 
     //QString tip = QString("<b><h4>ID:%1</h4></b>").arg(contactID);
     //QToolTip::showText(global_mouse_pos, tip);
@@ -1435,7 +1441,7 @@ void MainWindow::slotMoveContactToGroup(){
     QString newGroupName = action->text();
     QString contactID = action->data().toString();
     Contact *contact = 0;
-    if(imUser->hasContact(contactID)){
+    if(imUser->hasFriendContact(contactID)){
         contact = contactsManager->getUser(contactID);
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
@@ -1477,7 +1483,7 @@ void MainWindow::slotMoveContactToBlacklist(){
     //QString newGroupName = action->text();
     QString contactID = action->data().toString();
     Contact *contact = 0;
-    if(imUser->hasContact(contactID)){
+    if(imUser->hasFriendContact(contactID)){
         contact = contactsManager->getUser(contactID);
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
@@ -1507,7 +1513,7 @@ void MainWindow::slotMoveContactToBlacklist(){
 void MainWindow::slotDeleteContact(const QString &contactID, const QString &existingGroupName){
 
     Contact *contact = 0;
-    if(imUser->hasContact(contactID)){
+    if(imUser->hasFriendContact(contactID)){
         contact = contactsManager->getUser(contactID);
     }else{
         QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
@@ -1696,20 +1702,20 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
     switch(type){
     case IM::ERROR_NoError :
     {
-        Contact *contact = 0;
-        if(imUser->hasContact(contactID)){
-            contact = contactsManager->getUser(contactID);
-        }else{
-//            contact = new Contact(contactID, userNickName, this);
-//            contact->setFace(userFace);
-//            //save new contact to db
-//            contactsManager->slotAddNewContactToDatabase(contact);
-            contact =  contactsManager->createNewContact(contactID, userNickName, userFace);
-        }
+//        Contact *contact = 0;
+//        if(imUser->hasContact(contactID)){
+//            contact = contactsManager->getUser(contactID);
+//        }else{
+////            contact = new Contact(contactID, userNickName, this);
+////            contact->setFace(userFace);
+////            //save new contact to db
+////            contactsManager->slotAddNewContactToDatabase(contact);
+//            contact =  contactsManager->createNewContact(contactID, userNickName, userFace);
+//        }
 
+        Contact *contact =  contactsManager->createNewContact(contactID, userNickName, userFace);
+        Q_ASSERT(contact);
 
-        imUser->addOrDeleteContact(contactID, "", true);
-        imUser->saveMyInfoToLocalDatabase();
 
         //Save contact to default group
         QString groupName = imUser->getDefaultGroupName();
@@ -1718,12 +1724,14 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
             groupID = contactsManager->slotAddNewContactGroupToDatabase(groupName);
             contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
         }
-        qDebug()<<"----------0------------:"<<contact->getUpdateSQLStatement();
 
         contact->setContactGroupID(groupID);
-        qDebug()<<"----------1------------:"<<contact->getUpdateSQLStatement();
         contactsManager->saveContactInfoToDatabase(contactID);
         contactsManager->addContactToUI(friendBox, groupName, contactID);
+
+
+        imUser->addOrDeleteContact(contactID, "", true);
+        imUser->saveMyInfoToLocalDatabase();
 
 
         //show trayicon info

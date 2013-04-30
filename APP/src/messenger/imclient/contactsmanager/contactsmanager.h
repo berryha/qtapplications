@@ -50,7 +50,7 @@ public:
     QString getContactGroupsInfoString() const;
     ContactGroup * getContactGroup(int personalContactGroupID);
 
-    bool hasContact(const QString &contactID);
+    bool hasFriendContact(const QString &contactID);
     bool hasUserInfo(const QString &userID);
     Contact * getUser(const QString &contactID);
 
@@ -77,7 +77,7 @@ public:
 
 
 
-    Contact * createNewContact(const QString &contactID, const QString &nickname = "", const QString *face = "");
+    Contact * createNewContact(const QString &contactID, const QString &nickname = "", const QString &face = "");
 
 public slots:
     //void slotUpdateContactsInfo2();
@@ -105,8 +105,6 @@ public slots:
     //联系人在线状态改变
     void slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo);
 
-    bool slotAddNewContactToDatabase(Contact *contact);
-    bool slotdeleteContactFromDatabase(Contact *contact);
 
 
 
@@ -137,6 +135,10 @@ private slots:
     //void slotLoadContacts(ItemBoxWidget *widgetBox, bool loadFromFile = true, const QString &string = "");
     void slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
     //void slotLoadContacts(ItemBoxWidget *expandListView,ContactGroup *contactGroup);
+
+    bool slotAddNewContactToDatabase(Contact *contact);
+    bool slotdeleteContactFromDatabase(Contact *contact);
+
 
 private:
     QSqlQuery queryDatabase(const QString & queryString, bool localConfigDatabase) ;

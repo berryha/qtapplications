@@ -67,36 +67,37 @@ QStringList ContactsManager::contactGroups() const{
 
 }
 
-bool ContactsManager::hasContact(const QString &contactID){
+bool ContactsManager::hasFriendContact(const QString &contactID){
 
     //TODO:改进
 
-    bool has = false;
     if(!hasUserInfo(contactID)){
-        return has;
+        return false;
     }
 
     Contact * contact = getUser(contactID);
-    if(!contact){return has;}
+    if(!contact){return false;}
     if(contact->getContactGroupID() > 0){
-        has = true;
+        return true;
     }
 
-    return has;
+    return false;
 
 }
 
 bool ContactsManager::hasUserInfo(const QString &userID){
-    bool has = false;
-    QStringList contacts = contactHash.keys();
-    foreach (QString id, contacts) {
-        if(id == userID){
-            has = true;
-            break;
-        }
-    }
+//    bool has = false;
+//    QStringList contacts = contactHash.keys();
+//    foreach (QString id, contacts) {
+//        if(id == userID){
+//            has = true;
+//            break;
+//        }
+//    }
 
-    return has;
+//    return has;
+
+    return contactHash.contains(userID);
 
 }
 
@@ -520,14 +521,21 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 
 }
 
-Contact * ContactsManager::createNewContact(const QString &contactID, const QString &nickname, const QString *face){
+Contact * ContactsManager::createNewContact(const QString &contactID, const QString &nickname, const QString &face){
 
-    Contact *contact = new Contact(contactID, nickname, this);
-    contact->setFace(face);
+    Contact *contact = 0;
+    if(contactHash.contains(contactID)){
+        contact = contactHash.value(contactID);
+        contact->setNickName(nickname);
+        contact->setFace(face);
+    }else{
+        contact = new Contact(contactID, nickname, this);
+        contact->setFace(face);
+        if(!slotAddNewContactToDatabase(contact)){
+            //delete contact;
+            //contact = 0;
+        }
 
-    if(!slotAddNewContactToDatabase(contact)){
-        delete contact;
-        contact = 0;
     }
 
     return contact;
@@ -805,7 +813,7 @@ void ContactsManager::renameGroupToUI(ItemBoxWidget *expandListView, const QStri
 
 
 void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
-        qDebug()<<"------------------------------------------------ContactsManager::slotLoadContacts(...)";
+        qDebug()<<"--ContactsManager::slotLoadContacts(...)";
 
     //	Category *category = new Category();
     //	category->setID(QString::number(groupID));
@@ -911,11 +919,13 @@ void ContactsManager::slotChangeContactOnlineState(const QString &contactID, qui
 //添加新的联系人
 //Add new contact
 bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
-    qDebug()<<"----ContactsManager::slotAddNewContactToDatabase(...)";
+    qDebug()<<"----ContactsManager::slotAddNewContactToDatabase(...)  Contact ID:"<<contact->getUserID();
     
     if(contactHash.contains(contact->getUserID())){
+        qCritical()<<"Error! Contact already exists!";
         return false;
     }
+    qDebug()<<"-----------------------------0";
 
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
@@ -937,7 +947,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
         qCritical()<<"Can not insert new contact data to database! Error:"<<query.lastError().text();
         return false;
     }
-    
+
     contactHash.insert(contact->getUserID(), contact);
     int groupID = contact->getContactGroupID();
     ContactGroup *group = contactGroupHash.value(groupID);
@@ -1429,7 +1439,6 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
     }
     
     QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);   
-    qDebug()<<"----------------------1-------------statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save contact info to database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());

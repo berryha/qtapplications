@@ -123,8 +123,6 @@ QString IMUserBase::getUpdateSQLStatement() const{
     
     return sqlstatements.join(" , ");
     
-
-
 }
 
 void IMUserBase::clearUpdatedProperties(){
