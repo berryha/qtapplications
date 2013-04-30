@@ -285,15 +285,20 @@ ItemBoxCategoryListView *ItemBoxTreeWidget::addCategoryView(QTreeWidgetItem *par
     embed_item->setFlags(Qt::ItemIsEnabled);
     ItemBoxCategoryListView *categoryView = new ItemBoxCategoryListView(m_core, this);
     categoryView->setViewMode(iconMode ? QListView::IconMode : QListView::ListMode);
-    categoryView->setFlow(iconMode ? QListView::TopToBottom:QListView::LeftToRight);
+    categoryView->setFlow(iconMode ? QListView::LeftToRight : QListView::TopToBottom);
+
+    //categoryView->setFixedWidth(header()->width());
+    //const int height = qMax(categoryView->contentsSize().height(), 1);
+    //categoryView->setFixedHeight(1);
 
 //    connect(categoryView, SIGNAL(scratchPadChanged()), this, SLOT(slotSave()));
 //    connect(categoryView, SIGNAL(pressed(QString,QString,QPoint)), this, SIGNAL(pressed(QString,QString,QPoint)));
     connect(categoryView, SIGNAL(itemRemoved()), this, SLOT(slotScratchPadItemDeleted()));
-    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
+//    connect(categoryView, SIGNAL(lastItemRemoved()), this, SLOT(slotLastScratchPadItemDeleted()));
 
     setItemWidget(embed_item, 0, categoryView);
     return categoryView;
+
 }
 
 int ItemBoxTreeWidget::indexOfScratchpad() const
@@ -706,9 +711,13 @@ void ItemBoxTreeWidget::adjustSubListSize(QTreeWidgetItem *cat_item)
     list_widget->doItemsLayout();
     const int height = qMax(list_widget->contentsSize().height(), 1);
     list_widget->setFixedHeight(height);
-    list_widget->setFlow(QListView::TopToBottom);
+    //list_widget->setFlow(QListView::TopToBottom);
+    list_widget->setFlow((list_widget->viewMode() == QListView::ListMode) ? QListView::TopToBottom:QListView::LeftToRight);
+
 
     embedItem->setSizeHint(0, QSize(-1, height - 1));
+    viewport()->update();
+
 }
 
 int ItemBoxTreeWidget::categoryCount() const
@@ -796,6 +805,7 @@ void ItemBoxTreeWidget::addCategory(const Category &cat)
             categoryView->addItem(w, iconForItem(w.iconName()), isScratchPad);
     }
     adjustSubListSize(cat_item);
+
 }
 
 void ItemBoxTreeWidget::removeCategory(int cat_idx)
