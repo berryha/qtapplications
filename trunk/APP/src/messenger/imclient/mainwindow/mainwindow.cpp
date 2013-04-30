@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
 
     chatWindowManager = 0;
-//    expandListViewManager = 0;
+    //    expandListViewManager = 0;
     friendBox = 0;
     m_userInfoTipWindow = 0;
 
@@ -268,23 +268,23 @@ void MainWindow::initUI(){
     //
     //if(!expandListViewManager){
 
-//        expandListViewManager = new ExpandListViewManager(this);
-//        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
-//        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
-//        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
-//        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
+    //        expandListViewManager = new ExpandListViewManager(this);
+    //        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
+    //        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
+    //        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
+    //        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
 
-        //}
+    //}
     //if(!friendsListView){
-//        friendBox = expandListViewManager->createExpandListView(ui.friendsPage);
-//        m_boxCore = new ItemBoxCore();
-        friendBox = new ItemBoxWidget(this, ui.friendsPage);
-        ui.friendsPageGridLayout->addWidget(friendBox, 0, 0, 1, 1);
+    //        friendBox = expandListViewManager->createExpandListView(ui.friendsPage);
+    //        m_boxCore = new ItemBoxCore();
+    friendBox = new ItemBoxWidget(this, ui.friendsPage);
+    ui.friendsPageGridLayout->addWidget(friendBox, 0, 0, 1, 1);
     //}
 
 
-        m_userInfoTipWindow = new UserInfoTipWindow(this);
-        connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
+    m_userInfoTipWindow = new UserInfoTipWindow(this);
+    connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
 
 
@@ -329,7 +329,7 @@ void MainWindow::startNetwork(){
 
 
     clientPacketsParser = new IMClientPacketsParser(m_resourcesManager, this);
-  //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
+    //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), this, SLOT(requestRegistration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
@@ -398,9 +398,9 @@ void MainWindow::startNetwork(){
     //Single Process Thread
     //QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
     //IMPORTANT For Multi-thread
-//    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-//    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
-//    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
+    //    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    //    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startparseIncomingPackets);
+    //    QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::startprocessOutgoingPackets);
 
 
     //TODO:
@@ -1044,18 +1044,18 @@ void MainWindow::savePreferedLanguage(const QString &preferedLanguage){
 void MainWindow::slotUpdateContactsInfo(){
     qDebug()<<"----MainWindow::slotUpdateContactsInfo()";
 
-//    if(!expandListViewManager){
-//        expandListViewManager = new ExpandListViewManager(this);
-//        //TODO
-//        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
-//        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
-//        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
-//        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
-//    }
-//    if(!friendsListView){
-//        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
-//        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
-//    }
+    //    if(!expandListViewManager){
+    //        expandListViewManager = new ExpandListViewManager(this);
+    //        //TODO
+    //        connect(expandListViewManager, SIGNAL(signalContactItemActivated(const QString &)), chatWindowManager, SLOT(slotNewChatWithContact(const QString &)));
+    //        connect(expandListViewManager, SIGNAL(contextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnCategoryOccurs(const QString& ,const QPoint, QMenu*)));
+    //        connect(expandListViewManager, SIGNAL(contextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)), this, SLOT(slotContextMenuEventOnObjectItemOccurs(const QString& ,const QPoint, QMenu*)));
+    //        connect(expandListViewManager, SIGNAL(signalTooltipEventOnObjectItemOccurs(const QString& ,const QPoint, const QPoint)), this, SLOT(slotTooltipEventOnObjectItemOccurs(const QString&, const QPoint, const QPoint)));
+    //    }
+    //    if(!friendsListView){
+    //        friendsListView = expandListViewManager->createExpandListView(ui.friendsPage);
+    //        ui.friendsPageGridLayout->addWidget(friendsListView, 0, 0, 1, 1);
+    //    }
 
     //contactsManager = new ContactsManager(this);
     //if(!contactsManager){
@@ -1459,10 +1459,8 @@ void MainWindow::slotMoveContactToGroup(){
     contact->setContactGroupID(groupID);
     contactsManager->saveContactInfoToDatabase(contactID);
 
-    //contactsManager->slotAddNewContactToDatabase(contact);
 
     clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, newGroupName);
-
 
     contactsManager->moveContact(contactID, contactsManager->getPersonalContactGroupID(existingGroupName), groupID);
 
@@ -1663,9 +1661,10 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
             if(contactID.trimmed().isEmpty()){continue;}
             Contact *contact = contactsManager->getUser(contactID);
             if(!contact){
-                contact = new Contact(contactID, 0);
+                contact =  contactsManager->createNewContact(contactID);
+//                contact = new Contact(contactID, 0);
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
-                contactsManager->slotAddNewContactToDatabase(contact);
+//                contactsManager->slotAddNewContactToDatabase(contact);
                 contactsManager->addContactToUI(friendBox, groupName, contactID);
             }
             contact->setContactGroupID(groupID);
@@ -1682,7 +1681,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     
     imUser->saveMyInfoToLocalDatabase();
 
-//    slotUpdateContactsInfo();
+    //    slotUpdateContactsInfo();
     
 }
 
@@ -1691,80 +1690,62 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 
 //}
 
-void MainWindow::slotProcessAddContactResult(const QString &userID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage){
+void MainWindow::slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage){
 
     IM::ErrorType type = IM::ErrorType(errorTypeCode);
     switch(type){
     case IM::ERROR_NoError :
     {
         Contact *contact = 0;
-        if(imUser->hasContact(userID)){
-            contact = contactsManager->getUser(userID);
+        if(imUser->hasContact(contactID)){
+            contact = contactsManager->getUser(contactID);
         }else{
-            contact = new Contact(userID, userNickName, this);
-            contact->setFace(userFace);
-
+//            contact = new Contact(contactID, userNickName, this);
+//            contact->setFace(userFace);
+//            //save new contact to db
+//            contactsManager->slotAddNewContactToDatabase(contact);
+            contact =  contactsManager->createNewContact(contactID, userNickName, userFace);
         }
-        
-        imUser->addOrDeleteContact(userID, "", true);
-        imUser->saveMyInfoToLocalDatabase();
-        contactsManager->slotAddNewContactToDatabase(contact);
-        //contactsManager->addContactToUI(friendsListView, imUser->getDefaultGroupName(), userID);
-        
 
+
+        imUser->addOrDeleteContact(contactID, "", true);
+        imUser->saveMyInfoToLocalDatabase();
+
+        //Save contact to default group
+        QString groupName = imUser->getDefaultGroupName();
+        int groupID = contactsManager->getPersonalContactGroupID(groupName);
+        if(!groupID){
+            groupID = contactsManager->slotAddNewContactGroupToDatabase(groupName);
+            contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
+        }
+        qDebug()<<"----------0------------:"<<contact->getUpdateSQLStatement();
+
+        contact->setContactGroupID(groupID);
+        qDebug()<<"----------1------------:"<<contact->getUpdateSQLStatement();
+        contactsManager->saveContactInfoToDatabase(contactID);
+        contactsManager->addContactToUI(friendBox, groupName, contactID);
+
+
+        //show trayicon info
         if(autoShowSystemMessage){
-            getNewContactSettings(userID);
+            getNewContactSettings(contactID);
         }else{
             //TODO
             TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
-            data.setToolTip(userID);
+            data.setToolTip(contactID);
             data.settrayIconType(TrayIconData::TRAYICON_Flash);
             data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
-            data.setData(userID);
+            data.setData(contactID);
             
             systemTray->appendTrayIconData(data);
             systemTray->updateSystemTrayIcon();
         }
         
-        
-
-        //        QString existingGroupName = imUser->groupNameThatContactBelongsTo(userID);
-
-
-        //        AddContactDialog dlg(contact, false, this);
-        //        dlg.exec();
-        //        QString groupName = dlg.getGroupname();
-        //        //qDebug()<<"---------existingGroupName:"<<existingGroupName<<"  groupName"<<groupName;
-        //        if(existingGroupName == groupName){return;}
-
-        //        imUser->addOrDeleteContact(userID, groupName, true);
-        //        imUser->saveMyInfoToLocalDatabase();
-        
-        //        int groupID = contactsManager->getGroup(groupName);
-        //        if(!groupID){
-        //            groupID = contactsManager->slotAddNewContactGroupToDatabase(groupName);
-        //            contactsManager->slotAddNewContactGroupToUI(friendsListView, groupID, groupName);
-        //        }
-        //        //qDebug()<<"---------groupID:"<<groupID<<"  groupName"<<groupName;
-
-        //        contact->setContactGroupID(groupID);
-        //        contactsManager->slotAddNewContactToDatabase(contact);
-        
-        //        if(!existingGroupName.isEmpty()){
-        //            contactsManager->moveContactToUI(friendsListView, existingGroupName, groupName, userID);
-        //        }else{
-        //            contactsManager->addContactToUI(friendsListView, groupName, userID);
-        //        }
-
-        //        clientPacketsParser->moveContactToGroup(userID, existingGroupName, groupName);
-
-        
-        
     }
         break;
     case IM::ERROR_RequestDenied :
     {
-        QString msg = tr("User %1 rejected your request that add (s)he as a contact!)").arg(userID);
+        QString msg = tr("User %1 rejected your request that add (s)he as a contact!)").arg(contactID);
         if(!reasonMessage.trimmed().isEmpty()){
             msg += tr("<p>Message: %1</p>").arg(reasonMessage);
         }
@@ -1772,9 +1753,8 @@ void MainWindow::slotProcessAddContactResult(const QString &userID, const QStrin
     }
         break;
     default:
-        QMessageBox::critical(this, tr("Error"), tr("Can not add user %1 as a contact! Error code:%2").arg(userID).arg(errorTypeCode));
+        QMessageBox::critical(this, tr("Error"), tr("Can not add user %1 as a contact! Error code:%2").arg(contactID).arg(errorTypeCode));
         
-
     }
 
     
@@ -1794,8 +1774,14 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     dlg.exec();
     QString groupName = dlg.getGroupname();
     QString remarkName = dlg.getNewName();
+    if(!remarkName.trimmed().isEmpty()){
+        contact->setRemarkName(remarkName);
+        contactsManager->saveContactInfoToDatabase(contactID);
+    }
     qDebug()<<"---------existingGroupName:"<<existingGroupName<<"  groupName"<<groupName;
-    if(existingGroupName == groupName){return;}
+    if(existingGroupName == groupName){
+        return;
+    }
 
     
     int groupID = contactsManager->getPersonalContactGroupID(groupName);
@@ -1808,12 +1794,10 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     imUser->moveContact(contactID, existingGroupName, groupName);
     imUser->saveMyInfoToLocalDatabase();
     clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, groupName);
-    
+
     contact->setContactGroupID(groupID);
-    contact->setRemarkName(remarkName);
     contactsManager->saveContactInfoToDatabase(contactID);
     contactsManager->moveContact(contactID, contactsManager->getPersonalContactGroupID(existingGroupName), groupID);
-    //contactsManager->saveContactGroupsInfoToDatabase();
 
     if(existingGroupName.isEmpty()){
         contactsManager->addContactToUI(friendBox, groupName, contactID);
@@ -1973,9 +1957,10 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
 
     Contact *contact = contactsManager->getUser(contactID);
     if(!contact){
-        contact = new Contact(contactID, this);
+        contact =  contactsManager->createNewContact(contactID);
+//        contact = new Contact(contactID, this);
         clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
-        contactsManager->slotAddNewContactToDatabase(contact);
+//        contactsManager->slotAddNewContactToDatabase(contact);
     }
 
     contactsManager->saveInterestGroupChatMessageToDatabase(contactID, interestGroupID, message, time);
@@ -2221,9 +2206,10 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
         qWarning()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
         Contact *contact = contactsManager->getUser(contactID);
         if(!contact){
-            contact = new Contact(contactID, this);
+            contact =  contactsManager->createNewContact(contactID);
+//            contact = new Contact(contactID, this);
             clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
-            contactsManager->slotAddNewContactToDatabase(contact);
+//            contactsManager->slotAddNewContactToDatabase(contact);
         }else{
             if(contactInfoVersion > contact->getPersonalInfoVersion()){
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
@@ -2290,7 +2276,7 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
     m_serverHostAddress = serverHostAddress;
     m_serverHostPort = serverPort;
 
-//    peerConnected(m_socketConnectedToServer, serverHostAddress.toString(), serverPort);
+    //    peerConnected(m_socketConnectedToServer, serverHostAddress.toString(), serverPort);
 
     clientPacketsParser->requestLogin(m_socketConnectedToServer);
 
@@ -2498,8 +2484,8 @@ void MainWindow::processFileDataRequestPacket(int socketID, const QString &conta
 
     }
 
-//    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
-//    fileTXRequestHash.insert(id, socketID);
+    //    int id = m_fileManager->readPiece(fileMD5, pieceIndex);
+    //    fileTXRequestHash.insert(id, socketID);
 
 }
 
@@ -2509,7 +2495,7 @@ void MainWindow::processFileDataReceivedPacket(int socketID, const QString &cont
     m_fileManager->writePiece(fileMD5, pieceIndex, data, sha1);
 
 
-//        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_PIECE_LENGTH);
+    //        clientPacketsParser->requestFileData(socketID, fileTXWithAdmin->pos(), FILE_PIECE_LENGTH);
 
 
 }
@@ -2620,12 +2606,12 @@ void MainWindow::pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool v
 
         }else{
             //TODO:
-//            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
-//            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
-//            if(uncompletedPieceIndex < 0){
-//                return;
-//            }
-//            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
+            //            int uncompletedPieceIndex = m_fileManager->getOneUncompletedPiece(fileMD5);
+            //            qDebug()<<"uncompletedPieceIndex:"<<uncompletedPieceIndex;
+            //            if(uncompletedPieceIndex < 0){
+            //                return;
+            //            }
+            //            clientPacketsParser->requestFileData(sockets.first(), fileMD5, uncompletedPieceIndex);
 
 
             //if((pieceIndex % FILE_PIECES_IN_ONE_REQUEST) == 0){

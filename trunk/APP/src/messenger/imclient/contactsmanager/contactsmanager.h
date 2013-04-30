@@ -77,7 +77,7 @@ public:
 
 
 
-
+    Contact * createNewContact(const QString &contactID, const QString &nickname = "", const QString *face = "");
 
 public slots:
     //void slotUpdateContactsInfo2();
@@ -124,7 +124,7 @@ public slots:
     bool getContactInfoFormLocalDatabase(const QString &contactID);
     bool saveContactInfoToDatabase(const QString &contactID);
 
-    bool saveContactGroupsInfoToDatabase();
+//    bool saveContactGroupsInfoToDatabase();
 
 
     bool openDatabase(bool reopen = false);

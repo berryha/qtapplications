@@ -520,6 +520,19 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 
 }
 
+Contact * ContactsManager::createNewContact(const QString &contactID, const QString &nickname, const QString *face){
+
+    Contact *contact = new Contact(contactID, nickname, this);
+    contact->setFace(face);
+
+    if(!slotAddNewContactToDatabase(contact)){
+        delete contact;
+        contact = 0;
+    }
+
+    return contact;
+
+}
 
 void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
     qDebug()<<"ContactsManager::slotFetchContactsInfo(...)";
@@ -1406,14 +1419,17 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
     if(contactHash.contains(contactID)){
         contact = contactHash.value(contactID);
     }else{
+        qCritical()<<"Error! Contact '"<<contactID<<"' does not exist!";
         return false;
     }
     QString updateSQLStatement = contact->getUpdateSQLStatement();
     if(updateSQLStatement.trimmed().isEmpty()){
+        qCritical()<<"Error! Empty Update SQL Statement";
         return false;
     }
     
     QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);   
+    qDebug()<<"----------------------1-------------statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save contact info to database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());
@@ -1427,47 +1443,49 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
     
 }
 
-bool ContactsManager::saveContactGroupsInfoToDatabase(){
+
+//bool ContactsManager::saveContactGroupsInfoToDatabase(){
     
-    foreach (Contact *contact, contactHash.values()) {
-        contact->setContactGroupID(0);
-    }
+//    foreach (Contact *contact, contactHash.values()) {
+//        contact->setContactGroupID(0);
+//    }
     
     
-    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = m_imUser->getPersonalContactGroupsHash();
+//    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = m_imUser->getPersonalContactGroupsHash();
 
     
-    QStringList groups = personalContactGroupsHash.keys();
-    foreach (QString groupName, groups) {
-        int groupID = getPersonalContactGroupID(groupName);
-        if(!groupID){
-            groupID = slotAddNewContactGroupToDatabase(groupName);
-        }
-        QStringList members = personalContactGroupsHash.value(groupName);
-        foreach (QString contactID, members) {
-            if(contactID.trimmed().isEmpty()){continue;}
-            Contact *contact = 0;
-            if(contactHash.contains(contactID)){
-                contact = contactHash.value(contactID);
-            }else{
-                contact = new Contact(contactID, 0);
-                contactHash.insert(contactID, contact);
-                slotAddNewContactToDatabase(contact);
-            }
-            contact->setContactGroupID(groupID);
-            saveContactInfoToDatabase(contactID);
+//    QStringList groups = personalContactGroupsHash.keys();
+//    foreach (QString groupName, groups) {
+//        int groupID = getPersonalContactGroupID(groupName);
+//        if(!groupID){
+//            groupID = slotAddNewContactGroupToDatabase(groupName);
+//        }
+//        QStringList members = personalContactGroupsHash.value(groupName);
+//        foreach (QString contactID, members) {
+//            if(contactID.trimmed().isEmpty()){continue;}
+//            Contact *contact = 0;
+//            if(contactHash.contains(contactID)){
+//                contact = contactHash.value(contactID);
+//            }else{
+//                contact = new Contact(contactID, 0);
+//                contactHash.insert(contactID, contact);
+//                slotAddNewContactToDatabase(contact);
+//            }
+//            contact->setContactGroupID(groupID);
+//            saveContactInfoToDatabase(contactID);
             
-        }
+//        }
         
         
-    }
+//    }
     
-    //TODO:更新联系人信息
+//    //TODO:更新联系人信息
     
-    return true;
+//    return true;
     
     
-}
+//}
+
 
 bool ContactsManager::openDatabase(bool reopen){
     qWarning()<<"--ContactsManager::openDatabase(...)";
