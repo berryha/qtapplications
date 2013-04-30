@@ -871,6 +871,7 @@ void ItemBoxTreeWidget::addItem(int cat_idx, const Item &item)
     // The same categories are read from the file $HOME, avoid duplicates
     if (!categoryView->containsItem(item.id())){
         categoryView->addItem(item, iconForItem(item.iconName(), item.iconMode()), scratch);
+        categoryView->updateGeometry();
     }else{
         qWarning()<<"ERROR! Item "<<item.id()<<" already exists!";
     }
@@ -906,6 +907,8 @@ void ItemBoxTreeWidget::removeItem(int cat_idx, int wgt_idx)
         return;
 
     categoryView->removeRow(am, wgt_idx);
+    categoryView->updateGeometry();
+
 }
 
 void ItemBoxTreeWidget::removeItem(const QString &cat_name, const QString &item_id){
@@ -925,9 +928,11 @@ void ItemBoxTreeWidget::removeItem(const QString &cat_name, const QString &item_
 
     if (item_idx >= categoryview->count(am)){return;}
     categoryview->removeRow(am, item_idx);
+    categoryview->updateGeometry();
     adjustSubListSize(topLevelItem(cat_Idx));
 
     updateGeometries();
+    //viewport()->update();
 
 }
 
