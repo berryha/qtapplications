@@ -65,7 +65,7 @@ public slots:
         QString getContactGroupsInfoString() const;
         QStringList getContacts() const;
 
-        bool hasContact(const QString &contactID);
+        bool hasFriendContact(const QString &contactID);
         QString groupNameThatContactBelongsTo(const QString &contactID) const;
 
 

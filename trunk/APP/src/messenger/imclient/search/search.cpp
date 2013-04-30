@@ -202,7 +202,7 @@ void Search::on_pushButtonSearch_clicked(){
                     ui.lineEditUserID->clear();
                     return;
                 }
-                if(IMUser::instance()->hasContact(userID)){
+                if(IMUser::instance()->hasFriendContact(userID)){
                     QMessageBox::critical(this, tr("Error"), tr("'%1' was already your contact!").arg(userID));
                     ui.lineEditUserID->clear();
                     return;
@@ -305,7 +305,7 @@ void Search::on_pushButtonAddAsContact_clicked(){
         QMessageBox::critical(this, tr("Error"), tr("You can't add yourself as a contact!"));
         return;
     }
-    if(IMUser::instance()->hasContact(userID)){
+    if(IMUser::instance()->hasFriendContact(userID)){
         QMessageBox::critical(this, tr("Error"), tr("'%1' was already your contact!").arg(userID));
         return;
     }
