@@ -470,7 +470,7 @@ ItemBoxCategoryListView::ItemBoxCategoryListView(ItemBoxEventHandler *core, QWid
     m_proxyModel(new QSortFilterProxyModel(this)),
     m_model(new ItemBoxCategoryModel(core, this))
 {
-//    setFocusPolicy(Qt::NoFocus);
+    //setFocusPolicy(Qt::StrongFocus);
     setFrameShape(QFrame::NoFrame);
     setIconSize(QSize(22, 22));
     setSpacing(1);
