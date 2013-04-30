@@ -592,7 +592,7 @@ void SystemTrayIconBase::setData(const QString &id, const QVariant &data){
 
 
 void SystemTrayIconBase::slotShowFlash(){
-    qDebug()<<"----SystemTrayIconBase::showFlash()";
+    //qDebug()<<"----SystemTrayIconBase::showFlash()";
     
     static QIcon emptyIcon = ImageResourceBase::emptyIcon();
     static int curIndex = 1;
@@ -601,7 +601,7 @@ void SystemTrayIconBase::slotShowFlash(){
         iconIndex = 0;
     }
     
-    qDebug()<<"~~ iconIndex:"<<iconIndex;
+    //qDebug()<<"~~ iconIndex:"<<iconIndex;
     
     if(curIndex < 0){
         setIcon(emptyIcon);
