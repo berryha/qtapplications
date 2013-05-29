@@ -145,8 +145,8 @@ void ApplyForRegistrationWidget::slotProcessRegistrationResult(quint8 errorTypeC
     QString errorMessage = "";
     
     if(errorType == IM::ERROR_NoError){
-        errorMessage = tr("Registration Succeed!");
-        QMessageBox::information(this, tr("Registration Succeed"), errorMessage + QString("\n%1").arg(message));
+        errorMessage = tr("Registration Successful!");
+        QMessageBox::information(this, tr("Registration Successful"), errorMessage + QString("\n%1").arg(message));
 
 
     }else{
@@ -180,12 +180,12 @@ void ApplyForRegistrationWidget::slotProcessRegistrationResult(quint8 errorTypeC
             
         case IM::ERROR_IDEXISTED:
         {
-            errorMessage = tr("ID Already Existed!");
+            errorMessage = tr("ID Already Exists!");
         }
             break;
         case IM::ERROR_EMAILEXISTED:
         {
-            errorMessage = tr("Email Address Already Existed!");
+            errorMessage = tr("Email Address Already Exists!");
         }
             break;
             
