@@ -38,7 +38,7 @@ namespace HEHUI {
 IMUser *IMUser::imUserInstance = 0;
 
 IMUser * IMUser::instance(){
-	if(imUserInstance == NULL){
+    if(imUserInstance == 0){
 		imUserInstance = new IMUser();
 	}
 
@@ -50,6 +50,9 @@ IMUser::IMUser(const QString & userID, QObject *parent)
 	:IMUserBase(userID, parent)
 {
 	stateAfterLoggedin = IM::ONLINESTATE_ONLINE;
+    m_loginServerAddress = "";
+    m_loginServerPort = 0;
+    m_regServerAddress = "";
 
 }
 
@@ -93,6 +96,30 @@ QStringList IMUser::contactGroups() const{
     }
 
     return groups;
+}
+
+void IMUser::setLoginServerAddress(const QString &serverAddress){
+    m_loginServerAddress = serverAddress;
+}
+
+QString IMUser::getLoginServerAddress() const{
+    return m_loginServerAddress;
+}
+
+void IMUser::setLoginServerPort(quint16 serverPort){
+    m_loginServerPort = serverPort;
+}
+
+quint16 IMUser::getLoginServerPort() const{
+    return m_loginServerPort;
+}
+
+void IMUser::setRegistrationServerAddressInfo(const QString &regServerAddress){
+    m_regServerAddress = regServerAddress;
+}
+
+QString IMUser::getRegistrationServerAddressInfo() const{
+    return m_regServerAddress;
 }
 
 //bool IMUser::addGroup(const QString &groupName, const QStringList &members){

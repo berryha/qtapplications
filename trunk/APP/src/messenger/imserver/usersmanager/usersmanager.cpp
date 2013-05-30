@@ -227,7 +227,7 @@ UserInfo* UsersManager::logUserIn(const QString &userID, const QByteArray &encry
     return userInfo;
 }
 
-bool UsersManager::registerNewUser(const QString &userID, const QString &password, const QString &email, IM::ErrorType *errorType, QString *message){
+bool UsersManager::registerNewUser(const QString &userID, const QString &password, IM::ErrorType *errorType, quint32 *sysID, QString *message){
     
     
     UserInfo *userInfo = getUserInfo(userID);
@@ -236,10 +236,6 @@ bool UsersManager::registerNewUser(const QString &userID, const QString &passwor
         return false;
     }
     
-    
-    
-    
-    
     if(!db.isValid()){
         if(!openDatabase()){
             *errorType = IM::ERROR_UnKnownError;
@@ -247,12 +243,13 @@ bool UsersManager::registerNewUser(const QString &userID, const QString &passwor
         }
     } 
     QSqlQuery query(db);
-    QString statement = QString("insert into users_detailed_info(UserID, UserPassword) values('%1', '%2') ").arg(userID).arg(password);
-    
+    //QString statement = QString("insert into users_detailed_info(UserID, UserPassword) values('%1', '%2') ").arg(userID).arg(password);
+    QString statement = QString("call sp_CreateNewUser('%1', '%2', @sysID); ").arg(userID).arg(password);
+    statement += QString("select @sysID;");
+
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not add new user info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
 
         //TODO:数据库重启，重新连接
@@ -265,11 +262,21 @@ bool UsersManager::registerNewUser(const QString &userID, const QString &passwor
         *errorType = IM::ERROR_UnKnownError;
         return false;
     }
-    
+    query.first();
+
+    if(sysID){
+        *sysID = query.value(0).toUInt();
+       qDebug()<<"---------------------------------sysID:"<<*sysID;
+       if(*sysID == 0){
+           *errorType = IM::ERROR_UnKnownError;
+           return false;
+       }
+    }
+
+
     
     userInfo = getUserInfo(userID);
     if(!userInfo){
-        
         *errorType = IM::ERROR_UnKnownError;
         return false;
     }

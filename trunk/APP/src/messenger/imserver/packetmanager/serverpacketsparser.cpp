@@ -167,17 +167,39 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
     break;
 
+    case quint8(IM::CLIENT_REQUEST_REGISTRATION_SERVER_INFO):
+    {
+        qDebug()<<"~~CLIENT_REQUEST_REGISTRATION_SERVER_INFO";
+
+        QString clientVersion = "";
+        in >> clientVersion;
+
+
+        //TODO
+        IM::ErrorType errorype = IM::ERROR_NoError;
+        bool canRegister = true;
+        QString extraMessage = "TEST";
+        IM::RegistrationMode regMode = IM::RM_UserDefineAll;
+        QString regServerAddress = "";
+        bool requireActivation = false;
+
+        sendRegistrationServerInfoPacket(socketID, quint8(errorype), extraMessage, canRegister, regMode, regServerAddress, requireActivation);
+
+    }
+    break;
+
     case quint8(IM::CLIENT_REGISTRATION):
     {
         qDebug()<<"~~CLIENT_REGISTRATION";
         
-        QString userID = "", password = "", email = "";
-        in >> userID >> password >> email;
+        QString userID = "", password = "";
+        in >> userID >> password;
 
         IM::ErrorType errorype = IM::ERROR_UnKnownError;
         QString message = "";
-        registerNewUser(userID, password, email, &errorype, &message);
-        sendClientRegistrationResultPacket(socketID, quint8(errorype), message);
+        quint32 sysID = 0;
+        registerNewUser(userID, password, &errorype, &sysID, &message);
+        sendClientRegistrationResultPacket(socketID, quint8(errorype), sysID, message);
 
     }
     break;

@@ -31,7 +31,7 @@ public:
         NORMAL, VERIFYING, LOCKED
     };
 
-    LoginWidget(IMUser *u = 0, QWidget *parent = 0);
+    LoginWidget(QWidget *parent = 0);
     ~LoginWidget();
 
     //	void setUser(IMUser *u) {user = u;};
@@ -69,8 +69,10 @@ private:
 
 
 signals:
-    void registration(const QString &serverHostAddress, quint16 serverHostPort, const QString &userID, const QString &password, const QString &email);
-    void signalRegistrationResultReceived(quint8 errorTypeCode, const QString &message);
+    void requestRegistrationServerInfo();
+    void registration();
+    void signalRegistrationServerInfoReceived(quint8 errorTypeCode, bool canRegister, const QString &extraMessage, quint8 regMode, const QString &regServerAddress, bool requireActivation);
+    void signalRegistrationResultReceived(quint8 errorTypeCode, quint32 sysID, const QString &message);
 
     void signalRequestLogin(const QHostAddress &serverHostAddress, quint16 serverHostPort);
     void signalLookForServer(const QHostAddress &targetAddress, quint16 targetPort);
@@ -104,10 +106,9 @@ private slots:
 
     void slotServersUpdated();
     void slotServerSelected(const QString &serverInfoString);
+    void updateUserLoginServerInfo();
 
     void loginTimeout();
-
-    void slotRegistration(const QString &userID, const QString &password, const QString &email);
 
 
 private:

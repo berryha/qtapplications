@@ -31,6 +31,7 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include <QTimer>
+#include <QDesktopServices>
 
 #include <QDebug>
 
@@ -52,19 +53,22 @@ ApplyForRegistrationWidget::ApplyForRegistrationWidget(QWidget *parent) :
 //    QRegExp rx("\\w{6,16}");
 //    validator->setRegExp(rx);
 //    ui.lineEditUserID->setValidator(validator);
-    
+
     ui.pushButtonPrevious->hide();
     ui.pushButtonNext->hide();
     ui.pushButtonRegister->setText(tr("&Cancel"));
+
+    user = IMUser::instance();
         
     m_registrationModeInfoResponseReceived = false;
     m_registrationResultReceived = false;
 
     m_registrationMode = IM::RM_ServerCreateUserIDOnly;
     m_requireActivation = false;
+
     
-    emit requestRegistration();
-    QTimer::singleShot(5000, this, SLOT(requestRegistrationTimeout()));
+    //emit requestRegistrationServerInfo();
+    QTimer::singleShot(5000, this, SLOT(requestRegistrationServerInfoTimeout()));
 
 }
 
@@ -86,7 +90,8 @@ void ApplyForRegistrationWidget::changeEvent(QEvent *e)
     }
 }
 
-void ApplyForRegistrationWidget::slotProcessRegistrationModeInfo(bool canRegister, bool extraMessage, IM::RegistrationMode regMode, bool requireActivation){
+void ApplyForRegistrationWidget::slotProcessRegistrationServerInfo(quint8 errorTypeCode, bool canRegister, const QString &extraMessage, quint8 regMode, const QString &regServerAddress, bool requireActivation){
+    qDebug()<<"--ApplyForRegistrationWidget::slotProcessRegistrationServerInfo(...)";
 
     m_registrationModeInfoResponseReceived = true;
 
@@ -96,10 +101,19 @@ void ApplyForRegistrationWidget::slotProcessRegistrationModeInfo(bool canRegiste
         return;
     }
 
-    m_registrationMode = regMode;
+
+    if(regServerAddress.startsWith("http://", Qt::CaseInsensitive) || regServerAddress.startsWith("https://", Qt::CaseInsensitive)){
+        QDesktopServices::openUrl(regServerAddress);
+        emit canceled();
+        return;
+    }
+
+
+    m_registrationMode = IM::RegistrationMode(regMode);
+    user->setRegistrationServerAddressInfo(regServerAddress);
     m_requireActivation = requireActivation;
 
-    switch(regMode){
+    switch(m_registrationMode){
     case IM::RM_UserDefineAll:
         break;
     case IM::RM_ServerCreateAll:
@@ -137,18 +151,21 @@ void ApplyForRegistrationWidget::slotProcessRegistrationModeInfo(bool canRegiste
 
 }
 
-void ApplyForRegistrationWidget::slotProcessRegistrationResult(quint8 errorTypeCode, const QString &message){
+void ApplyForRegistrationWidget::slotProcessRegistrationResult(quint8 errorTypeCode, quint32 sysID, const QString &message){
+    qDebug()<<"--ApplyForRegistrationWidget::slotProcessRegistrationResult(...)";
 
     m_registrationResultReceived = true;
     
     IM::ErrorType errorType = IM::ErrorType(errorTypeCode);
     QString errorMessage = "";
     
-    if(errorType == IM::ERROR_NoError){
-        errorMessage = tr("Registration Successful!");
-        QMessageBox::information(this, tr("Registration Successful"), errorMessage + QString("\n%1").arg(message));
+    if(errorType == IM::ERROR_NoError && sysID != 0){
+        QString msg = tr("<p><font color='red'>Registration Successful!</font></p>%1<p>System ID:%2</p><p>User ID:%3</p>").arg(message).arg(sysID).arg(user->getUserID());
+        ui.labelInfo->setText(msg);
 
-
+        //errorMessage = tr("Registration Successful!");
+        //ui.labelInfo->setText(errorMessage);
+        //QMessageBox::information(this, tr("Registration Successful"), errorMessage + QString("\n%1").arg(message));
     }else{
 
         switch(errorType){
@@ -235,10 +252,12 @@ void ApplyForRegistrationWidget::on_pushButtonRegister_clicked(){
     QByteArray password(ui.lineEditPassword->text().toUtf8());
     password = QCryptographicHash::hash (password, QCryptographicHash::Sha1);
 
-    //user->setPassword(password.toBase64());
+    user->setUserID(ui.lineEditUserID->text());
+    user->setPassword(password.toBase64());
     
-    emit registration(ui.lineEditUserID->text(), password.toBase64(), ui.lineEditEmail->text().trimmed());
-    
+    //emit registration(ui.lineEditUserID->text(), password.toBase64(), ui.lineEditEmail->text().trimmed());
+    emit registration();
+
     m_registrationResultReceived = false;
     QTimer::singleShot(5000, this, SLOT(registrationTimeout()));
     
@@ -255,7 +274,7 @@ bool ApplyForRegistrationWidget::isUserIDValid(){
     QString userID = ui.lineEditUserID->text();
     int pos = 0;
     QRegExpValidator rxValidator(this);
-    QRegExp rx("^\\w{6,16}$");
+    QRegExp rx("^\\w{5,16}$");
     rxValidator.setRegExp(rx);
     if(rxValidator.validate(userID, pos) != QValidator::Acceptable){
         ui.lineEditUserID->setFocus();
@@ -289,7 +308,7 @@ bool ApplyForRegistrationWidget::isPasswordValid(){
 
 }
 
-void ApplyForRegistrationWidget::requestRegistrationTimeout(){
+void ApplyForRegistrationWidget::requestRegistrationServerInfoTimeout(){
 
     if(!m_registrationModeInfoResponseReceived){
         //QMessageBox::critical(this, tr("Error"), tr("Timeout!"));

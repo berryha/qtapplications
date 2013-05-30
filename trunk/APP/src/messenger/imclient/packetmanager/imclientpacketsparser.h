@@ -148,16 +148,17 @@ public slots:
 
     //    }
 
-    bool registration(int serverSocketID, const QString &userID, const QString &password, const QString &email){
-        qWarning()<<"--registration(...)";
+
+    bool requestRegistrationServerInfo(int serverSocketID, const QString &clientVersion = APP_VERSION){
+        qWarning()<<"--requestRegistrationServerInfo(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::CLIENT_REGISTRATION));
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_REGISTRATION_SERVER_INFO));
         packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID << userID << password << email;
+        out << m_myUserID << clientVersion;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -169,6 +170,26 @@ public slots:
 
     }
 
+    bool registration(int serverSocketID, const QString &userID, const QString &password){
+        qWarning()<<"--registration(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CLIENT_REGISTRATION));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+        out << m_myUserID << userID << password;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+
+    }
 
     bool updatePassword(int serverSocketID, const QString &newPassword){
         qDebug()<<"--updatePassword(...)";
@@ -1121,7 +1142,8 @@ signals:
     void  signalHeartbeatPacketReceived(const QString &contactID);
     void  signalConfirmationOfReceiptPacketReceived(quint16 packetSerialNumber1, quint16 packetSerialNumber2);
 
-    void signalRegistrationResultReceived(quint8 errorTypeCode, const QString &message);
+    void signalRegistrationServerInfoReceived(quint8 errorTypeCode, bool canRegister, const QString &extraMessage, quint8 regMode, const QString &regServerAddress, bool requireActivation);
+    void signalRegistrationResultReceived(quint8 errorTypeCode, quint32 sysID, const QString &message);
     void signalUpdatePasswordResultReceived(quint8 errorTypeCode, const QString &message);
     
     void signalLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
