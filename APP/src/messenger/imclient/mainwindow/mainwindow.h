@@ -139,7 +139,8 @@ private slots:
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
     void loginTimeout();
 
-    void requestRegistration(const QString &serverHostAddress, quint16 serverHostPort, const QString &userID, const QString &password, const QString &email);
+    void requestRegistrationServerInfo();
+    void requestRegistration();
 
 
     void peerConnected(int socketID, const QString &peerAddress, quint16 peerPort);

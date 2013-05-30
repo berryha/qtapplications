@@ -193,9 +193,28 @@ public slots:
 
 
 
+    bool sendRegistrationServerInfoPacket(int peerSocketID, quint8 errorTypeCode, const QString &extraMessage, bool canRegister, IM::RegistrationMode regMode, const QString &regServerAddress, bool requireActivation){
+        qDebug()<<"--sendRegistrationServerInfoPacket(...)";
 
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION_SERVER_INFO));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+        out << m_serverName << errorTypeCode << extraMessage << quint8(canRegister?1:0) << quint8(regMode) << regServerAddress << quint8(requireActivation?1:0);
+        packet->setPacketData(ba);
 
-    bool sendClientRegistrationResultPacket(int peerSocketID, quint8 errorTypeCode, const QString &message){
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
+    bool sendClientRegistrationResultPacket(int peerSocketID, quint8 errorTypeCode, quint32 sysID, const QString &message){
         qWarning()<<"--sendClientRegistrationResultPacket(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -204,7 +223,7 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_serverName << errorTypeCode << message;
+        out << m_serverName << errorTypeCode << sysID << message;
         packet->setPacketData(ba);
 
         ba.clear();

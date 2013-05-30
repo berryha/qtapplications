@@ -36,6 +36,7 @@
 
 #include <QWidget>
 #include "ui_applyforregistrationwidget.h"
+#include "../imuser.h"
 
 #include "../../sharedim/constants_global_shared.h"
 
@@ -51,34 +52,32 @@ public:
     ~ApplyForRegistrationWidget();
     
     
-    QString userID();
-    QString email();
-    QString password();
 
 protected:
     void changeEvent(QEvent *e);
     
 signals:
-    void requestRegistration();
-    void registration(const QString &userID, const QString &password, const QString &email);
+    void requestRegistrationServerInfo();
+    void registration();
     void canceled();
         
 public slots:
-    void slotProcessRegistrationModeInfo(bool canRegister, bool extraMessage, IM::RegistrationMode regMode, bool requireActivation);
-    void slotProcessRegistrationResult(quint8 errorTypeCode, const QString &message);
+    void slotProcessRegistrationServerInfo(quint8 errorTypeCode, bool canRegister, const QString &extraMessage, quint8 regMode, const QString &regServerAddress, bool requireActivation);
+    void slotProcessRegistrationResult(quint8 errorTypeCode, quint32 sysID, const QString &message);
 
 private slots:
     void on_pushButtonRegister_clicked();
     bool isUserIDValid();
     bool isPasswordValid();
     
-    void requestRegistrationTimeout();
+    void requestRegistrationServerInfoTimeout();
     void registrationTimeout();
 
     
-
 private:
     Ui::ApplyForRegistrationWidgetUI ui;
+
+    IMUser *user;
 
 //    QRegExpValidator *validator;
     
@@ -87,6 +86,7 @@ private:
 
     IM::RegistrationMode m_registrationMode;
     bool m_requireActivation;
+
 
 
 };

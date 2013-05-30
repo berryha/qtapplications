@@ -225,15 +225,33 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION_SERVER_INFO):
+    {
+
+        qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION_SERVER_INFO";
+
+        quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
+        quint8 canRegister = 1;
+        QString extraMessage = "";
+        quint8 regMode = quint8(IM::RM_UserDefineAll);
+        QString regServerAddress = "";
+        quint8 requireActivation = 0;
+        in >> errorTypeCode >> extraMessage >> canRegister  >> regMode >> regServerAddress >> requireActivation;
+        emit signalRegistrationServerInfoReceived(errorTypeCode, canRegister, extraMessage, regMode, regServerAddress, requireActivation);
+
+    }
+        break;
+
     case quint8(IM::SERVER_RESPONSE_CLIENT_REGISTRATION):
     {
         
         qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_REGISTRATION";
         
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
+        quint32 sysID = 0;
         QString message = "";
-        in >> errorTypeCode >> message;
-        emit signalRegistrationResultReceived(errorTypeCode, message);
+        in >> errorTypeCode >> sysID >> message;
+        emit signalRegistrationResultReceived(errorTypeCode, sysID, message);
         
     }
         break;

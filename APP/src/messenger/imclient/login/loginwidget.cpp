@@ -17,14 +17,14 @@
 namespace HEHUI {
 
 
-LoginWidget::LoginWidget(IMUser *u, QWidget *parent)
-    : QWidget(parent), user(u)
+LoginWidget::LoginWidget(QWidget *parent)
+    : QWidget(parent)
 {
     ui.setupUi(this);
 
-    if(!this->user){
-        user = IMUser::instance();
-    }
+
+    user = IMUser::instance();
+
 
     movie = new QMovie(":/resources/images/verifying.gif");
 
@@ -211,11 +211,20 @@ inline QString LoginWidget::passWord() const {
 }
 
 inline QString LoginWidget::serverAddress(){
-    return ui.comboBoxServerIP->currentText().split(":").at(0);
+    QStringList serverInfo = ui.comboBoxServerIP->currentText().split(":");
+    if(serverInfo.size() == 2){
+        return serverInfo.at(0);
+    }
+
+    return "";
 }
 
 inline quint16 LoginWidget::serverPort(){
-    return ui.comboBoxServerIP->currentText().split(":").at(1).toUInt();
+    QStringList serverInfo = ui.comboBoxServerIP->currentText().split(":");
+    if(serverInfo.size() == 2){
+        return serverInfo.at(1).toUInt();
+    }
+    return 0;
 }
 
 void LoginWidget::lockUI(const QString &key){
@@ -324,14 +333,21 @@ void LoginWidget::on_toolButtonApplyForRegistration_clicked(){
     QVBoxLayout vbl(&dlg);
     
     ApplyForRegistrationWidget rw(&dlg);
-    connect(this, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), &rw, SLOT(slotProcessRegistrationResult(quint8, const QString&))/*, Qt::QueuedConnection*/);
-    connect(&rw, SIGNAL(registration(const QString &, const QString &, const QString &)), this, SLOT(slotRegistration(const QString &, const QString &, const QString &)));
+    connect(this, SIGNAL(signalRegistrationServerInfoReceived(quint8, bool, const QString &, quint8, const QString &, bool)), &rw, SLOT(slotProcessRegistrationServerInfo(quint8, bool, const QString &, quint8, const QString &, bool))/*, Qt::QueuedConnection*/);
+    connect(this, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), &rw, SLOT(slotProcessRegistrationResult(quint8, quint32, const QString&))/*, Qt::QueuedConnection*/);
+    //connect(&rw, SIGNAL(requestRegistrationServerInfo()), this, SIGNAL(requestRegistrationServerInfo())/*, Qt::QueuedConnection*/);
+    connect(&rw, SIGNAL(registration()), this, SIGNAL(registration()));
     connect(&rw, SIGNAL(canceled()), &dlg, SLOT(accept()));
 
     vbl.addWidget(&rw);
     dlg.setLayout(&vbl);
     dlg.updateGeometry();
     dlg.setWindowTitle(tr("Registration"));
+
+    emit requestRegistrationServerInfo();
+    //QTimer::singleShot(5000, &rw, SLOT(requestRegistrationServerInfoTimeout()));
+
+
     dlg.exec();
     
 }
@@ -482,10 +498,9 @@ void LoginWidget::on_comboBoxProtocol_currentIndexChanged ( const QString & text
 
 void LoginWidget::on_comboBoxServerIP_currentIndexChanged ( int index )
 {
-    //QString ip = ui.comboBoxServerIP->itemText(index);
-    //quint16 port = ui.comboBoxServerIP->itemData(index).toUInt();
+    //qDebug()<<"--LoginWidget::on_comboBoxServerIP_currentIndexChanged() index:"<<index;
 
-
+    updateUserLoginServerInfo();
 
 }
 
@@ -545,8 +560,15 @@ void LoginWidget::slotServerSelected(const QString &serverInfoString){
     
     ui.comboBoxServerIP->setCurrentIndex(ui.comboBoxServerIP->findText(serverInfoString));
     
-    
-    
+    updateUserLoginServerInfo();
+        
+}
+
+void LoginWidget::updateUserLoginServerInfo(){
+    qDebug()<<"--LoginWidget::updateUserLoginServerInfo() serverAddress:"<<serverAddress();
+
+    user->setLoginServerAddress(serverAddress());
+    user->setLoginServerPort(serverPort());
 }
 
 void LoginWidget::loginTimeout(){
@@ -555,12 +577,6 @@ void LoginWidget::loginTimeout(){
         slotProcessLoginResult(IM::ERROR_Timeout);
     }
     
-}
-
-void LoginWidget::slotRegistration(const QString &userID, const QString &password, const QString &email){
-
-    emit registration(serverAddress(), serverPort(), userID, password, email);
-
 }
 
 //void LoginWidget::serverFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version){

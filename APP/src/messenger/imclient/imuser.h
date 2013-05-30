@@ -35,52 +35,59 @@
 
 namespace HEHUI {
 
-class  IMUser: public HEHUI::IMUserBase {
+class  IMUser: public IMUserBase {
 public:
-        static IMUser * instance();
-	virtual ~IMUser();
-        
-        bool loadMyInfoFromLocalDatabase();
-        bool saveMyInfoToLocalDatabase();
-        
-        bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
-        bool saveContactInfoToLocalDatabase(const QString &contactID);
-        
-        IM::OnlineState getStateAfterLoggedin() const;
-        void setStateAfterLoggedin(IM::OnlineState state);
+    static IMUser * instance();
+    virtual ~IMUser();
 
-        QStringList contactGroups() const;
-        
+    bool loadMyInfoFromLocalDatabase();
+    bool saveMyInfoToLocalDatabase();
+
+    bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
+    bool saveContactInfoToLocalDatabase(const QString &contactID);
+
+    IM::OnlineState getStateAfterLoggedin() const;
+    void setStateAfterLoggedin(IM::OnlineState state);
+
+    QStringList contactGroups() const;
+
+    void setLoginServerAddress(const QString &serverAddress);
+    QString getLoginServerAddress() const;
+    void setLoginServerPort(quint16 serverPort);
+    quint16 getLoginServerPort() const;
+    void setRegistrationServerAddressInfo(const QString &regServerAddress);
+    QString getRegistrationServerAddressInfo() const;
+
 
 private:
-	IMUser(const QString & userID = "", QObject *parent = 0);
+    IMUser(const QString & userID = "", QObject *parent = 0);
 
 
 public slots:
-//        bool addGroup(const QString &groupName, const QStringList &members = QStringList());
-//        bool removeGroup(const QString &groupName);
-//        bool updateGroupName(const QString &oldGroupName, const QString &newGroupName);
-//        bool addContactToGroup(const QString &contactID, const QString &groupName);
+    //        bool addGroup(const QString &groupName, const QStringList &members = QStringList());
+    //        bool removeGroup(const QString &groupName);
+    //        bool updateGroupName(const QString &oldGroupName, const QString &newGroupName);
+    //        bool addContactToGroup(const QString &contactID, const QString &groupName);
 
-        QString getContactGroupsInfoString() const;
-        QStringList getContacts() const;
+    QString getContactGroupsInfoString() const;
+    QStringList getContacts() const;
 
-        bool hasFriendContact(const QString &contactID);
-        QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    bool hasFriendContact(const QString &contactID);
+    QString groupNameThatContactBelongsTo(const QString &contactID) const;
 
 
 private slots:
 
-        QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
+    QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
 
 private:
-	static IMUser *imUserInstance;
-        
-        IM::OnlineState stateAfterLoggedin;
-        
+    static IMUser *imUserInstance;
 
+    IM::OnlineState stateAfterLoggedin;
 
-
+    QString m_loginServerAddress;
+    quint16 m_loginServerPort;
+    QString m_regServerAddress;
 
 
 };

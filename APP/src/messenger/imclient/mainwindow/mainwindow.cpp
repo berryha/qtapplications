@@ -332,8 +332,10 @@ void MainWindow::startNetwork(){
     //    connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), this, SLOT(serverFound(const QString& ,quint16, const QString&, const QString&)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalServerDeclarePacketReceived(const QString&, quint16, const QString&, const QString&)), ui.loginPage, SIGNAL(signalServerFound(const QString& , quint16, const QString&, const QString&)), Qt::QueuedConnection);
-    connect(ui.loginPage, SIGNAL(registration(const QString &, quint16 , const QString &, const QString &, const QString &)), this, SLOT(requestRegistration(const QString &, quint16 , const QString &, const QString &, const QString &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, const QString&)), Qt::QueuedConnection);
+    connect(ui.loginPage, SIGNAL(requestRegistrationServerInfo()), this, SLOT(requestRegistrationServerInfo()), Qt::QueuedConnection);
+    connect(ui.loginPage, SIGNAL(registration()), this, SLOT(requestRegistration()), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalRegistrationServerInfoReceived(quint8, bool, const QString &, quint8, const QString &, bool)), ui.loginPage, SIGNAL(signalRegistrationServerInfoReceived(quint8, bool, const QString &, quint8, const QString &, bool)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
     connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
     connect(this,SIGNAL(signalMyOnlineStateChanged(int, quint8)), clientPacketsParser, SLOT(changeMyOnlineState(int, quint8)));
@@ -2307,28 +2309,66 @@ void MainWindow::loginTimeout(){
 
 }
 
-void MainWindow::requestRegistration(const QString &serverHostAddress, quint16 serverHostPort, const QString &userID, const QString &password, const QString &email){
+void MainWindow::requestRegistrationServerInfo(){
+    qDebug()<<"--MainWindow::requestRegistrationServerInfo()";
 
     int socketID = INVALID_SOCK_ID;
 
-    if(QHostAddress(serverHostAddress) == m_serverHostAddress && serverHostPort == m_serverHostPort && m_rtp->isSocketConnected(m_socketConnectedToServer)){
+    QHostAddress svrAddress = QHostAddress(imUser->getLoginServerAddress());
+    quint16 svrPort = imUser->getLoginServerPort();
+
+    if(svrAddress == m_serverHostAddress && svrPort == m_serverHostPort && m_rtp->isSocketConnected(m_socketConnectedToServer)){
         socketID = m_socketConnectedToServer;
     }else{
         QString errorMessage;
-        socketID = m_rtp->connectToHost(QHostAddress(serverHostAddress), serverHostPort, 10000, &errorMessage);
+        socketID = m_rtp->connectToHost(svrAddress, svrPort, 10000, &errorMessage);
         if(socketID == INVALID_SOCK_ID){
-            QMessageBox::critical(this, tr("Error"), tr("Failed to register! <br>%1").arg(errorMessage));
+            QMessageBox::critical(this, tr("Error"), tr("Failed to contact server! <br>%1").arg(errorMessage));
             return;
         }
         m_rtp->closeSocket(m_socketConnectedToServer);
     }
 
-    m_serverHostAddress = serverHostAddress;
-    m_serverHostPort = serverHostPort;
+    m_serverHostAddress = svrAddress;
+    m_serverHostPort = svrPort;
     m_socketConnectedToServer = socketID;
 
 
-    bool ok = clientPacketsParser->registration(m_socketConnectedToServer, userID, password, email);
+    bool ok = clientPacketsParser->requestRegistrationServerInfo(m_socketConnectedToServer);
+    if(!ok){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to send request! <br>%1").arg(m_rtp->lastErrorString()));
+    }
+
+}
+
+void MainWindow::requestRegistration(){
+
+    //TODO
+    int socketID = INVALID_SOCK_ID;
+    QHostAddress svrAddress = QHostAddress::Null;
+    quint32 svrPort = 0;
+
+    QStringList serverAddressInfo = imUser->getRegistrationServerAddressInfo().split(":");
+    if(serverAddressInfo.size() == 2){
+        svrAddress = QHostAddress(serverAddressInfo.at(0));
+        svrPort = serverAddressInfo.at(1).toUInt();
+    }else{
+        svrAddress = QHostAddress(imUser->getLoginServerAddress());
+        svrPort = imUser->getLoginServerPort();
+    }
+
+    if(QHostAddress(svrAddress) == m_serverHostAddress && svrPort == m_serverHostPort && m_rtp->isSocketConnected(m_socketConnectedToServer)){
+        socketID = m_socketConnectedToServer;
+    }else{
+        QString errorMessage;
+        socketID = m_rtp->connectToHost(svrAddress, svrPort, 10000, &errorMessage);
+        if(socketID == INVALID_SOCK_ID){
+            QMessageBox::critical(this, tr("Error"), tr("Failed to register! <br>%1").arg(errorMessage));
+            return;
+        }
+    }
+
+    bool ok = clientPacketsParser->registration(socketID, imUser->getUserID(), imUser->getPassword());
     if(!ok){
         QMessageBox::critical(this, tr("Error"), tr("Failed to send registration request! <br>%1").arg(m_rtp->lastErrorString()));
     }
