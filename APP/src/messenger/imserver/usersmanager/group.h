@@ -19,14 +19,14 @@
 
 namespace HEHUI {
 
-class Group : public GroupBase {
+class InterestGroup : public GroupBase {
     Q_OBJECT
 public:
-        Group(quint32 groupID = 0, QObject *parent = 0);
-	virtual ~Group();
+    InterestGroup(quint32 groupID = 0, QObject *parent = 0);
+    virtual ~InterestGroup();
 
 
-        QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
+    static QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
 
 
 protected:

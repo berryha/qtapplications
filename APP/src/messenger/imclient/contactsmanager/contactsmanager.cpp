@@ -593,7 +593,7 @@ void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
             
             //            contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
             //            contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
-            contact->setPersonalInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
+            contact->setPersonalDetailInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
             
             contact->setHomeAddress(QVariant(contactsModel->record(j).value("HomeAddress")).toString());
             contact->setHomePhoneNumber(QVariant(contactsModel->record(j).value("HomePhoneNumber")).toString());
@@ -664,7 +664,7 @@ void ContactsManager::slotFetchStrangersInfo(){
 
         //        contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
         //        contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
-        contact->setPersonalInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
+        contact->setPersonalDetailInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
 
         contact->setHomeAddress(QVariant(contactsModel->record(j).value("HomeAddress")).toString());
         contact->setHomePhoneNumber(QVariant(contactsModel->record(j).value("HomePhoneNumber")).toString());
@@ -1237,7 +1237,7 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
     m_imUser->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf("PersonalContactGroupsInfoVersion"))).toUInt());
     m_imUser->setBlacklistInfoVersion(QVariant(query.value(record.indexOf("BlacklistInfoVersion"))).toUInt());
     m_imUser->setBlacklistInfoString(QVariant(query.value(record.indexOf("Blacklist"))).toString());
-    m_imUser->setPersonalInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
+    m_imUser->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
     
     m_imUser->setHomeAddress(QVariant(query.value(record.indexOf("HomeAddress"))).toString());
     m_imUser->setHomePhoneNumber(QVariant(query.value(record.indexOf("HomePhoneNumber"))).toString());
@@ -1370,7 +1370,7 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
     //    contact->setInterestGroupID(QVariant(query.value(record.indexOf("InterestGroupID"))).toUInt());
     //    contact->setSystemGroupID(QVariant(query.value(record.indexOf("SystemGroupID"))).toUInt());
     contact->setContactGroupID(QVariant(query.value(record.indexOf("ContactGroupID"))).toUInt());
-    contact->setPersonalInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
+    contact->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
     
     //    info->setSystemGroupInfoVersion(QVariant(query.value(record.indexOf("SystemGroupsInfoVersion"))).toUInt());
     //    info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf("PersonalInterestGroupsInfoVersion"))).toUInt());

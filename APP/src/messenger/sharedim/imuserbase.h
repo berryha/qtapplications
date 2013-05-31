@@ -62,6 +62,7 @@ public:
     enum ShortTalk{ST_AUTO_ACCEPT = 0, ST_PROMPT, ST_DENY};
     enum AgeSection{AS_16_22 = 0, AS_23_30, AS_31_40, AS_40_};
 
+    enum AccountState{AS_Invalid = 0, AS_Normal, AS_Banned, AS_Limitted};
 
     IMUserBase(QObject *parent = 0);
     IMUserBase(const QString & userID, QObject *parent = 0);
@@ -122,10 +123,17 @@ public:
     {
         return interestGroups;
     }
+    void setInterestGroups(const QStringList &groups){
+        this->interestGroups = groups;
+    }
 
-    quint32 getPersonalInfoVersion() const
+    quint32 getPersonalSummaryInfoVersion() const
     {
-        return personalInfoVersion;
+        return personalSummaryInfoVersion;
+    }
+    quint32 getPersonalDetailInfoVersion() const
+    {
+        return personalDetailInfoVersion;
     }
 
     //    QHash<quint32,QString> getPersonalInterestGroupsHash() const
@@ -192,14 +200,18 @@ public:
     }
 
     
-    void setInterestGroupsStringFromDatabase(const QString &interestGroupsStringFromDatabase)
+//    void setInterestGroupsStringFromDatabase(const QString &interestGroupsStringFromDatabase)
+//    {
+//        this->interestGroups = interestGroupsStringFromDatabase.split(",");
+//    }
+
+    void setPersonalSummaryInfoVersion(quint32 personalSummaryInfoVersion)
     {
-        this->interestGroups = interestGroupsStringFromDatabase.split(",");
+        this->personalSummaryInfoVersion = personalSummaryInfoVersion;
     }
-    
-    void setPersonalInfoVersion(quint32 personalInfoVersion)
+    void setPersonalDetailInfoVersion(quint32 personalDetailInfoVersion)
     {
-        this->personalInfoVersion = personalInfoVersion;
+        this->personalDetailInfoVersion = personalDetailInfoVersion;
     }
 
     //    void setPersonalInterestGroupsHash(QHash<quint32,QString> personalInterestGroups)
@@ -220,6 +232,13 @@ public:
     void setUserRole(int userRole)
     {
         this->userRole = userRole;
+    }
+
+    void setAccountState(AccountState state){
+        this->accountState = state;
+    }
+    AccountState getAccountState(){
+        return accountState;
     }
 
 
@@ -260,7 +279,6 @@ public slots:
 
 private:
 
-    int userRole;
 
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
@@ -275,13 +293,16 @@ private:
     QStringList interestGroups;
     quint32 interestGroupInfoVersion;
     
-    quint32 personalInfoVersion;
+    quint32 personalSummaryInfoVersion;
+    quint32 personalDetailInfoVersion;
     quint32 personalContactGroupsInfoVersion;
 
 
     IM::OnlineState onlineState;
     FriendshipApply friendshipApply;
     ShortTalk shortTalk;
+    int userRole;
+    IM::AccountState accountState;
 
     QByteArray sessionEncryptionKey;
     

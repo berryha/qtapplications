@@ -2221,7 +2221,7 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
             clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
 //            contactsManager->slotAddNewContactToDatabase(contact);
         }else{
-            if(contactInfoVersion > contact->getPersonalInfoVersion()){
+            if(contactInfoVersion > contact->getPersonalDetailInfoVersion()){
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
         }

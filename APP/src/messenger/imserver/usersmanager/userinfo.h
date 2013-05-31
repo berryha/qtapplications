@@ -72,6 +72,9 @@ public:
     void setSocketID(int socketID){this->m_socketID = socketID;}
     int getSocketID(){return m_socketID;}
 
+    void setSysID(quint32 sysID){this->m_sysID = sysID;}
+    quint32 getSysID(){return m_sysID;}
+
 
 public slots:
     bool addGroup(const QString &groupName, const QStringList &members = QStringList());
@@ -104,6 +107,7 @@ private:
 
     int m_socketID;
 
+    quint32 m_sysID;
 
 
 

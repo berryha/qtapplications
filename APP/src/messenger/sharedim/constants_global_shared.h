@@ -267,39 +267,38 @@ enum ErrorType {
 };
 
 enum PropertyIDOfUser{
-    PI_UserID = 1,
+    PI_SysID = 1,
+    PI_UserID,
     PI_Password,
 
     PI_TrueName,
     PI_NickName,
     PI_Gender,
-    PI_Age,
     PI_Face,
     
-    PI_PersonalContactGroupsInfoString,
+//    PI_PersonalContactGroupsInfoString,
     PI_PersonalContactGroupsInfoVersion,
-    PI_InterestGroupsInfoString,
+//    PI_InterestGroupsInfoString,
     PI_InterestGroupsInfoVersion,
     PI_BlacklistInfoVersion,
     PI_Blacklist,
-    PI_PersonalInfoVersion,
-
+//    PI_PersonalInfoVersion,
+    PI_PersonalDetailInfoVersion,
+    PI_PersonalSummaryInfoVersion,
+    PI_FriendshipApply,
+    PI_ShortTalk,
+    PI_Role,
+    PI_AccountState,
     
-
+    PI_Age,
     PI_HomeAddress,
     PI_HomePhoneNumber,
     PI_HomeZipCode,
     PI_PersonalHomepage,
     PI_PersonalEmailAddress,
-
-    PI_LastLoginTime,
-    PI_LastLoginHostAddress,
-    PI_LastLoginHostPort,
-
     PI_QuestionForSecurity,
     PI_AnswerForSecurity,
     PI_EmailForSecurity,
-
     PI_CompanyName,
     PI_JobTitle,
     PI_BusinessAddress,
@@ -308,15 +307,13 @@ enum PropertyIDOfUser{
     PI_BusinessFaxNumber,
     PI_BusinessHomepage,
     PI_BusinessEmailAddress,
-
     PI_RegistrationTime,
-    PI_LoginTimes,
+//    PI_LoginTimes,
+    PI_Description,
     
-
-    PI_FriendshipApply,
-    PI_ShortTalk,
-
-    PI_Role,
+//    PI_LastLoginTime,
+//    PI_LastLoginHostAddress,
+//    PI_LastLoginHostPort,
 
 
     //For Contact
@@ -344,7 +341,9 @@ enum PropertyIDOfGroup{
     PIG_Remark,
 //    PIG_LastUpdateTime,
     
-    
+    //For Table InterestGroupMembers
+    PIG_MemberSysID,
+    PIG_MemberRole
     
     
 
@@ -360,6 +359,9 @@ enum RegistrationMode{
     RM_ServerCreatePasswordOnly
 
 };
+
+
+
 
 
 } //namespace IM

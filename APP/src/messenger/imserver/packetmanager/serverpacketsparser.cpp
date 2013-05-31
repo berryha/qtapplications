@@ -275,7 +275,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,
-                                           userInfo->getPersonalInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
+                                           userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
                                            userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
 
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);

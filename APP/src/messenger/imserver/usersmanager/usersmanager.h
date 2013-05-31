@@ -87,21 +87,20 @@ public:
     bool deleteFriendshipApplyRequest(const QString &applicantID, const QString &contactID);
     bool getFriendshipApplyRequest(const QString &receiverID, QList<QStringList> *sentApplicationList, QList<QStringList> *receivedApplicationList);
 
-    
+
     QString getInterestGroupsListForUser(UserInfo* userInfo);
     QString getInterestGroupInfoStringForUser(UserInfo* userInfo, quint32 groupID);
-    QString getInterestGroupMembersInfoStringForUser(UserInfo* userInfo, Group *group);
-    
+    QString getInterestGroupMembersInfoStringForUser(UserInfo* userInfo, InterestGroup *group);
     
     
     
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
-    Group* getGroup(quint32 groupID);
-    bool createNewGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName );
+    InterestGroup* getInterestGroup(quint32 groupID);
+    bool createNewInterestGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName );
  
-    QStringList searchGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
-    bool saveGroupToDatabase(Group *info);
+    QStringList searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    bool saveInterestGroupToDatabase(InterestGroup *groupInfo);
 
     bool saveMembershipApplyRequest(quint32 applicantID, quint32 groupID, const QString &message = "");
     bool deleteMembershipApplyRequest(quint32 applicantID, quint32 groupID);
@@ -119,14 +118,16 @@ private:
     UserInfo * queryUserInfo(const QString &imUserID);
     bool queryUserInfo(UserInfo *info);
 
+    bool getUserInterestGroupsFromDatabase(UserInfo* info);
+
 
     
     
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
   
-    Group * queryGroup(quint32 groupID);
-    bool queryGroup(Group *info);
+    InterestGroup * queryGroup(quint32 groupID);
+    bool queryGroup(InterestGroup *info);
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
      
      
@@ -177,7 +178,7 @@ private:
     
     
     static QMutex *groupMutex;
-    static QHash<quint32/*Group ID*/, Group*> *groupHash;
+    static QHash<quint32/*Group ID*/, InterestGroup*> *groupHash;
 
 
 };
