@@ -82,6 +82,8 @@ void UserInfo::init(){
 
     m_socketID = INVALID_SOCK_ID;
 
+    m_sysID = 0;
+
 
 }
 
@@ -184,6 +186,9 @@ void UserInfo::setOffline(){
 QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     QString columnName = "";
     switch(propertyID){
+    case IM::PI_SysID:
+        columnName = "SysID";
+        break;
     case IM::PI_UserID:
         columnName = "UserID";
         break;
@@ -199,22 +204,18 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_Gender:
         columnName = "Gender";
         break;
-    case IM::PI_Age:
-        columnName = "Age";
-        break;
     case IM::PI_Face:
         columnName = "Face";
         break;
-        
-    case IM::PI_PersonalContactGroupsInfoString:
-        columnName = "PersonalContactGroupsInfo";
-        break;
+//    case IM::PI_PersonalContactGroupsInfoString:
+//        columnName = "PersonalContactGroupsInfo";
+//        break;
     case IM::PI_PersonalContactGroupsInfoVersion:
         columnName = "PersonalContactGroupsInfoVersion";
         break;
-    case IM::PI_InterestGroupsInfoString:
-        columnName = "InterestGroupsInfo";
-        break;
+//    case IM::PI_InterestGroupsInfoString:
+//        columnName = "InterestGroupsInfo";
+//        break;
     case IM::PI_InterestGroupsInfoVersion:
         columnName = "InterestGroupsInfoVersion";
         break;
@@ -224,11 +225,28 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_Blacklist:
         columnName = "Blacklist";
         break;
-    case IM::PI_PersonalInfoVersion:
-        columnName = "PersonalInfoVersion";
+    case IM::PI_PersonalDetailInfoVersion:
+        columnName = "PersonalDetailInfoVersion";
         break;
-        
+    case IM::PI_PersonalSummaryInfoVersion:
+        columnName = "PersonalSummaryInfoVersion";
+        break;
+    case IM::PI_FriendshipApply:
+        columnName = "FriendshipApply";
+        break;
+    case IM::PI_ShortTalk:
+        columnName = "ShortTalk";
+        break;
+    case IM::PI_Role:
+        columnName = "Role";
+        break;
+    case IM::PI_AccountState:
+        columnName = "AccountState";
+        break;
 
+    case IM::PI_Age:
+        columnName = "Age";
+        break;
     case IM::PI_HomeAddress:
         columnName = "HomeAddress";
         break;
@@ -244,15 +262,7 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_PersonalEmailAddress:
         columnName = "PersonalEmailAddress";
         break;
-    case IM::PI_LastLoginTime:
-        columnName = "LastLoginTime";
-        break;
-    case IM::PI_LastLoginHostAddress:
-        columnName = "LastLoginHostAddress";
-        break;
-    case IM::PI_LastLoginHostPort:
-        columnName = "LastLoginHostPort";
-        break;
+
     case IM::PI_QuestionForSecurity:
         columnName = "QuestionForSecurity";
         break;
@@ -262,7 +272,6 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_EmailForSecurity:
         columnName = "EmailForSecurity";
         break;
-
     case IM::PI_CompanyName:
         columnName = "CompanyName";
         break;
@@ -290,19 +299,23 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_RegistrationTime:
         columnName = "RegistrationTime";
         break;
-    case IM::PI_LoginTimes:
-        columnName = "LoginTimes";
-        break;
-    case IM::PI_FriendshipApply:
-        columnName = "FriendshipApply";
-        break;
-    case IM::PI_ShortTalk:
-        columnName = "ShortTalk";
+//    case IM::PI_LoginTimes:
+//        columnName = "LoginTimes";
+//        break;
+    case IM::PI_Description:
+        columnName = "Description";
         break;
 
-    case IM::PI_Role:
-        columnName = "Role";
-        break;
+//    case IM::PI_LastLoginTime:
+//        columnName = "LastLoginTime";
+//        break;
+//    case IM::PI_LastLoginHostAddress:
+//        columnName = "LastLoginHostAddress";
+//        break;
+//    case IM::PI_LastLoginHostPort:
+//        columnName = "LastLoginHostPort";
+//        break;
+
         
     default:
         columnName = "";

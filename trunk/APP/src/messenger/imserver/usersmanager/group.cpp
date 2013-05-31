@@ -9,7 +9,7 @@
 
 namespace HEHUI {
 
-Group::Group(quint32 groupID, QObject *parent)
+InterestGroup::InterestGroup(quint32 groupID, QObject *parent)
     :GroupBase(groupID, parent)
 {
 	
@@ -18,16 +18,16 @@ Group::Group(quint32 groupID, QObject *parent)
 
 }
 
-Group::~Group() {
+InterestGroup::~InterestGroup() {
 	// TODO Auto-generated destructor stub
 }
 
-QString Group::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
+QString InterestGroup::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
     
     QString columnName = "";
     switch(propertyID){
     case IM::PIG_GroupID:
-        columnName = "ID";
+        columnName = "GroupID";
         break;
     case IM::PIG_GroupTypeID:
         columnName = "TypeID";
@@ -63,7 +63,16 @@ QString Group::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
 //    case IM::PIG_LastUpdateTime :
 //        columnName = "LastUpdateTime";
 //        break;
-        
+
+    case IM::PIG_MemberSysID :
+        columnName = "MemberSysID"; //For Table InterestGroupMembers
+        break;
+    case IM::PIG_MemberRole :
+        columnName = "MemberRole"; //For Table InterestGroupMembers
+        break;
+
+
+
     default:
         columnName = "";
 

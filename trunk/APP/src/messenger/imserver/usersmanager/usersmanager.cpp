@@ -64,7 +64,7 @@ QHash<QString/*User ID*/, UserInfo*> * UsersManager::offlineUserInfoHash = new Q
 
 
 QMutex * UsersManager::groupMutex = new QMutex();
-QHash<quint32/*Group ID*/, Group*> * UsersManager::groupHash = new QHash<quint32, Group*> ();
+QHash<quint32/*Group ID*/, InterestGroup*> * UsersManager::groupHash = new QHash<quint32, InterestGroup*> ();
 
 
 
@@ -244,9 +244,7 @@ bool UsersManager::registerNewUser(const QString &userID, const QString &passwor
     } 
     QSqlQuery query(db);
     //QString statement = QString("insert into users_detailed_info(UserID, UserPassword) values('%1', '%2') ").arg(userID).arg(password);
-    QString statement = QString("call sp_CreateNewUser('%1', '%2', @sysID); ").arg(userID).arg(password);
-    statement += QString("select @sysID;");
-
+    QString statement = QString("call sp_CreateNewUser('%1', '%2', @sysID);").arg(userID).arg(password);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not add new user info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -262,7 +260,13 @@ bool UsersManager::registerNewUser(const QString &userID, const QString &passwor
         *errorType = IM::ERROR_UnKnownError;
         return false;
     }
-    query.first();
+
+    statement = "select @sysID;";
+    query.exec(statement);
+    if(!query.first()){
+        qCritical()<<QString("Can not query user SysID! Invalid record! User ID:%1").arg(userID);
+        return false;
+    }
 
     if(sysID){
         *sysID = query.value(0).toUInt();
@@ -948,9 +952,8 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     QSqlQuery query(db);
     
     QSqlRecord record;
-    QString statement = QString("select * from users_detailed_info where %1='%2' ").arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
+    QString statement = QString("SELECT * FROM UsersSummaryInfo usi left join UsersDetailedInfo udi on usi.%1=udi.%1 where %2='%3' ").arg(info->databaseColumnName(IM::PI_SysID)).arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
 
-    
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -990,22 +993,27 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     
 
     //UserInfo *info = new UserInfo(imUserID, this);
+    info->setSysID(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_SysID)))).toUInt());
     info->setPassword(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Password)))).toString());
-    //info->setTrueName(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_TrueName)))).toString());
+    info->setTrueName(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_TrueName)))).toString());
     info->setNickName(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_NickName)))).toString());
     info->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Gender)))).toUInt()));
-    info->setAge(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Age)))).toInt());
     info->setFace(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Face)))).toString());
 
-    info->setContactGroupsInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalContactGroupsInfoString)))).toString());
+//    info->setContactGroupsInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalContactGroupsInfoString)))).toString());
     info->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalContactGroupsInfoVersion)))).toInt());
-    info->setInterestGroupsStringFromDatabase(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoString)))).toString());
+//    info->setInterestGroupsStringFromDatabase(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoString)))).toString());
     info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
     info->setBlacklistInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_BlacklistInfoVersion)))).toInt());
- 
     info->setBlacklistInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Blacklist)))).toString());
-    info->setPersonalInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalInfoVersion)))).toInt());
-    
+    info->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
+    info->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
+    info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toString().toUInt()));
+    info->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_ShortTalk)))).toString().toUInt()));
+    info->setUserRole(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Role)))).toInt());
+    info->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_AccountState)))).toString().toUInt()));
+
+    info->setAge(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Age)))).toInt());
     info->setHomeAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomeAddress)))).toString());
     info->setHomePhoneNumber(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomePhoneNumber)))).toString());
     info->setHomeZipCode(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomeZipCode)))).toString());
@@ -1030,12 +1038,11 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     info->setBusinessEmailAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_BusinessEmailAddress)))).toString());
 
     info->setRegistrationTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_RegistrationTime)))).toDateTime());
-    info->setLoginTimes(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LoginTimes)))).toInt());
-
-    info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toString().toUInt()));
-    info->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_ShortTalk)))).toString().toUInt()));
+//    info->setLoginTimes(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LoginTimes)))).toInt());
+    info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Description)))).toString());
 
 
+    getUserInterestGroupsFromDatabase(info);
     getUserLastLoginInfo(info);
 
     info->clearUpdatedProperties();
@@ -1044,6 +1051,46 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     
     return true;
     
+
+}
+
+bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
+
+    if(!info){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        //TODO:数据库重启，重新连接
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query.clear();
+            openDatabase(true);
+        }
+
+        return false;
+    }
+
+    QStringList groups;
+     while(query.next()){
+        groups.append(query.value(0).toString());
+     }
+
+     info->setInterestGroups(groups);
+
+    return true;
 
 }
 
@@ -1248,6 +1295,7 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
 
 }
 
+
 //Format: groupID:groupVersion,groupID:groupVersion,groupID:groupVersion
 QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
     qDebug()<<"--UsersManager::getInterestGroupsListForUser(...)";
@@ -1260,7 +1308,7 @@ QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
     QStringList infoList;
     QStringList groups = userInfo->getInterestGroups();
     foreach (QString groupID, groups) {
-        Group *group = getGroup(groupID.toUInt());
+        InterestGroup *group = getInterestGroup(groupID.toUInt());
         if(!group){
             qDebug()<<"invalid group";
             return "";
@@ -1281,7 +1329,7 @@ QString UsersManager::getInterestGroupInfoStringForUser(UserInfo* userInfo, quin
         return infoString;
     }
     
-    Group *group = getGroup(groupID);
+    InterestGroup *group = getInterestGroup(groupID);
     if(!group){
         return infoString;
     }
@@ -1292,7 +1340,7 @@ QString UsersManager::getInterestGroupInfoStringForUser(UserInfo* userInfo, quin
 }
 
 //Format: ?
-QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInfo, Group *group){
+QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInfo, InterestGroup *group){
 
     QString infoString = "";
     
@@ -1313,7 +1361,7 @@ QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInf
         UserInfo *memberInfo = getUserInfo(memberUserID);
         if(!memberInfo){continue;}
         QStringList memberInfoList;
-        memberInfoList << memberInfo->getUserID() << QString::number(memberInfo->getPersonalInfoVersion()) << QString::number(membersHash.value(memberUserID));
+        memberInfoList << memberInfo->getUserID() << QString::number(memberInfo->getPersonalDetailInfoVersion()) << QString::number(membersHash.value(memberUserID));
         infoList.append(memberInfoList.join(QString(CONTACT_INFO_SEPARATOR)));        
     }
     
@@ -1442,7 +1490,7 @@ QSqlQuery UsersManager::queryDatabase(const QString & queryString, const QString
 
 /////////////////////////// Group Manager ////////////////////////////////////////    
   
-Group* UsersManager::getGroup(quint32 groupID){
+InterestGroup* UsersManager::getInterestGroup(quint32 groupID){
     
     if(groupID < 1){
         return 0;
@@ -1460,7 +1508,7 @@ Group* UsersManager::getGroup(quint32 groupID){
 
 }
 
-bool UsersManager::createNewGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName ){
+bool UsersManager::createNewInterestGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName ){
     
     
     if(!db.isValid()){
@@ -1521,7 +1569,7 @@ bool UsersManager::createNewGroup(quint32 groupTypeID, quint32 parentGroupID, qu
     
 }
 
-QStringList UsersManager::searchGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
+QStringList UsersManager::searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
 
     
     if(propertiesString.trimmed().isEmpty()){
@@ -1534,7 +1582,7 @@ QStringList UsersManager::searchGroup(const QString &propertiesString, bool matc
         return QStringList();
     }
     
-    Group info;
+    InterestGroup info;
     
     foreach (QString property, propertiesList) {
         QStringList list = property.split("=");
@@ -1625,13 +1673,13 @@ QStringList UsersManager::searchGroup(const QString &propertiesString, bool matc
     
 }
 
-bool UsersManager::saveGroupToDatabase(Group *info){
+bool UsersManager::saveInterestGroupToDatabase(InterestGroup *groupInfo){
     //TODO:
-    if(!info){
+    if(!groupInfo){
         return false;
     }
     
-    QString updateSQLStatement = info->getUpdateSQLStatement();
+    QString updateSQLStatement = groupInfo->getUpdateSQLStatement();
     if(updateSQLStatement.trimmed().isEmpty()){
         return false;
     }
@@ -1643,7 +1691,7 @@ bool UsersManager::saveGroupToDatabase(Group *info){
         }
     } 
     QSqlQuery query(db);
-    QString statement = QString("update groups set %1 where %2='%3' ").arg(updateSQLStatement).arg(info->databaseColumnName(IM::PIG_GroupID)).arg(info->getGroupID());
+    QString statement = QString("update groups set %1 where %2='%3' ").arg(updateSQLStatement).arg(groupInfo->databaseColumnName(IM::PIG_GroupID)).arg(groupInfo->getGroupID());
      
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1660,7 +1708,7 @@ bool UsersManager::saveGroupToDatabase(Group *info){
 
         return false;
     }else{
-        info->clearUpdatedProperties();
+        groupInfo->clearUpdatedProperties();
     }
     
     
@@ -1878,9 +1926,9 @@ QStringList UsersManager::cachedInterestGroupChatMessagesForIMUser(UserInfo* use
 
 
 
-Group * UsersManager::queryGroup(quint32 groupID){
+InterestGroup * UsersManager::queryGroup(quint32 groupID){
     
-    Group *group = new Group(groupID);
+    InterestGroup *group = new InterestGroup(groupID);
     if(!queryGroup(group)){
         delete group;
         group = 0;
@@ -1890,7 +1938,7 @@ Group * UsersManager::queryGroup(quint32 groupID){
     
 }
 
-bool UsersManager::queryGroup(Group *info){
+bool UsersManager::queryGroup(InterestGroup *info){
 
     if(!info){
         return false;

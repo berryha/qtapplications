@@ -683,7 +683,7 @@ public slots:
     bool sendUserInterestGroupMembersInfoPacket(int peerSocketID, UserInfo *userInfo, quint32 groupID, const QHostAddress &targetHostAddress, quint16 targetHostPort){
         //qWarning()<<"----sendUserInterestGroupMembersInfoPacket(...)"<<" groupID"<<groupID;
 
-        Group *group = getGroup(groupID);
+        InterestGroup *group = getInterestGroup(groupID);
         if(!group){
             return false;
         }

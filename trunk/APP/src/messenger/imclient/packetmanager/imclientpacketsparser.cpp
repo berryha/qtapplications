@@ -335,7 +335,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             //TODO:
             user->loadMyInfoFromLocalDatabase();
 
-            if(personalInfoVersionOnServer != user->getPersonalInfoVersion()){requestContactInfo(socketID, m_myUserID);}
+            if(personalInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID);}
             if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){updatePersonalContactGroupsInfo(socketID, false);}
             if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
             //requestInterestGroupsList();

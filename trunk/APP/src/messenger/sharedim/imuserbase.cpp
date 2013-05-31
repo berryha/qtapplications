@@ -74,7 +74,7 @@ void IMUserBase::init(){
 
     interestGroups.clear();
     
-    personalInfoVersion = 0;
+    personalDetailInfoVersion = 0;
     personalContactGroupsInfoVersion = 0;
     interestGroupInfoVersion = 0;
     
@@ -311,7 +311,7 @@ void IMUserBase::setPersonalSummaryInfo(const QString &personalSummaryInfo){
     addUpdatedProperty(IM::PI_FriendshipApply, friendshipApplyString);
     
     QString personalInfoVersionString = infoList.at(6);
-    setPersonalInfoVersion(personalInfoVersionString.toUInt());
+    setPersonalDetailInfoVersion(personalInfoVersionString.toUInt());
     addUpdatedProperty(IM::PI_PersonalInfoVersion, personalInfoVersionString);
 
 
@@ -323,7 +323,7 @@ QString IMUserBase::getPersonalSummaryInfo() const{
     infoList << this->getUserID() << this->getNickName()
              << QString::number(this->getGender()) << QString::number(getAge())
              << this->getFace() << QString::number(this->getFriendshipApply())
-             << QString::number(getPersonalInfoVersion())
+             << QString::number(getPersonalDetailInfoVersion())
                 ;
 
     return infoList.join(QString(PACKET_DATA_SEPARTOR));
