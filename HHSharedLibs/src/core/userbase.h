@@ -41,80 +41,80 @@
 namespace HEHUI {
 
 class CORE_LIB_API UserBase: public QObject {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     UserBase(const QString &userID = "", const QString &userName = "", const QString &password = "", QObject *parent = 0);
 
-        virtual ~UserBase();
+    virtual ~UserBase();
 
 
 
 
 
-        void setUserID(const QString &id) {
-		this->userID = id;
-	}
+    void setUserID(const QString &id) {
+        this->userID = id;
+    }
 
-        QString getUserID() const {
-                return this->userID;
-	}
+    QString getUserID() const {
+        return this->userID;
+    }
 
-        void setUserName(const QString &userName){
-            this->userName = userName;
-        }
+    void setUserName(const QString &userName){
+        this->userName = userName;
+    }
 
-        QString getUserName() const {
-            return this->userName;
-        }
+    QString getUserName() const {
+        return this->userName;
+    }
 
-	void setPassword(const QString &pwd) {
-		this->password = pwd;
-	}
+    void setPassword(const QString &pwd) {
+        this->password = pwd;
+    }
 
-	QString getPassword() const {
-		return this->password;
-	}
+    QString getPassword() const {
+        return this->password;
+    }
 
-        QString getAuthenticode() const {
-            return this->authenticode;
-        }
+    QString getAuthenticode() const {
+        return this->authenticode;
+    }
 
-        void setAuthenticode(const QString &authenticode){
-            this->authenticode = authenticode;
-        }
-
-
-	void setVerified(bool v) {
-		this->isVerified = v;
-	}
-
-	bool verified() {
-		return this->isVerified;
-	}
+    void setAuthenticode(const QString &authenticode){
+        this->authenticode = authenticode;
+    }
 
 
-	//TODO:更名
-	//设置是否允许帐户重复登陆
-//	void setSingleUserMode(bool isSingleUserMode) {
-//		this->singleUserMode = isSingleUserMode;
-//	}
-//	;
-//	bool isSingleUserMode() {
-//		return this->singleUserMode;
-//	}
+    void setVerified(bool v) {
+        this->isVerified = v;
+    }
+
+    bool verified() {
+        return this->isVerified;
+    }
+
+
+    //TODO:更名
+    //设置是否允许帐户重复登陆
+    //	void setSingleUserMode(bool isSingleUserMode) {
+    //		this->singleUserMode = isSingleUserMode;
+    //	}
+    //	;
+    //	bool isSingleUserMode() {
+    //		return this->singleUserMode;
+    //	}
 
 private:
 
-        QString userID;
-        QString userName;
-	QString password;
-        QString authenticode;
+    QString userID;
+    QString userName;
+    QString password;
+    QString authenticode;
 
-	bool isVerified;
+    bool isVerified;
 
-	//单用户模式//Single User Mode
-//	bool singleUserMode;
+    //单用户模式//Single User Mode
+    //	bool singleUserMode;
 
 };
 
