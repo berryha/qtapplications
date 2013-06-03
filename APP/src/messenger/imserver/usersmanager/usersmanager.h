@@ -126,8 +126,8 @@ private:
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
   
-    InterestGroup * queryGroup(quint32 groupID);
-    bool queryGroup(InterestGroup *info);
+    InterestGroup * queryInterestGroup(quint32 groupID);
+    bool queryInterestGroup(InterestGroup *info);
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
      
      

@@ -1066,7 +1066,8 @@ bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
+    //QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
+    QString statement = QString("call sp_GetUserInterestGroups('%1') ").arg(info->getUserID());
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1082,13 +1083,15 @@ bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
 
         return false;
     }
+    if(query.first()){
+        info->setInterestGroups(query.value(0).toString().split(","));
+    }
 
-    QStringList groups;
-     while(query.next()){
-        groups.append(query.value(0).toString());
-     }
-
-     info->setInterestGroups(groups);
+//    QStringList groups;
+//     while(query.next()){
+//        groups.append(query.value(0).toString());
+//     }
+//     info->setInterestGroups(groups);
 
     return true;
 
@@ -1500,7 +1503,7 @@ InterestGroup* UsersManager::getInterestGroup(quint32 groupID){
     if(groupHash->contains(groupID)){
         Group = groupHash->value(groupID);
     }else{
-        Group = queryGroup(groupID);
+        Group = queryInterestGroup(groupID);
     }
     
 
@@ -1559,7 +1562,7 @@ bool UsersManager::createNewInterestGroup(quint32 groupTypeID, quint32 parentGro
     }
     
     quint32 groupID = query.value(0).toUInt();
-    Group *Group = queryGroup(groupID);
+    Group *Group = queryInterestGroup(groupID);
     if(!Group){
         return false;
     }
@@ -1926,10 +1929,10 @@ QStringList UsersManager::cachedInterestGroupChatMessagesForIMUser(UserInfo* use
 
 
 
-InterestGroup * UsersManager::queryGroup(quint32 groupID){
+InterestGroup * UsersManager::queryInterestGroup(quint32 groupID){
     
     InterestGroup *group = new InterestGroup(groupID);
-    if(!queryGroup(group)){
+    if(!queryInterestGroup(group)){
         delete group;
         group = 0;
     }
@@ -1938,7 +1941,7 @@ InterestGroup * UsersManager::queryGroup(quint32 groupID){
     
 }
 
-bool UsersManager::queryGroup(InterestGroup *info){
+bool UsersManager::queryInterestGroup(InterestGroup *info){
 
     if(!info){
         return false;
@@ -1952,12 +1955,12 @@ bool UsersManager::queryGroup(InterestGroup *info){
     QSqlQuery query(db);
     
     QSqlRecord record;
-    QString statement = QString("select * from groups where %1='%2' ").arg(info->databaseColumnName(IM::PIG_GroupID)).arg(info->getGroupID());
+    //QString statement = QString("select * from groups where %1='%2' ").arg(info->databaseColumnName(IM::PIG_GroupID)).arg(info->getGroupID());
+    QString statement = QString("call sp_GetInterestGroupInfo(%1); ").arg(info->getGroupID());
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query group info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
 
         //TODO:数据库重启，重新连接
@@ -1984,7 +1987,6 @@ bool UsersManager::queryGroup(InterestGroup *info){
 
     record = query.record();
     
-
     info->setGroupTypeID(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_GroupTypeID)))).toUInt());
     info->setParentGroupID(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_ParentGroupID)))).toUInt());
     info->setCreatorID(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_CreatorID)))).toString());
@@ -2005,12 +2007,12 @@ bool UsersManager::queryGroup(InterestGroup *info){
     
     //TODO:Members
 
-    statement = QString("select MemberUserID, MemberRole from groupmembers where GroupID=%1 ").arg(info->getGroupID());
+    //statement = QString("select MemberUserID, MemberRole from groupmembers where GroupID=%1 ").arg(info->getGroupID());
+    statement = QString("call sp_GetInterestGroupMembers(%1);").arg(info->getGroupID());
     query.clear();
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query group members info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
 
         //TODO:数据库重启，重新连接
