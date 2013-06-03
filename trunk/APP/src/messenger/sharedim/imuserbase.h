@@ -302,7 +302,7 @@ private:
     FriendshipApply friendshipApply;
     ShortTalk shortTalk;
     int userRole;
-    IM::AccountState accountState;
+    AccountState accountState;
 
     QByteArray sessionEncryptionKey;
     
