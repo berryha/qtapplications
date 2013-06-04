@@ -32,15 +32,15 @@ DROP TABLE IF EXISTS `CachedChatMessages`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CachedChatMessages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Sender` varchar(16) NOT NULL COMMENT '发送者ID',
-  `Reciever` varchar(16) NOT NULL COMMENT '接收者ID',
+  `Sender` int(10) unsigned NOT NULL COMMENT '发送者ID',
+  `Reciever` int(10) unsigned NOT NULL COMMENT '接收者ID',
   `TransmittingTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
   `Message` varchar(255) NOT NULL COMMENT '消息',
   PRIMARY KEY (`ID`),
-  KEY `FK-CCM_Sender-USI_UserID` (`Sender`),
-  KEY `FK-CCM_Receiver-USI_UserID` (`Reciever`),
-  CONSTRAINT `FK-CCM_Receiver-USI_UserID` FOREIGN KEY (`Reciever`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-CCM_Sender-USI_UserID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK-CCM_Receiver-USI_SysID` (`Reciever`),
+  KEY `FK-CCM_Sender-USI_SysID` (`Sender`),
+  CONSTRAINT `FK-CCM_Receiver-USI_SysID` FOREIGN KEY (`Reciever`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK-CCM_Sender-USI_SysID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='缓存的消息';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -62,15 +62,15 @@ DROP TABLE IF EXISTS `CachedInterestGroupChatMessages`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CachedInterestGroupChatMessages` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Sender` varchar(16) NOT NULL COMMENT '发送者ID',
-  `GroupID` int(10) unsigned NOT NULL COMMENT '接收组ID',
+  `Sender` int(10) unsigned NOT NULL COMMENT '发送者ID',
+  `GroupID` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '接收组ID',
   `TransmittingTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
   `Message` varchar(255) NOT NULL COMMENT '消息',
   PRIMARY KEY (`ID`),
-  KEY `FK-CIGCM_Sender-USI_UserID` (`Sender`),
-  KEY `FK-CIGCM_GroupID-IG_GroupID` (`GroupID`),
-  CONSTRAINT `FK-CIGCM_GroupID-IG_GroupID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-CIGCM_Sender-USI_UserID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK-CIGCM_IG-USI_SysID` (`Sender`),
+  KEY `FK-CIGCM_IG-IG_ID` (`GroupID`),
+  CONSTRAINT `FK-CIGCM_IG-IG_ID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK-CIGCM_IG-USI_SysID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='缓存的群组消息';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -92,18 +92,17 @@ DROP TABLE IF EXISTS `FriendshipApply`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `FriendshipApply` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Sender` varchar(16) NOT NULL,
-  `Receiver` varchar(16) NOT NULL,
+  `Sender` int(10) unsigned NOT NULL,
+  `Receiver` int(10) unsigned NOT NULL,
   `ExtraMessage` varchar(32) DEFAULT NULL,
   `Result` char(1) NOT NULL DEFAULT '0' COMMENT '0:未知,1:接受,2:拒绝',
   `SenderRead` char(1) NOT NULL DEFAULT '0' COMMENT '0:未读,1：已读',
   `ReceiverRead` char(1) NOT NULL DEFAULT '0' COMMENT '0:未读,1：已读',
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `index-FA_Sender_Receiver` (`Sender`,`Receiver`),
-  KEY `FK-FA_Sender-USI_UserID` (`Sender`),
-  KEY `FK-FA_Receiver-USI_UserID` (`Receiver`),
-  CONSTRAINT `FK-FA_Receiver-USI_UserID` FOREIGN KEY (`Receiver`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-FA_Sender-USI_UserID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK-FA_Sender-USI_SysID` (`Sender`),
+  KEY `FK-FA_Receiver-USI_SysID` (`Receiver`),
+  CONSTRAINT `FK-FA_Receiver-USI_SysID` FOREIGN KEY (`Receiver`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK-FA_Sender-USI_SysID` FOREIGN KEY (`Sender`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='好友请求';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -150,16 +149,16 @@ DROP TABLE IF EXISTS `InterestGroupMembers`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `InterestGroupMembers` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `UserID` varchar(16) NOT NULL COMMENT '成员ID',
+  `MemberSysID` int(10) unsigned NOT NULL COMMENT '成员ID',
   `GroupID` int(10) unsigned NOT NULL COMMENT '兴趣组ID',
   `RoleID` int(10) unsigned NOT NULL COMMENT '成员角色',
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `Index_UserID_GroupID` (`UserID`,`GroupID`) USING BTREE,
-  KEY `FK-IGm_RoleID-IGMR_RoleID` (`RoleID`),
-  KEY `FK-IGM_GroupID-IG_GroupID` (`GroupID`),
-  CONSTRAINT `FK-IGM_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-IGM_GroupID-IG_GroupID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-IGm_RoleID-IGMR_RoleID` FOREIGN KEY (`RoleID`) REFERENCES `InterestGroupMemberRoles` (`RoleID`) ON UPDATE CASCADE
+  UNIQUE KEY `Index_MemberUserID_GroupID` (`MemberSysID`,`GroupID`) USING BTREE,
+  KEY `FK_groupmembers_GroupID` (`GroupID`),
+  KEY `FK-IGm_RoleID-USI_SysID` (`RoleID`),
+  CONSTRAINT `FK-IGm_RoleID-USI_SysID` FOREIGN KEY (`RoleID`) REFERENCES `InterestGroupMemberRoles` (`RoleID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK-IGM_GroupID-IG_ID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK-IGM_MemberSysID-USI_SysID` FOREIGN KEY (`MemberSysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='组的成员';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -169,6 +168,7 @@ CREATE TABLE `InterestGroupMembers` (
 
 LOCK TABLES `InterestGroupMembers` WRITE;
 /*!40000 ALTER TABLE `InterestGroupMembers` DISABLE KEYS */;
+INSERT INTO `InterestGroupMembers` VALUES (2,1,1001,2),(3,1,1000,1);
 /*!40000 ALTER TABLE `InterestGroupMembers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -181,15 +181,14 @@ DROP TABLE IF EXISTS `InterestGroupMembershipApply`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `InterestGroupMembershipApply` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `ApplicantUserID` varchar(16) NOT NULL,
+  `ApplicantSysID` int(10) unsigned NOT NULL,
   `GroupID` int(10) unsigned NOT NULL,
   `ExtraMessage` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `index-AUID-GroupID` (`ApplicantUserID`,`GroupID`),
-  KEY `FK-IGMA_AUID-USI_UserID` (`ApplicantUserID`),
-  KEY `FK-IGMA_GI_IG_GroupID` (`GroupID`),
-  CONSTRAINT `FK-IGMA_AUID-USI_UserID` FOREIGN KEY (`ApplicantUserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-IGMA_GI_IG_ID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK-IGMA_A-USI_SysID` (`ApplicantSysID`),
+  KEY `FK-IGMA_GI_IG_ID` (`GroupID`),
+  CONSTRAINT `FK-IGMA_A-USI_SysID` FOREIGN KEY (`ApplicantSysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK-IGMA_GI_IG_ID` FOREIGN KEY (`GroupID`) REFERENCES `InterestGroups` (`GroupID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='加入组请求';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -214,8 +213,7 @@ CREATE TABLE `InterestGroupTypes` (
   `ParentType` int(10) unsigned DEFAULT NULL,
   `TypeName` varchar(45) NOT NULL,
   `Description` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`TypeID`),
-  UNIQUE KEY `TypeName_UNIQUE` (`TypeName`)
+  PRIMARY KEY (`TypeID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='组类型';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -240,7 +238,7 @@ CREATE TABLE `InterestGroups` (
   `GroupID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `TypeID` int(10) unsigned NOT NULL COMMENT '类型',
   `ParentGroup` int(10) unsigned DEFAULT NULL COMMENT '父组的ID',
-  `Creator` varchar(10) NOT NULL COMMENT '创建者',
+  `Creator` int(10) unsigned NOT NULL COMMENT '创建者',
   `GroupName` varchar(32) NOT NULL COMMENT '组名称',
   `CreationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `GroupInfoVersion` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '组信息版本',
@@ -249,10 +247,8 @@ CREATE TABLE `InterestGroups` (
   `Announcement` varchar(64) DEFAULT NULL COMMENT '公告',
   `Remark` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`GroupID`),
-  KEY `FK-IG_Creator-USI_UserID` (`Creator`),
-  KEY `FK-IF_TypeID-IGT_TypeID` (`TypeID`),
-  CONSTRAINT `FK-IF_TypeID-IGT_TypeID` FOREIGN KEY (`TypeID`) REFERENCES `InterestGroupTypes` (`TypeID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK-IG_Creator-USI_UserID` FOREIGN KEY (`Creator`) REFERENCES `UsersSummaryInfo` (`UserID`) ON UPDATE CASCADE
+  KEY `FK-IG_Creator-USI_SysID` (`Creator`),
+  CONSTRAINT `FK-IG_Creator-USI_SysID` FOREIGN KEY (`Creator`) REFERENCES `UsersSummaryInfo` (`SysID`) ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=1002 DEFAULT CHARSET=utf8 COMMENT='兴趣组';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -262,6 +258,7 @@ CREATE TABLE `InterestGroups` (
 
 LOCK TABLES `InterestGroups` WRITE;
 /*!40000 ALTER TABLE `InterestGroups` DISABLE KEYS */;
+INSERT INTO `InterestGroups` VALUES (1000,1,NULL,1,'Group 1000','2013-06-03 03:57:53',1,1,NULL,NULL,NULL),(1001,2,NULL,9,'Group 1001','2013-06-03 04:00:38',1,1,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `InterestGroups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -274,19 +271,14 @@ DROP TABLE IF EXISTS `LoginHistories`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `LoginHistories` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `UserID` varchar(16) NOT NULL,
+  `User` int(10) unsigned NOT NULL,
   `ExtIPAddress` varchar(64) NOT NULL,
-  `ExtPort` smallint(6) unsigned NOT NULL,
   `IntIPAddress` varchar(64) NOT NULL,
-  `IntPort` smallint(6) unsigned NOT NULL,
   `LoginTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LogoutTime` datetime DEFAULT NULL,
-  `DeviceInfo` varchar(64) DEFAULT NULL,
-  `HostInfo` varchar(64) DEFAULT NULL,
-  `ClientVersion` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `FK-LH_UserID-USI_UserID` (`UserID`),
-  CONSTRAINT `FK-LH_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_loginhistories_UserID` (`User`),
+  CONSTRAINT `FK-LH_User-USI_SysID` FOREIGN KEY (`User`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='登陆历史';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -307,13 +299,12 @@ DROP TABLE IF EXISTS `PersonalContactGroups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PersonalContactGroups` (
-  `ContactGroupID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Creator` varchar(16) NOT NULL,
-  `GroupName` varchar(32) NOT NULL,
-  PRIMARY KEY (`ContactGroupID`),
-  UNIQUE KEY `index-Creator-GroupName` (`Creator`,`GroupName`),
-  KEY `FK-PCG_Creator-USI_UserID` (`Creator`),
-  CONSTRAINT `FK-PCG_Creator-USI_UserID` FOREIGN KEY (`Creator`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Creator` int(10) unsigned NOT NULL,
+  `GroupName` varchar(45) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK-PCG_Creator-USI_SysID` (`Creator`),
+  CONSTRAINT `FK-PCG_Creator-USI_SysID` FOREIGN KEY (`Creator`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='个人联系人组';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -324,41 +315,6 @@ CREATE TABLE `PersonalContactGroups` (
 LOCK TABLES `PersonalContactGroups` WRITE;
 /*!40000 ALTER TABLE `PersonalContactGroups` DISABLE KEYS */;
 /*!40000 ALTER TABLE `PersonalContactGroups` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `PersonalRelationship`
---
-
-DROP TABLE IF EXISTS `PersonalRelationship`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `PersonalRelationship` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `UserID` varchar(16) NOT NULL,
-  `ContactID` varchar(16) NOT NULL,
-  `Relationship` tinyint(4) NOT NULL DEFAULT '1' COMMENT '成员关系\n-1:blacklisted\n0:stranger\n1:approved',
-  `PersonalContactGroup` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '联系人所在的个人组。0:Blacklist 1:Friends',
-  `RemarkName` varchar(32) DEFAULT NULL COMMENT '名称备注',
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`ID`),
-  KEY `FK-UF_UserID-USI_UserID` (`UserID`),
-  KEY `FK-UF_ContactID-USI_UserID` (`ContactID`),
-  KEY `FK-UF_PCG-PCG_IPCGID` (`PersonalContactGroup`),
-  KEY `FK-UF_PCGID-PCG_CGID` (`PersonalContactGroup`),
-  CONSTRAINT `FK-UF_ContactID-USI_UserID` FOREIGN KEY (`ContactID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK-UF_PCGID-PCG_CGID` FOREIGN KEY (`PersonalContactGroup`) REFERENCES `PersonalContactGroups` (`ContactGroupID`) ON UPDATE CASCADE,
-  CONSTRAINT `FK-UF_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='成员关系表';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `PersonalRelationship`
---
-
-LOCK TABLES `PersonalRelationship` WRITE;
-/*!40000 ALTER TABLE `PersonalRelationship` DISABLE KEYS */;
-/*!40000 ALTER TABLE `PersonalRelationship` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -413,6 +369,7 @@ CREATE TABLE `UsersDetailedInfo` (
   `BusinessHomepage` varchar(255) DEFAULT NULL,
   `BusinessEmailAddress` varchar(255) DEFAULT NULL,
   `RegistrationTime` datetime DEFAULT NULL,
+  `Description` varchar(256) DEFAULT NULL COMMENT '自我介绍',
   PRIMARY KEY (`SysID`),
   KEY `FK-UDI_UserSysID-USI_SysID` (`SysID`),
   CONSTRAINT `FK-UDI_SysID-USI_SysID` FOREIGN KEY (`SysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -425,8 +382,41 @@ CREATE TABLE `UsersDetailedInfo` (
 
 LOCK TABLES `UsersDetailedInfo` WRITE;
 /*!40000 ALTER TABLE `UsersDetailedInfo` DISABLE KEYS */;
-INSERT INTO `UsersDetailedInfo` VALUES (1,29,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `UsersDetailedInfo` VALUES (1,29,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `UsersDetailedInfo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `UsersFriendship`
+--
+
+DROP TABLE IF EXISTS `UsersFriendship`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `UsersFriendship` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `UserSysID` int(10) unsigned NOT NULL,
+  `ContactSysID` int(10) unsigned NOT NULL,
+  `Relationship` tinyint(4) NOT NULL DEFAULT '1' COMMENT '成员关系\n-1:blacklisted\n0:stranger\n1:approved',
+  `PersonalContactGroup` int(10) unsigned DEFAULT NULL COMMENT '联系人所在的个人组',
+  `RemarkName` varchar(32) DEFAULT NULL COMMENT '名称备注',
+  PRIMARY KEY (`ID`),
+  KEY `FK-UF_UserSysID-USI_SysID` (`UserSysID`),
+  KEY `FK-UF_ContactSysID-USI_SysID` (`ContactSysID`),
+  KEY `FK-UF_PCG-PCG_ID` (`PersonalContactGroup`),
+  CONSTRAINT `FK-UF_ContactSysID-USI_SysID` FOREIGN KEY (`ContactSysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK-UF_PCG-PCG_ID` FOREIGN KEY (`PersonalContactGroup`) REFERENCES `PersonalContactGroups` (`ID`) ON UPDATE NO ACTION,
+  CONSTRAINT `FK-UF_UserSysID-USI_SysID` FOREIGN KEY (`UserSysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='成员关系表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UsersFriendship`
+--
+
+LOCK TABLES `UsersFriendship` WRITE;
+/*!40000 ALTER TABLE `UsersFriendship` DISABLE KEYS */;
+/*!40000 ALTER TABLE `UsersFriendship` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -534,7 +524,8 @@ DELIMITER ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 DEFINER=`root`@`200.200.200.17`*/ /*!50003 PROCEDURE `sp_GetInterestGroupMembers`(in p_groupID int(10) unsigned)
 BEGIN
-	select UserID, RoleID from InterestGroupMembers where GroupID = p_groupID ;
+	#select MemberSysID, RoleID from InterestGroupMembers where GroupID = p_groupID;
+	select usi.UserID, igm.RoleID from InterestGroupMembers igm, UsersSummaryInfo usi where GroupID = p_groupID and igm.MemberSysID = usi.SysID;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -551,26 +542,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`hehui`@`200.200.200.17`*/ /*!50003 PROCEDURE `sp_GetUserInfo`(in p_userID varchar(16) )
-BEGIN
-SELECT * FROM UsersSummaryInfo usi left join UsersDetailedInfo udi on usi.SysID=udi.SysID WHERE usi.UserID = p_userID;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `sp_GetUserInfoBySysID` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = '' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`hehui`@`200.200.200.17`*/ /*!50003 PROCEDURE `sp_GetUserInfoBySysID`(in p_userSysID int(10) unsigned )
+/*!50003 CREATE*/ /*!50020 DEFINER=`hehui`@`200.200.200.17`*/ /*!50003 PROCEDURE `sp_GetUserInfo`(in p_userSysID int(10) unsigned )
 BEGIN
 SELECT * FROM UsersSummaryInfo usi left join UsersDetailedInfo udi on usi.SysID=udi.SysID WHERE usi.SysID = p_userSysID;
 END */;;
@@ -608,4 +580,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-04 14:01:42
+-- Dump completed on 2013-06-03 17:15:35
