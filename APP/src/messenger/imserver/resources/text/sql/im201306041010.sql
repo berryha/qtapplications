@@ -276,14 +276,9 @@ CREATE TABLE `LoginHistories` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `UserID` varchar(16) NOT NULL,
   `ExtIPAddress` varchar(64) NOT NULL,
-  `ExtPort` smallint(6) unsigned NOT NULL,
   `IntIPAddress` varchar(64) NOT NULL,
-  `IntPort` smallint(6) unsigned NOT NULL,
   `LoginTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `LogoutTime` datetime DEFAULT NULL,
-  `DeviceInfo` varchar(64) DEFAULT NULL,
-  `HostInfo` varchar(64) DEFAULT NULL,
-  `ClientVersion` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `FK-LH_UserID-USI_UserID` (`UserID`),
   CONSTRAINT `FK-LH_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -309,7 +304,7 @@ DROP TABLE IF EXISTS `PersonalContactGroups`;
 CREATE TABLE `PersonalContactGroups` (
   `ContactGroupID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Creator` varchar(16) NOT NULL,
-  `GroupName` varchar(32) NOT NULL,
+  `GroupName` varchar(45) NOT NULL,
   PRIMARY KEY (`ContactGroupID`),
   UNIQUE KEY `index-Creator-GroupName` (`Creator`,`GroupName`),
   KEY `FK-PCG_Creator-USI_UserID` (`Creator`),
@@ -340,14 +335,13 @@ CREATE TABLE `PersonalRelationship` (
   `Relationship` tinyint(4) NOT NULL DEFAULT '1' COMMENT '成员关系\n-1:blacklisted\n0:stranger\n1:approved',
   `PersonalContactGroup` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '联系人所在的个人组。0:Blacklist 1:Friends',
   `RemarkName` varchar(32) DEFAULT NULL COMMENT '名称备注',
-  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ID`),
   KEY `FK-UF_UserID-USI_UserID` (`UserID`),
   KEY `FK-UF_ContactID-USI_UserID` (`ContactID`),
   KEY `FK-UF_PCG-PCG_IPCGID` (`PersonalContactGroup`),
   KEY `FK-UF_PCGID-PCG_CGID` (`PersonalContactGroup`),
-  CONSTRAINT `FK-UF_ContactID-USI_UserID` FOREIGN KEY (`ContactID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK-UF_PCGID-PCG_CGID` FOREIGN KEY (`PersonalContactGroup`) REFERENCES `PersonalContactGroups` (`ContactGroupID`) ON UPDATE CASCADE,
+  CONSTRAINT `FK-UF_ContactID-USI_UserID` FOREIGN KEY (`ContactID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK-UF_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='成员关系表';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -413,6 +407,7 @@ CREATE TABLE `UsersDetailedInfo` (
   `BusinessHomepage` varchar(255) DEFAULT NULL,
   `BusinessEmailAddress` varchar(255) DEFAULT NULL,
   `RegistrationTime` datetime DEFAULT NULL,
+  `Description` varchar(256) DEFAULT NULL COMMENT '自我介绍',
   PRIMARY KEY (`SysID`),
   KEY `FK-UDI_UserSysID-USI_SysID` (`SysID`),
   CONSTRAINT `FK-UDI_SysID-USI_SysID` FOREIGN KEY (`SysID`) REFERENCES `UsersSummaryInfo` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -425,7 +420,7 @@ CREATE TABLE `UsersDetailedInfo` (
 
 LOCK TABLES `UsersDetailedInfo` WRITE;
 /*!40000 ALTER TABLE `UsersDetailedInfo` DISABLE KEYS */;
-INSERT INTO `UsersDetailedInfo` VALUES (1,29,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `UsersDetailedInfo` VALUES (1,29,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `UsersDetailedInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -457,7 +452,7 @@ CREATE TABLE `UsersSummaryInfo` (
   `AccountState` tinyint(1) NOT NULL DEFAULT '1' COMMENT '0:Invalid 1:Normal 2:Banned 3:Limitted',
   PRIMARY KEY (`SysID`),
   UNIQUE KEY `index_UsersSummaryInfo_UserID` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='基本信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8 COMMENT='基本信息表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -608,4 +603,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-06-04 14:01:42
+-- Dump completed on 2013-06-04 10:10:39
