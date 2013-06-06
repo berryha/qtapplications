@@ -5,8 +5,8 @@
  *      Author: hehui
  */
 
-#ifndef GROUPBASE_H_
-#define GROUPBASE_H_
+#ifndef INTERESTGROUPBASE_H_
+#define INTERESTGROUPBASE_H_
 
 
 #include <QObject>
@@ -24,11 +24,11 @@
 
 namespace HEHUI {
 
-class SHAREDIMLIB_API GroupBase : public QObject {
+class SHAREDIMLIB_API InterestGroupBase : public QObject {
     Q_OBJECT
 public:
-    GroupBase(quint32 groupID = 0, QObject *parent = 0);
-    virtual ~GroupBase();
+    InterestGroupBase(quint32 groupID = 0, QObject *parent = 0);
+    virtual ~InterestGroupBase();
     
     bool isNull();
     bool hasMember(const QString &memberUserID);
@@ -246,4 +246,4 @@ private:
 
 }
 
-#endif /* GROUPBASE_H_ */
+#endif /* INTERESTGROUPBASE_H_ */

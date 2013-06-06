@@ -5,8 +5,8 @@
  *      Author: hehui
  */
 
-#ifndef GROUP_H_
-#define GROUP_H_
+#ifndef INTERESTGROUP_H_
+#define INTERESTGROUP_H_
 
 
 #include <QObject>
@@ -14,12 +14,12 @@
 #include <QStringList>
 #include <QHash>
 
-#include "../../sharedim/groupbase.h"
+#include "../../sharedim/interestgroupbase.h"
 
 
 namespace HEHUI {
 
-class InterestGroup : public GroupBase {
+class InterestGroup : public InterestGroupBase {
     Q_OBJECT
 public:
     InterestGroup(quint32 groupID = 0, QObject *parent = 0);
@@ -47,4 +47,4 @@ private:
 
 }
 
-#endif /* GROUP_H_ */
+#endif /* INTERESTGROUP_H_ */

@@ -5,11 +5,11 @@
  *      Author: 贺辉
  */
 
-#ifndef CONTACTGROUP_H_
-#define CONTACTGROUP_H_
+#ifndef CONTACTGROUP_SERVER_H_
+#define CONTACTGROUP_SERVER_H_
 
 #include <QObject>
-#include "contact.h"
+#include "userinfo.h"
 
 #include "../../sharedim/contactgroupbase.h"
 
@@ -18,16 +18,16 @@ namespace HEHUI {
 class ContactGroup :public ContactGroupBase{
     Q_OBJECT
 public:
-    ContactGroup(quint32 groupID, const QString &groupName, QList<Contact*> contactList, QObject *parent = 0);
+    ContactGroup(quint32 groupID, const QString &groupName, const QString &creatorName, QList<UserInfo*> contactList, QObject *parent = 0);
     virtual ~ContactGroup();
 
 
-    QList<Contact*> getContactList() const
+    QList<UserInfo*> getContactList() const
     {
         return contactList;
     }
 
-    void setContactList(QList<Contact*> contactList)
+    void setContactList(QList<UserInfo*> contactList)
     {
         this->contactList = contactList;
     }
@@ -44,21 +44,26 @@ public:
 //    }
 
 
-    void addContact(Contact *contact){
+    void addContact(UserInfo *contact){
         contactList.append(contact);
     }
-    void deleteContact(Contact *contact){
+    void deleteContact(UserInfo *contact){
         contactList.removeAll(contact);
     }
+
+    void setCreatorInfo(UserInfo *creator){this->m_creator = creator;}
+    UserInfo * getCreatorInfo(){return m_creator;}
 
 
 private:
 //    int parentGroupID;
 
-    QList<Contact*> contactList;
+    QList<UserInfo*> contactList;
+
+    UserInfo *m_creator;
 
 };
 
 } //namespace HEHUI
 
-#endif /* CONTACTGROUP_H_ */
+#endif /* CONTACTGROUP_SERVER_H_ */

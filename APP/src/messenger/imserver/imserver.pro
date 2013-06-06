@@ -48,9 +48,10 @@ HEADERS += \
     packetmanager/serverpacketsparser.h \
     usersmanager/usersmanager.h \
     usersmanager/userinfo.h \
-    usersmanager/group.h \
     serverlib.h \
-    resourcesmanagerinstance.h
+    resourcesmanagerinstance.h \
+    usersmanager/contactgroup.h \
+    usersmanager/interestgroup.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \
@@ -58,8 +59,9 @@ SOURCES += \
     packetmanager/serverpacketsparser.cpp \
     usersmanager/usersmanager.cpp \
     usersmanager/userinfo.cpp \
-    usersmanager/group.cpp \
-    resourcesmanagerinstance.cpp
+    resourcesmanagerinstance.cpp \
+    usersmanager/contactgroup.cpp \
+    usersmanager/interestgroup.cpp
 FORMS += 
 RESOURCES += resources.qrc
 win32 { 

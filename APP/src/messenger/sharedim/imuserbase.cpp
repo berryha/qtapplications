@@ -310,10 +310,13 @@ void IMUserBase::setPersonalSummaryInfo(const QString &personalSummaryInfo){
     setFriendshipApply(FriendshipApply(friendshipApplyString.toUInt()));
     addUpdatedProperty(IM::PI_FriendshipApply, friendshipApplyString);
     
-    QString personalInfoVersionString = infoList.at(6);
-    setPersonalDetailInfoVersion(personalInfoVersionString.toUInt());
-    addUpdatedProperty(IM::PI_PersonalInfoVersion, personalInfoVersionString);
+    QString personalSummaryInfoVersionString = infoList.at(6);
+    setPersonalSummaryInfoVersion(personalSummaryInfoVersionString.toUInt());
+    addUpdatedProperty(IM::PI_PersonalSummaryInfoVersion, personalSummaryInfoVersionString);
 
+    QString personalDetailInfoVersionString = infoList.at(7);
+    setPersonalDetailInfoVersion(personalDetailInfoVersionString.toUInt());
+    addUpdatedProperty(IM::PI_PersonalDetailInfoVersion, personalDetailInfoVersionString);
 
 
 }
@@ -323,6 +326,7 @@ QString IMUserBase::getPersonalSummaryInfo() const{
     infoList << this->getUserID() << this->getNickName()
              << QString::number(this->getGender()) << QString::number(getAge())
              << this->getFace() << QString::number(this->getFriendshipApply())
+             << QString::number(getPersonalSummaryInfoVersion())
              << QString::number(getPersonalDetailInfoVersion())
                 ;
 
@@ -409,7 +413,7 @@ bool IMUserBase::addOrDeleteContact(const QString &contactID, const QString &gro
     }
 
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+//    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
     
     return true;
 
