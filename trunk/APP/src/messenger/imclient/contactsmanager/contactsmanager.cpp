@@ -860,13 +860,15 @@ bool ContactsManager::addOrDeleteContact(const QString &contactID, int groupID, 
 
     ContactGroup *group = contactGroupHash.value(groupID);
     if(group){
-        QList<Contact*> contacts = group->getContactList();
+        //QList<Contact*> contacts = group->getContactList();
         if(add){
-            contacts.append(contact);
+            //contacts.append(contact);
+            group->addContact(contact);
         }else{
-            contacts.removeAll(contact);
+            //contacts.removeAll(contact);
+            group->deleteContact(contact);
         }
-        group->setContactList(contacts);
+        //group->setContactList(contacts);
     }
 
     return true;
@@ -880,23 +882,24 @@ bool ContactsManager::moveContact(const QString &contactID, int oldGroupID, int 
         return false;
     }
 
-    QList<Contact*> contacts;
+//    QList<Contact*> contacts;
 
     ContactGroup *oldGroup = contactGroupHash.value(oldGroupID);
     if(oldGroup){
-        contacts = oldGroup->getContactList();
-        contacts.removeAll(contact);
-        oldGroup->setContactList(contacts);
-        contacts.clear();
+//        contacts = oldGroup->getContactList();
+//        contacts.removeAll(contact);
+//        oldGroup->setContactList(contacts);
+//        contacts.clear();
+        oldGroup->deleteContact(contact);
     }
 
     ContactGroup *newGroup = contactGroupHash.value(newGroupID);
     if(newGroup){
-        contacts = newGroup->getContactList();
-        contacts.append(contact);
-        newGroup->setContactList(contacts);
+//        contacts = newGroup->getContactList();
+//        contacts.append(contact);
+//        newGroup->setContactList(contacts);
+        newGroup->addContact(contact);
     }
-
 
     return true;
 

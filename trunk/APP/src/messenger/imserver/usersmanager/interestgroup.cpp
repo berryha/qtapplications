@@ -5,12 +5,12 @@
  *      Author: hehui
  */
 
-#include "group.h"
+#include "interestgroup.h"
 
 namespace HEHUI {
 
 InterestGroup::InterestGroup(quint32 groupID, QObject *parent)
-    :GroupBase(groupID, parent)
+    :InterestGroupBase(groupID, parent)
 {
 	
 

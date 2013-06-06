@@ -20,7 +20,7 @@ HHSharedLibs += HHSharedCore \
 include(../../HHSharedLibs.pri)
 
 # Input
-HEADERS += groupbase.h \
+HEADERS += \
     constants_global_shared.h \
     imuserbase.h \
     sharedimlib.h \
@@ -28,14 +28,18 @@ HEADERS += groupbase.h \
     tcpserver.h \
     rtp.h \
     resourcesmanager.h \
-    filemanager.h
-SOURCES += groupbase.cpp \
+    filemanager.h \
+    contactgroupbase.h \
+    interestgroupbase.h
+SOURCES += \
     imuserbase.cpp \
     udtprotocol.cpp \
     tcpserver.cpp \
     rtp.cpp \
     resourcesmanager.cpp \
-    filemanager.cpp
+    filemanager.cpp \
+    contactgroupbase.cpp \
+    interestgroupbase.cpp
 FORMS += 
 RESOURCES += resources.qrc
 

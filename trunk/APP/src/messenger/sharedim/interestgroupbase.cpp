@@ -9,11 +9,11 @@
 #include <QVariant>
 #include <QDebug>
 
-#include "groupbase.h"
+#include "interestgroupbase.h"
 
 namespace HEHUI {
 
-GroupBase::GroupBase(quint32 groupID, QObject *parent)
+InterestGroupBase::InterestGroupBase(quint32 groupID, QObject *parent)
     :QObject(parent), groupID(groupID)
 {
 	
@@ -38,15 +38,15 @@ GroupBase::GroupBase(quint32 groupID, QObject *parent)
 
 }
 
-GroupBase::~GroupBase() {
+InterestGroupBase::~InterestGroupBase() {
 	// TODO Auto-generated destructor stub
 }
 
-bool GroupBase::isNull(){
+bool InterestGroupBase::isNull(){
     return ((groupID < 1) || (groupName.isEmpty()) || (creatorID.isEmpty()));
 }
 
-bool GroupBase::hasMember(const QString &memberUserID){
+bool InterestGroupBase::hasMember(const QString &memberUserID){
     QList<QString> members = membersHash.keys();
     if(members.contains(memberUserID)){
         return true;
@@ -55,11 +55,11 @@ bool GroupBase::hasMember(const QString &memberUserID){
     return false;
 }
 
-quint32 GroupBase::memberRole(const QString &memberUserID){
+quint32 InterestGroupBase::memberRole(const QString &memberUserID){
     return membersHash.value(memberUserID);
 }
 
-QString GroupBase::getUpdateSQLStatement() const{
+QString InterestGroupBase::getUpdateSQLStatement() const{
     QMutexLocker locker(updatedPropertiesMutex);
     
     QStringList sqlstatements;
@@ -77,21 +77,21 @@ QString GroupBase::getUpdateSQLStatement() const{
     
 }
 
-void GroupBase::addUpdatedProperty(IM::PropertyIDOfGroup propertyID, const QString &value){
+void InterestGroupBase::addUpdatedProperty(IM::PropertyIDOfGroup propertyID, const QString &value){
 
     QMutexLocker locker(updatedPropertiesMutex);
     updatedProperties.insert(propertyID, value);
     
 }
 
-void GroupBase::clearUpdatedProperties(){
+void InterestGroupBase::clearUpdatedProperties(){
     QMutexLocker locker(updatedPropertiesMutex);
     
     updatedProperties.clear();
     
 }
 
-QString GroupBase::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
+QString InterestGroupBase::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
     
     QString columnName = "";
     switch(propertyID){
@@ -148,7 +148,7 @@ QString GroupBase::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
 
 }
 
-void GroupBase::setGroupInfoString(const QString &infoString){
+void InterestGroupBase::setGroupInfoString(const QString &infoString){
     if(infoString.trimmed().isEmpty()){
         return;
     }
@@ -191,7 +191,7 @@ void GroupBase::setGroupInfoString(const QString &infoString){
     
 }
 
-QString GroupBase::getGroupInfoString(){
+QString InterestGroupBase::getGroupInfoString(){
     QStringList infoList;
     infoList << QString::number(groupTypeID)
              << QString::number(parentGroupID) << creatorID << groupName
@@ -205,17 +205,17 @@ QString GroupBase::getGroupInfoString(){
     
 }
 
-void GroupBase::addMember(const QString &memberuserID, quint32 memberRole){
+void InterestGroupBase::addMember(const QString &memberuserID, quint32 memberRole){
 
     membersHash.insert(memberuserID, memberRole);
 }
 
-void GroupBase::deleteMember(const QString &memberuserID){
+void InterestGroupBase::deleteMember(const QString &memberuserID){
 
     membersHash.remove(memberuserID);
 }
 
-QStringList GroupBase::members() const{
+QStringList InterestGroupBase::members() const{
     return membersHash.keys();
 }
 
