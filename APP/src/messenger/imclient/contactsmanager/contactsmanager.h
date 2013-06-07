@@ -98,8 +98,8 @@ public slots:
     void renameGroupToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName);
 
 
-    bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
-    bool moveContact(const QString &contactID, int oldGroupID, int newGroupID);
+    bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
+    bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
 
 
     //联系人在线状态改变
