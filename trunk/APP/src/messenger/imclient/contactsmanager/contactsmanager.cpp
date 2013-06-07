@@ -851,7 +851,7 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
 }
 
-bool ContactsManager::addOrDeleteContact(const QString &contactID, int groupID, bool add ){
+bool ContactsManager::addOrDeleteContact(const QString &contactID, quint32 groupID, bool add ){
 
     Contact *contact = contactHash.value(contactID);
     if(!contact){
@@ -875,7 +875,7 @@ bool ContactsManager::addOrDeleteContact(const QString &contactID, int groupID, 
 
 }
 
-bool ContactsManager::moveContact(const QString &contactID, int oldGroupID, int newGroupID){
+bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
 
     Contact *contact = contactHash.value(contactID);
     if(!contact){
