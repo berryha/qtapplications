@@ -49,8 +49,8 @@ User::User(const QString &userID, const QString & userName, const QString &passw
     personalEmailAddress = "";
 
     lastLoginTime = QDateTime();
-    lastLoginHostAddress = "";
-    lastLoginHostPort = 0;
+    lastLoginExternalHostAddress = "";
+    lastLoginExternalHostPort = 0;
 
     questionForSecurity = "";
     answerForSecurity = "";

@@ -41,19 +41,19 @@ namespace HEHUI {
 
 class NETWORK_LIB_API NetworkUtilities {
 public:
-	NetworkUtilities();
-	virtual ~NetworkUtilities();
+    NetworkUtilities();
+    virtual ~NetworkUtilities();
 
 
-	static QList<QHostAddress> broadcastAddresses();
-        static QList<QHostAddress> validIPAddresses();
+    static QList<QHostAddress> broadcastAddresses();
+    static QList<QHostAddress> validIPAddresses();
 
 
-        static QString hardwareAddress(const QHostAddress &ipAddress);
-        static QString hardwareAddress(const QString &ipAddress);
+    static QString hardwareAddress(const QHostAddress &ipAddress);
+    static QString hardwareAddress(const QString &ipAddress);
 
-        static bool isLocalAddress(const QHostAddress &address);
-        static bool isLocalAddress(const QString &address);
+    static bool isLocalAddress(const QHostAddress &address);
+    static bool isLocalAddress(const QString &address);
 
 
 

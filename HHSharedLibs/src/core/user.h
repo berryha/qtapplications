@@ -139,14 +139,14 @@ public:
         return jobTitle;
     }
 
-    QString getLastLoginHostAddress() const
+    QString getLastLoginExternalHostAddress() const
     {
-        return lastLoginHostAddress;
+        return lastLoginExternalHostAddress;
     }
 
-    quint16 getLastLoginHostPort() const
+    quint16 getLastLoginExternalHostPort() const
     {
-        return lastLoginHostPort;
+        return lastLoginExternalHostPort;
     }
 
     QDateTime getLastLoginTime() const
@@ -284,14 +284,14 @@ public:
         this->jobTitle = jobTitle;
     }
 
-    void setLastLoginHostAddress(const QString & lastLoginHostAddress)
+    void setLastLoginExternalHostAddress(const QString & lastLoginHostAddress)
     {
-        this->lastLoginHostAddress = lastLoginHostAddress;
+        this->lastLoginExternalHostAddress = lastLoginHostAddress;
     }
 
-    void setLastLoginHostPort(quint16 lastLoginHostPort)
+    void setLastLoginExternalHostPort(quint16 lastLoginHostPort)
     {
-        this->lastLoginHostPort = lastLoginHostPort;
+        this->lastLoginExternalHostPort = lastLoginHostPort;
     }
 
     void setLastLoginTime(const QDateTime &lastLoginTime)
@@ -360,8 +360,8 @@ private:
     QString personalEmailAddress;
 
     QDateTime lastLoginTime;
-    QString lastLoginHostAddress;
-    quint16 lastLoginHostPort;
+    QString lastLoginExternalHostAddress;
+    quint16 lastLoginExternalHostPort;
 
     QString questionForSecurity;
     QString answerForSecurity;
