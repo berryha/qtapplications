@@ -545,7 +545,7 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
     QString imUserID = userInfo->getUserID();
     QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     userInfo->setLastLoginTime(QDateTime::fromString(curTime));
-    userInfo->setLastLoginHostAddress(userHostAddress);
+    userInfo->setLastLoginExternalHostAddress(userHostAddress);
 
 
     QString statement = "";
@@ -615,7 +615,7 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
     }
 
 
-    userInfo->setLastLoginHostAddress(query.value(0).toString());
+    userInfo->setLastLoginExternalHostAddress(query.value(0).toString());
     userInfo->setLastLoginTime(query.value(1).toDateTime());
 
     return true;
@@ -952,7 +952,8 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     QSqlQuery query(db);
     
     QSqlRecord record;
-    QString statement = QString("SELECT * FROM UsersSummaryInfo usi left join UsersDetailedInfo udi on usi.%1=udi.%1 where %2='%3' ").arg(info->databaseColumnName(IM::PI_SysID)).arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
+//    QString statement = QString("SELECT * FROM UsersSummaryInfo usi left join UsersDetailedInfo udi on usi.%1=udi.%1 where %2='%3' ").arg(info->databaseColumnName(IM::PI_SysID)).arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
+    QString statement = QString("call sp_GetUserInfo('%1') ").arg(info->getUserID());
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();

@@ -45,8 +45,8 @@ UserInfo::UserInfo(const QString &userID, QObject *parent)
 {
 
     init();
-    setLastLoginHostAddress("");
-    setLastLoginHostPort(0);
+    setLastLoginExternalHostAddress("");
+    setLastLoginExternalHostPort(0);
 
 }
 
@@ -57,8 +57,8 @@ UserInfo::UserInfo(const QString &ipAddress, quint16 port, QObject *parent)
     init();
 
     setUserID("");
-    setLastLoginHostAddress(ipAddress);
-    setLastLoginHostPort(port);
+    setLastLoginExternalHostAddress(ipAddress);
+    setLastLoginExternalHostPort(port);
 
 
 
@@ -179,7 +179,7 @@ void UserInfo::setOffline(){
     //TODO:Save to database
 
 
-    setLastLoginHostPort(0);
+    setLastLoginExternalHostPort(0);
 
 }
 

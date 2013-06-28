@@ -1088,7 +1088,7 @@ private slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin());
+        out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin()) << m_rtp->getUDTServerPort() ;
         packet->setPacketData(ba);
 
         ba.clear();

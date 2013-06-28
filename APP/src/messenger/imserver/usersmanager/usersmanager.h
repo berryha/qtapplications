@@ -37,7 +37,7 @@
 
 
 #include "userinfo.h"
-#include "group.h"
+#include "interestgroup.h"
 
 
 #include "HHSharedCore/hsingleton.h"

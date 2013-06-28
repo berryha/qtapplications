@@ -1576,8 +1576,8 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
     
     IM::OnlineState state = IM::OnlineState(onlineStateCode);
     contact->setOnlineState(state);
-    contact->setLastLoginHostAddress(contactHostAddress);
-    contact->setLastLoginHostPort(contactHostPort);
+    contact->setLastLoginExternalHostAddress(contactHostAddress);
+    contact->setLastLoginExternalHostPort(contactHostPort);
 
     //TODO:Tip
     contactsManager->updateContactToUI(friendBox, contact->getContactGroupID(), contactID);
@@ -1615,8 +1615,8 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
             continue;
         }
         contact->setOnlineState(IM::OnlineState(infoList.at(1).toUInt()));
-        contact->setLastLoginHostAddress(infoList.at(2));
-        contact->setLastLoginHostPort(infoList.at(3).toUInt());
+        contact->setLastLoginExternalHostAddress(infoList.at(2));
+        contact->setLastLoginExternalHostPort(infoList.at(3).toUInt());
         contactsManager->updateContactToUI(friendBox, contact->getContactGroupID(), contactID);
 
     }
@@ -2071,8 +2071,8 @@ void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &m
     if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
         clientPacketsParser->sendChatMessageToServer(m_socketConnectedToServer, contactID, message);
     }else{
-        QString contactHostAddress = contact->getLastLoginHostAddress();
-        quint16 contactHostPort = contact->getLastLoginHostPort();
+        QString contactHostAddress = contact->getLastLoginExternalHostAddress();
+        quint16 contactHostPort = contact->getLastLoginExternalHostPort();
         clientPacketsParser->sendChatMessageToContact(m_socketConnectedToServer, contactID, message, contactHostAddress, contactHostPort);
         clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contactHostAddress, contactHostPort);
     }
@@ -2100,8 +2100,8 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
         if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
             //            clientPacketsParser->sendChatMessageToServer(contactID, message);
         }else{
-            clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
-            clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contact->getLastLoginHostAddress(), contact->getLastLoginHostPort());
+            clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
+            clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
         }
     }
 

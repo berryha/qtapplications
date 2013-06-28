@@ -602,8 +602,8 @@ void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
             contact->setPersonalEmailAddress(QVariant(contactsModel->record(j).value("PersonalEmailAddress")).toString());
             
             contact->setLastLoginTime(QVariant(contactsModel->record(j).value("LastLoginTime")).toDateTime());
-            contact->setLastLoginHostAddress(QVariant(contactsModel->record(j).value("LastLoginHostAddress")).toString());
-            contact->setLastLoginHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
+            contact->setLastLoginExternalHostAddress(QVariant(contactsModel->record(j).value("LastLoginHostAddress")).toString());
+            contact->setLastLoginExternalHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
             
             //contact->setQuestionForSecurity(QVariant(contactsModel->record(j).value("QuestionForSecurity")).toString());
             //contact->setAnswerForSecurity(QVariant(contactsModel->record(j).value("AnswerForSecurity")).toString());
@@ -673,8 +673,8 @@ void ContactsManager::slotFetchStrangersInfo(){
         contact->setPersonalEmailAddress(QVariant(contactsModel->record(j).value("PersonalEmailAddress")).toString());
 
         contact->setLastLoginTime(QVariant(contactsModel->record(j).value("LastLoginTime")).toDateTime());
-        contact->setLastLoginHostAddress(QVariant(contactsModel->record(j).value("LastLoginHostAddress")).toString());
-        contact->setLastLoginHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
+        contact->setLastLoginExternalHostAddress(QVariant(contactsModel->record(j).value("LastLoginHostAddress")).toString());
+        contact->setLastLoginExternalHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
 
         //contact->setQuestionForSecurity(QVariant(contactsModel->record(j).value("QuestionForSecurity")).toString());
         //contact->setAnswerForSecurity(QVariant(contactsModel->record(j).value("AnswerForSecurity")).toString());
@@ -1249,8 +1249,8 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
     m_imUser->setPersonalEmailAddress(QVariant(query.value(record.indexOf("PersonalEmailAddress"))).toString());
 
     m_imUser->setLastLoginTime(QVariant(query.value(record.indexOf("LastLoginTime"))).toDateTime());
-    m_imUser->setLastLoginHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
-    m_imUser->setLastLoginHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
+    m_imUser->setLastLoginExternalHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
+    m_imUser->setLastLoginExternalHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
 
     //info->setQuestionForSecurity(QVariant(query.value(record.indexOf("QuestionForSecurity"))).toString());
     //info->setAnswerForSecurity(QVariant(query.value(record.indexOf("AnswerForSecurity"))).toString());
@@ -1386,8 +1386,8 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
     contact->setPersonalEmailAddress(QVariant(query.value(record.indexOf("PersonalEmailAddress"))).toString());
 
     contact->setLastLoginTime(QVariant(query.value(record.indexOf("LastLoginTime"))).toDateTime());
-    contact->setLastLoginHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
-    contact->setLastLoginHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
+    contact->setLastLoginExternalHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
+    contact->setLastLoginExternalHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
 
     //info->setQuestionForSecurity(QVariant(query.value(record.indexOf("QuestionForSecurity"))).toString());
     //info->setAnswerForSecurity(QVariant(query.value(record.indexOf("AnswerForSecurity"))).toString());
