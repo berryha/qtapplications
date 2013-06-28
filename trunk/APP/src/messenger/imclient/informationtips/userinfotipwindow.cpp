@@ -67,7 +67,7 @@ void UserInfoTipWindow::showUserInfoTip(Contact *contact, const QPoint &global_p
     ui.labelDescription->setText(contact->getdescription());
 
     if( (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) && (contact->getOnlineState() != IM::ONLINESTATE_OFFLINE)){
-        QString info = QString("IP: %1").arg(contact->getLastLoginHostAddress());
+        QString info = QString("IP: %1").arg(contact->getLastLoginExternalHostAddress());
         ui.labelExtraInfo->setText(info);
     }
 

@@ -489,7 +489,7 @@ public slots:
         foreach (QString contact, contacts) {
             UserInfo *contactInfo = getOnlineUserInfo(contact);
             if(contactInfo){
-                sendContactOnlineStatusChangedPacket(contactInfo->getSocketID(), userInfo->getUserID(), onlineStateCode, contactInfo->getSessionEncryptionKey(), userHostAddress, userHostPort, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendContactOnlineStatusChangedPacket(contactInfo->getSocketID(), userInfo->getUserID(), onlineStateCode, contactInfo->getSessionEncryptionKey(), userHostAddress, userHostPort, contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
             }
         }
 
@@ -511,8 +511,8 @@ public slots:
                     QStringList onlineInfo;
                     onlineInfo.append(contact);
                     onlineInfo.append(QString::number(quint8(state)));
-                    onlineInfo.append(info->getLastLoginHostAddress());
-                    onlineInfo.append(QString::number(info->getLastLoginHostPort()));
+                    onlineInfo.append(info->getLastLoginExternalHostAddress());
+                    onlineInfo.append(QString::number(info->getLastLoginExternalHostPort()));
                     contactsOnlineInfo.append(onlineInfo.join(QString(PACKET_DATA_SEPARTOR)));
                 }
 

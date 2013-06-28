@@ -66,7 +66,7 @@ ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *resourcesMana
 
 
 
-//    heartbeatTimer = 0;
+    //    heartbeatTimer = 0;
 
 
     //m_serverName = networkManager->hostName();
@@ -96,11 +96,11 @@ ServerPacketsParser::~ServerPacketsParser() {
     delete checkIMUsersOnlineStateTimer;
     checkIMUsersOnlineStateTimer = 0;
 
-//    if(heartbeatTimer){
-//        heartbeatTimer->stop();
-//    }
-//    delete heartbeatTimer;
-//    heartbeatTimer = 0;
+    //    if(heartbeatTimer){
+    //        heartbeatTimer->stop();
+    //    }
+    //    delete heartbeatTimer;
+    //    heartbeatTimer = 0;
 
 
     delete cryptography;
@@ -130,29 +130,29 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     PacketHandlerBase::recylePacket(packet);
     switch(packetType){
-//    case quint8(HEHUI::HeartbeatPacket):
-//    {
-//        QString userID = peerID;
-//        //in >> userID;
+    //    case quint8(HEHUI::HeartbeatPacket):
+    //    {
+    //        QString userID = peerID;
+    //        //in >> userID;
 
-//        UserInfo *userInfo = getOnlineUserInfo(userID);
-//        if(userInfo){
-//            userInfo->updateRemainingOnlineStatusCheckingTimes(true);
-//        }
+    //        UserInfo *userInfo = getOnlineUserInfo(userID);
+    //        if(userInfo){
+    //            userInfo->updateRemainingOnlineStatusCheckingTimes(true);
+    //        }
 
-//        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), userID);
-//        qWarning()<<"~~HeartbeatPacket--"<<" userID:"<<userID;
-//    }
-//    break;
-//    case quint8(HEHUI::ConfirmationOfReceiptPacket):
-//    {
-//        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
-//        in >> packetSerialNumber1 >> packetSerialNumber2;
-//        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
-//        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
-//        //qDebug()<<"~~ConfirmationOfReceiptPacket--"<<"packetSerialNumber:"<<packetSerialNumber;
-//    }
-//    break;
+    //        emit signalHeartbeatPacketReceived(packet->getPeerHostAddress().toString(), userID);
+    //        qWarning()<<"~~HeartbeatPacket--"<<" userID:"<<userID;
+    //    }
+    //    break;
+    //    case quint8(HEHUI::ConfirmationOfReceiptPacket):
+    //    {
+    //        quint16 packetSerialNumber1 = 0, packetSerialNumber2 = 0;
+    //        in >> packetSerialNumber1 >> packetSerialNumber2;
+    //        m_packetHandlerBase->removeWaitingForReplyPacket(packetSerialNumber1, packetSerialNumber2);
+    //        emit signalConfirmationOfReceiptPacketReceived(packetSerialNumber1, packetSerialNumber2);
+    //        //qDebug()<<"~~ConfirmationOfReceiptPacket--"<<"packetSerialNumber:"<<packetSerialNumber;
+    //    }
+    //    break;
     case quint8(IM::ClientLookForServer):
     {
         qDebug()<<"~~ClientLookForServer";
@@ -165,7 +165,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //emit signalClientLookForServerPacketReceived(peerAddress, peerPort, peerName);
         //qDebug()<<"~~ClientLookForServer--"<<" peerAddress:"<<peerAddress.toString()<<"   peerPort:"<<peerPort;
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_REGISTRATION_SERVER_INFO):
     {
@@ -186,7 +186,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendRegistrationServerInfoPacket(socketID, quint8(errorype), extraMessage, canRegister, regMode, regServerAddress, requireActivation);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REGISTRATION):
     {
@@ -202,7 +202,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendClientRegistrationResultPacket(socketID, quint8(errorype), sysID, message);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_UPDATE_PASSWORD):
     {
@@ -227,7 +227,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendClientUpdatePasswordResultPacket(socketID, quint8(errorype), message);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_LOGIN):
     {
@@ -253,7 +253,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //qWarning()<<"~~CLIENT_REQUEST_LOGIN--"<<" peerAddress:"<<clientAddress.toString()<<"   peerPort:"<<clientPort;
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_LOGIN_INFO):
     {
@@ -262,15 +262,16 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString userID = peerID;
         QByteArray encryptedPassword;
         quint8 onlineStateCode = quint8(IM::ONLINESTATE_ONLINE);
-        in >> encryptedPassword >> onlineStateCode;
+        quint16 internalListenningPort = 0;
+        in >> encryptedPassword >> onlineStateCode >> internalListenningPort;
         //        qDebug()<<"----onlineStateCode:"<<onlineStateCode;
 
         IM::ErrorType errorType = IM::ERROR_UnKnownError;
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
 
-            userInfo->setLastLoginHostAddress(peerAddress.toString());
-            userInfo->setLastLoginHostPort(peerPort);
+            userInfo->setLastLoginExternalHostAddress(peerAddress.toString());
+            userInfo->setLastLoginExternalHostPort(peerPort);
             //userInfo->setOnline();
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
@@ -296,9 +297,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     UserInfo::FriendshipApplyResult faResult = UserInfo::FriendshipApplyResult(infoList.at(1).toUInt());
                     QString message = infoList.at(2);
                     if(faResult == UserInfo::FAR_ACCEPTED ){
-                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
                     }else{
-                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
                     }
                 }
             }
@@ -339,7 +340,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //        qWarning()<<"~~CLIENT_LOGIN_INFO--"<<" peerAddress:"<<clientAddress.toString()<<"   peerPort:"<<clientPort;
 
     }
-    break;
+        break;
 
     case quint8(IM::ONLINE_STATE_CHANGED):
     {
@@ -362,7 +363,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //        emit signalUserOnlineStateChanged(userID, encryptedOnlineState);
 
     }
-    break;
+        break;
 
     case quint8(IM::CONTACT_GROUPS_INFO):
     {
@@ -396,7 +397,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_USER_SUMMARY_INFO):
     {
@@ -437,7 +438,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         //        emit signalUserRequestUserInfo(userID, encryptedUserID);
     }
-    break;
+        break;
 
 
 
@@ -457,7 +458,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString propertiesString = ""; 
+        QString propertiesString = "";
         bool matchExactly = true, searchOnlineUsersOnly = true;
         stream >> propertiesString >> matchExactly >> searchOnlineUsersOnly;
         
@@ -467,7 +468,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
         
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
     {
@@ -486,7 +487,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", verificationMessage = ""; 
+        QString contactID = "", verificationMessage = "";
         stream >> contactID >> verificationMessage;
         
         if(userID == contactID){return;}
@@ -503,11 +504,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
             userInfo->addOrDeleteContact(contactID, userInfo->getDefaultGroupName(), true);
-            sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginHostAddress(), userInfo->getLastLoginHostPort());
+            sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
 
             contactInfo->addOrDeleteContact(userID, contactInfo->getDefaultGroupName(), true);
             if(contactInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
-                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
             }else{
                 //TODO:保存消息到数据库
                 saveFriendshipApplyRequest(userID, contactID, verificationMessage, UserInfo::FAR_ACCEPTED, true);
@@ -523,7 +524,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_MOVE_CONTACT):
     {
@@ -541,7 +542,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", oldGroupName = "", newGroupName = ""; 
+        QString contactID = "", oldGroupName = "", newGroupName = "";
         stream >> contactID >> oldGroupName >> newGroupName;
         
         if(userID == contactID){return;}
@@ -553,7 +554,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         userInfo->moveContact(contactID, oldGroupName, newGroupName);
         
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_RESPONSE_ADD_CONTACT_REQUEST):
     {
@@ -571,7 +572,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", extraMessage = ""; 
+        QString contactID = "", extraMessage = "";
         bool acceptRequest = true;
         stream >> contactID >> acceptRequest >> extraMessage;
         
@@ -587,7 +588,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 saveFriendshipApplyRequest(contactID, userID, extraMessage, UserInfo::FAR_ACCEPTED, false, true);
                 return;
             }else{
-                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
             }
 
         }else{
@@ -597,7 +598,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     saveFriendshipApplyRequest(contactID, userID, extraMessage, UserInfo::FAR_DENIED, false, true);
                     return;
                 }else{
-                    sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+                    sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
                 }
             }
             
@@ -607,7 +608,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         deleteFriendshipApplyRequest(contactID, userID);
         
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_DELETE_CONTACT):
     {
@@ -644,7 +645,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //qDebug()<<"------------contactID:"<<contactID<<" groupName:"<<groupName;
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT):
     {
@@ -681,7 +682,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUPS_LIST):
     {
@@ -695,7 +696,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendUserInterestGroupsListPacket(socketID, userInfo, peerAddress, peerPort);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_INFO):
     {
@@ -719,7 +720,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendUserInterestGroupInfoPacket(socketID, userInfo, groupID, peerAddress, peerPort);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO):
     {
@@ -744,7 +745,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendUserInterestGroupMembersInfoPacket(socketID, userInfo, groupID, peerAddress, peerPort);
 
     }
-    break;
+        break;
 
 
     case quint8(IM::BLACKLIST_INFO):
@@ -759,7 +760,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         sendUserBlacklistInfoPacket(socketID, userInfo, peerAddress, peerPort);
 
     }
-    break;
+        break;
 
     case quint8(IM::CLIENT_REQUEST_MODIFY_CONTACT_REMARK):
     {
@@ -783,7 +784,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO:Save To DB!
 
     }
-    break;
+        break;
 
     case quint8(IM::RENAME_CONTACT_GROUP):
     {
@@ -807,7 +808,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         userInfo->updateGroupName(oldGroupName, newGroupName);
 
     }
-    break;
+        break;
 
     case quint8(IM::CREATE_OR_DELETE_CONTACT_GROUP):
     {
@@ -834,7 +835,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         userInfo->createOrDeleteGroup(groupName, create);
 
     }
-    break;
+        break;
 
     case quint8(IM::SESSION_ENCRYPTION_KEY_WITH_CONTACT):
     {
@@ -860,16 +861,16 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!contactInfo){return;}
         if(contactInfo->isOnLine()){
             QByteArray key = ServerUtilities::generateSessionEncryptionKey();
-            sendSessionEncryptionKeyWithContact(socketID, userID, contactInfo->getSessionEncryptionKey(), key, contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort());
+            sendSessionEncryptionKeyWithContact(socketID, userID, contactInfo->getSessionEncryptionKey(), key, contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
             sendSessionEncryptionKeyWithContact(socketID, contactID, userInfo->getSessionEncryptionKey(), key, peerAddress.toString(), peerPort);
         }else{
-            sendContactOnlineStatusChangedPacket(socketID, contactID, quint8(IM::ONLINESTATE_OFFLINE), userInfo->getSessionEncryptionKey(), contactInfo->getLastLoginHostAddress(), contactInfo->getLastLoginHostPort(), peerAddress.toString(), peerPort);
+            sendContactOnlineStatusChangedPacket(socketID, contactID, quint8(IM::ONLINESTATE_OFFLINE), userInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort(), peerAddress.toString(), peerPort);
 
         }
 
 
     }
-    break;
+        break;
 
     case quint8(IM::CHAT_MESSAGES_CACHED_ON_SERVER):
     {
@@ -895,7 +896,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         saveCachedChatMessageFromIMUser(userID, contactID, message);
 
     }
-    break;
+        break;
 
     case quint8(IM::GROUP_CHAT_MESSAGE):
     {
@@ -927,38 +928,38 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
     }
-    break;
+        break;
 
 
 
-    //    case quint8(IM::):
-    //        {
-    //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
+        //    case quint8(IM::):
+        //        {
+        //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
 
 
-    //        }
-    //        break;
-    //    case quint8(IM::):
-    //        {
-    //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
+        //        }
+        //        break;
+        //    case quint8(IM::):
+        //        {
+        //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
 
 
-    //        }
-    //        break;
+        //        }
+        //        break;
 
-    //    case quint8(IM::CLIENT_REQUEST_LOGIN):
-    //        {
-    //
-    //        }
-    //        break;
+        //    case quint8(IM::CLIENT_REQUEST_LOGIN):
+        //        {
+        //
+        //        }
+        //        break;
 
 
 
 
     default:
-        qWarning()<<"Unknown Packet Type:"<<packetType                
-                <<" From:"<<peerAddress.toString()
-               <<" Port:"<<peerPort;
+        qWarning()<<"Unknown Packet Type:"<<packetType
+                 <<" From:"<<peerAddress.toString()
+                <<" Port:"<<peerPort;
         break;
 
     }
@@ -973,7 +974,7 @@ void ServerPacketsParser::userExceptionalOffline(const QString &peerAddress, qui
 
     QList<UserInfo*>  users = onlineUsers();
     foreach(UserInfo *info, users){
-        if(info->getLastLoginHostAddress() == peerAddress && info->getLastLoginHostPort() == peerPort){
+        if(info->getLastLoginExternalHostAddress() == peerAddress && info->getLastLoginExternalHostPort() == peerPort){
             processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, peerAddress, peerPort);
         }
     }
@@ -1036,8 +1037,8 @@ void ServerPacketsParser::peerDisconnected(int socketID){
         UserInfo *info = m_userSocketsHash.value(socketID);
         if(!info){return;}
 
-        QString peerAddress = info->getLastLoginHostAddress();
-        quint16 peerPort = info->getLastLoginHostPort();
+        QString peerAddress = info->getLastLoginExternalHostAddress();
+        quint16 peerPort = info->getLastLoginExternalHostPort();
         processUserOnlineStatusChanged(info, IM::ONLINESTATE_OFFLINE, peerAddress, peerPort);
 
         qCritical()<<QString("ERROR! Peer %1:%2 Closed Unexpectedly!").arg(peerAddress).arg(peerPort);
@@ -1050,7 +1051,7 @@ void ServerPacketsParser::peerDisconnected(int socketID){
 
 //void ServerPacketsParser::startCheckIMUsersOnlineStateTimer(){
 //    qWarning()<<"--startCheckIMUsersOnlineStateTimer()";
-    
+
 //    if(!checkIMUsersOnlineStateTimer){
 //        checkIMUsersOnlineStateTimer = new QTimer(this);
 //        checkIMUsersOnlineStateTimer->setInterval(HEARTBEAT_TIMER_INTERVAL); //1 minute
@@ -1060,7 +1061,7 @@ void ServerPacketsParser::peerDisconnected(int socketID){
 
 //    //    if(!checkIMUsersOnlineStateTimer->isActive()){
 //    //    }
-    
+
 //    checkIMUsersOnlineStateTimer->start();
 
 //}
