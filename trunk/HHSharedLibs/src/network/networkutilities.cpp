@@ -41,12 +41,12 @@
 namespace HEHUI {
 
 NetworkUtilities::NetworkUtilities() {
-	// TODO Auto-generated constructor stub
+    // TODO Auto-generated constructor stub
 
 }
 
 NetworkUtilities::~NetworkUtilities() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 
@@ -69,19 +69,19 @@ QList<QHostAddress> NetworkUtilities::broadcastAddresses(){
 
 }
 
- QList<QHostAddress> NetworkUtilities::validIPAddresses(){
-     QList<QHostAddress> ipAddresses;
-     foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-         foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
-             qDebug()<<"entry.ip():"<<entry.ip().toString();
-             QHostAddress broadcastAddress = entry.broadcast();
-             if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
-                 ipAddresses << entry.ip();
-             }
-         }
-     }
+QList<QHostAddress> NetworkUtilities::validIPAddresses(){
+    QList<QHostAddress> ipAddresses;
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+            qDebug()<<"entry.ip():"<<entry.ip().toString();
+            QHostAddress broadcastAddress = entry.broadcast();
+            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
+                ipAddresses << entry.ip();
+            }
+        }
+    }
 
-     return ipAddresses;
+    return ipAddresses;
 }
 
 
