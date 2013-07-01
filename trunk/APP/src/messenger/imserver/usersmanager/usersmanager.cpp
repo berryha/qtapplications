@@ -528,7 +528,7 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
 }
 
-bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, bool login){
+bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress,quint16 userHostPort){
     qDebug()<<"--UsersManager::saveUserLoginInfo(...)";
 
     if(!userInfo){
@@ -543,38 +543,57 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
     QSqlQuery query(db);
 
     QString imUserID = userInfo->getUserID();
-    QString curTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    userInfo->setLastLoginTime(QDateTime::fromString(curTime));
+
     userInfo->setLastLoginExternalHostAddress(userHostAddress);
+    userInfo->setLastLoginExternalHostPort(userHostPort);
 
 
-    QString statement = "";
-    if(login){
-        //statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
-        statement = QString(" call sp_userlogin('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
-    }else{
-        //statement = QString("start  transcation; select @MAXID:=max(ID) from loginhistories where UserID = '%1'; update loginhistories set LogoutTime = '%2' where ID = @MAXID; commit;").arg(curTime).arg(imUserID);
-        statement = QString(" call sp_userlogout('%1', '%2') ").arg(imUserID).arg(curTime);
-    }
+    //statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
+    QString statement = QString(" call sp_LogUserIn('%1', '%2', %3, @loginTme);  ").arg(imUserID).arg(userHostAddress).arg(userHostPort);
+    statement += QString(" select @loginTme;");
+
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save user login info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
         return false;
     }
 
-    if((query.lastError().type() != QSqlError::NoError)){
+    if(!query.first()){
         qCritical()<<QString("Can not save user login info into database! Error: %1").arg(query.lastError().text());
         return false;
     }
 
+    userInfo->setLastLoginTime(query.value(0).toDateTime());
+
+    return true;
+
+}
+
+bool UsersManager::saveUserLastLogoutInfo(UserInfo* userInfo){
+    qDebug()<<"--UsersManager::saveUserLastLogoutInfo(...)";
+
+    if(!userInfo){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString imUserID = userInfo->getUserID();
+    QString loginTime = userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss");
+
+    QString statement = QString(" call sp_LogUserOut('%1', '%2') ; ").arg(imUserID).arg(loginTime);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not save user logout info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
 
     return true;
 
