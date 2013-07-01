@@ -262,17 +262,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString userID = peerID;
         QByteArray encryptedPassword;
         quint8 onlineStateCode = quint8(IM::ONLINESTATE_ONLINE);
-        quint16 internalListenningPort = 0;
-        in >> encryptedPassword >> onlineStateCode >> internalListenningPort;
+        in >> encryptedPassword >> onlineStateCode ;
         //        qDebug()<<"----onlineStateCode:"<<onlineStateCode;
 
         IM::ErrorType errorType = IM::ERROR_UnKnownError;
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
-
-            userInfo->setLastLoginExternalHostAddress(peerAddress.toString());
-            userInfo->setLastLoginExternalHostPort(peerPort);
-            //userInfo->setOnline();
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,

@@ -65,41 +65,41 @@ public slots:
     void parseIncomingPacketData(Packet *packet);
 
 
-//    void sendHeartbeatPacket(){
-//        qDebug()<<"----sendHeartbeatPacket()";
+    //    void sendHeartbeatPacket(){
+    //        qDebug()<<"----sendHeartbeatPacket()";
 
-//        if(serverTCPListeningAddress.isNull()){
-//            serverTCPListeningAddress = QHostAddress::Broadcast;
-//        }
+    //        if(serverTCPListeningAddress.isNull()){
+    //            serverTCPListeningAddress = QHostAddress::Broadcast;
+    //        }
 
-//        Packet *packet = new Packet(QString(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_RUDP_LISTENING_PORT), localIPMCListeningAddress.toString(), localIPMCListeningPort);
-//        packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
-//        QByteArray ba;
-//        QDataStream out(&ba, QIODevice::WriteOnly);
-//        out.setVersion(QDataStream::Qt_4_8);
-//        out << m_serverName;
-//        packet->setPacketData(ba);
-//        m_packetHandlerBase->appendOutgoingPacket(packet);
-
-
-//    }
+    //        Packet *packet = new Packet(QString(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_RUDP_LISTENING_PORT), localIPMCListeningAddress.toString(), localIPMCListeningPort);
+    //        packet->setPacketType(quint8(HEHUI::HeartbeatPacket));
+    //        QByteArray ba;
+    //        QDataStream out(&ba, QIODevice::WriteOnly);
+    //        out.setVersion(QDataStream::Qt_4_8);
+    //        out << m_serverName;
+    //        packet->setPacketData(ba);
+    //        m_packetHandlerBase->appendOutgoingPacket(packet);
 
 
-//    void sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
-//        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
+    //    }
 
-//        //Packet *packet = packetHandlerBase->getPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
-//        Packet *packet = PacketHandlerBase::getPacket(peerAddress, peerPort, localUDPListeningAddress, localUDPListeningPort);
-        
-//        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
-//        QByteArray ba;
-//        QDataStream out(&ba, QIODevice::WriteOnly);
-//        out.setVersion(QDataStream::Qt_4_8);
-//        out << m_serverName << packetSerialNumber << getLastReceivedPacketSN(peerID);
-//        packet->setPacketData(ba);
-//        m_packetHandlerBase->appendOutgoingPacket(packet);
 
-//    }
+    //    void sendConfirmationOfReceiptPacket(const QHostAddress peerAddress, quint16 peerPort, quint16 packetSerialNumber, const QString &peerID){
+    //        qDebug()<<"----sendConfirmationOfReceiptPacket(...)";
+
+    //        //Packet *packet = packetHandlerBase->getPacket(peerAddress, peerPort, localIPMCListeningAddress, localIPMCListeningPort);
+    //        Packet *packet = PacketHandlerBase::getPacket(peerAddress, peerPort, localUDPListeningAddress, localUDPListeningPort);
+
+    //        packet->setPacketType(quint8(HEHUI::ConfirmationOfReceiptPacket));
+    //        QByteArray ba;
+    //        QDataStream out(&ba, QIODevice::WriteOnly);
+    //        out.setVersion(QDataStream::Qt_4_8);
+    //        out << m_serverName << packetSerialNumber << getLastReceivedPacketSN(peerID);
+    //        packet->setPacketData(ba);
+    //        m_packetHandlerBase->appendOutgoingPacket(packet);
+
+    //    }
 
     bool sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort){
         qWarning()<<"--sendServerDeclarePacket(...)"<<" Peer Address:"<<peerAddress.toString()<<":"<<peerPort;
@@ -344,8 +344,8 @@ public slots:
     }
 
     bool sendClientLoginSucceededPacket(int peerSocketID, const QString &userID, const QByteArray &encryptedPassword, const QByteArray &sessionEncryptionKey,
-                                           quint32 personalInfoVersionOnServer, quint32 personalContactGroupsInfoVersionOnServer,
-                                           quint32 interestGroupInfoVersionOnServer, quint32 blacklistInfoVersionOnServer){
+                                        quint32 personalInfoVersionOnServer, quint32 personalContactGroupsInfoVersionOnServer,
+                                        quint32 interestGroupInfoVersionOnServer, quint32 blacklistInfoVersionOnServer){
 
         qDebug()<<"--sendClientLoginSucceededPacket(...)";
         
@@ -377,7 +377,7 @@ public slots:
     }
 
     bool sendUserInfoPacket(int peerSocketID, const QString &userID, const QString &userInfo, const QByteArray &sessionEncryptionKey){
-    	qDebug()<<"--sendUserInfoPacket(...)";
+        qDebug()<<"--sendUserInfoPacket(...)";
         
         //TODO:用户信息的格式
         Packet *packet = PacketHandlerBase::getPacket();
@@ -463,7 +463,7 @@ public slots:
     void processUserOnlineStatusChanged(const  QString &userID, quint8 onlineStateCode, const QString &userHostAddress, quint16 userHostPort){
         //qDebug()<<"processUserOnlineStatusChanged(...)";
         
-        UserInfo *userInfo = getUserInfo(userID);        
+        UserInfo *userInfo = getUserInfo(userID);
         return processUserOnlineStatusChanged(userInfo, onlineStateCode, userHostAddress, userHostPort);
 
     }
@@ -476,12 +476,12 @@ public slots:
         userInfo->setOnlineState(IM::OnlineState(onlineStateCode));
         if(onlineStateCode == quint8(IM::ONLINESTATE_OFFLINE)){
             userOffline(userInfo);
-            saveUserLastLoginInfo(userInfo, userHostAddress, false);
+            saveUserLastLogoutInfo(userInfo);
             //saveUserInfoToDatabase(userInfo);
             m_userSocketsHash.remove(userInfo->getSocketID());
         }else{
             userOnline(userInfo);
-            saveUserLastLoginInfo(userInfo, userHostAddress, true);
+            saveUserLastLoginInfo(userInfo, userHostAddress, userHostPort);
         }
 
         //通知所有在线联系人
@@ -548,7 +548,7 @@ public slots:
     }
 
     bool sendSearchResultPacket(int peerSocketID, const QStringList &users, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
-    	qDebug()<<"--sendSearchResultPacket(...)";
+        qDebug()<<"--sendSearchResultPacket(...)";
         
         //TODO:搜索结果的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -774,7 +774,7 @@ public slots:
 
 
     bool sendCachedChatMessagesPacket(int peerSocketID, const QStringList &messages, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
-    	qDebug()<<"--sendCachedChatMessagesPacket(...)";
+        qDebug()<<"--sendCachedChatMessagesPacket(...)";
         
         //TODO:缓存消息的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -837,15 +837,15 @@ public slots:
 
 private slots:
     //HeartbeatPacket: PacketType+ComputerName
-//    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
-//    void stopHeartbeat();
+    //    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
+    //    void stopHeartbeat();
 
     int crypto(QByteArray *destination, const QByteArray &source, const QByteArray &key, bool encrypt);
 
     bool encrypeData(const QString &userID, QByteArray *destination, const QByteArray &source);
     bool decryptData(const QString &userID, QByteArray *destination, const QByteArray &source);
 
-//    void slotCheckIMUsersOnlineStatus();
+    //    void slotCheckIMUsersOnlineStatus();
 
     void peerDisconnected(int socketID);
 
@@ -868,15 +868,15 @@ private:
 
 
 private:
-//    QHostAddress serverTCPListeningAddress;
-//    quint16 serverTCPListeningPort;
+    //    QHostAddress serverTCPListeningAddress;
+    //    quint16 serverTCPListeningPort;
     QString m_serverName;
     quint16 m_localRTPListeningPort;
 
 
 
 
-//    QTimer *heartbeatTimer;
+    //    QTimer *heartbeatTimer;
     //        QTimer *processWaitingForReplyPacketsTimer;
 
     UDPServer *m_ipmcServer;
