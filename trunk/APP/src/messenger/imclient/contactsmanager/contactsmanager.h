@@ -118,7 +118,7 @@ public slots:
     bool getMyInfoFormLocalDatabase();
     bool saveMyInfoToDatabase();
 
-    bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
+    bool setContactInfoString(const QString &contactID, const QString &contactInfoString, bool summaryInfo);
     bool getContactInfoFormLocalDatabase(const QString &contactID);
     bool saveContactInfoToDatabase(const QString &contactID);
 

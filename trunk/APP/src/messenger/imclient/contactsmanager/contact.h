@@ -61,7 +61,7 @@ public:
     void setContactGroupID(quint32 contactGroupID)
     {
         this->contactGroupID = contactGroupID;
-        addUpdatedProperty(IM::PI_ContactGroupID, QString::number(contactGroupID));
+        addUpdatedPersonalInfoProperty(IM::PI_ContactGroupID, QString::number(contactGroupID));
     }
 
     //    quint32 getInterestGroupID() const
@@ -81,7 +81,7 @@ public:
     void setRemarkName(const QString &remarkName){
         qDebug()<<"---setRemarkName()";
         this->m_remarkName = remarkName;
-        addUpdatedProperty(IM::PI_RemarkName, "'" + m_remarkName + "'");
+        addUpdatedPersonalInfoProperty(IM::PI_RemarkName, "'" + m_remarkName + "'");
     }
 
 

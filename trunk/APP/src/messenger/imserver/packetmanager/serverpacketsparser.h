@@ -343,8 +343,8 @@ public slots:
 
     }
 
-    bool sendClientLoginSucceededPacket(int peerSocketID, const QString &userID, const QByteArray &encryptedPassword, const QByteArray &sessionEncryptionKey,
-                                        quint32 personalInfoVersionOnServer, quint32 personalContactGroupsInfoVersionOnServer,
+    bool sendClientLoginSucceededPacket(int peerSocketID, const QString &userID, const QByteArray &encryptedPassword, const QByteArray &sessionEncryptionKey, quint32 personalSummaryInfoVersion,
+                                        quint32 personalDetailInfoVersionOnServer, quint32 personalContactGroupsInfoVersionOnServer,
                                         quint32 interestGroupInfoVersionOnServer, quint32 blacklistInfoVersionOnServer){
 
         qDebug()<<"--sendClientLoginSucceededPacket(...)";
@@ -361,9 +361,9 @@ public slots:
         crypto(&encryptedData, ba, encryptedPassword, true);
         ba.clear();
         out.device()->seek(0);
-        out << m_serverName << quint8(1) << encryptedData <<personalInfoVersionOnServer << personalContactGroupsInfoVersionOnServer << interestGroupInfoVersionOnServer << blacklistInfoVersionOnServer;
-        qWarning()<<"---encryptedData.size():"<<encryptedData.size() <<"--encryptedPassword:"<<encryptedPassword.toBase64();
-        qWarning()<<"---sessionEncryptionKey From Server:"<<sessionEncryptionKey.toBase64();
+        out << m_serverName << quint8(1) << encryptedData << personalSummaryInfoVersion << personalDetailInfoVersionOnServer << personalContactGroupsInfoVersionOnServer << interestGroupInfoVersionOnServer << blacklistInfoVersionOnServer;
+        //qWarning()<<"---encryptedData.size():"<<encryptedData.size() <<"--encryptedPassword:"<<encryptedPassword.toBase64();
+        //qWarning()<<"---sessionEncryptionKey From Server:"<<sessionEncryptionKey.toBase64();
 
         packet->setPacketData(ba);
 
@@ -376,18 +376,18 @@ public slots:
 
     }
 
-    bool sendUserInfoPacket(int peerSocketID, const QString &userID, const QString &userInfo, const QByteArray &sessionEncryptionKey){
+    bool sendUserInfoPacket(int peerSocketID, const QString &userID, const QString &userInfo, const QByteArray &sessionEncryptionKey, bool summaryInfo){
         qDebug()<<"--sendUserInfoPacket(...)";
         
         //TODO:用户信息的格式
         Packet *packet = PacketHandlerBase::getPacket();
-        packet->setPacketType(quint8(IM::SERVER_RESPONSE_USER_SUMMARY_INFO));
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_USER_INFO));
         packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << userInfo;
+        out << userInfo << quint8(summaryInfo?1:0);
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

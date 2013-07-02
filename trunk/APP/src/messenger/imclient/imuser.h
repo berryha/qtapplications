@@ -43,7 +43,7 @@ public:
     bool loadMyInfoFromLocalDatabase();
     bool saveMyInfoToLocalDatabase();
 
-    bool setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo);
+    bool setContactInfoString(const QString &contactID, const QString &contactInfoString, bool summaryInfo);
     bool saveContactInfoToLocalDatabase(const QString &contactID);
 
     IM::OnlineState getStateAfterLoggedin() const;

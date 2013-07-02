@@ -279,21 +279,21 @@ public slots:
 
     }
 
-    bool requestContactInfo(int serverSocketID, const QString &contactID){
+    bool requestContactInfo(int serverSocketID, const QString &contactID, bool summaryInfo = true){
         qDebug()<<"--requestContactInfo(...)";
         
         QByteArray encryptedID;
         cryptography->teaCrypto(&encryptedID, contactID.toUtf8(), sessionEncryptionKey, true);
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::CLIENT_REQUEST_USER_SUMMARY_INFO));
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_USER_INFO));
         packet->setTransmissionProtocol(TP_RUDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
         
-        out << contactID;
+        out << contactID << quint8(summaryInfo?1:0);
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
@@ -1151,7 +1151,7 @@ signals:
     //void signalContactStateChangedPacketReceived(const QString &contactID, IM::OnlineState onlineState, const QString &contactHostAddress, quint16 contactHostPort);
     void signalContactStateChangedPacketReceived(const QString &contactID, quint8 onlineState, const QString &contactHostAddress, quint16 contactHostPort);
     void signalContactsOnlineInfoPacketReceived(const QString &contactsOnlineInfoString);
-    void signalUserInfoPacketReceived(const QString &userID, const QString &userInfo);
+    void signalUserInfoPacketReceived(const QString &userID/*, const QString &userInfo*/);
     void signalContactGroupsInfoPacketReceived(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
 
     void signalSearchContactsResultPacketReceived(const QStringList &users);
