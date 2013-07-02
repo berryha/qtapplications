@@ -1101,8 +1101,8 @@ private slots:
     }
 
 
-    bool updatePersonalContactGroupsInfo(int serverSocketID, bool uploadToServer){
-        //        qWarning()<<"--updatePersonalContactGroupsInfo(...)";
+    bool requestPersonalContactGroupsInfo(int serverSocketID){
+        //qWarning()<<"--requestPersonalContactGroupsInfo(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
         packet->setPacketType(quint8(IM::CONTACT_GROUPS_INFO));
@@ -1111,16 +1111,7 @@ private slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        if(uploadToServer){
-            out << user->getPersonalContactGroupsVersion() << user->getContactGroupsInfoString();
-            QByteArray encryptedData;
-            cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
-            ba.clear();
-            out.device()->seek(0);
-            out << m_myUserID << quint8(uploadToServer) << encryptedData;
-        }else{
-            out << m_myUserID << quint8(uploadToServer);
-        }
+        out << m_myUserID;
         packet->setPacketData(ba);
 
         ba.clear();
