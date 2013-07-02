@@ -317,8 +317,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         if(loginResultCode){
             QByteArray encryptedData;
-            quint32 personalInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, blacklistInfoVersionOnServer = 1;
-            in >> encryptedData >> personalInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> blacklistInfoVersionOnServer;
+            quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, blacklistInfoVersionOnServer = 1;
+            in >> encryptedData >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> blacklistInfoVersionOnServer;
 
             QByteArray decryptedData;
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
@@ -335,7 +335,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             //TODO:
             user->loadMyInfoFromLocalDatabase();
 
-            if(personalInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID);}
+            if(personalSummaryInfoVersionOnServer != user->getPersonalSummaryInfoVersion()){requestContactInfo(socketID, m_myUserID, true);}
+            if(personalDetailInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
             if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){updatePersonalContactGroupsInfo(socketID, false);}
             if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
             //requestInterestGroupsList();
@@ -404,7 +405,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         break;
 
 
-    case quint8(IM::SERVER_RESPONSE_USER_SUMMARY_INFO):
+    case quint8(IM::SERVER_RESPONSE_USER_INFO):
     {
         qWarning()<<"--SERVER_RESPONSE_USER_SUMMARY_INFO";
         
@@ -421,17 +422,18 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString userInfo = "";
-        stream >> userInfo;
+        quint8 summaryInfo = 1;
+        stream >> userInfo >> summaryInfo;
         
         if(userID == user->getUserID()){
-            user->setPersonalSummaryInfo(userInfo);
+            user->setPersonalInfoString(userInfo, summaryInfo);
             user->saveMyInfoToLocalDatabase();
         }else{
-            user->setContactSummaryInfo(userID, userInfo);
+            user->setContactInfoString(userID, userInfo, summaryInfo);
             user->saveContactInfoToLocalDatabase(userID);
         }
 
-        emit signalUserInfoPacketReceived(userID, userInfo);
+        emit signalUserInfoPacketReceived(userID);
 
     }
         break;

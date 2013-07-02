@@ -1307,10 +1307,10 @@ bool ContactsManager::saveMyInfoToDatabase(){
     
 }
 
-bool ContactsManager::setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo){
+bool ContactsManager::setContactInfoString(const QString &contactID, const QString &contactInfoString, bool summaryInfo){
 
     if(contactHash.contains(contactID)){
-        contactHash.value(contactID)->setPersonalSummaryInfo(contactSummaryInfo);
+        contactHash.value(contactID)->setPersonalInfoString(contactInfoString, summaryInfo);
         return true;
     }
     

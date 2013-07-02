@@ -180,7 +180,7 @@ void ContactInfoWidget::on_lineEditNickName_editingFinished(){
     QString newNickName = ui.lineEditNickName->text();
     if(newNickName != m_user->getNickName()){
         m_user->setNickName(newNickName);
-        m_user->addUpdatedProperty(IM::PI_NickName, newNickName);
+        m_user->addUpdatedPersonalInfoProperty(IM::PI_NickName, newNickName);
     }
 
 }

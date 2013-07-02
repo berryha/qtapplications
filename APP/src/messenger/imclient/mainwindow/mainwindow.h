@@ -100,7 +100,7 @@ private slots:
     void slotProcessLoginResult(quint8 errorTypeCode);
     void slotProcessContactStateChanged(const QString &contactID, quint8 onlineStateCode, const QString &contactHostAddress, quint16 contactHostPort);
     void slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString);
-    void slotProcessUserInfo(const QString &userID, const QString &userInfo);
+    void slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/);
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
 
     //void slotProcessSearchContactsResult(const QString &users);

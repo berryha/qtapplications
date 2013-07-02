@@ -346,7 +346,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalLoginResultReceived(quint8)), this, SLOT(slotProcessLoginResult(quint8)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactStateChangedPacketReceived(const QString &, quint8, const QString &, quint16)), this, SLOT(slotProcessContactStateChanged(const QString &, quint8, const QString &, quint16)));
     connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )));
-    connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &, const QString &)), this, SLOT(slotProcessUserInfo(const QString &, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &)), this, SLOT(slotProcessUserInfo(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
@@ -1624,7 +1624,7 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
 
 }
 
-void MainWindow::slotProcessUserInfo(const QString &userID, const QString &userInfo){
+void MainWindow::slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/){
     qDebug()<<"--MainWindow::slotProcessUserInfo(...)";
 
     if(userID == imUser->getUserID()){
@@ -1637,8 +1637,8 @@ void MainWindow::slotProcessUserInfo(const QString &userID, const QString &userI
         //TODO
         Contact *contact = contactsManager->getUser(userID);
         if(!contact){return;}
-        contact->setPersonalSummaryInfo(userInfo);
-        contactsManager->saveContactInfoToDatabase(userID);
+//        contact->setPersonalInfoString(userInfo);
+//        contactsManager->saveContactInfoToDatabase(userID);
 
         quint32 contactGroupID = contact->getContactGroupID();
         if(contactGroupID){

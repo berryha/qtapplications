@@ -72,8 +72,8 @@ bool IMUser::saveMyInfoToLocalDatabase(){
     return ContactsManager::instance()->saveMyInfoToDatabase();
 }
 
-bool IMUser::setContactSummaryInfo(const QString &contactID, const QString &contactSummaryInfo){
-    return ContactsManager::instance()->setContactSummaryInfo(contactID, contactSummaryInfo);
+bool IMUser::setContactInfoString(const QString &contactID, const QString &contactInfoString, bool summaryInfo){
+    return ContactsManager::instance()->setContactInfoString(contactID, contactInfoString, summaryInfo);
 }
 
 bool IMUser::saveContactInfoToLocalDatabase(const QString &contactID){

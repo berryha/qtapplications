@@ -100,27 +100,44 @@ QByteArray IMUserBase::encryptedPassword() const{
 
 }
 
-void IMUserBase::addUpdatedProperty(IM::PropertyIDOfUser propertyID, const QString &value){
+void IMUserBase::addUpdatedPersonalInfoProperty(IM::PropertyIDOfUser propertyID, const QString &value, bool summaryInfo){
 
     QMutexLocker locker(updatedPropertiesMutex);
-    updatedProperties.insert(propertyID, value);
+    if(summaryInfo){
+        updatedSummaryInfoProperties.insert(propertyID, value);
+    }else{
+        updatedDetailInfoProperties.insert(propertyID, value);
+    }
     
 }
 
-QString IMUserBase::getUpdateSQLStatement() const{
+QString IMUserBase::getUpdateSQLStatement(bool summaryInfo) const{
     QMutexLocker locker(updatedPropertiesMutex);
     
     QStringList sqlstatements;
-    QList<IM::PropertyIDOfUser> keys = updatedProperties.keys();
-    foreach (IM::PropertyIDOfUser propertyID, keys) {
-        QString propertyName = databaseColumnName(propertyID);
-        if(propertyName.isEmpty()){
-            qCritical()<<QString("Unknown Property ID '%1'!").arg(propertyID);
-            continue;
+    if(summaryInfo){
+        QList<IM::PropertyIDOfUser> keys = updatedSummaryInfoProperties.keys();
+        foreach (IM::PropertyIDOfUser propertyID, keys) {
+            QString propertyName = databaseColumnName(propertyID);
+            if(propertyName.isEmpty()){
+                qCritical()<<QString("Unknown Property ID '%1'!").arg(propertyID);
+                continue;
+            }
+            sqlstatements.append(QString(propertyName + "=" + updatedSummaryInfoProperties.value(propertyID)));
         }
-        sqlstatements.append(QString(propertyName + "=" + updatedProperties.value(propertyID)));
+    }else{
+        QList<IM::PropertyIDOfUser> keys = updatedDetailInfoProperties.keys();
+        foreach (IM::PropertyIDOfUser propertyID, keys) {
+            QString propertyName = databaseColumnName(propertyID);
+            if(propertyName.isEmpty()){
+                qCritical()<<QString("Unknown Property ID '%1'!").arg(propertyID);
+                continue;
+            }
+            sqlstatements.append(QString(propertyName + "=" + updatedDetailInfoProperties.value(propertyID)));
+        }
+
     }
-    
+
     return sqlstatements.join(" , ");
     
 }
@@ -128,7 +145,8 @@ QString IMUserBase::getUpdateSQLStatement() const{
 void IMUserBase::clearUpdatedProperties(){
     QMutexLocker locker(updatedPropertiesMutex);
     
-    updatedProperties.clear();
+    updatedSummaryInfoProperties.clear();
+    updatedDetailInfoProperties.clear();
     
     
 }
@@ -272,7 +290,7 @@ void IMUserBase::clearUpdatedProperties(){
 quint32 IMUserBase::updatePersonalContactGroupsInfoVersion(){
     this->personalContactGroupsInfoVersion++;
     
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
 
     return personalContactGroupsInfoVersion;
 }
@@ -282,53 +300,156 @@ QString IMUserBase::getDefaultGroupName() const{
 }
 
 
-void IMUserBase::setPersonalSummaryInfo(const QString &personalSummaryInfo){
-    qDebug()<<"--IMUserBase::setPersonalSummaryInfo(...)"<<" personalSummaryInfo:"<<personalSummaryInfo;
+void IMUserBase::setPersonalInfoString(const QString &personalInfoString, bool summaryInfo){
+    qDebug()<<"--IMUserBase::setPersonalSummaryInfo(...)"<<" personalSummaryInfo:"<<personalInfoString;
     
-    QStringList infoList = personalSummaryInfo.split(QString(PACKET_DATA_SEPARTOR));
+    QStringList infoList = personalInfoString.split(QString(PACKET_DATA_SEPARTOR));
     if(infoList.at(0) != this->getUserID()){
         return;
     }
-    
-    QString nickNameString = infoList.at(1);
-    setNickName(nickNameString);
-    addUpdatedProperty(IM::PI_NickName, "'"+nickNameString+"'");
-    
-    QString genderString = infoList.at(2);
-    setGender(Gender(genderString.toUInt()));
-    addUpdatedProperty(IM::PI_Gender, genderString);
-    
-    QString ageString = infoList.at(3);
-    setAge(ageString.toUInt());
-    addUpdatedProperty(IM::PI_Age, ageString);
-    
-    QString faceString = infoList.at(4);
-    setFace(faceString);
-    addUpdatedProperty(IM::PI_Face, "'"+faceString+"'");
-    
-    QString friendshipApplyString = infoList.at(5);
-    setFriendshipApply(FriendshipApply(friendshipApplyString.toUInt()));
-    addUpdatedProperty(IM::PI_FriendshipApply, friendshipApplyString);
-    
-    QString personalSummaryInfoVersionString = infoList.at(6);
-    setPersonalSummaryInfoVersion(personalSummaryInfoVersionString.toUInt());
-    addUpdatedProperty(IM::PI_PersonalSummaryInfoVersion, personalSummaryInfoVersionString);
 
-    QString personalDetailInfoVersionString = infoList.at(7);
-    setPersonalDetailInfoVersion(personalDetailInfoVersionString.toUInt());
-    addUpdatedProperty(IM::PI_PersonalDetailInfoVersion, personalDetailInfoVersionString);
+    if(summaryInfo){
+
+        QString trueNameString = infoList.at(1);
+        setTrueName(trueNameString);
+        addUpdatedPersonalInfoProperty(IM::PI_TrueName, "'"+trueNameString+"'", summaryInfo);
+
+        QString nickNameString = infoList.at(2);
+        setNickName(nickNameString);
+        addUpdatedPersonalInfoProperty(IM::PI_NickName, "'"+nickNameString+"'", summaryInfo);
+
+        QString genderString = infoList.at(3);
+        setGender(Gender(genderString.toUInt()));
+        addUpdatedPersonalInfoProperty(IM::PI_Gender, genderString, summaryInfo);
+
+        QString ageString = infoList.at(4);
+        setAge(ageString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_Age, ageString, summaryInfo);
+
+        QString faceString = infoList.at(5);
+        setFace(faceString);
+        addUpdatedPersonalInfoProperty(IM::PI_Face, "'"+faceString+"'", summaryInfo);
+
+        QString personalContactGroupsVersionString = infoList.at(6);
+        setPersonalContactGroupsVersion(personalContactGroupsVersionString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, personalContactGroupsVersionString, summaryInfo);
+
+        QString interestGroupInfoString = infoList.at(7);
+        setInterestGroupInfoVersion(interestGroupInfoString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, interestGroupInfoString, summaryInfo);
+
+        QString blacklistInfoString = infoList.at(8);
+        setBlacklistInfoVersion(blacklistInfoString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, blacklistInfoString, summaryInfo);
+
+        QString personalSummaryInfoVersionString = infoList.at(9);
+        setPersonalSummaryInfoVersion(personalSummaryInfoVersionString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalSummaryInfoVersion, personalSummaryInfoVersionString, summaryInfo);
+
+        QString personalDetailInfoVersionString = infoList.at(10);
+        setPersonalDetailInfoVersion(personalDetailInfoVersionString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalDetailInfoVersion, personalDetailInfoVersionString, summaryInfo);
+
+        QString friendshipApplyString = infoList.at(11);
+        setFriendshipApply(FriendshipApply(friendshipApplyString.toUInt()));
+        addUpdatedPersonalInfoProperty(IM::PI_FriendshipApply, friendshipApplyString, summaryInfo);
+
+        QString shortTalkString = infoList.at(12);
+        setShortTalk(ShortTalk(shortTalkString.toUInt()));
+        addUpdatedPersonalInfoProperty(IM::PI_ShortTalk, shortTalkString, summaryInfo);
+
+        QString userRoleString = infoList.at(13);
+        setUserRole(userRoleString.toUInt());
+        addUpdatedPersonalInfoProperty(IM::PI_Role, userRoleString, summaryInfo);
+
+        QString descriptionString = infoList.at(14);
+        setDescription(descriptionString);
+        addUpdatedPersonalInfoProperty(IM::PI_Description, description, summaryInfo);
+
+        QString accountStateString = infoList.at(15);
+        setAccountState(AccountState(accountStateString.toUInt()));
+        addUpdatedPersonalInfoProperty(IM::PI_AccountState, accountStateString, summaryInfo);
+
+    }else{
+
+        QString homeAddressString = infoList.at(1);
+        setHomeAddress(homeAddressString);
+        addUpdatedPersonalInfoProperty(IM::PI_HomeAddress, "'"+homeAddressString+"'", summaryInfo);
+
+        QString homePhoneNumberString = infoList.at(2);
+        setHomePhoneNumber(homePhoneNumberString);
+        addUpdatedPersonalInfoProperty(IM::PI_HomePhoneNumber, "'"+homePhoneNumberString+"'", summaryInfo);
+
+        QString homeZipCodeString = infoList.at(3);
+        setHomeZipCode(homeZipCodeString);
+        addUpdatedPersonalInfoProperty(IM::PI_HomeZipCode, "'"+homeZipCodeString+"'", summaryInfo);
+
+        QString personalHomepageString = infoList.at(4);
+        setPersonalHomepage(personalHomepageString);
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalHomepage, "'"+personalHomepageString+"'", summaryInfo);
+
+        QString personalEmailAddressString = infoList.at(5);
+        setPersonalEmailAddress(personalEmailAddressString);
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalEmailAddress, "'"+personalEmailAddressString+"'", summaryInfo);
+
+        QString companyNameString = infoList.at(6);
+        setPersonalEmailAddress(companyNameString);
+        addUpdatedPersonalInfoProperty(IM::PI_CompanyName, "'"+companyNameString+"'", summaryInfo);
+
+        QString jobTitleString = infoList.at(7);
+        setJobTitle(jobTitleString);
+        addUpdatedPersonalInfoProperty(IM::PI_JobTitle, "'"+jobTitleString+"'", summaryInfo);
+
+        QString businessAddressString = infoList.at(8);
+        setBusinessAddress(businessAddressString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessAddress, "'"+businessAddressString+"'", summaryInfo);
+
+        QString businessPhoneNumberString = infoList.at(9);
+        setBusinessPhoneNumber(businessPhoneNumberString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessPhoneNumber, "'"+businessPhoneNumberString+"'", summaryInfo);
+
+        QString businessZipCodeString = infoList.at(10);
+        setBusinessZipCode(businessZipCodeString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessZipCode, "'"+businessZipCodeString+"'", summaryInfo);
+
+        QString businessFaxNumberString = infoList.at(11);
+        setBusinessFaxNumber(businessFaxNumberString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessFaxNumber, "'"+businessFaxNumberString+"'", summaryInfo);
+
+        QString businessHomepageString = infoList.at(12);
+        setBusinessHomepage(businessHomepageString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessHomepage, "'"+businessHomepageString+"'", summaryInfo);
+
+        QString businessEmailAddressString = infoList.at(13);
+        setBusinessEmailAddress(businessEmailAddressString);
+        addUpdatedPersonalInfoProperty(IM::PI_BusinessEmailAddress, "'"+businessEmailAddressString+"'", summaryInfo);
+
+    }
 
 
 }
 
-QString IMUserBase::getPersonalSummaryInfo() const{
+QString IMUserBase::getPersonalInfoString(bool requestSummaryInfo) const{
     QStringList infoList;
-    infoList << this->getUserID() << this->getNickName()
-             << QString::number(this->getGender()) << QString::number(getAge())
-             << this->getFace() << QString::number(this->getFriendshipApply())
-             << QString::number(getPersonalSummaryInfoVersion())
-             << QString::number(getPersonalDetailInfoVersion())
-                ;
+    if(requestSummaryInfo){
+        infoList << this->getUserID()
+                 << this->getTrueName() << this->getNickName()
+                 << QString::number(this->getGender()) << QString::number(getAge()) << this->getFace()
+                 << this->getPersonalContactGroupsVersion() << this->getInterestGroupInfoVersion()
+                 << this->getBlacklistInfoVersion() << this->getPersonalSummaryInfoVersion() << this->getPersonalDetailInfoVersion()
+                 << QString::number(this->getFriendshipApply()) << QString::number(this->getShortTalk()) << QString::number(this->getUserRole())
+                 << this->getdescription() << getAccountState()
+                    ;
+    }else{
+        infoList << this->getUserID()
+                 << this->getHomeAddress() << this->getHomePhoneNumber() << this->getHomeZipCode()
+                 << this->getPersonalHomepage() << this->getPersonalEmailAddress()
+                 << this->getCompanyName() << this->getJobTitle() << this->getBusinessAddress()
+                 << this->getBusinessPhoneNumber() << this->getBusinessZipCode() << this->getBusinessFaxNumber()
+                 << this->getBusinessHomepage() << this->getBusinessEmailAddress()
+                 //<< this->getRegistrationTime().toString("yyyy-MM-dd HH:mm:ss")
+                    ;
+    }
 
     return infoList.join(QString(PACKET_DATA_SEPARTOR));
 
@@ -413,7 +534,7 @@ bool IMUserBase::addOrDeleteContact(const QString &contactID, const QString &gro
     }
 
     updatePersonalContactGroupsInfoVersion();
-//    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    //    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
     
     return true;
 
@@ -441,7 +562,7 @@ bool IMUserBase::moveContact(const QString &contactID, const QString &oldGroupNa
     personalContactGroupsHash[newGroupName] = members;
     
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
     return true;
 
@@ -477,7 +598,7 @@ bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool j
 
     updateInterestGroupInfoVersion();
 
-    addUpdatedProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
 
     return true;
 }
@@ -485,7 +606,7 @@ bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool j
 quint32 IMUserBase::updateInterestGroupInfoVersion(){
 
     this->interestGroupInfoVersion++;
-    addUpdatedProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
 
     return interestGroupInfoVersion;
 
@@ -505,14 +626,14 @@ bool IMUserBase::addOrDeleteBlacklistedContact(const QString &contactID,  bool a
     }
 
     updateBlacklistInfoVersion();
-    addUpdatedProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
     
     return true;
 }
 
 quint32 IMUserBase::updateBlacklistInfoVersion(){
     this->blacklistInfoVersion++;
-    addUpdatedProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
 
     return blacklistInfoVersion;
 
@@ -528,7 +649,7 @@ void IMUserBase::setBlacklistInfoString(const QString &blacklistInfoString){
     }else{
         this->blacklist = blacklistInfoString.split(CONTACT_INFO_SEPARATOR);
     }
-    addUpdatedProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
 
 }
 

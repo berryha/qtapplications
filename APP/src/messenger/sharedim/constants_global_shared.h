@@ -158,8 +158,8 @@ enum Command {
 //    SERVER_RESPONSE_CLIENT__PERSONAL_INFO,
 
     CONTACT_GROUPS_INFO, //c s
-    CLIENT_REQUEST_USER_SUMMARY_INFO, //c
-    SERVER_RESPONSE_USER_SUMMARY_INFO, //s
+    CLIENT_REQUEST_USER_INFO, //c
+    SERVER_RESPONSE_USER_INFO, //s
 
 //    CLIENT_REQUEST_CONTACT_GROUPS_LIST,
 //    SERVER_RESPONSE__CONTACT_GROUPS_LIST,
@@ -281,7 +281,7 @@ enum PropertyIDOfUser{
 //    PI_InterestGroupsInfoString,
     PI_InterestGroupsInfoVersion,
     PI_BlacklistInfoVersion,
-    PI_Blacklist,
+//    PI_Blacklist,
 //    PI_PersonalInfoVersion,
     PI_PersonalDetailInfoVersion,
     PI_PersonalSummaryInfoVersion,

@@ -298,7 +298,7 @@ void UsersManager::updateUserPassword(const QString &userID, const QString &newP
     }
 
     userInfo->setPassword(newPassword);
-    userInfo->addUpdatedProperty(IM::PI_Password, "'"+newPassword+"'");
+    userInfo->addUpdatedPersonalInfoProperty(IM::PI_Password, "'"+newPassword+"'");
     
     if(saveUserInfoToDatabase(userInfo)){
         *errorType = IM::ERROR_NoError;        

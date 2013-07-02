@@ -70,8 +70,8 @@ public:
 
     QByteArray encryptedPassword() const;
     
-    void addUpdatedProperty(IM::PropertyIDOfUser propertyID, const QString &value);
-    QString getUpdateSQLStatement() const;
+    void addUpdatedPersonalInfoProperty(IM::PropertyIDOfUser propertyID, const QString &value, bool summaryInfo);
+    QString getUpdateSQLStatement(bool summaryInfo) const;
     void clearUpdatedProperties();
     
     virtual QString databaseColumnName(IM::PropertyIDOfUser propertyID) const = 0;
@@ -178,7 +178,7 @@ public:
 
     void setBlacklistInfoVersion(quint32 blacklistInfoVersion){
         this->blacklistInfoVersion = blacklistInfoVersion;
-        addUpdatedProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
     }
 
     void setBlacklist( const QStringList &blacklist){
@@ -188,14 +188,14 @@ public:
     void setPersonalContactGroupsVersion(quint32 personalContactGroupsVersion)
     {
         this->personalContactGroupsInfoVersion = personalContactGroupsVersion;
-        addUpdatedProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
 
     }
 
     void setInterestGroupInfoVersion(quint32 interestGroupInfoVersion)
     {
         this->interestGroupInfoVersion = interestGroupInfoVersion;
-        addUpdatedProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
 
     }
 
@@ -253,8 +253,8 @@ private:
 
 
 public slots:
-    void setPersonalSummaryInfo(const QString &personalSummaryInfo);
-    QString getPersonalSummaryInfo() const;
+    void setPersonalInfoString(const QString &personalInfoString, bool summaryInfo);
+    QString getPersonalInfoString(bool requestSummaryInfo) const;
 
     void setContactGroupsInfoString(const QString &contactGroupsInfo);
     virtual QString getContactGroupsInfoString() const;
@@ -306,7 +306,8 @@ private:
 
     QByteArray sessionEncryptionKey;
     
-    QHash<IM::PropertyIDOfUser/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
+    QHash<IM::PropertyIDOfUser/*Property ID*/, QString/*SQL Update Statement*/> updatedSummaryInfoProperties;
+    QHash<IM::PropertyIDOfUser/*Property ID*/, QString/*SQL Update Statement*/> updatedDetailInfoProperties;
     QMutex *updatedPropertiesMutex;
 
     

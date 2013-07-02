@@ -337,7 +337,7 @@ bool UserInfo::addGroup(const QString &groupName, const QStringList &members){
     setPersonalContactGroupsHash(personalContactGroups);
 
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
     return true;
 }
@@ -354,7 +354,7 @@ bool UserInfo::createOrDeleteGroup(const QString &groupName, bool create){
 
 
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
 
     return true;
@@ -371,7 +371,7 @@ bool UserInfo::updateGroupName(const QString &oldGroupName, const QString &newGr
     setPersonalContactGroupsHash(personalContactGroups);
 
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
 
     return true;
@@ -386,7 +386,7 @@ bool UserInfo::addContactToGroup(const QString &contactID, const QString &groupN
     setPersonalContactGroupsHash(personalContactGroups);
 
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
 
     return true;

@@ -270,7 +270,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(userInfo){
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
-            sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,
+            sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
                                            userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
 
@@ -394,17 +394,17 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::CLIENT_REQUEST_USER_SUMMARY_INFO):
+    case quint8(IM::CLIENT_REQUEST_USER_INFO):
     {
-        qDebug()<<"~~CLIENT_REQUEST_USER_SUMMARY_INFO";
+        qDebug()<<"~~CLIENT_REQUEST_USER_INFO";
 
         QString userID = peerID;
-        QByteArray encryptedUserID;
-        in >> encryptedUserID;
+        QByteArray encryptedData;
+        in >> encryptedData;
         //        qWarning()<<"userID:"<<userID << encryptedUserID.size();
         //解密数据
         QByteArray decryptedData;
-        if(!decryptData(userID, &decryptedData, encryptedUserID)){return;}
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         
         //QBuffer buf(&decryptedData);
         //buf.open(QIODevice::ReadOnly);
@@ -416,20 +416,21 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "";
-        stream >> contactID;
+        quint8 requestSummaryInfo = 1;
+        stream >> contactID >> requestSummaryInfo;
         //        qWarning()<<"contactID:"<<contactID;
 
-        QString userSummaryInfo = "";
+        QString userInfoString = "";
         UserInfo *userInfo = getUserInfo(userID);
         if(!userInfo){return;}
         if(userID == contactID){
-            userSummaryInfo = userInfo->getPersonalSummaryInfo();
+            userInfoString = userInfo->getPersonalInfoString(requestSummaryInfo);
         }else{
             UserInfo *contactInfo = getUserInfo(contactID);
             if(!contactInfo){return;}
-            userSummaryInfo = contactInfo->getPersonalSummaryInfo();
+            userInfoString = contactInfo->getPersonalInfoString(requestSummaryInfo);
         }
-        sendUserInfoPacket(socketID, contactID, userSummaryInfo, userInfo->getSessionEncryptionKey());
+        sendUserInfoPacket(socketID, contactID, userInfoString, userInfo->getSessionEncryptionKey(), requestSummaryInfo);
 
         //        emit signalUserRequestUserInfo(userID, encryptedUserID);
     }
