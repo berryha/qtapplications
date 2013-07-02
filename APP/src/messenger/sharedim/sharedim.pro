@@ -30,7 +30,8 @@ HEADERS += \
     resourcesmanager.h \
     filemanager.h \
     contactgroupbase.h \
-    interestgroupbase.h
+    interestgroupbase.h \
+    imgroupbase.h
 SOURCES += \
     imuserbase.cpp \
     udtprotocol.cpp \
@@ -39,7 +40,8 @@ SOURCES += \
     resourcesmanager.cpp \
     filemanager.cpp \
     contactgroupbase.cpp \
-    interestgroupbase.cpp
+    interestgroupbase.cpp \
+    imgroupbase.cpp
 FORMS += 
 RESOURCES += resources.qrc
 
