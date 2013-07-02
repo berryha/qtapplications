@@ -120,6 +120,7 @@ private:
     bool queryUserInfo(UserInfo *info);
 
     bool getUserInterestGroupsFromDatabase(UserInfo* info);
+    bool getUserPersonalContactGroupsFromDatabase(UserInfo* info);
 
 
     
@@ -129,6 +130,7 @@ private:
   
     InterestGroup * queryInterestGroup(quint32 groupID);
     bool queryInterestGroup(InterestGroup *info);
+
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
      
      

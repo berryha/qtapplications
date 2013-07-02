@@ -14,6 +14,8 @@ ContactGroupBase::ContactGroupBase(quint32 groupID, const QString &name)
     m_groupID = groupID;
     m_creatorName = "";
     m_groupName = name;
+    groupInfoVersion = 0;
+    memberListInfoVersion = 0;
 
 }
 

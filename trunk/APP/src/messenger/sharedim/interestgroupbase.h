@@ -17,14 +17,14 @@
 
 
 #include "constants_global_shared.h"
-
 #include "sharedimlib.h"
+#include "imgroupbase.h"
 
 
 
 namespace HEHUI {
 
-class SHAREDIMLIB_API InterestGroupBase : public QObject {
+class SHAREDIMLIB_API InterestGroupBase : public IMGroupBase {
     Q_OBJECT
 public:
     InterestGroupBase(quint32 groupID = 0, QObject *parent = 0);

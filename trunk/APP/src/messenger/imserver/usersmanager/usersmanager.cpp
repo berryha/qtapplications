@@ -1117,6 +1117,48 @@ bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
 
 }
 
+bool getUserPersonalContactGroupsFromDatabase(UserInfo* info){
+    if(!info){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    //QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
+    QString statement = QString("call sp_GetUserInterestGroups('%1') ").arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        //TODO:数据库重启，重新连接
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query.clear();
+            openDatabase(true);
+        }
+
+        return false;
+    }
+    if(query.first()){
+        info->setInterestGroups(query.value(0).toString().split(","));
+    }
+
+//    QStringList groups;
+//     while(query.next()){
+//        groups.append(query.value(0).toString());
+//     }
+//     info->setInterestGroups(groups);
+
+    return true;
+
+}
+
 bool UsersManager::saveUserInfoToDatabase(UserInfo *info){
     //TODO:
     if(!info){
