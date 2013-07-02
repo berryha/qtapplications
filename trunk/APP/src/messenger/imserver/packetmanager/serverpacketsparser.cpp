@@ -365,32 +365,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         qDebug()<<"~~CONTACT_GROUPS_INFO";
 
         QString userID =peerID;
-        quint8 uploadToServer = 0;
-        in >> uploadToServer;
 
         UserInfo *userInfo = getOnlineUserInfo(userID);
         if(!userInfo){return;}
-        if(uploadToServer){
-            QByteArray encryptedContactsGroupInfo;
-            in >> encryptedContactsGroupInfo;
 
-            //解密数据
-            QByteArray decryptedData;
-            if(!decryptData(userID, &decryptedData, encryptedContactsGroupInfo)){return;}
-            QDataStream stream(&decryptedData, QIODevice::ReadOnly);
-            stream.setVersion(QDataStream::Qt_4_7);
-            quint32 personalContactGroupsVersion = 0;
-            QString contactsGroupInfo = "";
-            stream >> personalContactGroupsVersion >> contactsGroupInfo;
-            if(personalContactGroupsVersion > userInfo->getPersonalContactGroupsVersion()){
-                userInfo->setPersonalContactGroupsVersion(personalContactGroupsVersion);
-                userInfo->setContactGroupsInfoString(contactsGroupInfo);
-            }
-
-        }else{
-            sendPersonalContactGroupsInfoPacket(socketID, userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
-        }
-
+        sendPersonalContactGroupsInfoPacket(socketID, userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
     }
         break;
 
