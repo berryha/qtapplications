@@ -77,8 +77,8 @@ public:
 
 
 public slots:
-    bool addGroup(const QString &groupName, const QStringList &members = QStringList());
-    bool createOrDeleteGroup(const QString &groupName, bool create);
+    bool addContactGroup(quint32 groupID, const QString &groupName, const QStringList &members = QStringList());
+    bool createOrDeleteContactGroup(const QString &groupName, bool create);
     bool updateGroupName(const QString &oldGroupName, const QString &newGroupName);
     bool addContactToGroup(const QString &contactID, const QString &groupName);
 

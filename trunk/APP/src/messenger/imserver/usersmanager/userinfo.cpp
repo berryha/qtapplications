@@ -331,7 +331,8 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 
 }
 
-bool UserInfo::addGroup(const QString &groupName, const QStringList &members){
+bool UserInfo::addContactGroup(quint32 groupID, const QString &groupName, const QStringList &members){
+
     QHash<QString, QStringList> personalContactGroups = getPersonalContactGroupsHash();
     personalContactGroups.insert(groupName, members);
     setPersonalContactGroupsHash(personalContactGroups);
@@ -342,7 +343,7 @@ bool UserInfo::addGroup(const QString &groupName, const QStringList &members){
     return true;
 }
 
-bool UserInfo::createOrDeleteGroup(const QString &groupName, bool create){
+bool UserInfo::createOrDeleteContactGroup(const QString &groupName, bool create){
     QHash<QString, QStringList> personalContactGroups = getPersonalContactGroupsHash();
     
     if(create){
