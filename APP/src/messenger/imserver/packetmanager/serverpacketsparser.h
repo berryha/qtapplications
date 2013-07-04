@@ -697,7 +697,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << getInterestGroupMembersInfoStringForUser(userInfo, group) << group->getMemberListInfoVersion() << groupID;
+        out << getInterestGroupMembersInfoStringForUser(userInfo, group) << group->getGroupMemberListInfoVersion() << groupID;
         QByteArray encryptedData;
         crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
         ba.clear();

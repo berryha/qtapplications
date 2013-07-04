@@ -246,7 +246,7 @@ bool ContactsManager::loadInterestGroups(){
         interestGroup->setCreationTime(QVariant(model->record(j).value("CreationTime")).toDateTime());
         interestGroup->setGroupInfoVersion(QVariant(model->record(j).value("GroupInfoVersion")).toUInt());
         
-        interestGroup->setMemberListInfoVersion(QVariant(model->record(j).value("MemberListVersion")).toUInt());
+        interestGroup->setGroupMemberListInfoVersion(QVariant(model->record(j).value("MemberListVersion")).toUInt());
         interestGroup->setDescription(QVariant(model->record(j).value("Description")).toString());
         interestGroup->setAnnouncement(QVariant(model->record(j).value("Announcement")).toString());
         interestGroup->setRemark(QVariant(model->record(j).value("Remark")).toString());

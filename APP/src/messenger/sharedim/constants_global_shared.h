@@ -344,13 +344,10 @@ enum PropertyIDOfGroup{
     //For Table InterestGroupMembers
     PIG_MemberSysID,
     PIG_MemberRole
-    
-    
-
-
-
 
 };
+
+
 
 enum RegistrationMode{
     RM_UserDefineAll,

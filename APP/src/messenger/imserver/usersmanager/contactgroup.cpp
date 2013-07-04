@@ -9,10 +9,10 @@
 
 namespace HEHUI {
 
-ContactGroup::ContactGroup(int groupID, const QString &groupName, const QString &creatorName, QList<UserInfo*> contactList, QObject *parent)
-    :ContactGroupBase(groupID, groupName), contactList(contactList)
+ContactGroup::ContactGroup(int groupID, const QString &groupName, QObject *parent)
+    :ContactGroupBase(groupID, groupName, parent)
 {
-    setCreator(creatorName);
+
 
 }
 

@@ -181,7 +181,7 @@ private:
     
     
     static QMutex *groupMutex;
-    static QHash<quint32/*Group ID*/, InterestGroup*> *groupHash;
+    static QHash<quint32/*Group ID*/, InterestGroup*> *m_interestGroupHash;
 
 
 };

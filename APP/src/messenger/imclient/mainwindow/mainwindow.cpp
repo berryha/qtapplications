@@ -2134,11 +2134,11 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
 
         InterestGroup *group = contactsManager->getInterestGroup(groupID);
         if(group){
-            qWarning()<<"Local: groupInfoVersion:"<<group->getGroupInfoVersion()<<" memberListInfoVersion:"<<group->getMemberListInfoVersion();
+            qWarning()<<"Local: groupInfoVersion:"<<group->getGroupInfoVersion()<<" memberListInfoVersion:"<<group->getGroupMemberListInfoVersion();
 
             if(groupInfoVersion != group->getGroupInfoVersion()){
                 clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, groupID);
-            }else if(memberListInfoVersion != group->getMemberListInfoVersion()){
+            }else if(memberListInfoVersion != group->getGroupMemberListInfoVersion()){
                 clientPacketsParser->requestInterestGroupMembersInfo(m_socketConnectedToServer, groupID);
             }
         }else{
@@ -2176,14 +2176,14 @@ void MainWindow::slotProcessInterestGroupInfo(const QString &interestGroupInfoFr
         return;
     }
     
-    quint32 oldMembersInfoVersion = interestGroup->getMemberListInfoVersion();
+    quint32 oldMembersInfoVersion = interestGroup->getGroupMemberListInfoVersion();
     
     interestGroup->setGroupInfoString(interestGroupInfoFromServer);
     qWarning()<<"interestGroupInfoFromServer:"<<interestGroupInfoFromServer;
     
-    if(oldMembersInfoVersion != interestGroup->getMemberListInfoVersion()){
+    if(oldMembersInfoVersion != interestGroup->getGroupMemberListInfoVersion()){
         clientPacketsParser->requestInterestGroupMembersInfo(m_socketConnectedToServer, groupID);
-        interestGroup->setMemberListInfoVersion(oldMembersInfoVersion);
+        interestGroup->setGroupMemberListInfoVersion(oldMembersInfoVersion);
     }
 
     updateInterestGroupInfoToUI(interestGroup);
@@ -2234,7 +2234,7 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
     
     if(!membersHash.isEmpty()){
         if(contactsManager->saveInterestGroupMembersToDatabase(interestGroup)){
-            interestGroup->setMemberListInfoVersion(interestGroupMembersInfoVersionOnServer);
+            interestGroup->setGroupMemberListInfoVersion(interestGroupMembersInfoVersionOnServer);
         }
     }
 

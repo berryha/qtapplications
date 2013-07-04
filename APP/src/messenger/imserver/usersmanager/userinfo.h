@@ -39,7 +39,7 @@
 #include <QMutex>
 
 #include "../../sharedim/imuserbase.h"
-
+#include "contactgroup.h"
 
 namespace HEHUI {
 
@@ -108,6 +108,8 @@ private:
     int m_socketID;
 
     quint32 m_sysID;
+
+    QHash<quint32 /*ContactGroup ID*/, ContactGroup*>m_contactGroupsHash;
 
 
 
