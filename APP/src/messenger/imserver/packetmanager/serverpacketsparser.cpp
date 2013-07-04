@@ -780,7 +780,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString oldGroupName = "", newGroupName = "";
         stream >> oldGroupName >> newGroupName;
 
-        userInfo->updateGroupName(oldGroupName, newGroupName);
+        userInfo->updateContactGroupName(oldGroupName, newGroupName);
 
     }
         break;
@@ -807,7 +807,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         bool create = true;
         stream >> groupName >> create;
 
-        userInfo->createOrDeleteGroup(groupName, create);
+        userInfo->createOrDeleteContactGroup(groupName, create);
 
     }
         break;
