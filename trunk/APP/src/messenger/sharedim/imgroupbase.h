@@ -27,13 +27,11 @@ namespace HEHUI {
 class SHAREDIMLIB_API IMGroupBase : public QObject {
     Q_OBJECT
 public:
-    IMGroupBase(quint32 groupID = 0, QObject *parent = 0);
+    IMGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~IMGroupBase();
     
     bool isNull();
-    bool hasMember(const QString &memberUserID);
-    quint32 memberRole(const QString &memberUserID);
-    
+
     QString getUpdateSQLStatement() const;
     void addUpdatedProperty(IM::PropertyIDOfGroup propertyID, const QString &value);
     void clearUpdatedProperties();
@@ -42,18 +40,7 @@ public:
     
 
 
-    void setGroupInfoString(const QString &infoString);
-    QString getGroupInfoString();
-    
-    void addMember(const QString &memberuserID, quint32 memberRole);   
-    void deleteMember(const QString &memberuserID);
 
-    QStringList members() const;
-    
- 
-    
-    
-    
     
 
 
@@ -80,7 +67,7 @@ public:
         return groupName;
     }
 
-    quint32 getMemberListInfoVersion() const
+    quint32 getGroupMemberListInfoVersion() const
     {
         return memberListInfoVersion;
     }
@@ -113,7 +100,7 @@ public:
         addUpdatedProperty(IM::PIG_GroupName, "'"+groupName+"'");  
     }
 
-    void setMemberListInfoVersion(quint32 memberListInfoVersion)
+    void setGroupMemberListInfoVersion(quint32 memberListInfoVersion)
     {
         this->memberListInfoVersion = memberListInfoVersion;
         addUpdatedProperty(IM::PIG_MemberListInfoVersion, QString::number(memberListInfoVersion));
@@ -134,13 +121,6 @@ private:
 
     QHash<IM::PropertyIDOfGroup/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
     QMutex *updatedPropertiesMutex;
-
-
-
-
-
-
-
 
 
 };

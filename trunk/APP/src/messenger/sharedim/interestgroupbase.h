@@ -27,29 +27,18 @@ namespace HEHUI {
 class SHAREDIMLIB_API InterestGroupBase : public IMGroupBase {
     Q_OBJECT
 public:
-    InterestGroupBase(quint32 groupID = 0, QObject *parent = 0);
+    InterestGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~InterestGroupBase();
-    
-    bool isNull();
-    bool hasMember(const QString &memberUserID);
-    quint32 memberRole(const QString &memberUserID);
-    
-    QString getUpdateSQLStatement() const;
-    void addUpdatedProperty(IM::PropertyIDOfGroup propertyID, const QString &value);
-    void clearUpdatedProperties();
-    
-    virtual QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
     
     void setGroupInfoString(const QString &infoString);
     QString getGroupInfoString();
     
     void addMember(const QString &memberuserID, quint32 memberRole);   
     void deleteMember(const QString &memberuserID);
-
+    bool hasMember(const QString &memberUserID);
     QStringList members() const;
-    
- 
-    
+    quint32 memberRole(const QString &memberUserID);
+
     
     
     
@@ -65,42 +54,14 @@ public:
         return creationTime;
     }
 
-    QString getCreatorID() const
-    {
-        return creatorID;
-    }
-
     QString getDescription() const
     {
         return description;
     }
 
-    quint32 getGroupID() const
-    {
-        return groupID;
-    }
-
-    quint32 getGroupInfoVersion() const
-    {
-        return groupInfoVersion;
-    }
-
-    QString getGroupName() const
-    {
-        if(groupName.trimmed().isEmpty()){
-            return QString::number(groupID);
-        }
-        return groupName;
-    }
-
     quint32 getGroupTypeID() const
     {
         return groupTypeID;
-    }
-
-    quint32 getMemberListInfoVersion() const
-    {
-        return memberListInfoVersion;
     }
 
     QHash<QString,quint32> getMembersHash() const
@@ -136,13 +97,6 @@ public:
         
     }
 
-    void setCreatorID(const QString &creatorID)
-    {
-        this->creatorID = creatorID;
-        addUpdatedProperty(IM::PIG_CreatorID, "'"+creatorID+"'");
-        
-    }
-
     void setDescription(QString description)
     {
         this->description = description;
@@ -150,24 +104,6 @@ public:
         
     }
 
-    void setGroupID(quint32 groupID)
-    {
-        this->groupID = groupID;
-    }
-
-    void setGroupInfoVersion(quint32 groupInfoVersion)
-    {
-        this->groupInfoVersion = groupInfoVersion;
-        addUpdatedProperty(IM::PIG_GroupInfoVersion, QString::number(groupInfoVersion));
-        
-    }
-
-    void setGroupName(QString groupName)
-    {
-        this->groupName = groupName;
-        addUpdatedProperty(IM::PIG_GroupName, "'"+groupName+"'");
-        
-    }
 
     void setGroupTypeID(quint32 groupTypeID)
     {
@@ -176,11 +112,6 @@ public:
         
     }
 
-    void setMemberListInfoVersion(quint32 memberListInfoVersion)
-    {
-        this->memberListInfoVersion = memberListInfoVersion;
-        addUpdatedProperty(IM::PIG_MemberListInfoVersion, QString::number(memberListInfoVersion));
-    }
 
     void setMembersHash(QHash<QString,quint32> membersHash)
     {
@@ -212,14 +143,9 @@ protected:
 
 private:
     
-    quint32 groupID;
     quint32 groupTypeID;
     quint32 parentGroupID;
-    QString groupName;
-    QString creatorID;
     QDateTime creationTime;
-    quint32 groupInfoVersion;
-    quint32 memberListInfoVersion;
     
     QString description;
     QString announcement;
@@ -229,17 +155,6 @@ private:
 
 
     QHash <QString/*Member's ID*/, quint32/*Member's Role*/> membersHash;
-
-
-    QHash<IM::PropertyIDOfGroup/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
-    QMutex *updatedPropertiesMutex;
-
-
-
-
-
-
-
 
 
 };

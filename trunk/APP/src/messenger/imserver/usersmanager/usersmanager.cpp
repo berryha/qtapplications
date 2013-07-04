@@ -64,7 +64,7 @@ QHash<QString/*User ID*/, UserInfo*> * UsersManager::offlineUserInfoHash = new Q
 
 
 QMutex * UsersManager::groupMutex = new QMutex();
-QHash<quint32/*Group ID*/, InterestGroup*> * UsersManager::groupHash = new QHash<quint32, InterestGroup*> ();
+QHash<quint32/*Group ID*/, InterestGroup*> * UsersManager::m_interestGroupHash = new QHash<quint32, InterestGroup*> ();
 
 
 
@@ -1128,25 +1128,17 @@ bool getUserPersonalContactGroupsFromDatabase(UserInfo* info){
         }
     }
     QSqlQuery query(db);
-    //QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
-    QString statement = QString("call sp_GetUserInterestGroups('%1') ").arg(info->getUserID());
+    QString statement = QString("call sp_GetUserContactGroups('%1') ").arg(info->getUserID());
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
     if(query.first()){
-        info->setInterestGroups(query.value(0).toString().split(","));
+        info->setContactGroupsInfoString(query.value(0).toString().split(","));
     }
 
 //    QStringList groups;
@@ -1378,7 +1370,7 @@ QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
             qDebug()<<"invalid group";
             return "";
         }
-        infoList.append(groupID + ":" + QString::number(group->getGroupInfoVersion()) + ":" + QString::number(group->getMemberListInfoVersion()));
+        infoList.append(groupID + ":" + QString::number(group->getGroupInfoVersion()) + ":" + QString::number(group->getGroupMemberListInfoVersion()));
     }
     
     return infoList.join(",");
@@ -1561,15 +1553,15 @@ InterestGroup* UsersManager::getInterestGroup(quint32 groupID){
         return 0;
     }
     
-    Group * Group = 0;
-    if(groupHash->contains(groupID)){
-        Group = groupHash->value(groupID);
+    InterestGroup * group = 0;
+    if(m_interestGroupHash->contains(groupID)){
+        group = m_interestGroupHash->value(groupID);
     }else{
-        Group = queryInterestGroup(groupID);
+        group = queryInterestGroup(groupID);
     }
     
 
-    return Group;
+    return group;
 
 }
 
@@ -2056,7 +2048,7 @@ bool UsersManager::queryInterestGroup(InterestGroup *info){
     info->setCreationTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_CreationTime)))).toDateTime());
 
     info->setGroupInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_GroupInfoVersion)))).toUInt());
-    info->setMemberListInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_MemberListInfoVersion)))).toUInt());
+    info->setGroupMemberListInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_MemberListInfoVersion)))).toUInt());
     info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Description)))).toString());
     info->setAnnouncement(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Announcement)))).toString());
     info->setRemark(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Remark)))).toString());
