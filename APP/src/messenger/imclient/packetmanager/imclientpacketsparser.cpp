@@ -337,7 +337,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
             if(personalSummaryInfoVersionOnServer != user->getPersonalSummaryInfoVersion()){requestContactInfo(socketID, m_myUserID, true);}
             if(personalDetailInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
-            if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID, false);}
+            if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
             if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
             if(blacklistInfoVersionOnServer != user->getBlacklistInfoVersion()){requestBlacklistInfo(socketID);}
 

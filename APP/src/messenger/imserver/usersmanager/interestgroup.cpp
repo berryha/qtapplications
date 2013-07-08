@@ -22,7 +22,7 @@ InterestGroup::~InterestGroup() {
 	// TODO Auto-generated destructor stub
 }
 
-QString InterestGroup::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
+QString InterestGroup::databaseColumnName(IM::PropertyIDOfGroup propertyID){
     
     QString columnName = "";
     switch(propertyID){

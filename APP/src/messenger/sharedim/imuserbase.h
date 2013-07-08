@@ -178,7 +178,7 @@ public:
 
     void setBlacklistInfoVersion(quint32 blacklistInfoVersion){
         this->blacklistInfoVersion = blacklistInfoVersion;
-        addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion), true);
     }
 
     void setBlacklist( const QStringList &blacklist){
@@ -188,14 +188,14 @@ public:
     void setPersonalContactGroupsVersion(quint32 personalContactGroupsVersion)
     {
         this->personalContactGroupsInfoVersion = personalContactGroupsVersion;
-        addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion), true);
 
     }
 
     void setInterestGroupInfoVersion(quint32 interestGroupInfoVersion)
     {
         this->interestGroupInfoVersion = interestGroupInfoVersion;
-        addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
+        addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion), true);
 
     }
 
@@ -237,7 +237,7 @@ public:
     void setAccountState(AccountState state){
         this->accountState = state;
     }
-    AccountState getAccountState(){
+    AccountState getAccountState() const{
         return accountState;
     }
 

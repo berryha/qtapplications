@@ -290,7 +290,7 @@ void IMUserBase::clearUpdatedProperties(){
 quint32 IMUserBase::updatePersonalContactGroupsInfoVersion(){
     this->personalContactGroupsInfoVersion++;
     
-    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion), true);
 
     return personalContactGroupsInfoVersion;
 }
@@ -364,7 +364,7 @@ void IMUserBase::setPersonalInfoString(const QString &personalInfoString, bool s
 
         QString descriptionString = infoList.at(14);
         setDescription(descriptionString);
-        addUpdatedPersonalInfoProperty(IM::PI_Description, description, summaryInfo);
+        addUpdatedPersonalInfoProperty(IM::PI_Description, descriptionString, summaryInfo);
 
         QString accountStateString = infoList.at(15);
         setAccountState(AccountState(accountStateString.toUInt()));
@@ -435,10 +435,10 @@ QString IMUserBase::getPersonalInfoString(bool requestSummaryInfo) const{
         infoList << this->getUserID()
                  << this->getTrueName() << this->getNickName()
                  << QString::number(this->getGender()) << QString::number(getAge()) << this->getFace()
-                 << this->getPersonalContactGroupsVersion() << this->getInterestGroupInfoVersion()
-                 << this->getBlacklistInfoVersion() << this->getPersonalSummaryInfoVersion() << this->getPersonalDetailInfoVersion()
+                 << QString::number(this->getPersonalContactGroupsVersion()) << QString::number(this->getInterestGroupInfoVersion())
+                 << QString::number(this->getBlacklistInfoVersion()) << QString::number(this->getPersonalSummaryInfoVersion()) << QString::number(this->getPersonalDetailInfoVersion())
                  << QString::number(this->getFriendshipApply()) << QString::number(this->getShortTalk()) << QString::number(this->getUserRole())
-                 << this->getdescription() << getAccountState()
+                 << getdescription() << QString::number(getAccountState())
                     ;
     }else{
         infoList << this->getUserID()
@@ -562,7 +562,7 @@ bool IMUserBase::moveContact(const QString &contactID, const QString &oldGroupNa
     personalContactGroupsHash[newGroupName] = members;
     
     updatePersonalContactGroupsInfoVersion();
-    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
+//    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
 
     return true;
 
@@ -598,7 +598,7 @@ bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool j
 
     updateInterestGroupInfoVersion();
 
-    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
+//    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
 
     return true;
 }
@@ -606,13 +606,11 @@ bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool j
 quint32 IMUserBase::updateInterestGroupInfoVersion(){
 
     this->interestGroupInfoVersion++;
-    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoVersion, QString::number(interestGroupInfoVersion), true);
 
     return interestGroupInfoVersion;
 
 }
-
-
 
 bool IMUserBase::addOrDeleteBlacklistedContact(const QString &contactID,  bool addToBlacklist){
 
@@ -626,14 +624,14 @@ bool IMUserBase::addOrDeleteBlacklistedContact(const QString &contactID,  bool a
     }
 
     updateBlacklistInfoVersion();
-    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
+//    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
     
     return true;
 }
 
 quint32 IMUserBase::updateBlacklistInfoVersion(){
     this->blacklistInfoVersion++;
-    addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion));
+    addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion), true);
 
     return blacklistInfoVersion;
 
@@ -649,7 +647,7 @@ void IMUserBase::setBlacklistInfoString(const QString &blacklistInfoString){
     }else{
         this->blacklist = blacklistInfoString.split(CONTACT_INFO_SEPARATOR);
     }
-    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
+//    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
 
 }
 

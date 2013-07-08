@@ -22,7 +22,7 @@ namespace HEHUI {
 class InterestGroup : public InterestGroupBase {
     Q_OBJECT
 public:
-        InterestGroup(quint32 groupID = 0, QObject *parent = 0);
+    InterestGroup(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
 	virtual ~InterestGroup();
 
 
