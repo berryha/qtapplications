@@ -9,8 +9,8 @@
 
 namespace HEHUI {
 
-InterestGroup::InterestGroup(quint32 groupID, QObject *parent)
-    :InterestGroupBase(groupID, parent)
+InterestGroup::InterestGroup(quint32 groupID, const QString &groupName, QObject *parent)
+    :InterestGroupBase(groupID, groupName, parent)
 {
 	
 

@@ -106,9 +106,9 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //        columnName = "InterestGroupID";
 //        break;         
 
-    case IM::PI_PersonalInfoVersion:
-        columnName = "PersonalInfoVersion";
-        break; 
+//    case IM::PI_PersonalInfoVersion:
+//        columnName = "PersonalInfoVersion";
+//        break;
         
 
     case IM::PI_HomeAddress:
@@ -126,15 +126,15 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_PersonalEmailAddress:
         columnName = "PersonalEmailAddress";
         break;
-    case IM::PI_LastLoginTime:
-        columnName = "LastLoginTime";
-        break;
-    case IM::PI_LastLoginHostAddress:
-        columnName = "LastLoginHostAddress";
-        break;
-    case IM::PI_LastLoginHostPort:
-        columnName = "LastLoginHostPort";
-        break;
+//    case IM::PI_LastLoginTime:
+//        columnName = "LastLoginTime";
+//        break;
+//    case IM::PI_LastLoginHostAddress:
+//        columnName = "LastLoginHostAddress";
+//        break;
+//    case IM::PI_LastLoginHostPort:
+//        columnName = "LastLoginHostPort";
+//        break;
     case IM::PI_QuestionForSecurity:
         columnName = "QuestionForSecurity";
         break;

@@ -1959,7 +1959,7 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
 
     InterestGroup *group = contactsManager->getInterestGroup(interestGroupID);
     if(!group){
-        group = new InterestGroup(interestGroupID, this);
+        group = new InterestGroup(interestGroupID, "", this);
         //TODO:
         clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, interestGroupID);
         contactsManager->addNewInterestGroupToDatabase(group);
@@ -2142,7 +2142,7 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
                 clientPacketsParser->requestInterestGroupMembersInfo(m_socketConnectedToServer, groupID);
             }
         }else{
-            group = new InterestGroup(groupID, this);
+            group = new InterestGroup(groupID, "", this);
             contactsManager->addNewInterestGroupToDatabase(group);
             //TODO:
             clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, groupID);

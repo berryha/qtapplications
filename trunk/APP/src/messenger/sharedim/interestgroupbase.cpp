@@ -14,7 +14,7 @@
 namespace HEHUI {
 
 InterestGroupBase::InterestGroupBase(quint32 groupID, const QString &groupName, QObject *parent)
-    :QObject(groupID, groupName, parent)
+    :IMGroupBase(groupID, groupName, parent)
 {
 	
     groupTypeID = 0;
@@ -31,10 +31,6 @@ InterestGroupBase::~InterestGroupBase() {
 	// TODO Auto-generated destructor stub
 }
 
-bool InterestGroupBase::isNull(){
-    return ((groupID < 1) || (groupName.isEmpty()) || (creatorID.isEmpty()));
-}
-
 void InterestGroupBase::setGroupInfoString(const QString &infoString){
     if(infoString.trimmed().isEmpty()){
         return;
@@ -47,12 +43,12 @@ void InterestGroupBase::setGroupInfoString(const QString &infoString){
     setParentGroupID(infoList.at(2).toUInt());
     setCreatorID(infoList.at(3));
     setGroupName(infoList.at(4));
-    setCreationTime(QDateTime::fromString(infoList.at(5).toUInt(), "yyyy.MM.dd hh:mm:ss"));
+    setCreationTime(QDateTime::fromString(infoList.at(5), "yyyy.MM.dd hh:mm:ss"));
     setGroupInfoVersion(infoList.at(6).toUInt());
     setGroupMemberListInfoVersion(infoList.at(7).toUInt());
-    setDescription(infoList.at(8).toUInt());
-    setAnnouncement(infoList.at(9).toUInt());
-    setRemark(infoList.at(10).toUInt());
+    setDescription(infoList.at(8));
+    setAnnouncement(infoList.at(9));
+    setRemark(infoList.at(10));
 
     
 }

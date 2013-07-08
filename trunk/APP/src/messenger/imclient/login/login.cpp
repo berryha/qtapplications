@@ -208,7 +208,7 @@ bool Login::verifyUser() {
         user->setNickName(userNickName);
         user->setTrueName(userTrueName);
         user->setBusinessEmailAddress(email);
-        user->setLastLsetLastLoginExternalHostAddressinIP);
+//        user->setLastLsetLastLoginExternalHostAddressinIP);
         user->setLastLoginTime(lastLoginTime);
         user->setFace(face);
         user->setBusinessPhoneNumber(phone);

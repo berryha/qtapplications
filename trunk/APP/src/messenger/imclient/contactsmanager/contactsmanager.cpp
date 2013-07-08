@@ -237,7 +237,7 @@ bool ContactsManager::loadInterestGroups(){
 
     for (int j=0; j<model->rowCount(); j++) {
         quint32 groupID = QVariant(model->record(j).value("GroupID")).toUInt();
-        InterestGroup *interestGroup = new InterestGroup(groupID, this);
+        InterestGroup *interestGroup = new InterestGroup(groupID, "", this);
         interestGroup->setGroupTypeID(QVariant(model->record(j).value("TypeID")).toUInt());
         interestGroup->setParentGroupID(QVariant(model->record(j).value("ParentGroup")).toUInt());
         interestGroup->setCreatorID(QVariant(model->record(j).value("Creator")).toString());
@@ -1282,7 +1282,8 @@ bool ContactsManager::saveMyInfoToDatabase(){
     
     //IMUser *info = IMUser::instance();
     IMUser *info = m_imUser;
-    QString updateSQLStatement = info->getUpdateSQLStatement();
+    QString updateSQLStatement = info->getUpdateSQLStatement(true);
+    updateSQLStatement += " , " + info->getUpdateSQLStatement(false);
     if(updateSQLStatement.trimmed().isEmpty()){
         return false;
     }
@@ -1435,7 +1436,8 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
         qCritical()<<"Error! Contact '"<<contactID<<"' does not exist!";
         return false;
     }
-    QString updateSQLStatement = contact->getUpdateSQLStatement();
+    QString updateSQLStatement = contact->getUpdateSQLStatement(true);
+    updateSQLStatement += " , " + contact->getUpdateSQLStatement(false);
     if(updateSQLStatement.trimmed().isEmpty()){
         qCritical()<<"Error! Empty Update SQL Statement";
         return false;

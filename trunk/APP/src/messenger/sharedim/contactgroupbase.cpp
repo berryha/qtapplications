@@ -4,12 +4,12 @@
 
 namespace HEHUI {
 
-QString ContactGroupBase::Group_Blacklist_Name = tr("Blacklist");
-QString ContactGroupBase::Group_Friends_Name = tr("Friends");
-QString ContactGroupBase::Group_Strangers_Name = tr("Strangers");
+QString ContactGroupBase::Group_Blacklist_Name = QString(tr("Blacklist"));
+QString ContactGroupBase::Group_Friends_Name = QString(tr("Friends"));
+QString ContactGroupBase::Group_Strangers_Name = QString(tr("Strangers"));
 
 ContactGroupBase::ContactGroupBase(quint32 groupID, const QString &groupName, QObject *parent)
-    :IMGroupBase(groupID, groupName)
+    :IMGroupBase(groupID, groupName, parent)
 {
 
 

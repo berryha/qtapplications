@@ -231,12 +231,12 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_BlacklistInfoVersion:
         columnName = "BlacklistInfoVersion";
         break;
-    case IM::PI_Blacklist:
-        columnName = "Blacklist";
-        break;
-    case IM::PI_PersonalInfoVersion :
-        columnName = "PersonalInfoVersion";
-        break;  
+//    case IM::PI_Blacklist:
+//        columnName = "Blacklist";
+//        break;
+//    case IM::PI_PersonalInfoVersion :
+//        columnName = "PersonalInfoVersion";
+//        break;
                
 
     case IM::PI_HomeAddress:
@@ -254,15 +254,15 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_PersonalEmailAddress:
         columnName = "PersonalEmailAddress";
         break;
-    case IM::PI_LastLoginTime:
-        columnName = "LastLoginTime";
-        break;
-    case IM::PI_LastLoginHostAddress:
-        columnName = "LastLoginHostAddress";
-        break;
-    case IM::PI_LastLoginHostPort:
-        columnName = "LastLoginHostPort";
-        break;
+//    case IM::PI_LastLoginTime:
+//        columnName = "LastLoginTime";
+//        break;
+//    case IM::PI_LastLoginHostAddress:
+//        columnName = "LastLoginHostAddress";
+//        break;
+//    case IM::PI_LastLoginHostPort:
+//        columnName = "LastLoginHostPort";
+//        break;
     case IM::PI_QuestionForSecurity:
         columnName = "QuestionForSecurity";
         break;
@@ -300,9 +300,9 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_RegistrationTime:
         columnName = "RegistrationTime";
         break;
-    case IM::PI_LoginTimes:
-        columnName = "LoginTimes";
-        break;
+//    case IM::PI_LoginTimes:
+//        columnName = "LoginTimes";
+//        break;
     case IM::PI_FriendshipApply:
         columnName = "FriendshipApply";
         break;    

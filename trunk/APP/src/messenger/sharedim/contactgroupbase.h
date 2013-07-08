@@ -16,7 +16,9 @@ class SHAREDIMLIB_API ContactGroupBase : public IMGroupBase
 {
 public:
     enum DefaultGroupID{Group_Blacklist_ID = 0, Group_Friends_ID = 1, Group_Strangers_ID = 2};
-    static QString Group_Blacklist_Name, Group_Friends_Name, Group_Strangers_Name;
+    static QString Group_Blacklist_Name;
+    static QString Group_Friends_Name;
+    static QString Group_Strangers_Name;
 
     ContactGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
 
