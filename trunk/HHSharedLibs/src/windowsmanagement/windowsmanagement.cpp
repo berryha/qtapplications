@@ -656,7 +656,6 @@ bool WindowsManagement::initNewSitoyUser(){
             process.waitForFinished();
         }
 
-
     }
 
 
