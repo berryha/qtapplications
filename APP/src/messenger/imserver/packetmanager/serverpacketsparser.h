@@ -883,7 +883,7 @@ private:
     RTP *m_rtp;
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
-    QHash<int/*Socket ID*/, UserInfo*/*UserInfo*/> m_userSocketsHash;
+    QHash<int /*Socket ID*/, UserInfo* /*UserInfo*/> m_userSocketsHash;
 
 
     UsersManager usersManager;
