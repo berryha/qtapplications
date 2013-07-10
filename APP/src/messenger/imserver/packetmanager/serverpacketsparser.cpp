@@ -777,10 +777,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString oldGroupName = "", newGroupName = "";
-        stream >> oldGroupName >> newGroupName;
+        quint32 groupID = ;
+        QString newGroupName = "";
+        stream >> groupID >> newGroupName;
 
-        userInfo->updateContactGroupName(oldGroupName, newGroupName);
+        updateUserPersonalContactGroupName(groupID, newGroupName);
 
     }
         break;

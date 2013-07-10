@@ -95,16 +95,16 @@ QString IMGroupBase::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
         
     case IM::PIG_MemberListInfoVersion:
         columnName = "MemberListVersion";
-        break;  
+        break;
     case IM::PIG_Description:
         columnName = "Description";
-        break;         
+        break;
     case IM::PIG_Announcement:
         columnName = "Announcement";
-        break;  
+        break;
     case IM::PIG_Remark :
         columnName = "Remark";
-        break; 
+        break;
         
     default:
         columnName = "";

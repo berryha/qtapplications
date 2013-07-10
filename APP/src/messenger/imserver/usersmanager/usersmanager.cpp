@@ -1117,7 +1117,7 @@ bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
 
 }
 
-bool getUserPersonalContactGroupsFromDatabase(UserInfo* info){
+bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
     if(!info){
         return false;
     }
@@ -1148,6 +1148,39 @@ bool getUserPersonalContactGroupsFromDatabase(UserInfo* info){
 //     info->setInterestGroups(groups);
 
     return true;
+
+}
+
+bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName){
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("call sp_UpdateUserContactGroupName('%1', %2, '%3', @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
+    statement += QString(" select GroupInfoVersion; ");
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not update user contact group name ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+    if(query.first()){
+        info->setContactGroupsInfoSt(query.value(0).toUInt());
+    }
+
+//    QStringList groups;
+//     while(query.next()){
+//        groups.append(query.value(0).toString());
+//     }
+//     info->setInterestGroups(groups);
+
+    return true;
+
+
 
 }
 

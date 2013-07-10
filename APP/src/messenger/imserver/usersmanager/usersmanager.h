@@ -121,7 +121,7 @@ private:
 
     bool getUserInterestGroupsFromDatabase(UserInfo* info);
     bool getUserPersonalContactGroupsFromDatabase(UserInfo* info);
-
+    bool updateUserPersonalContactGroupName(const QString &userID, quint32 groupID, const QString &newGroupName);
 
     
     
