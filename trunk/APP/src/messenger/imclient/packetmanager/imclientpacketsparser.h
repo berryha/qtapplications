@@ -611,7 +611,7 @@ public slots:
 
     }
 
-    bool renameContactGroup(int serverSocketID, const QString &oldGroupName, const QString &newGroupName){
+    bool renameContactGroup(int serverSocketID, quint32 groupID, const QString &newGroupName){
         qDebug()<<"--renameContactGroup(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -621,7 +621,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << oldGroupName << newGroupName;
+        out << groupID << newGroupName;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

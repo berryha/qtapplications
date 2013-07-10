@@ -26,7 +26,7 @@ public:
     virtual ~InterestGroup();
 
 
-    static QString databaseColumnName(IM::PropertyIDOfGroup propertyID);
+    QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
 
 
 protected:
