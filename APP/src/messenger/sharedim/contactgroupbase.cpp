@@ -15,18 +15,22 @@ ContactGroupBase::ContactGroupBase(quint32 groupID, const QString &groupName, QO
 
 }
 
-void ContactGroupBase::setGroupInfoFromString(const QString &infoString, const QString &fieldSepartor){
+bool ContactGroupBase::setGroupInfoFromString(const QString &infoString, const QString &fieldSepartor){
     if(infoString.trimmed().isEmpty()){
-        return;
+        return false;
     }
 
     QStringList infoList = infoString.split(fieldSepartor);
+    if(infoList.size() != 4){
+        return false;
+    }
 
     setGroupID(infoList.at(0).toUInt());
     setGroupName(infoList.at(1));
     setGroupInfoVersion(infoList.at(2).toUInt());
     setGroupMemberListInfoVersion(infoList.at(3).toUInt());
 
+    return true;
 }
 
 QString ContactGroupBase::getGroupInfoAsString(const QString &fieldSepartor){

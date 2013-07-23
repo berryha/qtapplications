@@ -1025,7 +1025,7 @@ bool UsersManager::queryUserInfo(UserInfo *info){
 //    info->setInterestGroupsStringFromDatabase(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoString)))).toString());
     info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
     info->setBlacklistInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_BlacklistInfoVersion)))).toInt());
-    info->setBlacklistInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Blacklist)))).toString());
+//    info->setBlacklistInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Blacklist)))).toString());
     info->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
     info->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
     info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toString().toUInt()));
@@ -1128,7 +1128,8 @@ bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_GetUserContactGroups('%1') ").arg(info->getUserID());
+    QString fieldSepartor = ",";
+    QString statement = QString("call sp_GetUserContactGroups('%1', '%2'); ").arg(info->getUserID()).arg(fieldSepartor);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1138,7 +1139,7 @@ bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
         return false;
     }
     if(query.first()){
-        info->setContactGroupsInfoString(query.value(0).toString().split(","));
+        info->setContactGroupsInfoString(query.value(0));
     }
 
 //    QStringList groups;
@@ -1160,7 +1161,7 @@ bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 gr
     }
     QSqlQuery query(db);
     QString statement = QString("call sp_UpdateUserContactGroupName('%1', %2, '%3', @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
-    statement += QString(" select GroupInfoVersion; ");
+    statement += QString(" select @GroupInfoVersion; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not update user contact group name ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1169,7 +1170,7 @@ bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 gr
         return false;
     }
     if(query.first()){
-        info->setContactGroupsInfoSt(query.value(0).toUInt());
+        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
     }
 
 //    QStringList groups;

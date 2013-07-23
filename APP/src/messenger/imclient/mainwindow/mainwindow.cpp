@@ -1208,8 +1208,12 @@ void MainWindow::handleItemActivated(const QString &id){
     chatWindowManager->slotNewChatWithContact(id);
 }
 
-void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, const QPoint &global_mouse_pos, QMenu *contextMenu){
+void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, const QPoint &global_mouse_pos, QMenu *contextMenu){
     qDebug()<<"--MainWindow::handleContextMenuEventOnCategory(...)";
+
+    quint32 groupID = groupIDString.toUInt();
+    ContactGroup *contactGroup = contactsManager->getContactGroup(groupID);
+    if(!contactGroup){return;}
 
     m_userInfoTipWindow->hideUserInfoTip();
 
@@ -1222,7 +1226,7 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, con
         
         contextMenu->addAction(&actionRenameGroupName);
         
-        if(contactsManager->getContactGroupMembers(group_name).isEmpty()){
+        if(contactsManager->getContactGroupMembers(groupID).isEmpty()){
             contextMenu->addAction(&actionDeleteGroup);
         }
         
@@ -1235,7 +1239,7 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, con
             QString labelText = tr("New Name:\n(Only word-characters up to 16 are acceptable!)");
             QString newGroupName = QInputDialog::getText(this, tr("Rename Group"),
                                                          labelText, QLineEdit::Normal,
-                                                         group_name, &ok);
+                                                         contactGroup->getGroupName(), &ok);
             if (ok && !newGroupName.isEmpty()){
                 int pos = 0;
                 QRegExpValidator rxValidator(this);
@@ -1254,10 +1258,10 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, con
                     return;
                 }
 
-                clientPacketsParser->renameContactGroup(m_socketConnectedToServer, group_name, newGroupName);
+                clientPacketsParser->renameContactGroup(m_socketConnectedToServer, groupID, newGroupName);
 
-                contactsManager->renameGroupToDatabase(group_name, newGroupName);
-                contactsManager->renameGroupToUI(friendBox, group_name, newGroupName);
+                contactsManager->renameGroupToDatabase(groupID, newGroupName);
+                contactsManager->renameGroupToUI(friendBox, groupID, newGroupName);
             }
 
 
@@ -1268,13 +1272,13 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &group_name, con
             //}
             //TODO:
 
-            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, group_name, false);
+            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupIDString, false);
 
-            contactsManager->deleteGroupFromDatabase(group_name);
+            contactsManager->deleteGroupFromDatabase(groupIDString);
             //TODO?
             //imUser->saveMyInfoToLocalDatabase();
 
-            contactsManager->slotDeleteContactGroupFromUI(friendBox, group_name);
+            contactsManager->slotDeleteContactGroupFromUI(friendBox, groupIDString);
             
 
         }else if(action == &actionCreateNewGroup){
