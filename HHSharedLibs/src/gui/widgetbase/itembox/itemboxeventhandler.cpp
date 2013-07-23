@@ -33,13 +33,13 @@ void ItemBoxEventHandler::handleItemEntered(const QModelIndex & index ){
 
 }
 
-void ItemBoxEventHandler::handleContextMenuEventOnCategory(const QString &cat_name, const QPoint &global_mouse_pos, QMenu *contextMenu){
-    qDebug()<<"ItemBoxCore::handleContextMenuEventOnCategory(...)"<<" cat_name:"<<cat_name;
+void ItemBoxEventHandler::handleContextMenuEventOnCategory(const QString &cat_id, const QPoint &global_mouse_pos, QMenu *contextMenu){
+    qDebug()<<"ItemBoxCore::handleContextMenuEventOnCategory(...)"<<" cat_id:"<<cat_id;
 
 }
 
 void ItemBoxEventHandler::handleContextMenuEventOnItem(const QString &item_id, const QPoint &global_mouse_pos, QMenu *contextMenu){
-    qDebug()<<"ItemBoxCore::handleContextMenuEventOnCategory(...)"<<" item_id:"<<item_id;
+    qDebug()<<"ItemBoxCore::handleContextMenuEventOnItem(...)"<<" item_id:"<<item_id;
 
 }
 

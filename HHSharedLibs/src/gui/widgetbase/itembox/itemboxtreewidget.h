@@ -51,6 +51,7 @@
 //#include <QTimer>
 
 
+
 namespace HEHUI {
 
 class ItemBoxEventHandler;
@@ -74,27 +75,27 @@ public:
 
     int categoryCount() const;
     Category category(int cat_idx) const;
-    Category category(const QString &cat_name) const;
-    /*static*/ int findCategory(const QString &cat_name, const ItemBoxTreeWidget::CategoryList &list);
+    Category category(const QString &cat_id) const;
+    /*static*/ int findCategory(const QString &cat_id, const ItemBoxTreeWidget::CategoryList &list);
 
     void addCategory(const Category &cat);
     void removeCategory(int cat_idx);
-    void removeCategory(const QString &cat_name);
+    void removeCategory(const QString &cat_id);
 
-    void updateCategoryName(const QString &old_cat_name, const QString &new_cat_name);
+    void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 
     int itemCount(int cat_idx) const;
     Item item(int cat_idx, int item_idx) const;
-    Item item(const QString &cat_name, const QString &item_id) const;
+    Item item(const QString &cat_id, const QString &item_id) const;
 
     void addItem(int cat_idx, const Item &item);
-    void addItem(const QString &cat_name, const Item &item);
+    void addItem(const QString &cat_id, const Item &item);
 
     void removeItem(int cat_idx, int wgt_idx);
-    void removeItem(const QString &cat_name, const QString &item_id);
+    void removeItem(const QString &cat_id, const QString &item_id);
 
     void moveItem(int old_cat_idx, int new_cat_idx, const QString &item_id);
-    void moveItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id);
+    void moveItem(const QString &old_cat_id, const QString &new_cat_id, const QString &item_id);
 
 
 //    void dropItems(const QList<ItemBoxWidgetInterface *> &item_list);
@@ -109,9 +110,9 @@ public:
 
 //    void setLoadMode(ItemBoxWidgetBase::LoadMode loadMode);
 
-    bool updateItemName(const QString &cat_name, const QString &item_id, const QString &itemName);
-    bool updateItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon);
-    bool updateItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName);
+    bool updateItemName(const QString &cat_id, const QString &item_id, const QString &itemName);
+    bool updateItemIcon(const QString &cat_id, const QString &item_id, const QIcon &icon);
+    bool updateItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
 
 
 signals:
@@ -137,7 +138,7 @@ private slots:
 private:
     ItemBoxCategoryListView *addCategoryView(QTreeWidgetItem *parent, bool iconMode);
     ItemBoxCategoryListView *categoryViewAt(int idx) const;
-    ItemBoxCategoryListView *categoryView(const QString &cat_name) const;
+    ItemBoxCategoryListView *categoryView(const QString &cat_id) const;
 
     void adjustSubListSize(QTreeWidgetItem *cat_item);
 
@@ -147,7 +148,7 @@ private:
 //    CategoryList loadCustomCategoryList() const;
 //    void writeCategories(QXmlStreamWriter &writer, const CategoryList &cat_list) const;
 
-    int indexOfCategory(const QString &name) const;
+    int indexOfCategory(const QString &cat_id) const;
     int indexOfScratchpad() const;
     int ensureScratchpad();
 //    void addCustomCategories(bool replace);
