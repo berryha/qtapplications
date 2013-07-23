@@ -110,6 +110,8 @@ public:
     bool saveCachedInterestGroupChatMessageFromIMUser(const QString &senderID, quint32 interestGroupID, const QString &message);
     QStringList cachedInterestGroupChatMessagesForIMUser(UserInfo* userInfo);
 
+    bool updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName);
+
     
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
     
@@ -121,10 +123,8 @@ private:
 
     bool getUserInterestGroupsFromDatabase(UserInfo* info);
     bool getUserPersonalContactGroupsFromDatabase(UserInfo* info);
-    bool updateUserPersonalContactGroupName(const QString &userID, quint32 groupID, const QString &newGroupName);
 
-    
-    
+
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
   

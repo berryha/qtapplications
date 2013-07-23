@@ -48,13 +48,15 @@ public:
 
 
     QString getContactGroupsInfoString() const;
-    ContactGroup * getContactGroup(int personalContactGroupID);
+    ContactGroup * getContactGroup(quint32 personalContactGroupID);
 
     bool hasFriendContact(const QString &contactID);
     bool hasUserInfo(const QString &userID);
     Contact * getUser(const QString &contactID);
 
     QList<Contact*> getContactGroupMembers(const QString &contactGroupName);
+    QList<Contact*> getContactGroupMembers(quint32 contactGroupID);
+
     QStringList getContacts() const;
     QStringList getStrangers() const;
     QStringList getUsers() const;
@@ -95,7 +97,7 @@ public slots:
     void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 
 
-    void renameGroupToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName);
+    void renameGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
 
 
     bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
@@ -108,10 +110,10 @@ public slots:
 
 
 
-    int getPersonalContactGroupID(const QString &groupName);
+    quint32 getPersonalContactGroupID(const QString &groupName);
     QString getPersonalContactGroupName(int personalContactGroupID) ;
     int slotAddNewContactGroupToDatabase(const QString &groupName);
-    bool renameGroupToDatabase(const QString &old_groupName, const QString &new_groupName);
+    bool renameGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteGroupFromDatabase(const QString &groupName);
 
 
@@ -154,10 +156,10 @@ private:
     QString userPrivateDataFilePath;
     QSqlDatabase localUserDataDB;
 
-    QHash<int/*Grup ID*/, ContactGroup*> contactGroupHash;
+    QHash<quint32/*Grup ID*/, ContactGroup*> contactGroupHash;
     QHash<QString/*Contact ID*/, Contact*> contactHash;
 
-    QHash<int/*Grup ID*/, InterestGroup*> interestGroupsHash;
+    QHash<quint32/*Grup ID*/, InterestGroup*> interestGroupsHash;
 
     IMUser *m_imUser;
 

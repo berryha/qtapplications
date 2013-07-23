@@ -40,6 +40,7 @@
 
 #include "constants_global_shared.h"
 #include "sharedimlib.h"
+#include "contactgroupbase.h"
 
 
 
@@ -256,8 +257,8 @@ public slots:
     void setPersonalInfoString(const QString &personalInfoString, bool summaryInfo);
     QString getPersonalInfoString(bool requestSummaryInfo) const;
 
-    void setContactGroupsInfoString(const QString &contactGroupsInfo);
-    virtual QString getContactGroupsInfoString() const;
+    void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor, const QString &fieldSepartor);
+    virtual QString getContactGroupsInfoString(const QString &rowSepartor, const QString &fieldSepartor) const;
     virtual QStringList getContacts() const;
     bool addOrDeleteContact(const QString &contactID, const QString &groupName, bool add = true);
     bool moveContact(const QString &contactID, const QString &oldGroupName, const QString &newGroupName);
@@ -282,7 +283,9 @@ private:
 
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
-    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
+//    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
+    QHash<quint32/*Group ID*/, ContactGroupBase *> personalContactGroupsHash;
+
 
     //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
 

@@ -455,35 +455,52 @@ QString IMUserBase::getPersonalInfoString(bool requestSummaryInfo) const{
 
 }
 
-void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo){
+void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor, const QString &fieldSepartor){
     
+    foreach (ContactGroupBase *group, personalContactGroupsHash) {
+        personalContactGroupsHash.remove(group->getGroupID());
+        delete group;
+        group = 0;
+    }
+
     if(contactGroupsInfo.trimmed().isEmpty()){
-        //TODO:
-        personalContactGroupsHash.clear();
         return;
     }
     
-    QStringList groupsInfoList = contactGroupsInfo.split(QString(GROUP_INFO_SEPARATOR));
+    QStringList groupsInfoList = contactGroupsInfo.split(rowSepartor);
     for(int i=0; i<groupsInfoList.size(); i++) {
-        QStringList infoList = groupsInfoList.at(i).split(QString(CONTACT_INFO_SEPARATOR));
-        if(infoList.isEmpty()){continue;}
-        QString groupName = infoList.takeFirst();
-        personalContactGroupsHash.insert(groupName, infoList);
+        ContactGroupBase * contactGroup = new ContactGroupBase();
+        if(!contactGroup->setGroupInfoFromString(groupsInfoList.at(i), fieldSepartor)){
+            delete contactGroup;
+            contactGroup = 0;
+            continue;
+        }
+        personalContactGroupsHash.insert(contactGroup->getGroupID(), contactGroup);
     }
     
 
 }
 
-QString IMUserBase::getContactGroupsInfoString() const{
+QString IMUserBase::getContactGroupsInfoString(const QString &rowSepartor, const QString &fieldSepartor) const{
     
-    QStringList groupsInfo;
-    QStringList groups = personalContactGroupsHash.keys();
-    foreach (QString groupName, groups) {
-        QStringList members = personalContactGroupsHash.value(groupName);
-        groupsInfo.append(groupName + CONTACT_INFO_SEPARATOR + members.join(CONTACT_INFO_SEPARATOR));
+    if(personalContactGroupsHash.isEmpty()){
+        return "";
     }
 
-    return groupsInfo.join(GROUP_INFO_SEPARATOR);
+    QStringList groupsInfo;
+    foreach (ContactGroupBase *group, personalContactGroupsHash) {
+        groupsInfo.append(group->getGroupInfoAsString(fieldSepartor));
+    }
+    return groupsInfo.join(rowSepartor);
+
+
+//    QStringList groups = personalContactGroupsHash.keys();
+//    foreach (QString groupName, groups) {
+//        QStringList members = personalContactGroupsHash.value(groupName);
+//        groupsInfo.append(groupName + CONTACT_INFO_SEPARATOR + members.join(CONTACT_INFO_SEPARATOR));
+//    }
+
+//    return groupsInfo.join(GROUP_INFO_SEPARATOR);
 
 }
 
