@@ -67,22 +67,22 @@ public:
     virtual Category category(int cat_idx) const;
     virtual void addCategory(const Category &cat);
     virtual void removeCategory(int cat_idx);
-    virtual void removeCategory(const QString &cat_name);
-    virtual void updateCategoryName(const QString &old_cat_name, const QString &new_cat_name);
+    virtual void removeCategory(const QString &cat_id);
+    virtual void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 
 
     virtual int itemCount(int cat_idx) const;
     virtual Item item(int cat_idx, int wgt_idx) const;
-    virtual Item item(const QString &cat_name, const QString &item_id) const;
+    virtual Item item(const QString &cat_id, const QString &item_id) const;
 
     virtual void addItem(int cat_idx, const Item &itm);
-    virtual void addItem(const QString &cat_name, const Item &item);
+    virtual void addItem(const QString &cat_id, const Item &item);
 
     virtual void removeItem(int cat_idx, int wgt_idx);
-    virtual void removeItem(const QString &cat_name, const QString &item_id);
+    virtual void removeItem(const QString &cat_id, const QString &item_id);
 
     virtual void moveItem(int old_cat_idx, int new_cat_idx, const QString &item_id);
-    virtual void moveItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id);
+    virtual void moveItem(const QString &old_cat_id, const QString &new_cat_id, const QString &item_id);
 
 //    void dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint &global_mouse_pos);
 
@@ -94,9 +94,9 @@ public:
 //    virtual bool loadContents(const QString &contents);
     virtual QIcon iconForItem(const QString &itemID, const QString &category = QString()) const;
 
-    bool updateObjectItemName(const QString &cat_name, const QString &item_id, const QString &itemName);
-    bool updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon);
-    bool updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName);
+    bool updateObjectItemName(const QString &cat_id, const QString &item_id, const QString &itemName);
+    bool updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QIcon &icon);
+    bool updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
 
 
     void setFilterWidgetVisible(bool visible);

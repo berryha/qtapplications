@@ -155,12 +155,12 @@ void ItemBoxWidget::removeCategory(int cat_idx)
     m_treeWidget->removeCategory(cat_idx);
 }
 
-void ItemBoxWidget::removeCategory(const QString &cat_name){
-     m_treeWidget->removeCategory(cat_name);
+void ItemBoxWidget::removeCategory(const QString &cat_id){
+     m_treeWidget->removeCategory(cat_id);
 }
 
-void ItemBoxWidget::updateCategoryName(const QString &old_cat_name, const QString &new_cat_name){
-    m_treeWidget->updateCategoryName(old_cat_name, new_cat_name);
+void ItemBoxWidget::updateCategoryName(const QString &cat_id, const QString &new_cat_name){
+    m_treeWidget->updateCategoryName(cat_id, new_cat_name);
 }
 
 
@@ -174,9 +174,8 @@ ItemBoxWidgetInterface::Item ItemBoxWidget::item(int cat_idx, int wgt_idx) const
     return m_treeWidget->item(cat_idx, wgt_idx);
 }
 
-ItemBoxWidgetInterface::Item ItemBoxWidget::item(const QString &cat_name, const QString &item_id) const{
-    return m_treeWidget->item(cat_name, item_id);
-
+ItemBoxWidgetInterface::Item ItemBoxWidget::item(const QString &cat_id, const QString &item_id) const{
+    return m_treeWidget->item(cat_id, item_id);
 }
 
 void ItemBoxWidget::addItem(int cat_idx, const HEHUI::ItemBoxWidgetInterface::Item &itm)
@@ -184,8 +183,8 @@ void ItemBoxWidget::addItem(int cat_idx, const HEHUI::ItemBoxWidgetInterface::It
     m_treeWidget->addItem(cat_idx, itm);
 }
 
-void ItemBoxWidget::addItem(const QString &cat_name, const Item &item){
-    m_treeWidget->addItem(cat_name, item);
+void ItemBoxWidget::addItem(const QString &cat_id, const Item &item){
+    m_treeWidget->addItem(cat_id, item);
 }
 
 void ItemBoxWidget::removeItem(int cat_idx, int wgt_idx)
@@ -193,16 +192,16 @@ void ItemBoxWidget::removeItem(int cat_idx, int wgt_idx)
     m_treeWidget->removeItem(cat_idx, wgt_idx);
 }
 
-void ItemBoxWidget::removeItem(const QString &cat_name, const QString &item_id){
-    m_treeWidget->removeItem(cat_name, item_id);
+void ItemBoxWidget::removeItem(const QString &cat_id, const QString &item_id){
+    m_treeWidget->removeItem(cat_id, item_id);
 }
 
 void ItemBoxWidget::moveItem(int old_cat_idx, int new_cat_idx, const QString &item_id){
     m_treeWidget->moveItem(old_cat_idx, new_cat_idx, item_id);
 }
 
-void ItemBoxWidget::moveItem(const QString &old_cat_name, const QString &new_cat_name, const QString &item_id){
-    m_treeWidget->moveItem(old_cat_name, new_cat_name, item_id);
+void ItemBoxWidget::moveItem(const QString &old_cat_id, const QString &new_cat_id, const QString &item_id){
+    m_treeWidget->moveItem(old_cat_id, new_cat_id, item_id);
 }
 
 //void ItemBoxWidget::dropItems(const QList<ItemBoxWidgetInterface*> &item_list, const QPoint&)
@@ -268,16 +267,16 @@ QIcon ItemBoxWidget::iconForItem(const QString &itemID, const QString &category)
     return m_treeWidget->iconForItem(itemData.iconName());
 }
 
-bool ItemBoxWidget::updateObjectItemName(const QString &cat_name, const QString &item_id, const QString &itemName){
-    return m_treeWidget->updateItemName(cat_name, item_id, itemName);
+bool ItemBoxWidget::updateObjectItemName(const QString &cat_id, const QString &item_id, const QString &itemName){
+    return m_treeWidget->updateItemName(cat_id, item_id, itemName);
 }
 
-bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QIcon &icon){
-    return m_treeWidget->updateItemIcon(cat_name, item_id, icon);
+bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QIcon &icon){
+    return m_treeWidget->updateItemIcon(cat_id, item_id, icon);
 }
 
-bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_name, const QString &item_id, const QString &iconName){
-    return m_treeWidget->updateItemIcon(cat_name, item_id, iconName);
+bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName){
+    return m_treeWidget->updateItemIcon(cat_id, item_id, iconName);
 }
 
 void ItemBoxWidget::setFilterWidgetVisible(bool visible){
