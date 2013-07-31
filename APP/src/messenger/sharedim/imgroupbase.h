@@ -106,6 +106,11 @@ public:
         addUpdatedProperty(IM::PIG_MemberListInfoVersion, QString::number(memberListInfoVersion));
     }
 
+    void updateMemberListInfoVersion(){
+        memberListInfoVersion++;
+        addUpdatedProperty(IM::PIG_MemberListInfoVersion, QString::number(memberListInfoVersion));
+    }
+
 
 
 

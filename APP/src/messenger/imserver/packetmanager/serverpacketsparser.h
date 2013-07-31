@@ -503,13 +503,13 @@ public slots:
 
         QStringList contacts = userInfo->getContacts();
         QStringList contactsOnlineInfo;
-        foreach (QString contact, contacts) {
-            UserInfo *info = getOnlineUserInfo(contact);
+        foreach (QString contactID, contacts) {
+            UserInfo *info = getOnlineUserInfo(contactID);
             if(info){
                 IM::OnlineState state = info->getOnlineState();
                 if(state != IM::ONLINESTATE_OFFLINE && state != IM::ONLINESTATE_INVISIBLE){
                     QStringList onlineInfo;
-                    onlineInfo.append(contact);
+                    onlineInfo.append(contactID);
                     onlineInfo.append(QString::number(quint8(state)));
                     onlineInfo.append(info->getLastLoginExternalHostAddress());
                     onlineInfo.append(QString::number(info->getLastLoginExternalHostPort()));

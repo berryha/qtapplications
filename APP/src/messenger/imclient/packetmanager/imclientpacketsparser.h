@@ -372,7 +372,7 @@ public slots:
 
     }
     
-    bool moveContactToGroup(int serverSocketID, const QString &contactID, const QString &oldGroupName, const QString &newGroupName){
+    bool moveContactToGroup(int serverSocketID, const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
         qDebug()<<"--moveContactToGroup(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -383,7 +383,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << oldGroupName << newGroupName;
+        out << contactID << oldGroupID << newGroupID;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
@@ -430,7 +430,7 @@ public slots:
 
     
     
-    bool deleteContact(int serverSocketID, const QString &contactID, const QString &groupName, bool deleteMeFromOpposition = false){
+    bool deleteContact(int serverSocketID, const QString &contactID, quint32 groupID, bool deleteMeFromOpposition = false){
         qDebug()<<"--deleteContact(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -441,7 +441,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << groupName << deleteMeFromOpposition;
+        out << contactID << groupID << deleteMeFromOpposition;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

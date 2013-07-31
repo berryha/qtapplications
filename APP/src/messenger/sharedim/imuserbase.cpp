@@ -506,49 +506,27 @@ QString IMUserBase::getContactGroupsInfoString(const QString &rowSepartor, const
 
 QStringList IMUserBase::getContacts() const{
     QStringList contacts;
-    QStringList groups = personalContactGroupsHash.keys();
-    foreach (QString groupName, groups) {
-        contacts << personalContactGroupsHash.value(groupName);
+    foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
+        contacts << contactGroup->getMembers();
     }
 
     return contacts;
 
 }
 
-bool IMUserBase::addOrDeleteContact(const QString &contactID, const QString &groupName, bool add){
+bool IMUserBase::addOrDeleteContact(const QString &contactID, quint32 groupID, bool add){
     
     if(contactID.trimmed().isEmpty()){
         return false;
     }
 
-    QString gpName = groupName;
-    if(groupName.trimmed().isEmpty()){
-        gpName = defaultGroupName;
-    }
-
-    QStringList members = personalContactGroupsHash.value(gpName);
+    ContactGroupBase *contactGroup = personalContactGroupsHash.value(groupID);
     if(add){
-        if(members.contains(contactID)){return false;}
-        members.append(contactID);
-        personalContactGroupsHash[gpName] = members;
-
+        contactGroup->addMember(contactID);
     }else{
-        QStringList groups;
-        if(groupName.trimmed().isEmpty()){
-            groups = personalContactGroupsHash.keys();
-        }else{
-            groups.append(gpName);
-        }
-
-        foreach (QString group, groups) {
-            QStringList groupMembers = personalContactGroupsHash.value(group);
-            //if(groupMembers.contains(contactID)){
-            groupMembers.removeAll(contactID);
-            //}
-            personalContactGroupsHash[group] = groupMembers;
-        }
-
+        contactGroup->deleteMember(contactID);
     }
+
 
     updatePersonalContactGroupsInfoVersion();
     //    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
@@ -557,26 +535,15 @@ bool IMUserBase::addOrDeleteContact(const QString &contactID, const QString &gro
 
 }
 
-bool IMUserBase::moveContact(const QString &contactID, const QString &oldGroupName, const QString &newGroupName){
+bool IMUserBase::moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
     
-    QString oldGPName = oldGroupName;
-    if(oldGPName.trimmed().isEmpty()){
-        oldGPName = defaultGroupName;
-    }
-    
-    if(oldGPName == newGroupName){
-        return false;
-    }
-    
-    QStringList members = personalContactGroupsHash.value(oldGPName);
-    if(members.contains(contactID)){
-        members.removeAll(contactID);
-        personalContactGroupsHash[oldGPName] = members;
-    }
+    ContactGroupBase *oldContactGroup = personalContactGroupsHash.value(oldGroupID);
+    ContactGroupBase *newContactGroup = personalContactGroupsHash.value(newGroupID);
+    Q_ASSERT(oldContactGroup);
+    Q_ASSERT(newContactGroup);
 
-    members = personalContactGroupsHash.value(newGroupName);
-    members.append(contactID);
-    personalContactGroupsHash[newGroupName] = members;
+    oldContactGroup->deleteMember(contactID);
+    newContactGroup->addMember(contactID);
     
     updatePersonalContactGroupsInfoVersion();
 //    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
