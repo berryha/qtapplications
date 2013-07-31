@@ -45,6 +45,7 @@ public:
 
     QStringList contactGroups() const;
     QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    quint32 groupIDThatContactBelongsTo(const QString &contactID);
 
 
     QString getContactGroupsInfoString() const;
@@ -91,8 +92,8 @@ public slots:
     void slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName);
 
     void addContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
-    void deleteContactFromUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
-    void moveContactToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID);
+    void deleteContactFromUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &contactID);
+    void moveContactToUI(ItemBoxWidget *expandListView, quint32 old_groupID, quint32 new_groupID, const QString &contactID);
     void updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
     void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 

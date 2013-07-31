@@ -53,14 +53,20 @@ QString ContactGroupBase::getMembersAsString(const QString &fieldSepartor){
     return membersList.join(fieldSepartor);
 }
 
-void ContactGroupBase::addMember(const QString &memberuserID){
+QStringList ContactGroupBase::getMembers(){
+    return membersList;
+}
 
+void ContactGroupBase::addMember(const QString &memberuserID){
+    if(membersList.contains(memberuserID)){return;}
     membersList.append(memberuserID);
+    updateMemberListInfoVersion();
 }
 
 void ContactGroupBase::deleteMember(const QString &memberuserID){
-
+    if(!membersList.contains(memberuserID)){return;}
     membersList.removeAll(memberuserID);
+    updateMemberListInfoVersion();
 }
 
 bool ContactGroupBase::hasMember(const QString &memberUserID){

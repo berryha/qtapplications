@@ -28,6 +28,7 @@ public:
 
     void setMembersFromString(const QString &infoString, const QString &fieldSepartor);
     QString getMembersAsString(const QString &fieldSepartor);
+    QStringList getMembers();
     void addMember(const QString &memberuserID);
     void deleteMember(const QString &memberuserID);
     bool hasMember(const QString &memberUserID);

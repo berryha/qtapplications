@@ -517,8 +517,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", oldGroupName = "", newGroupName = "";
-        stream >> contactID >> oldGroupName >> newGroupName;
+        QString contactID = "";
+        quint32 oldGroupID = 0, newGroupID = 0;
+        stream >> contactID >> oldGroupID >> newGroupID;
         
         if(userID == contactID){return;}
         
@@ -526,7 +527,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!contactInfo){return;}
         if(!userInfo->hasContact(contactID)){return;}
         
-        userInfo->moveContact(contactID, oldGroupName, newGroupName);
+        userInfo->moveContact(contactID, oldGroupID, newGroupID);
         
     }
         break;
@@ -601,11 +602,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", groupName = "";
+        QString contactID = "";
+        quint32 groupID = 0;
         bool deleteMeFromOpposition = false;
-        stream >> contactID >> groupName >> deleteMeFromOpposition;
+        stream >> contactID >> groupID >> deleteMeFromOpposition;
 
-        userInfo->addOrDeleteContact(contactID, groupName, false);
+        userInfo->addOrDeleteContact(contactID, groupID, false);
         if(deleteMeFromOpposition){
             //TODO:
             UserInfo *contactInfo = getUserInfo(contactID);

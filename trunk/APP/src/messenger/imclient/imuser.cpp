@@ -189,9 +189,11 @@ bool IMUser::hasFriendContact(const QString &contactID){
 }
 
 QString IMUser::groupNameThatContactBelongsTo(const QString &contactID) const{
-
     return ContactsManager::instance()->groupNameThatContactBelongsTo(contactID);
+}
 
+quint32 IMUser::groupIDThatContactBelongsTo(const QString &contactID) {
+    return ContactsManager::instance()->groupIDThatContactBelongsTo(contactID);
 }
 
 

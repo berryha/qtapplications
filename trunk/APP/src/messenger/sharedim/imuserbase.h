@@ -95,10 +95,10 @@ public:
         return onlineState;
     }
 
-    QHash<QString, QStringList> getPersonalContactGroupsHash() const
-    {
-        return personalContactGroupsHash;
-    }
+//    QHash<QString, QStringList> getPersonalContactGroupsHash() const
+//    {
+//        return personalContactGroupsHash;
+//    }
 
     quint32 getBlacklistInfoVersion() const{
         return blacklistInfoVersion;
@@ -172,10 +172,10 @@ public:
         this->onlineState = onlineState;
     }
 
-    void setPersonalContactGroupsHash(QHash<QString, QStringList> personalContactGroups)
-    {
-        this->personalContactGroupsHash = personalContactGroups;
-    }
+//    void setPersonalContactGroupsHash(QHash<QString, QStringList> personalContactGroups)
+//    {
+//        this->personalContactGroupsHash = personalContactGroups;
+//    }
 
     void setBlacklistInfoVersion(quint32 blacklistInfoVersion){
         this->blacklistInfoVersion = blacklistInfoVersion;
@@ -260,8 +260,8 @@ public slots:
     void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor, const QString &fieldSepartor);
     virtual QString getContactGroupsInfoString(const QString &rowSepartor, const QString &fieldSepartor) const;
     virtual QStringList getContacts() const;
-    bool addOrDeleteContact(const QString &contactID, const QString &groupName, bool add = true);
-    bool moveContact(const QString &contactID, const QString &oldGroupName, const QString &newGroupName);
+    bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
+    bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
     
 
     bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);

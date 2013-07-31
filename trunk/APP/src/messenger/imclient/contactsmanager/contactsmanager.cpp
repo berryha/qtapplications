@@ -121,6 +121,22 @@ QString ContactsManager::groupNameThatContactBelongsTo(const QString &contactID)
 
 }
 
+quint32 ContactsManager::groupIDThatContactBelongsTo(const QString &contactID) {
+
+    quint32 gpID = 0;
+
+    if(contactHash.contains(contactID)){
+        Contact *contact = contactHash.value(contactID);
+        if(contact){
+            gpID = contact->getContactGroupID();
+            //qDebug()<<"------gpID:"<<gpID<<"  contactID:"<<contactID;
+        }
+    }
+
+    return gpID;
+
+}
+
 QString ContactsManager::getContactGroupsInfoString() const{
 
     QStringList groupsInfo;
@@ -764,19 +780,19 @@ void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, const QStrin
 
 }
 
-void ContactsManager::deleteContactFromUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
+void ContactsManager::deleteContactFromUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &contactID){
 
-    expandListView->removeItem(groupName, contactID);
+    expandListView->removeItem(QString::number(groupID), contactID);
 
 }
 
-void ContactsManager::moveContactToUI(ItemBoxWidget *expandListView, const QString &old_groupName, const QString &new_groupName, const QString &contactID){
+void ContactsManager::moveContactToUI(ItemBoxWidget *expandListView, quint32 old_groupID, quint32 new_groupID, const QString &contactID){
     qDebug()<<"moveContactToUI(...)";
 
     if(!contactHash.contains(contactID)){
         return;
     }
-    expandListView->moveItem(old_groupName, new_groupName, contactID);
+    expandListView->moveItem(QString::number(old_groupID), QString::number(new_groupID), contactID);
 
     //expandListView->update();
     //expandListView->updateGeometry();
@@ -876,12 +892,17 @@ bool ContactsManager::addOrDeleteContact(const QString &contactID, quint32 group
         if(add){
             //contacts.append(contact);
             group->addContact(contact);
+            contact->setContactGroupID(groupID);
+
         }else{
             //contacts.removeAll(contact);
             group->deleteContact(contact);
+            contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
+
         }
         //group->setContactList(contacts);
     }
+
 
     return true;
 
@@ -912,6 +933,8 @@ bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, 
 //        newGroup->setContactList(contacts);
         newGroup->addContact(contact);
     }
+
+    contact->setContactGroupID(newGroupID);
 
     return true;
 
@@ -1015,28 +1038,39 @@ bool ContactsManager::slotdeleteContactFromDatabase(Contact *contact){
 
 quint32 ContactsManager::getPersonalContactGroupID(const QString &groupName){
 
-    if(!localUserDataDB.isValid()){
-        if(!openDatabase()){
-            return 0;
+
+    foreach (ContactGroup *group, contactGroupHash.values()) {
+        if(group->getGroupName() == groupName){
+            return group->getGroupID();
         }
     }
-    QSqlQuery query(localUserDataDB);
-    
-    QString queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(groupName);
 
-    //QSqlQuery query = queryDatabase(queryString, true);
-    if(!query.exec(queryString)){
-        qCritical()<<QString("Can not get contact group ID! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
+    return 0;
 
-        return 0;
-    }
+
+
+//    if(!localUserDataDB.isValid()){
+//        if(!openDatabase()){
+//            return 0;
+//        }
+//    }
+//    QSqlQuery query(localUserDataDB);
     
-    query.first();
-    if(!query.isValid()){
-        return 0;
-    }
+//    QString queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(groupName);
+
+//    //QSqlQuery query = queryDatabase(queryString, true);
+//    if(!query.exec(queryString)){
+//        qCritical()<<QString("Can not get contact group ID! Group Name:'%1', Error:%2").arg(groupName).arg(query.lastError().text());
+
+//        return 0;
+//    }
     
-    return query.value(0).toUInt();
+//    query.first();
+//    if(!query.isValid()){
+//        return 0;
+//    }
+    
+//    return query.value(0).toUInt();
     
     
     

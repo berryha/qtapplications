@@ -74,6 +74,7 @@ public slots:
 
     bool hasFriendContact(const QString &contactID);
     QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    quint32 groupIDThatContactBelongsTo(const QString &contactID);
 
 
 private slots:

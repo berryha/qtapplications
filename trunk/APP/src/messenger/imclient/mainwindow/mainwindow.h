@@ -92,7 +92,7 @@ private slots:
 
     void slotMoveContactToGroup();
     void slotMoveContactToBlacklist();
-    void slotDeleteContact(const QString &contactID, const QString &existingGroupName);
+    void slotDeleteContact(const QString &contactID);
 
     void slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message);
 
