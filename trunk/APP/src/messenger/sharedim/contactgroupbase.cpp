@@ -21,14 +21,14 @@ bool ContactGroupBase::setGroupInfoFromString(const QString &infoString, const Q
     }
 
     QStringList infoList = infoString.split(fieldSepartor);
-    if(infoList.size() != 4){
+    if(infoList.size() != 2){
         return false;
     }
 
     setGroupID(infoList.at(0).toUInt());
     setGroupName(infoList.at(1));
-    setGroupInfoVersion(infoList.at(2).toUInt());
-    setGroupMemberListInfoVersion(infoList.at(3).toUInt());
+//    setGroupInfoVersion(infoList.at(2).toUInt());
+//    setGroupMemberListInfoVersion(infoList.at(3).toUInt());
 
     return true;
 }
@@ -37,8 +37,8 @@ QString ContactGroupBase::getGroupInfoAsString(const QString &fieldSepartor){
     QStringList infoList;
     infoList << QString::number(getGroupID())
              << getGroupName()
-             << QString::number(getGroupInfoVersion())
-             <<QString::number(getGroupMemberListInfoVersion())
+//             << QString::number(getGroupInfoVersion())
+//             <<QString::number(getGroupMemberListInfoVersion())
                 ;
 
     return infoList.join(fieldSepartor);
@@ -53,9 +53,9 @@ QString ContactGroupBase::getMembersAsString(const QString &fieldSepartor){
     return membersList.join(fieldSepartor);
 }
 
-QStringList ContactGroupBase::getMembers(){
-    return membersList;
-}
+//QStringList ContactGroupBase::getMembers(){
+//    return membersList;
+//}
 
 void ContactGroupBase::addMember(const QString &memberuserID){
     if(membersList.contains(memberuserID)){return;}
@@ -76,6 +76,10 @@ bool ContactGroupBase::hasMember(const QString &memberUserID){
 
 QStringList ContactGroupBase::members() const{
     return membersList;
+}
+
+int ContactGroupBase::countOfMembers(){
+    return membersList.size();
 }
 
 

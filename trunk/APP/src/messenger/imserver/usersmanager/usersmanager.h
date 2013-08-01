@@ -93,7 +93,8 @@ public:
     QString getInterestGroupInfoStringForUser(UserInfo* userInfo, quint32 groupID);
     QString getInterestGroupMembersInfoStringForUser(UserInfo* userInfo, InterestGroup *group);
     
-    
+    QString getAllContactsInfoStringForUser(const QString &rowSepartor = CONTACTS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_INFO_SEPARATOR) const;
+
     
     
 /////////////////////////// Group Manager ////////////////////////////////////////    

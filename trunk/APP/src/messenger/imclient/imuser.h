@@ -49,7 +49,6 @@ public:
     IM::OnlineState getStateAfterLoggedin() const;
     void setStateAfterLoggedin(IM::OnlineState state);
 
-    QStringList contactGroups() const;
 
     void setLoginServerAddress(const QString &serverAddress);
     QString getLoginServerAddress() const;
@@ -69,12 +68,8 @@ public slots:
     //        bool updateGroupName(const QString &oldGroupName, const QString &newGroupName);
     //        bool addContactToGroup(const QString &contactID, const QString &groupName);
 
-    QString getContactGroupsInfoString() const;
-    QStringList getContacts() const;
 
     bool hasFriendContact(const QString &contactID);
-    QString groupNameThatContactBelongsTo(const QString &contactID) const;
-    quint32 groupIDThatContactBelongsTo(const QString &contactID);
 
 
 private slots:

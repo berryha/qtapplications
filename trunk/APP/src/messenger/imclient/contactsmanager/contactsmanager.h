@@ -46,20 +46,9 @@ public:
 
 
 
-    QString getContactGroupsInfoString() const;
-
     bool hasFriendContact(const QString &contactID);
     bool hasUserInfo(const QString &userID);
     Contact * getUser(const QString &contactID);
-
-    QList<Contact*> getContactGroupMembers(const QString &contactGroupName);
-    QList<Contact*> getContactGroupMembers(quint32 contactGroupID);
-
-    QStringList getContacts1() const;
-    QStringList getStrangers1() const;
-    QStringList getUsers1() const;
-
-
 
 
     bool loadInterestGroups();
@@ -95,7 +84,7 @@ public slots:
     void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 
 
-    void renameGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
+    void renameContactGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
 
 
     bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
@@ -108,10 +97,9 @@ public slots:
 
 
 
-    quint32 getPersonalContactGroupID(const QString &groupName);
     QString getPersonalContactGroupName(int personalContactGroupID) ;
-    int slotAddNewContactGroupToDatabase(const QString &groupName);
-    bool renameGroupToDatabase(quint32 groupID, const QString &new_groupName);
+    int slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
+    bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteGroupFromDatabase(const QString &groupName);
 
 
@@ -154,7 +142,6 @@ private:
     QString userPrivateDataFilePath;
     QSqlDatabase localUserDataDB;
 
-    QHash<quint32/*Grup ID*/, ContactGroup*> contactGroupHash;
     QHash<QString/*Contact ID*/, Contact*> contactHash;
 
     QHash<quint32/*Grup ID*/, InterestGroup*> interestGroupsHash;
