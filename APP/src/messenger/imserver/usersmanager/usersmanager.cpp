@@ -1462,6 +1462,62 @@ QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInf
        
 }
 
+QString UsersManager::getAllContactsInfoStringForUser(UserInfo* userInfo, const QString &rowSepartor, const QString &fieldSepartor) const{
+
+    QString infoString = "";
+
+    if(!userInfo){
+        return infoString;
+    }
+
+    if(!db.isValid()){
+            if(!openDatabase()){
+                return infoString;
+            }
+        }
+        QSqlQuery query(db);
+        QString statement = QString("call sp_GetAllContactsForUserAsString('%1', '%2');").arg(userID).arg(fieldSepartor);
+        if(!query.exec(statement)){
+            QSqlError error = query.lastError();
+            QString msg = QString("Can not add new user info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+            qCritical()<<msg;
+
+            //TODO:数据库重启，重新连接
+            //MySQL数据库重启，重新连接
+            if(error.number() == 2006){
+                query.clear();
+                openDatabase(true);
+            }
+
+            *errorType = IM::ERROR_UnKnownError;
+            return false;
+        }
+
+        statement = "select @sysID;";
+        query.exec(statement);
+        if(!query.first()){
+            qCritical()<<QString("Can not query user SysID! Invalid record! User ID:%1").arg(userID);
+            return false;
+        }
+
+        if(sysID){
+            *sysID = query.value(0).toUInt();
+           qDebug()<<"---------------------------------sysID:"<<*sysID;
+           if(*sysID == 0){
+               *errorType = IM::ERROR_UnKnownError;
+               return false;
+           }
+        }
+
+
+
+        userInfo = getUserInfo(userID);
+        if(!userInfo){
+            *errorType = IM::ERROR_U
+
+
+}
+
 
 bool UsersManager::openDatabase(bool reopen){
 

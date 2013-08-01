@@ -95,7 +95,7 @@ void IMUserBase::init(){
     
     updatedPropertiesMutex =new QMutex();
     
-    defaultGroupName = tr("Friends");
+//    defaultGroupName = tr("Friends");
 
     
     
@@ -502,15 +502,9 @@ QString IMUserBase::getContactGroupsInfoString(const QString &rowSepartor, const
     return groupsInfo.join(rowSepartor);
 
 
-//    QStringList groups = personalContactGroupsHash.keys();
-//    foreach (QString groupName, groups) {
-//        QStringList members = personalContactGroupsHash.value(groupName);
-//        groupsInfo.append(groupName + CONTACT_INFO_SEPARATOR + members.join(CONTACT_INFO_SEPARATOR));
-//    }
-
-//    return groupsInfo.join(GROUP_INFO_SEPARATOR);
-
 }
+
+
 
 QList<ContactGroupBase *> IMUserBase::getContactGroups(){
     return personalContactGroupsHash.values();
@@ -595,10 +589,26 @@ bool IMUserBase::hasContactGroup(const QString &groupName){
     return false;
 }
 
-QStringList IMUserBase::getContacts() const{
+QStringList IMUserBase::getContactGroupMembers(quint32 groupID){
+    if(!personalContactGroupsHash.contains(groupID)){
+        return QStringList();
+    }
+
+    return personalContactGroupsHash.value(groupID)->members();
+}
+
+int IMUserBase::countOfContactGroupMembers(quint32 groupID){
+    if(!personalContactGroupsHash.contains(groupID)){
+        return -1;
+    }
+
+    return personalContactGroupsHash.value(groupID)->countOfMembers();
+}
+
+QStringList IMUserBase::getAllContacts() const{
     QStringList contacts;
     foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
-        contacts << contactGroup->getMembers();
+        contacts << contactGroup->members();
     }
 
     return contacts;

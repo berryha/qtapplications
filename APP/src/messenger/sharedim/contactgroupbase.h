@@ -15,7 +15,7 @@ namespace HEHUI {
 class SHAREDIMLIB_API ContactGroupBase : public IMGroupBase
 {
 public:
-    enum DefaultGroupID{Group_Blacklist_ID = -1, Group_Strangers_ID = 0, Group_Friends_ID = 1 };
+    enum DefaultGroupID{Group_Strangers_ID = -1, Group_Blacklist_ID = 0, Group_Friends_ID = 1 };
     static QString Group_Blacklist_Name;
     static QString Group_Friends_Name;
     static QString Group_Strangers_Name;
@@ -28,12 +28,13 @@ public:
 
     void setMembersFromString(const QString &infoString, const QString &fieldSepartor);
     QString getMembersAsString(const QString &fieldSepartor);
-    QStringList getMembers();
+//    QStringList getMembers();
     void addMember(const QString &memberuserID);
     void deleteMember(const QString &memberuserID);
     bool hasMember(const QString &memberUserID);
 
     QStringList members() const;
+    int countOfMembers();
 
 
 

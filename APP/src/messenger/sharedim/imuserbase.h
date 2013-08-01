@@ -260,6 +260,7 @@ public slots:
     void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR);
     virtual QString getContactGroupsInfoString(const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR) const;
 
+
     QList<ContactGroupBase *> getContactGroups();
     ContactGroupBase * getContactGroup(quint32 personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
@@ -269,12 +270,14 @@ public slots:
     QString groupNameThatContactBelongsTo(const QString &contactID) const;
     quint32 groupIDThatContactBelongsTo(const QString &contactID);
 
-
     bool hasContactGroup(quint32 groupID);
     bool hasContactGroup(const QString &groupName);
 
+    QStringList getContactGroupMembers(quint32 groupID);
+    int countOfContactGroupMembers(quint32 groupID);
 
-    virtual QStringList getContacts() const;
+
+    virtual QStringList getAllContacts() const;
     bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
     bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
     

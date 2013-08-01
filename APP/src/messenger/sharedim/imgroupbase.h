@@ -84,7 +84,7 @@ public:
     void setGroupID(quint32 groupID)
     {
         this->groupID = groupID;
-        addUpdatedProperty(IM::PIG_GroupID, QString::number(groupID));
+//        addUpdatedProperty(IM::PIG_GroupID, QString::number(groupID));
     }
 
     void setGroupInfoVersion(quint32 groupInfoVersion)
@@ -96,6 +96,7 @@ public:
 
     void setGroupName(QString groupName)
     {
+        if(this->groupName.toLower() == groupName.toLower()){return;}
         this->groupName = groupName;
         addUpdatedProperty(IM::PIG_GroupName, "'"+groupName+"'");  
     }

@@ -485,7 +485,7 @@ public slots:
         }
 
         //通知所有在线联系人
-        QStringList contacts = userInfo->getContacts();
+        QStringList contacts = userInfo->getAllContacts();
         foreach (QString contact, contacts) {
             UserInfo *contactInfo = getOnlineUserInfo(contact);
             if(contactInfo){
@@ -501,7 +501,7 @@ public slots:
             return false;
         }
 
-        QStringList contacts = userInfo->getContacts();
+        QStringList contacts = userInfo->getAllContacts();
         QStringList contactsOnlineInfo;
         foreach (QString contactID, contacts) {
             UserInfo *info = getOnlineUserInfo(contactID);

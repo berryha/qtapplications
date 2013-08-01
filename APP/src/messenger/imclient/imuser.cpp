@@ -89,15 +89,6 @@ void IMUser::setStateAfterLoggedin(IM::OnlineState state){
     this->stateAfterLoggedin = state;
 }
 
-QStringList IMUser::contactGroups() const{
-    QStringList groups =  ContactsManager::instance()->contactGroups();
-    if(groups.isEmpty()){
-        groups.append(getDefaultGroupName());
-    }
-
-    return groups;
-}
-
 void IMUser::setLoginServerAddress(const QString &serverAddress){
     m_loginServerAddress = serverAddress;
 }
@@ -171,31 +162,11 @@ QString IMUser::getRegistrationServerAddressInfo() const{
 
 //}
 
-QString IMUser::getContactGroupsInfoString() const{
-
-    return ContactsManager::instance()->getContactGroupsInfoString();
-
-}
-
-QStringList IMUser::getContacts() const{
-    return ContactsManager::instance()->getContacts();
-
-}
-
 
 bool IMUser::hasFriendContact(const QString &contactID){
 
     return ContactsManager::instance()->hasFriendContact(contactID);
 }
-
-QString IMUser::groupNameThatContactBelongsTo(const QString &contactID) const{
-    return ContactsManager::instance()->groupNameThatContactBelongsTo(contactID);
-}
-
-quint32 IMUser::groupIDThatContactBelongsTo(const QString &contactID) {
-    return ContactsManager::instance()->groupIDThatContactBelongsTo(contactID);
-}
-
 
 QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     

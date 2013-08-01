@@ -103,6 +103,10 @@ private slots:
     void slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/);
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
 
+    void slotProcessContactsInfo(const QString &contactsInfo);
+//    void slotProcessBadGuysInfo(const QString &badGuysInfo);
+
+
     //void slotProcessSearchContactsResult(const QString &users);
     void slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage);
     void getNewContactSettings(const QString &contactID);
