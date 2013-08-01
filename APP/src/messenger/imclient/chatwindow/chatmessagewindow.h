@@ -6,8 +6,11 @@
 #include "../ui/ui_chatmessagewindow.h"
 #include "./emoticonselecter/emoticonselector.h"
 #include "../contactsmanager/contact.h"
-#include "contactsmanager/contactgroup.h"
 #include "contactsmanager/interestgroup.h"
+
+//#include "contactsmanager/contactgroup.h"
+#include "../../sharedim/contactgroupbase.h"
+
 
 #include "HHSharedGUI/hscreenshot.h"
 

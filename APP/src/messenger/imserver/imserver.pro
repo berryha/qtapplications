@@ -50,8 +50,8 @@ HEADERS += \
     usersmanager/userinfo.h \
     serverlib.h \
     resourcesmanagerinstance.h \
-    usersmanager/contactgroup.h \
-    usersmanager/interestgroup.h
+    usersmanager/interestgroup.h \
+    usersmanager/contactgroup1.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \

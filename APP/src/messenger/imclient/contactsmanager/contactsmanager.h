@@ -13,10 +13,13 @@
 #include <QHash>
 
 #include "contact.h"
-#include "contactgroup.h"
 #include "imuser.h"
-
 #include "interestgroup.h"
+//#include "contactgroup.h"
+#include "../../sharedim/contactgroupbase.h"
+
+
+
 
 //#include "../../../shared/core/global_core.h"
 //#include "../../../shared/core/singleton.h"
@@ -43,13 +46,7 @@ public:
 
 
 
-    QStringList contactGroups() const;
-    QString groupNameThatContactBelongsTo(const QString &contactID) const;
-    quint32 groupIDThatContactBelongsTo(const QString &contactID);
-
-
     QString getContactGroupsInfoString() const;
-    ContactGroup * getContactGroup(quint32 personalContactGroupID);
 
     bool hasFriendContact(const QString &contactID);
     bool hasUserInfo(const QString &userID);
@@ -58,9 +55,9 @@ public:
     QList<Contact*> getContactGroupMembers(const QString &contactGroupName);
     QList<Contact*> getContactGroupMembers(quint32 contactGroupID);
 
-    QStringList getContacts() const;
-    QStringList getStrangers() const;
-    QStringList getUsers() const;
+    QStringList getContacts1() const;
+    QStringList getStrangers1() const;
+    QStringList getUsers1() const;
 
 
 

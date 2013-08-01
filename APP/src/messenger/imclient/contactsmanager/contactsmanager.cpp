@@ -57,16 +57,6 @@ ContactsManager::~ContactsManager() {
     
 }
 
-QStringList ContactsManager::contactGroups() const{
-    QStringList groups;
-    foreach (ContactGroup *group, contactGroupHash.values()) {
-        groups.append(group->getGroupName());
-    }
-
-    return groups;
-
-}
-
 bool ContactsManager::hasFriendContact(const QString &contactID){
 
     //TODO:改进
@@ -101,41 +91,6 @@ bool ContactsManager::hasUserInfo(const QString &userID){
 
 }
 
-QString ContactsManager::groupNameThatContactBelongsTo(const QString &contactID) const{
-
-    QString gpName = "";
-
-    if(contactHash.contains(contactID)){
-        Contact *contact = contactHash.value(contactID);
-        if(contact){
-            int gpID = contact->getContactGroupID();
-            //qDebug()<<"------gpID:"<<gpID<<"  contactID:"<<contactID;
-            ContactGroup *group = contactGroupHash.value(gpID);
-            if(group){
-                gpName = group->getGroupName();
-            }
-        }
-    }
-
-    return gpName;
-
-}
-
-quint32 ContactsManager::groupIDThatContactBelongsTo(const QString &contactID) {
-
-    quint32 gpID = 0;
-
-    if(contactHash.contains(contactID)){
-        Contact *contact = contactHash.value(contactID);
-        if(contact){
-            gpID = contact->getContactGroupID();
-            //qDebug()<<"------gpID:"<<gpID<<"  contactID:"<<contactID;
-        }
-    }
-
-    return gpID;
-
-}
 
 QString ContactsManager::getContactGroupsInfoString() const{
 
@@ -152,16 +107,6 @@ QString ContactsManager::getContactGroupsInfoString() const{
 
     return groupsInfo.join(GROUP_INFO_SEPARATOR);
 
-}
-
-ContactGroup * ContactsManager::getContactGroup(quint32 personalContactGroupID){
-    ContactGroup * group = 0;
-    if(contactGroupHash.contains(personalContactGroupID)){
-        group = contactGroupHash.value(personalContactGroupID);
-    }
-    
-    return group;
-    
 }
 
 Contact * ContactsManager::getUser(const QString &contactID){
@@ -200,7 +145,7 @@ QList<Contact*> ContactsManager::getContactGroupMembers(quint32 contactGroupID){
 
 }
 
-QStringList ContactsManager::getContacts() const{
+QStringList ContactsManager::getContacts1() const{
 
     QStringList contacts;
 
@@ -217,7 +162,7 @@ QStringList ContactsManager::getContacts() const{
 
 }
 
-QStringList ContactsManager::getStrangers() const{
+QStringList ContactsManager::getStrangers1() const{
 
     QStringList contacts;
 
@@ -236,7 +181,7 @@ QStringList ContactsManager::getStrangers() const{
 }
 
 
-QStringList ContactsManager::getUsers() const{
+QStringList ContactsManager::getUsers1() const{
 
     QStringList users;
 
@@ -593,8 +538,17 @@ void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
     
     for (int i=0; i<model->rowCount(); i++) {
         quint32 groupID = QVariant(model->record(i).value("GroupID")).toUInt();
-        if(contactGroupHash.contains(groupID)){continue;}
         QString groupName = QVariant(model->record(i).value("GroupName")).toString();
+        quint32 groupInfoVersion = QVariant(model->record(i).value("GroupInfoVersion")).toUInt();
+        quint32 memberListVersion = QVariant(model->record(i).value("MemberListVersion")).toUInt();
+
+        ContactGroupBase *group = m_imUser->addContactGroup(groupID);
+        Q_ASSERT(group);
+        group->setGroupName(groupName);
+        group->setGroupInfoVersion(groupInfoVersion);
+        group->setGroupMemberListInfoVersion(memberListVersion);
+
+
         QList<Contact*> list;
         QString contactsQueryString = QString("select * from contacts_detailed_info where ContactGroupID=%1") .arg(groupID);
         
@@ -650,12 +604,14 @@ void ContactsManager::slotFetchContactsInfo(ItemBoxWidget *expandListView){
             contact->setContactGroupID(groupID);
             contactHash.insert(contactUID, contact);
             list.append(contact);
+
+            group->addMember(contactUID);
+
             qApp->processEvents();
 
         }
-        
-        ContactGroup *group = new ContactGroup(groupID, groupName, list, this);
-        contactGroupHash.insert(groupID, group);
+
+        group->clearUpdatedProperties();
 
         slotLoadContacts(expandListView, groupID, groupName, list);
 
@@ -886,21 +842,10 @@ bool ContactsManager::addOrDeleteContact(const QString &contactID, quint32 group
         return false;
     }
 
-    ContactGroup *group = contactGroupHash.value(groupID);
-    if(group){
-        //QList<Contact*> contacts = group->getContactList();
-        if(add){
-            //contacts.append(contact);
-            group->addContact(contact);
-            contact->setContactGroupID(groupID);
+    m_imUser->addOrDeleteContact(contactID, groupID, add);
 
-        }else{
-            //contacts.removeAll(contact);
-            group->deleteContact(contact);
-            contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
-
-        }
-        //group->setContactList(contacts);
+    if(!add){
+        contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
     }
 
 
@@ -1148,6 +1093,10 @@ int ContactsManager::slotAddNewContactGroupToDatabase(const QString &groupName){
 
 bool ContactsManager::renameGroupToDatabase(quint32 groupID, const QString &new_groupName){
 
+    if(!m_imUser->hasContactGroup(groupID)){
+        return false;
+    }
+
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
             return false;
@@ -1163,45 +1112,20 @@ bool ContactsManager::renameGroupToDatabase(quint32 groupID, const QString &new_
         return false;
     }
 
-//    queryString = QString("Select [GroupID]  From [contactgroups] where [GroupName] = '%1' ").arg(new_groupName);
-//    if(!query.exec(queryString)){
-//        qCritical()<<QString("Can not get contact group ID! Group Name:'%1', Error:%2").arg(new_groupName).arg(query.lastError().text());
-//        return false;
-//    }
-//    query.first();
-//    if(!query.isValid()){
-//        return false;
-//    }
-//    int groupID = query.value(0).toInt();
 
-    ContactGroup *contactGroup = 0;
-    if(contactGroupHash.contains(groupID)){
-        contactGroup = contactGroupHash.value(groupID);
-
-    }else{
-        //contactGroup = new ContactGroup()
-        //contactGroupHash.insert(groupID, contactGroup);
-        //TODO:
-        return false;
-    }
-
+    ContactGroupBase *contactGroup = m_imUser->getContactGroup(groupID);
     contactGroup->setGroupName(new_groupName);
 
     return true;
-
 
 }
 
 bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
     qDebug()<<"--ContactsManager::deleteGroupFromDatabase(..) groupName:"<<groupName;
 
-    int groupID = getPersonalContactGroupID(groupName);
-    ContactGroup *group = contactGroupHash.take(groupID);
-    if(group){
-        delete group;
-        qDebug()<<"contactGroupHash.keys():"<<contactGroupHash.keys();
+    if(m_imUser->hasContactGroup(groupName)){
+        return false;
     }
-
 
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
@@ -1209,7 +1133,6 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
         }
     }
     QSqlQuery query(localUserDataDB);
-
 
     QString queryString = QString("Delete From [contactgroups] where [GroupName] = '%1' ").arg(groupName);
 
@@ -1219,9 +1142,7 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
         return false;
     }
 
-
     return true;
-
 
 }
 
