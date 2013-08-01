@@ -79,7 +79,7 @@ public:
 
     quint32 updatePersonalContactGroupsInfoVersion();
     
-    QString getDefaultGroupName() const;
+//    QString getDefaultGroupName() const;
 
 
 
@@ -257,8 +257,23 @@ public slots:
     void setPersonalInfoString(const QString &personalInfoString, bool summaryInfo);
     QString getPersonalInfoString(bool requestSummaryInfo) const;
 
-    void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor, const QString &fieldSepartor);
-    virtual QString getContactGroupsInfoString(const QString &rowSepartor, const QString &fieldSepartor) const;
+    void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR);
+    virtual QString getContactGroupsInfoString(const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR) const;
+
+    QList<ContactGroupBase *> getContactGroups();
+    ContactGroupBase * getContactGroup(quint32 personalContactGroupID);
+    ContactGroupBase * getContactGroup(const QString &groupName);
+    ContactGroupBase * addContactGroup(quint32 contactGroupID);
+    void deleteContactGroup(quint32 contactGroupID);
+
+    QString groupNameThatContactBelongsTo(const QString &contactID) const;
+    quint32 groupIDThatContactBelongsTo(const QString &contactID);
+
+
+    bool hasContactGroup(quint32 groupID);
+    bool hasContactGroup(const QString &groupName);
+
+
     virtual QStringList getContacts() const;
     bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
     bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
@@ -314,7 +329,7 @@ private:
     QMutex *updatedPropertiesMutex;
 
     
-    QString defaultGroupName;
+//    QString defaultGroupName;
 
 
 };

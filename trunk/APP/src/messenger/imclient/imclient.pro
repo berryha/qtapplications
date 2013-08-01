@@ -51,7 +51,6 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     networkmanager/serverinfo.h \
     networkmanager/serverinfomodel.h \
     login/loginwidget.h \
-    contactsmanager/contactgroup.h \
     chatwindow/chatmessagewindow.h \
     chatwindow/chatwindowmanager.h \
     contactwidget/contactwidget.h \
@@ -66,7 +65,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     packetmanager/imclientpacketsparser.h \
     networkmanager/clientresourcesmanager.h \
     contractstree/contractstree.h \
-    chatwindow/contactchatwidget.h
+    chatwindow/contactchatwidget.h \
+    contactsmanager/contactgroup1.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \

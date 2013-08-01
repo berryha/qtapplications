@@ -5,7 +5,7 @@
  *      Author: 贺辉
  */
 
-#include "contactgroup.h"
+#include "contactgroup1.h"
 
 namespace HEHUI {
 

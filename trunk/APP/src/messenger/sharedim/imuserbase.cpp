@@ -54,7 +54,15 @@ IMUserBase::IMUserBase(const QString &userID, QObject *parent)
 
 IMUserBase::~IMUserBase() {
 
+    foreach (ContactGroupBase *group, personalContactGroupsHash) {
+        delete group;
+        group = 0;
+    }
+    personalContactGroupsHash.clear();
 
+
+    delete updatedPropertiesMutex;
+    updatedPropertiesMutex = 0;
 
 }
 
@@ -295,9 +303,9 @@ quint32 IMUserBase::updatePersonalContactGroupsInfoVersion(){
     return personalContactGroupsInfoVersion;
 }
 
-QString IMUserBase::getDefaultGroupName() const{
-    return defaultGroupName;
-}
+//QString IMUserBase::getDefaultGroupName() const{
+//    return defaultGroupName;
+//}
 
 
 void IMUserBase::setPersonalInfoString(const QString &personalInfoString, bool summaryInfo){
@@ -458,10 +466,10 @@ QString IMUserBase::getPersonalInfoString(bool requestSummaryInfo) const{
 void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor, const QString &fieldSepartor){
     
     foreach (ContactGroupBase *group, personalContactGroupsHash) {
-        personalContactGroupsHash.remove(group->getGroupID());
         delete group;
         group = 0;
     }
+    personalContactGroupsHash.clear();
 
     if(contactGroupsInfo.trimmed().isEmpty()){
         return;
@@ -469,7 +477,7 @@ void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo, co
     
     QStringList groupsInfoList = contactGroupsInfo.split(rowSepartor);
     for(int i=0; i<groupsInfoList.size(); i++) {
-        ContactGroupBase * contactGroup = new ContactGroupBase();
+        ContactGroupBase * contactGroup = new ContactGroupBase(0, "", this);
         if(!contactGroup->setGroupInfoFromString(groupsInfoList.at(i), fieldSepartor)){
             delete contactGroup;
             contactGroup = 0;
@@ -502,6 +510,89 @@ QString IMUserBase::getContactGroupsInfoString(const QString &rowSepartor, const
 
 //    return groupsInfo.join(GROUP_INFO_SEPARATOR);
 
+}
+
+QList<ContactGroupBase *> IMUserBase::getContactGroups(){
+    return personalContactGroupsHash.values();
+}
+
+ContactGroupBase *IMUserBase::getContactGroup(quint32 personalContactGroupID){
+    ContactGroupBase * group = 0;
+    if(personalContactGroupsHash.contains(personalContactGroupID)){
+        group = personalContactGroupsHash.value(personalContactGroupID);
+    }
+
+    return group;
+}
+
+ContactGroupBase *IMUserBase::getContactGroup(const QString &groupName){
+
+    foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
+        if(contactGroup->getGroupName().toLower() == groupName.toLower()){
+            return contactGroup;
+        }
+    }
+
+    return 0;
+}
+
+ContactGroupBase * IMUserBase::addContactGroup(quint32 contactGroupID){
+    if(personalContactGroupsHash.contains(contactGroupID)){
+        return personalContactGroupsHash.value(contactGroupID);
+    }
+
+    ContactGroupBase * group = new ContactGroupBase(contactGroupID, "", this);
+    personalContactGroupsHash.insert(contactGroupID, group);
+    return group;
+
+}
+
+void IMUserBase::deleteContactGroup(quint32 contactGroupID){
+    if(!personalContactGroupsHash.contains(contactGroupID)){
+        return ;
+    }
+
+    ContactGroupBase * group = personalContactGroupsHash.take(contactGroupID);
+    delete group;
+    group = 0;
+
+}
+
+QString IMUserBase::groupNameThatContactBelongsTo(const QString &contactID) const{
+
+    foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
+        if(contactGroup->hasMember(contactID)){
+            return contactGroup->getGroupName();
+        }
+    }
+
+    return "";
+}
+
+quint32 IMUserBase::groupIDThatContactBelongsTo(const QString &contactID){
+
+    foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
+        if(contactGroup->hasMember(contactID)){
+            return contactGroup->getGroupID();
+        }
+    }
+
+    return 0;
+}
+
+
+bool IMUserBase::hasContactGroup(quint32 groupID){
+    return personalContactGroupsHash.contains(groupID);
+}
+
+bool IMUserBase::hasContactGroup(const QString &groupName){
+    foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
+        if(contactGroup->getGroupName().toLower() == groupName.toLower()){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 QStringList IMUserBase::getContacts() const{

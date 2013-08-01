@@ -198,7 +198,7 @@ private:
     UserInfoTipWindow *m_userInfoTipWindow;
     //ContactInfoWidget *m_ContactInfoWidget;
 
-    ContactsManager *contactsManager;
+    ContactsManager *m_contactsManager;
     IMUser *imUser;
     IM::OnlineState stateBeforeLocking;
 

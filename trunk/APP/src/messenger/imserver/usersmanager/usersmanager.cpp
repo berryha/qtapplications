@@ -1128,7 +1128,7 @@ bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
         }
     }
     QSqlQuery query(db);
-    QString fieldSepartor = ",";
+    QString fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR;
     QString statement = QString("call sp_GetUserContactGroups('%1', '%2'); ").arg(info->getUserID()).arg(fieldSepartor);
 
     if(!query.exec(statement)){
@@ -1138,15 +1138,17 @@ bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
 
         return false;
     }
-    if(query.first()){
-        info->setContactGroupsInfoString(query.value(0));
-    }
+//    if(query.first()){
+//        info->setContactGroupsInfoString(query.value(0));
+//    }
 
-//    QStringList groups;
-//     while(query.next()){
-//        groups.append(query.value(0).toString());
-//     }
-//     info->setInterestGroups(groups);
+    QStringList contactGroups;
+     while(query.next()){
+        contactGroups.append(query.value(0).toString());
+     }
+
+    QString rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR;
+    info->setContactGroupsInfoString(contactGroups.join(rowSepartor));
 
     return true;
 
