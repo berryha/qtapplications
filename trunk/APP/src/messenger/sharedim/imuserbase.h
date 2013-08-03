@@ -278,10 +278,11 @@ public slots:
     int countOfContactGroupMembers(int groupID);
 
 
-    virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
+    virtual QStringList getAllContacts(bool noStrangers = true) const;
+    bool hasContact(const QString &contactID);
     bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
     bool moveContact(const QString &contactID, int oldGroupID, quint32 newGroupID);
-    
+
 
     bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);
     quint32 updateInterestGroupInfoVersion();
@@ -294,7 +295,6 @@ public slots:
     bool isContactBlacklisted(const QString &contactID);
     QStringList blacklistedContacts();
 
-    //    bool hasContact(const QString &contactID);
     //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
     
 
