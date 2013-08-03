@@ -648,15 +648,13 @@ int IMUserBase::countOfContactGroupMembers(int groupID){
     return personalContactGroupsHash.value(groupID)->countOfMembers();
 }
 
-QStringList IMUserBase::getAllContacts(bool noStrangers, bool noBlacklisted) const{
+QStringList IMUserBase::getAllContacts(bool noStrangers) const{
 
     QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
     if(noStrangers){
         groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Strangers_ID));
     }
-    if(noBlacklisted){
-        groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Blacklist_ID));
-    }
+
 
     QStringList contacts;
     foreach (ContactGroupBase *contactGroup, groups) {
@@ -665,6 +663,18 @@ QStringList IMUserBase::getAllContacts(bool noStrangers, bool noBlacklisted) con
 
     return contacts;
 
+}
+
+bool IMUserBase::hasContact(const QString &contactID){
+
+    QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
+    foreach (ContactGroupBase *contactGroup, groups) {
+        if(contactGroup->hasMember(contactID)){
+            return true;
+        };
+    }
+
+    return false;
 }
 
 bool IMUserBase::addOrDeleteContact(const QString &contactID, int groupID, bool add){
@@ -797,20 +807,6 @@ QStringList IMUserBase::blacklistedContacts(){
 }
 
 
-//bool IMUserBase::hasContact(const QString &contactID){
-
-//    bool has = false;
-//    QStringList groups = personalContactGroupsHash.keys();
-//    foreach (QString groupName, groups) {
-//        QStringList members = personalContactGroupsHash.value(groupName);
-//        if(members.contains(contactID)){
-//            has = true;
-//            break;
-//        }
-//    }
-
-//    return has;
-//}
 
 //QString IMUserBase::groupNameThatContactBelongsTo(const QString &contactID) const{
 

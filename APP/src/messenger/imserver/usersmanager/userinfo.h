@@ -79,11 +79,6 @@ public:
 
 public slots:
     bool createOrDeleteContactGroup(const QString &groupName, bool create);
-    bool updateGroupName(const QString &oldGroupName, const QString &newGroupName);
-    bool addContactToGroup(const QString &contactID, const QString &groupName);
-
-    bool hasContact(const QString &contactID);
-    QString groupNameThatContactBelongsTo(const QString &contactID) const;
 
 
 private:
