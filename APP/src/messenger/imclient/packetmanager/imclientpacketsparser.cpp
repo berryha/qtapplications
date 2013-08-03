@@ -461,6 +461,27 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::CONTACTS_INFO_VERSION):
+    {
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+        QString contactsInfoVersionString = "";
+        stream >> contactsInfoVersionString;
+
+        emit signalContactsInfoVersionPacketReceived(contactsInfoVersionString);
+
+        qWarning()<<"--CONTACTS_INFO_VERSION";
+
+    }
+        break;
+
     case quint8(IM::SERVER_RESPONSE_SEARCH_CONTACTS):
     {
         //TODO:

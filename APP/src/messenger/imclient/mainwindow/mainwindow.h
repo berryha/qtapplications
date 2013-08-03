@@ -102,9 +102,8 @@ private slots:
     void slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString);
     void slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/);
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
+    void slotProcessContactsInfoVersion(const QString &contactsInfoVersionString);
 
-    void slotProcessContactsInfo(const QString &contactsInfo);
-//    void slotProcessBadGuysInfo(const QString &badGuysInfo);
 
 
     //void slotProcessSearchContactsResult(const QString &users);

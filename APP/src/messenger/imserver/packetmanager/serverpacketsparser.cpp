@@ -269,6 +269,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
 
+            //Get contact groups info
+            getUserAllContactGroupsInfoFromDatabase(userInfo);
+
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
@@ -276,6 +279,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
             sendContactsOnlineInfo(socketID, userInfo);
+
+            //Send contacts version info to user
+            QString versionInfo = "";
+            if(getUserAllContactsInfoVersionFromDatabase(userInfo, &versionInfo)){
+                sendPersonalContactsInfoVersionPacket(socketID, versionInfo, sessionEncryptionKey);
+            }
+
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
@@ -370,6 +380,23 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!userInfo){return;}
 
         sendPersonalContactGroupsInfoPacket(socketID, userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
+    }
+        break;
+    case quint8(IM::CONTACTS_INFO_VERSION):
+    {
+        qDebug()<<"~~CONTACTS_INFO_VERSION";
+
+        QString userID =peerID;
+
+        UserInfo *userInfo = getOnlineUserInfo(userID);
+        if(!userInfo){return;}
+
+        QString versionInfo = "";
+        if(!getUserAllContactsInfoVersionFromDatabase(userInfo, &versionInfo)){
+            return;
+        }
+
+        sendPersonalContactsInfoVersionPacket(socketID, versionInfo, userInfo->getSessionEncryptionKey());
     }
         break;
 

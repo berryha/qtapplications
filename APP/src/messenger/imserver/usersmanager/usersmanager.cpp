@@ -1117,7 +1117,9 @@ bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
 
 }
 
-bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
+bool UsersManager::getUserAllContactGroupsInfoFromDatabase(UserInfo* info){
+
+
     if(!info){
         return false;
     }
@@ -1128,31 +1130,75 @@ bool UsersManager::getUserPersonalContactGroupsFromDatabase(UserInfo* info){
         }
     }
     QSqlQuery query(db);
-    QString fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR;
-    QString statement = QString("call sp_GetUserContactGroups('%1', '%2'); ").arg(info->getUserID()).arg(fieldSepartor);
-
+    QString statement = QString("call sp_GetAllContactGroupsInfoForUserAsString('%1'); ").arg(info->getUserID());
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not query user contact groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return false;
     }
-//    if(query.first()){
-//        info->setContactGroupsInfoString(query.value(0));
-//    }
 
     QStringList contactGroups;
      while(query.next()){
-        contactGroups.append(query.value(0).toString());
+         quint32 groupID  = query.value(0).toUInt();
+         QString groupName = query.value(1).toString();
+
+         //CONTACTS FORMATE: UserID,UserID,...
+         //e.g. user1,user2,user3
+         QString contacts = query.value(2).toString();
+
+         contactGroups.append(groupID+","+groupName+","+contacts);
      }
 
-    QString rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR;
-    info->setContactGroupsInfoString(contactGroups.join(rowSepartor));
+
+     //STRING FORMATE: GroupID,GroupName,UserID,,UserID,...||GroupID,...
+     //e.g. 100,Group100,user1,user2,user3||101,Group101,user4
+     QString infoString = contactGroups.join(GROUP_INFO_SEPARATOR);
+     info->setContactGroupsInfoString(*infoString);
 
     return true;
 
 }
+
+bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString){
+
+    //infoString FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion;UserID,...
+    //e.g. user1,10,10;user2,5,6;user3,11,10
+
+
+    if(!info){
+        return false;
+    }
+    if(!infoString){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("call sp_GetAllContactsInfoForUserAsString('%1'); ").arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user contacts info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+    query.first();
+
+    *infoString = query.value(0).toString();
+
+    return true;
+
+}
+
+
 
 bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName){
 
@@ -1460,62 +1506,6 @@ QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInf
     
     return infoList.join(QString(PACKET_DATA_SEPARTOR));
        
-}
-
-QString UsersManager::getAllContactsInfoStringForUser(UserInfo* userInfo, const QString &rowSepartor, const QString &fieldSepartor) const{
-
-    QString infoString = "";
-
-    if(!userInfo){
-        return infoString;
-    }
-
-    if(!db.isValid()){
-            if(!openDatabase()){
-                return infoString;
-            }
-        }
-        QSqlQuery query(db);
-        QString statement = QString("call sp_GetAllContactsForUserAsString('%1', '%2');").arg(userID).arg(fieldSepartor);
-        if(!query.exec(statement)){
-            QSqlError error = query.lastError();
-            QString msg = QString("Can not add new user info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-            qCritical()<<msg;
-
-            //TODO:数据库重启，重新连接
-            //MySQL数据库重启，重新连接
-            if(error.number() == 2006){
-                query.clear();
-                openDatabase(true);
-            }
-
-            *errorType = IM::ERROR_UnKnownError;
-            return false;
-        }
-
-        statement = "select @sysID;";
-        query.exec(statement);
-        if(!query.first()){
-            qCritical()<<QString("Can not query user SysID! Invalid record! User ID:%1").arg(userID);
-            return false;
-        }
-
-        if(sysID){
-            *sysID = query.value(0).toUInt();
-           qDebug()<<"---------------------------------sysID:"<<*sysID;
-           if(*sysID == 0){
-               *errorType = IM::ERROR_UnKnownError;
-               return false;
-           }
-        }
-
-
-
-        userInfo = getUserInfo(userID);
-        if(!userInfo){
-            *errorType = IM::ERROR_U
-
-
 }
 
 
