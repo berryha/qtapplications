@@ -81,6 +81,10 @@ public:
     bool saveUserLastLogoutInfo(UserInfo* userInfo);
     bool getUserLastLoginInfo(UserInfo *userInfo);
     
+    bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
+    bool addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist = false);
+
+
 
     bool saveUserInfoToDatabase(UserInfo *info);
 
@@ -112,7 +116,10 @@ public:
 
     bool updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName);
 
-    
+    bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
+    bool getUserBlacklistedContactsInfoFromDB(UserInfo* info);
+    bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
+
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
     
 
@@ -122,8 +129,6 @@ private:
     bool queryUserInfo(UserInfo *info);
 
     bool getUserInterestGroupsFromDatabase(UserInfo* info);
-    bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
-    bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
 
 
 

@@ -38,10 +38,11 @@ AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, Q
         }
     
     }else{
-        ui.groupBoxUserInfo->setTitle(tr("The following user has added you as a contact."));
+        ui.groupBoxUserInfo->setTitle(tr("The following user has been added you as a contact."));
         ui.pushButtonAddAsAContact->setText(tr("OK"));
         ui.groupBoxMessage->hide();
-        ui.comboBoxGroup->addItems(IMUser::instance()->contactGroups());
+        ui.comboBoxGroup->addItems(IMUser::instance()->contactGroupNames());
+        ui.comboBoxGroup->setCurrentIndex(0);
         ui.groupBoxSettings->show();
         ui.lineEditRename->setFocus();
     }
@@ -116,9 +117,9 @@ QString AddContactDialog::getNewName() const{
 
 QString AddContactDialog::getGroupname(){
     QString groupName = ui.comboBoxGroup->currentText();
-    if(groupName.trimmed().isEmpty()){
-        groupName = m_user->getDefaultGroupName();
-    }
+//    if(groupName.trimmed().isEmpty()){
+//        groupName = m_user->getDefaultGroupName();
+//    }
     return groupName;
 }
 

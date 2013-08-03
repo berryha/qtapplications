@@ -641,6 +641,53 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
 
 }
 
+bool UsersManager::deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition, bool addToBlacklist){
+
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString statement = QString("call sp_DeleteContactForUser('%1', '%2', %3, %4);  ").arg(userID).arg(contactID).arg(deleteMeFromOpposition?1:0).arg(addToBlacklist?1:0);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not delete contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+
+    return true;
+
+}
+
+bool UsersManager::addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist){
+
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString statement = QString("call sp_AddOrDeleteBlacklistedContactForUser('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(addToBlacklist?1:0);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not add or delete blacklisted contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+
+    return true;
+
+}
+
+
 //void UsersManager::slotFetchIMUsersInfo(){
 
 ////	QString groupQueryString = QString("select * from contactgroups");
@@ -1155,7 +1202,43 @@ bool UsersManager::getUserAllContactGroupsInfoFromDatabase(UserInfo* info){
      //STRING FORMATE: GroupID,GroupName,UserID,,UserID,...||GroupID,...
      //e.g. 100,Group100,user1,user2,user3||101,Group101,user4
      QString infoString = contactGroups.join(GROUP_INFO_SEPARATOR);
-     info->setContactGroupsInfoString(*infoString);
+     info->setContactGroupsInfoString(infoString);
+
+    return true;
+
+}
+
+bool UsersManager::getUserBlacklistedContactsInfoFromDB(UserInfo* info){
+
+    //infoString FORMATE: UserID,UserID,...
+    //e.g. user1,user2,user3
+
+
+    if(!info){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("call sp_GetBlacklistedContactsInfoForUserAsString('%1'); ").arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user blacklisted contacts info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+    query.first();
+
+
+    QString infoString = query.value(0).toString();
+    info->setBlacklistInfoString(infoString);
 
     return true;
 
@@ -1239,10 +1322,20 @@ bool UsersManager::saveUserInfoToDatabase(UserInfo *info){
         return false;
     }
     
-    QString updateSQLStatement = info->getUpdateSQLStatement();
-    if(updateSQLStatement.trimmed().isEmpty()){
+    QString summaryInfoUpdateSQLStatement = info->getUpdateSQLStatement(true);
+    QString detailInfoStatement = info->getUpdateSQLStatement(false);
+    QString statement = "" ;
+    if(!summaryInfoUpdateSQLStatement.trimmed().isEmpty()){
+        statement = QString("update UsersSummaryInfo set %1 where %2='%3'; ").arg(summaryInfoUpdateSQLStatement).arg(info->databaseColumnName(IM::PI_SysID)).arg(info->getSysID());
+    }
+    if(!detailInfoStatement.trimmed().isEmpty()){
+        statement += QString("update UsersDetailedInfo set %1 where %2='%3'; ").arg(summaryInfoUpdateSQLStatement).arg(info->databaseColumnName(IM::PI_SysID)).arg(info->getSysID());
+    }
+
+    if(statement.isEmpty()){
         return false;
     }
+
     
 //    if(!query){
 //        if(!openDatabase()){
@@ -1258,7 +1351,7 @@ bool UsersManager::saveUserInfoToDatabase(UserInfo *info){
         }
     } 
     QSqlQuery query(db);
-    QString statement = QString("update users_detailed_info set %1 where %2='%3' ").arg(updateSQLStatement).arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
+//    QString statement = QString("update users_detailed_info set %1 where %2='%3' ").arg(updateSQLStatement).arg(info->databaseColumnName(IM::PI_UserID)).arg(info->getUserID());
     
 //    query = queryDatabase(statement, false);
 //    if((query.lastError().type() != QSqlError::NoError)){
@@ -1333,7 +1426,7 @@ bool UsersManager::deleteFriendshipApplyRequest(const QString &applicantID, cons
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("delete from friendshipapply where SenderID='%1' and ReceiverID='%2' ").arg(applicantID).arg(contactID);
+    QString statement = QString("delete from friendshipapply where Sender='%1' and Receiver='%2' ").arg(applicantID).arg(contactID);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1698,8 +1791,8 @@ bool UsersManager::createNewInterestGroup(quint32 groupTypeID, quint32 parentGro
     }
     
     quint32 groupID = query.value(0).toUInt();
-    Group *Group = queryInterestGroup(groupID);
-    if(!Group){
+    InterestGroup *group = queryInterestGroup(groupID);
+    if(!group){
         return false;
     }
     

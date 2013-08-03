@@ -430,7 +430,7 @@ public slots:
 
     
     
-    bool deleteContact(int serverSocketID, const QString &contactID, quint32 groupID, bool deleteMeFromOpposition = false){
+    bool deleteContact(int serverSocketID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false){
         qDebug()<<"--deleteContact(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -441,7 +441,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << groupID << deleteMeFromOpposition;
+        out << contactID << quint8(deleteMeFromOpposition?1:0) << quint8(addToBlacklist?1:0);
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
@@ -600,6 +600,28 @@ public slots:
         ba.clear();
         out.device()->seek(0);
         out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+
+    }
+
+    bool requestPersonalContactGroupsInfo(int serverSocketID){
+        //qWarning()<<"--requestPersonalContactGroupsInfo(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CONTACT_GROUPS_INFO));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << m_myUserID;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -1101,27 +1123,6 @@ private slots:
     }
 
 
-    bool requestPersonalContactGroupsInfo(int serverSocketID){
-        //qWarning()<<"--requestPersonalContactGroupsInfo(...)";
-        
-        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::CONTACT_GROUPS_INFO));
-        packet->setTransmissionProtocol(TP_RUDP);
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
-
-        out << m_myUserID;
-        packet->setPacketData(ba);
-
-        ba.clear();
-        out.device()->seek(0);
-        QVariant v;
-        v.setValue(*packet);
-        out << v;
-        return m_rtp->sendReliableData(serverSocketID, &ba);
-
-    }
 
     bool requestPersonalContacsInfoVersion(int serverSocketID){
         //qWarning()<<"--requestPersonalContacsVersionInfo(...)";

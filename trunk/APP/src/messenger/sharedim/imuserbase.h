@@ -69,6 +69,9 @@ public:
     IMUserBase(const QString & userID, QObject *parent = 0);
     virtual ~IMUserBase();
 
+    static QString defaultContactGroupName();
+    static quint32 defaultContactGroupID();
+
     QByteArray encryptedPassword() const;
     
     void addUpdatedPersonalInfoProperty(IM::PropertyIDOfUser propertyID, const QString &value, bool summaryInfo);
@@ -79,10 +82,6 @@ public:
 
     quint32 updatePersonalContactGroupsInfoVersion();
     
-//    QString getDefaultGroupName() const;
-
-
-
 
 
     FriendshipApply getFriendshipApply() const
@@ -262,8 +261,10 @@ public slots:
 
 
     QList<ContactGroupBase *> getContactGroups();
+    QStringList contactGroupNames();
     ContactGroupBase * getContactGroup(int personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
+    quint32 getContactGroupID(const QString &groupName);
     ContactGroupBase * addContactGroup(int contactGroupID);
     void deleteContactGroup(quint32 contactGroupID);
 
@@ -290,6 +291,8 @@ public slots:
     quint32 updateBlacklistInfoVersion();
     QString getBlacklistInfoString();
     void setBlacklistInfoString(const QString &blacklistInfoString);
+    bool isContactBlacklisted(const QString &contactID);
+    QStringList blacklistedContacts();
 
     //    bool hasContact(const QString &contactID);
     //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
@@ -303,7 +306,6 @@ private:
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
 //    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
     QHash<int/*Group ID*/, ContactGroupBase *> personalContactGroupsHash;
-
 
     //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
 

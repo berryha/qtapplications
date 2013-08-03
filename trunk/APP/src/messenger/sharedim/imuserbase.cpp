@@ -66,6 +66,13 @@ IMUserBase::~IMUserBase() {
 
 }
 
+QString IMUserBase::defaultContactGroupName(){
+    return ContactGroupBase::Group_Friends_Name;
+}
+quint32 IMUserBase::defaultContactGroupID(){
+    return ContactGroupBase::Group_Friends_ID;
+}
+
 void IMUserBase::init(){
 
     userRole = 0;
@@ -521,6 +528,22 @@ QList<ContactGroupBase *> IMUserBase::getContactGroups(){
     return personalContactGroupsHash.values();
 }
 
+QStringList IMUserBase::contactGroupNames(){
+
+    QList<int> groupIDs = personalContactGroupsHash.keys();
+    groupIDs.removeAll(ContactGroupBase::Group_Strangers_ID);
+    groupIDs.removeAll(ContactGroupBase::Group_Blacklist_ID);
+    //groupIDs.removeAll(ContactGroupBase::Group_Friends_ID);
+
+    QStringList groupNames;
+    foreach (int groupID , groupIDs) {
+        groupNames.append(personalContactGroupsHash.value(groupID)->getGroupName());
+    }
+
+    return groupNames;
+
+}
+
 ContactGroupBase *IMUserBase::getContactGroup(int personalContactGroupID){
     ContactGroupBase * group = 0;
     if(personalContactGroupsHash.contains(personalContactGroupID)){
@@ -536,6 +559,15 @@ ContactGroupBase *IMUserBase::getContactGroup(const QString &groupName){
         if(contactGroup->getGroupName().toLower() == groupName.toLower()){
             return contactGroup;
         }
+    }
+
+    return 0;
+}
+
+quint32 IMUserBase::getContactGroupID(const QString &groupName){
+    ContactGroupBase * contactGroup = getContactGroup(groupName);
+    if(contactGroup){
+        return contactGroup->getGroupID();
     }
 
     return 0;
@@ -649,7 +681,7 @@ bool IMUserBase::addOrDeleteContact(const QString &contactID, int groupID, bool 
     }
 
 
-    updatePersonalContactGroupsInfoVersion();
+//    updatePersonalContactGroupsInfoVersion();
     //    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
     
     return true;
@@ -754,6 +786,14 @@ void IMUserBase::setBlacklistInfoString(const QString &blacklistInfoString){
     }
 //    addUpdatedPersonalInfoProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
 
+}
+
+bool IMUserBase::isContactBlacklisted(const QString &contactID){
+    return blacklist.contains(contactID);
+}
+
+QStringList IMUserBase::blacklistedContacts(){
+    return blacklist;
 }
 
 

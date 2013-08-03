@@ -222,9 +222,9 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_BlacklistInfoVersion:
         columnName = "BlacklistInfoVersion";
         break;
-    case IM::PI_Blacklist:
-        columnName = "Blacklist";
-        break;
+//    case IM::PI_Blacklist:
+//        columnName = "Blacklist";
+//        break;
     case IM::PI_PersonalDetailInfoVersion:
         columnName = "PersonalDetailInfoVersion";
         break;
@@ -329,18 +329,6 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 
 
 
-}
-
-bool UserInfo::addContactGroup(quint32 groupID, const QString &groupName, const QStringList &members){
-
-    QHash<QString, QStringList> personalContactGroups = getPersonalContactGroupsHash();
-    personalContactGroups.insert(groupName, members);
-    setPersonalContactGroupsHash(personalContactGroups);
-
-    updatePersonalContactGroupsInfoVersion();
-    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
-
-    return true;
 }
 
 bool UserInfo::createOrDeleteContactGroup(const QString &groupName, bool create){

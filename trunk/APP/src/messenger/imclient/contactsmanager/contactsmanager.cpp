@@ -682,7 +682,7 @@ void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, const QSt
 
 void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID){
 
-    updateContactToUI(expandListView, getPersonalContactGroupName(personalContactGroupID), contactID);
+    updateContactToUI(expandListView, personalContactGroupID, contactID);
 
 }
 
@@ -869,33 +869,33 @@ bool ContactsManager::slotdeleteContactFromDatabase(Contact *contact){
 
 }
 
-QString ContactsManager::getPersonalContactGroupName(int personalContactGroupID) {
+//QString ContactsManager::getPersonalContactGroupName(int personalContactGroupID) {
 
-    if(!localUserDataDB.isValid()){
-        if(!openDatabase()){
-            return "";
-        }
-    }
-    QSqlQuery query(localUserDataDB);
+//    if(!localUserDataDB.isValid()){
+//        if(!openDatabase()){
+//            return "";
+//        }
+//    }
+//    QSqlQuery query(localUserDataDB);
     
-    QString queryString = QString("Select [GroupName]  From [contactgroups] where [GroupID] = %1 ").arg(personalContactGroupID);
+//    QString queryString = QString("Select [GroupName]  From [contactgroups] where [GroupID] = %1 ").arg(personalContactGroupID);
 
-    //QSqlQuery query = queryDatabase(queryString, true);
-    if(!query.exec(queryString)){
-        qCritical()<<QString("Can not get contact group name! Group ID:'%1', Error:%2").arg(personalContactGroupID).arg(query.lastError().text());
+//    //QSqlQuery query = queryDatabase(queryString, true);
+//    if(!query.exec(queryString)){
+//        qCritical()<<QString("Can not get contact group name! Group ID:'%1', Error:%2").arg(personalContactGroupID).arg(query.lastError().text());
 
-        return "";
-    }
+//        return "";
+//    }
     
-    query.first();
-    if(!query.isValid()){
-        return "";
-    }
+//    query.first();
+//    if(!query.isValid()){
+//        return "";
+//    }
     
     
-    return query.value(0).toString();
+//    return query.value(0).toString();
     
-}
+//}
 
 int ContactsManager::slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName){
     qDebug()<<"--slotAddNewContactGroupToDatabase(...)";
@@ -1244,13 +1244,6 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
     qDebug()<<"--ContactsManager::saveContactInfoToDatabase(...)";
     
 
-    if(!localUserDataDB.isValid()){
-        if(!openDatabase()){
-            return false;
-        }
-    }
-    QSqlQuery query(localUserDataDB);
-
     Contact *contact = 0;
     if(contactHash.contains(contactID)){
         contact = contactHash.value(contactID);
@@ -1264,6 +1257,15 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
         qCritical()<<"Error! Empty Update SQL Statement";
         return false;
     }
+
+    if(!localUserDataDB.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(localUserDataDB);
+
+
     
     QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);   
     if(!query.exec(statement)){

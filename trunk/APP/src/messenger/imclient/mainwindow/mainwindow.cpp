@@ -1706,7 +1706,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 if(groupID != oldGroupID){
                     contact->setContactGroupID(groupID);
                     m_contactsManager->saveContactInfoToDatabase(contactID);
-                    m_contactsManager->moveContactToUI(friendBox, oldGroupID, groupID);
+                    m_contactsManager->moveContactToUI(friendBox, oldGroupID, groupID, contactID);
                 }
             }
 
@@ -1725,10 +1725,13 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersionString){
     qDebug()<<"--MainWindow::slotProcessContactsInfoVersion(...)"<<" -contactsInfoVersionString:"<<contactsInfoVersionString;
 
-    //String FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion;UserID,...
+    //infoString FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion;UserID,...
     //e.g. user1,10,10;user2,5,6;user3,11,10
 
     if(contactsInfoVersionString.trimmed().isEmpty()){return;}
+
+    bool needToUpdateContactGroupsInfo = false;
+
 
     QStringList list = contactsInfoVersionString.split(";");
     foreach (QString info, list) {
@@ -1741,17 +1744,20 @@ void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersi
         quint32 summaryInfoVersion = infoList.at(1).toUInt();
         quint32 detailInfoVersion = infoList.at(2).toUInt();
 
-        Contact *contact = m_contactsManager->getUser(userID);
-        //TODO:
+
+        Contact *contact = m_contactsManager->getUser(contactID);
         if(!contact){
-            contact = m_contactsManager->createNewContact(contactID);
-            clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
-            //m_contactsManager->slotAddNewContactToDatabase(contact);
+            //NOTE:Need to sync data with server
+            needToUpdateContactGroupsInfo = true;
+            //contact = m_contactsManager->createNewContact(contactID);
+            //clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             continue;
         }else{
-            //TODO:Blacklist
-            int groupID = imUser->groupIDThatContactBelongsTo(contactID);
-            if(groupID == ContactGroupBase::Group_Blacklist_ID){
+            //int groupID = imUser->groupIDThatContactBelongsTo(contactID);
+            int groupID = contact->getContactGroupID();
+            if(groupID == ContactGroupBase::Group_Blacklist_ID || groupID == ContactGroupBase::Group_Strangers_ID){
+                //NOTE:Need to sync data with server
+                needToUpdateContactGroupsInfo = true;
                 continue;
             }
 
@@ -1765,6 +1771,11 @@ void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersi
 
 
     }
+
+    if(needToUpdateContactGroupsInfo){
+        clientPacketsParser->requestPersonalContactGroupsInfo(m_socketConnectedToServer);
+    }
+
 
 }
 
@@ -1804,7 +1815,7 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
         m_contactsManager->addOrDeleteContact(contactID, groupID, true);
         m_contactsManager->saveContactInfoToDatabase(contactID);
 
-        m_contactsManager->addContactToUI(friendBox, groupName, contactID);
+        m_contactsManager->addContactToUI(friendBox, groupID, contactID);
 
 
         imUser->addOrDeleteContact(contactID, groupID, true);
@@ -1869,31 +1880,51 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     }
 
     
-    int groupID = m_contactsManager->getPersonalContactGroupID(groupName);
+    int groupID = imUser->getContactGroupID(groupName);
     if(!groupID){
-        groupID = m_contactsManager->slotAddNewContactGroupToDatabase(groupName);
+        groupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, groupName);
         m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
     }
     //qDebug()<<"---------groupID:"<<groupID<<"  groupName"<<groupName;
 
-    imUser->moveContact(contactID, existingGroupName, groupName);
-    imUser->saveMyInfoToLocalDatabase();
-    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupName, groupName);
+    quint32 existingGroupID = imUser->getContactGroupID(existingGroupName);
 
-    contact->setContactGroupID(groupID);
+    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupID, groupID);
+
+    m_contactsManager->moveContact(contactID, existingGroupID, groupID);
     m_contactsManager->saveContactInfoToDatabase(contactID);
-    m_contactsManager->moveContact(contactID, m_contactsManager->getPersonalContactGroupID(existingGroupName), groupID);
+    imUser->saveMyInfoToLocalDatabase();
+
 
     if(existingGroupName.isEmpty()){
-        m_contactsManager->addContactToUI(friendBox, groupName, contactID);
+        m_contactsManager->addContactToUI(friendBox, groupID, contactID);
     }else{
-        m_contactsManager->moveContactToUI(friendBox, existingGroupName, groupName, contactID);
+        m_contactsManager->moveContactToUI(friendBox, existingGroupID, groupID, contactID);
     }
 
     
 }
 
 void MainWindow::slotProcessBlacklistInfo(const QString &blacklistOnServer, quint32 blacklistInfoVersionOnServer){
+
+    QStringList list = imUser->blacklistedContacts();
+    foreach (QString contactID, list) {
+        Contact *ct = m_contactsManager->getUser(contactID);
+        if(!ct){
+            ct = m_contactsManager->createNewContact(contactID);
+            ct->setContactGroupID(ContactGroupBase::Group_Blacklist_ID);
+            m_contactsManager->saveContactInfoToDatabase(contactID);
+        }else{
+            int oldGroupID = ct->getContactGroupID();
+            if(oldGroupID != ContactGroupBase::Group_Blacklist_ID){
+                m_contactsManager->deleteContactFromUI(friendBox, oldGroupID, contactID);
+                ct->setContactGroupID(ContactGroupBase::Group_Blacklist_ID);
+                m_contactsManager->saveContactInfoToDatabase(contactID);
+            }
+        }
+
+    }
+
 
     imUser->setBlacklistInfoString(blacklistOnServer);
     imUser->setBlacklistInfoVersion(blacklistInfoVersionOnServer);

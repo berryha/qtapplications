@@ -271,6 +271,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
             //Get contact groups info
             getUserAllContactGroupsInfoFromDatabase(userInfo);
+            //Load blacklist
+            getUserBlacklistedContactsInfoFromDB(userInfo);
+
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
@@ -281,9 +284,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             sendContactsOnlineInfo(socketID, userInfo);
 
             //Send contacts version info to user
-            QString versionInfo = "";
-            if(getUserAllContactsInfoVersionFromDatabase(userInfo, &versionInfo)){
-                sendPersonalContactsInfoVersionPacket(socketID, versionInfo, sessionEncryptionKey);
+            QString infoString = "";
+            if(getUserAllContactsInfoVersionFromDatabase(userInfo, &infoString)){
+                sendPersonalContactsInfoVersionPacket(socketID, infoString, sessionEncryptionKey);
             }
 
 
@@ -505,10 +508,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
         
         if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
-            userInfo->addOrDeleteContact(contactID, userInfo->getDefaultGroupName(), true);
+            userInfo->addOrDeleteContact(contactID, userInfo->defaultContactGroupID(), true);
             sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
 
-            contactInfo->addOrDeleteContact(userID, contactInfo->getDefaultGroupName(), true);
+            contactInfo->addOrDeleteContact(userID, contactInfo->defaultContactGroupID(), true);
             if(contactInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
                 sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
             }else{
@@ -584,7 +587,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         //TODO:
         if(acceptRequest){
-            contactInfo->addOrDeleteContact(userID, "", true);
+            contactInfo->addOrDeleteContact(userID, UserInfo::defaultContactGroupID(), true);
 
             if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
                 //TODO:保存请求到数据库
@@ -630,21 +633,30 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "";
-        quint32 groupID = 0;
-        bool deleteMeFromOpposition = false;
-        stream >> contactID >> groupID >> deleteMeFromOpposition;
+        quint8 deleteMeFromOpposition = 0, addToBlacklist = 0;
+        stream >> contactID >> deleteMeFromOpposition >> addToBlacklist;
 
-        userInfo->addOrDeleteContact(contactID, groupID, false);
+        //TODO:数据库
+        //deleteFriendshipApplyRequest(userID, contactID);
+        deleteContactForUserFromDB(userID, contactID, deleteMeFromOpposition, addToBlacklist);
+
+        userInfo->addOrDeleteContact(contactID, userInfo->groupIDThatContactBelongsTo(contactID), false);
         if(deleteMeFromOpposition){
             //TODO:
-            UserInfo *contactInfo = getUserInfo(contactID);
+            UserInfo *contactInfo = getOnlineUserInfo(contactID);
+            if(!contactInfo){
+                contactInfo = getOfflineUserInfo(contactID);;
+            }
             if(!contactInfo){return;}
-            contactInfo->addOrDeleteContact(userID, "", false);
+            contactInfo->addOrDeleteContact(userID, contactInfo->groupIDThatContactBelongsTo(userID), false);
 
-            deleteFriendshipApplyRequest(contactID, userID);
+            //deleteFriendshipApplyRequest(contactID, userID);
         }
-        //TODO:从数据库删除请求
-        deleteFriendshipApplyRequest(userID, contactID);
+        if(addToBlacklist){
+            userInfo->addOrDeleteBlacklistedContact(contactID, true);
+            userInfo->clearUpdatedProperties();
+        }
+
 
         //qDebug()<<"------------contactID:"<<contactID<<" groupName:"<<groupName;
 
@@ -672,18 +684,22 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         bool addToBlacklist = true;
         stream >> contactID >> addToBlacklist;
 
+        addOrDeleteBlacklistedContactForUserFromDB(userID, contactID, addToBlacklist);
+
         userInfo->addOrDeleteBlacklistedContact(contactID, addToBlacklist);
+        userInfo->clearUpdatedProperties();
 
-        if(addToBlacklist){
-            //TODO:
-            UserInfo *contactInfo = getUserInfo(contactID);
-            if(!contactInfo){return;}
-            contactInfo->addOrDeleteContact(userID, "", false);
 
-            //TODO:从数据库删除请求
-            deleteFriendshipApplyRequest(userID, contactID);
-            deleteFriendshipApplyRequest(contactID, userID);
-        }
+//        if(addToBlacklist){
+//            //TODO:
+//            UserInfo *contactInfo = getUserInfo(contactID);
+//            if(!contactInfo){return;}
+//            contactInfo->addOrDeleteContact(userID, contactInfo->groupIDThatContactBelongsTo(userID), false);
+
+//            //TODO:从数据库删除请求
+//            deleteFriendshipApplyRequest(userID, contactID);
+//            deleteFriendshipApplyRequest(contactID, userID);
+//        }
 
     }
         break;
@@ -818,8 +834,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CREATE_OR_DELETE_CONTACT_GROUP):
     {
         qDebug()<<"--CREATE_OR_DELETE_CONTACT_GROUP";
-
-
 
         QString userID = peerID;
         QByteArray encryptedData;

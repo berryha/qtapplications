@@ -83,7 +83,6 @@ public slots:
     void updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
     void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 
-
     void renameContactGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
 
 
@@ -97,7 +96,7 @@ public slots:
 
 
 
-    QString getPersonalContactGroupName(int personalContactGroupID) ;
+//    QString getPersonalContactGroupName(int personalContactGroupID) ;
     int slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
     bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteGroupFromDatabase(const QString &groupName);
