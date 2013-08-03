@@ -257,29 +257,29 @@ public slots:
     void setPersonalInfoString(const QString &personalInfoString, bool summaryInfo);
     QString getPersonalInfoString(bool requestSummaryInfo) const;
 
-    void setContactGroupsInfoString(const QString &contactGroupsInfo, const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR);
-    virtual QString getContactGroupsInfoString(const QString &rowSepartor = CONTACT_GROUPS_INFO_ROW_SEPARATOR, const QString &fieldSepartor = CONTACT_GROUPS_INFO_FIELD_SEPARATOR) const;
+    void setContactGroupsInfoString(const QString &contactGroupsInfo);
+    virtual QString getContactGroupsInfoString() const;
 
 
     QList<ContactGroupBase *> getContactGroups();
-    ContactGroupBase * getContactGroup(quint32 personalContactGroupID);
+    ContactGroupBase * getContactGroup(int personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
-    ContactGroupBase * addContactGroup(quint32 contactGroupID);
+    ContactGroupBase * addContactGroup(int contactGroupID);
     void deleteContactGroup(quint32 contactGroupID);
 
     QString groupNameThatContactBelongsTo(const QString &contactID) const;
-    quint32 groupIDThatContactBelongsTo(const QString &contactID);
+    int groupIDThatContactBelongsTo(const QString &contactID);
 
     bool hasContactGroup(quint32 groupID);
     bool hasContactGroup(const QString &groupName);
 
-    QStringList getContactGroupMembers(quint32 groupID);
-    int countOfContactGroupMembers(quint32 groupID);
+    QStringList getContactGroupMembers(int groupID);
+    int countOfContactGroupMembers(int groupID);
 
 
-    virtual QStringList getAllContacts() const;
-    bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
-    bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
+    virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
+    bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
+    bool moveContact(const QString &contactID, int oldGroupID, quint32 newGroupID);
     
 
     bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);
@@ -302,7 +302,7 @@ private:
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
 //    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
-    QHash<quint32/*Group ID*/, ContactGroupBase *> personalContactGroupsHash;
+    QHash<int/*Group ID*/, ContactGroupBase *> personalContactGroupsHash;
 
 
     //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;

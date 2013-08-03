@@ -432,6 +432,34 @@ public slots:
 
     }
 
+    bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendPersonalContactsInfoVersionPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::CONTACTS_INFO_VERSION));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << contactsInfoVersion;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
     bool sendContactOnlineStatusChangedPacket(int peerSocketID, const QString &contactID, quint8 onlineStateCode, const QByteArray &sessionEncryptionKey, const QString &contactHostAddress, quint16 contactHostPort, const QString &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendContactOnlineStatusChangedPacket(...)";
         

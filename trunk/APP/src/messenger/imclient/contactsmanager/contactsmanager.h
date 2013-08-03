@@ -77,7 +77,7 @@ public slots:
     void slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName);
     void slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName);
 
-    void addContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
+    void addContactToUI(ItemBoxWidget *expandListView, int groupID, const QString &contactID);
     void deleteContactFromUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &contactID);
     void moveContactToUI(ItemBoxWidget *expandListView, quint32 old_groupID, quint32 new_groupID, const QString &contactID);
     void updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);

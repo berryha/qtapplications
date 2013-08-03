@@ -1122,7 +1122,30 @@ private slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
 
     }
-    
+
+    bool requestPersonalContacsInfoVersion(int serverSocketID){
+        //qWarning()<<"--requestPersonalContacsVersionInfo(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CONTACTS_INFO_VERSION));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << m_myUserID;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+
+    }
+
+
 
 
 private slots:
@@ -1144,6 +1167,7 @@ signals:
     void signalContactsOnlineInfoPacketReceived(const QString &contactsOnlineInfoString);
     void signalUserInfoPacketReceived(const QString &userID/*, const QString &userInfo*/);
     void signalContactGroupsInfoPacketReceived(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
+    void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString);
 
     void signalSearchContactsResultPacketReceived(const QStringList &users);
     //void signalAddContactResultPacketReceived(const QString &contactID, IM::ErrorType errorType);

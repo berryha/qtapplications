@@ -348,6 +348,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )));
     connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &)), this, SLOT(slotProcessUserInfo(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString)), this, SLOT(slotProcessContactsInfoVersion(const QString)), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
@@ -1663,12 +1664,21 @@ void MainWindow::slotProcessUserInfo(const QString &userID/*, const QString &use
 void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer){
     qDebug()<<"--MainWindow::slotProcessContactGroupsInfo(...)"<<" -contactGroupsInfo:"<<contactGroupsInfo;
 
+    //STRING FORMATE: GroupID,GroupName,UserID,,UserID,...||GroupID,...
+    //e.g. 100,Group100,user1,user2,user3||101,Group101,user4
 
-    QStringList groupsInfoList = contactGroupsInfo.split(CONTACT_GROUPS_INFO_ROW_SEPARATOR);
+    //TODO
+//    if(contactGroupsInfo.trimmed().isEmpty()){
+//        return;
+//    }
+
+    QStringList groupsInfoList = contactGroupsInfo.split(GROUP_INFO_SEPARATOR);
     for(int i=0; i<groupsInfoList.size(); i++) {
-        QStringList gInfoList = groupsInfoList.at(i).split(CONTACT_GROUPS_INFO_FIELD_SEPARATOR);
-        quint32 groupID = gInfoList.at(0).toUInt();
-        QString groupName = gInfoList.at(1);
+        QStringList contactList = groupsInfoList.at(i).split(",");
+        Q_ASSERT(contactList.size() >= 2);
+
+        quint32 groupID = contactList.takeFirst().toUInt();
+        QString groupName = contactList.takeFirst();
 
         ContactGroupBase * contactGroup = imUser->getContactGroup(groupID);
         if(contactGroup){
@@ -1676,58 +1686,83 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 m_contactsManager->renameContactGroupToDatabase(groupID, groupName);
                 m_contactsManager->renameContactGroupToUI(friendBox, groupID, groupName);
             }
-
         }else{
             contactGroup = imUser->addContactGroup(groupID);
             m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
             m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
         }
-
         contactGroup->setGroupName(groupName);
-    }
-       
-    
-    //    contactsManager->saveContactGroupsInfoToDatabase();
-    
-//    imUser->setContactGroupsInfoString(contactGroupsInfo);
-    imUser->setPersonalContactGroupsVersion(personalContactGroupsInfoVersionOnServer);
-    
-    imUser->saveMyInfoToLocalDatabase();
+        contactGroup->setMembers(contactList);
+        contactGroup->clearUpdatedProperties();
 
-    //    slotUpdateContactsInfo();
-    
-}
-
-void MainWindow::slotProcessContactsInfo(const QString &contactsInfo){
-    qDebug()<<"--MainWindow::slotProcessContactsInfo(...)";
-
-    if(contactsInfo.trimmed().isEmpty()){return;}
-
-
-
-
-    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash = imUser->getPersonalContactGroupsHash();
-    QStringList groups = personalContactGroupsHash.keys();
-    foreach (QString groupName, groups) {
-        int groupID = m_contactsManager->getPersonalContactGroupID(groupName);
-        if(!groupID){
-            groupID = m_contactsManager->slotAddNewContactGroupToDatabase(groupName);
-            m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
-        }
-        QStringList members = personalContactGroupsHash.value(groupName);
-        foreach (QString contactID, members) {
-            if(contactID.trimmed().isEmpty()){continue;}
+        foreach (QString contactID, contactList) {
             Contact *contact = m_contactsManager->getUser(contactID);
             if(!contact){
                 contact =  m_contactsManager->createNewContact(contactID);
-//                contact = new Contact(contactID, 0);
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
-//                contactsManager->slotAddNewContactToDatabase(contact);
-                m_contactsManager->addContactToUI(friendBox, groupName, contactID);
+                m_contactsManager->addContactToUI(friendBox, groupID, contactID);
+            }else{
+                int oldGroupID = contact->getContactGroupID();
+                if(groupID != oldGroupID){
+                    contact->setContactGroupID(groupID);
+                    m_contactsManager->saveContactInfoToDatabase(contactID);
+                    m_contactsManager->moveContactToUI(friendBox, oldGroupID, groupID);
+                }
             }
-            contact->setContactGroupID(groupID);
-            m_contactsManager->saveContactInfoToDatabase(contactID);
+
         }
+
+
+    }
+
+
+//    imUser->setContactGroupsInfoString(contactGroupsInfo);
+//    imUser->saveMyInfoToLocalDatabase();
+
+    
+}
+
+void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersionString){
+    qDebug()<<"--MainWindow::slotProcessContactsInfoVersion(...)"<<" -contactsInfoVersionString:"<<contactsInfoVersionString;
+
+    //String FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion;UserID,...
+    //e.g. user1,10,10;user2,5,6;user3,11,10
+
+    if(contactsInfoVersionString.trimmed().isEmpty()){return;}
+
+    QStringList list = contactsInfoVersionString.split(";");
+    foreach (QString info, list) {
+        QStringList infoList = info.split(",");
+        if(infoList.size() != 3 ){
+            qCritical()<<"ERROR! Invalid version info format!";
+            continue;
+        }
+        QString contactID = infoList.at(0);
+        quint32 summaryInfoVersion = infoList.at(1).toUInt();
+        quint32 detailInfoVersion = infoList.at(2).toUInt();
+
+        Contact *contact = m_contactsManager->getUser(userID);
+        //TODO:
+        if(!contact){
+            contact = m_contactsManager->createNewContact(contactID);
+            clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
+            //m_contactsManager->slotAddNewContactToDatabase(contact);
+            continue;
+        }else{
+            //TODO:Blacklist
+            int groupID = imUser->groupIDThatContactBelongsTo(contactID);
+            if(groupID == ContactGroupBase::Group_Blacklist_ID){
+                continue;
+            }
+
+            if(summaryInfoVersion > contact->getPersonalSummaryInfoVersion()){
+                clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
+            }
+            if(detailInfoVersion > contact->getPersonalDetailInfoVersion()){
+                clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID, false);
+            }
+        }
+
 
     }
 

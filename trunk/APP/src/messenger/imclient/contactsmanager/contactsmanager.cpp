@@ -615,8 +615,8 @@ void ContactsManager::slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView
     expandListView->removeCategory(groupName);
 }
 
-void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
-    qDebug()<<"--ContactsManager::addContactToUI(...)  groupName:"<<groupName<<" contactID:"<<contactID;
+void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, int groupID, const QString &contactID){
+    qDebug()<<"--ContactsManager::addContactToUI(...)  groupID:"<<groupID<<" contactID:"<<contactID;
 
     Contact *contact = 0;
     if(!contactHash.contains(contactID)){
@@ -639,7 +639,7 @@ void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, const QStrin
 
     objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
 
-    expandListView->addItem(groupName, objectItem);
+    expandListView->addItem(QString::number(groupID), objectItem);
 
 
 }
