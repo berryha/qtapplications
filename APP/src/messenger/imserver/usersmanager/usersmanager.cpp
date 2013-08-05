@@ -1281,9 +1281,11 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
 
 }
 
+bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup){
 
-
-bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName){
+    if(!info){
+        return false;
+    }
 
     if(!db.isValid()){
         if(!openDatabase()){
@@ -1291,7 +1293,36 @@ bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 gr
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_UpdateUserContactGroupName('%1', %2, '%3', @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
+    QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4, @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(groupName).arg(createGroup?1:0);
+    statement += QString(" select @GroupInfoVersion; ");
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not create or delete contact group for user! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+    if(query.first()){
+        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
+        info->clearUpdatedProperties();
+    }
+
+
+    return true;
+
+}
+
+bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, const QString &newGroupName){
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3', @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
     statement += QString(" select @GroupInfoVersion; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1302,6 +1333,7 @@ bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 gr
     }
     if(query.first()){
         info->setPersonalContactGroupsVersion(query.value(0).toUInt());
+        info->clearUpdatedProperties();
     }
 
 //    QStringList groups;
@@ -1315,6 +1347,7 @@ bool UsersManager::updateUserPersonalContactGroupName(UserInfo* info, quint32 gr
 
 
 }
+
 
 bool UsersManager::saveUserInfoToDatabase(UserInfo *info){
     //TODO:

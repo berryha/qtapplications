@@ -1273,7 +1273,7 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
             //}
             //TODO:
 
-            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupIDString, false);
+            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupID, "", false);
 
             m_contactsManager->deleteGroupFromDatabase(groupIDString);
             //TODO?
@@ -1305,9 +1305,8 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
                     return;
                 }
 
-                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, newGroupName, true);
-
                 int groupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, newGroupName);
+                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupID, newGroupName, true);
                 m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, newGroupName);
             }
             

@@ -78,7 +78,6 @@ public:
 
 
 public slots:
-    bool createOrDeleteContactGroup(const QString &groupName, bool create);
 
 
 private:
