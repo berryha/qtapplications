@@ -114,11 +114,13 @@ public:
     bool saveCachedInterestGroupChatMessageFromIMUser(const QString &senderID, quint32 interestGroupID, const QString &message);
     QStringList cachedInterestGroupChatMessagesForIMUser(UserInfo* userInfo);
 
-    bool updateUserPersonalContactGroupName(UserInfo* info, quint32 groupID, const QString &newGroupName);
 
     bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
     bool getUserBlacklistedContactsInfoFromDB(UserInfo* info);
     bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
+    bool createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup);
+    bool updateContactGroupNameInDB(UserInfo* info, quint32 groupID, const QString &newGroupName);
+
 
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
     

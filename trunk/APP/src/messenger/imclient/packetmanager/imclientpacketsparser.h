@@ -660,7 +660,7 @@ public slots:
 
     }
 
-    bool createOrDeleteContactGroup(int serverSocketID, const QString &groupName, bool create = true){
+    bool createOrDeleteContactGroup(int serverSocketID, quint32 groupID, const QString &groupName, bool create = true){
         qDebug()<<"--createOrDeleteContactGroup(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -670,7 +670,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << groupName << create;
+        out << groupID << groupName << quint8(create?1:0);
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

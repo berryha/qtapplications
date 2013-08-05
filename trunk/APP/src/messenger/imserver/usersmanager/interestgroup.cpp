@@ -10,7 +10,7 @@
 namespace HEHUI {
 
 InterestGroup::InterestGroup(quint32 groupID, QObject *parent)
-    :InterestGroupBase(groupID, parent)
+    :InterestGroupBase(groupID, "", parent)
 {
 	
 

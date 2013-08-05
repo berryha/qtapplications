@@ -826,7 +826,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString newGroupName = "";
         stream >> groupID >> newGroupName;
 
-        updateUserPersonalContactGroupName(userInfo, groupID, newGroupName);
+        updateContactGroupNameInDB(userInfo, groupID, newGroupName);
 
     }
         break;
@@ -847,11 +847,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
+        quint32 groupID = 0;
         QString groupName = "";
-        bool create = true;
-        stream >> groupName >> create;
+        quint8 create = 1;
+        stream >> groupID >> groupName >> create;
 
-        userInfo->createOrDeleteContactGroup(groupName, create);
+        createOrDeleteContactGroupInDB(userInfo, groupID, groupName, create);
 
     }
         break;

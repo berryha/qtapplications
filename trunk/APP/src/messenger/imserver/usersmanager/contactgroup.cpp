@@ -9,7 +9,7 @@
 
 namespace HEHUI {
 
-ContactGroup::ContactGroup(int groupID, const QString &groupName, QObject *parent)
+ContactGroup::ContactGroup(quint32 groupID, const QString &groupName, QObject *parent)
     :ContactGroupBase(groupID, groupName, parent)
 {
 

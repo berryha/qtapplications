@@ -331,24 +331,6 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 
 }
 
-bool UserInfo::createOrDeleteContactGroup(const QString &groupName, bool create){
-    QHash<QString, QStringList> personalContactGroups = getPersonalContactGroupsHash();
-    
-    if(create){
-        personalContactGroups.insert(groupName, QStringList());
-    }else{
-        personalContactGroups.remove(groupName);
-    }
-    setPersonalContactGroupsHash(personalContactGroups);
-
-
-    updatePersonalContactGroupsInfoVersion();
-    addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
-
-
-    return true;
-}
-
 
 
 
