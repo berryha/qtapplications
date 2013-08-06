@@ -79,7 +79,6 @@ public:
 
     bool saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, quint16 userHostPort);
     bool saveUserLastLogoutInfo(UserInfo* userInfo);
-    bool getUserLastLoginInfo(UserInfo *userInfo);
     
     bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
     bool addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist = false);
@@ -103,7 +102,7 @@ public:
 /////////////////////////// Group Manager ////////////////////////////////////////    
     InterestGroup* getInterestGroup(quint32 groupID);
     bool createNewInterestGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName );
- 
+
     QStringList searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
     bool saveInterestGroupToDatabase(InterestGroup *groupInfo);
 
@@ -115,8 +114,6 @@ public:
     QStringList cachedInterestGroupChatMessagesForIMUser(UserInfo* userInfo);
 
 
-    bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
-    bool getUserBlacklistedContactsInfoFromDB(UserInfo* info);
     bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
     bool createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup);
     bool updateContactGroupNameInDB(UserInfo* info, quint32 groupID, const QString &newGroupName);
@@ -130,15 +127,19 @@ private:
     UserInfo * queryUserInfo(const QString &imUserID);
     bool queryUserInfo(UserInfo *info);
 
-    bool getUserInterestGroupsFromDatabase(UserInfo* info);
-
-
+    bool getUserLastLoginInfo(UserInfo *userInfo);
 
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
   
     InterestGroup * queryInterestGroup(quint32 groupID);
     bool queryInterestGroup(InterestGroup *info);
+    bool getUserInterestGroupsFromDB(UserInfo* info);
+
+
+    bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
+    bool getUserBlacklistedContactsInfoFromDB(UserInfo* info);
+
 
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
      

@@ -169,15 +169,15 @@ bool IMUser::hasFriendContact(const QString &contactID){
 }
 
 QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
-    
+    qDebug()<<"--IMUser::databaseColumnName(...)";
     
     QString columnName = "";
     switch(propertyID){
+    case IM::PI_SysID:
+        columnName = "SysID";
+        break;
     case IM::PI_UserID:
         columnName = "UserID";
-        break;
-    case IM::PI_Password:
-        columnName = "UserPassword";
         break;
     case IM::PI_TrueName:
         columnName = "TrueName";
@@ -195,12 +195,12 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         columnName = "Face";
         break;
           
+    case IM::PI_PersonalContactGroupsInfoVersion :
+        columnName = "PersonalContactGroupsInfoVersion";
+        break;
     case IM::PI_InterestGroupsInfoVersion :
         columnName = "InterestGroupsInfoVersion";
         break;  
-    case IM::PI_PersonalContactGroupsInfoVersion :
-        columnName = "PersonalContactGroupsInfoVersion";
-        break;       
     case IM::PI_BlacklistInfoVersion:
         columnName = "BlacklistInfoVersion";
         break;
@@ -210,7 +210,24 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_PersonalInfoVersion :
 //        columnName = "PersonalInfoVersion";
 //        break;
-               
+    case IM::PI_PersonalSummaryInfoVersion:
+        columnName = "PersonalSummaryInfoVersion";
+        break;
+    case IM::PI_PersonalDetailInfoVersion:
+        columnName = "PersonalDetailInfoVersion";
+        break;
+    case IM::PI_FriendshipApply:
+        columnName = "FriendshipApply";
+        break;
+    case IM::PI_ShortTalk:
+        columnName = "ShortTalk";
+        break;
+    case IM::PI_Role:
+        columnName = "Role";
+        break;
+    case IM::PI_AccountState:
+        columnName = "AccountState";
+        break;
 
     case IM::PI_HomeAddress:
         columnName = "HomeAddress";
@@ -273,19 +290,7 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_RegistrationTime:
         columnName = "RegistrationTime";
         break;
-//    case IM::PI_LoginTimes:
-//        columnName = "LoginTimes";
-//        break;
-    case IM::PI_FriendshipApply:
-        columnName = "FriendshipApply";
-        break;    
-    case IM::PI_ShortTalk:
-        columnName = "ShortTalk";
-        break;  
 
-    case IM::PI_Role:
-        columnName = "Role";
-        break;         
         
     default:
         columnName = "";

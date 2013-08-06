@@ -376,6 +376,34 @@ public slots:
 
     }
 
+    bool sendClientLastLoginInfoPacket(int peerSocketID, const QByteArray &sessionEncryptionKey, const QString &extIPAddress, const QString &loginTime, const QString &LogoutTime, const QString &deviceInfo ){
+        qDebug()<<"--sendClientLastLoginInfoPacket(...)";
+
+
+        Packet *packet = PacketHandlerBase::getPacket();
+        packet->setPacketType(quint8(IM::CLIENT_LAST_LOGIN_INFO));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << extIPAddress << loginTime << LogoutTime << deviceInfo;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName  << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
     bool sendUserInfoPacket(int peerSocketID, const QString &userID, const QString &userInfo, const QByteArray &sessionEncryptionKey, bool summaryInfo){
         qDebug()<<"--sendUserInfoPacket(...)";
         
@@ -403,6 +431,8 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
 
     }
+
+
 
     bool sendPersonalContactGroupsInfoPacket(int peerSocketID, const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendPersonalContactGroupsInfoPacket(...)";

@@ -425,8 +425,8 @@ void LoginWidget::on_loginToolButton_clicked() {
         password = QCryptographicHash::hash (password, QCryptographicHash::Sha1);
 
         user->setPassword(password.toBase64());
-        //		qDebug()<<"----LoginWidget::on_loginToolButton_clicked()~~password:"<<ui.passwordLineEdit->text();
-        //		qWarning()<<"----LoginWidget::on_loginToolButton_clicked()~~password.toBase64():"<<password.toBase64();
+        qDebug()<<"----LoginWidget::on_loginToolButton_clicked()~~password:"<<ui.passwordLineEdit->text();
+        qDebug()<<"----LoginWidget::on_loginToolButton_clicked()~~password.toBase64():"<<password.toBase64();
 
         user->setStateAfterLoggedin(invisibleLogin?IM::ONLINESTATE_INVISIBLE:IM::ONLINESTATE_ONLINE);
 

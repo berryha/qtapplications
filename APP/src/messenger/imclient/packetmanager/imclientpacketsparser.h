@@ -1163,6 +1163,7 @@ signals:
     
     void signalLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
     void signalLoginResultReceived(quint8 errorType);
+    void signalClientLastLoginInfoPacketReceived(const QString &extIPAddress, const QString &loginTime, const QString &LogoutTime, const QString &deviceInfo);
     //void signalContactStateChangedPacketReceived(const QString &contactID, IM::OnlineState onlineState, const QString &contactHostAddress, quint16 contactHostPort);
     void signalContactStateChangedPacketReceived(const QString &contactID, quint8 onlineState, const QString &contactHostAddress, quint16 contactHostPort);
     void signalContactsOnlineInfoPacketReceived(const QString &contactsOnlineInfoString);

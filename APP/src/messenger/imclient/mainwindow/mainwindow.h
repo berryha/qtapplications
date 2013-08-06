@@ -98,6 +98,8 @@ private slots:
 
     void slotProcessLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
     void slotProcessLoginResult(quint8 errorTypeCode);
+    void slotProcessClientLastLoginInfo(const QString &extIPAddress, const QString &loginTime, const QString &LogoutTime, const QString &deviceInfo);
+
     void slotProcessContactStateChanged(const QString &contactID, quint8 onlineStateCode, const QString &contactHostAddress, quint16 contactHostPort);
     void slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString);
     void slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/);

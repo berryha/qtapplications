@@ -1104,9 +1104,16 @@ bool ContactsManager::saveMyInfoToDatabase(){
     
     //IMUser *info = IMUser::instance();
     IMUser *info = m_imUser;
-    QString updateSQLStatement = info->getUpdateSQLStatement(true);
-    updateSQLStatement += " , " + info->getUpdateSQLStatement(false);
-    if(updateSQLStatement.trimmed().isEmpty()){
+    QStringList updateSQLStatements;
+    QString summaryInfoStatement = info->getUpdateSQLStatement(true);
+    QString detailInfoStatement = info->getUpdateSQLStatement(false);
+    if(!summaryInfoStatement.trimmed().isEmpty()){
+        updateSQLStatements.append(summaryInfoStatement);
+    }
+    if(!detailInfoStatement.trimmed().isEmpty()){
+        updateSQLStatements.append(detailInfoStatement);
+    }
+    if(updateSQLStatements.isEmpty()){
         return false;
     }
     
@@ -1116,10 +1123,11 @@ bool ContactsManager::saveMyInfoToDatabase(){
         }
     }
     QSqlQuery query(localUserDataDB);
-    QString statement = QString("update my_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(info->getUserID());
+    QString statement = QString("update my_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatements.join(",")).arg(info->getUserID());
+    qDebug()<<"------statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not save user info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
         return false;
     }
@@ -1251,10 +1259,17 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
         qCritical()<<"Error! Contact '"<<contactID<<"' does not exist!";
         return false;
     }
-    QString updateSQLStatement = contact->getUpdateSQLStatement(true);
-    updateSQLStatement += " , " + contact->getUpdateSQLStatement(false);
-    if(updateSQLStatement.trimmed().isEmpty()){
-        qCritical()<<"Error! Empty Update SQL Statement";
+
+    QStringList updateSQLStatements;
+    QString summaryInfoStatement = contact->getUpdateSQLStatement(true);
+    QString detailInfoStatement = contact->getUpdateSQLStatement(false);
+    if(!summaryInfoStatement.trimmed().isEmpty()){
+        updateSQLStatements.append(summaryInfoStatement);
+    }
+    if(!detailInfoStatement.trimmed().isEmpty()){
+        updateSQLStatements.append(detailInfoStatement);
+    }
+    if(updateSQLStatements.isEmpty()){
         return false;
     }
 
@@ -1267,7 +1282,7 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
 
 
     
-    QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatement).arg(contactID);   
+    QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatements.join(",")).arg(contactID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save contact info to database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());

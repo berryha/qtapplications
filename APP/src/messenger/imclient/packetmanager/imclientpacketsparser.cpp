@@ -355,12 +355,37 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::ONLINE_STATE_CHANGED):
+    case quint8(IM::CLIENT_LAST_LOGIN_INFO):
     {
 
         QByteArray encryptedData;
         in >> encryptedData;
 
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        QString extIPAddress = "", loginTime = "", LogoutTime = "", deviceInfo = "";
+        stream >> extIPAddress >> loginTime >> LogoutTime >> deviceInfo;
+        user->setLastLoginExternalHostAddress(extIPAddress);
+        user->setLastLoginTime(QDateTime::fromString(loginTime));
+        user->setLastLogoutTime(QDateTime::fromString(LogoutTime));
+        user->setLastLoginDeviceInfo(deviceInfo);
+        //TODO
+
+        emit signalClientLastLoginInfoPacketReceived(extIPAddress, loginTime, LogoutTime, deviceInfo);
+
+        qWarning()<<"--CLIENT_LAST_LOGIN_INFO";
+    }
+        break;
+
+    case quint8(IM::ONLINE_STATE_CHANGED):
+    {
+
+        QByteArray encryptedData;
+        in >> encryptedData;
 
         QByteArray decryptedData;
         cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
@@ -421,14 +446,14 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         QString userInfo = "";
-        quint8 summaryInfo = 1;
-        stream >> userInfo >> summaryInfo;
+        quint8 isSummaryInfo = 1;
+        stream >> userInfo >> isSummaryInfo;
         
         if(userID == user->getUserID()){
-            user->setPersonalInfoString(userInfo, summaryInfo);
+            user->setPersonalInfoString(userInfo, isSummaryInfo);
             user->saveMyInfoToLocalDatabase();
         }else{
-            user->setContactInfoString(userID, userInfo, summaryInfo);
+            user->setContactInfoString(userID, userInfo, isSummaryInfo);
             user->saveContactInfoToLocalDatabase(userID);
         }
 

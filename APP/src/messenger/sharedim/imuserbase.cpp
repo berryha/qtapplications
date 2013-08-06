@@ -102,8 +102,8 @@ void IMUserBase::init(){
     
     updatedPropertiesMutex =new QMutex();
     
-//    defaultGroupName = tr("Friends");
 
+    lastLoginDeviceInfo = "";
     
     
 
@@ -127,6 +127,8 @@ void IMUserBase::addUpdatedPersonalInfoProperty(IM::PropertyIDOfUser propertyID,
 }
 
 QString IMUserBase::getUpdateSQLStatement(bool summaryInfo) const{
+    qDebug()<<"--IMUserBase::getUpdateSQLStatement(...)";
+
     QMutexLocker locker(updatedPropertiesMutex);
     
     QStringList sqlstatements;
@@ -316,7 +318,7 @@ quint32 IMUserBase::updatePersonalContactGroupsInfoVersion(){
 
 
 void IMUserBase::setPersonalInfoString(const QString &personalInfoString, bool summaryInfo){
-    qDebug()<<"--IMUserBase::setPersonalSummaryInfo(...)"<<" personalSummaryInfo:"<<personalInfoString;
+    qDebug()<<"--IMUserBase::setPersonalInfoString(...)"<<" personalSummaryInfo:"<<personalInfoString;
     
     QStringList infoList = personalInfoString.split(QString(PACKET_DATA_SEPARTOR));
     if(infoList.at(0) != this->getUserID()){

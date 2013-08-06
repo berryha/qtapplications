@@ -241,6 +241,15 @@ public:
         return accountState;
     }
 
+    void setLastLoginDeviceInfo(const QString deviceInfo){
+        this->lastLoginDeviceInfo = deviceInfo;
+    }
+    QString getLastLoginDeviceInfo() const{
+        return this->lastLoginDeviceInfo;
+    }
+
+
+
 
 
 
@@ -333,8 +342,7 @@ private:
     QHash<IM::PropertyIDOfUser/*Property ID*/, QString/*SQL Update Statement*/> updatedDetailInfoProperties;
     QMutex *updatedPropertiesMutex;
 
-    
-//    QString defaultGroupName;
+    QString lastLoginDeviceInfo;
 
 
 };
