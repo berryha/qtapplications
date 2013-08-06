@@ -158,6 +158,7 @@ enum Command {
     CLIENT_LOGIN_INFO, //c
     SERVER_RESPONSE_CLIENT_LOGIN_RESULT, //s
     SERVER_RESPONSE_CLIENT_LOGIN_REDIRECTION, //s
+    CLIENT_LAST_LOGIN_INFO, //s
 
     ONLINE_STATE_CHANGED, //c s
 
@@ -296,8 +297,8 @@ enum PropertyIDOfUser{
     PI_BlacklistInfoVersion,
 //    PI_Blacklist,
 //    PI_PersonalInfoVersion,
-    PI_PersonalDetailInfoVersion,
     PI_PersonalSummaryInfoVersion,
+    PI_PersonalDetailInfoVersion,
     PI_FriendshipApply,
     PI_ShortTalk,
     PI_Role,

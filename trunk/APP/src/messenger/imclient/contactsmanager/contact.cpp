@@ -83,9 +83,6 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_UserID:
         columnName = "UserID";
         break;
-    case IM::PI_Password:
-        columnName = "UserPassword";
-        break;
     case IM::PI_TrueName:
         columnName = "TrueName";
         break;
@@ -101,15 +98,25 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_Face:
         columnName = "Face";
         break;
+    case IM::PI_ContactGroupID :
+        columnName = "ContactGroupID";
+        break;
         
-//    case IM::PI_InterestGroupID :
-//        columnName = "InterestGroupID";
-//        break;         
-
-//    case IM::PI_PersonalInfoVersion:
-//        columnName = "PersonalInfoVersion";
+    case IM::PI_PersonalSummaryInfoVersion:
+        columnName = "PersonalSummaryInfoVersion";
+        break;
+    case IM::PI_PersonalDetailInfoVersion:
+        columnName = "PersonalDetailInfoVersion";
+        break;
+//    case IM::PI_FriendshipApply:
+//        columnName = "FriendshipApply";
 //        break;
-        
+//    case IM::PI_ShortTalk:
+//        columnName = "ShortTalk";
+//        break;
+    case IM::PI_Role:
+        columnName = "Role";
+        break;
 
     case IM::PI_HomeAddress:
         columnName = "HomeAddress";
@@ -135,12 +142,12 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_LastLoginHostPort:
 //        columnName = "LastLoginHostPort";
 //        break;
-    case IM::PI_QuestionForSecurity:
-        columnName = "QuestionForSecurity";
-        break;
-    case IM::PI_AnswerForSecurity:
-        columnName = "AnswerForSecurity";
-        break;
+//    case IM::PI_QuestionForSecurity:
+//        columnName = "QuestionForSecurity";
+//        break;
+//    case IM::PI_AnswerForSecurity:
+//        columnName = "AnswerForSecurity";
+//        break;
 
     case IM::PI_CompanyName:
         columnName = "CompanyName";
@@ -172,21 +179,11 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_LoginTimes:
 //        columnName = "LoginTimes";
 //        break;
-//    case IM::PI_FriendshipApply:
-//        columnName = "FriendshipApply";
-//        break;    
-//    case IM::PI_ShortTalk:
-//        columnName = "ShortTalk";
-//        break;  
-
-    case IM::PI_Role:
-        columnName = "Role";
-        break;
 
 
-    case IM::PI_ContactGroupID :
-        columnName = "ContactGroupID";
-        break;
+
+
+
     case IM::PI_RemarkName :
         columnName = "RemarkName";
         break;

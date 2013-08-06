@@ -221,8 +221,20 @@ UserInfo* UsersManager::logUserIn(const QString &userID, const QByteArray &encry
         userInfo->setOnlineState(loginState);
         userInfo->setSessionEncryptionKey(ServerUtilities::generateSessionEncryptionKey());
         userOnline(userInfo);
+
+
+        //Get contact groups info
+        getUserAllContactGroupsInfoFromDatabase(userInfo);
+        //Load blacklist
+        getUserBlacklistedContactsInfoFromDB(userInfo);
+        //Load interest groups
+        getUserInterestGroupsFromDB(userInfo);
+        //Load Last login info
+        getUserLastLoginInfo(userInfo);
+
         //qWarning()<<"getSessionEncryptionKey:"<<userInfo->getSessionEncryptionKey().toBase64();
     }
+
 
     return userInfo;
 }
@@ -486,18 +498,13 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
     QString imUserID = userInfo->getUserID();
 
     //QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' and TransmittingTime>'%2'  ").arg(imUserID).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
-    QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
+    //QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
+    QString statement = QString("call sp_GetCachedChatMessages('%1', '%2'); ").arg(imUserID).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
+
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query chat messages from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
 
         return QStringList();
     }
@@ -518,8 +525,8 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
     }
 
-    statement = QString("delete from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
-    query.exec(statement);
+//    statement = QString("delete from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
+//    query.exec(statement);
 
 
     qWarning()<<"messages cached on server:"<<messages.size();
@@ -613,18 +620,13 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
     QSqlQuery query(db);
 
     QString imUserID = userInfo->getUserID();
-    QString statement = QString("SELECT IPAddress, LoginTime FROM loginhistories where ID = (select max(ID) from loginhistories where UserID = '%1')  ").arg(imUserID);
+    //QString statement = QString("SELECT IPAddress, LoginTime FROM loginhistories where ID = (select max(ID) from loginhistories where UserID = '%1')  ").arg(imUserID);
+    QString statement = QString("call sp_GetUserLastLoginInfo('%1'); ").arg(imUserID);
+
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user login info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
         return false;
     }
 
@@ -636,6 +638,8 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
 
     userInfo->setLastLoginExternalHostAddress(query.value(0).toString());
     userInfo->setLastLoginTime(query.value(1).toDateTime());
+    userInfo->setLastLogoutTime(query.value(2).toDateTime());
+    userInfo->setLastLoginDeviceInfo(query.value(3).toString());
 
     return true;
 
@@ -1109,8 +1113,8 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Description)))).toString());
 
 
-    getUserInterestGroupsFromDatabase(info);
-    getUserLastLoginInfo(info);
+//    getUserInterestGroupsFromDatabase(info);
+//    getUserLastLoginInfo(info);
 
     info->clearUpdatedProperties();
 
@@ -1118,49 +1122,6 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     
     return true;
     
-
-}
-
-bool UsersManager::getUserInterestGroupsFromDatabase(UserInfo* info){
-
-    if(!info){
-        return false;
-    }
-
-    if(!db.isValid()){
-        if(!openDatabase()){
-            return false;
-        }
-    }
-    QSqlQuery query(db);
-    //QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
-    QString statement = QString("call sp_GetUserInterestGroups('%1') ").arg(info->getUserID());
-
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
-        return false;
-    }
-    if(query.first()){
-        info->setInterestGroups(query.value(0).toString().split(","));
-    }
-
-//    QStringList groups;
-//     while(query.next()){
-//        groups.append(query.value(0).toString());
-//     }
-//     info->setInterestGroups(groups);
-
-    return true;
 
 }
 
@@ -1207,6 +1168,52 @@ bool UsersManager::getUserAllContactGroupsInfoFromDatabase(UserInfo* info){
     return true;
 
 }
+
+
+
+bool UsersManager::getUserInterestGroupsFromDB(UserInfo* info){
+
+    if(!info){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    //QString statement = QString("select %1 from InterestGroupMembers where %2='%3' ").arg(InterestGroup::databaseColumnName(IM::PIG_GroupID).arg(InterestGroup::databaseColumnName(IM::PIG_MemberSysID)).arg(info->getUserID());
+    QString statement = QString("call sp_GetUserInterestGroups('%1') ").arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        //TODO:数据库重启，重新连接
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query.clear();
+            openDatabase(true);
+        }
+
+        return false;
+    }
+    if(query.first()){
+        info->setInterestGroups(query.value(0).toString().split(","));
+    }
+
+//    QStringList groups;
+//     while(query.next()){
+//        groups.append(query.value(0).toString());
+//     }
+//     info->setInterestGroups(groups);
+
+    return true;
+
+}
+
 
 bool UsersManager::getUserBlacklistedContactsInfoFromDB(UserInfo* info){
 
@@ -1322,8 +1329,8 @@ bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, c
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3', @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
-    statement += QString(" select @GroupInfoVersion; ");
+    QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3', @ContactGroupsVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
+    statement += QString(" select @ContactGroupsVersion; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not update user contact group name ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1500,13 +1507,6 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
         QString msg = QString("Can not get friendship application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
     while(query.next()){
@@ -1529,13 +1529,6 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
         QSqlError error = query.lastError();
         QString msg = QString("Can not get friendship application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
 
         return false;
     }

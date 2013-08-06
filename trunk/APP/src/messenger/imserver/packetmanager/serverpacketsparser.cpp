@@ -269,12 +269,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
 
-            //Get contact groups info
-            getUserAllContactGroupsInfoFromDatabase(userInfo);
-            //Load blacklist
-            getUserBlacklistedContactsInfoFromDB(userInfo);
-
-
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
@@ -289,6 +283,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 sendPersonalContactsInfoVersionPacket(socketID, infoString, sessionEncryptionKey);
             }
 
+            //Send last login info
+            sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
+                                          userInfo->getLastLoginExternalHostAddress(),
+                                          userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"),
+                                          userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"),
+                                          userInfo->getLastLoginDeviceInfo());
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
