@@ -526,7 +526,7 @@ public slots:
 
     }
     
-    void processUserOnlineStatusChanged(UserInfo *userInfo, quint8 onlineStateCode, const QString &userHostAddress, quint16 userHostPort){
+    void processUserOnlineStatusChanged(UserInfo *userInfo, quint8 onlineStateCode, const QString &userHostAddress, quint16 userHostPort, const QString &deviceInfo = ""){
         //qDebug()<<"processUserOnlineStatusChanged(...)";
         
         
@@ -539,7 +539,7 @@ public slots:
             m_userSocketsHash.remove(userInfo->getSocketID());
         }else{
             userOnline(userInfo);
-            saveUserLastLoginInfo(userInfo, userHostAddress, userHostPort);
+            saveUserLastLoginInfo(userInfo, userHostAddress, userHostPort, deviceInfo);
         }
 
         //通知所有在线联系人

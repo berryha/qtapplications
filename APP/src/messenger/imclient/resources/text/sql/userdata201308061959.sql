@@ -138,7 +138,7 @@ CREATE TABLE "interestgroups"(
 -- ----------------------------
 DROP TABLE IF EXISTS "main"."my_detailed_info";
 CREATE TABLE "my_detailed_info" (
-"SysID"  INTEGER DEFAULT NULL,
+"SysID"  INTEGER NOT NULL,
 "UserID"  varchar(16) NOT NULL,
 "TrueName"  varchar(20) DEFAULT NULL,
 "NickName"  varchar(20) DEFAULT NULL,
