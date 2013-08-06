@@ -154,6 +154,11 @@ public:
         return lastLoginTime;
     }
 
+    QDateTime getLastLogoutTime() const
+    {
+        return lastLogoutTime;
+    }
+
     int getLoginTimes() const
     {
         return loginTimes;
@@ -298,6 +303,10 @@ public:
     {
         this->lastLoginTime = lastLoginTime;
     }
+    void setLastLogoutTime(const QDateTime &lastLogoutTime)
+    {
+        this->lastLogoutTime = lastLogoutTime;
+    }
 
     void setLoginTimes(int loginTimes)
     {
@@ -360,6 +369,7 @@ private:
     QString personalEmailAddress;
 
     QDateTime lastLoginTime;
+    QDateTime lastLogoutTime;
     QString lastLoginExternalHostAddress;
     quint16 lastLoginExternalHostPort;
 
