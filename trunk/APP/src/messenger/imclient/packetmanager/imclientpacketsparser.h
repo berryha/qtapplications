@@ -1099,6 +1099,10 @@ private slots:
     //quint16 login(const QString &serverAddress, quint16 serverPort){
     bool login(int serverSocketID){
         //qWarning()<<"--login() "<<m_serverAddress.toString()<<":"<<m_serverUDPListeningPort;
+
+        //TODO:Device Info
+        QString deviceInfo = "PC";
+
         //TODO:密码保存方式
         sessionEncryptionKey = user->encryptedPassword();
         QByteArray encryptedPassword;
@@ -1110,7 +1114,7 @@ private slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin())  ;
+        out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin()) << deviceInfo ;
         packet->setPacketData(ba);
 
         ba.clear();

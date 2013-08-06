@@ -77,7 +77,7 @@ public:
     bool saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message);
     QStringList cachedChatMessagesForIMUser(UserInfo* userInfo);
 
-    bool saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, quint16 userHostPort);
+    bool saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, quint16 userHostPort, const QString &deviceInfo);
     bool saveUserLastLogoutInfo(UserInfo* userInfo);
     
     bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
@@ -111,7 +111,7 @@ public:
     bool getMembershipApplyRequest(quint32 groupID, QList<QStringList> *receivedApplicationList);
 
     bool saveCachedInterestGroupChatMessageFromIMUser(const QString &senderID, quint32 interestGroupID, const QString &message);
-    QStringList cachedInterestGroupChatMessagesForIMUser(UserInfo* userInfo);
+    QStringList getCachedInterestGroupChatMessagesForUserFromDB(UserInfo* userInfo);
 
 
     bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);

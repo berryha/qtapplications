@@ -373,7 +373,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
 
     }
     
-    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From users_detailed_info where %7")
+    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From UsersDetailedInfo where %7")
             .arg(info.databaseColumnName(IM::PI_UserID))
             .arg(info.databaseColumnName(IM::PI_NickName))
             .arg(info.databaseColumnName(IM::PI_Gender))
@@ -535,7 +535,7 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
 }
 
-bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress,quint16 userHostPort){
+bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress,quint16 userHostPort, const QString &deviceInfo){
     qDebug()<<"--UsersManager::saveUserLoginInfo(...)";
 
     if(!userInfo){
@@ -553,10 +553,11 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
 
     userInfo->setLastLoginExternalHostAddress(userHostAddress);
     userInfo->setLastLoginExternalHostPort(userHostPort);
+    userInfo->setLastLoginDeviceInfo(deviceInfo);
 
 
     //statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
-    QString statement = QString(" call sp_LogUserIn('%1', '%2', %3, @loginTme);  ").arg(imUserID).arg(userHostAddress).arg(userHostPort);
+    QString statement = QString(" call sp_LogUserIn('%1', '%2', %3, '%4', @loginTme);  ").arg(imUserID).arg(userHostAddress).arg(userHostPort).arg(deviceInfo);
     statement += QString(" select @loginTme;");
 
     if(!query.exec(statement)){
@@ -567,7 +568,7 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
     }
 
     if(!query.first()){
-        qCritical()<<QString("Can not save user login info into database! Error: %1").arg(query.lastError().text());
+        qCritical()<<QString("Can not get user login time from database! Error: %1").arg(query.lastError().text());
         return false;
     }
 
@@ -1489,6 +1490,7 @@ bool UsersManager::deleteFriendshipApplyRequest(const QString &applicantID, cons
 }
 
 bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStringList> *sentApplicationList, QList<QStringList> *receivedApplicationList){
+    qDebug()<<"--UsersManager::getFriendshipApplyRequest(...)";
 
     if(!sentApplicationList || !receivedApplicationList){
         return false;
@@ -1501,7 +1503,8 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
     }
     QSqlQuery query(db);
 
-    QString statement = QString("select ReceiverID, Result, ExtraMessage from friendshipapply where SenderID='%1' and SenderRead = '0' ").arg(userID);
+    //QString statement = QString("select ReceiverID, Result, ExtraMessage from friendshipapply where SenderID='%1' and SenderRead = '0' ").arg(userID);
+    QString statement = QString("call sp_GetFriendshipApplyRequestSentByUser('%1'); ").arg(userID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not get friendship application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1523,7 +1526,8 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
 
     }
 
-    statement = QString("select SenderID, Result, ExtraMessage from friendshipapply where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
+    //statement = QString("select SenderID, Result, ExtraMessage from friendshipapply where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
+    statement = QString("call sp_GetFriendshipApplyRequestSentToUser('%1'); ").arg(userID);
     query.clear();
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1543,9 +1547,11 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
     }
 
     //statement = QString("delete from friendshipapply where SenderID='%1' or ReceiverID='%1' ").arg(userID);
-    statement = QString("update friendshipapply set SenderRead = '1' where SenderID='%1' and SenderRead = '0'  ").arg(userID);
-    query.exec(statement);
-    statement = QString("update friendshipapply set ReceiverRead = '1' where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
+//    statement = QString("update friendshipapply set SenderRead = '1' where SenderID='%1' and SenderRead = '0'  ").arg(userID);
+//    query.exec(statement);
+//    statement = QString("update friendshipapply set ReceiverRead = '1' where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
+
+    statement = QString("call sp_UpdateFriendshipApplyRequestForUser('%1'); ").arg(userID);
     query.exec(statement);
 
 
@@ -2121,7 +2127,7 @@ bool UsersManager::saveCachedInterestGroupChatMessageFromIMUser(const QString &s
 
 }
 
-QStringList UsersManager::cachedInterestGroupChatMessagesForIMUser(UserInfo* userInfo){
+QStringList UsersManager::getCachedInterestGroupChatMessagesForUserFromDB(UserInfo* userInfo){
     //TODO:
 
     if(!userInfo){
@@ -2140,20 +2146,13 @@ QStringList UsersManager::cachedInterestGroupChatMessagesForIMUser(UserInfo* use
 
 //    QString imUserID = userInfo->getUserID();
 
-    QString statement = QString("select InterestGroupID, SenderID,  Message, TransmittingTime from cachedinterestgroupchatmessages where InterestGroupID in (%1) and TransmittingTime>'%2'  ").arg(interestgroups.join(",")).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
+    //QString statement = QString("select InterestGroupID, SenderID,  Message, TransmittingTime from cachedinterestgroupchatmessages where InterestGroupID in (%1) and TransmittingTime>'%2'  ").arg(interestgroups.join(",")).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
+    QString statement = QString("call sp_GetCachedInterestGroupChatMessages('%1', '%2');  ").arg(userInfo->getUserID()).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
+
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query cached InterestGroup chat messages from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return QStringList();
     }
 

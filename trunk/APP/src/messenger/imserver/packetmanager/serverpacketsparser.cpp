@@ -262,7 +262,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString userID = peerID;
         QByteArray encryptedPassword;
         quint8 onlineStateCode = quint8(IM::ONLINESTATE_ONLINE);
-        in >> encryptedPassword >> onlineStateCode ;
+        QString deviceInfo = "";
+        in >> encryptedPassword >> onlineStateCode >> deviceInfo;
         //        qDebug()<<"----onlineStateCode:"<<onlineStateCode;
 
         IM::ErrorType errorType = IM::ERROR_UnKnownError;
@@ -274,7 +275,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
                                            userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
 
-            processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort);
+            processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort, deviceInfo);
             sendContactsOnlineInfo(socketID, userInfo);
 
             //Send contacts version info to user
@@ -330,7 +331,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 }
             }
 
-            QStringList interestgroupChatMessagesCachedOnServer = cachedInterestGroupChatMessagesForIMUser(userInfo);
+            QStringList interestgroupChatMessagesCachedOnServer = getCachedInterestGroupChatMessagesForUserFromDB(userInfo);
             if(!interestgroupChatMessagesCachedOnServer.isEmpty()){
                 sendCachedInterestGroupChatMessagesPacket(socketID, interestgroupChatMessagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
             }
