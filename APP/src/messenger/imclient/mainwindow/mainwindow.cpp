@@ -1066,8 +1066,9 @@ void MainWindow::slotUpdateContactsInfo(){
     //if(!contactsManager){
     //    contactsManager = ContactsManager::instance();
     //}
-    m_contactsManager->slotFetchContactsInfo(friendBox);
-    m_contactsManager->slotFetchStrangersInfo();
+
+
+    m_contactsManager->slotFetchAllContactsInfo(friendBox);
 
     ui.contactsToolBox->setEnabled(true);
     ui.stackedWidget->setCurrentWidget(ui.mainPage);

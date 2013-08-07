@@ -70,8 +70,7 @@ public:
 
 public slots:
     //void slotUpdateContactsInfo2();
-    void slotFetchContactsInfo(ItemBoxWidget *expandListView);
-    void slotFetchStrangersInfo();
+    void slotFetchAllContactsInfo(ItemBoxWidget *expandListView);
 
 
     void slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName);
