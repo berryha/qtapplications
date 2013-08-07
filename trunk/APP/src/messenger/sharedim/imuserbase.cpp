@@ -650,11 +650,14 @@ int IMUserBase::countOfContactGroupMembers(int groupID){
     return personalContactGroupsHash.value(groupID)->countOfMembers();
 }
 
-QStringList IMUserBase::getAllContacts(bool noStrangers) const{
+QStringList IMUserBase::getAllContacts(bool noStrangers, bool noBlacklisted) const{
 
     QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
     if(noStrangers){
         groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Strangers_ID));
+    }
+    if(noBlacklisted){
+        groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Blacklist_ID));
     }
 
 

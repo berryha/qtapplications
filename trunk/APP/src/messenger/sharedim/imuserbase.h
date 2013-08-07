@@ -287,7 +287,7 @@ public slots:
     int countOfContactGroupMembers(int groupID);
 
 
-    virtual QStringList getAllContacts(bool noStrangers = true) const;
+    virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
     bool hasContact(const QString &contactID);
     bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
     bool moveContact(const QString &contactID, int oldGroupID, quint32 newGroupID);
