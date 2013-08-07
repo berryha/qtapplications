@@ -169,7 +169,7 @@ bool IMUser::hasFriendContact(const QString &contactID){
 }
 
 QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
-    qDebug()<<"--IMUser::databaseColumnName(...)";
+    //qDebug()<<"--IMUser::databaseColumnName(...)";
     
     QString columnName = "";
     switch(propertyID){

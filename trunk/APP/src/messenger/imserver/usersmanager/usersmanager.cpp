@@ -321,7 +321,7 @@ void UsersManager::updateUserPassword(const QString &userID, const QString &newP
 }
 
 QStringList UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
-    //qWarning()<<"propertiesString:"<<propertiesString;
+    qDebug()<<"propertiesString:"<<propertiesString;
     
     if(propertiesString.trimmed().isEmpty()){
         return QStringList();
@@ -373,7 +373,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
 
     }
     
-    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From UsersDetailedInfo where %7")
+    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From UsersSummaryInfo where %7")
             .arg(info.databaseColumnName(IM::PI_UserID))
             .arg(info.databaseColumnName(IM::PI_NickName))
             .arg(info.databaseColumnName(IM::PI_Gender))
@@ -393,14 +393,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-        
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-        
+
         return QStringList();
     }
     
@@ -558,8 +551,6 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
 
     //statement = QString("insert into loginhistories(UserID, IPAddress, LoginTime) values('%1', '%2', '%3') ").arg(imUserID).arg(userHostAddress).arg(curTime);
     QString statement = QString(" call sp_LogUserIn('%1', '%2', %3, '%4', @loginTme);  ").arg(imUserID).arg(userHostAddress).arg(userHostPort).arg(deviceInfo);
-    statement += QString(" select @loginTme;");
-
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save user login info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -567,12 +558,15 @@ bool UsersManager::saveUserLastLoginInfo(UserInfo* userInfo, const QString &user
         return false;
     }
 
+    statement = QString("select @loginTme;");
+    query.exec(statement);
     if(!query.first()){
         qCritical()<<QString("Can not get user login time from database! Error: %1").arg(query.lastError().text());
         return false;
     }
 
     userInfo->setLastLoginTime(query.value(0).toDateTime());
+    qDebug()<<"------------Login Time:"<<query.value(0).toString();
 
     return true;
 
@@ -594,14 +588,26 @@ bool UsersManager::saveUserLastLogoutInfo(UserInfo* userInfo){
 
     QString imUserID = userInfo->getUserID();
     QString loginTime = userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss");
+    qDebug()<<"-------------loginTime:"<<loginTime;
 
-    QString statement = QString(" call sp_LogUserOut('%1', '%2') ; ").arg(imUserID).arg(loginTime);
+    QString statement = QString(" call sp_LogUserOut('%1', '%2', @LogoutTime) ; ").arg(imUserID).arg(loginTime);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save user logout info into database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
         return false;
     }
+
+    statement = QString("select @LogoutTime; ");
+    query.exec(statement);
+    if(!query.first()){
+        qCritical()<<QString("Can not get user logout time from database! Error: %1").arg(query.lastError().text());
+        return false;
+    }
+
+    userInfo->setLastLogoutTime(query.value(0).toDateTime());
+    qDebug()<<"------------logout Time:"<<query.value(0).toString();
+
 
     return true;
 
