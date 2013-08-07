@@ -275,8 +275,15 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
                                            userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
 
+            //Send last login info
+            sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
+                                          userInfo->getLastLoginExternalHostAddress(),
+                                          userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"),
+                                          userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"),
+                                          userInfo->getLastLoginDeviceInfo());
+
+            //Save login or logout info, send info to contacts
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort, deviceInfo);
-            sendContactsOnlineInfo(socketID, userInfo);
 
             //Send contacts version info to user
             QString infoString = "";
@@ -284,12 +291,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 sendPersonalContactsInfoVersionPacket(socketID, infoString, sessionEncryptionKey);
             }
 
-            //Send last login info
-            sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
-                                          userInfo->getLastLoginExternalHostAddress(),
-                                          userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"),
-                                          userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"),
-                                          userInfo->getLastLoginDeviceInfo());
+            //Send all online contacts list to user
+            sendContactsOnlineInfo(socketID, userInfo);
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
