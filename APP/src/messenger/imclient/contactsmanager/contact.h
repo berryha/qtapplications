@@ -54,11 +54,11 @@ public:
 
 
 
-    quint32 getContactGroupID() const
+    int getContactGroupID() const
     {
         return contactGroupID;
     }
-    void setContactGroupID(quint32 contactGroupID)
+    void setContactGroupID(int contactGroupID)
     {
         this->contactGroupID = contactGroupID;
         addUpdatedPersonalInfoProperty(IM::PI_ContactGroupID, QString::number(contactGroupID), true);
@@ -99,9 +99,14 @@ public:
     }
 
 
+    bool isFriend();
+    bool isStranger();
+    bool isBlacklisted();
+
+
 private:
 
-    quint32 contactGroupID;
+    int contactGroupID;
     quint32 interestGroupID;
     quint32 systemGroupID;
     

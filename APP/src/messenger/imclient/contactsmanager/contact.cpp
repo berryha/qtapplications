@@ -34,7 +34,7 @@ namespace HEHUI {
 Contact::Contact(QObject *parent)
     :IMUserBase(parent)
 {
-    contactGroupID = 0;
+    contactGroupID = defaultStrangerContactGroupID();
     interestGroupID = 0;
     systemGroupID = 0;
 
@@ -202,7 +202,17 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 
 }
 
+bool Contact::isFriend(){
+    return contactGroupID == defaultFriendContactGroupID();
+}
 
+bool Contact::isStranger(){
+    return contactGroupID == defaultStrangerContactGroupID();
+}
+
+bool Contact::isBlacklisted(){
+    return contactGroupID == defaultBlacklistContactGroupID();
+}
 
 
 

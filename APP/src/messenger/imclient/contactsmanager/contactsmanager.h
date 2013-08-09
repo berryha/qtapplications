@@ -46,7 +46,8 @@ public:
 
 
 
-    bool hasFriendContact(const QString &contactID);
+    bool isFriendContact(const QString &contactID);
+    bool isStranger(const QString &contactID);
     bool hasUserInfo(const QString &userID);
     Contact * getUser(const QString &contactID);
 
@@ -85,7 +86,8 @@ public slots:
     void renameContactGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
 
 
-    bool addOrDeleteContact(const QString &contactID, quint32 groupID, bool add = true);
+//    bool addContact(const QString &contactID, quint32 groupID);
+    bool deleteContact(const QString &contactID, bool addToBlacklist = false);
     bool moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID);
 
 

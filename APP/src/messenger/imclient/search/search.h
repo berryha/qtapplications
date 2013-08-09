@@ -23,7 +23,7 @@ public:
     Search(QWidget *parent = 0);
     
 signals:
-    void signalSearchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    void signalSearchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly = true, bool searchWebcamUsersOnly = false);
     void signalAddContact(const QString &userID, const QString &verificationMessage);
     
     

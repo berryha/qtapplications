@@ -17,14 +17,18 @@ Search::Search(QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
-        
+
+        ui.comboBoxGender->addItem(tr("Any"), IMUser::GENDER_UNKNOWN);
         ui.comboBoxGender->addItem(tr("Male"), IMUser::MALE);
         ui.comboBoxGender->addItem(tr("Female"), IMUser::FEMALE);
+        ui.comboBoxGender->setCurrentIndex(0);
         
-        ui.comboBoxAge->addItem("16-22", IMUser::AS_16_22);
-        ui.comboBoxAge->addItem("23-30", IMUser::AS_23_30);
-        ui.comboBoxAge->addItem("31-40", IMUser::AS_31_40);
-        ui.comboBoxAge->addItem("40+", IMUser::AS_40_);
+        ui.comboBoxAge->addItem(tr("Any"), IMUser::Age_Any);
+        ui.comboBoxAge->addItem("16-22", IMUser::Age_1_18);
+        ui.comboBoxAge->addItem("23-30", IMUser::Age_19_30);
+        ui.comboBoxAge->addItem("31-40", IMUser::Age_31_40);
+        ui.comboBoxAge->addItem("40+", IMUser::Age_40_);
+        ui.comboBoxAge->setCurrentIndex(0);
         
         ui.pushButtonCondition->setVisible(false);
         
@@ -192,57 +196,49 @@ void Search::on_pushButtonSearch_clicked(){
     if(ui.tabWidget->currentWidget() == ui.tabUsers){
 
         QStringList propertiesList;
+        QString userID = ui.lineEditUserID->text().trimmed();
+        QString nickName = ui.lineEditNickname->text();
+        QString age = "";
+        if(ui.comboBoxAge->currentIndex() != 0){
+            age = ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toString();
+        }
+        QString gender = "";
+        if(ui.comboBoxGender->currentIndex() != 0){
+            gender = ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toString();
+        }
+        QString hometown = ui.lineEditHomeAddress->text().trimmed();
+        QString businessAddress = ui.lineEditBusinessAddress->text().trimmed();
+
         bool matchExactly = ui.radioButtonUsersMatchExactly->isChecked();
-        bool searchOnlineUsersOnly = true;
+        bool searchOnlineUsersOnly = ui.checkBoxUserSearchOnlineUsers->isChecked();
+        bool searchWebcamUsersOnly = ui.checkBoxUserSearchWebcamUsers->isChecked();
+
+
         if(matchExactly){
-            QString userID = ui.lineEditUserID->text().trimmed();
             if(!userID.isEmpty()){
                 if(userID == IMUser::instance()->getUserID()){
                     //QMessageBox::critical(this, tr("Error"), tr("Please input a valid user id!"));
                     ui.lineEditUserID->clear();
                     return;
                 }
-                if(IMUser::instance()->hasFriendContact(userID)){
-                    QMessageBox::critical(this, tr("Error"), tr("'%1' was already your contact!").arg(userID));
+                if(IMUser::instance()->isFriendContact(userID)){
+                    QMessageBox::critical(this, tr("Error"), tr("'%1' is already your contact!").arg(userID));
                     ui.lineEditUserID->clear();
                     return;
                 }
+            }
+            searchOnlineUsersOnly = searchWebcamUsersOnly = false;
+        }
 
-                propertiesList.append(QString::number(IM::PI_UserID)+"='"+userID+"'");
-                searchOnlineUsersOnly = false;
-            }
-            
-            QString nickName = ui.lineEditNickname->text();
-            if(!nickName.trimmed().isEmpty()){
-                propertiesList.append(QString::number(IM::PI_NickName)+"='"+nickName+"'");
-            }
-            
-        }else{
-            
-            if(ui.comboBoxGender->currentIndex() != 0){
-                propertiesList.append(QString::number(IM::PI_Gender)+"='"+ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toString()+"'");
-            }
-            
-            if(ui.comboBoxAge->currentIndex() != 0){
-                propertiesList.append(QString::number(IM::PI_Age)+"="+QString::number(ui.comboBoxAge->itemData(ui.comboBoxAge->currentIndex()).toUInt()));
-            }
-            
-            if(ui.checkBoxUserSearchOnlineUsers->isChecked()){
-                searchOnlineUsersOnly = true;
-            }else{
-                searchOnlineUsersOnly = false;
-            }
-            
-            
-        }
+        propertiesList << userID << nickName << age << gender <<hometown << businessAddress;
+
         
-        if(propertiesList.isEmpty()){
-            QMessageBox::critical(this, tr("Error"), tr("Search Condition Required!"));
-            return;
-        }else{
-            emit signalSearchContact(propertiesList.join(QString(CONTACT_INFO_SEPARATOR)), matchExactly, searchOnlineUsersOnly);
-       
-        }
+//        if(propertiesList.isEmpty()){
+//            QMessageBox::critical(this, tr("Error"), tr("Search Condition Required!"));
+//            return;
+//        }else{
+            emit signalSearchContact(propertiesList.join(QString(CONTACT_INFO_SEPARATOR)), matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
+//        }
         
         
         ui.stackedWidgetUsers->setCurrentWidget(ui.pageUsersSearchResult);
@@ -305,7 +301,7 @@ void Search::on_pushButtonAddAsContact_clicked(){
         QMessageBox::critical(this, tr("Error"), tr("You can't add yourself as a contact!"));
         return;
     }
-    if(IMUser::instance()->hasFriendContact(userID)){
+    if(IMUser::instance()->isFriendContact(userID)){
         QMessageBox::critical(this, tr("Error"), tr("'%1' was already your contact!").arg(userID));
         return;
     }
