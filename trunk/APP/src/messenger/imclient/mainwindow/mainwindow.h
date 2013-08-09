@@ -67,7 +67,7 @@ public slots:
     void slotQuit();
 
     void slotUpdateContactsInfo();
-    void slotUpdateBlacklistInfo();
+//    void slotUpdateBlacklistInfo();
 
     void updateAllInterestGroupsInfoToUI();
     void updateInterestGroupInfoToUI(InterestGroup *interestGroup);
@@ -92,7 +92,7 @@ private slots:
 
     void slotMoveContactToGroup();
     void slotMoveContactToBlacklist();
-    void slotDeleteContact(const QString &contactID);
+    void slotDeleteContact(const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
 
     void slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message);
 
@@ -114,7 +114,7 @@ private slots:
     void slotProcessBlacklistInfo(const QString &blacklistOnServer, quint32 blacklistInfoVersionOnServer);
 
     void slotSearch();
-    void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
     void addContact(const QString &userID, const QString &verificationMessage);
 
     void slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);

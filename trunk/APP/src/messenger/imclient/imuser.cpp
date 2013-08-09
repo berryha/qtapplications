@@ -163,9 +163,9 @@ QString IMUser::getRegistrationServerAddressInfo() const{
 //}
 
 
-bool IMUser::hasFriendContact(const QString &contactID){
+bool IMUser::isFriendContact(const QString &contactID){
 
-    return ContactsManager::instance()->hasFriendContact(contactID);
+    return ContactsManager::instance()->isFriendContact(contactID);
 }
 
 QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{

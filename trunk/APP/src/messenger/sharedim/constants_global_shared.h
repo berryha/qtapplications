@@ -275,7 +275,7 @@ enum ErrorType {
     ERROR_EMAILEXISTED,
     
     
-    
+    ERROR_ServerError,
     
     ERROR_UnKnownError = 255
 };
@@ -370,6 +370,8 @@ enum RegistrationMode{
     RM_ServerCreatePasswordOnly
 
 };
+
+
 
 
 

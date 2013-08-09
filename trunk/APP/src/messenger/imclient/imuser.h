@@ -69,7 +69,7 @@ public slots:
     //        bool addContactToGroup(const QString &contactID, const QString &groupName);
 
 
-    bool hasFriendContact(const QString &contactID);
+    bool isFriendContact(const QString &contactID);
 
 
 private slots:

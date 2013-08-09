@@ -15,7 +15,12 @@ namespace HEHUI {
 class SHAREDIMLIB_API ContactGroupBase : public IMGroupBase
 {
 public:
-    enum DefaultGroupID{Group_Strangers_ID = -1, Group_Blacklist_ID = 0, Group_Friends_ID = 1 };
+    enum DefaultContactGroupID{
+        Group_Strangers_ID = -1,
+        Group_Blacklist_ID = 0,
+        Group_Friends_ID = 1
+    };
+
     static QString Group_Blacklist_Name;
     static QString Group_Friends_Name;
     static QString Group_Strangers_Name;

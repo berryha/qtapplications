@@ -320,7 +320,7 @@ void UsersManager::updateUserPassword(const QString &userID, const QString &newP
 
 }
 
-QStringList UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
+QStringList UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
     qDebug()<<"propertiesString:"<<propertiesString;
     
     if(propertiesString.trimmed().isEmpty()){
@@ -329,59 +329,61 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
     
     QStringList queryStringList;
     QStringList propertiesList = propertiesString.split(QString(CONTACT_INFO_SEPARATOR));
-    if(propertiesList.isEmpty()){
+    if(propertiesList != 6){
         return QStringList();
     }
-    
-    UserInfo info("");
-    
-    foreach (QString property, propertiesList) {
-        QStringList list = property.split("=");
-        IM::PropertyIDOfUser pi = IM::PropertyIDOfUser(list.at(0).toUInt());
-        QString value = list.at(1);
-        
-        if(value.trimmed().startsWith("'") && (!matchExactly)){
-            queryStringList.append(info.databaseColumnName(pi)+" like "+value);
-        }else{
-            if(pi == IM::PI_Age){
-                QString statement = "";
-                IMUserBase::AgeSection as = IMUserBase::AgeSection(value.toUInt());
-                switch(as){
-                case IMUserBase::AS_16_22:
-                    statement = " Between 16 And 22";
-                    break;
-                case IMUserBase::AS_23_30:
-                    statement = " Between 23 And 30";
-                    break;
-                case IMUserBase::AS_31_40:
-                    statement = " Between 31 And 40";
-                    break;
-                case IMUserBase::AS_40_:
-                    statement = " > 40";
-                    break;
-                default:
-                    statement = " > 0"; 
-                }
-                
-                queryStringList.append(info.databaseColumnName(pi)+" "+statement);
-                
-            }else{
-                queryStringList.append(info.databaseColumnName(pi)+" = "+value);
-            }
-            
+
+    QString userID = propertiesList.at(0);
+    QString nickName = propertiesList.at(1);
+    QString ageSectionString = propertiesList.at(2);
+    QString genderString = propertiesList.at(3);
+    QString hometown = propertiesList.at(4);
+    QString businessAddress = propertiesList.at(5);
+
+    IMUserBase::AgeSection as = IMUserBase::AgeSection(ageSectionString.toUInt());
+    quint8 startAge = 0, endAge = 120;
+    switch(as){
+    case IMUserBase::Age_Any:
+        break;
+    case IMUserBase::Age_1_18:
+        startAge = 1;
+        endAge = 18;
+        break;
+    case IMUserBase::Age_19_30:
+        startAge = 19;
+        endAge = 30;
+        break;
+    case IMUserBase::Age_31_40:
+        startAge = 31;
+        endAge = 40;
+        break;
+    case IMUserBase::Age_40_:
+        startAge = 41;
+        endAge = 120;
+        break;
+    default:
+        break;
+    }
+
+//    User::Gender gd = User::Gender(genderString.toInt());
+
+   QString queryString ;
+
+    if(matchExactly){
+        if(userID.isEmpty()){
+            userID  = "%%";
+        }
+        if(nickName.isEmpty()){
+            nickName = "%%";
         }
 
+        queryString = QString("call sp_Contact_Search_MatchExactly('%1', '%2');").arg(userID).arg(nickName);
+    }else{
+        if(hometown.trimmed()){hometown = "%%";}
+        if(businessAddress.trimmed().isEmpty()){businessAddress = "%%";}
+        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, '%3', '%4', '%5');").arg(startAge).arg(endAge).arg(genderString=="0"?"all":genderString).arg(hometown).arg(businessAddress);
     }
-    
-    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From UsersSummaryInfo where %7")
-            .arg(info.databaseColumnName(IM::PI_UserID))
-            .arg(info.databaseColumnName(IM::PI_NickName))
-            .arg(info.databaseColumnName(IM::PI_Gender))
-            .arg(info.databaseColumnName(IM::PI_Age))
-            .arg(info.databaseColumnName(IM::PI_Face))
-            .arg(info.databaseColumnName(IM::PI_FriendshipApply))
-            .arg(queryStringList.join(" And "))
-            ;
+
     if(!db.isValid()){
         if(!openDatabase()){
             return QStringList();
@@ -391,7 +393,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
     
     if(!query.exec(queryString)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not search contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return QStringList();
@@ -638,7 +640,7 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
     }
 
     if(!query.first()){
-        qCritical()<<QString("Can not query user login info from database! Error: %1").arg(query.lastError().text());
+        qCritical()<<QString("No user login info returned from database! Error: %1").arg(query.lastError().text());
         return false;
     }
 
@@ -652,6 +654,30 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
 
 }
 
+bool UsersManager::addNewContactForUserFromDB(const QString &userID, const QString &contactID, quint32 contactGroupID){
+
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString statement = QString("call sp_Contact_Add('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(contactGroupID);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not add contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+
+    return true;
+
+}
+
+
 bool UsersManager::deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition, bool addToBlacklist){
 
 
@@ -662,7 +688,7 @@ bool UsersManager::deleteContactForUserFromDB(const QString &userID, const QStri
     }
     QSqlQuery query(db);
 
-    QString statement = QString("call sp_DeleteContactForUser('%1', '%2', %3, %4);  ").arg(userID).arg(contactID).arg(deleteMeFromOpposition?1:0).arg(addToBlacklist?1:0);
+    QString statement = QString("call sp_Contact_Delete('%1', '%2', %3, %4);  ").arg(userID).arg(contactID).arg(deleteMeFromOpposition?1:0).arg(addToBlacklist?1:0);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not delete contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -675,6 +701,30 @@ bool UsersManager::deleteContactForUserFromDB(const QString &userID, const QStri
 
 }
 
+bool UsersManager::moveContactForUserInDB(const QString &userID, const QString &contactID, quint32 newGroupID){
+
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+
+    QString statement = QString("call sp_Contact_MoveToAnotherGroup('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(newGroupID);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not move contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+
+    return true;
+
+}
+
+
 bool UsersManager::addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist){
 
 
@@ -685,7 +735,7 @@ bool UsersManager::addOrDeleteBlacklistedContactForUserFromDB(const QString &use
     }
     QSqlQuery query(db);
 
-    QString statement = QString("call sp_AddOrDeleteBlacklistedContactForUser('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(addToBlacklist?1:0);
+    QString statement = QString("call sp_Contact_Blacklisted_AddOrDelete('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(addToBlacklist?1:0);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not add or delete blacklisted contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1430,7 +1480,7 @@ bool UsersManager::saveUserInfoToDatabase(UserInfo *info){
     
 }
 
-bool UsersManager::saveFriendshipApplyRequest(const QString &applicantID, const QString &contactID, const QString &message, quint8 resultCode, bool senderRead, bool receiverRead){
+bool UsersManager::saveFriendshipApplyRequestToDB(const QString &applicantID, const QString &contactID, const QString &message, quint8 resultCode, bool senderRead, bool receiverRead){
 
 
     if(!db.isValid()){
@@ -1439,23 +1489,17 @@ bool UsersManager::saveFriendshipApplyRequest(const QString &applicantID, const 
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("insert into friendshipapply(SenderID, ReceiverID, ExtraMessage, Result, SenderRead, ReceiverRead) values('%1',  '%2', '%3', '%4', '%5', '%6' ) ")
-            .arg(applicantID).arg(contactID).arg(message).arg(QString::number(resultCode))
-            .arg(senderRead?"1":"0").arg(receiverRead?"1":"0")
+    //QString statement = QString("insert into friendshipapply(SenderID, ReceiverID, ExtraMessage, Result, SenderRead, ReceiverRead) values('%1',  '%2', '%3', '%4', '%5', '%6' ) ")
+    QString statement = QString("call sp_FriendshipApplyRequest_Add('%1',  '%2', '%3', %4, %5, %6 ) ")
+
+            .arg(applicantID).arg(contactID).arg(message).arg(resultCode)
+            .arg(senderRead?1:0).arg(receiverRead?1:0)
             ;
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not write friendship application info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
 
@@ -1473,26 +1517,17 @@ bool UsersManager::deleteFriendshipApplyRequest(const QString &applicantID, cons
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("delete from friendshipapply where Sender='%1' and Receiver='%2' ").arg(applicantID).arg(contactID);
+    //QString statement = QString("delete from friendshipapply where Sender='%1' and Receiver='%2' ").arg(applicantID).arg(contactID);
+    QString statement = QString("call sp_FriendshipApplyRequest_Delete('%1', '%2'); ").arg(applicantID).arg(contactID);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not delete friendship application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
 
-
     return true;
-
 }
 
 bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStringList> *sentApplicationList, QList<QStringList> *receivedApplicationList){

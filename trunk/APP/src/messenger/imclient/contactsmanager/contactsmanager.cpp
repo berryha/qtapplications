@@ -57,22 +57,34 @@ ContactsManager::~ContactsManager() {
     
 }
 
-bool ContactsManager::hasFriendContact(const QString &contactID){
+bool ContactsManager::isFriendContact(const QString &contactID){
 
     //TODO:改进
 
-    if(!hasUserInfo(contactID)){
+//    if(!hasUserInfo(contactID)){
+//        return false;
+//    }
+
+    Contact * contact = contactHash.value(contactID);
+    if(!contact){return false;}
+    int groupID = contact->getContactGroupID();
+    if((groupID == ContactGroupBase::Group_Strangers_ID) || (groupID == ContactGroupBase::Group_Blacklist_ID)){
         return false;
     }
 
-    Contact * contact = getUser(contactID);
+    return true;
+
+}
+
+bool ContactsManager::isStranger(const QString &contactID){
+    Contact * contact = contactHash.value(contactID);
     if(!contact){return false;}
-    if(contact->getContactGroupID() > 0){
+    int groupID = contact->getContactGroupID();
+    if((groupID == ContactGroupBase::Group_Strangers_ID)){
         return true;
     }
 
     return false;
-
 }
 
 bool ContactsManager::hasUserInfo(const QString &userID){
@@ -530,13 +542,6 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 
         group->clearUpdatedProperties();
 
-        if(groupID == ContactGroupBase::Group_Blacklist_ID){
-            m_imUser->setBlacklist(m_imUser->getContactGroupMembers(groupID));
-            m_imUser->deleteContactGroup(groupID);
-            continue;
-        }
-
-
         slotLoadContacts(expandListView, groupID, groupName, list);
 
     }
@@ -697,22 +702,38 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
 }
 
-bool ContactsManager::addOrDeleteContact(const QString &contactID, quint32 groupID, bool add ){
+//bool ContactsManager::addContact(const QString &contactID, quint32 groupID){
+
+//    Contact *contact = contactHash.value(contactID);
+//    if(!contact){
+//        return false;
+//    }
+
+//    m_imUser->addOrDeleteContact(contactID, groupID, add);
+
+//    contact->setContactGroupID(groupID);
+
+//    return true;
+
+//}
+
+bool ContactsManager::deleteContact(const QString &contactID, bool addToBlacklist){
 
     Contact *contact = contactHash.value(contactID);
     if(!contact){
         return false;
     }
 
-    m_imUser->addOrDeleteContact(contactID, groupID, add);
+    m_imUser->deleteFriendContact(contactID, addToBlacklist);
 
-    if(!add){
+    if(addToBlacklist){
+        contact->setContactGroupID(ContactGroupBase::Group_Blacklist_ID);
+    }else{
         contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
     }
 
 
     return true;
-
 }
 
 bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
@@ -723,7 +744,7 @@ bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, 
     }
     contact->setContactGroupID(newGroupID);
 
-    m_imUser->moveContact(contactID, oldGroupID, newGroupID);
+    m_imUser->moveFriendContact(contactID, oldGroupID, newGroupID);
 
     return true;
 
@@ -777,7 +798,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
 
     contactHash.insert(contact->getUserID(), contact);
 
-    m_imUser->addOrDeleteContact(contactUID, contactsGroupID, true);
+    m_imUser->addNewContact(contactUID, contactsGroupID);
 
     return true;
     
@@ -813,7 +834,7 @@ bool ContactsManager::slotdeleteContactFromDatabase(Contact *contact){
 
     int groupID = contact->getContactGroupID();
 
-    m_imUser->addOrDeleteContact(contactID, groupID, false);
+    m_imUser->deleteFriendContact(contactID, false);
 
     delete contact;
     contact = 0;

@@ -317,7 +317,7 @@ public slots:
 
     }
 
-    bool searchContact(int serverSocketID, const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
+    bool searchContact(int serverSocketID, const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
         qDebug()<<"--searchContact(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -328,7 +328,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << propertiesString << matchExactly << searchOnlineUsersOnly;
+        out << propertiesString << matchExactly << searchOnlineUsersOnly << searchWebcamUsersOnly;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

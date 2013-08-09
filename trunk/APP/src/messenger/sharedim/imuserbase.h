@@ -61,7 +61,7 @@ public:
     enum FriendshipApplyResult{FAR_UNKNOWN = 0, FAR_ACCEPTED = 1, FAR_DENIED};
 
     enum ShortTalk{ST_AUTO_ACCEPT = 0, ST_PROMPT, ST_DENY};
-    enum AgeSection{AS_16_22 = 0, AS_23_30, AS_31_40, AS_40_};
+    enum AgeSection{Age_Any = 0, Age_1_18, Age_19_30, Age_23_30, Age_31_40, Age_40_};
 
     enum AccountState{AS_Invalid = 0, AS_Normal, AS_Banned, AS_Limitted};
 
@@ -69,8 +69,12 @@ public:
     IMUserBase(const QString & userID, QObject *parent = 0);
     virtual ~IMUserBase();
 
-    static QString defaultContactGroupName();
-    static quint32 defaultContactGroupID();
+    static QString defaultFriendContactGroupName();
+    static quint32 defaultFriendContactGroupID();
+    static QString defaultStrangerContactGroupName();
+    static quint32 defaultStrangerContactGroupID();
+    static QString defaultBlacklistContactGroupName();
+    static quint32 defaultBlacklistContactGroupID();
 
     QByteArray encryptedPassword() const;
     
@@ -101,10 +105,6 @@ public:
 
     quint32 getBlacklistInfoVersion() const{
         return blacklistInfoVersion;
-    }
-
-    QStringList getBlacklist() const{
-        return blacklist;
     }
 
 
@@ -179,10 +179,6 @@ public:
     void setBlacklistInfoVersion(quint32 blacklistInfoVersion){
         this->blacklistInfoVersion = blacklistInfoVersion;
         addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion), true);
-    }
-
-    void setBlacklist( const QStringList &blacklist){
-        this->blacklist = blacklist;
     }
 
     void setPersonalContactGroupsVersion(quint32 personalContactGroupsVersion)
@@ -288,16 +284,17 @@ public slots:
 
 
     virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
-    bool hasContact(const QString &contactID);
-    bool addOrDeleteContact(const QString &contactID, int groupID, bool add = true);
-    bool moveContact(const QString &contactID, int oldGroupID, quint32 newGroupID);
+    bool hasFriendContact(const QString &contactID);
+    bool addNewContact(const QString &contactID, int groupID);
+    bool deleteFriendContact(const QString &contactID, bool addToBlacklist = false);
+    bool moveFriendContact(const QString &contactID, int oldGroupID, int newGroupID);
 
 
     bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);
     quint32 updateInterestGroupInfoVersion();
 
-    
-    bool addOrDeleteBlacklistedContact(const QString &contactID,  bool addToBlacklist = true);
+
+    bool addOrDeleteBlacklistedContact(const QString &contactID, bool addToBlacklist = true);
     quint32 updateBlacklistInfoVersion();
     QString getBlacklistInfoString();
     void setBlacklistInfoString(const QString &blacklistInfoString);
@@ -320,7 +317,7 @@ private:
 
 
     quint32 blacklistInfoVersion;
-    QStringList blacklist;
+//    QStringList blacklist;
 
     QStringList interestGroups;
     quint32 interestGroupInfoVersion;

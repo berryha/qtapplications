@@ -71,7 +71,7 @@ public:
     bool registerNewUser(const QString &userID, const QString &password, IM::ErrorType *errorType, quint32 *sysID, QString *message = 0);
     void updateUserPassword(const QString &userID, const QString &newPassword, IM::ErrorType *errorType, QString *message = 0);
 
-    QStringList searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    QStringList searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
 
 
     bool saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message);
@@ -80,14 +80,17 @@ public:
     bool saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, quint16 userHostPort, const QString &deviceInfo);
     bool saveUserLastLogoutInfo(UserInfo* userInfo);
     
+    bool addNewContactForUserFromDB(const QString &userID, const QString &contactID, quint32 contactGroupID);
     bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
+    bool moveContactForUserInDB(const QString &userID, const QString &contactID, quint32 newGroupID);
+
     bool addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist = false);
 
 
 
     bool saveUserInfoToDatabase(UserInfo *info);
 
-    bool saveFriendshipApplyRequest(const QString &applicantID, const QString &contactID, const QString &message, quint8 resultCode = quint8(UserInfo::FAR_UNKNOWN),  bool senderRead = false, bool receiverRead = false);
+    bool saveFriendshipApplyRequestToDB(const QString &applicantID, const QString &contactID, const QString &message, quint8 resultCode = quint8(UserInfo::FAR_UNKNOWN),  bool senderRead = false, bool receiverRead = false);
     bool deleteFriendshipApplyRequest(const QString &applicantID, const QString &contactID);
     bool getFriendshipApplyRequest(const QString &receiverID, QList<QStringList> *sentApplicationList, QList<QStringList> *receivedApplicationList);
 
