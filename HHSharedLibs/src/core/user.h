@@ -47,7 +47,7 @@ class CORE_LIB_API User : public UserBase
     Q_OBJECT
 
 public:
-    enum Gender{ GENDER_UNKNOWN = 0, MALE, FEMALE};
+    enum Gender{GENDER_UNKNOWN = 0, MALE = 1, FEMALE = 2 };
     User(const QString &userID = "", const QString &userName = "", const QString &password = "", QObject *parent = 0);
     virtual ~User();
 
