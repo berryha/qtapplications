@@ -72,6 +72,9 @@ Search::~Search()
 void Search::slotSearchContactsResultPacketReceived(const QStringList &users){
 
     resetUsersInfo();
+
+    //TODO
+    //FORMAT:UserID,NickName,Gender,Age,Face,FriendshipApply,BusinessAddress,OnlineState
     
     foreach (QString userInfo, users) {
         QStringList userInfoList = userInfo.split(QString(CONTACT_INFO_SEPARATOR));
@@ -82,7 +85,8 @@ void Search::slotSearchContactsResultPacketReceived(const QStringList &users){
         user->setAge(userInfoList.at(3).toUInt());
         user->setFace(userInfoList.at(4));
         user->setFriendshipApply(IMUserBase::FriendshipApply(userInfoList.at(5).toUInt()));
-        user->setOnlineState(IM::OnlineState(userInfoList.at(6).toUInt()));
+        user->setBusinessAddress(userInfoList.at(6));
+        user->setOnlineState(IM::OnlineState(userInfoList.at(7).toUInt()));
         
         usersHash.insert(userID, user);
     }

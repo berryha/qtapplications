@@ -327,9 +327,9 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
         return QStringList();
     }
     
-    QStringList queryStringList;
     QStringList propertiesList = propertiesString.split(QString(CONTACT_INFO_SEPARATOR));
-    if(propertiesList != 6){
+    if(propertiesList.size() != 6){
+        qWarning()<<"ERROR! Invalid propertiesString!";
         return QStringList();
     }
 
@@ -379,9 +379,9 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
 
         queryString = QString("call sp_Contact_Search_MatchExactly('%1', '%2');").arg(userID).arg(nickName);
     }else{
-        if(hometown.trimmed()){hometown = "%%";}
-        if(businessAddress.trimmed().isEmpty()){businessAddress = "%%";}
-        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, '%3', '%4', '%5');").arg(startAge).arg(endAge).arg(genderString=="0"?"all":genderString).arg(hometown).arg(businessAddress);
+        if(hometown.trimmed().isEmpty()){hometown = "";}
+        if(businessAddress.trimmed().isEmpty()){businessAddress = "";}
+        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, %3, '%4', '%5');").arg(startAge).arg(endAge).arg(genderString.toInt()).arg(hometown).arg(businessAddress);
     }
 
     if(!db.isValid()){
@@ -403,20 +403,25 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
     while(query.next()){  
         //TODO:query安全性
         QString userID = query.value(0).toString();
-        UserInfo *info = getUserInfo(userID);
-        
+        IM::OnlineState onlineState = IM::ONLINESTATE_OFFLINE;
         if(searchOnlineUsersOnly){
-            if(info->getOnlineState() != IM::ONLINESTATE_ONLINE){
+            UserInfo *info = getOnlineUserInfo(userID);
+            if(!info || (info->getOnlineState() != IM::ONLINESTATE_ONLINE)){
                 continue;
+            }else{
+                onlineState = IM::ONLINESTATE_ONLINE;
             }
         }
         
+        //TODO
+        //FORMAT:UserID,NickName,Gender,Age,Face,FriendshipApply,BusinessAddress,OnlineState
         QStringList userInfoList;
-        for(int i=0; i<6; i++){
+        userInfoList.append(userID);
+        for(int i=1; i<7; i++){
             userInfoList.append(query.value(i).toString());
 //            qWarning()<<i<<":"<<query.value(i).toString();
         }
-        userInfoList.append(QString::number(info->getOnlineState()));
+        userInfoList.append(QString::number(onlineState));
         
         usersInfoList.append(userInfoList.join(QString(CONTACT_INFO_SEPARATOR)));
     }
