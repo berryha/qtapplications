@@ -18,16 +18,16 @@ Search::Search(QWidget *parent)
 {
 	ui.setupUi(this);
 
-        ui.comboBoxGender->addItem(tr("Any"), IMUser::GENDER_UNKNOWN);
-        ui.comboBoxGender->addItem(tr("Male"), IMUser::MALE);
-        ui.comboBoxGender->addItem(tr("Female"), IMUser::FEMALE);
+        ui.comboBoxGender->addItem(tr("Any"), QVariant(IMUser::GENDER_UNKNOWN));
+        ui.comboBoxGender->addItem(tr("Male"), QVariant(IMUser::MALE));
+        ui.comboBoxGender->addItem(tr("Female"), QVariant(IMUser::FEMALE));
         ui.comboBoxGender->setCurrentIndex(0);
         
-        ui.comboBoxAge->addItem(tr("Any"), IMUser::Age_Any);
-        ui.comboBoxAge->addItem("16-22", IMUser::Age_1_18);
-        ui.comboBoxAge->addItem("23-30", IMUser::Age_19_30);
-        ui.comboBoxAge->addItem("31-40", IMUser::Age_31_40);
-        ui.comboBoxAge->addItem("40+", IMUser::Age_40_);
+        ui.comboBoxAge->addItem(tr("Any"), QVariant(IMUser::Age_Any));
+        ui.comboBoxAge->addItem("18-", QVariant(IMUser::Age_1_18));
+        ui.comboBoxAge->addItem("19-30", QVariant(IMUser::Age_19_30));
+        ui.comboBoxAge->addItem("31-40", QVariant(IMUser::Age_31_40));
+        ui.comboBoxAge->addItem("40+", QVariant(IMUser::Age_40_));
         ui.comboBoxAge->setCurrentIndex(0);
         
         ui.pushButtonCondition->setVisible(false);
@@ -202,13 +202,14 @@ void Search::on_pushButtonSearch_clicked(){
         QStringList propertiesList;
         QString userID = ui.lineEditUserID->text().trimmed();
         QString nickName = ui.lineEditNickname->text();
-        QString age = "";
+        quint8 age = IMUserBase::Age_Any;
         if(ui.comboBoxAge->currentIndex() != 0){
-            age = ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toString();
+            age = ui.comboBoxAge->itemData(ui.comboBoxAge->currentIndex()).toUInt();
+            qDebug()<<"----------age"<<age;
         }
-        QString gender = "";
+        quint8 gender = IMUser::GENDER_UNKNOWN;
         if(ui.comboBoxGender->currentIndex() != 0){
-            gender = ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toString();
+            gender = ui.comboBoxGender->itemData(ui.comboBoxGender->currentIndex()).toUInt();
         }
         QString hometown = ui.lineEditHomeAddress->text().trimmed();
         QString businessAddress = ui.lineEditBusinessAddress->text().trimmed();
@@ -234,7 +235,7 @@ void Search::on_pushButtonSearch_clicked(){
             searchOnlineUsersOnly = searchWebcamUsersOnly = false;
         }
 
-        propertiesList << userID << nickName << age << gender <<hometown << businessAddress;
+        propertiesList << userID << nickName << QString::number(age) << QString::number(gender) <<hometown << businessAddress;
 
         
 //        if(propertiesList.isEmpty()){

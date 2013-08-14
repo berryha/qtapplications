@@ -370,19 +370,11 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
    QString queryString ;
 
     if(matchExactly){
-        if(userID.isEmpty()){
-            userID  = "%%";
-        }
-        if(nickName.isEmpty()){
-            nickName = "%%";
-        }
-
         queryString = QString("call sp_Contact_Search_MatchExactly('%1', '%2');").arg(userID).arg(nickName);
     }else{
-        if(hometown.trimmed().isEmpty()){hometown = "";}
-        if(businessAddress.trimmed().isEmpty()){businessAddress = "";}
-        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, %3, '%4', '%5');").arg(startAge).arg(endAge).arg(genderString.toInt()).arg(hometown).arg(businessAddress);
+        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, %3, '%4', '%5');").arg(startAge).arg(endAge).arg(genderString.toUInt()).arg(hometown).arg(businessAddress);
     }
+    qDebug()<<"----queryString:"<<queryString;
 
     if(!db.isValid()){
         if(!openDatabase()){
@@ -419,7 +411,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
         userInfoList.append(userID);
         for(int i=1; i<7; i++){
             userInfoList.append(query.value(i).toString());
-//            qWarning()<<i<<":"<<query.value(i).toString();
+            //qWarning()<<i<<":"<<query.value(i).toString();
         }
         userInfoList.append(QString::number(onlineState));
         
