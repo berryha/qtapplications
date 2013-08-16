@@ -282,7 +282,7 @@ CREATE TABLE `LoginHistories` (
   PRIMARY KEY (`ID`),
   KEY `FK-LH_UserID-USI_UserID` (`UserID`),
   CONSTRAINT `FK-LH_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 COMMENT='登陆历史';
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8 COMMENT='登陆历史';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -291,7 +291,7 @@ CREATE TABLE `LoginHistories` (
 
 LOCK TABLES `LoginHistories` WRITE;
 /*!40000 ALTER TABLE `LoginHistories` DISABLE KEYS */;
-INSERT INTO `LoginHistories` VALUES (20,'admin','200.200.200.17',39148,NULL,NULL,'2013-08-08 03:52:44','2013-08-08 15:47:26','PC',NULL,NULL),(21,'admin','200.200.200.17',39548,NULL,NULL,'2013-08-14 00:59:27',NULL,'PC',NULL,NULL),(22,'admin','200.200.200.17',40072,NULL,NULL,'2013-08-14 01:09:42',NULL,'PC',NULL,NULL),(23,'admin','200.200.200.17',42702,NULL,NULL,'2013-08-14 02:28:37','2013-08-14 10:37:49','PC',NULL,NULL),(24,'admin','200.200.200.17',56066,NULL,NULL,'2013-08-14 02:44:46','2013-08-14 10:45:29','PC',NULL,NULL),(25,'admin','200.200.200.17',48059,NULL,NULL,'2013-08-14 02:49:41','2013-08-14 10:50:08','PC',NULL,NULL),(26,'admin','200.200.200.17',54117,NULL,NULL,'2013-08-14 02:52:28','2013-08-14 10:52:45','PC',NULL,NULL),(27,'admin','200.200.200.17',36235,NULL,NULL,'2013-08-14 02:55:16','2013-08-14 10:56:49','PC',NULL,NULL);
+INSERT INTO `LoginHistories` VALUES (30,'admin','200.200.200.17',58583,NULL,NULL,'2013-08-14 06:08:26','2013-08-14 14:12:52','PC',NULL,NULL),(31,'admin','200.200.200.17',57157,NULL,NULL,'2013-08-14 06:30:59','2013-08-14 14:47:39','PC',NULL,NULL),(32,'admin','200.200.200.17',58802,NULL,NULL,'2013-08-14 06:48:07','2013-08-14 14:52:02','PC',NULL,NULL),(33,'admin','200.200.200.17',52940,NULL,NULL,'2013-08-14 06:52:58',NULL,'PC',NULL,NULL),(34,'admin','200.200.200.17',44607,NULL,NULL,'2013-08-14 06:59:10','2013-08-14 14:59:57','PC',NULL,NULL),(35,'admin','200.200.200.17',45754,NULL,NULL,'2013-08-14 07:03:03','2013-08-14 15:27:20','PC',NULL,NULL),(36,'admin','200.200.200.17',51967,NULL,NULL,'2013-08-14 08:03:10','2013-08-14 16:04:20','PC',NULL,NULL),(37,'admin','200.200.200.17',45484,NULL,NULL,'2013-08-14 08:05:40','2013-08-14 16:06:45','PC',NULL,NULL),(38,'admin','200.200.200.17',42369,NULL,NULL,'2013-08-14 08:11:24','2013-08-14 16:12:24','PC',NULL,NULL),(39,'admin','200.200.200.17',43323,NULL,NULL,'2013-08-14 08:32:27','2013-08-14 16:33:26','PC',NULL,NULL),(40,'admin','200.200.200.17',34539,NULL,NULL,'2013-08-14 08:35:39','2013-08-14 16:36:08','PC',NULL,NULL),(41,'admin','200.200.200.17',60313,NULL,NULL,'2013-08-14 08:41:17','2013-08-14 16:42:46','PC',NULL,NULL),(42,'admin','200.200.200.17',38813,NULL,NULL,'2013-08-14 08:49:44','2013-08-14 16:50:10','PC',NULL,NULL),(43,'admin','200.200.200.17',46148,NULL,NULL,'2013-08-14 08:51:38','2013-08-14 16:52:25','PC',NULL,NULL),(44,'admin','200.200.200.17',39081,NULL,NULL,'2013-08-14 08:55:32','2013-08-14 17:07:18','PC',NULL,NULL),(45,'admin','200.200.200.17',43348,NULL,NULL,'2013-08-14 09:08:26',NULL,'PC',NULL,NULL),(46,'admin','200.200.200.17',46028,NULL,NULL,'2013-08-14 09:15:58',NULL,'PC',NULL,NULL),(47,'admin','200.200.200.17',42796,NULL,NULL,'2013-08-14 09:24:45','2013-08-14 17:25:32','PC',NULL,NULL),(48,'admin','200.200.200.17',60501,NULL,NULL,'2013-08-14 12:00:36','2013-08-14 20:02:07','PC',NULL,NULL),(49,'admin','200.200.200.17',57261,NULL,NULL,'2013-08-14 12:11:07','2013-08-14 20:13:00','PC',NULL,NULL);
 /*!40000 ALTER TABLE `LoginHistories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,9 +334,9 @@ DROP TABLE IF EXISTS `PersonalContactGroups`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `PersonalContactGroups` (
   `SysID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `GroupID` int(10) unsigned NOT NULL,
-  `Creator` varchar(16) NOT NULL,
+  `GroupID` int(10) unsigned NOT NULL COMMENT '0:Blacklist, 1:Friend',
   `GroupName` varchar(32) NOT NULL,
+  `Creator` varchar(16) NOT NULL,
   `GroupInfoVersion` int(10) unsigned NOT NULL DEFAULT '1',
   `MemberListVersion` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`SysID`),
@@ -344,7 +344,7 @@ CREATE TABLE `PersonalContactGroups` (
   UNIQUE KEY `index-Creator-GroupID` (`Creator`,`GroupID`),
   KEY `FK-PCG_Creator-USI_UserID` (`Creator`),
   CONSTRAINT `FK-PCG_Creator-USI_UserID` FOREIGN KEY (`Creator`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1003 DEFAULT CHARSET=utf8 COMMENT='个人联系人组';
+) ENGINE=InnoDB AUTO_INCREMENT=1012 DEFAULT CHARSET=utf8 COMMENT='个人联系人组';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -353,7 +353,7 @@ CREATE TABLE `PersonalContactGroups` (
 
 LOCK TABLES `PersonalContactGroups` WRITE;
 /*!40000 ALTER TABLE `PersonalContactGroups` DISABLE KEYS */;
-INSERT INTO `PersonalContactGroups` VALUES (1001,1001,'hehui','CG1',1,1),(1002,1002,'hehui','TG1',1,1);
+INSERT INTO `PersonalContactGroups` VALUES (1004,1,'Friends','hehui',1,0),(1005,1,'Friends','admin',1,0),(1006,1,'Friends','test1',1,0),(1007,1,'Friends','test2',1,0),(1008,1,'Friends','test3',1,0),(1009,1,'Friends','test4',1,0),(1010,1,'Friends','test5',1,0),(1011,1,'Friends','test6',1,0);
 /*!40000 ALTER TABLE `PersonalContactGroups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -377,10 +377,10 @@ CREATE TABLE `PersonalRelationship` (
   KEY `FK-UF_UserID-USI_UserID` (`UserID`),
   KEY `FK-UF_ContactID-USI_UserID` (`ContactID`),
   KEY `FK-UF_PCGID-PCG_CGID` (`PersonalContactGroupSysID`),
-  CONSTRAINT `FK-PR_PCGSysID-PCG_CGSysID` FOREIGN KEY (`PersonalContactGroupSysID`) REFERENCES `PersonalContactGroups` (`SysID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK-PR_PCGSysID-PCG_CGSysID` FOREIGN KEY (`PersonalContactGroupSysID`) REFERENCES `PersonalContactGroups` (`SysID`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK-UF_ContactID-USI_UserID` FOREIGN KEY (`ContactID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK-UF_UserID-USI_UserID` FOREIGN KEY (`UserID`) REFERENCES `UsersSummaryInfo` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='成员关系表';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='成员关系表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -389,7 +389,7 @@ CREATE TABLE `PersonalRelationship` (
 
 LOCK TABLES `PersonalRelationship` WRITE;
 /*!40000 ALTER TABLE `PersonalRelationship` DISABLE KEYS */;
-INSERT INTO `PersonalRelationship` VALUES (1,'hehui','admin',1001,NULL,'2013-08-01 20:50:24',1),(2,'hehui','test',1002,NULL,'2013-08-01 20:50:24',1),(3,'hehui','test2',1001,NULL,'2013-08-02 09:18:58',1);
+INSERT INTO `PersonalRelationship` VALUES (6,'admin','test4',1005,NULL,'2013-08-14 06:10:51',1),(7,'test4','admin',1009,NULL,'2013-08-14 06:10:51',1);
 /*!40000 ALTER TABLE `PersonalRelationship` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -456,7 +456,7 @@ CREATE TABLE `UsersDetailedInfo` (
 
 LOCK TABLES `UsersDetailedInfo` WRITE;
 /*!40000 ALTER TABLE `UsersDetailedInfo` DISABLE KEYS */;
-INSERT INTO `UsersDetailedInfo` VALUES (1,'China HuBei ZaoYang',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'China GuangDong DongGuan',NULL,NULL,NULL,NULL,NULL,NULL),(2,'China HuBei ZaoYang',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'China GuangDong DongGuan',NULL,NULL,NULL,NULL,NULL,NULL),(9,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'China GuangDong YingDe',NULL,NULL,NULL,NULL,NULL,NULL),(10,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'China HongKong',NULL,NULL,NULL,NULL,NULL,NULL),(11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'China HongKong',NULL,NULL,NULL,NULL,NULL,NULL),(12,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(13,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(14,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `UsersDetailedInfo` VALUES (16,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(17,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(18,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(19,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(20,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(21,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(22,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(23,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `UsersDetailedInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -478,17 +478,18 @@ CREATE TABLE `UsersSummaryInfo` (
   `Face` varchar(255) DEFAULT NULL,
   `PersonalContactGroupsInfoVersion` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '联系人组版本',
   `InterestGroupsInfoVersion` int(10) unsigned NOT NULL DEFAULT '0',
-  `BlacklistInfoVersion` int(10) unsigned NOT NULL DEFAULT '0',
   `PersonalSummaryInfoVersion` int(11) NOT NULL DEFAULT '1',
   `PersonalDetailInfoVersion` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '个人信息版本',
-  `FriendshipApply` char(1) NOT NULL DEFAULT '0' COMMENT '好友请求(V:要求认证;A:自动接受)',
-  `ShortTalk` char(1) NOT NULL DEFAULT '0' COMMENT '临时佳话(P:提示;D:拒绝;A:自动接受)',
+  `PersonalMessageInfoVersion` int(10) unsigned NOT NULL DEFAULT '0',
+  `FriendshipApply` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0:AUTO_ACCEPT , 1:REQUIRE_AUTHENTICATION',
+  `ShortTalk` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'AUTO_ACCEPT = 0, PROMPT = 1, DENY = 2',
   `Role` int(10) unsigned NOT NULL DEFAULT '3',
   `Description` varchar(256) DEFAULT NULL COMMENT '自我介绍',
   `AccountState` tinyint(1) NOT NULL DEFAULT '1' COMMENT '0:Invalid 1:Normal 2:Banned 3:Limitted',
+  `PersonalMessage` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`SysID`),
   UNIQUE KEY `index_UsersSummaryInfo_UserID` (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='基本信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='基本信息表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -497,7 +498,7 @@ CREATE TABLE `UsersSummaryInfo` (
 
 LOCK TABLES `UsersSummaryInfo` WRITE;
 /*!40000 ALTER TABLE `UsersSummaryInfo` DISABLE KEYS */;
-INSERT INTO `UsersSummaryInfo` VALUES (1,'hehui','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,29,NULL,0,0,0,1,1,'0','0',3,NULL,1),(2,'admin','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,40,NULL,0,0,0,1,1,'0','0',3,NULL,1),(9,'test','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,16,NULL,0,0,0,1,1,'0','0',3,NULL,1),(10,'test2','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,2,0,NULL,0,0,0,1,1,'0','0',3,NULL,1),(11,'test3','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,24,NULL,0,0,0,1,1,'0','0',3,NULL,1),(12,'test4','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,0,NULL,0,0,0,1,1,'0','0',3,NULL,1),(13,'test5','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,2,60,NULL,0,0,0,1,1,'0','0',3,NULL,1),(14,'test6','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,0,NULL,0,0,0,1,1,'0','0',3,NULL,1);
+INSERT INTO `UsersSummaryInfo` VALUES (16,'hehui','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,29,NULL,0,0,1,1,0,1,0,3,NULL,1,NULL),(17,'admin','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,60,NULL,0,0,1,1,0,0,0,3,NULL,1,NULL),(18,'test1','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,2,17,NULL,0,0,1,1,0,1,0,3,NULL,1,NULL),(19,'test2','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,0,NULL,0,0,1,1,0,2,0,3,NULL,1,NULL),(20,'test3','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,40,NULL,0,0,1,1,0,1,0,3,NULL,1,NULL),(21,'test4','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,0,NULL,0,0,1,1,0,0,0,3,NULL,1,NULL),(22,'test5','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,1,0,NULL,0,0,1,1,0,0,0,3,NULL,1,NULL),(23,'test6','P66eKnCMcBPetxi+LMKG2P7cBSA=',NULL,NULL,0,0,NULL,0,0,1,1,0,0,0,3,NULL,1,NULL);
 /*!40000 ALTER TABLE `UsersSummaryInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -646,18 +647,31 @@ BEGIN
 #p_addToBlacklist：是否加入黑名單
 
 
+if p_addToBlacklist <> 0 then
+	#call sp_Contact_Blacklisted_AddOrDelete(p_userID, p_contactID, 1);
+	
+	set @groupSysID = null;
+	select SysID into @groupSysID from PersonalContactGroups where GroupID=0 and Creator=p_userID;
+	if @groupSysID is null then
+		insert into PersonalContactGroups(GroupID, GroupName, Creator) values(0, 'Blacklist', p_userID) ;
+		select SysID into @groupSysID from PersonalContactGroups where GroupID=0 and Creator=p_userID;
+	end if;
 
-delete from PersonalRelationship  where UserID = p_userID and ContactID = p_contactID;
+	update PersonalRelationship  set PersonalContactGroupSysID=@groupSysID where UserID = p_userID and ContactID = p_contactID;
+
+else
+	delete from PersonalRelationship  where UserID = p_userID and ContactID = p_contactID;
+end if;
+
+
 
 if p_deleteMeFromOpposition <> 0 then
 	delete from PersonalRelationship  where UserID = p_contactID and ContactID = p_userID;
 end if;
 
-if p_addToBlacklist <> 0 then
-	call sp_Contact_Blacklisted_AddOrDelete(p_userID, p_contactID, 1);
-	#insert into PersonalBlacklist values(p_userID, p_contactID, NULL) ;
-	#update UsersSummaryInfo set BlacklistInfoVersion = BlacklistInfoVersion+1 where UserID = p_userID;
-end if;
+#if p_addToBlacklist <> 0 then
+#	call sp_Contact_Blacklisted_AddOrDelete(p_userID, p_contactID, 1);
+#end if;
 
 
 
@@ -687,7 +701,7 @@ BEGIN
 #p_newContactGroupID:新的聯系人組
 
 
-set @groupSysID = 0;
+set @groupSysID = null;
 select SysID into @groupSysID from PersonalContactGroups where Creator=p_userID and GroupID=p_newContactGroupID;
 
 update PersonalRelationship  set PersonalContactGroupSysID=@groupSysID where UserID = p_userID and ContactID = p_contactID;
@@ -868,31 +882,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `sp_GetCachedInterestGroupChatMessages` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = '' */ ;
-DELIMITER ;;
-CREATE DEFINER=`hehui`@`%` PROCEDURE `sp_GetCachedInterestGroupChatMessages`(in p_userID varchar(16), in p_startTime datetime )
-BEGIN
-
-
-select cigc.Sender, cigc.GroupID, cigc.Message, cigc.TransmittingTime 
-from CachedInterestGroupChatMessages cigc, InterestGroupMembers igm
-where igm.UserID=p_userID and igm.GroupID=cigc.GroupID and cigc.TransmittingTime>p_startTime ; 
-
-
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `sp_Contact_Search_MatchWildcard` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -966,18 +955,20 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`hehui`@`%` PROCEDURE `sp_CreateNewUser`(in p_userID varchar(16), in u_password varchar(32), out u_sysid int(10) unsigned )
+CREATE DEFINER=`hehui`@`%` PROCEDURE `sp_CreateNewUser`(in p_userID varchar(16), in p_password varchar(32), out p_sysid int(10) unsigned )
 BEGIN
 
-select SysID into u_sysid from UsersSummaryInfo where UserID = p_userID ;
-if u_sysid is null then
-    insert into UsersSummaryInfo(UserID, UserPassword) values(u_id, u_password);
-	insert into PersonalContactGroups(GroupID, Creator, GroupName) values(p_userID, 1, 'Friends') ;
-    select SysID into u_sysid from UsersSummaryInfo where UserID = p_userID ;
-	insert into UsersDetailedInfo(SysID) values(u_sysid);
+select SysID into p_sysid from UsersSummaryInfo where UserID = p_userID ;
+if p_sysid is null then
+    insert into UsersSummaryInfo(UserID, UserPassword) values(p_userID, p_password);
+    select SysID into p_sysid from UsersSummaryInfo where UserID = p_userID ;
+	insert into UsersDetailedInfo(SysID) values(p_sysid);
+
+	insert into PersonalContactGroups(GroupID, GroupName, Creator) values(1, 'Friends', p_userID) ;
+
 else    
     #如果记录已存在则u_sysid返回0
-    set u_sysid = 0; 
+    set p_sysid = 0; 
 end if;
 
 #insert into UsersSummaryInfo(UserID, UserPassword, NickName, Gender) values(u_id, u_password, u_nickname, u_gender);
@@ -1007,10 +998,35 @@ BEGIN
 #where pr.UserID = p_userID and usi.UserID = pr.ContactID;
 
 
-select  GROUP_CONCAT( (select CONCAT_WS(',', usi.UserID, usi.PersonalSummaryInfoVersion, usi.PersonalDetailInfoVersion )) SEPARATOR ';' ) as Contacts
+select  GROUP_CONCAT( (select CONCAT_WS(',', usi.UserID, usi.PersonalSummaryInfoVersion, usi.PersonalDetailInfoVersion, usi.PersonalMessageInfoVersion )) SEPARATOR ';' ) as Contacts
 from  UsersSummaryInfo usi, PersonalRelationship pr 
 where pr.UserID = p_userID and usi.UserID = pr.ContactID 
 ;#group by pr.PersonalContactGroup;
+
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `sp_GetCachedInterestGroupChatMessages` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`hehui`@`%` PROCEDURE `sp_GetCachedInterestGroupChatMessages`(in p_userID varchar(16), in p_startTime datetime )
+BEGIN
+
+
+select cigc.Sender, cigc.GroupID, cigc.Message, cigc.TransmittingTime 
+from CachedInterestGroupChatMessages cigc, InterestGroupMembers igm
+where igm.UserID=p_userID and igm.GroupID=cigc.GroupID and cigc.TransmittingTime>p_startTime ; 
 
 
 END ;;
@@ -1276,4 +1292,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-08-14 11:00:54
+-- Dump completed on 2013-08-16 17:59:44

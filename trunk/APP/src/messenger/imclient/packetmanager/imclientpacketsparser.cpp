@@ -317,8 +317,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         if(loginResultCode){
             QByteArray encryptedData;
-            quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, blacklistInfoVersionOnServer = 1;
-            in >> encryptedData >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> blacklistInfoVersionOnServer;
+            quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, personalMessageInfoVersionOnServer = 1;
+            in >> encryptedData >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> personalMessageInfoVersionOnServer;
 
             QByteArray decryptedData;
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
@@ -339,7 +339,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             if(personalDetailInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
             if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
             if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
-            if(blacklistInfoVersionOnServer != user->getBlacklistInfoVersion()){requestBlacklistInfo(socketID);}
+            if(personalMessageInfoVersionOnServer != user->getPersonalMessageInfoVersion()){requestPersonalMessage(socketID, m_myUserID);}
 
         }else{
             in >> errorTypeCode;
@@ -570,6 +570,28 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::SERVER_RESPONSE_DELETE_CONTACT):
+    {
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+        QString contactID = "";
+        quint8 contactDeleted = 0, addToBlacklist = 0;
+
+        stream >> contactID >> contactDeleted >> addToBlacklist;
+
+        emit signalDeleteContactResultPacketReceived(contactID, contactDeleted, addToBlacklist);
+
+    }
+        break;
+
+
     case quint8(IM::SERVER_RESPONSE_INTEREST_GROUPS_LIST):
     {
         qDebug()<<"--SERVER_RESPONSE_INTEREST_GROUPS_LIST";
@@ -637,7 +659,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::BLACKLIST_INFO):
+    case quint8(IM::SERVER_RESPONSE_PERSONAL_MESSAGE_INFO):
     {
 
         QByteArray encryptedData;
@@ -648,12 +670,11 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
-        QString blacklistOnServer = "";
-        quint32 blacklistInfoVersionOnServer = 1;
+        QString userID = "", personalMessage = "";
 
-        stream >> blacklistOnServer >> blacklistInfoVersionOnServer;
+        stream >> userID >> personalMessage;
 
-        emit signalBlacklistInfoPacketReceived(blacklistOnServer, blacklistInfoVersionOnServer);
+        emit signalPersonalMessagePacketReceived(userID, personalMessage);
 
     }
         break;

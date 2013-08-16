@@ -105,6 +105,21 @@ UserInfo* UsersManager::getUserInfo(const QString &imUserID){
 
 }
 
+UserInfo* UsersManager::getCachedUserInfo(const QString &imUserID){
+
+    if(imUserID.trimmed().isEmpty()){
+        return 0;
+    }
+
+    UserInfo * userInfo = getOnlineUserInfo(imUserID);
+    if(!userInfo){
+        userInfo = getOfflineUserInfo(imUserID);
+    }
+
+    return userInfo;
+
+}
+
 UserInfo* UsersManager::getOnlineUserInfo(const QString &imUserID){
     QMutexLocker locker(onlineUserMutex);
     UserInfo * userInfo = 0;
@@ -1123,22 +1138,24 @@ bool UsersManager::queryUserInfo(UserInfo *info){
     info->setTrueName(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_TrueName)))).toString());
     info->setNickName(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_NickName)))).toString());
     info->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Gender)))).toUInt()));
+    info->setAge(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Age)))).toInt());
     info->setFace(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Face)))).toString());
 
 //    info->setContactGroupsInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalContactGroupsInfoString)))).toString());
     info->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalContactGroupsInfoVersion)))).toInt());
 //    info->setInterestGroupsStringFromDatabase(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoString)))).toString());
     info->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
-    info->setBlacklistInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_BlacklistInfoVersion)))).toInt());
 //    info->setBlacklistInfoString(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Blacklist)))).toString());
     info->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
     info->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
-    info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toString().toUInt()));
-    info->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_ShortTalk)))).toString().toUInt()));
+    info->setPersonalMessageInfoVersion(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalMessageInfoVersion)))).toInt());
+    info->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_FriendshipApply)))).toUInt()));
+    info->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_ShortTalk)))).toUInt()));
     info->setUserRole(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Role)))).toInt());
-    info->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_AccountState)))).toString().toUInt()));
+    info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Description)))).toString());
+    info->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_AccountState)))).toUInt()));
+    info->setPersonalMessage(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_PersonalMessage)))).toString());
 
-    info->setAge(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Age)))).toInt());
     info->setHomeAddress(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomeAddress)))).toString());
     info->setHomePhoneNumber(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomePhoneNumber)))).toString());
     info->setHomeZipCode(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_HomeZipCode)))).toString());
@@ -1164,7 +1181,6 @@ bool UsersManager::queryUserInfo(UserInfo *info){
 
     info->setRegistrationTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_RegistrationTime)))).toDateTime());
 //    info->setLoginTimes(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_LoginTimes)))).toInt());
-    info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PI_Description)))).toString());
 
 
 //    getUserInterestGroupsFromDatabase(info);
@@ -1210,7 +1226,7 @@ bool UsersManager::getUserAllContactGroupsInfoFromDatabase(UserInfo* info){
          //e.g. user1,user2,user3
          QString contacts = query.value(2).toString();
 
-         contactGroups.append(groupID+","+groupName+","+contacts);
+         contactGroups.append(QString::number(groupID)+","+groupName+","+contacts);
      }
 
 
@@ -1307,8 +1323,8 @@ bool UsersManager::getUserBlacklistedContactsInfoFromDB(UserInfo* info){
 
 bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString){
 
-    //infoString FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion;UserID,...
-    //e.g. user1,10,10;user2,5,6;user3,11,10
+    //FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...
+    //e.g. user1,10,10,2;user2,5,6,15;user3,11,10,20
 
 
     if(!info){

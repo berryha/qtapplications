@@ -684,6 +684,33 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
+    bool sendDeleteContactResultPacket(int peerSocketID, const QString &contactID, bool contactDeleted, bool addToBlacklist, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendDeleteContactResultPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_DELETE_CONTACT));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << contactID << quint8(contactDeleted?1:0) << quint8(addToBlacklist?1:0);
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
+
     bool sendUserInterestGroupsListPacket(int peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
 
         //TODO:用户信息的格式
@@ -773,18 +800,18 @@ public slots:
     }
     
     
-    bool sendUserBlacklistInfoPacket(bool peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
-        qDebug()<<"--sendUserBlacklistInfoPacket(...)";
+    bool sendUserPersonalMessagePacket(bool peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
+        qDebug()<<"--sendUserPersonalMessagePacket(...)";
 
         //TODO:用户信息的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
-        packet->setPacketType(quint8(IM::BLACKLIST_INFO));
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_PERSONAL_MESSAGE_INFO));
         packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << userInfo->getBlacklistInfoString() << userInfo->getBlacklistInfoVersion();
+        out << userInfo->getUserID() << userInfo->getPersonalMessage();
         QByteArray encryptedData;
         crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
         ba.clear();

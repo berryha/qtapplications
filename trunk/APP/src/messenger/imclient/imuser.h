@@ -40,6 +40,10 @@ public:
     static IMUser * instance();
     virtual ~IMUser();
 
+
+    QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
+
+
     bool loadMyInfoFromLocalDatabase();
     bool saveMyInfoToLocalDatabase();
 
@@ -74,7 +78,6 @@ public slots:
 
 private slots:
 
-    QString databaseColumnName(IM::PropertyIDOfUser propertyID) const;
 
 private:
     static IMUser *imUserInstance;
