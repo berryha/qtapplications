@@ -57,10 +57,10 @@ class SHAREDIMLIB_API IMUserBase : public User//, public Singleton<IMUserBase>
     //friend class Singleton<IMUserBase>;
 
 public:
-    enum FriendshipApply{FA_AUTO_ACCEPT = 0, FA_REQUIRE_AUTHENTICATION};
+    enum FriendshipApply{FA_AUTO_ACCEPT = 0, FA_REQUIRE_AUTHENTICATION = 1};
     enum FriendshipApplyResult{FAR_UNKNOWN = 0, FAR_ACCEPTED = 1, FAR_DENIED};
 
-    enum ShortTalk{ST_AUTO_ACCEPT = 0, ST_PROMPT, ST_DENY};
+    enum ShortTalk{ST_AUTO_ACCEPT = 0, ST_PROMPT = 1, ST_DENY = 2};
     enum AgeSection{Age_Any = 0, Age_1_18, Age_19_30, Age_23_30, Age_31_40, Age_40_};
 
     enum AccountState{AS_Invalid = 0, AS_Normal, AS_Banned, AS_Limitted};
@@ -103,10 +103,12 @@ public:
 //        return personalContactGroupsHash;
 //    }
 
-    quint32 getBlacklistInfoVersion() const{
-        return blacklistInfoVersion;
+    quint32 getPersonalMessageInfoVersion() const{
+        return personalMessageInfoVersion;
     }
-
+    QString getPersonalMessage() const{
+        return personalMessage;
+    }
 
     quint32 getPersonalContactGroupsVersion() const
     {
@@ -176,9 +178,13 @@ public:
 //        this->personalContactGroupsHash = personalContactGroups;
 //    }
 
-    void setBlacklistInfoVersion(quint32 blacklistInfoVersion){
-        this->blacklistInfoVersion = blacklistInfoVersion;
-        addUpdatedPersonalInfoProperty(IM::PI_BlacklistInfoVersion, QString::number(blacklistInfoVersion), true);
+    void setPersonalMessageInfoVersion(quint32 personalMessageInfoVersion){
+        this->personalMessageInfoVersion = personalMessageInfoVersion;
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalMessageInfoVersion, QString::number(personalMessageInfoVersion), true);
+    }
+    void setPersonalMessage(const QString &personalMessage){
+        this->personalMessage = personalMessage;
+        addUpdatedPersonalInfoProperty(IM::PI_PersonalMessage, "'" + personalMessage + "'", true);
     }
 
     void setPersonalContactGroupsVersion(quint32 personalContactGroupsVersion)
@@ -265,7 +271,7 @@ public slots:
     virtual QString getContactGroupsInfoString() const;
 
 
-    QList<ContactGroupBase *> getContactGroups();
+    QList<ContactGroupBase *> getContactGroups(bool noStrangers = true, bool noBlacklisted = true);
     QStringList contactGroupNames();
     ContactGroupBase * getContactGroup(int personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
@@ -295,7 +301,7 @@ public slots:
 
 
     bool addOrDeleteBlacklistedContact(const QString &contactID, bool addToBlacklist = true);
-    quint32 updateBlacklistInfoVersion();
+    quint32 updatePersonalMessageInfoVersion();
     QString getBlacklistInfoString();
     void setBlacklistInfoString(const QString &blacklistInfoString);
     bool isContactBlacklisted(const QString &contactID);
@@ -316,7 +322,9 @@ private:
     //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
 
 
-    quint32 blacklistInfoVersion;
+    quint32 personalMessageInfoVersion;
+    QString personalMessage;
+
 //    QStringList blacklist;
 
     QStringList interestGroups;

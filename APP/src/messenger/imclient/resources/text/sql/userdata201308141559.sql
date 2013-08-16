@@ -1,16 +1,3 @@
-/*
-Navicat SQLite Data Transfer
-
-Source Server         : userdata
-Source Server Version : 30714
-Source Host           : :0
-
-Target Server Type    : SQLite
-Target Server Version : 30714
-File Encoding         : 65001
-
-Date: 2013-08-16 18:00:20
-*/
 
 PRAGMA foreign_keys = OFF;
 
@@ -63,13 +50,11 @@ CREATE TABLE "contacts_detailed_info" (
 "Age"  tinyint(3) DEFAULT 0,
 "Face"  varchar(255) DEFAULT NULL,
 "ContactGroupID"  INTEGER NOT NULL ON CONFLICT REPLACE DEFAULT -1,
-"PersonalSummaryInfoVersion"  INT(10) NOT NULL DEFAULT 1,
-"PersonalDetailInfoVersion"  INT(10) NOT NULL DEFAULT 0,
-"PersonalMessageInfoVersion"  INT(10) NOT NULL DEFAULT 0,
+"PersonalSummaryInfoVersion"  INTEGER NOT NULL DEFAULT 1,
+"PersonalDetailInfoVersion"  INTEGER NOT NULL DEFAULT 0,
 "Role"  int(10) DEFAULT '3',
 "Description"  varchar(255),
 "AccountState"  Tinyint(3) NOT NULL DEFAULT 1,
-"PersonalMessage"  varchar(64),
 "HomeAddress"  varchar(255) DEFAULT NULL,
 "HomePhoneNumber"  varchar(32) DEFAULT NULL,
 "HomeZipCode"  varchar(12) DEFAULT NULL,
@@ -166,13 +151,11 @@ CREATE TABLE "my_detailed_info" (
 "BlacklistInfoVersion"  int(10) NOT NULL DEFAULT 0,
 "PersonalSummaryInfoVersion"  int(10) NOT NULL DEFAULT 0,
 "PersonalDetailInfoVersion"  INT(10) NOT NULL DEFAULT 0,
-"PersonalMessageInfoVersion"  INT(10) NOT NULL DEFAULT 0,
 "FriendshipApply"  Tinyint(1),
 "ShortTalk"  Tinyint(1),
 "Role"  INTEGER,
 "Description"  VARCHAR(255),
 "AccountState"  Tinyint(3) NOT NULL DEFAULT 1,
-"PersonalMessage"  varchar(64),
 "HomeAddress"  varchar(255) DEFAULT NULL,
 "HomePhoneNumber"  varchar(32) DEFAULT NULL,
 "HomeZipCode"  varchar(12) DEFAULT NULL,
@@ -192,26 +175,6 @@ CREATE TABLE "my_detailed_info" (
 
 -- ----------------------------
 -- Records of my_detailed_info
--- ----------------------------
-
--- ----------------------------
--- Table structure for sqlite_sequence
--- ----------------------------
-DROP TABLE IF EXISTS "main"."sqlite_sequence";
-CREATE TABLE sqlite_sequence(name,seq);
-
--- ----------------------------
--- Records of sqlite_sequence
--- ----------------------------
-
--- ----------------------------
--- Table structure for sqlite_stat1
--- ----------------------------
-DROP TABLE IF EXISTS "main"."sqlite_stat1";
-CREATE TABLE sqlite_stat1(tbl,idx,stat);
-
--- ----------------------------
--- Records of sqlite_stat1
 -- ----------------------------
 
 -- ----------------------------

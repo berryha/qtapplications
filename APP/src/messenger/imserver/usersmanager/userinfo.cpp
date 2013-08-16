@@ -204,6 +204,9 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_Gender:
         columnName = "Gender";
         break;
+    case IM::PI_Age:
+        columnName = "Age";
+        break;
     case IM::PI_Face:
         columnName = "Face";
         break;
@@ -219,8 +222,11 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_InterestGroupsInfoVersion:
         columnName = "InterestGroupsInfoVersion";
         break;
-    case IM::PI_BlacklistInfoVersion:
-        columnName = "BlacklistInfoVersion";
+    case IM::PI_PersonalMessageInfoVersion:
+        columnName = "PersonalMessageInfoVersion";
+        break;
+    case IM::PI_PersonalMessage:
+        columnName = "PersonalMessage";
         break;
 //    case IM::PI_Blacklist:
 //        columnName = "Blacklist";
@@ -240,13 +246,14 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_Role:
         columnName = "Role";
         break;
+    case IM::PI_Description:
+        columnName = "Description";
+        break;
     case IM::PI_AccountState:
         columnName = "AccountState";
         break;
 
-    case IM::PI_Age:
-        columnName = "Age";
-        break;
+
     case IM::PI_HomeAddress:
         columnName = "HomeAddress";
         break;
@@ -302,9 +309,7 @@ QString UserInfo::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_LoginTimes:
 //        columnName = "LoginTimes";
 //        break;
-    case IM::PI_Description:
-        columnName = "Description";
-        break;
+
 
 //    case IM::PI_LastLoginTime:
 //        columnName = "LastLoginTime";

@@ -66,7 +66,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     networkmanager/clientresourcesmanager.h \
     contractstree/contractstree.h \
     chatwindow/contactchatwidget.h \
-    contactsmanager/contactgroup1.h
+    contactsmanager/contactgroup1.h \
+    deletecontactdialog/deletecontactdialog.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -99,7 +100,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     packetmanager/imclientpacketsparser.cpp \
     networkmanager/clientresourcesmanager.cpp \
     contractstree/contractstree.cpp \
-    chatwindow/contactchatwidget.cpp
+    chatwindow/contactchatwidget.cpp \
+    deletecontactdialog/deletecontactdialog.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
@@ -113,7 +115,8 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     about/aboutdialog.ui \
     mainwindow/mainwindow.ui \
     login/applyforregistrationwidget.ui \
-    search/addcontactdialog.ui
+    search/addcontactdialog.ui \
+    deletecontactdialog/deletecontactdialog.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
     resources/images/messageeditor/messageeditor.qrc \

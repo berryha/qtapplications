@@ -17,6 +17,8 @@
 
 #include "informationtips/userinfotipwindow.h"
 #include "contactinfowidget/contactinfowidget.h"
+#include "deletecontactdialog/deletecontactdialog.h"
+
 
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedGUI/hmainwindowbase.h"
@@ -91,8 +93,9 @@ private slots:
 
 
     void slotMoveContactToGroup();
-    void slotMoveContactToBlacklist();
-    void slotDeleteContact(const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
+//    void slotMoveContactToBlacklist();
+    void slotRequestDeleteContact(const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
+    void slotDeleteContactResultReceived(const QString &contactID, bool contactDeleted = false, bool addToBlacklist = false);
 
     void slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message);
 
@@ -111,7 +114,7 @@ private slots:
     //void slotProcessSearchContactsResult(const QString &users);
     void slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage);
     void getNewContactSettings(const QString &contactID);
-    void slotProcessBlacklistInfo(const QString &blacklistOnServer, quint32 blacklistInfoVersionOnServer);
+    void slotProcessPersonalMessage(const QString &userID, const QString &message);
 
     void slotSearch();
     void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
@@ -137,7 +140,7 @@ private slots:
 
     void interestGroupItemActivated(QListWidgetItem * item );
 
-    void on_toolButtonUserFace_clicked(){showUserInfo(imUser);}
+    void on_toolButtonUserFace_clicked(){showUserInfo(m_imUser);}
     void showUserInfo(IMUserBase *user);
 
 
@@ -184,6 +187,8 @@ private:
     void savePreferedStyle(const QString &preferedStyle, bool useStylePalette);
     void savePreferedLanguage(const QString &preferedLanguage);
 
+    void showDeleteContactDialog(Contact *contact, bool blacklistMode = false);
+
 
 private:
     Ui::MainWindowUIClass ui;
@@ -204,7 +209,7 @@ private:
     //ContactInfoWidget *m_ContactInfoWidget;
 
     ContactsManager *m_contactsManager;
-    IMUser *imUser;
+    IMUser *m_imUser;
     IM::OnlineState stateBeforeLocking;
 
     PacketHandlerBase *m_packetHandler;
@@ -220,6 +225,7 @@ private:
 
 
     Search *search;
+    DeleteContactDialog *m_deleteContactDialog;
 
     bool autoShowSystemMessage;
     bool autoShowChatMessageFromContact;

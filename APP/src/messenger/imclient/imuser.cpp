@@ -201,8 +201,11 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
     case IM::PI_InterestGroupsInfoVersion :
         columnName = "InterestGroupsInfoVersion";
         break;  
-    case IM::PI_BlacklistInfoVersion:
-        columnName = "BlacklistInfoVersion";
+    case IM::PI_PersonalMessageInfoVersion:
+        columnName = "PersonalMessageInfoVersion";
+        break;
+    case IM::PI_PersonalMessage:
+        columnName = "PersonalMessage";
         break;
 //    case IM::PI_Blacklist:
 //        columnName = "Blacklist";
@@ -224,6 +227,9 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
         break;
     case IM::PI_Role:
         columnName = "Role";
+        break;
+    case IM::PI_Description:
+        columnName = "Description";
         break;
     case IM::PI_AccountState:
         columnName = "AccountState";
@@ -253,15 +259,15 @@ QString IMUser::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 //    case IM::PI_LastLoginHostPort:
 //        columnName = "LastLoginHostPort";
 //        break;
-    case IM::PI_QuestionForSecurity:
-        columnName = "QuestionForSecurity";
-        break;
-    case IM::PI_AnswerForSecurity:
-        columnName = "AnswerForSecurity";
-        break;
-    case IM::PI_EmailForSecurity:
-        columnName = "EmailForSecurity";
-        break;  
+//    case IM::PI_QuestionForSecurity:
+//        columnName = "QuestionForSecurity";
+//        break;
+//    case IM::PI_AnswerForSecurity:
+//        columnName = "AnswerForSecurity";
+//        break;
+//    case IM::PI_EmailForSecurity:
+//        columnName = "EmailForSecurity";
+//        break;
         
     case IM::PI_CompanyName:
         columnName = "CompanyName";

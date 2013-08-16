@@ -773,7 +773,6 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
         qCritical()<<"Error! Contact already exists!";
         return false;
     }
-    qDebug()<<"-----------------------------0";
 
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
@@ -996,14 +995,6 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
     
@@ -1028,42 +1019,89 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
 
     record = query.record();
     
-
-    m_imUser->setTrueName(QVariant(query.value(record.indexOf("TrueName"))).toString());
-    m_imUser->setNickName(QVariant(query.value(record.indexOf("NickName"))).toString());
-    m_imUser->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf("Gender"))).toUInt()));
-    m_imUser->setFace(QVariant(query.value(record.indexOf("Face"))).toString());
-    m_imUser->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf("InterestGroupsInfoVersion"))).toUInt());
-    m_imUser->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf("PersonalContactGroupsInfoVersion"))).toUInt());
-    m_imUser->setBlacklistInfoVersion(QVariant(query.value(record.indexOf("BlacklistInfoVersion"))).toUInt());
-    m_imUser->setBlacklistInfoString(QVariant(query.value(record.indexOf("Blacklist"))).toString());
-    m_imUser->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf("PersonalInfoVersion"))).toUInt());
+//    m_imUser->setTrueName(QVariant(query.value(record.indexOf("TrueName"))).toString());
+//    m_imUser->setNickName(QVariant(query.value(record.indexOf("NickName"))).toString());
+//    m_imUser->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf("Gender"))).toUInt()));
+//    m_imUser->setAge(QVariant(query.value(record.indexOf("Age"))).toUInt());
+//    m_imUser->setFace(QVariant(query.value(record.indexOf("Face"))).toString());
+//    m_imUser->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf("PersonalContactGroupsInfoVersion"))).toUInt());
+//    m_imUser->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf("InterestGroupsInfoVersion"))).toUInt());
+//    m_imUser->setBlacklistInfoVersion(QVariant(query.value(record.indexOf("BlacklistInfoVersion"))).toUInt());
+//    m_imUser->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf("PersonalSummaryInfoVersion"))).toUInt());
+//    m_imUser->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf("PersonalDetailInfoVersion"))).toUInt());
     
-    m_imUser->setHomeAddress(QVariant(query.value(record.indexOf("HomeAddress"))).toString());
-    m_imUser->setHomePhoneNumber(QVariant(query.value(record.indexOf("HomePhoneNumber"))).toString());
-    m_imUser->setHomeZipCode(QVariant(query.value(record.indexOf("HomeZipCode"))).toString());
-    m_imUser->setPersonalHomepage(QVariant(query.value(record.indexOf("PersonalHomepage"))).toString());
-    m_imUser->setPersonalEmailAddress(QVariant(query.value(record.indexOf("PersonalEmailAddress"))).toString());
+//    m_imUser->setFriendshipApply(QVariant(query.value(record.indexOf("FriendshipApply"))).toUInt());
+//    m_imUser->setShortTalk(QVariant(query.value(record.indexOf("ShortTalk"))).toUInt());
+//    m_imUser->setUserRole(QVariant(query.value(record.indexOf("Role"))).toUInt());
+//    m_imUser->setDescription(QVariant(query.value(record.indexOf("Description"))).toUInt());
+//    m_imUser->setAccountState(QVariant(query.value(record.indexOf("AccountState"))).toUInt());
 
-    m_imUser->setLastLoginTime(QVariant(query.value(record.indexOf("LastLoginTime"))).toDateTime());
-    m_imUser->setLastLoginExternalHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
-    m_imUser->setLastLoginExternalHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
+//    m_imUser->setHomeAddress(QVariant(query.value(record.indexOf("HomeAddress"))).toString());
+//    m_imUser->setHomePhoneNumber(QVariant(query.value(record.indexOf("HomePhoneNumber"))).toString());
+//    m_imUser->setHomeZipCode(QVariant(query.value(record.indexOf("HomeZipCode"))).toString());
+//    m_imUser->setPersonalHomepage(QVariant(query.value(record.indexOf("PersonalHomepage"))).toString());
+//    m_imUser->setPersonalEmailAddress(QVariant(query.value(record.indexOf("PersonalEmailAddress"))).toString());
+//    m_imUser->setCompanyName(QVariant(query.value(record.indexOf("CompanyName"))).toString());
+//    m_imUser->setJobTitle(QVariant(query.value(record.indexOf("JobTitle"))).toString());
 
-    //info->setQuestionForSecurity(QVariant(query.value(record.indexOf("QuestionForSecurity"))).toString());
-    //info->setAnswerForSecurity(QVariant(query.value(record.indexOf("AnswerForSecurity"))).toString());
-    
-    m_imUser->setCompanyName(QVariant(query.value(record.indexOf("CompanyName"))).toString());
-    m_imUser->setJobTitle(QVariant(query.value(record.indexOf("JobTitle"))).toString());
+//    m_imUser->setBusinessAddress(QVariant(query.value(record.indexOf("BusinessAddress"))).toString());
+//    m_imUser->setBusinessPhoneNumber(QVariant(query.value(record.indexOf("BusinessPhoneNumber"))).toString());
+//    m_imUser->setBusinessZipCode(QVariant(query.value(record.indexOf("BusinessZipCode"))).toString());
+//    m_imUser->setBusinessFaxNumber(QVariant(query.value(record.indexOf("BusinessFaxNumber"))).toString());
+//    m_imUser->setBusinessHomepage(QVariant(query.value(record.indexOf("BusinessHomepage"))).toString());
+//    m_imUser->setBusinessEmailAddress(QVariant(query.value(record.indexOf("BusinessEmailAddress"))).toString());
 
-    m_imUser->setBusinessAddress(QVariant(query.value(record.indexOf("BusinessAddress"))).toString());
-    m_imUser->setBusinessPhoneNumber(QVariant(query.value(record.indexOf("BusinessPhoneNumber"))).toString());
-    m_imUser->setBusinessZipCode(QVariant(query.value(record.indexOf("BusinessZipCode"))).toString());
-    m_imUser->setBusinessFaxNumber(QVariant(query.value(record.indexOf("BusinessFaxNumber"))).toString());
-    m_imUser->setBusinessHomepage(QVariant(query.value(record.indexOf("BusinessHomepage"))).toString());
-    m_imUser->setBusinessEmailAddress(QVariant(query.value(record.indexOf("BusinessEmailAddress"))).toString());
+////    m_imUser->setLastLoginTime(QVariant(query.value(record.indexOf("LastLoginTime"))).toDateTime());
+////    m_imUser->setLastLoginExternalHostAddress(QVariant(query.value(record.indexOf("LastLoginHostAddress"))).toString());
+////    m_imUser->setLastLoginExternalHostPort(QVariant(query.value(record.indexOf("LastLoginHostPort"))).toUInt());
 
-    m_imUser->setRegistrationTime(QVariant(query.value(record.indexOf("RegistrationTime"))).toDateTime());
-    m_imUser->setLoginTimes(QVariant(query.value(record.indexOf("LoginTimes"))).toInt());
+////    m_imUser->setRegistrationTime(QVariant(query.value(record.indexOf("RegistrationTime"))).toDateTime());
+////    m_imUser->setLoginTimes(QVariant(query.value(record.indexOf("LoginTimes"))).toInt());
+
+////    info->setQuestionForSecurity(QVariant(query.value(record.indexOf("QuestionForSecurity"))).toString());
+////    info->setAnswerForSecurity(QVariant(query.value(record.indexOf("AnswerForSecurity"))).toString());
+
+///////////////////////////////
+
+//    m_imUser->setSysID(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_SysID)))).toUInt());
+    m_imUser->setTrueName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_TrueName)))).toString());
+    m_imUser->setNickName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_NickName)))).toString());
+    m_imUser->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Gender)))).toUInt()));
+    m_imUser->setAge(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Age)))).toInt());
+    m_imUser->setFace(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Face)))).toString());
+
+    m_imUser->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalContactGroupsInfoVersion)))).toInt());
+    m_imUser->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
+    m_imUser->setPersonalMessageInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalMessageInfoVersion)))).toInt());
+
+    m_imUser->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
+    m_imUser->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
+    m_imUser->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_FriendshipApply)))).toUInt()));
+    m_imUser->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_ShortTalk)))).toUInt()));
+    m_imUser->setUserRole(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Role)))).toInt());
+    m_imUser->setDescription(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Description)))).toString());
+    m_imUser->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_AccountState)))).toUInt()));
+    m_imUser->setPersonalMessage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalMessage)))).toString());
+
+    m_imUser->setHomeAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomeAddress)))).toString());
+    m_imUser->setHomePhoneNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomePhoneNumber)))).toString());
+    m_imUser->setHomeZipCode(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomeZipCode)))).toString());
+    m_imUser->setPersonalHomepage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalHomepage)))).toString());
+    m_imUser->setPersonalEmailAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalEmailAddress)))).toString());
+
+    m_imUser->setCompanyName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_CompanyName)))).toString());
+    m_imUser->setJobTitle(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_JobTitle)))).toString());
+    m_imUser->setBusinessAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessAddress)))).toString());
+    m_imUser->setBusinessPhoneNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessPhoneNumber)))).toString());
+    m_imUser->setBusinessZipCode(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessZipCode)))).toString());
+    m_imUser->setBusinessFaxNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessFaxNumber)))).toString());
+    m_imUser->setBusinessHomepage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessHomepage)))).toString());
+    m_imUser->setBusinessEmailAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessEmailAddress)))).toString());
+
+
+
+///////////////////////////////
+
 
     m_imUser->clearUpdatedProperties();
 
@@ -1258,6 +1296,7 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
 
     
     QString statement = QString("update contacts_detailed_info set %1 where UserID='%2' ").arg(updateSQLStatements.join(",")).arg(contactID);
+    qDebug()<<"statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save contact info to database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());
@@ -1316,7 +1355,7 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
 
 
 bool ContactsManager::openDatabase(bool reopen){
-    qWarning()<<"--ContactsManager::openDatabase(...)";
+    qDebug()<<"--ContactsManager::openDatabase(...)";
 
     userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(m_imUser->getUserID());
 

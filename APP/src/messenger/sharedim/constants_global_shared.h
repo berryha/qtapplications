@@ -187,6 +187,10 @@ enum Command {
     CLIENT_REQUEST_INTEREST_GROUP_MEMBERS_INFO,
     SERVER_RESPONSE_INTEREST_GROUP_MEMBERS_INFO,
 
+    CLIENT_REQUEST_PERSONAL_MESSAGE_INFO, //c
+    SERVER_RESPONSE_PERSONAL_MESSAGE_INFO, //s
+
+
 //    CLIENT_REQUEST_SYSTEM_GROUPS_LIST,
 //    SERVER_RESPONSE_SYSTEM_GROUPS_LIST,
 //    CLIENT_REQUEST_SYSTEM_GROUP_INFO,
@@ -197,10 +201,10 @@ enum Command {
     CLIENT_REQUEST_ADD_CONTACT, //c
     CLIENT_RESPONSE_ADD_CONTACT_REQUEST, //c, s
     CLIENT_REQUEST_DELETE_CONTACT, //c
-//    SERVER_RESPONSE_DELETE_CONTACT,
+    SERVER_RESPONSE_DELETE_CONTACT, //s
 
-    CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT,
-    BLACKLIST_INFO,
+//    CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT,
+//    BLACKLIST_INFO,
 
     CLIENT_REQUEST_MOVE_CONTACT,
 //    SERVER_RESPONSE_MOVE_CONTACT,
@@ -294,7 +298,9 @@ enum PropertyIDOfUser{
     PI_PersonalContactGroupsInfoVersion,
 //    PI_InterestGroupsInfoString,
     PI_InterestGroupsInfoVersion,
-    PI_BlacklistInfoVersion,
+    PI_PersonalMessageInfoVersion,
+    PI_PersonalMessage,
+
 //    PI_Blacklist,
 //    PI_PersonalInfoVersion,
     PI_PersonalSummaryInfoVersion,
@@ -302,6 +308,7 @@ enum PropertyIDOfUser{
     PI_FriendshipApply,
     PI_ShortTalk,
     PI_Role,
+    PI_Description,
     PI_AccountState,
     
     PI_Age,
@@ -323,7 +330,7 @@ enum PropertyIDOfUser{
     PI_BusinessEmailAddress,
     PI_RegistrationTime,
 //    PI_LoginTimes,
-    PI_Description,
+
     
 //    PI_LastLoginTime,
 //    PI_LastLoginHostAddress,

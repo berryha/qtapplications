@@ -57,6 +57,7 @@ public:
 
 
     UserInfo* getUserInfo(const QString &imUserID);
+    UserInfo* getCachedUserInfo(const QString &imUserID);
     UserInfo* getOnlineUserInfo(const QString &imUserID);
     UserInfo* getOfflineUserInfo(const QString &imUserID);
     QList<UserInfo*> onlineUsers();

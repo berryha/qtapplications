@@ -458,33 +458,33 @@ public slots:
 
     }
 
-    bool addOrDeleteBlacklistedContact(int serverSocketID, const QString &contactID,  bool addToBlacklist = true){
-        qDebug()<<"--addOrDeleteBlacklistedContact(...)";
+//    bool addOrDeleteBlacklistedContact(int serverSocketID, const QString &contactID,  bool addToBlacklist = true){
+//        qDebug()<<"--addOrDeleteBlacklistedContact(...)";
 
-        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT));
-        packet->setTransmissionProtocol(TP_RUDP);
-        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
+//        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+//        packet->setPacketType(quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT));
+//        packet->setTransmissionProtocol(TP_RUDP);
+//        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << addToBlacklist;
-        QByteArray encryptedData;
-        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
-        ba.clear();
-        out.device()->seek(0);
-        out << m_myUserID << encryptedData;
-        packet->setPacketData(ba);
+//        out << contactID << addToBlacklist;
+//        QByteArray encryptedData;
+//        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+//        ba.clear();
+//        out.device()->seek(0);
+//        out << m_myUserID << encryptedData;
+//        packet->setPacketData(ba);
 
-        ba.clear();
-        out.device()->seek(0);
-        QVariant v;
-        v.setValue(*packet);
-        out << v;
-        return m_rtp->sendReliableData(serverSocketID, &ba);
+//        ba.clear();
+//        out.device()->seek(0);
+//        QVariant v;
+//        v.setValue(*packet);
+//        out << v;
+//        return m_rtp->sendReliableData(serverSocketID, &ba);
 
-    }
+//    }
 
     bool requestInterestGroupsList(int serverSocketID){
         qDebug()<<"------------------requestInterestGroupsList(...)";
@@ -563,17 +563,22 @@ public slots:
     }
 
 
-
-    bool requestBlacklistInfo(int serverSocketID){
-        qDebug()<<"--requestBlacklistInfo(...)";
+    bool requestPersonalMessage(int serverSocketID, const QString &userID){
+        qDebug()<<"--requestPersonalMessage(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::BLACKLIST_INFO));
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_PERSONAL_MESSAGE_INFO));
         packet->setTransmissionProtocol(TP_RUDP);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
-        out << m_myUserID;
+
+        out << userID;
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -1180,12 +1185,15 @@ signals:
     void signalAddContactRequestFromUserPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void signalAddContactResultPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage);
 
+    void signalDeleteContactResultPacketReceived(const QString &contactID, bool contactDeleted, bool addToBlacklist = false);
+
+
     void signalInterestGroupsListPacketReceived(const QString &systemGroupsListFromServer, quint32 systemInfoVersionOnServer);
     void signalInterestGroupInfoPacketReceived(const QString &interestGroupInfoFromServer, quint32 groupID);
     void signalInterestGroupMembersInfoPacketReceived(const QString &interestGroupMembersInfoFromServer, quint32 interestGroupMembersInfoVersionOnServer, quint32 groupID);
     
     
-    void signalBlacklistInfoPacketReceived(const QString &blacklistOnServer, quint32 blacklistInfoVersionOnServer);
+    void signalPersonalMessagePacketReceived(const QString &userID, const QString &personalMessage);
 
     void signalChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
     void signalChatMessageCachedOnServerReceived(const QStringList &messages);

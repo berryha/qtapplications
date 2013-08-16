@@ -273,7 +273,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
                                            userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
-                                           userInfo->getInterestGroupInfoVersion(), userInfo->getBlacklistInfoVersion());
+                                           userInfo->getInterestGroupInfoVersion(), userInfo->getPersonalMessageInfoVersion());
 
             //Send last login info
             sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
@@ -666,52 +666,41 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             userInfo->clearUpdatedProperties();
         }
 
+        //TODO
+        sendDeleteContactResultPacket(socketID, contactID, true, addToBlacklist, userInfo->getSessionEncryptionKey());
+
 
         //qDebug()<<"------------contactID:"<<contactID<<" groupName:"<<groupName;
 
     }
         break;
 
-    case quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT):
-    {
+//    case quint8(IM::CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT):
+//    {
+//        qDebug()<<"~~CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT";
 
-        qDebug()<<"~~CLIENT_REQUEST_ADD_OR_DELETE_BLACKLISTED_CONTACT";
+//        QString userID = peerID;
+//        QByteArray encryptedData;
+//        in >> encryptedData;
 
-        QString userID = peerID;
-        QByteArray encryptedData;
-        in >> encryptedData;
+//        UserInfo *userInfo = getUserInfo(userID);
+//        if(!userInfo){return;}
 
-        UserInfo *userInfo = getUserInfo(userID);
-        if(!userInfo){return;}
+//        //解密数据
+//        QByteArray decryptedData;
+//        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+//        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+//        stream.setVersion(QDataStream::Qt_4_7);
+//        QString contactID = "";
+//        bool addToBlacklist = true;
+//        stream >> contactID >> addToBlacklist;
 
-        //解密数据
-        QByteArray decryptedData;
-        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
-        stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "";
-        bool addToBlacklist = true;
-        stream >> contactID >> addToBlacklist;
+//        addOrDeleteBlacklistedContactForUserFromDB(userID, contactID, addToBlacklist);
 
-        addOrDeleteBlacklistedContactForUserFromDB(userID, contactID, addToBlacklist);
-
-        userInfo->addOrDeleteBlacklistedContact(contactID, addToBlacklist);
-        userInfo->clearUpdatedProperties();
-
-
-//        if(addToBlacklist){
-//            //TODO:
-//            UserInfo *contactInfo = getUserInfo(contactID);
-//            if(!contactInfo){return;}
-//            contactInfo->addOrDeleteContact(userID, contactInfo->groupIDThatContactBelongsTo(userID), false);
-
-//            //TODO:从数据库删除请求
-//            deleteFriendshipApplyRequest(userID, contactID);
-//            deleteFriendshipApplyRequest(contactID, userID);
-//        }
-
-    }
-        break;
+//        userInfo->addOrDeleteBlacklistedContact(contactID, addToBlacklist);
+//        userInfo->clearUpdatedProperties();
+//    }
+//        break;
 
     case quint8(IM::CLIENT_REQUEST_INTEREST_GROUPS_LIST):
     {
@@ -777,16 +766,16 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         break;
 
 
-    case quint8(IM::BLACKLIST_INFO):
+    case quint8(IM::CLIENT_REQUEST_PERSONAL_MESSAGE_INFO):
     {
-        qDebug()<<"~~BLACKLIST_INFO";
+        qDebug()<<"~~CLIENT_REQUEST_PERSONAL_MESSAGE_INFO";
 
         QString userID = peerID;
-        //in >> userID ;
+        in >> userID ;
 
         UserInfo *userInfo = getUserInfo(userID);
-        if(!userInfo){return;}
-        sendUserBlacklistInfoPacket(socketID, userInfo, peerAddress, peerPort);
+        if(userInfo){return;}
+        sendUserPersonalMessagePacket(socketID, userInfo, peerAddress, peerPort);
 
     }
         break;
