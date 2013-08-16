@@ -121,6 +121,7 @@ void LoginDlg::on_loginButton_clicked() {
         return;
 
     } else if(ui.lineEditAuthenticode->text() != QDateTime::currentDateTime().toString("HHmm")){
+        qDebug()<<"Authenti code:"<<QDateTime::currentDateTime().toString("HHmm");
         QMessageBox::critical(this, tr("Authentication Failed"), tr(
                                   "<b>Incorrect Authenticode!</b>"));
         ui.lineEditAuthenticode->clear();
