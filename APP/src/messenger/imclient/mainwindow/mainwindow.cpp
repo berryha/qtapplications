@@ -360,7 +360,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalDeleteContactResultPacketReceived(const QString &, bool, bool)), this, SLOT(slotDeleteContactResultReceived(const QString &, bool, bool)), Qt::QueuedConnection);
 
 
-    connect(clientPacketsParser, SIGNAL(signalPersonalMessagePacketReceived(const QString &, quint32 )), this, SLOT(slotProcessPersonalMessage(const QString &, quint32 )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalPersonalMessagePacketReceived(const QString &, const QString &)), this, SLOT(slotProcessPersonalMessage(const QString &, const QString &)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), this, SLOT(slotProcessChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalChatMessageCachedOnServerReceived(const QStringList & )), this, SLOT(slotProcessChatMessageCachedOnServer(const QStringList & )), Qt::QueuedConnection);
@@ -1353,7 +1353,6 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
     }
 
     QMenu menu;
-    QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
 
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups();
 
@@ -1361,6 +1360,7 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
     groups.removeAll(m_imUser->getContactGroup(existingGroupName));
 
     if(!groups.isEmpty()){
+        QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
         foreach (ContactGroupBase *group, groups) {
             QAction *action = new QAction(group->getGroupName(), menuMoveContactToGroup);
             action->setData(contactID);
