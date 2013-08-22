@@ -31,7 +31,7 @@ PaintArea::PaintArea(QWidget *parent) :
 
 
 
-    preferedImage = QSize(360, 480);
+    preferedImage = QSize(480, 640);
     outlineRect = QRect(QPoint(0, 0), preferedImage);
 
     dragPosition = QPoint(0, 0);
@@ -101,11 +101,11 @@ void PaintArea::setImage(const QImage &image)
 //}
 
 
-QSize PaintArea::sizeHint() const
-{
-    //return theImage.size();
-    return QSize(653, 490);
-}
+//QSize PaintArea::sizeHint() const
+//{
+//    //return theImage.size();
+//    return QSize(653, 490);
+//}
 
 void PaintArea::setFileDirectorys(const QString &targetImagePath){
 

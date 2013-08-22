@@ -65,4 +65,4 @@ int main(int argc, char *argv[])
     camera.show();
 
     return app.exec();
-};
+}

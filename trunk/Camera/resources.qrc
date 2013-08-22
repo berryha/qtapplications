@@ -1,0 +1,13 @@
+<RCC>
+  <qresource>
+    <file>resources/images/media_playback_stop.png</file>
+    <file>resources/images/media_record.png</file>
+    <file>resources/images/time.png</file>
+    <file>resources/images/kaffeine.png</file>
+    <file>resources/images/media_playback_pause.png</file>
+    <file>resources/images/configure.png</file>
+    <file>resources/images/camera-web.png</file>
+    <file>resources/images/camera-web_suspend.png</file>
+    <file>resources/images/camera-web_exit.png</file>
+  </qresource>
+</RCC>

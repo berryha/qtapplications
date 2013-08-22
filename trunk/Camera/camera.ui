@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>543</height>
+    <width>1140</width>
+    <height>783</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,7 +94,7 @@
        </palette>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="viewfinderPage">
        <property name="sizePolicy">
@@ -140,6 +140,41 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="opencvPage">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="HEHUI::CVCameraView" name="cvCameraView" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="previewPage">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -170,6 +205,12 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>960</width>
+            <height>720</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -314,7 +355,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>820</width>
+     <width>1140</width>
      <height>23</height>
     </rect>
    </property>
@@ -372,8 +413,16 @@
    <header>paintarea.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>HEHUI::CVCameraView</class>
+   <extends>QWidget</extends>
+   <header>cvcameraview.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>

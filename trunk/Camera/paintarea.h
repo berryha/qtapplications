@@ -28,7 +28,7 @@ public:
 //    QColor brushColor() const { return color; }
 //    int brushWidth() const { return thickness; }
 
-    QSize sizeHint() const;
+//    QSize sizeHint() const;
 
     void setFileDirectorys(const QString &targetImagePath);
 

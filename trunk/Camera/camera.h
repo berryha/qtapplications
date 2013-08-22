@@ -47,6 +47,8 @@
 
 #include <QMainWindow>
 
+#include "cvcamera/cvcamera.h"
+
 
 
 QT_BEGIN_NAMESPACE
@@ -136,6 +138,9 @@ private:
 
     QString snapshotImagesPath;
     QString targetImagePath;
+
+    HEHUI::CVCamera *cvCamera;
+    bool usingopenCV;
 
 
 
