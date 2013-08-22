@@ -32,6 +32,9 @@ RESOURCES += \
 
 INCLUDEPATH += cvcamera
 
+win32:RC_ICONS = resources/images/app.ico
+#mac:ICON = ./resources/images/app.icns
+
 
 win32 {
     INCLUDEPATH += E:\DEV\openCV2.4.6\build\include \
@@ -52,5 +55,10 @@ unix {
 }
 
 
+# define some usefull values
+QMAKE_TARGET_COMPANY	= "He Hui"
+QMAKE_TARGET_PRODUCT	= "Camera Capturer"
+QMAKE_TARGET_DESCRIPTION    = "Crossplatform Tools Based On Qt"
+QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2013 He Hui"
 
 
