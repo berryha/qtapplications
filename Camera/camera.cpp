@@ -95,10 +95,9 @@ Camera::Camera(QWidget *parent) :
     ui->lockButton->hide();
 #endif
 
-    setCamera(cameraDevice);
 
 
-    preferedImageSize = QSize(640, 480);
+    preferedImageSize = QSize(960, 720);
 
 
     readSettings();
@@ -115,19 +114,50 @@ Camera::Camera(QWidget *parent) :
 
     connect(ui->paintArea, SIGNAL(targetImageSaved(const QString &)), this, SLOT(targetImageSaved(const QString &)));
 
+
+    cvCamera = 0;
+    usingopenCV = true;
+
+    ui->cvCameraView->updateImage(QImage(":/resources/images/camera-web.png"));
+
+    setCamera(cameraDevice);
+
 }
 
 Camera::~Camera()
 {
+    delete cvCamera;
+
     delete mediaRecorder;
     delete imageCapture;
     delete camera;
-
 
 }
 
 void Camera::setCamera(const QByteArray &cameraDevice)
 {
+
+    if(usingopenCV){
+        delete cvCamera;
+        cvCamera = new HEHUI::CVCamera(this);
+
+        QList<QByteArray> cameras = QCamera::availableDevices();
+        for(int i=0; i<cameras.size(); i++){
+            if(cameraDevice == cameras.at(i)){
+                qWarning()<<"Camera Name:"<<camera->deviceDescription(cameraDevice);
+                cvCamera->setViewWidget(ui->cvCameraView);
+                cvCamera->setresolution(1280, 1024);
+                cvCamera->startCameraCapture(i);
+                return;
+            }
+        }
+        ui->stackedWidget->setCurrentWidget(ui->opencvPage);
+        return;
+    }
+
+    delete cvCamera;
+    cvCamera = 0;
+
     delete imageCapture;
     delete mediaRecorder;
     delete camera;
@@ -446,8 +476,25 @@ void Camera::updateLockStatus(QCamera::LockStatus status, QCamera::LockChangeRea
 
 void Camera::takeImage()
 {
-    isCapturingImage = true;
-    imageCapture->capture(snapshotImagesPath + "/" + QDateTime::currentDateTime().toString("yyyyMMddhhmmss.jpg"));
+    QString fileName = snapshotImagesPath + "/" + QDateTime::currentDateTime().toString("yyyyMMddhhmmss.jpg");
+
+    if(usingopenCV){
+//        if(ui->cvCameraView->saveOrignalImage(fileName)){
+            QImage image = ui->cvCameraView->getOrignalImage();
+
+            if(!image.save(fileName)){
+                QMessageBox::critical(this, tr("Error"), tr("Can not save image!"));
+                return;
+            }
+
+            processCapturedImage(0, image);
+//        }
+    }else{
+        isCapturingImage = true;
+        imageCapture->capture(fileName);
+    }
+
+
 }
 
 void Camera::displayCaptureError(int id, const QCameraImageCapture::Error error, const QString &errorString)
@@ -538,12 +585,21 @@ void Camera::updateCameraDevice(QAction *action)
 
 void Camera::displayViewfinder()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+//    ui->stackedWidget->setCurrentIndex(0);
+//    ui->stackedWidget->setCurrentWidget(ui->viewfinder);
+
+    if(usingopenCV){
+        ui->stackedWidget->setCurrentWidget(ui->opencvPage);
+    }else{
+        ui->stackedWidget->setCurrentWidget(ui->viewfinderPage);
+    }
+
 }
 
 void Camera::displayCapturedImage()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+//    ui->stackedWidget->setCurrentIndex(1);
+    ui->stackedWidget->setCurrentWidget(ui->previewPage);
 }
 
 void Camera::readyForCapture(bool ready)
