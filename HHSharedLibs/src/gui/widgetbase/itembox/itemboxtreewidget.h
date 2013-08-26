@@ -78,9 +78,13 @@ public:
     Category category(const QString &cat_id) const;
     /*static*/ int findCategory(const QString &cat_id, const ItemBoxTreeWidget::CategoryList &list);
 
-    void addCategory(const Category &cat);
+    void addCategory(const Category &cat, int index = -1);
     void removeCategory(int cat_idx);
     void removeCategory(const QString &cat_id);
+    void hideCategory(const QString &cat_id);
+    void setCategoryHidden(int cat_idx, bool hide);
+    void setCategoryHidden(const QString &cat_id, bool hide);
+
 
     void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 
