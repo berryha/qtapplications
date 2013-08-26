@@ -545,7 +545,10 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
         slotLoadContacts(expandListView, groupID, groupName, list);
 
     }
-    
+
+//    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
+//    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Blacklist_ID), true);
+
     
     contactsModel->deleteLater();
     model->deleteLater();
@@ -698,7 +701,20 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
         qApp->processEvents();
     }
 
-    expandListView->addCategory(category);
+
+
+    if(groupID == ContactGroupBase::Group_Friends_ID){
+        expandListView->addCategory(category, 0);
+    }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
+        expandListView->addCategory(category, -1);
+    }else{
+        expandListView->addCategory(category, expandListView->categoryCount()-1);
+        //expandListView->addCategory(category, 1);
+    }
+
+    //    expandListView->addCategory(category);
+
+
 
 }
 
