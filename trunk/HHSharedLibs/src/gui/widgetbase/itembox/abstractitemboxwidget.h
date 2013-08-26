@@ -123,7 +123,7 @@ public:
 
     virtual int categoryCount() const = 0;
     virtual Category category(int cat_idx) const = 0;
-    virtual void addCategory(const Category &cat) = 0;
+    virtual void addCategory(const Category &cat, int index = -1) = 0;
     virtual void removeCategory(int cat_idx) = 0;
 
     virtual int itemCount(int cat_idx) const = 0;

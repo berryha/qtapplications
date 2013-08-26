@@ -769,7 +769,7 @@ int ItemBoxTreeWidget::findCategory(const QString &cat_id, const ItemBoxTreeWidg
     return -1;
 }
 
-void ItemBoxTreeWidget::addCategory(const Category &cat)
+void ItemBoxTreeWidget::addCategory(const Category &cat, int index)
 {
 //    if (cat.itemCount() == 0)
 //        return;
@@ -792,7 +792,12 @@ void ItemBoxTreeWidget::addCategory(const Category &cat)
             // insert before scratchpad
             const int scratchPadIndex = indexOfScratchpad();
             if (scratchPadIndex == -1) {
-                addTopLevelItem(cat_item);
+                if(index == -1){
+                    addTopLevelItem(cat_item);
+                }else{
+                    insertTopLevelItem(index, cat_item);
+                }
+
             } else {
                 insertTopLevelItem(scratchPadIndex, cat_item);
             }
@@ -827,6 +832,18 @@ void ItemBoxTreeWidget::removeCategory(const QString &cat_id){
     if (cat_idx >= topLevelItemCount() || cat_idx < 0){return;}
 
     removeCategory(cat_idx);
+
+}
+
+void ItemBoxTreeWidget::setCategoryHidden(int cat_idx, bool hide){
+    setRowHidden(cat_idx, QModelIndex(), hide);
+}
+
+void ItemBoxTreeWidget::setCategoryHidden(const QString &cat_id, bool hide){
+    int cat_idx = indexOfCategory(cat_id);
+    if (cat_idx >= topLevelItemCount() || cat_idx < 0){return;}
+
+    setCategoryHidden(cat_idx, hide);
 
 }
 

@@ -65,9 +65,12 @@ public:
 
     virtual int categoryCount() const;
     virtual Category category(int cat_idx) const;
-    virtual void addCategory(const Category &cat);
+    virtual void addCategory(const Category &cat, int index = -1);
     virtual void removeCategory(int cat_idx);
     virtual void removeCategory(const QString &cat_id);
+    virtual void clearAllCategories();
+    virtual void setCategoryHidden(int cat_idx, bool hide);
+    virtual void setCategoryHidden(const QString &cat_id, bool hide);
     virtual void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 
 

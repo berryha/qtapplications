@@ -145,9 +145,9 @@ ItemBoxWidgetInterface::Category ItemBoxWidget::category(int cat_idx) const
     return m_treeWidget->category(cat_idx);
 }
 
-void ItemBoxWidget::addCategory(const Category &cat)
+void ItemBoxWidget::addCategory(const Category &cat, int index)
 {
-    m_treeWidget->addCategory(cat);
+    m_treeWidget->addCategory(cat, index);
 }
 
 void ItemBoxWidget::removeCategory(int cat_idx)
@@ -157,6 +157,18 @@ void ItemBoxWidget::removeCategory(int cat_idx)
 
 void ItemBoxWidget::removeCategory(const QString &cat_id){
      m_treeWidget->removeCategory(cat_id);
+}
+
+void ItemBoxWidget::clearAllCategories(){
+    m_treeWidget->clear();
+}
+
+void ItemBoxWidget::setCategoryHidden(int cat_idx, bool hide){
+    m_treeWidget->setCategoryHidden(cat_idx, hide);
+}
+
+void ItemBoxWidget::setCategoryHidden(const QString &cat_id, bool hide){
+    m_treeWidget->setCategoryHidden(cat_id, hide);
 }
 
 void ItemBoxWidget::updateCategoryName(const QString &cat_id, const QString &new_cat_name){
