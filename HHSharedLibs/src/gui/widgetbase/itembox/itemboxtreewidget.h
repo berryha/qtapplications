@@ -84,7 +84,8 @@ public:
     void hideCategory(const QString &cat_id);
     void setCategoryHidden(int cat_idx, bool hide);
     void setCategoryHidden(const QString &cat_id, bool hide);
-
+    void setCategoryExpanded(int cat_idx, bool expand);
+    void setCategoryExpanded(const QString &cat_id, bool expand);
 
     void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 

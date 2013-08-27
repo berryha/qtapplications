@@ -71,6 +71,9 @@ public:
     virtual void clearAllCategories();
     virtual void setCategoryHidden(int cat_idx, bool hide);
     virtual void setCategoryHidden(const QString &cat_id, bool hide);
+    virtual void setCategoryExpanded(int cat_idx, bool expand);
+    virtual void setCategoryExpanded(const QString &cat_id, bool expand);
+
     virtual void updateCategoryName(const QString &cat_id, const QString &new_cat_name);
 
 
