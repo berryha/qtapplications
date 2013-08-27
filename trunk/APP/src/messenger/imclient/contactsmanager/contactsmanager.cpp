@@ -549,6 +549,12 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Blacklist_ID), true);
 
+
+    expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Friends_ID), true);
+    expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Strangers_ID), false);
+    expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Blacklist_ID), false);
+
+
     
     contactsModel->deleteLater();
     model->deleteLater();
