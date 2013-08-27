@@ -171,6 +171,14 @@ void ItemBoxWidget::setCategoryHidden(const QString &cat_id, bool hide){
     m_treeWidget->setCategoryHidden(cat_id, hide);
 }
 
+void ItemBoxWidget::setCategoryExpanded(int cat_idx, bool expand){
+    m_treeWidget->setCategoryExpanded(cat_idx, expand);
+}
+
+void ItemBoxWidget::setCategoryExpanded(const QString &cat_id, bool expand){
+    m_treeWidget->setCategoryExpanded(cat_id, expand);
+}
+
 void ItemBoxWidget::updateCategoryName(const QString &cat_id, const QString &new_cat_name){
     m_treeWidget->updateCategoryName(cat_id, new_cat_name);
 }

@@ -847,6 +847,26 @@ void ItemBoxTreeWidget::setCategoryHidden(const QString &cat_id, bool hide){
 
 }
 
+void ItemBoxTreeWidget::setCategoryExpanded(int cat_idx, bool expand){
+
+    QTreeWidgetItem *cat_item = topLevelItem(cat_idx);
+    if(expand){
+        expandItem(cat_item);
+    }else{
+        collapseItem(cat_item);
+    }
+
+}
+
+void ItemBoxTreeWidget::setCategoryExpanded(const QString &cat_id, bool expand){
+
+    int cat_idx = indexOfCategory(cat_id);
+    if (cat_idx >= topLevelItemCount() || cat_idx < 0){return;}
+
+    setCategoryExpanded(cat_idx, expand);
+
+}
+
 void ItemBoxTreeWidget::updateCategoryName(const QString &cat_id, const QString &new_cat_name){
 
     int cat_idx = indexOfCategory(cat_id);
