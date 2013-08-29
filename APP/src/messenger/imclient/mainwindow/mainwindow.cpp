@@ -1698,6 +1698,8 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 //        return;
 //    }
 
+//    m_contactsManager->deleteAllContactGroupInDatabase();
+
     QStringList groupsInfoList = contactGroupsInfo.split(GROUP_INFO_SEPARATOR);
     for(int i=0; i<groupsInfoList.size(); i++) {
         QStringList contactList = groupsInfoList.at(i).split(",");

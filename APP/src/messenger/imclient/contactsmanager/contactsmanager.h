@@ -101,6 +101,7 @@ public slots:
     int slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
     bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteGroupFromDatabase(const QString &groupName);
+    bool deleteAllContactGroupInDatabase();
 
 
     bool getMyInfoFormLocalDatabase();
@@ -147,6 +148,7 @@ private:
     QHash<quint32/*Grup ID*/, InterestGroup*> interestGroupsHash;
 
     IMUser *m_imUser;
+
 
 
 

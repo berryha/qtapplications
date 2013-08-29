@@ -549,6 +549,10 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Blacklist_ID), true);
 
+    if(!m_imUser->isStrangersShown()){
+        expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
+    }
+
 
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Friends_ID), true);
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Strangers_ID), false);
@@ -813,7 +817,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
     //QSqlQuery query = queryDatabase(queryString, true);
     
     if(!query.exec(queryString)){
-        qCritical()<<"Can not insert new contact data to database! Error:"<<query.lastError().text();
+        qCritical()<<"ERROR! Can not insert new contact data to database! "<<query.lastError().text();
         return false;
     }
 
@@ -996,6 +1000,30 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
     return true;
 
 }
+
+bool ContactsManager::deleteAllContactGroupInDatabase(){
+    qDebug()<<"--ContactsManager::deleteAllContactGroupInDatabase() ";
+
+
+    if(!localUserDataDB.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(localUserDataDB);
+
+    QString queryString = QString("Delete From [contactgroups] where [GroupID] <> -1 ");
+
+    if(!query.exec(queryString)){
+        qCritical()<<QString("ERROR! Can not delete contact groups! %1").arg(query.lastError().text());
+
+        return false;
+    }
+
+    return true;
+
+}
+
 
 bool ContactsManager::getMyInfoFormLocalDatabase(){
     qWarning()<<"--getMyInfoFormLocalDatabase()";

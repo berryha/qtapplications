@@ -46,7 +46,7 @@ Contact::Contact(QObject *parent)
 Contact::Contact(const QString &contactID, QObject *parent)
     :IMUserBase(contactID, parent)
 {
-    contactGroupID = 0;
+    contactGroupID = defaultStrangerContactGroupID();
     interestGroupID = 0;
     systemGroupID = 0;
 
@@ -61,7 +61,7 @@ Contact::Contact(const QString &contactID, const QString &nickname, QObject *par
 
     setNickName(nickname);
     
-    contactGroupID = 0;
+    contactGroupID = defaultStrangerContactGroupID();
     interestGroupID = 0;
     systemGroupID = 0;
 
