@@ -398,7 +398,7 @@ void IMUserBase::setPersonalInfoString(const QString &personalInfoString, bool s
 
         QString descriptionString = infoList.at(14);
         setDescription(descriptionString);
-        addUpdatedPersonalInfoProperty(IM::PI_Description, descriptionString, summaryInfo);
+        addUpdatedPersonalInfoProperty(IM::PI_Description, "'" + descriptionString + "'", summaryInfo);
 
         QString accountStateString = infoList.at(15);
         setAccountState(AccountState(accountStateString.toUInt()));

@@ -61,6 +61,10 @@ public:
     void setRegistrationServerAddressInfo(const QString &regServerAddress);
     QString getRegistrationServerAddressInfo() const;
 
+    void showStrangers(bool show);
+    bool isStrangersShown();
+
+
 
 private:
     IMUser(const QString & userID = "", QObject *parent = 0);
@@ -87,6 +91,9 @@ private:
     QString m_loginServerAddress;
     quint16 m_loginServerPort;
     QString m_regServerAddress;
+
+    bool m_showStrangers;
+
 
 
 };

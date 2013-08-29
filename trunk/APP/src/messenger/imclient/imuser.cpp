@@ -54,6 +54,8 @@ IMUser::IMUser(const QString & userID, QObject *parent)
     m_loginServerPort = 0;
     m_regServerAddress = "";
 
+    m_showStrangers = true;
+
 }
 
 IMUser::~IMUser() {
@@ -111,6 +113,14 @@ void IMUser::setRegistrationServerAddressInfo(const QString &regServerAddress){
 
 QString IMUser::getRegistrationServerAddressInfo() const{
     return m_regServerAddress;
+}
+
+void IMUser::showStrangers(bool show){
+    m_showStrangers = show;
+}
+
+bool IMUser::isStrangersShown(){
+    return m_showStrangers;
 }
 
 //bool IMUser::addGroup(const QString &groupName, const QStringList &members){
