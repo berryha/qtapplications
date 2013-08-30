@@ -1693,12 +1693,68 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     //STRING FORMATE: GroupID,GroupName,UserID,,UserID,...||GroupID,...
     //e.g. 100,Group100,user1,user2,user3||101,Group101,user4
 
+
+
+    friendBox->clearAllCategories();
+    m_contactsManager->resetAllContactGroupInDatabase();
+    m_imUser->setContactGroupsInfoString(contactGroupsInfo);
+    ContactGroupBase * strangersGroup = m_imUser->addContactGroup(ContactGroupBase::Group_Strangers_ID);
+    strangersGroup->setGroupName(ContactGroupBase::Group_Strangers_Name);
+
+
+    QList<ContactGroupBase *> groups = m_imUser->getContactGroups(false, false);
+    QHash<QString/*Contact ID*/, Contact*> users = m_contactsManager->getAllUsers();
+
+    foreach (ContactGroupBase *contactGroup, groups) {
+        quint32 groupID = contactGroup->getGroupID();
+        QString groupName = contactGroup->getGroupName();
+        if(groupID != ContactGroupBase::Group_Friends_ID && (groupID != ContactGroupBase::Group_Blacklist_ID) ){
+            m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
+        }
+
+        QStringList members = contactGroup->members();
+        foreach (QString contactID, members) {
+            Contact *contact = users.take(contactID);
+            if(!contact){
+                contact =  m_contactsManager->createNewContact(contactID);
+                clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
+            }
+            if(contact->getContactGroupID() != groupID){
+                contact->setContactGroupID(groupID);
+                m_contactsManager->saveContactInfoToDatabase(contactID);
+            }
+        }
+    }
+
+
+    strangersGroup->setMembers(users.keys());
+    foreach (Contact *contact, users.values()) {
+        contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
+    }
+
+
+
+    m_contactsManager->slotFetchAllContactsInfo(friendBox);
+
+//    imUser->setContactGroupsInfoString(contactGroupsInfo);
+//    imUser->saveMyInfoToLocalDatabase();
+
+
+}
+
+void MainWindow::slotProcessContactGroupsInfo2(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer){
+    qDebug()<<"--MainWindow::slotProcessContactGroupsInfo2(...)"<<" -contactGroupsInfo:"<<contactGroupsInfo;
+
+    //STRING FORMATE: GroupID,GroupName,UserID,,UserID,...||GroupID,...
+    //e.g. 100,Group100,user1,user2,user3||101,Group101,user4
+
     //TODO
 //    if(contactGroupsInfo.trimmed().isEmpty()){
 //        return;
 //    }
 
-//    m_contactsManager->deleteAllContactGroupInDatabase();
+    friendBox->clearAllCategories();
+    m_contactsManager->resetAllContactGroupInDatabase();
 
     QStringList groupsInfoList = contactGroupsInfo.split(GROUP_INFO_SEPARATOR);
     for(int i=0; i<groupsInfoList.size(); i++) {
@@ -1724,23 +1780,27 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         contactGroup->setMembers(contactList);
         contactGroup->clearUpdatedProperties();
 
+        QList<Contact*> list;
+
         foreach (QString contactID, contactList) {
             if(contactID.trimmed().isEmpty()){continue;}
             Contact *contact = m_contactsManager->getUser(contactID);
             if(!contact){
+                list.append(contact);
                 contact =  m_contactsManager->createNewContact(contactID);
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
                 m_contactsManager->addContactToUI(friendBox, groupID, contactID);
-            }else{
-                int oldGroupID = contact->getContactGroupID();
-                if(groupID != oldGroupID){
-                    contact->setContactGroupID(groupID);
-                    m_contactsManager->saveContactInfoToDatabase(contactID);
-                    m_contactsManager->moveContactToUI(friendBox, oldGroupID, groupID, contactID);
-                }
             }
-
+            int oldGroupID = contact->getContactGroupID();
+            if(groupID != oldGroupID){
+                contact->setContactGroupID(groupID);
+                m_contactsManager->saveContactInfoToDatabase(contactID);
+                //m_contactsManager->moveContactToUI(friendBox, oldGroupID, groupID, contactID);
+                m_contactsManager->addContactToUI(friendBox, groupID, contactID);
+            }
         }
+
+
 
 
     }

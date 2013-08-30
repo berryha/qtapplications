@@ -115,6 +115,10 @@ Contact * ContactsManager::getUser(const QString &contactID){
 
 }
 
+QHash<QString, Contact *> ContactsManager::getAllUsers(){
+    return contactHash;
+}
+
 bool ContactsManager::loadInterestGroups(){
 
     QString groupQueryString = QString("select * from interestgroups");
@@ -436,7 +440,7 @@ Contact * ContactsManager::createNewContact(const QString &contactID, const QStr
 }
 
 void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
-    qDebug()<<"ContactsManager::slotFetchContactsInfo(...)";
+    qDebug()<<"ContactsManager::slotFetchAllContactsInfo(...)";
 
     QString groupQueryString = QString("select * from contactgroups;");
     
@@ -487,7 +491,8 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
         
         for (int j=0; j<contactsModel->rowCount(); j++) {
             QString contactUID = QVariant(contactsModel->record(j).value("UserID")).toString();
-            Contact *contact = new Contact(contactUID, "", this);
+            //Contact *contact = new Contact(contactUID, "", this);
+            Contact *contact = createNewContact(contactUID);
             contact->setTrueName(QVariant(contactsModel->record(j).value("TrueName")).toString());
             contact->setNickName(QVariant(contactsModel->record(j).value("NickName")).toString());
             contact->setGender(IMUserBase::Gender(QVariant(contactsModel->record(j).value("Gender")).toUInt()));
@@ -528,8 +533,6 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 
             group->addMember(contactUID);
 
-            qApp->processEvents();
-
         }
 
         if(groupID == ContactGroupBase::Group_Friends_ID){
@@ -557,7 +560,6 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Friends_ID), true);
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Strangers_ID), false);
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Blacklist_ID), false);
-
 
     
     contactsModel->deleteLater();
@@ -635,8 +637,8 @@ void ContactsManager::moveContactToUI(ItemBoxWidget *expandListView, quint32 old
 
 }
 
-void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID){
-    qDebug()<<"--ContactsManager::updateContactToUI(...)  groupName:"<<groupName<<" contactID:"<<contactID;
+void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID){
+
 
     Contact *contact = 0;
     if(!contactHash.contains(contactID)){
@@ -645,16 +647,9 @@ void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, const QSt
     contact = contactHash.value(contactID);
     Q_ASSERT(contact);
 
-    expandListView->updateObjectItemName(groupName, contactID, contact->displayName());
-    //expandListView->updateObjectItemIcon(groupName, contactID, contact->getFace());
-    expandListView->updateObjectItemIcon(groupName, contactID, ImageResource::getIconFilePathForContact(contact->getFace(), contact->getOnlineState()));
+    expandListView->updateObjectItemName(QString::number(personalContactGroupID), contactID, contact->displayName());
+    expandListView->updateObjectItemIcon(QString::number(personalContactGroupID), contactID, ImageResource::getIconFilePathForContact(contact->getFace(), contact->getOnlineState()));
 
-
-}
-
-void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID){
-
-    updateContactToUI(expandListView, personalContactGroupID, contactID);
 
 }
 
@@ -677,7 +672,7 @@ void ContactsManager::renameContactGroupToUI(ItemBoxWidget *expandListView, quin
 
 
 void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
-        qDebug()<<"--ContactsManager::slotLoadContacts(...)";
+    qDebug()<<"--ContactsManager::slotLoadContacts(...)  groupID:"<<groupID<<" groupName:"<<groupName;
 
     //	Category *category = new Category();
     //	category->setID(QString::number(groupID));
@@ -708,7 +703,6 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
         category.addItem(objectItem);
 
-        qApp->processEvents();
     }
 
 
@@ -812,7 +806,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
     QString contactNickName = contact->getNickName();
     QString face = contact->getFace();
     
-    QString queryString = QString("Insert  Into [contacts_detailed_info] ([UserID],[NickName],[Face],[ContactGroupID]) Values('%1', '%2', '%3', '%4')")
+    QString queryString = QString("Insert  Into [contacts_detailed_info] ([UserID],[NickName],[Face],[ContactGroupID]) Values('%1', '%2', '%3', %4)")
             .arg(contactUID).arg(contactNickName).arg(face).arg(contactsGroupID) ;
     //QSqlQuery query = queryDatabase(queryString, true);
     
@@ -909,7 +903,7 @@ int ContactsManager::slotAddNewContactGroupToDatabase(quint32 groupID, const QSt
     
     QString queryString = QString("Insert  Into [contactgroups] ([GroupName]) Values('%1')").arg(groupName);
     if(groupID){
-        queryString = QString("Insert  Into [contactgroups] ([GroupID], [GroupName]) Values(NULL, '%1')").arg(groupID).arg(groupName);
+        queryString = QString("Insert  Into [contactgroups] ([GroupID], [GroupName]) Values(NULL, '%1')").arg(groupName);
     }
 
     if(!query.exec(queryString)){
@@ -1001,8 +995,8 @@ bool ContactsManager::deleteGroupFromDatabase(const QString &groupName){
 
 }
 
-bool ContactsManager::deleteAllContactGroupInDatabase(){
-    qDebug()<<"--ContactsManager::deleteAllContactGroupInDatabase() ";
+bool ContactsManager::resetAllContactGroupInDatabase(){
+    qDebug()<<"--ContactsManager::resetAllContactGroupInDatabase() ";
 
 
     if(!localUserDataDB.isValid()){
@@ -1012,11 +1006,22 @@ bool ContactsManager::deleteAllContactGroupInDatabase(){
     }
     QSqlQuery query(localUserDataDB);
 
-    QString queryString = QString("Delete From [contactgroups] where [GroupID] <> -1 ");
+    QString queryString = QString("Delete From [contactgroups] where [GroupID] <> %1 ; ").arg(ContactGroupBase::Group_Strangers_ID);
 
     if(!query.exec(queryString)){
         qCritical()<<QString("ERROR! Can not delete contact groups! %1").arg(query.lastError().text());
+        return false;
+    }
 
+    queryString = QString("Insert  Into [contactgroups] ([GroupID], [GroupName]) Values(%1, '%2') ; ").arg(ContactGroupBase::Group_Blacklist_ID).arg(ContactGroupBase::Group_Blacklist_Name);
+    if(!query.exec(queryString)){
+        qCritical()<<QString("ERROR! Can not create contact group '%1' ! %2").arg(ContactGroupBase::Group_Blacklist_Name).arg(query.lastError().text());
+        return false;
+    }
+
+    queryString = QString("Insert  Into [contactgroups] ([GroupID], [GroupName]) Values(%1, '%2') ; ").arg(ContactGroupBase::Group_Friends_ID).arg(ContactGroupBase::Group_Friends_Name);
+    if(!query.exec(queryString)){
+        qCritical()<<QString("ERROR! Can not create contact group '%1' ! %2").arg(ContactGroupBase::Group_Friends_Name).arg(query.lastError().text());
         return false;
     }
 
