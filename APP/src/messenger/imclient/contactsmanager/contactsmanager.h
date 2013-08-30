@@ -50,6 +50,7 @@ public:
     bool isStranger(const QString &contactID);
     bool hasUserInfo(const QString &userID);
     Contact * getUser(const QString &contactID);
+    QHash<QString/*Contact ID*/, Contact*> getAllUsers();
 
 
     bool loadInterestGroups();
@@ -66,7 +67,6 @@ public:
     bool saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time = "");
 
 
-
     Contact * createNewContact(const QString &contactID, const QString &nickname = "", const QString &face = "");
 
 public slots:
@@ -80,7 +80,6 @@ public slots:
     void addContactToUI(ItemBoxWidget *expandListView, int groupID, const QString &contactID);
     void deleteContactFromUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &contactID);
     void moveContactToUI(ItemBoxWidget *expandListView, quint32 old_groupID, quint32 new_groupID, const QString &contactID);
-    void updateContactToUI(ItemBoxWidget *expandListView, const QString &groupName, const QString &contactID);
     void updateContactToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &contactID);
 
     void renameContactGroupToUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &new_groupName);
@@ -101,7 +100,7 @@ public slots:
     int slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
     bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteGroupFromDatabase(const QString &groupName);
-    bool deleteAllContactGroupInDatabase();
+    bool resetAllContactGroupInDatabase();
 
 
     bool getMyInfoFormLocalDatabase();
