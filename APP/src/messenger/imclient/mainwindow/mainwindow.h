@@ -80,6 +80,9 @@ private slots:
     void slotUserVerified();
     void slotLockUI();
 
+    void showProgressDialog(const QString &labelText = "", const QString & cancelButtonText = "", int minimum = 0, int maximum = 0);
+    void hideProgressDialog();
+
 
     //ItemBoxEventHandler
 //    void handleItemPressed(const QString &item_id, const QPoint &globalPos);
@@ -109,7 +112,7 @@ private slots:
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void slotProcessContactGroupsInfo2(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void slotProcessContactsInfoVersion(const QString &contactsInfoVersionString);
-
+    void slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, const QString &groupName, bool createGroup, bool result);
 
 
     //void slotProcessSearchContactsResult(const QString &users);
@@ -208,6 +211,8 @@ private:
 
     UserInfoTipWindow *m_userInfoTipWindow;
     //ContactInfoWidget *m_ContactInfoWidget;
+
+    QProgressDialog *progressDialog;
 
     ContactsManager *m_contactsManager;
     IMUser *m_imUser;

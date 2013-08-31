@@ -75,7 +75,7 @@ public slots:
 
 
     void slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName);
-    void slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName);
+    void slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, int contactGroupID);
 
     void addContactToUI(ItemBoxWidget *expandListView, int groupID, const QString &contactID);
     void deleteContactFromUI(ItemBoxWidget *expandListView, quint32 groupID, const QString &contactID);
@@ -122,7 +122,10 @@ private slots:
     //void slotSetupContacts(bool loadFromFile, const QString &string);
     //void slotLoadContacts(ItemBoxWidget *widgetBox, bool loadFromFile = true, const QString &string = "");
     void slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
+    void addNewContactGroupToUI(ItemBoxWidget *expandListView, Category category);
+
     //void slotLoadContacts(ItemBoxWidget *expandListView,ContactGroup *contactGroup);
+
 
     bool slotAddNewContactToDatabase(Contact *contact);
     bool slotdeleteContactFromDatabase(Contact *contact);

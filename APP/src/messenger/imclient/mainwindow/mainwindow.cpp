@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
     friendBox = 0;
     m_userInfoTipWindow = 0;
 
+    progressDialog = 0;
+
 
 
 
@@ -352,6 +354,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &)), this, SLOT(slotProcessUserInfo(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString)), this, SLOT(slotProcessContactsInfoVersion(const QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalCreateOrDeleteContactGroupResultPacketReceived(quint32,const QString &,bool,bool)), this, SLOT(slotProcessCreateOrDeleteContactGroupResult(quint32, const QString &,bool,bool)), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
@@ -1224,6 +1227,38 @@ void MainWindow::slotLockUI(){
 
 }
 
+void MainWindow::showProgressDialog(const QString &labelText, const QString & cancelButtonText, int minimum, int maximum){
+    if(!progressDialog){
+        progressDialog = new QProgressDialog(this);
+    }
+
+    if(labelText.trimmed().isEmpty()){
+        progressDialog->setLabelText(tr("Operation in progress"));
+    }else{
+        progressDialog->setLabelText(labelText);
+    }
+
+    if(cancelButtonText.trimmed().isEmpty()){
+        progressDialog->setCancelButtonText(tr("&Cancel"));
+    }else{
+        progressDialog->setCancelButtonText(cancelButtonText);
+    }
+
+    progressDialog->setRange(minimum, maximum);
+
+    progressDialog->showNormal();
+    progressDialog->raise();
+    progressDialog->activateWindow();
+
+}
+
+void MainWindow::hideProgressDialog(){
+    if(progressDialog){
+        progressDialog->reset();
+        progressDialog->hide();
+    }
+}
+
 
 void MainWindow::handleItemActivated(const QString &id){
     chatWindowManager->slotNewChatWithContact(id);
@@ -1292,13 +1327,10 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
             //}
             //TODO:
 
+            showProgressDialog();
             clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupID, "", false);
-
-            m_contactsManager->deleteGroupFromDatabase(groupIDString);
-            //TODO?
-            //imUser->saveMyInfoToLocalDatabase();
-
-            m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupIDString);
+//            m_contactsManager->deleteGroupFromDatabase(groupIDString);
+//            m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupIDString);
             
 
         }else if(action == &actionCreateNewGroup){
@@ -1324,9 +1356,12 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
                     return;
                 }
 
-                int groupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, newGroupName);
-                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupID, newGroupName, true);
-                m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, newGroupName);
+                showProgressDialog();
+
+//                int newGroupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, newGroupName);
+                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, 0, newGroupName, true);
+//                m_contactsManager->slotAddNewContactGroupToUI(friendBox, newGroupID, newGroupName);
+
             }
             
         }
@@ -1697,18 +1732,22 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     friendBox->clearAllCategories();
     m_contactsManager->resetAllContactGroupInDatabase();
     m_imUser->setContactGroupsInfoString(contactGroupsInfo);
-    ContactGroupBase * strangersGroup = m_imUser->addContactGroup(ContactGroupBase::Group_Strangers_ID);
-    strangersGroup->setGroupName(ContactGroupBase::Group_Strangers_Name);
+    ContactGroupBase * strangersGroup = m_imUser->addContactGroup(ContactGroupBase::Group_Strangers_ID, ContactGroupBase::Group_Strangers_Name);
+//    strangersGroup->setGroupName(ContactGroupBase::Group_Strangers_Name);
 
 
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups(false, false);
     QHash<QString/*Contact ID*/, Contact*> users = m_contactsManager->getAllUsers();
-
+    bool sync = true;
     foreach (ContactGroupBase *contactGroup, groups) {
         quint32 groupID = contactGroup->getGroupID();
         QString groupName = contactGroup->getGroupName();
-        if(groupID != ContactGroupBase::Group_Friends_ID && (groupID != ContactGroupBase::Group_Blacklist_ID) ){
-            m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
+        if(ContactGroupBase::isUserCreatedGroup(groupID)){
+            bool ok = m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
+            if(!ok){
+                sync = false;
+                QMessageBox::critical(this, tr("Error"), tr("Can not save contact group '%1' !").arg(groupName));
+            }
         }
 
         QStringList members = contactGroup->members();
@@ -1732,12 +1771,12 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     }
 
 
+    if(sync){
+        m_imUser->setPersonalContactGroupsVersion(personalContactGroupsInfoVersionOnServer);
+        m_imUser->saveMyInfoToLocalDatabase();
+    }
 
     m_contactsManager->slotFetchAllContactsInfo(friendBox);
-
-//    imUser->setContactGroupsInfoString(contactGroupsInfo);
-//    imUser->saveMyInfoToLocalDatabase();
-
 
 }
 
@@ -1767,15 +1806,15 @@ void MainWindow::slotProcessContactGroupsInfo2(const QString &contactGroupsInfo,
         ContactGroupBase * contactGroup = m_imUser->getContactGroup(groupID);
         if(contactGroup){
             if(groupName != contactGroup->getGroupName()){
+                contactGroup->setGroupName(groupName);
                 m_contactsManager->renameContactGroupToDatabase(groupID, groupName);
                 m_contactsManager->renameContactGroupToUI(friendBox, groupID, groupName);
             }
         }else{
-            contactGroup = m_imUser->addContactGroup(groupID);
+            contactGroup = m_imUser->addContactGroup(groupID, groupName);
             m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
             m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
         }
-        contactGroup->setGroupName(groupName);
         contactGroup->setMembers(contactList);
         contactGroup->clearUpdatedProperties();
 
@@ -1872,6 +1911,27 @@ void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersi
 
 
 }
+
+void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, const QString &groupName, bool createGroup, bool result){
+
+    hideProgressDialog();
+
+    if(result){
+        if(createGroup){
+            m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
+            m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
+        }else{
+            m_contactsManager->deleteGroupFromDatabase(groupName);
+            m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
+        }
+    }else{
+        QString errorMsg = tr("Failed to %1 group '%2'! ").arg(createGroup?tr("create"):tr("delete")).arg(groupName);
+        QMessageBox::critical(this, tr("Error"), QString("%1").arg(errorMsg));
+    }
+
+
+}
+
 
 //void MainWindow::slotProcessSearchContactsResult(const QString &users){
 

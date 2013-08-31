@@ -1359,10 +1359,26 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
 }
 
 bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup){
+    qDebug()<<"--UsersManager::createOrDeleteContactGroupInDB(...)  UserID:"<<info->getUserID()<<" groupID:"<<groupID<<" groupName:"<<groupName<<" createGroup:"<<createGroup;
 
     if(!info){
         return false;
     }
+
+    quint32 gID = groupID;
+
+    if(createGroup){
+        int newGroupID = info->getUnusedContactID();
+        if(newGroupID < 0){
+            return false;
+        }else{
+            gID = newGroupID;
+        }
+    }else if(!info->hasContactGroup(gID)){
+        return false;
+    }
+
+
 
     if(!db.isValid()){
         if(!openDatabase()){
@@ -1370,12 +1386,12 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupI
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4, @GroupInfoVersion); ").arg(info->getUserID()).arg(groupID).arg(groupName).arg(createGroup?1:0);
+    QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4, @GroupInfoVersion); ").arg(info->getUserID()).arg(gID).arg(groupName).arg(createGroup?1:0);
     statement += QString(" select @GroupInfoVersion; ");
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not create or delete contact group for user! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not %1 contact group '%2' for user! %3 Error Type:%4 Error NO.:%5").arg(createGroup?"create":"delete").arg(groupName).arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return false;
@@ -1384,6 +1400,12 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupI
     if(query.first()){
         info->setPersonalContactGroupsVersion(query.value(0).toUInt());
         info->clearUpdatedProperties();
+    }
+
+    if(createGroup){
+        info->addContactGroup(gID, groupName);
+    }else{
+        info->deleteContactGroup(gID);
     }
 
 
