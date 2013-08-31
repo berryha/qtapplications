@@ -288,7 +288,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             //Send contacts version info to user
             QString infoString = "";
             if(getUserAllContactsInfoVersionFromDatabase(userInfo, &infoString)){
-                sendPersonalContactsInfoVersionPacket(socketID, infoString, sessionEncryptionKey);
+                sendPersonalContactsInfoVersionPacket(socketID, infoString, userInfo->getPersonalContactGroupsVersion(), sessionEncryptionKey);
             }
 
             //Send all online contacts list to user
@@ -403,7 +403,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             return;
         }
 
-        sendPersonalContactsInfoVersionPacket(socketID, versionInfo, userInfo->getSessionEncryptionKey());
+        sendPersonalContactsInfoVersionPacket(socketID, versionInfo, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
     }
         break;
 

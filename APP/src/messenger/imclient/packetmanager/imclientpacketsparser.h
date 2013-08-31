@@ -1178,7 +1178,7 @@ signals:
     void signalContactsOnlineInfoPacketReceived(const QString &contactsOnlineInfoString);
     void signalUserInfoPacketReceived(const QString &userID/*, const QString &userInfo*/);
     void signalContactGroupsInfoPacketReceived(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
-    void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString);
+    void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer);
     void signalCreateOrDeleteContactGroupResultPacketReceived(quint32 groupID, const QString &groupName, bool createGroup, bool result);
 
     void signalSearchContactsResultPacketReceived(const QStringList &users);

@@ -337,7 +337,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
             if(personalSummaryInfoVersionOnServer != user->getPersonalSummaryInfoVersion()){requestContactInfo(socketID, m_myUserID, true);}
             if(personalDetailInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
-            if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
+//            if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
             if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
             if(personalMessageInfoVersionOnServer != user->getPersonalMessageInfoVersion()){requestPersonalMessage(socketID, m_myUserID);}
 
@@ -497,10 +497,12 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
-        QString contactsInfoVersionString = "";
-        stream >> contactsInfoVersionString;
 
-        emit signalContactsInfoVersionPacketReceived(contactsInfoVersionString);
+        QString contactsInfoVersionString = "";
+        quint32 contactGroupsInfoVersionOnServer = 1;
+        stream >> contactsInfoVersionString >> contactGroupsInfoVersionOnServer;
+
+        emit signalContactsInfoVersionPacketReceived(contactsInfoVersionString, contactGroupsInfoVersionOnServer);
 
         qWarning()<<"--CONTACTS_INFO_VERSION";
 
