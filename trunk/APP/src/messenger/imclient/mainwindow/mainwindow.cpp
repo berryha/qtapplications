@@ -353,7 +353,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )));
     connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &)), this, SLOT(slotProcessUserInfo(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString)), this, SLOT(slotProcessContactsInfoVersion(const QString)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString, quint32)), this, SLOT(slotProcessContactsInfoVersion(const QString, quint32)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalCreateOrDeleteContactGroupResultPacketReceived(quint32,const QString &,bool,bool)), this, SLOT(slotProcessCreateOrDeleteContactGroupResult(quint32, const QString &,bool,bool)), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
@@ -1850,8 +1850,8 @@ void MainWindow::slotProcessContactGroupsInfo2(const QString &contactGroupsInfo,
     
 }
 
-void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersionString){
-    qDebug()<<"--MainWindow::slotProcessContactsInfoVersion(...)"<<" -contactsInfoVersionString:"<<contactsInfoVersionString;
+void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer){
+    qDebug()<<"--MainWindow::slotProcessContactsInfoVersion(...)"<<" -contactsInfoVersionString:"<<contactsInfoVersionString <<"   contactGroupsInfoVersionOnServer:"<<contactGroupsInfoVersionOnServer;
 
     //FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...
     //e.g. user1,10,10,2;user2,5,6,15;user3,11,10,20
@@ -1905,7 +1905,7 @@ void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersi
 
     }
 
-    if(needToUpdateContactGroupsInfo){
+    if(needToUpdateContactGroupsInfo || (contactGroupsInfoVersionOnServer != m_imUser->getPersonalContactGroupsVersion()) ){
         clientPacketsParser->requestPersonalContactGroupsInfo(m_socketConnectedToServer);
     }
 

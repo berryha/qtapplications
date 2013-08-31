@@ -489,7 +489,7 @@ public slots:
     }
 
 
-    bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, const QByteArray &sessionEncryptionKey){
+    bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, quint32 contactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendPersonalContactsInfoVersionPacket(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -499,7 +499,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactsInfoVersion;
+        out << contactsInfoVersion << contactGroupsInfoVersionOnServer;
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
