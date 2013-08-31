@@ -27,6 +27,8 @@ public:
 
     ContactGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
 
+    static bool isUserCreatedGroup(int groupID);
+
 
 //    bool setGroupInfoFromString(const QString &infoString, const QString &fieldSepartor);
 //    QString getGroupInfoAsString(const QString &fieldSepartor);
@@ -41,6 +43,7 @@ public:
     QStringList members() const;
     void setMembers(const QStringList &members);
     int countOfMembers();
+
 
 
 

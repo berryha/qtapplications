@@ -1244,16 +1244,15 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
         QAction actionDeleteGroup(tr("Delete Group"), contextMenu);
         QAction actionCreateNewGroup(tr("Create New Group"), contextMenu);
         
-        
-        contextMenu->addAction(&actionRenameGroupName);
-        
-        if(m_imUser->countOfContactGroupMembers(groupID) == 0){
-            contextMenu->addAction(&actionDeleteGroup);
+        if(ContactGroupBase::isUserCreatedGroup(groupID)){
+            contextMenu->addAction(&actionRenameGroupName);
+            if(m_imUser->countOfContactGroupMembers(groupID) == 0){
+                contextMenu->addAction(&actionDeleteGroup);
+            }
         }
         
         contextMenu->addAction(&actionCreateNewGroup);
         
-
         QAction *action = contextMenu->exec(global_mouse_pos);
         if(action == &actionRenameGroupName){
             bool ok = false;
