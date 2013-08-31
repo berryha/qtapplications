@@ -507,6 +507,33 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::SERVER_RESPONSE_CREATE_OR_DELETE_CONTACT_GROUP):
+    {
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        quint32 groupID = 0;
+        QString groupName = "";
+        quint8 createGroup = 1, result = 0;
+        quint32 contactGroupsVersionOnServer = 1;
+        stream >> groupID >> groupName >> createGroup >> result >> contactGroupsVersionOnServer;
+
+        emit signalCreateOrDeleteContactGroupResultPacketReceived(groupID, groupName, createGroup, result);
+
+        if(contactGroupsVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
+
+        qWarning()<<"--SERVER_RESPONSE_CREATE_OR_DELETE_CONTACT_GROUP";
+
+    }
+        break;
+
     case quint8(IM::SERVER_RESPONSE_SEARCH_CONTACTS):
     {
         //TODO:

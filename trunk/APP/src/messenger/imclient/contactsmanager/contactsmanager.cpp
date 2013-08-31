@@ -467,9 +467,9 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 //        quint32 groupInfoVersion = QVariant(model->record(i).value("GroupInfoVersion")).toUInt();
 //        quint32 memberListVersion = QVariant(model->record(i).value("MemberListVersion")).toUInt();
 
-        ContactGroupBase *group = m_imUser->addContactGroup(groupID);
+        ContactGroupBase *group = m_imUser->addContactGroup(groupID, groupName);
         Q_ASSERT(group);
-        group->setGroupName(groupName);
+//        group->setGroupName(groupName);
 //        group->setGroupInfoVersion(groupInfoVersion);
 //        group->setGroupMemberListInfoVersion(memberListVersion);
 
@@ -580,13 +580,16 @@ void ContactsManager::slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, 
     Category category;
     category.setID(QString::number(personalContactGroupID));
     category.setName(groupName);
-    expandListView->addCategory(category);
+//    expandListView->addCategory(category);
+
+    addNewContactGroupToUI(expandListView, category);
+
 
 }
 
-void ContactsManager::slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, const QString &groupName){
+void ContactsManager::slotDeleteContactGroupFromUI(ItemBoxWidget *expandListView, int contactGroupID){
 
-    expandListView->removeCategory(groupName);
+    expandListView->removeCategory(QString::number(contactGroupID));
 }
 
 void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, int groupID, const QString &contactID){
@@ -707,21 +710,35 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
 
 
+//    if(groupID == ContactGroupBase::Group_Friends_ID){
+//        expandListView->addCategory(category, 0);
+//    }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
+//        expandListView->addCategory(category, -1);
+//    }else{
+//        expandListView->addCategory(category, expandListView->categoryCount()-1);
+//        //expandListView->addCategory(category, 1);
+//    }
+
+    //    expandListView->addCategory(category);
+
+
+    addNewContactGroupToUI(expandListView, category);
+
+
+}
+
+inline void ContactsManager::addNewContactGroupToUI(ItemBoxWidget *expandListView, Category category){
+
+    int groupID = category.id().toInt();
     if(groupID == ContactGroupBase::Group_Friends_ID){
         expandListView->addCategory(category, 0);
     }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
         expandListView->addCategory(category, -1);
     }else{
         expandListView->addCategory(category, expandListView->categoryCount()-1);
-        //expandListView->addCategory(category, 1);
     }
 
-    //    expandListView->addCategory(category);
-
-
-
 }
-
 //bool ContactsManager::addContact(const QString &contactID, quint32 groupID){
 
 //    Contact *contact = contactHash.value(contactID);

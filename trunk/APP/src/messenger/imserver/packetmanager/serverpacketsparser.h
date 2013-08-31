@@ -432,8 +432,6 @@ public slots:
 
     }
 
-
-
     bool sendPersonalContactGroupsInfoPacket(int peerSocketID, const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendPersonalContactGroupsInfoPacket(...)";
         
@@ -461,6 +459,35 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
 
     }
+
+    bool sendCreateOrDeleteContactGroupResultPacket(int peerSocketID, quint32 groupID, const QString &groupName, bool createGroup, bool result, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendCreateOrDeleteContactGroupResultPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_CREATE_OR_DELETE_CONTACT_GROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << groupName << quint8(createGroup?1:0) << quint8(result?1:0) << personalContactGroupsInfoVersionOnServer;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
 
     bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendPersonalContactsInfoVersionPacket(...)";
