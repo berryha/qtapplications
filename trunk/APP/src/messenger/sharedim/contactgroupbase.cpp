@@ -15,6 +15,16 @@ ContactGroupBase::ContactGroupBase(quint32 groupID, const QString &groupName, QO
 
 }
 
+bool ContactGroupBase::isUserCreatedGroup(int groupID){
+
+    if(groupID == Group_Blacklist_ID || (groupID == Group_Strangers_ID) || (groupID == Group_Friends_ID)){
+        return false;
+    }
+
+    return true;
+
+}
+
 //bool ContactGroupBase::setGroupInfoFromString(const QString &infoString, const QString &fieldSepartor){
 //    if(infoString.trimmed().isEmpty()){
 //        return false;
