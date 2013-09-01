@@ -729,13 +729,23 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
 inline void ContactsManager::addNewContactGroupToUI(ItemBoxWidget *expandListView, Category category){
 
+//    int groupID = category.id().toInt();
+//    if(groupID == ContactGroupBase::Group_Friends_ID){
+//        expandListView->addCategory(category, 0);
+//    }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
+//        expandListView->addCategory(category, -1);
+//    }else{
+//        expandListView->addCategory(category, expandListView->categoryCount()-1);
+//    }
+
+
     int groupID = category.id().toInt();
     if(groupID == ContactGroupBase::Group_Friends_ID){
         expandListView->addCategory(category, 0);
     }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
         expandListView->addCategory(category, -1);
     }else{
-        expandListView->addCategory(category, expandListView->categoryCount()-1);
+        expandListView->addCategory(category, 1);
     }
 
 }
