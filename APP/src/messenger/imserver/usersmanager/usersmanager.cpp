@@ -1547,7 +1547,7 @@ bool UsersManager::saveFriendshipApplyRequestToDB(const QString &applicantID, co
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not write friendship application info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("ERROR! Can not write friendship application info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
         return false;
     }
