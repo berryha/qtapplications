@@ -804,31 +804,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::RENAME_CONTACT_GROUP):
-    {
-        qDebug()<<"~~RENAME_CONTACT_GROUP";
-
-        QString userID = peerID;
-        QByteArray encryptedData;
-        in >> encryptedData;
-
-        UserInfo *userInfo = getUserInfo(userID);
-        if(!userInfo){return;}
-
-        //解密数据
-        QByteArray decryptedData;
-        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
-        stream.setVersion(QDataStream::Qt_4_7);
-        quint32 groupID = 0;
-        QString newGroupName = "";
-        stream >> groupID >> newGroupName;
-
-        updateContactGroupNameInDB(userInfo, groupID, newGroupName);
-
-    }
-        break;
-
     case quint8(IM::CREATE_OR_DELETE_CONTACT_GROUP):
     {
         qDebug()<<"--CREATE_OR_DELETE_CONTACT_GROUP";
@@ -852,6 +827,32 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         bool ok = createOrDeleteContactGroupInDB(userInfo, &groupID, groupName, create);
         sendCreateOrDeleteContactGroupResultPacket(socketID, groupID, groupName, create, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
+
+    }
+        break;
+
+    case quint8(IM::RENAME_CONTACT_GROUP):
+    {
+        qDebug()<<"~~RENAME_CONTACT_GROUP";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+        quint32 groupID = 0;
+        QString newGroupName = "";
+        stream >> groupID >> newGroupName;
+
+        bool ok = updateContactGroupNameInDB(userInfo, groupID, newGroupName);
+        sendRenameGroupResultPacket(socketID, groupID, newGroupName, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
 
     }
         break;

@@ -280,6 +280,7 @@ public slots:
 
     ContactGroupBase * addContactGroup(int contactGroupID, const QString &groupName);
     void deleteContactGroup(quint32 contactGroupID);
+    void renameContactGroup(quint32 contactGroupID, const QString &newGroupName);
 
     QString groupNameThatContactBelongsTo(const QString &contactID) const;
     int groupIDThatContactBelongsTo(const QString &contactID);

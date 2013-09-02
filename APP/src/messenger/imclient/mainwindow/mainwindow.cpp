@@ -355,6 +355,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString, quint32)), this, SLOT(slotProcessContactsInfoVersion(const QString, quint32)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalCreateOrDeleteContactGroupResultPacketReceived(quint32,const QString &,bool,bool)), this, SLOT(slotProcessCreateOrDeleteContactGroupResult(quint32, const QString &,bool,bool)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalRenameContactGroupResultPacketReceived(quint32,const QString &,bool)), this, SLOT(slotProcessRenameContactGroupResult(quint32, const QString &,bool)), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
@@ -1267,7 +1268,7 @@ void MainWindow::handleItemActivated(const QString &id){
 void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, const QPoint &global_mouse_pos, QMenu *contextMenu){
     qDebug()<<"--MainWindow::handleContextMenuEventOnCategory(...)";
 
-    quint32 groupID = groupIDString.toUInt();
+    int groupID = groupIDString.toInt();
     ContactGroupBase *contactGroup = m_imUser->getContactGroup(groupID);
     if(!contactGroup){return;}
 
@@ -1304,19 +1305,18 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
                     QMessageBox::critical(this, tr("Error"), tr("Invalid Group Name!"));
                     return ;
                 }
-                //TODO:
-                //imUser->updateGroupName(group_name, text);
-                m_imUser->saveMyInfoToLocalDatabase();
                 
                 if(m_imUser->hasContactGroup(newGroupName)){
                     QMessageBox::critical(this, tr("Error"), tr("Group already exists!"));
                     return;
                 }
 
+                showProgressDialog();
+
                 clientPacketsParser->renameContactGroup(m_socketConnectedToServer, groupID, newGroupName);
 
-                m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
-                m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
+//                m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
+//                m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
             }
 
 
@@ -1844,9 +1844,10 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
     qDebug()<<"--MainWindow::slotProcessCreateOrDeleteContactGroupResult(...)"<<" groupID:"<<groupID<<" groupName:"<<groupName<<" createGroup:"<<createGroup<<" result:"<<result;
 
     hideProgressDialog();
-    bool ok = false;
 
     if(result){
+        bool ok = false;
+
         if(createGroup){
             ok = m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
             m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
@@ -1870,6 +1871,29 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
 
 }
 
+void MainWindow::slotProcessRenameContactGroupResult(quint32 groupID, const QString &newGroupName, bool result){
+
+    hideProgressDialog();
+
+    if(result){
+        bool ok = m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
+        m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
+        m_imUser->renameContactGroup(groupID, newGroupName);
+
+        if(ok){
+            m_imUser->updatePersonalContactGroupsInfoVersion();
+            m_imUser->saveMyInfoToLocalDatabase();
+        }
+
+    }else{
+        QString errorMsg = tr("Failed to rename group to '%1'! ").arg(newGroupName);
+        QMessageBox::critical(this, tr("Error"), QString("%1").arg(errorMsg));
+    }
+
+
+
+
+}
 
 //void MainWindow::slotProcessSearchContactsResult(const QString &users){
 

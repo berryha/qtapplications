@@ -1180,6 +1180,7 @@ signals:
     void signalContactGroupsInfoPacketReceived(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer);
     void signalCreateOrDeleteContactGroupResultPacketReceived(quint32 groupID, const QString &groupName, bool createGroup, bool result);
+    void signalRenameContactGroupResultPacketReceived(quint32 groupID, const QString &newGroupName, bool result);
 
     void signalSearchContactsResultPacketReceived(const QStringList &users);
     //void signalAddContactResultPacketReceived(const QString &contactID, IM::ErrorType errorType);
