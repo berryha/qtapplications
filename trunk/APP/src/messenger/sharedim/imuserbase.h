@@ -276,6 +276,8 @@ public slots:
     ContactGroupBase * getContactGroup(int personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
     quint32 getContactGroupID(const QString &groupName);
+    QString getContactGroupName(int groupID) const;
+
     ContactGroupBase * addContactGroup(int contactGroupID, const QString &groupName);
     void deleteContactGroup(quint32 contactGroupID);
 
@@ -307,7 +309,7 @@ public slots:
     bool isContactBlacklisted(const QString &contactID);
     QStringList blacklistedContacts();
 
-    int getUnusedContactID();
+    int getUnusedContactGroupID();
 
     //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
     

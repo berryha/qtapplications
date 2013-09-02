@@ -1358,23 +1358,27 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
 
 }
 
-bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup){
-    qDebug()<<"--UsersManager::createOrDeleteContactGroupInDB(...)  UserID:"<<info->getUserID()<<" groupID:"<<groupID<<" groupName:"<<groupName<<" createGroup:"<<createGroup;
+bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 *groupID, const QString &groupName, bool createGroup){
+    qDebug()<<"--UsersManager::createOrDeleteContactGroupInDB(...)  UserID:"<<info->getUserID()<<" groupName:"<<groupName<<" createGroup:"<<createGroup;
+
+    Q_ASSERT(groupID);
 
     if(!info){
         return false;
     }
 
-    quint32 gID = groupID;
+    quint32 gID = *groupID;
 
     if(createGroup){
-        int newGroupID = info->getUnusedContactID();
+        int newGroupID = info->getUnusedContactGroupID();
         if(newGroupID < 0){
+            qCritical()<<"ERROR! Invalid unused contact group ID!"<<" Name:"<<groupName;
             return false;
         }else{
             gID = newGroupID;
         }
     }else if(!info->hasContactGroup(gID)){
+        qCritical()<<"ERROR! Contact group does not exist!"<<" ID:"<<groupID;
         return false;
     }
 
@@ -1387,26 +1391,38 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupI
     }
     QSqlQuery query(db);
     QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4, @GroupInfoVersion); ").arg(info->getUserID()).arg(gID).arg(groupName).arg(createGroup?1:0);
-    statement += QString(" select @GroupInfoVersion; ");
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not %1 contact group '%2' for user! %3 Error Type:%4 Error NO.:%5").arg(createGroup?"create":"delete").arg(groupName).arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not %1 contact group '%2' for user '%3'! %4 Error Type:%5 Error NO.:%6").arg(createGroup?"create":"delete").arg(groupName).arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return false;
     }
 
+    statement = QString(" select @GroupInfoVersion; ");
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+
     if(query.first()){
+        qDebug()<<"-------1------------V:"<<query.value(0).toUInt();
         info->setPersonalContactGroupsVersion(query.value(0).toUInt());
         info->clearUpdatedProperties();
     }
 
     if(createGroup){
         info->addContactGroup(gID, groupName);
+        *groupID = gID;
     }else{
         info->deleteContactGroup(gID);
     }
+    qDebug()<<"Contact Groups:"<<info->getContactGroupsInfoString();
 
 
     return true;
@@ -1422,10 +1438,18 @@ bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, c
     }
     QSqlQuery query(db);
     QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3', @ContactGroupsVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
-    statement += QString(" select @ContactGroupsVersion; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not update user contact group name ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+    statement = QString(" select @ContactGroupsVersion; ");
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return false;

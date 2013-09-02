@@ -97,9 +97,9 @@ public slots:
 
 
 //    QString getPersonalContactGroupName(int personalContactGroupID) ;
-    int slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
+    bool slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
     bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
-    bool deleteGroupFromDatabase(const QString &groupName);
+    bool deleteGroupFromDatabase(int groupID);
     bool resetAllContactGroupInDatabase();
 
 

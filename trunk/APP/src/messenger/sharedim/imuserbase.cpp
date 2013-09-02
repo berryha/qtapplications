@@ -610,6 +610,15 @@ quint32 IMUserBase::getContactGroupID(const QString &groupName){
     return 0;
 }
 
+QString IMUserBase::getContactGroupName(int groupID) const{
+    ContactGroupBase * contactGroup = personalContactGroupsHash.value(groupID);
+    if(!contactGroup){
+        return "";
+    }
+
+    return contactGroup->getGroupName();
+}
+
 ContactGroupBase * IMUserBase::addContactGroup(int contactGroupID, const QString &groupName){
     if(personalContactGroupsHash.contains(contactGroupID)){
         ContactGroupBase *group = personalContactGroupsHash.value(contactGroupID);
@@ -928,7 +937,7 @@ QStringList IMUserBase::blacklistedContacts(){
     return blacklistGroup->members();
 }
 
-int IMUserBase::getUnusedContactID(){
+int IMUserBase::getUnusedContactGroupID(){
     QList<int> ids = personalContactGroupsHash.keys();
     int id = -65535;
     for(int i=ContactGroupBase::Group_Friends_ID+1; i<65535; i++){
@@ -939,6 +948,7 @@ int IMUserBase::getUnusedContactID(){
         continue;
     }
 
+    qDebug()<<"Unused Contact ID:"<<id;
     return id;
 
 }
