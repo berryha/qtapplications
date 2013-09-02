@@ -1831,8 +1831,6 @@ void MainWindow::slotProcessContactsInfoVersion(const QString &contactsInfoVersi
 
 
     }
-    qDebug()<<"-----Server:"<<contactGroupsInfoVersionOnServer;
-    qDebug()<<"-----Local:"<<m_imUser->getPersonalContactGroupsVersion();
 
     if(needToUpdateContactGroupsInfo || (contactGroupsInfoVersionOnServer != m_imUser->getPersonalContactGroupsVersion()) ){
         clientPacketsParser->requestPersonalContactGroupsInfo(m_socketConnectedToServer);
@@ -1846,17 +1844,24 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
     qDebug()<<"--MainWindow::slotProcessCreateOrDeleteContactGroupResult(...)"<<" groupID:"<<groupID<<" groupName:"<<groupName<<" createGroup:"<<createGroup<<" result:"<<result;
 
     hideProgressDialog();
+    bool ok = false;
 
     if(result){
         if(createGroup){
-            m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
+            ok = m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
             m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
             m_imUser->addContactGroup(groupID, groupName);
         }else{
-            m_contactsManager->deleteGroupFromDatabase(groupID);
+            ok = m_contactsManager->deleteGroupFromDatabase(groupID);
             m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
             m_imUser->deleteContactGroup(groupID);
         }
+
+        if(ok){
+            m_imUser->updatePersonalContactGroupsInfoVersion();
+            m_imUser->saveMyInfoToLocalDatabase();
+        }
+
     }else{
         QString errorMsg = tr("Failed to %1 group '%2'! ").arg(createGroup?tr("create"):tr("delete")).arg(groupName);
         QMessageBox::critical(this, tr("Error"), QString("%1").arg(errorMsg));

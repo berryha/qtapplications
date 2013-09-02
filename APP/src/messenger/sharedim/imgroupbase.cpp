@@ -13,7 +13,7 @@
 
 namespace HEHUI {
 
-IMGroupBase::IMGroupBase(quint32 groupID, const QString &groupName, QObject *parent)
+IMGroupBase::IMGroupBase(int groupID, const QString &groupName, QObject *parent)
     :QObject(parent), groupID(groupID), groupName(groupName)
 {
 	
@@ -32,7 +32,7 @@ IMGroupBase::~IMGroupBase() {
 }
 
 bool IMGroupBase::isNull(){
-    return ((groupID < 1) || (groupName.isEmpty()) || (creatorID.isEmpty()));
+    return ( (groupName.isEmpty()) || (creatorID.isEmpty()) );
 }
 
 QString IMGroupBase::getUpdateSQLStatement() const{
