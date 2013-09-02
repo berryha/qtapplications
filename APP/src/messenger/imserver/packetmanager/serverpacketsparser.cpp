@@ -850,7 +850,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 create = 1;
         stream >> groupID >> groupName >> create;
 
-        bool ok = createOrDeleteContactGroupInDB(userInfo, groupID, groupName, create);
+        bool ok = createOrDeleteContactGroupInDB(userInfo, &groupID, groupName, create);
         sendCreateOrDeleteContactGroupResultPacket(socketID, groupID, groupName, create, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
 
     }

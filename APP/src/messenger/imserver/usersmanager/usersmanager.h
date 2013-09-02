@@ -119,7 +119,7 @@ public:
 
 
     bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
-    bool createOrDeleteContactGroupInDB(UserInfo* info, quint32 groupID, const QString &groupName, bool createGroup);
+    bool createOrDeleteContactGroupInDB(UserInfo* info, quint32 *groupID, const QString &groupName, bool createGroup);
     bool updateContactGroupNameInDB(UserInfo* info, quint32 groupID, const QString &newGroupName);
 
 
