@@ -3,6 +3,7 @@
 
 #include "ui_addcontactdialog.h"
 
+#include "../imuser.h"
 #include  "../contactsmanager/contact.h"
 
 
@@ -35,9 +36,13 @@ private slots:
     
 
 private:
+    void initContactGroupCombox();
+
+private:
     Ui::AddContactDialog ui;
     
-    Contact *m_user;
+    IMUser *m_imUser;
+    Contact *m_contact;
     bool m_requestToAddContact;
     
     bool m_rejectRequest;
