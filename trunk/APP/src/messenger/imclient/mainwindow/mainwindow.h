@@ -112,6 +112,7 @@ private slots:
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void slotProcessContactsInfoVersion(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer);
     void slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, const QString &groupName, bool createGroup, bool result);
+    void slotProcessRenameContactGroupResult(quint32 groupID, const QString &groupName, bool result);
 
 
     //void slotProcessSearchContactsResult(const QString &users);

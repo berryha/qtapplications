@@ -1456,15 +1456,8 @@ bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, c
         info->clearUpdatedProperties();
     }
 
-//    QStringList groups;
-//     while(query.next()){
-//        groups.append(query.value(0).toString());
-//     }
-//     info->setInterestGroups(groups);
 
     return true;
-
-
 
 }
 

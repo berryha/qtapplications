@@ -488,6 +488,34 @@ public slots:
 
     }
 
+    bool sendRenameGroupResultPacket(int peerSocketID, quint32 groupID, const QString &newGroupName, bool result, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendRenameGroupResultPacket(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_RENAME_CONTACT_GROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << newGroupName << quint8(result?1:0) << personalContactGroupsInfoVersionOnServer;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
 
     bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, quint32 contactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendPersonalContactsInfoVersionPacket(...)";

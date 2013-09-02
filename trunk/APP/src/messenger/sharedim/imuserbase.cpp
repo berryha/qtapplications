@@ -645,6 +645,17 @@ void IMUserBase::deleteContactGroup(quint32 contactGroupID){
 
 }
 
+void IMUserBase::renameContactGroup(quint32 contactGroupID, const QString &newGroupName){
+
+    if(!personalContactGroupsHash.contains(contactGroupID)){
+        return ;
+    }
+
+    ContactGroupBase * group = personalContactGroupsHash.take(contactGroupID);
+    group->setGroupName(newGroupName);
+
+}
+
 QString IMUserBase::groupNameThatContactBelongsTo(const QString &contactID) const{
 
     foreach (ContactGroupBase *contactGroup, personalContactGroupsHash.values()) {
