@@ -27,7 +27,7 @@ namespace HEHUI {
 class SHAREDIMLIB_API IMGroupBase : public QObject {
     Q_OBJECT
 public:
-    IMGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
+    IMGroupBase(int groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~IMGroupBase();
     
     bool isNull();
@@ -49,7 +49,7 @@ public:
         return creatorID;
     }
 
-    quint32 getGroupID() const
+    int getGroupID() const
     {
         return groupID;
     }
@@ -81,7 +81,7 @@ public:
     }
 
 
-    void setGroupID(quint32 groupID)
+    void setGroupID(int groupID)
     {
         this->groupID = groupID;
 //        addUpdatedProperty(IM::PIG_GroupID, QString::number(groupID));
@@ -119,7 +119,7 @@ protected:
 
 private:
     
-    quint32 groupID;
+    int groupID;
     QString creatorID;
     QString groupName;
     quint32 groupInfoVersion;

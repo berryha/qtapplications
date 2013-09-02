@@ -1008,7 +1008,7 @@ bool ContactsManager::renameContactGroupToDatabase(quint32 groupID, const QStrin
 bool ContactsManager::deleteGroupFromDatabase(int groupID){
     qDebug()<<"--ContactsManager::deleteGroupFromDatabase(..) groupID:"<<groupID;
 
-    if(m_imUser->hasContactGroup(groupID)){
+    if(!m_imUser->hasContactGroup(groupID)){
         qCritical()<<"ERROR! Contact group does not exist!"<<" Group ID:"<<groupID;
         return false;
     }

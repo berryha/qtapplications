@@ -528,8 +528,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         stream >> groupID >> groupName >> createGroup >> result >> contactGroupsVersionOnServer;
 
         emit signalCreateOrDeleteContactGroupResultPacketReceived(groupID, groupName, createGroup, result);
-        qDebug()<<"contactGroupsVersionOnServer:"<<contactGroupsVersionOnServer<<" local:"<<user->getPersonalContactGroupsVersion();
-        if(contactGroupsVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
+
+        if(contactGroupsVersionOnServer != (user->getPersonalContactGroupsVersion() + 1) ){
+            requestPersonalContactGroupsInfo(socketID);
+        }
 
         qWarning()<<"--SERVER_RESPONSE_CREATE_OR_DELETE_CONTACT_GROUP";
 

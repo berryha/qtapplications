@@ -1408,10 +1408,7 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 *group
 
         return false;
     }
-
-
     if(query.first()){
-        qDebug()<<"-------1------------V:"<<query.value(0).toUInt();
         info->setPersonalContactGroupsVersion(query.value(0).toUInt());
         info->clearUpdatedProperties();
     }
