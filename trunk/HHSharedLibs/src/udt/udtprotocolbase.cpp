@@ -534,7 +534,7 @@ bool UDTProtocolBase::sendData(UDTSOCKET socket, const QByteArray *byteArray){
 }
 
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
-    qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
+    //qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
 
     m_errorMessage = "";
 
@@ -600,7 +600,7 @@ bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byte
 //        return false;
 //    }
 
-    qDebug()<<"--UDT Stream Data Sent!"<<" Size:"<<ssize;
+    //qDebug()<<"--UDT Stream Data Sent!"<<" Size:"<<ssize;
     return true;
 
 }
@@ -937,7 +937,7 @@ void UDTProtocolBase::readDataFromSocket(UDTSOCKET socket){
     }
 
 
-    qDebug()<<"-------------!!!--------------"<<"socket:"<<socket<<" state:"<<UDT::getsockstate(socket);
+    //qDebug()<<"-------------!!!--------------"<<"socket:"<<socket<<" state:"<<UDT::getsockstate(socket);
 
     int size = MAX_DATA_BLOCK_SIZE + 4;
 

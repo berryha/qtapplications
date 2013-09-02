@@ -162,7 +162,7 @@ ItemBoxCategoryListView *ItemBoxTreeWidget::categoryView(const QString &cat_id) 
         if(cat_item && cat_item->data(0, Qt::UserRole).toString() == cat_id){
             if(QTreeWidgetItem *embedItem = cat_item->child(0)){
                 rc = qobject_cast<ItemBoxCategoryListView*>(itemWidget(embedItem, 0));
-                qDebug()<<"----ItemBoxTreeWidget::categoryView(...)~~cat_item->text(0):"<<cat_item->text(0);
+                //qDebug()<<"----ItemBoxTreeWidget::categoryView(...)~~cat_item->text(0):"<<cat_item->text(0);
                 break;
             }
 

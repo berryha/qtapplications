@@ -621,7 +621,7 @@ bool ItemBoxCategoryListView::removeCustomItems()
 }
 
 bool ItemBoxCategoryListView::updateItemName(const QString &item_id, const QString &name){
-    qDebug()<<"----CategoryListView::updateObjectItemName(const QString &item_id, const QIcon &icon)";
+    //qDebug()<<"----CategoryListView::updateObjectItemName(const QString &item_id, const QIcon &icon)";
 
     bool ok = m_model->updateItemName(item_id, name);
     viewport()->update();
@@ -630,7 +630,7 @@ bool ItemBoxCategoryListView::updateItemName(const QString &item_id, const QStri
 }
 
 bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QIcon &icon){
-    qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
+    //qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QIcon &icon)";
 
     bool ok =  m_model->updateItemIcon(item_id, icon);
     viewport()->update();
@@ -639,7 +639,7 @@ bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QIcon
 }
 
 bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QString &iconName){
-    qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
+    //qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
 
     bool ok = m_model->updateItemIcon(item_id, iconName);
     viewport()->update();
