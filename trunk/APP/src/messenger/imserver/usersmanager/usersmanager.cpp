@@ -744,14 +744,14 @@ bool UsersManager::moveContactForUserInDB(UserInfo *userInfo, const QString &con
     statement = QString(" select @ContactGroupsVersion; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(userInfo->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
         return false;
     }
     if(query.first()){
-        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
-        info->clearUpdatedProperties();
+        userInfo->setPersonalContactGroupsVersion(query.value(0).toUInt());
+        userInfo->clearUpdatedProperties();
     }
 
 
@@ -1344,11 +1344,12 @@ bool UsersManager::getUserBlacklistedContactsInfoFromDB(UserInfo* info){
 
 }
 
-bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString){
+bool UsersManager::getUserAllContactsInfoFromDatabase(UserInfo* info, QString *infoString){
 
-    //FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...
-    //e.g. user1,10,10,2;user2,5,6,15;user3,11,10,20
+    Q_ASSERT(infoString);
 
+    //FORMATE: GroupID,GroupName;UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...||GroupID,GroupName;UserID,...
+    //e.g. 100,Group-100;user1,10,10,2;user2,5,6,15||101,Group-101;user3,11,10,20
 
     if(!info){
         return false;
@@ -1392,9 +1393,42 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
      //e.g. 100,Group-100;user1,10,10,2;user2,5,6,15||101,Group-101;user3,11,10,20
      *infoString = contactGroups.join(GROUP_INFO_SEPARATOR);
 
+    return true;
 
-//    query.first();
-//    *infoString = query.value(0).toString();
+}
+
+bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString){
+
+    //FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...
+    //e.g. user1,10,10,2;user2,5,6,15;user3,11,10,20
+
+    Q_ASSERT(infoString);
+
+    if(!info){
+        return false;
+    }
+    if(!infoString){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    QString statement = QString("call sp_GetAllContactsInfoForUserAsString('%1'); ").arg(info->getUserID());
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query user contacts info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+
+    query.first();
+    *infoString = query.value(0).toString();
 
     return true;
 

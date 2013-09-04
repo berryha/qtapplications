@@ -23,7 +23,7 @@ public:
     
     QString getMessage() const;
     QString getNewName() const;
-    QString getGroupname();
+//    QString getGroupname();
     quint32 getGroupID();
 
     

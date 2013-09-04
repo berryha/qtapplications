@@ -516,33 +516,33 @@ public slots:
 
     }
 
-    bool sendMoveContactToGroupResultPacket(int peerSocketID, const QString &contactID, quint32 oldGroupID, quint32 newGroupID, bool result, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
-        qDebug()<<"--sendMoveContactToGroupResultPacket(...)";
+//    bool sendMoveContactToGroupResultPacket(int peerSocketID, const QString &contactID, quint32 oldGroupID, quint32 newGroupID, bool result, quint32 personalContactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
+//        qDebug()<<"--sendMoveContactToGroupResultPacket(...)";
 
-        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
-        packet->setPacketType(quint8(IM::SERVER_RESPONSE_MOVE_CONTACT));
-        packet->setTransmissionProtocol(TP_RUDP);
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
+//        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+//        packet->setPacketType(quint8(IM::SERVER_RESPONSE_MOVE_CONTACT));
+//        packet->setTransmissionProtocol(TP_RUDP);
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << oldGroupID << newGroupID << quint8(result?1:0) << personalContactGroupsInfoVersionOnServer;
-        QByteArray encryptedData;
-        crypto(&encryptedData, ba, sessionEncryptionKey, true);
-        ba.clear();
-        out.device()->seek(0);
-        out << m_serverName << encryptedData;
+//        out << contactID << oldGroupID << newGroupID << quint8(result?1:0) << personalContactGroupsInfoVersionOnServer;
+//        QByteArray encryptedData;
+//        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+//        ba.clear();
+//        out.device()->seek(0);
+//        out << m_serverName << encryptedData;
 
-        packet->setPacketData(ba);
+//        packet->setPacketData(ba);
 
-        ba.clear();
-        out.device()->seek(0);
-        QVariant v;
-        v.setValue(*packet);
-        out << v;
-        return m_rtp->sendReliableData(peerSocketID, &ba);
+//        ba.clear();
+//        out.device()->seek(0);
+//        QVariant v;
+//        v.setValue(*packet);
+//        out << v;
+//        return m_rtp->sendReliableData(peerSocketID, &ba);
 
-    }
+//    }
 
 
     bool sendPersonalContactsInfoVersionPacket(int peerSocketID, const QString &contactsInfoVersion, quint32 contactGroupsInfoVersionOnServer, const QByteArray &sessionEncryptionKey){
