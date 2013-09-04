@@ -713,8 +713,15 @@ bool UsersManager::deleteContactForUserFromDB(const QString &userID, const QStri
 
 }
 
-bool UsersManager::moveContactForUserInDB(const QString &userID, const QString &contactID, quint32 newGroupID){
+bool UsersManager::moveContactForUserInDB(UserInfo *userInfo, const QString &contactID, quint32 newGroupID){
 
+    if(!userInfo){
+        return false;
+    }
+    int oldGroupID = userInfo->groupIDThatContactBelongsTo(contactID);
+    if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
+        return false;
+    }
 
     if(!db.isValid()){
         if(!openDatabase()){
@@ -723,12 +730,28 @@ bool UsersManager::moveContactForUserInDB(const QString &userID, const QString &
     }
     QSqlQuery query(db);
 
-    QString statement = QString("call sp_Contact_MoveToAnotherGroup('%1', '%2', %3);  ").arg(userID).arg(contactID).arg(newGroupID);
+    QString statement = QString("call sp_Contact_MoveToAnotherGroup('%1', '%2', %3, @ContactGroupsVersion);  ").arg(userInfo->getUserID()).arg(contactID).arg(newGroupID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not move contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not move contact for user in database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
         return false;
+    }
+
+    userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
+
+
+    statement = QString(" select @ContactGroupsVersion; ");
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return false;
+    }
+    if(query.first()){
+        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
+        info->clearUpdatedProperties();
     }
 
 
@@ -1340,7 +1363,7 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_GetAllContactsInfoForUserAsString('%1'); ").arg(info->getUserID());
+    QString statement = QString("call sp_GetAllContactsInfoForUser('%1'); ").arg(info->getUserID());
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1350,9 +1373,28 @@ bool UsersManager::getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QSt
         return false;
     }
 
-    query.first();
+    QStringList contactGroups;
+     while(query.next()){
+         quint32 groupID  = query.value(0).toUInt();
+         QString groupName = query.value(1).toString();
 
-    *infoString = query.value(0).toString();
+         //FORMATE: UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...
+         //e.g. user1,10,10,2;user2,5,6,15;user3,11,10,20
+         QString contactsInfo = query.value(2).toString();
+
+         if(contactsInfo.trimmed().isEmpty()){
+             contactGroups.append(QString::number(groupID)+","+groupName);
+         }else{
+             contactGroups.append(QString::number(groupID)+","+groupName+";"+contactsInfo);
+         }
+     }
+     //FORMATE: GroupID,GroupName;UserID,PersonalSummaryInfoVersion,PersonalDetailInfoVersion,PersonalMessageInfoVersion;UserID,...||GroupID,GroupName;UserID,...
+     //e.g. 100,Group-100;user1,10,10,2;user2,5,6,15||101,Group-101;user3,11,10,20
+     *infoString = contactGroups.join(GROUP_INFO_SEPARATOR);
+
+
+//    query.first();
+//    *infoString = query.value(0).toString();
 
     return true;
 

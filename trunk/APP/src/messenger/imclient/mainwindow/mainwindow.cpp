@@ -1982,43 +1982,33 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     }
     
     
-    QString existingGroupName = m_imUser->groupNameThatContactBelongsTo(contactID);
+    int existingGroupID = m_imUser->groupIDThatContactBelongsTo(contactID);
 
     AddContactDialog dlg(contact, false, this);
     dlg.exec();
-    QString groupName = dlg.getGroupname();
+    quint32 newGroupID = dlg.getGroupID();
     QString remarkName = dlg.getNewName();
     if(!remarkName.trimmed().isEmpty()){
         contact->setRemarkName(remarkName);
         m_contactsManager->saveContactInfoToDatabase(contactID);
     }
-    qDebug()<<"---------existingGroupName:"<<existingGroupName<<"  groupName"<<groupName;
-    if(existingGroupName == groupName){
+    qDebug()<<"---------existingGroupID:"<<existingGroupID<<"  newGroupID:"<<newGroupID;
+    if(existingGroupID == newGroupID){
         return;
     }
 
-    
-    int groupID = m_imUser->getContactGroupID(groupName);
-    if(!groupID){
-        return;
-//        groupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, groupName);
-//        m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
-    }
-    //qDebug()<<"---------groupID:"<<groupID<<"  groupName"<<groupName;
+    showProgressDialog();
+    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupID, newGroupID);
 
-    quint32 existingGroupID = m_imUser->getContactGroupID(existingGroupName);
-
-    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupID, groupID);
-
-    m_contactsManager->moveContact(contactID, existingGroupID, groupID);
+    m_contactsManager->moveContact(contactID, existingGroupID, newGroupID);
     m_contactsManager->saveContactInfoToDatabase(contactID);
     m_imUser->saveMyInfoToLocalDatabase();
 
 
-    if(existingGroupName.isEmpty()){
-        m_contactsManager->addContactToUI(friendBox, groupID, contactID);
+    if(existingGroupID.isEmpty()){
+        m_contactsManager->addContactToUI(friendBox, newGroupID, contactID);
     }else{
-        m_contactsManager->moveContactToUI(friendBox, existingGroupID, groupID, contactID);
+        m_contactsManager->moveContactToUI(friendBox, existingGroupID, newGroupID, contactID);
     }
 
     

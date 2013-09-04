@@ -567,7 +567,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!userInfo->hasFriendContact(contactID)){return;}
         
         userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
-        moveContactForUserInDB(userID, contactID, newGroupID);
+        bool ok = moveContactForUserInDB(userID, contactID, newGroupID);
+        if(){}
+        sendMoveContactToGroupResultPacket(socketID, contactID, oldGroupID, newGroupID, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
         
     }
         break;
