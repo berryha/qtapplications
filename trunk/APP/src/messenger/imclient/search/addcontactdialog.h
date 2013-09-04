@@ -24,10 +24,13 @@ public:
     QString getMessage() const;
     QString getNewName() const;
     QString getGroupname();
+    quint32 getGroupID();
+
     
     bool requestRejected();
 
 protected:
+    void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *e);
     
 private slots:
@@ -36,6 +39,7 @@ private slots:
     
 
 private:
+    void initUI();
     void initContactGroupCombox();
 
 private:
@@ -43,6 +47,7 @@ private:
     
     IMUser *m_imUser;
     Contact *m_contact;
+
     bool m_requestToAddContact;
     
     bool m_rejectRequest;

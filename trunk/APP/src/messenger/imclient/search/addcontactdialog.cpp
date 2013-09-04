@@ -11,39 +11,29 @@ namespace HEHUI{
 AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, QWidget *parent) :
     QDialog(parent), m_contact(user)
 {
-    ui.setupUi(this);
 
-    m_imUser = IMUser::instance();
+    initUI();
     
     m_requestToAddContact = true;
-    m_rejectRequest = false;
     
-    Q_ASSERT_X(user, "AddContactDialog", "Invalid user object");
-    
-    ui.toolButtonUserFace->setIcon(ImageResource::createIconForContact(m_contact->getFace(), m_contact->getOnlineState()));
-    ui.labelUserNickName->setText(m_contact->getNickName());
-    ui.labelUserID->setText(m_contact->getUserID());
-    
-    ui.pushButtonReject->setEnabled(false);
-    ui.pushButtonReject->hide();
-    
+        
     if(requestToAddNewContact){
         ui.groupBoxUserInfo->setTitle(tr("The following user will be added."));
-        ui.groupBoxSettings->hide();
         ui.pushButtonReject->setText(tr("&Cancel"));
         if(m_contact->getFriendshipApply() == Contact::FA_AUTO_ACCEPT){
-            ui.groupBoxMessage->hide();
+            ui.groupBoxSettings->show();
         }else{
             ui.groupBoxMessage->setTitle(tr("Your Request"));
             ui.groupBoxMessage->show();
+            ui.lineEditMessage->setReadOnly(false);
             ui.lineEditMessage->setFocus();
         }
     
     }else{
         ui.groupBoxUserInfo->setTitle(tr("The following user has been added you as a contact."));
+        ui.pushButtonReject->setEnabled(false);
         ui.pushButtonReject->hide();
         ui.pushButtonAddAsAContact->setText(tr("&OK"));
-        ui.groupBoxMessage->hide();
 
         initContactGroupCombox();
 
@@ -52,12 +42,6 @@ AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, Q
     }
 
 
-    validator = new QRegExpValidator(this);
-    QRegExp rx("\\b\\w{0,16}\\b");
-    validator->setRegExp(rx);
-    ui.lineEditMessage->setValidator(validator);
-    ui.lineEditRename->setValidator(validator);
-    ui.comboBoxGroup->setValidator(validator);
 
 
     
@@ -67,41 +51,39 @@ AddContactDialog::AddContactDialog(Contact *user, const QString &requestMessage,
     :QDialog(parent), m_contact(user)
 {
     
-    ui.setupUi(this);
+    initUI();
 
-    m_imUser = IMUser::instance();
     
     m_requestToAddContact = false;
-    m_rejectRequest = false;
-    
-    
-    Q_ASSERT_X(user, "AddContactDialog", "Invalid user object");
-    
-    ui.toolButtonUserFace->setIcon(ImageResource::createIconForContact(m_contact->getFace(), m_contact->getOnlineState()));
-    ui.labelUserNickName->setText(m_contact->getNickName());
-    ui.labelUserID->setText(m_contact->getUserID());
     
     ui.groupBoxUserInfo->setTitle(tr("The following user requested to add you as a contact."));
-    ui.groupBoxMessage->setTitle(tr("Request Message"));
-    ui.lineEditMessage->setText(requestMessage);
+
+    if(!requestMessage.isEmpty()){
+        ui.groupBoxMessage->setTitle(tr("Request Message"));
+        ui.groupBoxMessage->show();
+        ui.lineEditMessage->setText(requestMessage);
+        ui.lineEditMessage->setReadOnly(true);
+    }
+
+
+    ui.pushButtonReject->setText(tr("&Reject"));
     ui.pushButtonReject->setEnabled(true);
     ui.pushButtonReject->show();
-    
-    ui.lineEditRename->setFocus();
-
-    initContactGroupCombox();
     ui.pushButtonAddAsAContact->setText(tr("&Accept"));
 
-    validator = new QRegExpValidator(this);
-    QRegExp rx("\\b\\w{0,16}\\b");
-    validator->setRegExp(rx);
-    ui.lineEditMessage->setValidator(validator);
-    ui.lineEditRename->setValidator(validator);
-    ui.comboBoxGroup->setValidator(validator);
-    
+    initContactGroupCombox();
+    ui.lineEditRename->setFocus();
+
+
 
 }
 
+void AddContactDialog::closeEvent(QCloseEvent *event){
+
+    ui.lineEditMessage->clear();
+
+
+}
 
 void AddContactDialog::changeEvent(QEvent *e)
 {
@@ -132,22 +114,81 @@ QString AddContactDialog::getGroupname(){
     return groupName;
 }
 
+quint32 AddContactDialog::getGroupID(){
+    return ui.comboBoxGroup->itemData(ui.comboBoxGroup->currentIndex()).toUInt();
+}
+
 bool AddContactDialog::requestRejected(){
     return m_rejectRequest;
 }
 
-
 void AddContactDialog::on_pushButtonAddAsAContact_clicked(){
     m_rejectRequest = false;
-    accept();
+
+
+    if(ui.groupBoxSettings->isVisible() || m_requestToAddContact){
+        accept();
+    }else{
+        ui.groupBoxMessage->hide();
+        ui.groupBoxSettings->show();
+        ui.pushButtonReject->setEnabled(false);
+        ui.pushButtonReject->hide();
+    }
+
 }
 
 void AddContactDialog::on_pushButtonReject_clicked(){
     m_rejectRequest = true;
-    accept();
+
+
+    if(m_requestToAddContact || (!ui.lineEditMessage->isReadOnly()) ){
+        accept();
+    }else{
+        ui.groupBoxMessage->setTitle(tr("Reply Message"));
+        ui.groupBoxMessage->show();
+        ui.lineEditMessage->setReadOnly(false);
+        ui.lineEditMessage->clear();
+        ui.lineEditMessage->setFocus();
+
+        ui.pushButtonAddAsAContact->setEnabled(false);
+        ui.pushButtonAddAsAContact->hide();
+
+    }
+
 }
 
-void AddContactDialog::initContactGroupCombox(){
+inline void AddContactDialog::initUI(){
+
+
+    ui.setupUi(this);
+
+
+    m_imUser = IMUser::instance();
+
+    m_requestToAddContact = false;
+    m_rejectRequest = false;
+
+    Q_ASSERT_X(m_contact, "AddContactDialog", "Invalid user object");
+
+    ui.toolButtonUserFace->setIcon(ImageResource::createIconForContact(m_contact->getFace(), m_contact->getOnlineState()));
+    ui.labelUserNickName->setText(m_contact->getNickName());
+    ui.labelUserID->setText(m_contact->getUserID());
+
+    ui.groupBoxMessage->hide();
+    ui.lineEditMessage->setReadOnly(true);
+    ui.groupBoxSettings->hide();
+
+
+    validator = new QRegExpValidator(this);
+    QRegExp rx("\\b\\w{0,16}\\b");
+    validator->setRegExp(rx);
+    ui.lineEditMessage->setValidator(validator);
+    ui.lineEditRename->setValidator(validator);
+    ui.comboBoxGroup->setValidator(validator);
+
+}
+
+inline void AddContactDialog::initContactGroupCombox(){
 
     //ui.comboBoxGroup->addItems(m_imUser->contactGroupNames());
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups();
@@ -157,6 +198,7 @@ void AddContactDialog::initContactGroupCombox(){
     }
     ui.comboBoxGroup->insertItem(0, ContactGroupBase::Group_Friends_Name, QVariant(ContactGroupBase::Group_Friends_ID));
     ui.comboBoxGroup->setCurrentIndex(0);
+
 
 }
 
