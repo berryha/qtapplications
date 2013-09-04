@@ -143,6 +143,12 @@
    </item>
    <item row="3" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>9</number>
+     </property>
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -158,26 +164,10 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonReject">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
        <property name="text">
         <string>Reject</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonAddAsAContact">
