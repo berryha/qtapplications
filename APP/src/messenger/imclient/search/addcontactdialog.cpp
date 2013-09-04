@@ -106,13 +106,13 @@ QString AddContactDialog::getNewName() const{
     return ui.lineEditRename->text();
 }
 
-QString AddContactDialog::getGroupname(){
-    QString groupName = ui.comboBoxGroup->currentText();
-//    if(groupName.trimmed().isEmpty()){
-//        groupName = m_user->getDefaultGroupName();
-//    }
-    return groupName;
-}
+//QString AddContactDialog::getGroupname(){
+//    QString groupName = ui.comboBoxGroup->currentText();
+////    if(groupName.trimmed().isEmpty()){
+////        groupName = m_user->getDefaultGroupName();
+////    }
+//    return groupName;
+//}
 
 quint32 AddContactDialog::getGroupID(){
     return ui.comboBoxGroup->itemData(ui.comboBoxGroup->currentIndex()).toUInt();

@@ -1997,19 +1997,18 @@ void MainWindow::getNewContactSettings(const QString &contactID){
         return;
     }
 
-    showProgressDialog();
     clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupID, newGroupID);
 
     m_contactsManager->moveContact(contactID, existingGroupID, newGroupID);
     m_contactsManager->saveContactInfoToDatabase(contactID);
-    m_imUser->saveMyInfoToLocalDatabase();
+//    m_imUser->saveMyInfoToLocalDatabase();
 
 
-    if(existingGroupID.isEmpty()){
-        m_contactsManager->addContactToUI(friendBox, newGroupID, contactID);
-    }else{
+    //if(existingGroupID.isEmpty()){
+    //    m_contactsManager->addContactToUI(friendBox, newGroupID, contactID);
+    //}else{
         m_contactsManager->moveContactToUI(friendBox, existingGroupID, newGroupID, contactID);
-    }
+    //}
 
     
 }
@@ -2099,7 +2098,7 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
         if(dlg.requestRejected()){
             clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, false, dlg.getMessage());
         }else{
-            clientPacketsParser->addContact(m_socketConnectedToServer, userID, dlg.getGroupname());
+            clientPacketsParser->addContact(m_socketConnectedToServer, userID, dlg.getMessage(), dlg.getGroupID());
         }
     }
 

@@ -83,7 +83,7 @@ public:
     
     bool addNewContactForUserFromDB(const QString &userID, const QString &contactID, quint32 contactGroupID);
     bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
-    bool moveContactForUserInDB(const QString &userID, const QString &contactID, quint32 newGroupID);
+    bool moveContactForUserInDB(UserInfo *userInfo, const QString &contactID, quint32 newGroupID);
 
     bool addOrDeleteBlacklistedContactForUserFromDB(const QString &userID, const QString &contactID, bool addToBlacklist = false);
 
@@ -117,7 +117,7 @@ public:
     bool saveCachedInterestGroupChatMessageFromIMUser(const QString &senderID, quint32 interestGroupID, const QString &message);
     QStringList getCachedInterestGroupChatMessagesForUserFromDB(UserInfo* userInfo);
 
-
+    bool getUserAllContactsInfoFromDatabase(UserInfo* info, QString *infoString);
     bool getUserAllContactsInfoVersionFromDatabase(UserInfo* info, QString *infoString);
     bool createOrDeleteContactGroupInDB(UserInfo* info, quint32 *groupID, const QString &groupName, bool createGroup);
     bool updateContactGroupNameInDB(UserInfo* info, quint32 groupID, const QString &newGroupName);

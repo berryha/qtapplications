@@ -271,9 +271,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(userInfo){
 
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
-            sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey, userInfo->getPersonalSummaryInfoVersion(),
-                                           userInfo->getPersonalDetailInfoVersion(), userInfo->getPersonalContactGroupsVersion(),
-                                           userInfo->getInterestGroupInfoVersion(), userInfo->getPersonalMessageInfoVersion());
+            sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,
+                                           userInfo->getPersonalSummaryInfoVersion(),
+                                           userInfo->getPersonalDetailInfoVersion(),
+                                           userInfo->getPersonalContactGroupsVersion(),
+                                           userInfo->getInterestGroupInfoVersion(),
+                                           userInfo->getPersonalMessageInfoVersion()
+                                           );
 
             //Send last login info
             sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
@@ -285,10 +289,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             //Save login or logout info, send info to contacts
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort, deviceInfo);
 
-            //Send contacts version info to user
-            QString infoString = "";
-            if(getUserAllContactsInfoVersionFromDatabase(userInfo, &infoString)){
-                sendPersonalContactsInfoVersionPacket(socketID, infoString, userInfo->getPersonalContactGroupsVersion(), sessionEncryptionKey);
+            //Send all contacts version info to user
+            QString contactsInfoString = "";
+            //if(getUserAllContactsInfoVersionFromDatabase(userInfo, &contactsInfoString)){
+            if(getUserAllContactsInfoFromDatabase(userInfo, &contactsInfoString)){
+                sendPersonalContactsInfoVersionPacket(socketID, contactsInfoString, userInfo->getPersonalContactGroupsVersion(), sessionEncryptionKey);
             }
 
             //Send all online contacts list to user
@@ -496,7 +501,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "", verificationMessage = "";
-        stream >> contactID >> verificationMessage;
+        quint32 groupID = ContactGroupBase::Group_Friends_ID;
+        stream >> contactID >> verificationMessage >> groupID;
         
         if(userID == contactID){return;}
         
@@ -511,10 +517,10 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
         
         if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
-            quint32 groupID = userInfo->defaultFriendContactGroupID();
-            userInfo->addNewContact(contactID, groupID);
+            //quint32 groupID = userInfo->defaultFriendContactGroupID();
             if(addNewContactForUserFromDB(userID, contactID, groupID)){
                 sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+                userInfo->addNewContact(contactID, groupID);
             }else{
                 sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
             }
@@ -566,10 +572,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!contactInfo){return;}
         if(!userInfo->hasFriendContact(contactID)){return;}
         
-        userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
-        bool ok = moveContactForUserInDB(userID, contactID, newGroupID);
-        if(){}
-        sendMoveContactToGroupResultPacket(socketID, contactID, oldGroupID, newGroupID, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
+        bool ok = moveContactForUserInDB(userInfo, contactID, newGroupID);
+        if(ok){
+            userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
+        }
+//        sendMoveContactToGroupResultPacket(socketID, contactID, oldGroupID, newGroupID, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
         
     }
         break;

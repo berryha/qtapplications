@@ -344,7 +344,7 @@ public slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
     }
 
-    bool addContact(int serverSocketID, const QString &contactID, const QString &verificationMessage = "", const QString &groupName = ""){
+    bool addContact(int serverSocketID, const QString &contactID, const QString &verificationMessage = "", quint32 groupID = ContactGroupBase::Group_Friends_ID){
         qWarning()<<"--addContact(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -355,7 +355,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << verificationMessage << groupName;
+        out << contactID << verificationMessage << groupID;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
