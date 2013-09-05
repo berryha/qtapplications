@@ -574,7 +574,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         bool ok = moveContactForUserInDB(userInfo, contactID, newGroupID);
         if(ok){
-            userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
+            userInfo->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
         }
 //        sendMoveContactToGroupResultPacket(socketID, contactID, oldGroupID, newGroupID, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
         
@@ -658,7 +658,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //deleteFriendshipApplyRequest(userID, contactID);
         deleteContactForUserFromDB(userID, contactID, deleteMeFromOpposition, addToBlacklist);
 
-        userInfo->deleteFriendContact(contactID);
+        userInfo->deleteContact(contactID);
         if(deleteMeFromOpposition){
             //TODO:
             UserInfo *contactInfo = getOnlineUserInfo(contactID);
@@ -666,7 +666,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 contactInfo = getOfflineUserInfo(contactID);;
             }
             if(!contactInfo){return;}
-            contactInfo->deleteFriendContact(userID);
+            contactInfo->deleteContact(userID);
 
             //deleteFriendshipApplyRequest(contactID, userID);
         }
@@ -860,8 +860,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString newGroupName = "";
         stream >> groupID >> newGroupName;
 
-        bool ok = updateContactGroupNameInDB(userInfo, groupID, newGroupName);
-        sendRenameGroupResultPacket(socketID, groupID, newGroupName, ok, userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
+        updateContactGroupNameInDB(userInfo, groupID, newGroupName);
 
     }
         break;

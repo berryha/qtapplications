@@ -774,14 +774,18 @@ bool ContactsManager::deleteContact(const QString &contactID, bool addToBlacklis
         return false;
     }
 
-    m_imUser->deleteFriendContact(contactID, addToBlacklist);
-
+    int oldGroupID = contact->getContactGroupID();
     if(addToBlacklist){
         contact->setContactGroupID(ContactGroupBase::Group_Blacklist_ID);
+        m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Blacklist_ID);
     }else{
         contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
+        //if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
+        //    m_imUser->strangersGroup()->deleteMember(contactID);
+        //}else{
+            m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Strangers_ID);
+        //}
     }
-
 
     return true;
 }
@@ -794,7 +798,7 @@ bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, 
     }
     contact->setContactGroupID(newGroupID);
 
-    m_imUser->moveFriendContact(contactID, oldGroupID, newGroupID);
+    m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
 
     return true;
 
@@ -881,9 +885,7 @@ bool ContactsManager::slotdeleteContactFromDatabase(Contact *contact){
         return false;
     }
 
-    int groupID = contact->getContactGroupID();
-
-    m_imUser->deleteFriendContact(contactID, false);
+    m_imUser->deleteContact(contactID);
 
     delete contact;
     contact = 0;

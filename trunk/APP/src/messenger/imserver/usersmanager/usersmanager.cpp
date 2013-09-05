@@ -730,7 +730,7 @@ bool UsersManager::moveContactForUserInDB(UserInfo *userInfo, const QString &con
     }
     QSqlQuery query(db);
 
-    QString statement = QString("call sp_Contact_MoveToAnotherGroup('%1', '%2', %3, @ContactGroupsVersion);  ").arg(userInfo->getUserID()).arg(contactID).arg(newGroupID);
+    QString statement = QString("call sp_Contact_MoveToAnotherGroup('%1', '%2', %3);  ").arg(userInfo->getUserID()).arg(contactID).arg(newGroupID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not move contact for user in database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -738,22 +738,7 @@ bool UsersManager::moveContactForUserInDB(UserInfo *userInfo, const QString &con
         return false;
     }
 
-    userInfo->moveFriendContact(contactID, oldGroupID, newGroupID);
-
-
-    statement = QString(" select @ContactGroupsVersion; ");
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(userInfo->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
-
-        return false;
-    }
-    if(query.first()){
-        userInfo->setPersonalContactGroupsVersion(query.value(0).toUInt());
-        userInfo->clearUpdatedProperties();
-    }
-
+    userInfo->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
 
     return true;
 
@@ -1510,7 +1495,7 @@ bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, c
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3', @ContactGroupsVersion); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
+    QString statement = QString("call sp_ContactGroup_UpdateName('%1', %2, '%3'); ").arg(info->getUserID()).arg(groupID).arg(newGroupName);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not update user contact group name ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1519,19 +1504,7 @@ bool UsersManager::updateContactGroupNameInDB(UserInfo* info, quint32 groupID, c
         return false;
     }
 
-    statement = QString(" select @ContactGroupsVersion; ");
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
-
-        return false;
-    }
-    if(query.first()){
-        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
-        info->clearUpdatedProperties();
-    }
-
+    info->renameContactGroup(groupID, newGroupName);
 
     return true;
 

@@ -39,6 +39,11 @@ public:
     ChatWindowDisplayStyle getChatWindowDisplayStyle();
     void switchChatWindowDisplayStyle(ChatWindowDisplayStyle style);
 
+    bool closeContactChatWindow(Contact *contact);
+    bool closeInterestGroupChatWindow(InterestGroup *group);
+
+
+
 
 signals:
     void signalSendChatMessageToCantact(Contact *contact, const QString &message, const QStringList &imageList);
@@ -80,7 +85,8 @@ private:
     ContactChatWidget * findContactChatTabWidget(Contact *contact);
 
 
-    GroupChatWindow* createGroupChatWindow(InterestGroup *group);
+
+    GroupChatWindow* createInterestGroupChatWindow(InterestGroup *group);
     QMdiSubWindow* findChatWithInterestGroupMdiSubWindow(InterestGroup *group);
     GroupChatWindow * findInterestGroupChatTabWidget(InterestGroup *group);
 

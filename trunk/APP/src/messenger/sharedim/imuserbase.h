@@ -295,8 +295,9 @@ public slots:
     virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
     bool hasFriendContact(const QString &contactID);
     bool addNewContact(const QString &contactID, int groupID);
-    bool deleteFriendContact(const QString &contactID, bool addToBlacklist = false);
-    bool moveFriendContact(const QString &contactID, int oldGroupID, int newGroupID);
+    bool deleteContact(const QString &contactID);
+    bool moveFriendContact2(const QString &contactID, int oldGroupID, int newGroupID);
+    bool moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID);
 
 
     bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);
@@ -314,10 +315,15 @@ public slots:
 
     //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
     
+    ContactGroupBase * strangersGroup();
+    ContactGroupBase * blacklistGroup();
 
 
 private:
 
+
+    ContactGroupBase *m_strangersGroup;
+    ContactGroupBase *m_blacklistGroup;
 
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
     //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
