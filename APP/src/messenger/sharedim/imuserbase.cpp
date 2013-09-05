@@ -58,6 +58,8 @@ IMUserBase::~IMUserBase() {
         delete group;
         group = 0;
     }
+    m_strangersGroup = 0;
+    m_blacklistGroup = 0;
     personalContactGroupsHash.clear();
 
 
@@ -92,14 +94,24 @@ quint32 IMUserBase::defaultBlacklistContactGroupID(){
 
 void IMUserBase::init(){
 
-    userRole = 0;
+
+    int gID = ContactGroupBase::Group_Strangers_ID;
+    m_strangersGroup = new ContactGroupBase(gID, ContactGroupBase::Group_Strangers_Name, this);
+    personalContactGroupsHash.insert(gID, m_strangersGroup);
+
+    gID = ContactGroupBase::Group_Blacklist_ID;
+    m_blacklistGroup = new ContactGroupBase(gID, ContactGroupBase::Group_Blacklist_Name, this);
+    personalContactGroupsHash.insert(gID, m_blacklistGroup);
+
+
+
 
     //    systemGroupsHash = QHash<quint32, QString>();
     //    personalInterestGroupsHash = QHash<quint32, QString> ();
     //    personalContacts = QHash<quint32, QString> ();
     
     //personalContactGroupsHash = QHash<QString, QStringList> ();
-    personalContactGroupsHash.clear();
+    //personalContactGroupsHash.clear();
 
     personalMessageInfoVersion = 0;
     personalMessage = "";
@@ -109,11 +121,12 @@ void IMUserBase::init(){
     personalDetailInfoVersion = 0;
     personalContactGroupsInfoVersion = 0;
     interestGroupInfoVersion = 0;
-    
+
 
     onlineState = IM::ONLINESTATE_OFFLINE;
     friendshipApply = FA_AUTO_ACCEPT;
     shortTalk = ST_PROMPT;
+    userRole = 0;
 
     sessionEncryptionKey = encryptedPassword();
     
@@ -503,7 +516,10 @@ void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo){
         delete group;
         group = 0;
     }
+    m_strangersGroup = 0;
+    m_blacklistGroup = 0;
     personalContactGroupsHash.clear();
+
 
     if(contactGroupsInfo.trimmed().isEmpty()){
         return;
@@ -522,7 +538,22 @@ void IMUserBase::setContactGroupsInfoString(const QString &contactGroupsInfo){
         personalContactGroupsHash.insert(groupID, contactGroup);
 
     }
-    
+
+    int gID = ContactGroupBase::Group_Strangers_ID;
+    m_strangersGroup = personalContactGroupsHash.value(gID);
+    if(!m_strangersGroup){
+        m_strangersGroup = new ContactGroupBase(gID, ContactGroupBase::Group_Strangers_Name, this);
+        personalContactGroupsHash.insert(gID, m_strangersGroup);
+    }
+
+    gID = ContactGroupBase::Group_Blacklist_ID;
+    m_blacklistGroup = personalContactGroupsHash.value(gID);
+    if(!m_blacklistGroup){
+        m_blacklistGroup = new ContactGroupBase(gID, ContactGroupBase::Group_Blacklist_Name, this);
+        personalContactGroupsHash.insert(gID, m_blacklistGroup);
+    }
+
+
 
 }
 
@@ -778,19 +809,15 @@ bool IMUserBase::addNewContact(const QString &contactID, int groupID){
 
 }
 
-bool IMUserBase::deleteFriendContact(const QString &contactID, bool addToBlacklist){
+bool IMUserBase::deleteContact(const QString &contactID){
 
     QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
-    groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Strangers_ID));
-    groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Blacklist_ID));
+    //groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Strangers_ID));
+    //groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Blacklist_ID));
 
     foreach (ContactGroupBase *contactGroup, groups) {
         if(contactGroup->hasMember(contactID)){
             contactGroup->deleteMember(contactID);
-
-            if(addToBlacklist){
-                addOrDeleteBlacklistedContact(contactID, true);
-            }
             updatePersonalContactGroupsInfoVersion();
             return true;
         }
@@ -799,7 +826,7 @@ bool IMUserBase::deleteFriendContact(const QString &contactID, bool addToBlackli
     return false;
 }
 
-bool IMUserBase::moveFriendContact(const QString &contactID, int oldGroupID, int newGroupID){
+bool IMUserBase::moveFriendContact2(const QString &contactID, int oldGroupID, int newGroupID){
         
     //TODO
     if(oldGroupID == ContactGroupBase::Group_Blacklist_ID
@@ -823,6 +850,19 @@ bool IMUserBase::moveFriendContact(const QString &contactID, int oldGroupID, int
 
     return true;
 
+}
+
+bool IMUserBase::moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID){
+
+    ContactGroupBase *oldContactGroup = personalContactGroupsHash.value(oldGroupID);
+    ContactGroupBase *newContactGroup = personalContactGroupsHash.value(newGroupID);
+    Q_ASSERT(oldContactGroup);
+    Q_ASSERT(newContactGroup);
+
+    oldContactGroup->deleteMember(contactID);
+    newContactGroup->addMember(contactID);
+
+    updatePersonalContactGroupsInfoVersion();
 }
 
 //bool IMUserBase::addContactToBlacklist(const QString &contactID){
@@ -962,6 +1002,14 @@ int IMUserBase::getUnusedContactGroupID(){
     qDebug()<<"Unused Contact ID:"<<id;
     return id;
 
+}
+
+ContactGroupBase * IMUserBase::strangersGroup(){
+    return m_strangersGroup;
+}
+
+ContactGroupBase * IMUserBase::blacklistGroup(){
+    return m_blacklistGroup;
 }
 
 

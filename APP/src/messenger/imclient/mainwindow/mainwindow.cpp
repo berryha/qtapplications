@@ -355,7 +355,6 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString, quint32)), this, SLOT(slotProcessContactsInfoVersion(const QString, quint32)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalCreateOrDeleteContactGroupResultPacketReceived(quint32,const QString &,bool,bool)), this, SLOT(slotProcessCreateOrDeleteContactGroupResult(quint32, const QString &,bool,bool)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalRenameContactGroupResultPacketReceived(quint32,const QString &,bool)), this, SLOT(slotProcessRenameContactGroupResult(quint32, const QString &,bool)), Qt::QueuedConnection);
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
@@ -1307,16 +1306,18 @@ void MainWindow::handleContextMenuEventOnCategory(const QString &groupIDString, 
                 }
                 
                 if(m_imUser->hasContactGroup(newGroupName)){
-                    QMessageBox::critical(this, tr("Error"), tr("Group already exists!"));
+                    QMessageBox::critical(this, tr("Error"), tr("Group with the same name already exists!"));
                     return;
                 }
 
-                showProgressDialog();
+//                showProgressDialog();
 
                 clientPacketsParser->renameContactGroup(m_socketConnectedToServer, groupID, newGroupName);
 
-//                m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
-//                m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
+                m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
+                m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
+                m_imUser->renameContactGroup(groupID, newGroupName);
+
             }
 
 
@@ -1385,10 +1386,9 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
 
     QMenu menu;
 
+    int oldGroupID = contact->getContactGroupID();
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups();
-
-    QString existingGroupName = m_imUser->groupNameThatContactBelongsTo(contactID);
-    groups.removeAll(m_imUser->getContactGroup(existingGroupName));
+    groups.removeAll(m_imUser->getContactGroup(oldGroupID));
 
     if(!groups.isEmpty()){
         QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
@@ -1421,26 +1421,19 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
     }
 
     if(executedAction == &actionDeleteContact){
-
-        showDeleteContactDialog(contact, false);
-
-
-
-        //        imUser->addOrDeleteContact(contactID, existingGroupName, false);
-        //        imUser->saveMyInfoToLocalDatabase();
-
-        //        int groupID = contactsManager->getGroup(existingGroupName);
-        //        if(!groupID){
-        //            QMessageBox::critical(this, tr("Error"), tr("Contact group '%1' does not exist!").arg(existingGroupName));
-        //            return;
-        //        }
-
-        //        contactsManager->slotdeleteContactFromDatabase(contact);
-        //        contactsManager->deleteContactFromUI(friendsListView, existingGroupName, contactID);
-
-        //        clientPacketsParser->deleteContact(contactID, existingGroupName, true);
-
-
+        if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
+            //TODO:Close chat window
+            if(!chatWindowManager->closeContactChatWindow(contact)){
+                return;
+            }
+            m_contactsManager->slotdeleteContactFromDatabase(contact);
+            m_contactsManager->deleteContactFromUI(friendBox, oldGroupID, contactID);
+        }else if(oldGroupID == ContactGroupBase::Group_Blacklist_ID){
+            slotRequestDeleteContact(contactID);
+            showProgressDialog();
+        }else{
+            showDeleteContactDialog(contact, false);
+        }
 
     }else if(executedAction == &actionBlockContact){
         showDeleteContactDialog(contact, true);
@@ -1498,47 +1491,44 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
 void MainWindow::slotMoveContactToGroup(){
     QAction *action = qobject_cast<QAction *>(sender());
     if(!action){return;}
-    //QMessageBox::information(0, "slotRenameGroupName", action->data().toString());
 
     QString newGroupName = action->text();
     QString contactID = action->data().toString();
     Contact *contact = m_contactsManager->getUser(contactID);
     if(!contact){return;}
-    if(contact->isStranger()){
-        //TODO
-    }else if(contact->isBlacklisted()){
-        //TODO:
-    }
+    quint32 oldGroupID = contact->getContactGroupID();
 
 
-    quint32 existingGroupID = contact->getContactGroupID();
-    if(existingGroupID == 0){return;}
+    if(contact->isFriend()){
+        ContactGroupBase *group = m_imUser->getContactGroup(newGroupName);
+        if(!group){
+            QMessageBox::critical(this, tr("Error"), tr("Contact group '%1' does not exist!").arg(newGroupName));
+            return;
+        }
+        quint32 newGroupID = group->getGroupID();
+        clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, oldGroupID, newGroupID);
+        m_contactsManager->moveContact(contactID, oldGroupID, newGroupID);
+        m_contactsManager->saveContactInfoToDatabase(contactID);
+        m_contactsManager->moveContactToUI(friendBox, oldGroupID, newGroupID, contactID);
 
-//    QString existingGroupName = imUser->groupNameThatContactBelongsTo(contactID);
-//    if(existingGroupName == newGroupName){return;}
-
-
-    ContactGroupBase *group = m_imUser->getContactGroup(newGroupName);
-    if(!group){
-        QMessageBox::critical(this, tr("Error"), tr("Contact group '%1' does not exist!").arg(newGroupName));
         return;
-        //groupID = contactsManager->slotAddNewContactGroupToDatabase(groupName);
-        //contactsManager->slotAddNewContactGroupToUI(friendsListView, groupID, groupName);
     }
-    quint32 newGroupID = group->getGroupID();
-    if(newGroupID == 0){return;}
+
+    if(contact->isStranger()){
+        AddContactDialog dlg(contact, true, this);
+        if(dlg.exec() != QDialog::Accepted){return;}
+        addContact(contactID, dlg.getMessage());
+
+    }else if(contact->isBlacklisted()){
+        AddContactDialog dlg(contact, true, this);
+        if(dlg.exec() != QDialog::Accepted){return;}
+        slotRequestDeleteContact(contactID);
+        addContact(contactID, dlg.getMessage());
+    }
 
 
 
-    clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, existingGroupID, newGroupID);
-
-    m_contactsManager->moveContact(contactID, existingGroupID, newGroupID);
-
-    m_contactsManager->saveContactInfoToDatabase(contactID);
-
-    m_contactsManager->moveContactToUI(friendBox, existingGroupID, newGroupID, contactID);
-
-    m_imUser->saveMyInfoToLocalDatabase();
+//    m_imUser->saveMyInfoToLocalDatabase();
 
     action->disconnect();
     action->deleteLater();
@@ -1582,31 +1572,17 @@ void MainWindow::slotDeleteContactResultReceived(const QString &contactID, bool 
 
     Contact *contact = m_contactsManager->getUser(contactID);
     if(!contact){
-        QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
+        //QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
         return;
     }
 
-    if(contact->isStranger() || contact->isBlacklisted()){return;}
+    //if(contact->isStranger() || contact->isBlacklisted()){return;}
 
     int groupID = contact->getContactGroupID();
 
-
-    //contactsManager->slotdeleteContactFromDatabase(contact);
-//    clientPacketsParser->deleteContact(m_socketConnectedToServer, contactID, deleteMeFromOpposition, addToBlacklist);
-
     m_contactsManager->deleteContact(contactID, addToBlacklist);
-
     m_contactsManager->saveContactInfoToDatabase(contactID);
-
-
-    if(addToBlacklist){
-        m_contactsManager->moveContactToUI(friendBox, groupID, ContactGroupBase::Group_Blacklist_ID, contactID);
-    }else{
-        //TODO
-        m_contactsManager->deleteContactFromUI(friendBox, groupID, contactID);
-    }
-
-
+    m_contactsManager->moveContactToUI(friendBox, groupID, contact->getContactGroupID(), contactID);
 
 }
 
@@ -1871,29 +1847,6 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
 
 }
 
-void MainWindow::slotProcessRenameContactGroupResult(quint32 groupID, const QString &newGroupName, bool result){
-
-    hideProgressDialog();
-
-    if(result){
-        bool ok = m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
-        m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
-        m_imUser->renameContactGroup(groupID, newGroupName);
-
-        if(ok){
-            m_imUser->updatePersonalContactGroupsInfoVersion();
-            m_imUser->saveMyInfoToLocalDatabase();
-        }
-
-    }else{
-        QString errorMsg = tr("Failed to rename group to '%1'! ").arg(newGroupName);
-        QMessageBox::critical(this, tr("Error"), QString("%1").arg(errorMsg));
-    }
-
-
-
-
-}
 
 //void MainWindow::slotProcessSearchContactsResult(const QString &users){
 
@@ -1981,7 +1934,6 @@ void MainWindow::getNewContactSettings(const QString &contactID){
         return;
     }
     
-    
     int existingGroupID = m_imUser->groupIDThatContactBelongsTo(contactID);
 
     AddContactDialog dlg(contact, false, this);
@@ -2047,8 +1999,6 @@ void MainWindow::slotSearch(){
         connect(search, SIGNAL(signalAddContact(const QString&, const QString&)), this, SLOT(addContact(const QString&, const QString&)));
 
         connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QStringList &)), search, SLOT(slotSearchContactsResultPacketReceived(const QStringList &)), Qt::QueuedConnection);
-
-
     }
 
     search->show();

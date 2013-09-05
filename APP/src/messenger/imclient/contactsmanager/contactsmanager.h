@@ -116,6 +116,8 @@ public slots:
     bool openDatabase(bool reopen = false);
     bool initLocalDatabase(QString *errorMessage = 0);
 
+    bool slotAddNewContactToDatabase(Contact *contact);
+    bool slotdeleteContactFromDatabase(Contact *contact);
 
 
 private slots:
@@ -127,8 +129,6 @@ private slots:
     //void slotLoadContacts(ItemBoxWidget *expandListView,ContactGroup *contactGroup);
 
 
-    bool slotAddNewContactToDatabase(Contact *contact);
-    bool slotdeleteContactFromDatabase(Contact *contact);
 
 
 private:

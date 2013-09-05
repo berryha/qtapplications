@@ -204,12 +204,35 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
 
 }
 
+bool ChatWindowManager::closeContactChatWindow(Contact *contact){
+
+    Q_ASSERT(contact);
+
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contact->getUserID());
+    if(!ccw){return true;}
+
+    return ccw->close();
+
+}
+
+bool ChatWindowManager::closeInterestGroupChatWindow(InterestGroup *group){
+
+    Q_ASSERT(group);
+
+    GroupChatWindow *gcw = m_groupChatWidgetHash.value(group->getGroupID());
+    if(!gcw){return true;}
+
+    return gcw->close();
+
+}
+
+
 void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
     qDebug()<<"----ChatWindowManager::slotNewChatWithContact(const QString &id)~~~";
 
     Contact *contact = ContactsManager::instance()->getUser(contactID);
     if(!contact){
-        qCritical()<<"XXXXChatWindowManager::slotNewMessageReceivedFromContact(...)~~Error:No such contact:"<<contactID;
+        qCritical()<<"ERROR! No such contact:"<<contactID;
         return;
     }
 
@@ -351,7 +374,7 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
     {
         groupChatWindow = findInterestGroupChatTabWidget(group);
         if(!groupChatWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
             ui.tabWidget->addTab(groupChatWindow, ImageResource::createIconForInterestGroup(), group->getGroupName());
         }
         ui.tabWidget->setCurrentWidget(groupChatWindow);
@@ -361,7 +384,7 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
     {
         QMdiSubWindow * subWindow = findChatWithInterestGroupMdiSubWindow(group);
         if(!subWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
             QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(groupChatWindow);
             subWindow->setWindowIcon(ImageResource::createIconForInterestGroup());
             //connect(subWindow, SIGNAL(destroyed()), this, SLOT(handleChatWindowClosed()));
@@ -375,7 +398,7 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
     {
         groupChatWindow = m_groupChatWidgetHash.value(interestGroupID);
         if(!groupChatWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
         }
         groupChatWindow->show();
         groupChatWindow->activateWindow();
@@ -419,7 +442,7 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
     {
         groupChatWindow = findInterestGroupChatTabWidget(group);
         if(!groupChatWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
             ui.tabWidget->addTab(groupChatWindow, group->getGroupName());
         }
         ui.tabWidget->setCurrentWidget(groupChatWindow);
@@ -433,7 +456,7 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
     {
         QMdiSubWindow * subWindow = findChatWithInterestGroupMdiSubWindow(group);
         if(!subWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
             QMdiSubWindow *subWindow = ui.mdiArea->addSubWindow(groupChatWindow);
             subWindow->setWindowIcon(ImageResource::createIconForInterestGroup());
             //connect(subWindow, SIGNAL(destroyed()), this, SLOT(handleChatWindowClosed()));
@@ -451,7 +474,7 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
     {
         groupChatWindow = m_groupChatWidgetHash.value(interestGroupID);
         if(!groupChatWindow){
-            groupChatWindow = createGroupChatWindow(group);
+            groupChatWindow = createInterestGroupChatWindow(group);
         }
         groupChatWindow->show();
         groupChatWindow->activateWindow();
@@ -741,7 +764,7 @@ ContactChatWidget * ChatWindowManager::findContactChatTabWidget(Contact *contact
     return 0;
 }
 
-GroupChatWindow* ChatWindowManager::createGroupChatWindow(InterestGroup *group){
+GroupChatWindow* ChatWindowManager::createInterestGroupChatWindow(InterestGroup *group){
 
     //InterestGroup *group = ContactsManager::instance()->getInterestGroup(interestGroupID);
     if(!group){

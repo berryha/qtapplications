@@ -203,7 +203,7 @@ QString Contact::databaseColumnName(IM::PropertyIDOfUser propertyID) const{
 }
 
 bool Contact::isFriend(){
-    return contactGroupID == defaultFriendContactGroupID();
+    return (contactGroupID != defaultStrangerContactGroupID()) && (contactGroupID != defaultBlacklistContactGroupID());
 }
 
 bool Contact::isStranger(){
