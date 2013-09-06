@@ -374,7 +374,7 @@ QSqlQuery DatabaseUtility::queryDatabase(const QString & queryString, const QStr
                                          const QString &host, int port, const QString &user, const QString &passwd,
                                          const QString &databaseName, HEHUI::DatabaseType databaseType) {
 
-    qDebug()<<"----DatabaseUtility::queryDatabase(...)";
+    //qDebug()<<"----DatabaseUtility::queryDatabase(...)";
 
     Q_ASSERT_X(!queryString.isEmpty(), "DatabaseUtility::queryDatabase(...)", "'queryString' is empty!");
     Q_ASSERT_X(!driver.isEmpty(), "DatabaseUtility::queryDatabase(...)", "'driver' is empty!");
