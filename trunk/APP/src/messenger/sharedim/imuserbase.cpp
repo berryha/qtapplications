@@ -787,23 +787,24 @@ bool IMUserBase::addNewContact(const QString &contactID, int groupID){
     }
 
 
-    QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
-    foreach (ContactGroupBase *group, groups) {
-        if(group->hasMember(contactID)){
-            if(group->getGroupID() == ContactGroupBase::Group_Strangers_ID){
-                group->deleteMember(contactID);
-            }else{
-                qDebug()<<"ERROR! Contact already exists in group:"<<group->getGroupName();
-                return false;
-            }
-        }
-    }
+//    QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
+//    foreach (ContactGroupBase *group, groups) {
+//        if(group->hasMember(contactID)){
+//            //if(group->getGroupID() == ContactGroupBase::Group_Strangers_ID){
+//                group->deleteMember(contactID);
+//            //}else{
+//            //    qDebug()<<"ERROR! Contact "<<contactID<<" already exists in group:"<<group->getGroupName();
+//            //    return false;
+//            //}
+//        }
+//    }
+
+    deleteContact(contactID);
 
 
     contactGroup->addMember(contactID);
     updatePersonalContactGroupsInfoVersion();
 
-    //    addUpdatedProperty(IM::PI_PersonalContactGroupsInfoString, "'"+getContactGroupsInfoString()+"'");
     
     return true;
 
@@ -812,8 +813,6 @@ bool IMUserBase::addNewContact(const QString &contactID, int groupID){
 bool IMUserBase::deleteContact(const QString &contactID){
 
     QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
-    //groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Strangers_ID));
-    //groups.removeAll(personalContactGroupsHash.value(ContactGroupBase::Group_Blacklist_ID));
 
     foreach (ContactGroupBase *contactGroup, groups) {
         if(contactGroup->hasMember(contactID)){

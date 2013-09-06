@@ -79,7 +79,7 @@ public:
         return m_remarkName;
     }
     void setRemarkName(const QString &remarkName){
-        qDebug()<<"---setRemarkName()";
+        //qDebug()<<"---setRemarkName()";
         this->m_remarkName = remarkName;
         addUpdatedPersonalInfoProperty(IM::PI_RemarkName, "'" + m_remarkName + "'", true);
     }

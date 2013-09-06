@@ -279,6 +279,21 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                                            userInfo->getPersonalMessageInfoVersion()
                                            );
 
+
+            //Send all contact groups info to user
+            sendPersonalContactGroupsInfoPacket(socketID, userInfo->getContactGroupsInfoString(), userInfo->getPersonalContactGroupsVersion(), userInfo->getSessionEncryptionKey());
+
+            //Send all online contacts list to user
+            sendContactsOnlineInfo(socketID, userInfo);
+
+            //Send all contacts version info to user
+            QString contactsInfoString = "";
+            if(getUserAllContactsInfoVersionFromDatabase(userInfo, &contactsInfoString)){
+                if(!contactsInfoString.trimmed().isEmpty()){
+                    sendPersonalContactsInfoVersionPacket(socketID, contactsInfoString, userInfo->getPersonalContactGroupsVersion(), sessionEncryptionKey);
+                }
+            }
+
             //Send last login info
             sendClientLastLoginInfoPacket(socketID, sessionEncryptionKey,
                                           userInfo->getLastLoginExternalHostAddress(),
@@ -289,15 +304,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             //Save login or logout info, send info to contacts
             processUserOnlineStatusChanged(userInfo, onlineStateCode, peerAddress.toString(), peerPort, deviceInfo);
 
-            //Send all contacts version info to user
-            QString contactsInfoString = "";
-            //if(getUserAllContactsInfoVersionFromDatabase(userInfo, &contactsInfoString)){
-            if(getUserAllContactsInfoFromDatabase(userInfo, &contactsInfoString)){
-                sendPersonalContactsInfoVersionPacket(socketID, contactsInfoString, userInfo->getPersonalContactGroupsVersion(), sessionEncryptionKey);
-            }
 
-            //Send all online contacts list to user
-            sendContactsOnlineInfo(socketID, userInfo);
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
