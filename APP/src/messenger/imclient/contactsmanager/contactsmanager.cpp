@@ -419,6 +419,7 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 }
 
 Contact * ContactsManager::createNewContact(const QString &contactID, const QString &nickname, const QString &face){
+    qDebug()<<"--ContactsManager::createNewContact(...) "<<" contactID:"<<contactID;
 
     Contact *contact = 0;
     if(contactHash.contains(contactID)){
@@ -571,6 +572,78 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 
 }
 
+void ContactsManager::slotFetchAllContactsInfoFromDB(){
+    qDebug()<<"ContactsManager::slotFetchAllContactsInfoFromDB()";
+
+
+    QSqlQueryModel *contactsModel = new QSqlQueryModel(this);
+
+    QString contactsQueryString = QString("select * from contacts_detailed_info;");
+
+    contactsModel->setQuery(queryDatabase(contactsQueryString, true));
+    if(contactsModel->lastError().type() != QSqlError::NoError){
+        qCritical()<<"Query Error!"<<contactsModel->lastError().text();
+        delete contactsModel;
+        return;
+    }
+
+    while (contactsModel->canFetchMore()) {
+        contactsModel->fetchMore();
+    }
+
+    for (int j=0; j<contactsModel->rowCount(); j++) {
+        QString contactUID = QVariant(contactsModel->record(j).value("UserID")).toString();
+        Contact *contact = getUser(contactUID);
+        if(!contact){
+            contact = new Contact(contactUID, this);
+        }
+
+        contact->setTrueName(QVariant(contactsModel->record(j).value("TrueName")).toString());
+        contact->setNickName(QVariant(contactsModel->record(j).value("NickName")).toString());
+        contact->setGender(IMUserBase::Gender(QVariant(contactsModel->record(j).value("Gender")).toUInt()));
+        contact->setAge(IMUserBase::Gender(QVariant(contactsModel->record(j).value("Age")).toUInt()));
+        contact->setFace(QVariant(contactsModel->record(j).value("Face")).toString());
+
+        contact->setContactGroupID(IMUserBase::Gender(QVariant(contactsModel->record(j).value("ContactGroupID")).toInt()));
+
+        //            contact->setInterestGroupID(QVariant(contactsModel->record(j).value("InterestGroupID")).toUInt());
+        //            contact->setSystemGroupID(QVariant(contactsModel->record(j).value("SystemGroupID")).toUInt());
+        contact->setPersonalDetailInfoVersion(QVariant(contactsModel->record(j).value("PersonalInfoVersion")).toUInt());
+
+        contact->setHomeAddress(QVariant(contactsModel->record(j).value("HomeAddress")).toString());
+        contact->setHomePhoneNumber(QVariant(contactsModel->record(j).value("HomePhoneNumber")).toString());
+        contact->setHomeZipCode(QVariant(contactsModel->record(j).value("HomeZipCode")).toString());
+        contact->setPersonalHomepage(QVariant(contactsModel->record(j).value("PersonalHomepage")).toString());
+        contact->setPersonalEmailAddress(QVariant(contactsModel->record(j).value("PersonalEmailAddress")).toString());
+
+        contact->setLastLoginTime(QVariant(contactsModel->record(j).value("LastLoginTime")).toDateTime());
+        contact->setLastLoginExternalHostAddress(QVariant(contactsModel->record(j).value("LastLoginHostAddress")).toString());
+        contact->setLastLoginExternalHostPort(QVariant(contactsModel->record(j).value("LastLoginHostPort")).toUInt());
+
+        //contact->setQuestionForSecurity(QVariant(contactsModel->record(j).value("QuestionForSecurity")).toString());
+        //contact->setAnswerForSecurity(QVariant(contactsModel->record(j).value("AnswerForSecurity")).toString());
+        contact->setCompanyName(QVariant(contactsModel->record(j).value("CompanyName")).toString());
+        contact->setJobTitle(QVariant(contactsModel->record(j).value("JobTitle")).toString());
+        contact->setBusinessAddress(QVariant(contactsModel->record(j).value("BusinessAddress")).toString());
+        contact->setBusinessPhoneNumber(QVariant(contactsModel->record(j).value("BusinessPhoneNumber")).toString());
+        contact->setBusinessZipCode(QVariant(contactsModel->record(j).value("BusinessZipCode")).toString());
+        contact->setBusinessFaxNumber(QVariant(contactsModel->record(j).value("BusinessFaxNumber")).toString());
+        contact->setBusinessHomepage(QVariant(contactsModel->record(j).value("BusinessHomepage")).toString());
+        contact->setBusinessEmailAddress(QVariant(contactsModel->record(j).value("BusinessEmailAddress")).toString());
+        contact->setRegistrationTime(QVariant(contactsModel->record(j).value("RegistrationTime")).toDateTime());
+        contact->setLoginTimes(QVariant(contactsModel->record(j).value("LoginTimes")).toInt());
+        contact->setRemarkName(QVariant(contactsModel->record(j).value("RemarkName")).toString());
+
+        contactHash.insert(contactUID, contact);
+
+
+    }
+
+
+    contactsModel->deleteLater();
+
+
+}
 
 void ContactsManager::slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName){
     qDebug()<<"--ContactsManager::slotAddNewContactGroupToUI(...)";
@@ -807,9 +880,7 @@ bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, 
 
 void ContactsManager::slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo){
 
-    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)";
-    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~contactID:"<<contactID;
-    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...)~~greetingInfo:"<<greetingInfo;
+    qDebug()<<"----ContactsManager::slotChangeContactOnlineState(...) "<<" contactID:"<<contactID;
 
     Contact *contact = contactHash.value(contactID);
     contact->setOnlineState(IM::OnlineState(onlineStateCode));
@@ -1265,16 +1336,8 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
             return false;
         }
     }
+
     QSqlQuery query(localUserDataDB);
-    
-    Contact *contact = 0;
-    if(contactHash.contains(contactID)){
-        contact = contactHash.value(contactID);
-    }else{
-        contact = new Contact(contactID, this);
-        contactHash.insert(contactID, contact);
-    }
-    
     QSqlRecord record;
     QString statement = QString("select * from contacts_detailed_info where UserID='%2' ").arg(contactID);
 
@@ -1285,7 +1348,14 @@ bool ContactsManager::getContactInfoFormLocalDatabase(const QString &contactID){
         return false;
     }
     
-    
+    Contact *contact = 0;
+    if(contactHash.contains(contactID)){
+        contact = contactHash.value(contactID);
+    }else{
+        contact = new Contact(contactID, this);
+        contactHash.insert(contactID, contact);
+    }
+
     //    query = queryDatabase(statement, false);
     //    if((query.lastError().type() != QSqlError::NoError)){
     //        qCritical()<<QString("Can not query data from local database! Error: %1").arg(query.lastError().text());

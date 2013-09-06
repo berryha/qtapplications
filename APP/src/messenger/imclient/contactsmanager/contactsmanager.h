@@ -72,6 +72,7 @@ public:
 public slots:
     //void slotUpdateContactsInfo2();
     void slotFetchAllContactsInfo(ItemBoxWidget *expandListView);
+    void slotFetchAllContactsInfoFromDB();
 
 
     void slotAddNewContactGroupToUI(ItemBoxWidget *expandListView, int personalContactGroupID, const QString &groupName);
