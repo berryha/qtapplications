@@ -440,7 +440,7 @@ Contact * ContactsManager::createNewContact(const QString &contactID, const QStr
 
 }
 
-void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
+void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
     qDebug()<<"ContactsManager::slotFetchAllContactsInfo(...)";
 
     QString groupQueryString = QString("select * from contactgroups;");
@@ -549,7 +549,7 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
 
         group->clearUpdatedProperties();
 
-        slotLoadContacts(expandListView, groupID, groupName, list);
+        slotLoadContactGroupToUI(expandListView, groupID, groupName, list);
 
     }
 
@@ -559,7 +559,6 @@ void ContactsManager::slotFetchAllContactsInfo(ItemBoxWidget *expandListView){
     if(!m_imUser->isStrangersShown()){
         expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
     }
-
 
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Friends_ID), true);
     expandListView->setCategoryExpanded(QString::number(ContactGroupBase::Group_Strangers_ID), false);
@@ -750,12 +749,8 @@ void ContactsManager::renameContactGroupToUI(ItemBoxWidget *expandListView, quin
 }
 
 
-void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
-    qDebug()<<"--ContactsManager::slotLoadContacts(...)  groupID:"<<groupID<<" groupName:"<<groupName;
-
-    //	Category *category = new Category();
-    //	category->setID(QString::number(groupID));
-    //	category->setName(groupName);
+void ContactsManager::slotLoadContactGroupToUI(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList){
+    qDebug()<<"--ContactsManager::slotLoadContactGroupToUI(...)  groupID:"<<groupID<<" groupName:"<<groupName;
 
     Category category;
     category.setID(QString::number(groupID));
@@ -800,6 +795,9 @@ void ContactsManager::slotLoadContacts(ItemBoxWidget *expandListView, int groupI
 
     addNewContactGroupToUI(expandListView, category);
 
+//    expandListView->setCategoryExpanded(QString::number(groupID), false);
+
+
 
 }
 
@@ -818,11 +816,15 @@ inline void ContactsManager::addNewContactGroupToUI(ItemBoxWidget *expandListVie
     int groupID = category.id().toInt();
     if(groupID == ContactGroupBase::Group_Friends_ID){
         expandListView->addCategory(category, 0);
-    }else if(groupID == ContactGroupBase::Group_Strangers_ID || groupID == ContactGroupBase::Group_Blacklist_ID){
+    }else if(groupID == ContactGroupBase::Group_Strangers_ID ){
+        expandListView->addCategory(category, expandListView->categoryCount()-1);
+    }else if(groupID == ContactGroupBase::Group_Blacklist_ID){
         expandListView->addCategory(category, -1);
     }else{
         expandListView->addCategory(category, 1);
     }
+
+
 
 }
 //bool ContactsManager::addContact(const QString &contactID, quint32 groupID){

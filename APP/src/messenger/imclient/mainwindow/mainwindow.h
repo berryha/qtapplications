@@ -68,7 +68,7 @@ public slots:
 
     void slotQuit();
 
-    void slotUpdateContactsInfo();
+    void slotUpdateContactsInfo2();
 //    void slotUpdateBlacklistInfo();
 
     void updateAllInterestGroupsInfoToUI();
