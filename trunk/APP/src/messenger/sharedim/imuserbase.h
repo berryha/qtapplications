@@ -272,7 +272,7 @@ public slots:
 
 
     QList<ContactGroupBase *> getContactGroups(bool noStrangers = true, bool noBlacklisted = true);
-    QStringList contactGroupNames();
+    QStringList friendContactGroupNames();
     ContactGroupBase * getContactGroup(int personalContactGroupID);
     ContactGroupBase * getContactGroup(const QString &groupName);
     quint32 getContactGroupID(const QString &groupName);

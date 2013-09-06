@@ -71,7 +71,7 @@ public:
 
 public slots:
     //void slotUpdateContactsInfo2();
-    void slotFetchAllContactsInfo(ItemBoxWidget *expandListView);
+    void slotFetchAllContactsInfo2(ItemBoxWidget *expandListView);
     void slotFetchAllContactsInfoFromDB();
 
 
@@ -120,11 +120,11 @@ public slots:
     bool slotAddNewContactToDatabase(Contact *contact);
     bool slotdeleteContactFromDatabase(Contact *contact);
 
+    void slotLoadContactGroupToUI(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
 
 private slots:
     //void slotSetupContacts(bool loadFromFile, const QString &string);
     //void slotLoadContacts(ItemBoxWidget *widgetBox, bool loadFromFile = true, const QString &string = "");
-    void slotLoadContacts(ItemBoxWidget *expandListView, int groupID, const QString groupName, QList<Contact*> contactList);
     void addNewContactGroupToUI(ItemBoxWidget *expandListView, Category category);
 
     //void slotLoadContacts(ItemBoxWidget *expandListView,ContactGroup *contactGroup);

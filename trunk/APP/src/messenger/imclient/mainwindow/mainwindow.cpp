@@ -1066,12 +1066,12 @@ void MainWindow::showDeleteContactDialog(Contact *contact, bool blacklistMode){
 
 }
 
-void MainWindow::slotUpdateContactsInfo(){
+void MainWindow::slotUpdateContactsInfo2(){
     qDebug()<<"----MainWindow::slotUpdateContactsInfo()";
 
 
 
-    m_contactsManager->slotFetchAllContactsInfo(friendBox);
+//    m_contactsManager->slotFetchAllContactsInfo(friendBox);
 
     ui.contactsToolBox->setEnabled(true);
     ui.stackedWidget->setCurrentWidget(ui.mainPage);
@@ -1689,6 +1689,9 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     m_contactsManager->slotFetchAllContactsInfoFromDB();
 
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups(false, false);
+    ContactGroupBase * strangersGroup = m_imUser->strangersGroup();
+    groups.removeAll(strangersGroup);
+
     QHash<QString/*Contact ID*/, Contact*> users = m_contactsManager->getAllUsers();
     foreach (ContactGroupBase *contactGroup, groups) {
         quint32 groupID = contactGroup->getGroupID();
@@ -1699,7 +1702,9 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 QMessageBox::critical(this, tr("Error"), tr("Can not save contact group '%1' !").arg(groupName));
             }
         }
+        //m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
 
+        QList<Contact*> list;
         QStringList members = contactGroup->members();
         foreach (QString contactID, members) {
             Contact *contact = users.take(contactID);
@@ -1710,17 +1715,36 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 contact->setContactGroupID(groupID);
                 m_contactsManager->saveContactInfoToDatabase(contactID);
             }
+            //m_contactsManager->addContactToUI(friendBox, groupID, contactID);
+            list.append(contact);
         }
+
+        m_contactsManager->slotLoadContactGroupToUI(friendBox, groupID, groupName, list);
     }
 
-    ContactGroupBase * strangersGroup = m_imUser->strangersGroup();
     strangersGroup->setMembers(users.keys());
+    QList<Contact*> strangersList;
+    int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
     foreach (Contact *contact, users.values()) {
-        contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
+        contact->setContactGroupID(strangersGroupID);
+        //m_contactsManager->addContactToUI(friendBox, strangersGroupID, contact->getUserID());
+        strangersList.append(contact);
     }
+    m_contactsManager->slotLoadContactGroupToUI(friendBox, strangersGroupID, strangersGroup->getGroupName(), strangersList);
 
 
-    slotUpdateContactsInfo();
+    if(!m_imUser->isStrangersShown()){
+        friendBox->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
+    }
+    friendBox->collapseAllCategories();
+    friendBox->setCategoryExpanded(QString::number(ContactGroupBase::Group_Friends_ID), true);
+
+
+//    slotUpdateContactsInfo();
+
+    ui.contactsToolBox->setEnabled(true);
+    ui.stackedWidget->setCurrentWidget(ui.mainPage);
+    setWindowTitle(m_imUser->getUserID());
 
 }
 
@@ -1779,7 +1803,7 @@ void MainWindow::slotProcessContactGroupsInfo2(const QString &contactGroupsInfo,
 //    }
 
 
-    slotUpdateContactsInfo();
+    slotUpdateContactsInfo2();
 //    m_contactsManager->slotFetchAllContactsInfo(friendBox);
 
 }
