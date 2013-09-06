@@ -314,6 +314,16 @@ void ItemBoxWidget::clearFilterWidget(){
     filterWidget->reset();
 }
 
+void ItemBoxWidget::expandAllCategories(){
+    m_treeWidget->expandAll();
+}
+
+void ItemBoxWidget::collapseAllCategories(){
+    m_treeWidget->collapseAll();
+}
+
+
+
 
 
 } //namespace HEHUI

@@ -108,6 +108,11 @@ public:
     void setFilterWidgetVisible(bool visible);
     void clearFilterWidget();
 
+public slots:
+    void expandAllCategories();
+    void collapseAllCategories();
+
+
 protected:
     bool eventFilter(QObject *o, QEvent *e);
 
