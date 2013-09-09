@@ -402,7 +402,7 @@ void LoginWidget::on_loginToolButton_clicked() {
     if (userName().isEmpty()) {
 
         QMessageBox::critical(this, tr("What's your name?"), tr(
-                                  "<b>How can I help you?<br> I don't know how to do that, I don't know!</b>"));
+                                  "<b>ID Required!</b>"));
 
         ui.idComboBox->setFocus();
         return;
@@ -410,7 +410,7 @@ void LoginWidget::on_loginToolButton_clicked() {
     } else if (passWord().isEmpty()) {
 
         QMessageBox::critical(this, tr("What's your password?"), tr(
-                                  "<b>How can I help you?<br> I don't know how to do that, I don't know!</b>"));
+                                  "<b>Password Required!</b>"));
         ui.passwordLineEdit->setFocus();
         return;
 
@@ -541,7 +541,7 @@ void LoginWidget::on_unlockToolButton_clicked() {
     QString str = ui.keyLineEdit->text().trimmed();
     if(str.isEmpty()){
         QMessageBox::critical(this, tr("Lost your key?"), tr(
-                                  "<b>How can I help you?<br> I don't know how to do that, I don't know!</b>"));
+                                  "<b>Password Required!</b>"));
         ui.keyLineEdit->setFocus();
         return;
     }else{

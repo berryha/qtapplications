@@ -151,6 +151,7 @@ private slots:
 
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
     void loginTimeout();
+    void destoryLoginTimer();
 
     void requestRegistrationServerInfo();
     void requestRegistration();
@@ -242,7 +243,7 @@ private:
     QHostAddress m_serverHostAddress;
     quint16 m_serverHostPort;
     bool m_verified;
-    //    QTimer *m_loginTimer;
+    QTimer *m_loginTimer;
 
     FileManager *m_fileManager;
     QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;

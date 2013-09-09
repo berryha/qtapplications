@@ -418,23 +418,29 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 
 }
 
-Contact * ContactsManager::createNewContact(const QString &contactID, const QString &nickname, const QString &face){
-    qDebug()<<"--ContactsManager::createNewContact(...) "<<" contactID:"<<contactID;
+Contact * ContactsManager::createNewContact(const QString &contactID, int groupID, const QString &nickname, const QString &face){
+    qDebug()<<"--ContactsManager::createNewContact(...) "<<" contactID:"<<contactID<<" groupID:"<<groupID;
+
+
+    Q_ASSERT(!contactHash.contains(contactID));
 
     Contact *contact = 0;
-    if(contactHash.contains(contactID)){
-        contact = contactHash.value(contactID);
-        contact->setNickName(nickname);
-        contact->setFace(face);
-    }else{
+//    if(contactHash.contains(contactID)){
+//        contact = contactHash.value(contactID);
+//        contact->setNickName(nickname);
+//        contact->setFace(face);
+//        contact->setContactGroupID(groupID);
+//    }else{
         contact = new Contact(contactID, nickname, this);
         contact->setFace(face);
+        contact->setContactGroupID(groupID);
+
         if(!slotAddNewContactToDatabase(contact)){
             //delete contact;
             //contact = 0;
         }
 
-    }
+//    }
 
     return contact;
 
@@ -573,6 +579,13 @@ void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
 
 void ContactsManager::slotFetchAllContactsInfoFromDB(){
     qDebug()<<"ContactsManager::slotFetchAllContactsInfoFromDB()";
+
+    Q_ASSERT(contactHash.isEmpty());
+    foreach (Contact *contact, contactHash.values()) {
+        delete contact;
+        contact = 0;
+    }
+    contactHash.clear();
 
 
     QSqlQueryModel *contactsModel = new QSqlQueryModel(this);
