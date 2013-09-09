@@ -67,7 +67,7 @@ public:
     bool saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time = "");
 
 
-    Contact * createNewContact(const QString &contactID, const QString &nickname = "", const QString &face = "");
+    Contact * createNewContact(const QString &contactID, int groupID = ContactGroupBase::Group_Strangers_ID, const QString &nickname = "", const QString &face = "");
 
 public slots:
     //void slotUpdateContactsInfo2();

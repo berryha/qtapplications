@@ -136,8 +136,9 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     m_serverHostAddress = QHostAddress::Null;
     m_serverHostPort = 0;
-    //    m_loginTimer = 0;
     m_verified = false;
+
+    m_loginTimer = 0;
 
     m_fileManager = 0;
 
@@ -444,14 +445,11 @@ void MainWindow::startNetwork(){
 
 void MainWindow::stopNetwork(){
 
+    destoryLoginTimer();
+
     m_serverHostAddress = QHostAddress::Null;
     m_serverHostPort = 0;
 
-    //    if(m_loginTimer){
-    //        m_loginTimer->stop();
-    //        delete m_loginTimer;
-    //        m_loginTimer = 0;
-    //    }
 
     if(clientPacketsParser){
         clientPacketsParser->logout(m_socketConnectedToServer);
@@ -1358,10 +1356,8 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
     if(contactID.trimmed().isEmpty()){
         return;
     }
-    Contact *contact = 0;
-    if(m_imUser->hasFriendContact(contactID)){
-        contact = m_contactsManager->getUser(contactID);
-    }else{
+    Contact *contact = m_contactsManager->getUser(contactID);
+    if(!contact){
         QMessageBox::critical(this, tr("Error"), tr("Contact '%1' does not exist!").arg(contactID));
         return;
     }
@@ -1582,6 +1578,9 @@ void MainWindow::slotProcessLoginServerRedirected(const QString &serverAddress, 
 }
 
 void MainWindow::slotProcessLoginResult(quint8 errorTypeCode){
+
+    destoryLoginTimer();
+
     //TODO:处理登陆结果
     //    QMessageBox::information(this, "A", "slotProcessLoginResult");
     ui.loginPage->slotProcessLoginResult(errorTypeCode);
@@ -1709,7 +1708,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         foreach (QString contactID, members) {
             Contact *contact = users.take(contactID);
             if(!contact){
-                contact =  m_contactsManager->createNewContact(contactID);
+                contact =  m_contactsManager->createNewContact(contactID, groupID);
             }
             if(contact->getContactGroupID() != groupID){
                 contact->setContactGroupID(groupID);
@@ -1780,7 +1779,7 @@ void MainWindow::slotProcessContactGroupsInfo2(const QString &contactGroupsInfo,
         foreach (QString contactID, members) {
             Contact *contact = users.take(contactID);
             if(!contact){
-                contact =  m_contactsManager->createNewContact(contactID);
+                contact =  m_contactsManager->createNewContact(contactID, groupID);
                 //clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
             if(contact->getContactGroupID() != groupID){
@@ -1915,17 +1914,12 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
     case IM::ERROR_NoError :
     {
 
-        Contact *contact =  m_contactsManager->createNewContact(contactID, userNickName, userFace);
-        Q_ASSERT(contact);
-
-
         //Save contact to default group
         quint32 groupID = ContactGroupBase::Group_Friends_ID;
-
-        contact->setContactGroupID(groupID);
-
-//        m_contactsManager->addContact(contactID, groupID, true);
-        m_contactsManager->saveContactInfoToDatabase(contactID);
+        Contact *contact =  m_contactsManager->createNewContact(contactID, groupID, userNickName, userFace);
+        Q_ASSERT(contact);
+        //contact->setContactGroupID(groupID);
+        //m_contactsManager->saveContactInfoToDatabase(contactID);
 
         m_contactsManager->addContactToUI(friendBox, groupID, contactID);
 
@@ -2492,22 +2486,35 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
 
     clientPacketsParser->requestLogin(m_socketConnectedToServer);
 
-    QTimer::singleShot(10000, this, SLOT(loginTimeout()));
+//    QTimer::singleShot(10000, this, SLOT(loginTimeout()));
 
-    //    if(!m_loginTimer){
-    //        m_loginTimer = new QTimer(this);
-    //        m_loginTimer->setSingleShot(true);
-    //        connect(m_loginTimer, SIGNAL(timeout()), this, SLOT(loginTimeout()));
-    //    }
-    //    m_loginTimer->start(10000);
+    if(!m_loginTimer){
+        m_loginTimer = new QTimer(this);
+        m_loginTimer->setSingleShot(true);
+        connect(m_loginTimer, SIGNAL(timeout()), this, SLOT(loginTimeout()));
+    }
+    m_loginTimer->start(10000);
 
 }
 
 void MainWindow::loginTimeout(){
 
+    destoryLoginTimer();
+
     if(!m_verified){
         ui.loginPage->slotProcessLoginResult(IM::ERROR_Timeout);
     }
+
+}
+
+void MainWindow::destoryLoginTimer(){
+    if(!m_loginTimer){
+       return;
+    }
+
+    m_loginTimer->stop();
+    delete m_loginTimer;
+    m_loginTimer = 0;
 
 }
 
@@ -2584,11 +2591,6 @@ void MainWindow::peerConnected(int socketID, const QString &peerAddress, quint16
         //clientPacketsParser->requestLogin(m_socketConnectedToServer);
         m_socketConnectedToServer = socketID;
 
-        //        if(m_loginTimer){
-        //            m_loginTimer->stop();
-        //            delete m_loginTimer;
-        //            m_loginTimer = 0;
-        //        }
         emit signalServerOnlineStateChanged(true);
     }else{
 

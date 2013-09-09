@@ -1451,7 +1451,7 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 *group
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4, @GroupInfoVersion); ").arg(info->getUserID()).arg(gID).arg(groupName).arg(createGroup?1:0);
+    QString statement = QString("call sp_ContactGroup_CreateOrDelete('%1', %2, '%3', %4); ").arg(info->getUserID()).arg(gID).arg(groupName).arg(createGroup?1:0);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1461,18 +1461,18 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 *group
         return false;
     }
 
-    statement = QString(" select @GroupInfoVersion; ");
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
+//    statement = QString(" select @GroupInfoVersion; ");
+//    if(!query.exec(statement)){
+//        QSqlError error = query.lastError();
+//        QString msg = QString("Can not query contact groups info version for user '%1'! %2 Error Type:%3 Error NO.:%4").arg(info->getUserID()).arg(error.text()).arg(error.type()).arg(error.number());
+//        qCritical()<<msg;
 
-        return false;
-    }
-    if(query.first()){
-        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
-        info->clearUpdatedProperties();
-    }
+//        return false;
+//    }
+//    if(query.first()){
+//        info->setPersonalContactGroupsVersion(query.value(0).toUInt());
+//        info->clearUpdatedProperties();
+//    }
 
     if(createGroup){
         info->addContactGroup(gID, groupName);
@@ -1480,7 +1480,7 @@ bool UsersManager::createOrDeleteContactGroupInDB(UserInfo* info, quint32 *group
     }else{
         info->deleteContactGroup(gID);
     }
-    qDebug()<<"Contact Groups:"<<info->getContactGroupsInfoString();
+//    qDebug()<<"Contact Groups:"<<info->getContactGroupsInfoString();
 
 
     return true;
