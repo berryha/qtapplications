@@ -142,7 +142,6 @@ private:
 
 
     bool getUserAllContactGroupsInfoFromDatabase(UserInfo* info);
-    bool getUserBlacklistedContactsInfoFromDB(UserInfo* info);
 
 
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
