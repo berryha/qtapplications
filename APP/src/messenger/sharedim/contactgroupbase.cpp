@@ -89,7 +89,8 @@ QStringList ContactGroupBase::members() const{
 }
 
 void ContactGroupBase::setMembers(const QStringList &members){
-    this->membersList = members;
+    membersList.clear();
+    membersList.append(members);
 }
 
 int ContactGroupBase::countOfMembers(){

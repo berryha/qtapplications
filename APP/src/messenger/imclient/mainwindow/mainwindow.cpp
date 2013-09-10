@@ -1424,18 +1424,7 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
 
     qDebug()<<"--MainWindow::handleTooltipEventOnItem()--contactID:"<<contactID;
 
-    //    if(!m_userInfoTipWindow){
-    //        m_userInfoTipWindow = new UserInfoTipWindow(this);
-    //    }
 
-
-//    Contact *contact = 0;
-//    if(imUser->hasFriendContact(contactID)){
-//        contact = contactsManager->getUser(contactID);
-//    }else{
-//        m_userInfoTipWindow->hideUserInfoTip();
-//        return;
-//    }
     Contact *contact = m_contactsManager->getUser(contactID);
     if(!contact){
         m_userInfoTipWindow->hideUserInfoTip();
@@ -1721,7 +1710,9 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         m_contactsManager->slotLoadContactGroupToUI(friendBox, groupID, groupName, list);
     }
 
-    strangersGroup->setMembers(users.keys());
+
+    QStringList strangers = users.keys();
+    strangersGroup->setMembers(strangers);
     QList<Contact*> strangersList;
     int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
     foreach (Contact *contact, users.values()) {
@@ -1744,6 +1735,11 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     ui.contactsToolBox->setEnabled(true);
     ui.stackedWidget->setCurrentWidget(ui.mainPage);
     setWindowTitle(m_imUser->getUserID());
+
+
+    if(contactGroupsInfo.trimmed().isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Invalid contact groups info!"));
+    }
 
 }
 

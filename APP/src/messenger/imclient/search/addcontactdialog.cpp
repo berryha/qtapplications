@@ -35,7 +35,6 @@ AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, Q
         ui.pushButtonReject->hide();
         ui.pushButtonAddAsAContact->setText(tr("&OK"));
 
-        initContactGroupCombox();
 
         ui.groupBoxSettings->show();
         ui.lineEditRename->setFocus();
@@ -177,6 +176,8 @@ inline void AddContactDialog::initUI(){
     ui.groupBoxMessage->hide();
     ui.lineEditMessage->setReadOnly(true);
     ui.groupBoxSettings->hide();
+
+    initContactGroupCombox();
 
 
     validator = new QRegExpValidator(this);

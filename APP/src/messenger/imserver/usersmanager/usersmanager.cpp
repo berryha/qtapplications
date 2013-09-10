@@ -240,10 +240,10 @@ UserInfo* UsersManager::logUserIn(const QString &userID, const QByteArray &encry
 
         //Get contact groups info
         getUserAllContactGroupsInfoFromDatabase(userInfo);
-        //Load blacklist
-        getUserBlacklistedContactsInfoFromDB(userInfo);
+
         //Load interest groups
         getUserInterestGroupsFromDB(userInfo);
+
         //Load Last login info
         getUserLastLoginInfo(userInfo);
 
@@ -437,17 +437,6 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
     
 }
 
-
-
-
-
-
-
-
-
-
-
-
 bool UsersManager::saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message){
 
     if(!db.isValid()){
@@ -460,21 +449,12 @@ bool UsersManager::saveCachedChatMessageFromIMUser(const QString &senderID, cons
     QString msg = message;
     msg.replace("'", "\\'");
     msg.replace("\"", "\\\"");
-    QString statement = QString("insert into cachedchatmessages(SenderID, RecieverID, Message) values('%1', '%2', '%3' )  ").arg(senderID).arg(receiverID).arg(msg);
+    QString statement = QString("call sp_CacheChatMessage_FromContact('%1', '%2', '%3' )  ").arg(senderID).arg(receiverID).arg(msg);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save data to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
 
@@ -1292,42 +1272,6 @@ bool UsersManager::getUserInterestGroupsFromDB(UserInfo* info){
 
 }
 
-
-bool UsersManager::getUserBlacklistedContactsInfoFromDB(UserInfo* info){
-
-    //infoString FORMATE: UserID,UserID,...
-    //e.g. user1,user2,user3
-
-
-    if(!info){
-        return false;
-    }
-
-    if(!db.isValid()){
-        if(!openDatabase()){
-            return false;
-        }
-    }
-    QSqlQuery query(db);
-    QString statement = QString("call sp_GetBlacklistedContactsInfoForUserAsString('%1'); ").arg(info->getUserID());
-
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not query user blacklisted contacts info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
-
-        return false;
-    }
-
-    query.first();
-
-
-    QString infoString = query.value(0).toString();
-    info->setBlacklistInfoString(infoString);
-
-    return true;
-
-}
 
 bool UsersManager::getUserAllContactsInfoFromDatabase(UserInfo* info, QString *infoString){
 

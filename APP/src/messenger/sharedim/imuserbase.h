@@ -306,8 +306,7 @@ public slots:
 
     bool addOrDeleteBlacklistedContact(const QString &contactID, bool addToBlacklist = true);
     quint32 updatePersonalMessageInfoVersion();
-    QString getBlacklistInfoString();
-    void setBlacklistInfoString(const QString &blacklistInfoString);
+
     bool isContactBlacklisted(const QString &contactID);
     QStringList blacklistedContacts();
 
@@ -315,28 +314,26 @@ public slots:
 
     //    QString groupNameThatContactBelongsTo(const QString &contactID) const;
     
-    ContactGroupBase * strangersGroup();
-    ContactGroupBase * blacklistGroup();
+    void ensureDefaultGroups();
+    ContactGroupBase * friendsGroup() const;
+    ContactGroupBase * strangersGroup() const;
+    ContactGroupBase * blacklistGroup() const;
 
 
 private:
 
 
+    ContactGroupBase *m_friendsGroup;
     ContactGroupBase *m_strangersGroup;
     ContactGroupBase *m_blacklistGroup;
 
-    //    QHash<quint32/*Group ID*/, QString/*Group Name*/> systemGroupsHash;
-    //    QHash<quint32/*Group ID*/, QString/*Group Name*/> personalInterestGroupsHash;
-//    QHash<QString/*Group Name*/, QStringList/*Group Members' ID*/> personalContactGroupsHash;
     QHash<int/*Group ID*/, ContactGroupBase *> personalContactGroupsHash;
 
-    //    QHash<QString/*Contact's ID*/, QString/*Contact's Nick Name*/> personalContacts;
 
 
     quint32 personalMessageInfoVersion;
     QString personalMessage;
 
-//    QStringList blacklist;
 
     QStringList interestGroups;
     quint32 interestGroupInfoVersion;
