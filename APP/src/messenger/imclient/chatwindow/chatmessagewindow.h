@@ -11,8 +11,11 @@
 //#include "contactsmanager/contactgroup.h"
 #include "../../sharedim/contactgroupbase.h"
 
+#include "../imuser.h"
+
 
 #include "HHSharedGUI/hscreenshot.h"
+
 
 class QTextBrowser;
 //class MessageEditor;
@@ -28,7 +31,7 @@ public:
 
     ChatMessageWindow(QWidget *parent = 0);
     ChatMessageWindow(Contact *m_contact, QWidget *parent = 0);
-//    ChatMessageWindow(ContactGroup *m_contactGroup, QWidget *parent = 0);
+    //    ChatMessageWindow(ContactGroup *m_contactGroup, QWidget *parent = 0);
     ChatMessageWindow(InterestGroup *m_interestGroup, QWidget *parent = 0);
 
     ~ChatMessageWindow();
@@ -39,26 +42,22 @@ public:
     void setContact(Contact *c);
     Contact * getContact();
 
-//    void setContactGroup(ContactGroup *group);
-//    ContactGroup * getContactGroup();
+    //    void setContactGroup(ContactGroup *group);
+    //    ContactGroup * getContactGroup();
 
     void setInterestGroup(InterestGroup *group);
     InterestGroup * getInterestGroup();
 
 
-    void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
+    void appendChatMessage(const QString &message, IMUserBase *contact, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
 
 
 protected:
     void closeEvent(QCloseEvent * event);
 
-private:
-    void initUI();
-    void getStyleString();
-
 
 signals:
-//    void sendMsgButtonClicked(const QString &contactID, const QString &message, const QStringList &imageList);
+    //    void sendMsgButtonClicked(const QString &contactID, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
 
@@ -68,8 +67,11 @@ public slots:
     void updateImage(const QString &imageName);
     
 private slots:
-    //void sendMsg(const QStringList &msgList);
-    //void sendMsg();
+
+    void emitSendMsgSignal();
+    void emitSendMsgSignal2();
+
+
 
     void showFontFrame();
     void showEmotions();
@@ -88,33 +90,37 @@ private slots:
     void currentCharFormatChanged(const QTextCharFormat &format);
     void cursorPositionChanged();
 
-    void emitSendMsgSignal();
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
     void scrollWebFrameToBottom(const QSize &contentsSize);
 
+
 private:
-    Ui::MessageWindowUi ui;
-    QWebFrame *m_mainWebFrame;
-
-    //const QString &contactID;
-    Contact *m_contact;
-//    ContactGroup *m_contactGroup;
-    InterestGroup *m_interestGroup;
-    ChatMessageWindowType m_chatMessageWindowType;
-
-    QString myDisplayName;
-    QString myUserID;
-    QString imageCachePath;
+    void initUI();
+    void getStyleString();
 
     void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
     void fontChanged(const QFont &f);
     void colorChanged(const QColor &c);
     void alignmentChanged(Qt::Alignment a);
 
-    void appendMessage(const QString &message);
+    QString getRichMessageBlock() const;
 
+private:
+    Ui::MessageWindowUi ui;
+    QWebFrame *m_mainWebFrame;
+
+    //const QString &contactID;
+    IMUser *m_myself;
+    Contact *m_contact;
+    //    ContactGroup *m_contactGroup;
+    InterestGroup *m_interestGroup;
+    ChatMessageWindowType m_chatMessageWindowType;
+
+    QString myDisplayName;
+    QString myUserID;
+    QString imageCachePath;
 
 
     //EmotionsListPage *emotionsListPage;
