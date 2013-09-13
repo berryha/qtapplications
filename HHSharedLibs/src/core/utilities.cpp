@@ -36,6 +36,12 @@
 #include <QDir>
 #include <QMutexLocker>
 #include <QDebug>
+#include <QFile>
+#include <QCryptographicHash>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+
+
 
 #include "utilities.h"
 
@@ -212,6 +218,120 @@ void Utilities::msleep(int msec){
 #endif
 
 }
+
+const QString Utilities::getFileMD5EncodedWithBase64(const QString &fileName){
+
+    QString md5String = "";
+
+    QByteArray ba;
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly)) {
+        qCritical()<< QString("ERROR! Failed to open file '%1'! %2").arg(fileName).arg(file.errorString());
+        return md5String;
+    }
+    ba = file.readAll();
+    file.close();
+
+    md5String = QCryptographicHash::hash(ba, QCryptographicHash::Md5).toBase64();
+
+    return md5String;
+
+}
+
+
+// Richtext simplification filter helpers: Elements to be discarded
+static inline bool filterElement(const QStringRef &name)
+{
+    return name != QStringLiteral("meta") && name != QStringLiteral("style");
+}
+
+// Richtext simplification filter helpers: Filter attributes of elements
+static inline void filterAttributes(const QStringRef &name,
+                                    QXmlStreamAttributes *atts,
+                                    bool *paragraphAlignmentFound)
+{
+    typedef QXmlStreamAttributes::iterator AttributeIt;
+
+    if (atts->isEmpty())
+        return;
+
+     // No style attributes for <body>
+    if (name == QStringLiteral("body")) {
+        atts->clear();
+        return;
+    }
+
+    // Clean out everything except 'align' for 'p'
+    if (name == QStringLiteral("p")) {
+        for (AttributeIt it = atts->begin(); it != atts->end(); ) {
+            if (it->name() == QStringLiteral("align")) {
+                ++it;
+                *paragraphAlignmentFound = true;
+            } else {
+                it = atts->erase(it);
+            }
+        }
+        return;
+    }
+}
+
+// Richtext simplification filter helpers: Check for blank QStringRef.
+static inline bool isWhiteSpace(const QStringRef &in)
+{
+    const int count = in.size();
+    for (int i = 0; i < count; i++)
+        if (!in.at(i).isSpace())
+            return false;
+    return true;
+}
+
+// Richtext simplification filter: Remove hard-coded font settings,
+// <style> elements, <p> attributes other than 'align' and
+// and unnecessary meta-information.
+QString Utilities::simplifyRichTextFilter(const QString &in, bool *isPlainTextPtr)
+{
+    unsigned elementCount = 0;
+    bool paragraphAlignmentFound = false;
+    QString out;
+    QXmlStreamReader reader(in);
+    QXmlStreamWriter writer(&out);
+    writer.setAutoFormatting(false);
+    writer.setAutoFormattingIndent(0);
+
+    while (!reader.atEnd()) {
+        switch (reader.readNext()) {
+        case QXmlStreamReader::StartElement:
+            elementCount++;
+            if (filterElement(reader.name())) {
+                const QStringRef name = reader.name();
+                QXmlStreamAttributes attributes = reader.attributes();
+                filterAttributes(name, &attributes, &paragraphAlignmentFound);
+                writer.writeStartElement(name.toString());
+                if (!attributes.isEmpty())
+                    writer.writeAttributes(attributes);
+            } else {
+                reader.readElementText(); // Skip away all nested elements and characters.
+            }
+            break;
+        case QXmlStreamReader::Characters:
+            if (!isWhiteSpace(reader.text()))
+                writer.writeCharacters(reader.text().toString());
+            break;
+        case QXmlStreamReader::EndElement:
+            writer.writeEndElement();
+            break;
+        default:
+            break;
+        }
+    }
+    // Check for plain text (no spans, just <html><head><body><p>)
+    if (isPlainTextPtr)
+        *isPlainTextPtr = !paragraphAlignmentFound && elementCount == 4u; //
+    return out;
+}
+
+
+
 
 
 
