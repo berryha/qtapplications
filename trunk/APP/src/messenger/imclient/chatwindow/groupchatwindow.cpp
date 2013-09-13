@@ -60,7 +60,7 @@ InterestGroup * GroupChatWindow::interestGroup(){
 }
 
 void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
-    ui.chatMessageWindow->appendMessageReceivedFromContact(message, contact, datetime);
+    ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
 void GroupChatWindow::updateImage(const QString &imageName){

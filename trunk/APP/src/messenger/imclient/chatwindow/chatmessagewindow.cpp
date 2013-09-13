@@ -12,37 +12,38 @@
 #include "../contactsmanager/contact.h"
 #include "../../sharedim/constants_global_shared.h"
 
-#include "../imuser.h"
+
+
 //#include "imageresource.h"
 //#include "../../shared/gui/imageresourcebase.h"
-
+#include "HHSharedCore/hutilities.h"
 
 namespace HEHUI {
 
 ChatMessageWindow::ChatMessageWindow(QWidget *parent)
     :QWidget(parent), m_contact(0), m_interestGroup(0) {
 
-        initUI();
+    initUI();
 
-        m_chatMessageWindowType = CMWT_Unknown;
+    m_chatMessageWindowType = CMWT_Unknown;
 
 }
 
 ChatMessageWindow::ChatMessageWindow(Contact *contact, QWidget *parent)
     :QWidget(parent), m_contact(contact), m_interestGroup(0) {
     
-        initUI();
+    initUI();
 
-        m_chatMessageWindowType = CMWT_Contact;
+    m_chatMessageWindowType = CMWT_Contact;
 
 }
 
 ChatMessageWindow::ChatMessageWindow(InterestGroup *interestGroup, QWidget *parent)
     :QWidget(parent), m_contact(0), m_interestGroup(interestGroup) {
 
-        initUI();
+    initUI();
 
-        m_chatMessageWindowType = CMWT_InterestGroup;
+    m_chatMessageWindowType = CMWT_InterestGroup;
 
 }
 
@@ -83,44 +84,28 @@ void ChatMessageWindow::initUI(){
     m_mainWebFrame = ui.webView->page()->mainFrame();
     connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrameToBottom(const QSize &)));
 
-    //ui.webView->setUrl(QUrl("qrc:/text/resources/text/sample.html"));
-    //ui.webView->load(QUrl("qrc:/text/resources/text/sample.html"));
-    //qWarning()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
-
-    //        QString htmlPath = imageCachePath + QString("/%1.htm").arg(contact->getUserID());
-    //        QFile::copy("qrc:/text/resources/text/sample.html", htmlPath);
-    //        ui.webView->setUrl(htmlPath);
-
-
-
     ui.mainSplitter->setStretchFactor(1, 1);
 
-//    QString displayName = contact->getNickName();
-//    QString contactID = contact->getUserID();
 
-//    if (displayName.isEmpty()) {
-//        displayName = contactID;
-//    }else if(contactID != displayName){
-//        displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
-//    }
-//    setWindowTitle(displayName);
+    //    QString displayName = contact->getNickName();
+    //    QString contactID = contact->getUserID();
+
+    //    if (displayName.isEmpty()) {
+    //        displayName = contactID;
+    //    }else if(contactID != displayName){
+    //        displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
+    //    }
+    //    setWindowTitle(displayName);
     //TODO:
     //setWindowIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), contact->getOnlineState()));
 
 
-    myDisplayName = QString(IMUser::instance()->getNickName());
-    myUserID = IMUser::instance()->getUserID();
+    m_myself = IMUser::instance();
+    myDisplayName = QString(m_myself->getNickName());
+    myUserID = m_myself->getUserID();
 
     imageCachePath = Settings::instance()->getPictureCacheDir();
 
-    //connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(sendMsg()));
-
-
-    //setMinimumSize(sizeHint());
-    //resize(sizeHint());
-
-    //connect(ui.textEdit, SIGNAL(currentCharFormatChanged(const QTextCharFormat &)), this, SLOT(currentCharFormatChanged(const QTextCharFormat &)));
-    //connect(ui.textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(cursorPositionChanged()));
 
     connect(ui.fontStyleToolButton, SIGNAL(clicked()), this, SLOT(showFontFrame()));
     connect(ui.emotionToolButton, SIGNAL(clicked()), this, SLOT(showEmotions()));
@@ -132,8 +117,9 @@ void ChatMessageWindow::initUI(){
     connect(ui.fontComboBox, SIGNAL(activated(const QString &)), this, SLOT(textFamily(const QString &)));
     //Font Size
     QFontDatabase db;
-    foreach(int size, db.standardSizes())
+    foreach(int size, db.standardSizes()){
         ui.fontSizeComboBox->addItem(QString::number(size));
+    }
 
     connect(ui.fontSizeComboBox, SIGNAL(activated(const QString &)), this, SLOT(textSize(const QString &)));
     ui.fontSizeComboBox->setCurrentIndex(ui.fontSizeComboBox->findText(
@@ -154,21 +140,12 @@ void ChatMessageWindow::initUI(){
     ui.fontStyleToolButton->setChecked(false);
     ui.fontFrame->setVisible(false);
 
-    //	fontChanged(ui.textEdit->font());
-    //	colorChanged(ui.textEdit->textColor());
-    //alignmentChanged(ui.textEdit->alignment());
 
     connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
 
-    //emotionsListPage = new EmotionsListPage();
-    //connect(emotionsListPage, SIGNAL(clicked(const QString &)), this, SLOT(insertEmotion(const QString &)));
-    //emotionsListPage->setVisible(false);
 
     smileyPopup = new EmoticonSelector();
     connect(smileyPopup, SIGNAL(signalEmoticonSelected(const QString&, bool)), this, SLOT(insertEmoticon(const QString&, bool)));
-
-
-
 
 
     m_defaultFontName = ui.fontComboBox->currentText();
@@ -184,11 +161,11 @@ void ChatMessageWindow::initUI(){
 }
 
 QTextEdit *ChatMessageWindow::messageEditor() {
-	return ui.textEdit;
+    return ui.textEdit;
 }
 
 QWebView *ChatMessageWindow::messageBrowser() {
-        return ui.webView;
+    return ui.webView;
 }
 
 void ChatMessageWindow::setContact(Contact *c){
@@ -221,261 +198,339 @@ InterestGroup * ChatMessageWindow::getInterestGroup(){
     return m_interestGroup;
 }
 
-/*
- void ChatMessageWindow::sendMsg(const QStringList &msgList)
- {
- //QMessageBox::warning(this, tr("msg!"), msg );
 
- messageBrowser()->append(msgList[0]);
- messageBrowser()->append(msgList[1]);
- messageBrowser()->append("");
- }
- */
+void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime){
+    qDebug()<<"--ChatMessageWindow::appendChatMessage(...)";
 
 
-void ChatMessageWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
-    qDebug()<<"--ChatMessageWindow::appendMessageReceivedFromContact(...)";
+    QString userID;
+    QString nickName;
 
-   Contact *c = contact;
-   if(!c){
-        c = m_contact;
-   }
-   Q_ASSERT_X(c != 0, "appendMessageReceivedFromContact", "NULL Contact!");
 
-   qDebug()<<"----Message Received From Contact! contactID:"<<c->getUserID()<<" Time:"<<datetime<<" Msg:"<<message;;
-        
-//        QString msg = "<dl>";
-//        msg += QString("<dt>%1  %2  </dt>").arg(contact->getNickName()).arg(datetime);
-//        msg += "<dd >";
-//        msg += QString(" %1 ").arg(message);
-//        msg += "</dd >";
-//        msg += "</dl >";
-        
-    
-    QWebFrame *frame = ui.webView->page()->mainFrame();
-    QWebElement doc = frame->documentElement();
-    
-//    if(message.contains(QRegExp("<style type=\"text/css\">"))){
-//        QString styeID = "";
-//        QString styleInfo = "";
-        
-//        QRegExp regExp(QString("\\.%1\\d+").arg(contact->getUserID()));
-//        regExp.setCaseSensitivity(Qt::CaseInsensitive);
-//        regExp.setMinimal(true);
-//        int pos = regExp.indexIn(message);
-//        if(pos != -1){
-//            styeID = regExp.cap(0);
-//        }
-        
-//        //regExp.setPattern("font-family.*;");
-//        regExp.setPattern("\\.%1\\d+{.+}");
-//        pos = regExp.indexIn(message);
-//        if(pos != -1){
-//            styleInfo = regExp.cap(0);
-//        }
-        
-//        if(!styeID.isEmpty() && !styleInfo.isEmpty()){
-//            //doc.setStyleProperty(m_styleID, styleInfo); 
-//            QWebElement styleElement = doc.findFirst("style");
-//            styleElement.appendInside(styleInfo);
-//        }
-
-//    }
-    
-    //QString msg = QString("<div><span>%1 %2</span></div>").arg(contact->getNickName()).arg(datetime);    
-    QString msg = QString("<span>%1 %2</span>").arg(c->getNickName()).arg(datetime);
-
-//    QString msg = "<dl>";
-//    msg += QString("<dt>%1  %2  </dt>").arg(contact->getNickName()).arg(datetime);
-//    msg += "<dd >";
-    
-    QRegExp regExp("<div.+>.*</div>");
-    regExp.setCaseSensitivity(Qt::CaseInsensitive);
-    regExp.setMinimal(true);
-    int pos = regExp.indexIn(message);
-    if(pos != -1){
-        msg += regExp.cap(0);
+    if(!sender){
+        userID = m_contact->getUserID();
+        nickName = m_contact->getNickName();
+    }else{
+        userID = sender->getUserID();
+        nickName = sender->getNickName();
     }
 
+    if(userID != myUserID){
+        Contact *contact = qobject_cast<Contact *>(sender);
+        if(contact){
+            QString remarkName = contact->getRemarkName();
+            if(!remarkName.trimmed().isEmpty()){
+                nickName = remarkName;
+            }
+        }
+    }
+
+
+
+    qDebug()<<"----Message Received From Contact! contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
+
+
+
+
+    //        QString msg = "<dl>";
+    //        msg += QString("<dt>%1  %2  </dt>").arg(contact->getNickName()).arg(datetime);
+    //        msg += "<dd >";
+    //        msg += QString(" %1 ").arg(message);
+    //        msg += "</dd >";
+    //        msg += "</dl >";
+
+
+
+
+    QString msg = QString("<span><a title=\"%1\" href=\"showcontact://%1\">%2</a> %3</span>").arg(userID).arg(nickName).arg(datetime);
     
-//    msg += "</dd >";
-//    msg += "</dl >";
-       
-        QWebElement div = doc.findFirst("div");
-        div.appendInside(msg);
-         
-        //qDebug()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
+    //Find Div tag
+    //QRegExp regExp("<div.+>.*</div>");
+    //regExp.setCaseSensitivity(Qt::CaseInsensitive);
+    //regExp.setMinimal(true);
+    //int pos = regExp.indexIn(message);
+    //if(pos != -1){
+    //    msg += regExp.cap(0);
+    //}
+    msg += message;
+
+    QWebElement doc = m_mainWebFrame->documentElement();
+    QWebElement div = doc.findFirst("div");
+    div.appendInside(msg);
+
+
+    //Modify images path
+    QWebElement messageElement = div.lastChild();
+    QWebElementCollection elements = messageElement.findAll("img");
+    foreach (QWebElement element, elements){
+        QString imageSRC = element.attribute("src");
+        if(!imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
+            QString localCacheImage = imageCachePath + "/" + imageSRC;
+            if(QFile::exists(localCacheImage)){
+                element.setAttribute("src", "file://" + localCacheImage);
+            }else{
+                element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+                element.setAttribute("id", imageSRC);
+            }
+
+        }
+    }
+
+    qDebug();
+    qDebug()<<"------msg:"<<msg;
+    qDebug();
+    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
+    qDebug();
+
+    //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 }
 
+QString ChatMessageWindow::getRichMessageBlock() const{
 
-void ChatMessageWindow::appendMessage(const QString &message){
-//	QStringList msgList;
-//	msgList << myDisplayName + ":\t" + QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz") << message;
+    QString out;
+    QXmlStreamReader reader(ui.textEdit->toHtml());
+    QXmlStreamWriter writer(&out);
+    writer.setAutoFormatting(false);
+    writer.setAutoFormattingIndent(0);
 
-//        ui.webView->append(msgList[0]);
-//        ui.webView->append(msgList[1]);
-//        ui.webView->append("");
-        
-        
-//        appendMessageReceivedFromContact(message, QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz") );
+    while (!reader.atEnd()) {
+        switch (reader.readNext()) {
+        case QXmlStreamReader::StartElement:
+        {
+            //elementCount++;
+            const QStringRef name = reader.name();
+            if( name == QStringLiteral("meta") || name == QStringLiteral("style")){
+                reader.readElementText(); // Skip away all nested elements and characters.
+            }else{
+
+                if(name == QStringLiteral("html")
+                        ||name == QStringLiteral("head")
+                        ||name == QStringLiteral("body")
+                        ){
+                    continue;
+                }
+
+                QXmlStreamAttributes attributes = reader.attributes();
+                if(name == QStringLiteral("img")){
+                    QString fileName;
+                    QString imgSRC = attributes.value("src").toString();
+                    if(imgSRC.startsWith(":/")){
+                        fileName = "qrc" + imgSRC;
+                    }else{
+                        QFileInfo imgInfo(imgSRC);
+                        fileName = imgInfo.fileName();
+                    }
+
+                    attributes.clear();
+                    attributes.append("src", fileName);
+                }else{
+                    attributes.clear();
+                }
+
+                writer.writeStartElement(name.toString());
+                if (!attributes.isEmpty())
+                    writer.writeAttributes(attributes);
+            }
+        }
+            break;
+        case QXmlStreamReader::Characters:
+        {
+            QStringRef text = reader.text();
+            writer.writeCharacters(text.toString());
+        }
+            break;
+        case QXmlStreamReader::EndElement:
+            writer.writeEndElement();
+            break;
+        default:
+            break;
+        }
+
+    }
+
+
+    return out.simplified();
 
 }
 
 void ChatMessageWindow::emitSendMsgSignal() {
-	//TODO:是否要转换成UTF8 
-    
+    //TODO:是否要转换成UTF8
+
     QString message = ui.textEdit->toPlainText();
 
-	if(message.isEmpty()){
-		qDebug()<<"XXXXChatMessageWindow::emitSendMsgSignal()~~ Empty Message!";
+    if(message.isEmpty()){
+        ui.textEdit->setFocus();
+        return;
+    }
 
-		ui.textEdit->setFocus();
-		return;
-	}
+    if(message.size() > MAX_MESSAGE_SIZE){
+        QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
+        qCritical()<<"ERROR! Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
+        ui.textEdit->setFocus();
+        return;
+    }
 
-	if(message.size() > MAX_MESSAGE_SIZE){
-		QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
-                qCritical()<<"ERROR! ChatMessageWindow::emitSendMsgSignal()~~Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
-		ui.textEdit->setFocus();
-		return;
-	}
+    QString richMessage = getRichMessageBlock();
 
-        QString richMessage = "";
+    if(m_styleString.trimmed().isEmpty()){
+        richMessage = QString("<div>") + richMessage;
+    }else{
+        richMessage = QString("<div style=\"%1\">").arg(m_styleString) + richMessage;
+    }
+    richMessage += QString("</div>");
 
-        QWebElement doc = ui.webView->page()->mainFrame()->documentElement();     
-        QWebElement div = doc.findFirst("div");
+    appendChatMessage(richMessage, m_myself, QDateTime::currentDateTime().toString("hh:mm:ss"));
 
-//        QString styleInfo = "";
-//        styleInfo = QString("font-family:'%1'; font-size:%2pt;").arg(ui.fontComboBox->currentText()).arg(ui.fontSizeComboBox->currentText());
-//        styleInfo += QString("font-weight:%1;").arg(ui.fontBoldToolButton->isChecked()?"600":"400");
-//        styleInfo += QString("font-style:%1;").arg(ui.fontItalicToolButton->isChecked()?"italic":"normal");
-//        if(ui.fontUnderlineToolButton->isChecked()){
-//            styleInfo += QString("text-decoration: underline;");
-//        }
-//        styleInfo += QString("color:%1;").arg(fmt.foreground().color().name());
-//        //styleInfo += "position: relative;";
-        
+    ui.textEdit->clear();
+    ui.textEdit->setFocus();
+    ui.textEdit->setCurrentCharFormat(fmt);
 
-        
-        QString htmlOfTextEdit = ui.textEdit->toHtml();
-                   
-        QRegExp regExp("<p.*</p>");
-        regExp.setCaseSensitivity(Qt::CaseInsensitive);
-        regExp.setMinimal(true);
-        int pos = 0; 
-        QStringList list;
-        while ((pos = regExp.indexIn(htmlOfTextEdit, pos)) != -1) {
-            list << regExp.cap(0);
-            pos += regExp.matchedLength();
-        }
-        
-        if(m_styleString.trimmed().isEmpty()){
-            richMessage += QString("<div>");
-        }else{
-            richMessage += QString("<div style = \"%1\">").arg(m_styleString);
-        }
-        foreach (QString str, list) {
-            str.replace(QRegExp("\\bstyle=\".*;\"", Qt::CaseInsensitive), "");
-            str.replace(QRegExp("src=\":/", Qt::CaseInsensitive), "src=\"qrc:/");
-            richMessage += str;
-        }
-        richMessage += QString("</div>");
-        
-        
+    QStringList imageList;
 
-
-
-        
-        
-        //qWarning()<<richMessage;
-
-//        QString msgToShow = "<dl>";
-//        msgToShow += QString("<dt>%1  %2  </dt>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss"));
-//        msgToShow += "<dd >";
-//        msgToShow += QString(" %1 ").arg(richMessage);
-//        msgToShow += "</dd >";
-//        msgToShow += "</dl >";
-        
-        //div.appendInside(QString("<div><span>%1 %2</span></div>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")));
-//        div.appendInside(QString("<span>%1 %2</span>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")));        
-//        div.appendInside(richMessage);
-        
-        QString temp = QString("<div><span>%1 %2</span>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")) + richMessage +"</div>";
-        div.appendInside(temp);
-         
-        
-        ui.textEdit->clear();
-        ui.textEdit->setFocus();        
-        ui.textEdit->setCurrentCharFormat(fmt);
-        
-        
-        qDebug()<<"-------richMessage1:"<<richMessage;
-//        richMessage.replace(QRegExp("src=\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"", Qt::CaseInsensitive), "");
-        
-        
-        
-        regExp.setPattern("<img.*>");
-        pos = 0; 
-        QStringList imgList;
-        while ((pos = regExp.indexIn(richMessage, pos)) != -1) {
-            imgList << regExp.cap(0);
-            pos += regExp.matchedLength();
-        } 
-        QStringList imageList;
-        regExp.setPattern("\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"");    
-         foreach (QString imgsrcTag, imgList) {
-            QString iconPath;
-            pos = 0; 
-            if((pos = regExp.indexIn(imgsrcTag, pos)) != -1){
-                iconPath = regExp.cap(0);
-                iconPath = iconPath.replace("\"", "");
-                richMessage.replace(iconPath, QFileInfo(iconPath).fileName());
-                imageList.append(iconPath);
-            }
-            
-        }
-        
-        //qDebug()<<"-------richMessage2:"<<richMessage;
-        
-        //emit sendMsgButtonClicked(m_contact->getUserID(), richMessage, imageList);
-
-
-        switch(m_chatMessageWindowType){
-        case CMWT_Contact:
-            emit sendMsgButtonClicked(m_contact, richMessage, imageList);
-            break;
-        case CMWT_InterestGroup:
-            emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
-            break;
-        case CMWT_TempGroup:
-            break;
-        default:
+    switch(m_chatMessageWindowType){
+    case CMWT_Contact:
+        emit sendMsgButtonClicked(m_contact, richMessage, imageList);
+        break;
+    case CMWT_InterestGroup:
+        emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
+        break;
+    case CMWT_TempGroup:
+        break;
+    default:
 
         break;
 
+    }
+
+
+
+    //qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+
+
+
+}
+
+
+void ChatMessageWindow::emitSendMsgSignal2() {
+    //TODO:是否要转换成UTF8
+    
+    QString message = ui.textEdit->toPlainText();
+
+    if(message.isEmpty()){
+        ui.textEdit->setFocus();
+        return;
+    }
+
+    if(message.size() > MAX_MESSAGE_SIZE){
+        QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
+        qCritical()<<"ERROR! Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
+        ui.textEdit->setFocus();
+        return;
+    }
+
+    QString richMessage = "";
+
+
+
+    QString htmlOfTextEdit = ui.textEdit->toHtml();
+
+    QRegExp regExp("<p.*</p>");
+    regExp.setCaseSensitivity(Qt::CaseInsensitive);
+    regExp.setMinimal(true);
+    int pos = 0;
+    QStringList list;
+    while ((pos = regExp.indexIn(htmlOfTextEdit, pos)) != -1) {
+        list << regExp.cap(0);
+        pos += regExp.matchedLength();
+    }
+
+    if(m_styleString.trimmed().isEmpty()){
+        richMessage += QString("<div>");
+    }else{
+        richMessage += QString("<div style = \"%1\">").arg(m_styleString);
+    }
+    foreach (QString str, list) {
+        str.replace(QRegExp("\\bstyle=\".*;\"", Qt::CaseInsensitive), "");
+        str.replace(QRegExp("src=\":/", Qt::CaseInsensitive), "src=\"qrc:/");
+        richMessage += str;
+    }
+    richMessage += QString("</div>");
+
+
+    QString temp = QString("<div><span>%1 %2</span>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")) + richMessage +"</div>";
+    QWebElement doc = m_mainWebFrame->documentElement();
+    QWebElement div = doc.findFirst("div");
+    div.appendInside(temp);
+
+
+    ui.textEdit->clear();
+    ui.textEdit->setFocus();
+    ui.textEdit->setCurrentCharFormat(fmt);
+
+
+    qDebug()<<"-------richMessage1:"<<richMessage;
+
+
+    regExp.setPattern("<img.*>");
+    pos = 0;
+    QStringList imgList;
+    while ((pos = regExp.indexIn(richMessage, pos)) != -1) {
+        imgList << regExp.cap(0);
+        pos += regExp.matchedLength();
+    }
+    QStringList imageList;
+    regExp.setPattern("\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"");
+    foreach (QString imgsrcTag, imgList) {
+        QString iconPath;
+        pos = 0;
+        if((pos = regExp.indexIn(imgsrcTag, pos)) != -1){
+            iconPath = regExp.cap(0);
+            iconPath = iconPath.replace("\"", "");
+            richMessage.replace(iconPath, QFileInfo(iconPath).fileName());
+            imageList.append(iconPath);
         }
 
+    }
+
+    qDebug()<<"-------richMessage2:"<<richMessage;
 
 
-        
-//        QWebElement e(div);
-//        //e.setInnerXml(richMessage);
-//        e.replace(richMessage);
-//        //e.appendInside(richMessage);
-//        qWarning()<<"---e:"<<e.toInnerXml();
-        
-//        QWebElementCollection elements = e.findAll("img");
-//        foreach (QWebElement element, elements){
-//            element.setAttribute("style", "background-color: #f0f090"); 
-//            qWarning()<<element.toInnerXml();
-//        }
+    switch(m_chatMessageWindowType){
+    case CMWT_Contact:
+        emit sendMsgButtonClicked(m_contact, richMessage, imageList);
+        break;
+    case CMWT_InterestGroup:
+        emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
+        break;
+    case CMWT_TempGroup:
+        break;
+    default:
 
-      
-        
-        //qWarning()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
-                
+        break;
+
+    }
+
+
+
+
+    //        QWebElement e(div);
+    //        //e.setInnerXml(richMessage);
+    //        e.replace(richMessage);
+    //        //e.appendInside(richMessage);
+    //        qWarning()<<"---e:"<<e.toInnerXml();
+
+    //        QWebElementCollection elements = e.findAll("img");
+    //        foreach (QWebElement element, elements){
+    //            element.setAttribute("style", "background-color: #f0f090");
+    //            qWarning()<<element.toInnerXml();
+    //        }
+
+
+
+    //qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+
 
 
 }
@@ -486,27 +541,27 @@ void ChatMessageWindow::scrollWebFrameToBottom(const QSize & contentsSize){
 
 
 void ChatMessageWindow::showFontFrame() {
-	if (ui.fontStyleToolButton->isChecked()) {
-		ui.fontFrame->setVisible(true);
-	} else {
-		ui.fontFrame->setVisible(false);
-	}
+    if (ui.fontStyleToolButton->isChecked()) {
+        ui.fontFrame->setVisible(true);
+    } else {
+        ui.fontFrame->setVisible(false);
+    }
 }
 
 void ChatMessageWindow::showEmotions() {
-	QPoint p = ui.emotionToolButton->mapToGlobal(QPoint(0, 0));
+    QPoint p = ui.emotionToolButton->mapToGlobal(QPoint(0, 0));
 
-	smileyPopup->move(p.x(), p.y() + ui.emotionToolButton->height());
-	smileyPopup->setVisible(true);
+    smileyPopup->move(p.x(), p.y() + ui.emotionToolButton->height());
+    smileyPopup->setVisible(true);
 
-	//emotionsListPage->move(p.x(), p.y()+ui.emotionToolButton->height());
-	//emotionsListPage->setVisible(true);
+    //emotionsListPage->move(p.x(), p.y()+ui.emotionToolButton->height());
+    //emotionsListPage->setVisible(true);
 }
 
 void ChatMessageWindow::insertEmoticon( const QString &iconPath, bool isSystemEmoticon/*int index const QString &emotionName*/) {
-	//QString emoticonsPath = Settings::instance()->getEmoticonsPath();
-	//QString emoticon = "<img src=\"" + emoticonsPath + "/" + QString::number(index) + ".gif\"> ";
-	
+    //QString emoticonsPath = Settings::instance()->getEmoticonsPath();
+    //QString emoticon = "<img src=\"" + emoticonsPath + "/" + QString::number(index) + ".gif\"> ";
+
     smileyPopup->hide();
     
     QString emoticon ;
@@ -514,7 +569,7 @@ void ChatMessageWindow::insertEmoticon( const QString &iconPath, bool isSystemEm
     if(isSystemEmoticon){
         emoticon = QString("<img src=\"" + iconPath + "/\"> ");
     }else{
-        QFileInfo fileInfo(iconPath);        
+        QFileInfo fileInfo(iconPath);
         QString fileName = myUserID + "_" + fileInfo.absoluteDir().dirName() + "_" + fileInfo.fileName();
         QString filePath = imageCachePath + "/" + fileName;
         
@@ -530,53 +585,74 @@ void ChatMessageWindow::insertEmoticon( const QString &iconPath, bool isSystemEm
         
     }
     
-        
-        
+
+
 
     
-        
-        ui.textEdit->insertHtml(emoticon);
-        
-        
-        qWarning()<<"----emoticon:"<<emoticon;
-        
-	//QString emotionPath = QDir::currentPath() + QString("/smiley");
 
-	//if (!emotionName.isEmpty())
-	//ui.textEdit->insertHtml(QLatin1String("<img src=\"") + emotionPath + "/" + emotionName + ".gif"
-	//				+ QLatin1String("\"/>"));
+    ui.textEdit->insertHtml(emoticon);
 
-	//emotionsListPage->setVisible(false);
+
+    qWarning()<<"----emoticon:"<<emoticon;
+
+    //QString emotionPath = QDir::currentPath() + QString("/smiley");
+
+    //if (!emotionName.isEmpty())
+    //ui.textEdit->insertHtml(QLatin1String("<img src=\"") + emotionPath + "/" + emotionName + ".gif"
+    //				+ QLatin1String("\"/>"));
+
+    //emotionsListPage->setVisible(false);
 
 
 }
 
 void ChatMessageWindow::insertImage() {
-	QFileDialog::Options options;
-        //options |= QFileDialog::DontUseNativeDialog;
-	QString selectedFilter;
-	QString fileName = QFileDialog::getOpenFileName(this,
-			tr("Chose Your Image"), QDir::homePath(), tr(
-                                        "Images (*.png *.jpg *.gif *.bmp);;All Files (*)"),
-			&selectedFilter, options);
+    QFileDialog::Options options;
+    //options |= QFileDialog::DontUseNativeDialog;
+    QString selectedFilter;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Chose Your Image"), QDir::homePath(), tr(
+                                                        "Images (*.png *.jpg *.gif *.bmp);;All Files (*)"),
+                                                    &selectedFilter, options);
 
-        if (!fileName.isEmpty()){
-            ui.textEdit->insertHtml(QLatin1String("<img src=\"") + fileName + QLatin1String("\"/>"));
-        }
+    if (fileName.isEmpty()){
+        return;
+    }
+
+
+    QString md5String = Utilities::getFileMD5EncodedWithBase64(fileName);
+    if(md5String.trimmed().isEmpty()){
+        QMessageBox::critical(this, tr("Error"), tr("Can not get image's MD5 hash!"));
+        return;
+    }
+
+    QFileInfo fileInfo(fileName);
+    QString format = fileInfo.suffix();
+
+    QString newFileName = imageCachePath + QString("/%1.%2").arg(md5String).arg(format);
+    QFile::remove(newFileName);
+    if(!QFile::copy(fileName, newFileName)){
+        QMessageBox::critical(this, tr("Error"), tr("Can not read image!"));
+        return;
+    }
+
+
+    ui.textEdit->insertHtml(QLatin1String("<img src=\"") + newFileName + QLatin1String("\"/>"));
+
 
 }
 
 void ChatMessageWindow::sendFile() {
-	QFileDialog::Options options;
-        //options |= QFileDialog::DontUseNativeDialog;
-	QString selectedFilter;
-	QStringList files = QFileDialog::getOpenFileNames(this, tr(
-			"QFileDialog::getOpenFileNames()"), QDir::homePath(), tr(
-			"All Files (*);;Text Files (*.txt)"), &selectedFilter, options);
-	if (files.count()) {
-		//openFilesPath = files[0];
-		//openFileNamesLabel->setText(QString("[%1]").arg(files.join(", ")));
-	}
+    QFileDialog::Options options;
+    //options |= QFileDialog::DontUseNativeDialog;
+    QString selectedFilter;
+    QStringList files = QFileDialog::getOpenFileNames(this, tr(
+                                                          "QFileDialog::getOpenFileNames()"), QDir::homePath(), tr(
+                                                          "All Files (*);;Text Files (*.txt)"), &selectedFilter, options);
+    if (files.count()) {
+        //openFilesPath = files[0];
+        //openFileNamesLabel->setText(QString("[%1]").arg(files.join(", ")));
+    }
 }
 
 void ChatMessageWindow::takeScreenshot(){
@@ -605,106 +681,116 @@ void ChatMessageWindow::screenshotDone(const QImage &image){
 
     QString format = "png";
     QString fileName = imageCachePath + QString("/Screenshot%1.%2").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss")).arg(format);
-
     if(!img.save(fileName, format.toLatin1())){
-        qWarning()<<"Save Image Failed!";
+        QMessageBox::critical(this, tr("Screenshot"), tr("Can not save image!"));
         return;
     }
 
-    ui.textEdit->insertHtml(QLatin1String("<img src=\"") + fileName + QLatin1String("\"/>"));
+
+    QString md5String = Utilities::getFileMD5EncodedWithBase64(fileName);
+    if(md5String.trimmed().isEmpty()){
+        QMessageBox::critical(this, tr("Screenshot"), tr("Can not get image's MD5 hash!"));
+        return;
+    }
+    QString newFileName = imageCachePath + QString("/%1.%2").arg(md5String).arg(format);
+    QFile::remove(newFileName);
+    QFile::rename(fileName, newFileName);
+
+
+    ui.textEdit->insertHtml(QLatin1String("<img src=\"") + newFileName + QLatin1String("\"/>"));
 
 
 }
 
 void ChatMessageWindow::textBold() {
-	//QTextCharFormat fmt;
-	fmt.setFontWeight(ui.fontBoldToolButton->isChecked() ? QFont::Bold
-			: QFont::Normal);
-	mergeFormatOnWordOrSelection(fmt);
+    //QTextCharFormat fmt;
+    fmt.setFontWeight(ui.fontBoldToolButton->isChecked() ? QFont::Bold
+                                                         : QFont::Normal);
+    mergeFormatOnWordOrSelection(fmt);
 }
 
 void ChatMessageWindow::textUnderline() {
-	//QTextCharFormat fmt;
-	fmt.setFontUnderline(ui.fontUnderlineToolButton->isChecked());
-	mergeFormatOnWordOrSelection(fmt);
+    //QTextCharFormat fmt;
+    fmt.setFontUnderline(ui.fontUnderlineToolButton->isChecked());
+    mergeFormatOnWordOrSelection(fmt);
 }
 
 void ChatMessageWindow::textItalic() {
-	//QTextCharFormat fmt;
-	fmt.setFontItalic(ui.fontItalicToolButton->isChecked());
-	mergeFormatOnWordOrSelection(fmt);
+    //QTextCharFormat fmt;
+    fmt.setFontItalic(ui.fontItalicToolButton->isChecked());
+    mergeFormatOnWordOrSelection(fmt);
 }
 
 void ChatMessageWindow::textFamily(const QString &f) {
-	//QTextCharFormat fmt;
-	fmt.setFontFamily(f);
-	mergeFormatOnWordOrSelection(fmt);
-	// QMessageBox::warning(this, tr("Here!"), f );
+    //QTextCharFormat fmt;
+    fmt.setFontFamily(f);
+    mergeFormatOnWordOrSelection(fmt);
+    // QMessageBox::warning(this, tr("Here!"), f );
 }
 
 void ChatMessageWindow::textSize(const QString &p) {
-	//QTextCharFormat fmt;
-	fmt.setFontPointSize(p.toFloat());
-	mergeFormatOnWordOrSelection(fmt);
+    //QTextCharFormat fmt;
+    fmt.setFontPointSize(p.toFloat());
+    mergeFormatOnWordOrSelection(fmt);
 }
 
 void ChatMessageWindow::textColor() {
-	QColor col = QColorDialog::getColor(ui.textEdit->textColor(), this);
-	if (!col.isValid())
-		return;
-	//QTextCharFormat fmt;
-	fmt.setForeground(col);
-	mergeFormatOnWordOrSelection(fmt);
-	colorChanged(col);
-        
-        
+    QColor col = QColorDialog::getColor(ui.textEdit->textColor(), this);
+    if (!col.isValid())
+        return;
+    //QTextCharFormat fmt;
+    fmt.setForeground(col);
+    mergeFormatOnWordOrSelection(fmt);
+    colorChanged(col);
+
+
 }
 
 void ChatMessageWindow::currentCharFormatChanged(const QTextCharFormat &format) {
-	fontChanged(format.font());
-	colorChanged(format.foreground().color());
+    fontChanged(format.font());
+    colorChanged(format.foreground().color());
 }
 
 void ChatMessageWindow::cursorPositionChanged() {
-	//alignmentChanged(textEdit->alignment());
+    //alignmentChanged(textEdit->alignment());
 }
 
 void ChatMessageWindow::mergeFormatOnWordOrSelection(const QTextCharFormat &format) {
 
-//	QTextCursor cursor = ui.textEdit->textCursor();
-//	if (!cursor.hasSelection())
-//		cursor.select(QTextCursor::WordUnderCursor);
-//	cursor.mergeCharFormat(format);
-//	ui.textEdit->mergeCurrentCharFormat(format);
+    //	QTextCursor cursor = ui.textEdit->textCursor();
+    //	if (!cursor.hasSelection())
+    //		cursor.select(QTextCursor::WordUnderCursor);
+    //	cursor.mergeCharFormat(format);
+    //	ui.textEdit->mergeCurrentCharFormat(format);
     
     
     QTextCursor cursor = ui.textEdit->textCursor();
     cursor.select(QTextCursor::Document);
     cursor.mergeCharFormat(format);
-        
+
     
     ui.textEdit->setCurrentCharFormat(fmt);
     ui.textEdit->mergeCurrentCharFormat(fmt);
     
     getStyleString();
-        
-        
+
+
 }
 
 void ChatMessageWindow::fontChanged(const QFont &f) {
-	ui.fontComboBox->setCurrentIndex(ui.fontComboBox->findText(
-			QFontInfo(f).family()));
-	ui.fontSizeComboBox->setCurrentIndex(ui.fontSizeComboBox->findText(
-			QString::number(f.pointSize())));
-	ui.fontBoldToolButton->setChecked(f.bold());
-	ui.fontItalicToolButton->setChecked(f.italic());
-	ui.fontUnderlineToolButton->setChecked(f.underline());
+    ui.fontComboBox->setCurrentIndex(ui.fontComboBox->findText(
+                                         QFontInfo(f).family()));
+    ui.fontSizeComboBox->setCurrentIndex(ui.fontSizeComboBox->findText(
+                                             QString::number(f.pointSize())));
+    ui.fontBoldToolButton->setChecked(f.bold());
+    ui.fontItalicToolButton->setChecked(f.italic());
+    ui.fontUnderlineToolButton->setChecked(f.underline());
 }
 
 void ChatMessageWindow::colorChanged(const QColor &c) {
-	QPixmap pix(16, 16);
-	pix.fill(c);
-	ui.textColorToolButton->setIcon(pix);
+    QPixmap pix(16, 16);
+    pix.fill(c);
+    ui.textColorToolButton->setIcon(pix);
 }
 
 void ChatMessageWindow::getStyleString(){
@@ -720,15 +806,15 @@ void ChatMessageWindow::getStyleString(){
     }
     
     if(ui.fontBoldToolButton->isChecked()){
-        styleInfo += QString("font-weight: bold;");       
+        styleInfo += QString("font-weight:bold;");
     }
     
     if(ui.fontItalicToolButton->isChecked()){
-        styleInfo += QString("font-style:italic;");   
+        styleInfo += QString("font-style:italic;");
     }
     
     if(ui.fontUnderlineToolButton->isChecked()){
-        styleInfo += QString("text-decoration: underline;");
+        styleInfo += QString("text-decoration:underline;");
     }
     
     if(fmt.foreground().color().name() != "#000000"){
@@ -744,21 +830,17 @@ void ChatMessageWindow::getStyleString(){
 }  
 
 void ChatMessageWindow::updateImage(const QString &imageName){
-    QWebElement doc = ui.webView->page()->mainFrame()->documentElement();     
-    
+
+    QWebElement doc = m_mainWebFrame->documentElement();
     QWebElementCollection elements = doc.findAll("img");
     foreach (QWebElement element, elements){
-        if(element.attribute("src") == imageName){
-            element.setAttribute("src", imageCachePath +"/"+imageName); 
+        //if(element.attribute("src") == imageName){
+        if(element.attribute("id") == imageName){
+            element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
         }
-        qWarning()<<element.toInnerXml();
     }
 
 }
-
-
-
-
 
 
 

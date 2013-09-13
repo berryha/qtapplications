@@ -76,7 +76,7 @@ void ContactChatWidget::closeEvent(QCloseEvent * event){
 
 
 void ContactChatWidget::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){
-    ui.chatMessageWindow->appendMessageReceivedFromContact(message, contact, datetime);
+    ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
 void ContactChatWidget::updateImage(const QString &imageName){
