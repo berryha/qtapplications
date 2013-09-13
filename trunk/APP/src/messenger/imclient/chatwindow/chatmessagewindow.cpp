@@ -285,6 +285,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
     //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
+
 }
 
 QString ChatMessageWindow::getRichMessageBlock() const{
@@ -373,6 +374,9 @@ void ChatMessageWindow::emitSendMsgSignal() {
     }
 
     QString richMessage = getRichMessageBlock();
+    richMessage.replace("<span>", "");
+    richMessage.replace("</span>", "");
+
 
     if(m_styleString.trimmed().isEmpty()){
         richMessage = QString("<div>") + richMessage;
@@ -406,7 +410,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
 
 
 
-    //qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+    qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 
