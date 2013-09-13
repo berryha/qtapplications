@@ -70,6 +70,29 @@ void ChatMessageWindow::initUI(){
 
     ui.setupUi(this);
 
+    static QString htmlForMessagesView = "";
+    if(htmlForMessagesView.isEmpty()){
+        QFile file(":/text/resources/text/sample.html");
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            htmlForMessagesView = file.readAll();
+        }else{
+            htmlForMessagesView = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-16\" /><title>Chat</title></head><body><div></div></body></html>";
+        }
+    }
+    ui.webView->setHtml(htmlForMessagesView);
+    m_mainWebFrame = ui.webView->page()->mainFrame();
+    connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrameToBottom(const QSize &)));
+
+    //ui.webView->setUrl(QUrl("qrc:/text/resources/text/sample.html"));
+    //ui.webView->load(QUrl("qrc:/text/resources/text/sample.html"));
+    //qWarning()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
+
+    //        QString htmlPath = imageCachePath + QString("/%1.htm").arg(contact->getUserID());
+    //        QFile::copy("qrc:/text/resources/text/sample.html", htmlPath);
+    //        ui.webView->setUrl(htmlPath);
+
+
+
     ui.mainSplitter->setStretchFactor(1, 1);
 
 //    QString displayName = contact->getNickName();
@@ -145,24 +168,6 @@ void ChatMessageWindow::initUI(){
     connect(smileyPopup, SIGNAL(signalEmoticonSelected(const QString&, bool)), this, SLOT(insertEmoticon(const QString&, bool)));
 
 
-    static QString htmlForMessagesView = "";
-    if(htmlForMessagesView.isEmpty()){
-        QFile file(":/text/resources/text/sample.html");
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
-            htmlForMessagesView = file.readAll();
-        }else{
-            htmlForMessagesView = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-16\" /><title>Chat</title></head><body><div></div></body></html>";
-        }
-    }
-    ui.webView->setHtml(htmlForMessagesView);
-
-    //ui.webView->setUrl(QUrl("qrc:/text/resources/text/sample.html"));
-    //ui.webView->load(QUrl("qrc:/text/resources/text/sample.html"));
-    //qWarning()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
-
-    //        QString htmlPath = imageCachePath + QString("/%1.htm").arg(contact->getUserID());
-    //        QFile::copy("qrc:/text/resources/text/sample.html", htmlPath);
-    //        ui.webView->setUrl(htmlPath);
 
 
 
@@ -299,9 +304,8 @@ void ChatMessageWindow::appendMessageReceivedFromContact(const QString &message,
         QWebElement div = doc.findFirst("div");
         div.appendInside(msg);
          
-
-        ui.webView->scroll(0, 0);
         //qDebug()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
+
 
 }
 
@@ -472,10 +476,13 @@ void ChatMessageWindow::emitSendMsgSignal() {
         
         //qWarning()<<"HTML:\n"<<ui.webView->page()->mainFrame()->toHtml();
                 
-                
+
+
 }
 
-
+void ChatMessageWindow::scrollWebFrameToBottom(const QSize & contentsSize){
+    m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
+}
 
 
 void ChatMessageWindow::showFontFrame() {

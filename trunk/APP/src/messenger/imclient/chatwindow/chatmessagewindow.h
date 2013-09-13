@@ -92,8 +92,11 @@ private slots:
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
+    void scrollWebFrameToBottom(const QSize &contentsSize);
+
 private:
     Ui::MessageWindowUi ui;
+    QWebFrame *m_mainWebFrame;
 
     //const QString &contactID;
     Contact *m_contact;
