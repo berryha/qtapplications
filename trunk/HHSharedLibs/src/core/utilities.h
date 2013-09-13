@@ -65,6 +65,10 @@ public:
 
     static void msleep(int msec);
 
+    static const QString getFileMD5EncodedWithBase64(const QString &fileName);
+
+    static QString simplifyRichTextFilter(const QString &in, bool *isPlainTextPtr = 0);
+
 private:
     static QList<QTranslator *>translators;
     static QMutex *translatorsMutex;
