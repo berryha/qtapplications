@@ -775,6 +775,34 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::REQUEST_CHAT_IMAGE):
+    {
+        //TODO:
+
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        bool fromContact = user->hasContact(peerID);
+        if(fromContact){
+            //From contact
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(peerID), false);
+        }else{
+            //From server
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        }
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+
+        QString imageName = "", contactID = "";
+        stream >> imageName >> contactID;
+
+        emit signalImageDownloadRequestReceived(contactID, imageName);
+    }
+        break;
+
     case quint8(IM::CHAT_IMAGE):
     {
         //TODO:
@@ -787,7 +815,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         bool fromContact = user->hasContact(peerID);
         if(fromContact){
             //From contact
-            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(peerID), false);
         }else{
             //From server
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
@@ -812,6 +840,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalImageDownloadResultReceived(contactID, imageName, image);
     }
         break;
+
 
     case quint8(IM::GROUP_CHAT_MESSAGES_CACHED_ON_SERVER):
     {

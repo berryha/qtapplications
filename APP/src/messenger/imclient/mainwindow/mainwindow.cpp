@@ -2241,7 +2241,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
 
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly)) {
-        qCritical()<< QString("ERROR! Failed to write file '%1'! %2").arg(fileName).arg(file.errorString());
+        qCritical()<< QString("ERROR! Failed to write file '%1'! %2").arg(filePath).arg(file.errorString());
 
         chatWindowManager->processImageDownloadResult(contactID, imageName, false);
         return ;
@@ -2295,7 +2295,6 @@ void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &m
         QString contactHostAddress = contact->getLastLoginExternalHostAddress();
         quint16 contactHostPort = contact->getLastLoginExternalHostPort();
         clientPacketsParser->sendChatMessageToContact(m_socketConnectedToServer, contactID, message, contactHostAddress, contactHostPort);
-        clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contactHostAddress, contactHostPort);
     }
 
     m_contactsManager->saveContactChatMessageToDatabase(m_imUser->getUserID(), contactID, message);
@@ -2322,7 +2321,6 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
             //            clientPacketsParser->sendChatMessageToServer(contactID, message);
         }else{
             clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
-            clientPacketsParser->sendImageFileToContact(m_socketConnectedToServer, contactID, imageList, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
         }
     }
 
