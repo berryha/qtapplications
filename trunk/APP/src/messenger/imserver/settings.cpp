@@ -12,6 +12,8 @@ Settings::Settings( const QString& pName, const QString& pVersion, const QString
 
     key = QString("HEHUI").toUtf8();
 
+    m_imagesDir = QCoreApplication::applicationDirPath() + "/images";
+
 }
 
 Settings::~Settings()
