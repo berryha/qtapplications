@@ -775,13 +775,6 @@ public slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
     }
 
-    bool sendChatMessageToContact(int peerSocketID, const QString &contactID, const QString &message, const QStringList &imagePathList, const QString &contactHostAddress, quint16 contactHostPort){
-        
-        bool ok = sendChatMessageToContact(peerSocketID, contactID, message, contactHostAddress, contactHostPort);
-        sendImageFileToContact(peerSocketID, contactID, imagePathList, contactHostAddress, contactHostPort);
-        return ok;
-    }
-
 
     bool sendInterestGroupChatMessageToContact(int peerSocketID, const QString &contactID, quint32 interestGroupID ,const QString &message, const QString &contactHostAddress, quint16 contactHostPort){
         qDebug()<<"--sendInterestGroupChatMessageToContact(...)";
@@ -836,11 +829,33 @@ public slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
     }
 
+    bool requestImageFromContact(int peerSocketID, const QString &contactID, const QString &imageName){
+        qDebug()<<"--requestImageFromContact(...)";
 
-    bool sendImageFileToContact2(int peerSocketID, const QString &contactID, const QStringList &filePathList, const QString &contactHostAddress, quint16 contactHostPort){
-        //TODO:
-        return true;
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::REQUEST_CHAT_IMAGE));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << imageName << contactID;
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
     }
+
     bool sendImageToContact(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &image){
         qDebug()<<"--sendImageToContact(...)";
 
@@ -1227,6 +1242,8 @@ signals:
     void signalChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
     void signalChatMessageCachedOnServerReceived(const QStringList &messages);
     void signalImageDownloadResultReceived(const QString &contactID, const QString &imageName, const QByteArray &image);
+    void signalImageDownloadRequestReceived(const QString &contactID, const QString &imageName);
+
 
     void signalInterestGroupChatMessageReceivedFromContact(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
     void signalInterestGroupChatMessagesCachedOnServerReceived(const QStringList &messages);

@@ -965,6 +965,72 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::REQUEST_CHAT_IMAGE):
+    {
+        qDebug()<<"--REQUEST_CHAT_IMAGE";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        QString imageName = "", contactID = "";
+        stream >> imageName >> contactID;
+
+        //TODO:Check cached file
+
+
+
+        UserInfo *contactInfo = getOnlineUserInfo(contactID);
+        if(!contactInfo){
+            sendImagePacket(socketID, contactID, imageName, QByteArray(), userInfo->getSessionEncryptionKey());
+            return;
+        }
+
+        sendRequestImagePacket(contactInfo->getSocketID(), userID, imageName, contactInfo->getSessionEncryptionKey(),);
+
+
+    }
+        break;
+
+    case quint8(IM::CHAT_IMAGE):
+    {
+        qDebug()<<"--CHAT_IMAGE";
+
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        quint32 interestGroupID = 0;
+        QString  message = "";
+        stream >> interestGroupID >> message;
+
+        //TODO:Save image
+
+
+
+
+    }
+        break;
+
 
 
         //    case quint8(IM::):

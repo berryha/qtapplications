@@ -1,5 +1,5 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef SERVERSETTINGS_H
+#define SERVERSETTINGS_H
 
 #include <QSettings>
 #include <QCoreApplication>
@@ -16,6 +16,7 @@
  
 
 namespace HEHUI{
+
 
 class SERVERLIB_API Settings : public SettingsCore
 {
@@ -150,4 +151,4 @@ private:
 
 } //namespace HEHUI
 
-#endif // SETTINGS_H
+#endif // SERVERSETTINGS_H
