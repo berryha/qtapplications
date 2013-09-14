@@ -368,7 +368,7 @@ void MainWindow::startNetwork(){
 
     connect(clientPacketsParser, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), this, SLOT(slotProcessChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalChatMessageCachedOnServerReceived(const QStringList & )), this, SLOT(slotProcessChatMessageCachedOnServer(const QStringList & )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalChatImageReceived(const QString & )), this, SLOT(slotProcessReceivedChatImage(const QString & )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalImageDownloadResultReceived(const QString &, const QString &, const QByteArray & )), this, SLOT(slotProcessImageDownloadResult(const QString &, const QString &, const QByteArray & )), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalInterestGroupChatMessageReceivedFromContact(quint32, const QString &, const QString &, const QString &)), this, SLOT(slotProcessInterestGroupChatMessagesReceivedFromContact(quint32, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalInterestGroupChatMessagesCachedOnServerReceived(const QStringList & )), this, SLOT(slotProcessInterestGroupChatMessagesCachedOnServer(const QStringList & )), Qt::QueuedConnection);
@@ -2222,7 +2222,36 @@ void MainWindow::slotProcessInterestGroupChatMessagesCachedOnServer(const QStrin
 
 }
 
-void MainWindow::slotProcessReceivedChatImage(const QString &fileName){
+void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const QString &imageName, const QByteArray &image){
+
+    QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
+    QFileInfo fileInfo(imageName);
+    if(md5String != fileInfo.baseName()){
+        qCritical()<<"ERROR! Image from "<<contactID<<" is damaged!";
+
+        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        return;
+    }
+
+
+
+    QString imageCachePath = Settings::instance()->getPictureCacheDir();
+    QString filePath = imageCachePath + "/" + imageName;
+
+
+    QFile file(filePath);
+    if (!file.open(QFile::WriteOnly)) {
+        qCritical()<< QString("ERROR! Failed to write file '%1'! %2").arg(fileName).arg(file.errorString());
+
+        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        return ;
+    }
+    file.write(image);
+    file.flush();
+    file.close();
+
+
+    chatWindowManager->processImageDownloadResult(contactID, imageName, true);
 
 }
 

@@ -782,6 +782,7 @@ public slots:
         return ok;
     }
 
+
     bool sendInterestGroupChatMessageToContact(int peerSocketID, const QString &contactID, quint32 interestGroupID ,const QString &message, const QString &contactHostAddress, quint16 contactHostPort){
         qDebug()<<"--sendInterestGroupChatMessageToContact(...)";
 
@@ -836,10 +837,37 @@ public slots:
     }
 
 
-    bool sendImageFileToContact(int peerSocketID, const QString &contactID, const QStringList &filePathList, const QString &contactHostAddress, quint16 contactHostPort){
+    bool sendImageFileToContact2(int peerSocketID, const QString &contactID, const QStringList &filePathList, const QString &contactHostAddress, quint16 contactHostPort){
         //TODO:
         return true;
     }
+    bool sendImageToContact(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &image){
+        qDebug()<<"--sendImageToContact(...)";
+
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::CHAT_IMAGE));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << imageName << image;
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
 
     bool requestSendFileToContact(int peerSocketID, const QString &contactID, const QStringList &filePathList){
         //TODO:
@@ -1198,7 +1226,7 @@ signals:
 
     void signalChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
     void signalChatMessageCachedOnServerReceived(const QStringList &messages);
-    void signalChatImageReceived(const QString &fileName);
+    void signalImageDownloadResultReceived(const QString &contactID, const QString &imageName, const QByteArray &image);
 
     void signalInterestGroupChatMessageReceivedFromContact(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
     void signalInterestGroupChatMessagesCachedOnServerReceived(const QStringList &messages);

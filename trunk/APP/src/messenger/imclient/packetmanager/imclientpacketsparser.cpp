@@ -778,6 +778,38 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::CHAT_IMAGE):
     {
         //TODO:
+
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        bool fromContact = user->hasContact(peerID);
+        if(fromContact){
+            //From contact
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
+        }else{
+            //From server
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        }
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+
+        QString imageName = "";
+        QByteArray image;
+
+        stream >> imageName >> image;
+
+        QString contactID = "";
+        if(fromContact){
+            contactID = peerID;
+        }else{
+            stream >> contactID;
+        }
+
+
+        emit signalImageDownloadResultReceived(contactID, imageName, image);
     }
         break;
 

@@ -219,6 +219,9 @@ InterestGroup * ChatMessageWindow::getInterestGroup(){
     return m_interestGroup;
 }
 
+bool ChatMessageWindow::isDownloadingImage(const QString &imageName){
+    return m_imagesDownloading.contains(imageName);
+}
 
 void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime){
     qDebug()<<"--ChatMessageWindow::appendChatMessage(...)";
@@ -293,14 +296,17 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
                 //Need to download the image
                 element.setAttribute("id", imageSRC);
                 if(m_myself->isAutoDownloadImageFromContact()){
+                    //Download image
                     element.setAttribute("src", ImagePath_Downloading);
+                    m_imagesDownloading.append(imageSRC);
                     emit signalRequestDownloadImage(userID, imageSRC);
                 }else{
                     element.setAttribute("src", ImagePath_Normal);
                 }
             }
             //URL: image://imagename
-            element.setOuterXml(QString("<a href=\"%1://%2\">%3</a>").arg(URLScheme_Image).arg(imageSRC).arg(element.toOuterXml()));
+            QString url = QString("%1://%2@%3").arg(URLScheme_Image).arg(userID).arg(imageSRC);
+            element.setOuterXml(QString("<a href=\"%1\">%2</a>").arg(url).arg(element.toOuterXml()));
 
         }
     }
@@ -318,7 +324,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 }
 
-void ChatMessageWindow::updateImage(const QString &imageName){
+void ChatMessageWindow::updateImage2(const QString &imageName){
 
     QWebElement doc = m_mainWebFrame->documentElement();
     QWebElementCollection elements = doc.findAll("img");
@@ -328,6 +334,18 @@ void ChatMessageWindow::updateImage(const QString &imageName){
             element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
         }
     }
+
+}
+
+void ChatMessageWindow::processImageDownloadResult(const QString &imageName, bool downloaded){
+    if(downloaded){
+        updateImage(imageName, ImageDownloaded);
+    }else{
+        updateImage(imageName, ImageDownloadingFailed);
+    }
+
+
+    m_imagesDownloading.removeAll(imageName);
 
 }
 
@@ -639,10 +657,37 @@ void ChatMessageWindow::showFontFrame() {
 
 void ChatMessageWindow::linkClicked(const QUrl & url){
     QString scheme = url.scheme();
-    QString target = url.host();
-    QMessageBox::information(this, tr("linkClicked"), scheme +"\n"+ target);
 
-    qDebug()<<"scheme:"<<scheme<<" target:"<<target<<" authority:"<<url.authority();
+    if(scheme == URLScheme_Image){
+        QString userID = url.userInfo();
+        QString imageName = url.host();
+
+
+        if(m_imagesDownloading.contains(imageName)){
+            return;
+        }
+
+
+
+        QString localCacheImage = imageCachePath + "/" + imageName;
+        if(QFile::exists(localCacheImage)){
+            //TODO:Show image
+        }else{
+            //Download image
+            updateImage(imageName, ImageDownloading);
+            m_imagesDownloading.append(imageName);
+            emit signalRequestDownloadImage(userID, imageName);
+        }
+
+
+    }else if(scheme == URLScheme_Contact){
+        //TODO
+
+    }
+
+
+
+    qDebug()<<"URL scheme:"<<scheme<<" host:"<<url.host()<<" userInfo:"<<url.userInfo();
 
 
 }

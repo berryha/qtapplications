@@ -49,7 +49,6 @@ signals:
     void signalSendChatMessageToCantact(Contact *contact, const QString &message, const QStringList &imageList);
     void signalSendChatMessageToInterestGroup(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
 
-    void signalChatImageReceived(const QString &imageName);
 
 public slots:
     void slotNewChatWithContact(const QString &contactID);
@@ -58,6 +57,8 @@ public slots:
     void slotNewChatWithInterestGroup(quint32 interestGroupID);
     void slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
 
+
+    void processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded);
 
 private slots:
     void initTabWidget();

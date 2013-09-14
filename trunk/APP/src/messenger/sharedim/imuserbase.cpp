@@ -767,6 +767,18 @@ bool IMUserBase::hasFriendContact(const QString &contactID){
     return false;
 }
 
+bool IMUserBase::hasContact(const QString &contactID){
+
+    QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
+    foreach (ContactGroupBase *contactGroup, groups) {
+        if(contactGroup->hasMember(contactID)){
+            return true;
+        };
+    }
+
+    return false;
+}
+
 bool IMUserBase::addNewContact(const QString &contactID, int groupID){
     
     if(contactID.trimmed().isEmpty()){

@@ -59,12 +59,16 @@ InterestGroup * GroupChatWindow::interestGroup(){
     return m_interestGroup;
 }
 
-void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
-    ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
+bool GroupChatWindow::isDownloadingImage(const QString &imageName){
+    return ui.chatMessageWindow->isDownloadingImage(imageName);
 }
 
-void GroupChatWindow::updateImage(const QString &imageName){
-    ui.chatMessageWindow->updateImage(imageName);
+void GroupChatWindow::processImageDownloadResult(const QString &imageName, bool downloaded){
+    ui.chatMessageWindow->processImageDownloadResult(imageName, downloaded);
+}
+
+void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
+    ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
 void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
