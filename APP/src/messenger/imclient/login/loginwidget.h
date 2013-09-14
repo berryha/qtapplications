@@ -27,9 +27,7 @@ class LoginWidget: public QWidget {
     Q_OBJECT
 
 public:
-    enum State {
-        NORMAL, VERIFYING, LOCKED
-    };
+    enum State {NORMAL, VERIFYING, LOCKED};
 
     LoginWidget(QWidget *parent = 0);
     ~LoginWidget();
