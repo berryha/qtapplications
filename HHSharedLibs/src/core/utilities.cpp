@@ -219,7 +219,7 @@ void Utilities::msleep(int msec){
 
 }
 
-const QString Utilities::getFileMD5EncodedWithBase64(const QString &fileName){
+const QString Utilities::getFileMD5EncodedWithHex(const QString &fileName){
 
     QString md5String = "";
 
@@ -232,7 +232,7 @@ const QString Utilities::getFileMD5EncodedWithBase64(const QString &fileName){
     ba = file.readAll();
     file.close();
 
-    md5String = QCryptographicHash::hash(ba, QCryptographicHash::Md5).toBase64();
+    md5String = QCryptographicHash::hash(ba, QCryptographicHash::Md5).toHex();
 
     return md5String;
 
