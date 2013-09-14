@@ -32,6 +32,7 @@
 #include "serverpacketsparser.h"
 #include "../serverutilities.h"
 
+#include "../settings.h"
 
 
 namespace HEHUI {
@@ -73,7 +74,8 @@ ServerPacketsParser::ServerPacketsParser(ResourcesManagerInstance *resourcesMana
     m_serverName = QHostInfo::localHostName().toLower();
     m_localRTPListeningPort = m_rtp->getTCPServerPort();
 
-
+    Settings settings;
+    m_chatImageCacheDir = settings.getChatImageCacheDir();
 
     //    usersManager = UsersManager::instance();
     cryptography = new Cryptography();
@@ -986,7 +988,19 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         stream >> imageName >> contactID;
 
         //TODO:Check cached file
+        QFile file(m_chatImageCacheDir + "/" + imageName);
+        if(file.exists()){
+            QByteArray ba;
+            if (file.open(QFile::ReadOnly)) {
+                ba = file.readAll();
+                file.close();
 
+                sendImagePacket(socketID, contactID, imageName, ba, userInfo->getSessionEncryptionKey());
+                return ;
+            }else{
+                qCritical()<< QString("ERROR! Failed to open image '%1'! %2").arg(imageName).arg(file.errorString());
+            }
+        }
 
 
         UserInfo *contactInfo = getOnlineUserInfo(contactID);
@@ -995,7 +1009,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             return;
         }
 
-        sendRequestImagePacket(contactInfo->getSocketID(), userID, imageName, contactInfo->getSessionEncryptionKey(),);
+        sendRequestImagePacket(contactInfo->getSocketID(), userID, imageName, contactInfo->getSessionEncryptionKey());
 
 
     }

@@ -1072,7 +1072,7 @@ private:
     QString m_serverName;
     quint16 m_localRTPListeningPort;
 
-
+    QString m_chatImageCacheDir;
 
 
     //    QTimer *heartbeatTimer;

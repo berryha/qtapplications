@@ -105,8 +105,6 @@ QString Settings::getPictureCacheDir(){
         dir.mkpath(pictureCacheDir);
     }
     return pictureCacheDir;
-    
-
 }
 
 QString Settings::getUserPrivateDataDir(const QString &userID) const{

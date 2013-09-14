@@ -137,6 +137,25 @@ public:
     }
 
 
+    QString getChatImageCacheDir(){
+        QString pictureCacheDir = m_imagesDir + QString("/cache");
+        if(!QFile::exists(pictureCacheDir)){
+            QDir dir;
+            dir.mkpath(pictureCacheDir);
+        }
+        return pictureCacheDir;
+    }
+    QString getUserFaceDir(){
+        QString pictureCacheDir = m_imagesDir + QString("/face");
+        if(!QFile::exists(pictureCacheDir)){
+            QDir dir;
+            dir.mkpath(pictureCacheDir);
+        }
+        return pictureCacheDir;
+    }
+
+
+
 private:
     //void encData(const QString dataString);
     //QString decData(const QByteArray &dataArray);
@@ -144,6 +163,8 @@ private:
 
 private:
     QByteArray key;
+
+    QString m_imagesDir;
 
 
 
