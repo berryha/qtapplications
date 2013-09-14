@@ -64,6 +64,15 @@ QString ContactChatWidget::displayName() const{
     return m_displayName;
 }
 
+bool ContactChatWidget::isDownloadingImage(const QString &imageName){
+    return ui.chatMessageWindow->isDownloadingImage(imageName);
+}
+
+void ContactChatWidget::processImageDownloadResult(const QString &imageName, bool downloaded){
+    return ui.chatMessageWindow->processImageDownloadResult(imageName, downloaded);
+}
+
+
 void ContactChatWidget::closeEvent(QCloseEvent * event){
 
     if(ui.chatMessageWindow->close()){
@@ -79,6 +88,3 @@ void ContactChatWidget::appendMessageReceivedFromContact(const QString &message,
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
-void ContactChatWidget::updateImage(const QString &imageName){
-    ui.chatMessageWindow->updateImage(imageName);
-}

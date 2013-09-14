@@ -294,6 +294,8 @@ public slots:
 
     virtual QStringList getAllContacts(bool noStrangers = true, bool noBlacklisted = true) const;
     bool hasFriendContact(const QString &contactID);
+    bool hasContact(const QString &contactID);
+
     bool addNewContact(const QString &contactID, int groupID);
     bool deleteContact(const QString &contactID);
     bool moveFriendContact2(const QString &contactID, int oldGroupID, int newGroupID);

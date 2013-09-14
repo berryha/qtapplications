@@ -17,6 +17,10 @@ public:
     Contact * contact();
     QString displayName() const;
 
+    bool isDownloadingImage(const QString &imageName);
+    void processImageDownloadResult(const QString &imageName, bool downloaded);
+
+
 protected:
     void closeEvent(QCloseEvent * event);
 
@@ -27,7 +31,6 @@ signals:
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
 
-    void updateImage(const QString &imageName);
 
 
 private:

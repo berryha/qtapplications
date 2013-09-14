@@ -416,6 +416,23 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
 
 }
 
+void ChatWindowManager::processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded){
+
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+    if(ccw){
+        if(ccw->isDownloadingImage(imageName)){
+            ccw->processImageDownloadResult(imageName, downloaded);
+        }
+    }
+
+    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
+        if(gcw->isDownloadingImage(imageName)){
+            gcw->processImageDownloadResult(imageName, downloaded);
+        }
+    }
+
+}
+
 void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time){
 
     InterestGroup *group = ContactsManager::instance()->getInterestGroup(interestGroupID);
@@ -715,7 +732,6 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
         contactChatWindow->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
 
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
-        connect(this, SIGNAL(signalChatImageReceived(const QString&)), contactChatWindow, SLOT(updateImage(const QString&)));
 
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
@@ -776,7 +792,6 @@ GroupChatWindow* ChatWindowManager::createInterestGroupChatWindow(InterestGroup 
     groupChatWindow->setWindowIcon(ImageResource::createIconForInterestGroup());
 
     connect(groupChatWindow, SIGNAL(sendMsgButtonClicked(InterestGroup *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup *, const QString &, const QStringList &)));
-    connect(this, SIGNAL(signalChatImageReceived(const QString&)), groupChatWindow, SLOT(updateImage(const QString&)));
 
     connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 

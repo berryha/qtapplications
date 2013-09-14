@@ -49,8 +49,10 @@ public:
     void setInterestGroup(InterestGroup *group);
     InterestGroup * getInterestGroup();
 
+    bool isDownloadingImage(const QString &imageName);
+    void processImageDownloadResult(const QString &imageName, bool downloaded);
 
-    void appendChatMessage(const QString &message, IMUserBase *contact, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
+    void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
 
 
 protected:
@@ -65,12 +67,15 @@ signals:
 
 
 public slots:
-    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
     
+
 private slots:
 
     void emitSendMsgSignal();
     void emitSendMsgSignal2();
+
+    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
+    void updateImage2(const QString &imageName);
 
 
 
@@ -141,6 +146,8 @@ private:
     QString m_styleString;
 
     Screenshot *m_screenshot;
+
+    QStringList m_imagesDownloading;
 
 
 

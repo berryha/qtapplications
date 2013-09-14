@@ -16,6 +16,10 @@ public:
 
     InterestGroup * interestGroup();
 
+    bool isDownloadingImage(const QString &imageName);
+    void processImageDownloadResult(const QString &imageName, bool downloaded);
+
+
 protected:
     void closeEvent(QCloseEvent * event);
 
@@ -26,7 +30,6 @@ signals:
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
 
-    void updateImage(const QString &imageName);
 
 private slots:
     void memberItemActivated(QListWidgetItem *memberItem);
