@@ -20,6 +20,14 @@
 
 namespace HEHUI {
 
+const QString URLScheme_Contact = "contact"; //contact://contact_id
+const QString URLScheme_Image= "image"; //image://image_name
+
+const QString ImagePath_Downloading = "qrc:/resources/images/imagedownloading.gif";
+const QString ImagePath_DownloadingFailed = "qrc:/resources/images/imagedownloadingfailed.png";
+
+
+
 ChatMessageWindow::ChatMessageWindow(QWidget *parent)
     :QWidget(parent), m_contact(0), m_interestGroup(0) {
 
@@ -81,8 +89,17 @@ void ChatMessageWindow::initUI(){
         }
     }
     ui.webView->setHtml(htmlForMessagesView);
-    m_mainWebFrame = ui.webView->page()->mainFrame();
+    //connect(ui.webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
+
+    QWebPage *page = ui.webView->page();
+    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
+
+
+    m_mainWebFrame = page->mainFrame();
     connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrameToBottom(const QSize &)));
+
+
 
     ui.mainSplitter->setStretchFactor(1, 1);
 
@@ -98,6 +115,9 @@ void ChatMessageWindow::initUI(){
     //    setWindowTitle(displayName);
     //TODO:
     //setWindowIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), contact->getOnlineState()));
+
+
+
 
 
     m_myself = IMUser::instance();
@@ -241,8 +261,8 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
 
-
-    QString msg = QString("<span><a title=\"%1\" href=\"showcontact://%1\">%2</a> %3</span>").arg(userID).arg(nickName).arg(datetime);
+    //URL: contact://contactid
+    QString msg = QString("<span><a title=\"%1\" href=\"%2://%1\">%3</a> %4</span>").arg(userID).arg(URLScheme_Contact).arg(nickName).arg(datetime);
     
     //Find Div tag
     //QRegExp regExp("<div.+>.*</div>");
@@ -269,9 +289,17 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
             if(QFile::exists(localCacheImage)){
                 element.setAttribute("src", "file://" + localCacheImage);
             }else{
-                element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+                //Need to download the image
                 element.setAttribute("id", imageSRC);
+                if(m_myself->isAutoDownloadImageFromContact()){
+                    element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+                    emit signalRequestDownloadImage(userID, imageSRC);
+                }else{
+                    element.setAttribute("src", "qrc:/resources/images/image.png");
+                }
             }
+            //URL: image://imagename
+            element.setOuterXml(QString("<a href=\"%1://%2\">%3</a>").arg(URLScheme_Image).arg(imageSRC).arg(element.toOuterXml()));
 
         }
     }
@@ -280,11 +308,67 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
     qDebug()<<"------msg:"<<msg;
     qDebug();
     qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
+
     qDebug();
 
     //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
+
+}
+
+void ChatMessageWindow::updateImage(const QString &imageName){
+
+    QWebElement doc = m_mainWebFrame->documentElement();
+    QWebElementCollection elements = doc.findAll("img");
+    foreach (QWebElement element, elements){
+        //if(element.attribute("src") == imageName){
+        if(element.attribute("id") == imageName){
+            element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
+        }
+    }
+
+}
+
+void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatus downloadStatus){
+
+    QWebElement doc = m_mainWebFrame->documentElement();
+    QWebElementCollection elements = doc.findAll("img");
+    foreach (QWebElement element, elements){
+
+        //QString imageSRC = element.attribute("src");
+        QString imageID = element.attribute("id").trimmed();
+        if(imageID != imageName){continue;}
+
+
+        //if(imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
+            switch (downloadStatus) {
+            case ImageDownloading:
+            {
+                element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+            }
+                break;
+            case ImageDownloaded:
+            {
+                element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
+                element.removeAttribute("id");
+            }
+                break;
+
+            case ImageDownloadingFailed:
+            {
+                element.setAttribute("src", "qrc:/resources/images/image.png");
+            }
+                break;
+            default:
+                break;
+            }
+
+        //}
+
+
+
+    }
 
 }
 
@@ -410,7 +494,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
 
 
 
-    qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+//    qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 
@@ -552,6 +636,16 @@ void ChatMessageWindow::showFontFrame() {
     }
 }
 
+void ChatMessageWindow::linkClicked(const QUrl & url){
+    QString scheme = url.scheme();
+    QString target = url.host();
+    QMessageBox::information(this, tr("linkClicked"), scheme +"\n"+ target);
+
+    qDebug()<<"scheme:"<<scheme<<" target:"<<target<<" authority:"<<url.authority();
+
+
+}
+
 void ChatMessageWindow::showEmotions() {
     QPoint p = ui.emotionToolButton->mapToGlobal(QPoint(0, 0));
 
@@ -624,7 +718,7 @@ void ChatMessageWindow::insertImage() {
     }
 
 
-    QString md5String = Utilities::getFileMD5EncodedWithBase64(fileName);
+    QString md5String = Utilities::getFileMD5EncodedWithHex(fileName);
     if(md5String.trimmed().isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Can not get image's MD5 hash!"));
         return;
@@ -691,7 +785,7 @@ void ChatMessageWindow::screenshotDone(const QImage &image){
     }
 
 
-    QString md5String = Utilities::getFileMD5EncodedWithBase64(fileName);
+    QString md5String = Utilities::getFileMD5EncodedWithHex(fileName);
     if(md5String.trimmed().isEmpty()){
         QMessageBox::critical(this, tr("Screenshot"), tr("Can not get image's MD5 hash!"));
         return;
@@ -833,18 +927,7 @@ void ChatMessageWindow::getStyleString(){
 
 }  
 
-void ChatMessageWindow::updateImage(const QString &imageName){
 
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElementCollection elements = doc.findAll("img");
-    foreach (QWebElement element, elements){
-        //if(element.attribute("src") == imageName){
-        if(element.attribute("id") == imageName){
-            element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
-        }
-    }
-
-}
 
 
 

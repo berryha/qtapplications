@@ -64,6 +64,9 @@ public:
     void showStrangers(bool show);
     bool isStrangersShown();
 
+    void setAutoDownloadImageFromContact(bool autoDownload);
+    bool isAutoDownloadImageFromContact();
+
 
 
 private:
@@ -93,6 +96,7 @@ private:
     QString m_regServerAddress;
 
     bool m_showStrangers;
+    bool m_autoDownloadImageFromContact;
 
 
 

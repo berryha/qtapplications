@@ -28,6 +28,7 @@ class ChatMessageWindow: public QWidget {
 
 public:
     enum ChatMessageWindowType{CMWT_Unknown, CMWT_Contact, CMWT_InterestGroup, CMWT_TempGroup};
+    enum ImageDownloadStatus{ImageDownloading, ImageDownloaded, ImageDownloadingFailed};
 
     ChatMessageWindow(QWidget *parent = 0);
     ChatMessageWindow(Contact *m_contact, QWidget *parent = 0);
@@ -60,11 +61,11 @@ signals:
     //    void sendMsgButtonClicked(const QString &contactID, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
-
+    void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
 
 
 public slots:
-    void updateImage(const QString &imageName);
+    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
     
 private slots:
 
@@ -94,6 +95,7 @@ private slots:
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
     void scrollWebFrameToBottom(const QSize &contentsSize);
+    void linkClicked(const QUrl & url);
 
 
 private:
@@ -110,6 +112,8 @@ private:
 private:
     Ui::MessageWindowUi ui;
     QWebFrame *m_mainWebFrame;
+
+
 
     //const QString &contactID;
     IMUser *m_myself;
@@ -137,6 +141,8 @@ private:
     QString m_styleString;
 
     Screenshot *m_screenshot;
+
+
 
 
 };

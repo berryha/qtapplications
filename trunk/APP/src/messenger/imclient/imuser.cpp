@@ -55,6 +55,7 @@ IMUser::IMUser(const QString & userID, QObject *parent)
     m_regServerAddress = "";
 
     m_showStrangers = true;
+    m_autoDownloadImageFromContact = true;
 
 }
 
@@ -121,6 +122,15 @@ void IMUser::showStrangers(bool show){
 
 bool IMUser::isStrangersShown(){
     return m_showStrangers;
+}
+
+
+void IMUser::setAutoDownloadImageFromContact(bool autoDownload){
+    m_autoDownloadImageFromContact = autoDownload;
+}
+
+bool IMUser::isAutoDownloadImageFromContact(){
+    return m_autoDownloadImageFromContact;
 }
 
 //bool IMUser::addGroup(const QString &groupName, const QStringList &members){
