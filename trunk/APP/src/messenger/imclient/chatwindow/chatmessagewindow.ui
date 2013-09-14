@@ -137,8 +137,8 @@
                  <string>Font Style</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/font.png</normaloff>:/messagewindow/resources/images/messageeditor/font.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/font.png</normaloff>:/messageeditor/messageeditor/font.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -160,8 +160,8 @@
                  <string>Face</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/face.png</normaloff>:/messagewindow/resources/images/messageeditor/face.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/face.png</normaloff>:/messageeditor/messageeditor/face.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -180,8 +180,8 @@
                  <string>Insert Image</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/insertimage.png</normaloff>:/messagewindow/resources/images/messageeditor/insertimage.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/insertimage.png</normaloff>:/messageeditor/messageeditor/insertimage.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -200,8 +200,8 @@
                  <string>Send File</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/file.png</normaloff>:/messagewindow/resources/images/messageeditor/file.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/file.png</normaloff>:/messageeditor/messageeditor/file.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -220,8 +220,8 @@
                  <string>Screenshot</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/screenshot.png</normaloff>:/messagewindow/resources/images/messageeditor/screenshot.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/screenshot.png</normaloff>:/messageeditor/messageeditor/screenshot.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -328,8 +328,8 @@
                  <string>Bold</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/textbold.png</normaloff>:/messagewindow/resources/images/messageeditor/textbold.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/textbold.png</normaloff>:/messageeditor/messageeditor/textbold.png</iconset>
                 </property>
                 <property name="checkable">
                  <bool>true</bool>
@@ -342,8 +342,8 @@
                  <string>Italic</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/textitalic.png</normaloff>:/messagewindow/resources/images/messageeditor/textitalic.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/textitalic.png</normaloff>:/messageeditor/messageeditor/textitalic.png</iconset>
                 </property>
                 <property name="checkable">
                  <bool>true</bool>
@@ -356,8 +356,8 @@
                  <string>Underline</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="../resources.qrc">
-                  <normaloff>:/messagewindow/resources/images/messageeditor/textunder.png</normaloff>:/messagewindow/resources/images/messageeditor/textunder.png</iconset>
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/textunder.png</normaloff>:/messageeditor/messageeditor/textunder.png</iconset>
                 </property>
                 <property name="checkable">
                  <bool>true</bool>
@@ -478,6 +478,7 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <resources>
   <include location="../resources.qrc"/>
+  <include location="../resources/images/chatmessagewindow/chatmessagewindow.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -23,8 +23,9 @@ namespace HEHUI {
 const QString URLScheme_Contact = "contact"; //contact://contact_id
 const QString URLScheme_Image= "image"; //image://image_name
 
-const QString ImagePath_Downloading = "qrc:/resources/images/imagedownloading.gif";
-const QString ImagePath_DownloadingFailed = "qrc:/resources/images/imagedownloadingfailed.png";
+const QString ImagePath_Normal = "qrc:/chatmessagewindow/image.png";
+const QString ImagePath_Downloading = "qrc:/chatmessagewindow/imagedownloading.gif";
+const QString ImagePath_DownloadingFailed = "qrc::/chatmessagewindow/imagedownloadingfailed.png";
 
 
 
@@ -292,10 +293,10 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
                 //Need to download the image
                 element.setAttribute("id", imageSRC);
                 if(m_myself->isAutoDownloadImageFromContact()){
-                    element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+                    element.setAttribute("src", ImagePath_Downloading);
                     emit signalRequestDownloadImage(userID, imageSRC);
                 }else{
-                    element.setAttribute("src", "qrc:/resources/images/image.png");
+                    element.setAttribute("src", ImagePath_Normal);
                 }
             }
             //URL: image://imagename
@@ -345,7 +346,7 @@ void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatu
             switch (downloadStatus) {
             case ImageDownloading:
             {
-                element.setAttribute("src", "qrc:/resources/images/verifying.gif");
+                element.setAttribute("src", ImagePath_Downloading);
             }
                 break;
             case ImageDownloaded:
@@ -357,7 +358,7 @@ void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatu
 
             case ImageDownloadingFailed:
             {
-                element.setAttribute("src", "qrc:/resources/images/image.png");
+                element.setAttribute("src", ImagePath_DownloadingFailed);
             }
                 break;
             default:

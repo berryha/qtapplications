@@ -119,7 +119,7 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     deletecontactdialog/deletecontactdialog.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
-    resources/images/messageeditor/messageeditor.qrc \
+    resources/images/chatmessagewindow/chatmessagewindow.qrc \
     resources.qrc
 
 # win32:RC_FILE = iconresource.rc
