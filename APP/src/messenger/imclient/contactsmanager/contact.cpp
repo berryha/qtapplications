@@ -41,6 +41,9 @@ Contact::Contact(QObject *parent)
     m_remarkName = "";
     m_showRemarkName= true;
 
+    m_socketID = INVALID_SOCK_ID;
+
+
 }
 
 Contact::Contact(const QString &contactID, QObject *parent)
@@ -52,6 +55,9 @@ Contact::Contact(const QString &contactID, QObject *parent)
 
     m_remarkName = "";
     m_showRemarkName= true;
+
+    m_socketID = INVALID_SOCK_ID;
+
 
 }
 
@@ -67,6 +73,9 @@ Contact::Contact(const QString &contactID, const QString &nickname, QObject *par
 
     m_remarkName = "";
     m_showRemarkName= true;
+
+    m_socketID = INVALID_SOCK_ID;
+
 
 }
 

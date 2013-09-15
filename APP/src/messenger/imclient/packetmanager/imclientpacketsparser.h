@@ -719,7 +719,7 @@ public slots:
 
     }
 
-    bool sendChatMessageToContact(int peerSocketID, const QString &contactID, const QString &message, const QString &contactHostAddress, quint16 contactHostPort){
+    bool sendChatMessageToContact(int peerSocketID, const QString &contactID, const QString &message){
         qDebug()<<"--sendChatMessageToContact(...)";
         
         //        QHostAddress targetHostAddress = QHostAddress(contactHostAddress);
@@ -829,7 +829,7 @@ public slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
     }
 
-    bool requestImageFromContact(int peerSocketID, const QString &contactID, const QString &imageName){
+    bool requestDownloadImageFromContact(int peerSocketID, const QString &contactID, const QString &imageName, bool sendRequestToServer){
         qDebug()<<"--requestImageFromContact(...)";
 
 
@@ -841,8 +841,14 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << imageName << contactID;
-        QByteArray encryptedData;
-        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
+        QByteArray encryptedData, key;
+        if(sendRequestToServer){
+            key = sessionEncryptionKey;
+        }else{
+            key =  sessionEncryptionKeyWithContactHash.value(contactID);
+        }
+
+        cryptography->teaCrypto(&encryptedData, ba, key, true);
         ba.clear();
         out.device()->seek(0);
         out << m_myUserID << encryptedData;
@@ -856,7 +862,7 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
-    bool sendImageToContact(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &image){
+    bool sendImageToContact(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &image, bool sendToServer){
         qDebug()<<"--sendImageToContact(...)";
 
 
@@ -868,8 +874,14 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << imageName << image;
-        QByteArray encryptedData;
-        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
+        QByteArray encryptedData, key;
+        if(sendToServer){
+            key = sessionEncryptionKey;
+        }else{
+            key =  sessionEncryptionKeyWithContactHash.value(contactID);
+        }
+
+        cryptography->teaCrypto(&encryptedData, ba, key, true);
         ba.clear();
         out.device()->seek(0);
         out << m_myUserID << encryptedData;

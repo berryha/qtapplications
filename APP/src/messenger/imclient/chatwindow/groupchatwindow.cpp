@@ -22,6 +22,8 @@ GroupChatWindow::GroupChatWindow(InterestGroup *interestGroup, QWidget *parent)
     ui.chatMessageWindow->setInterestGroup(interestGroup);
 
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(InterestGroup*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(InterestGroup*, const QString&, const QStringList&)));
+    connect(ui.chatMessageWindow, SIGNAL(signalRequestDownloadImage(const QString&, const QString&)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
+
 
     setWindowTitle(interestGroup->getGroupName() + "(" + QString::number(interestGroup->getGroupID()) + ")");
 

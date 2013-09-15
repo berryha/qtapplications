@@ -98,6 +98,9 @@ public:
         }
     }
 
+    void setSocketID(int socketID){this->m_socketID = socketID;}
+    int getSocketID(){return m_socketID;}
+
 
     bool isFriend();
     bool isStranger();
@@ -113,6 +116,7 @@ private:
     QString m_remarkName;
     bool m_showRemarkName;
 
+    int m_socketID;
 
 
 

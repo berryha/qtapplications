@@ -27,6 +27,8 @@ protected:
 signals:
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void toBeDstroyed();
+    void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
+
 
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
