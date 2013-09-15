@@ -391,7 +391,7 @@ void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatu
 
 }
 
-QString ChatMessageWindow::getRichMessageBlock() const{
+QString ChatMessageWindow::getRichMessageBlock(){
 
     m_imagesUploading.clear();
 

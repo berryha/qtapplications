@@ -749,7 +749,7 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
-    bool sendChatMessageToServer(int serverSocketID, const QString &contactID, const QString &message){
+    bool sendChatMessageToServer(int serverSocketID, const QString &contactID, const QString &message, const QStringList &imageNameList){
         qDebug()<<"--sendChatMessageToServer(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -759,7 +759,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << message;
+        out << contactID << message << imageNameList.join(",");
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

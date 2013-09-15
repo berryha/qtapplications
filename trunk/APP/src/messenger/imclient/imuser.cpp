@@ -56,6 +56,7 @@ IMUser::IMUser(const QString & userID, QObject *parent)
 
     m_showStrangers = true;
     m_autoDownloadImageFromContact = true;
+    m_syncAllChatMessagesToServer = true;
 
 }
 
@@ -131,6 +132,14 @@ void IMUser::setAutoDownloadImageFromContact(bool autoDownload){
 
 bool IMUser::isAutoDownloadImageFromContact(){
     return m_autoDownloadImageFromContact;
+}
+
+void IMUser::setSyncAllChatMessagesToServer(bool sync){
+    m_syncAllChatMessagesToServer = sync;
+}
+
+bool IMUser::isSyncAllChatMessagesToServer(){
+    return m_syncAllChatMessagesToServer;
 }
 
 //bool IMUser::addGroup(const QString &groupName, const QStringList &members){

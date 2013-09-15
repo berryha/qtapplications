@@ -369,6 +369,8 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), this, SLOT(slotProcessChatMessageReceivedFromContact(const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalChatMessageCachedOnServerReceived(const QStringList & )), this, SLOT(slotProcessChatMessageCachedOnServer(const QStringList & )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalImageDownloadResultReceived(const QString &, const QString &, const QByteArray & )), this, SLOT(slotProcessImageDownloadResult(const QString &, const QString &, const QByteArray & )), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalImageDownloadRequestReceived(const QString &, const QString &)), this, SLOT(slotProcessImageDownloadRequest(const QString &, const QString &)), Qt::QueuedConnection);
+
 
     connect(clientPacketsParser, SIGNAL(signalInterestGroupChatMessageReceivedFromContact(quint32, const QString &, const QString &, const QString &)), this, SLOT(slotProcessInterestGroupChatMessagesReceivedFromContact(quint32, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalInterestGroupChatMessagesCachedOnServerReceived(const QStringList & )), this, SLOT(slotProcessInterestGroupChatMessagesCachedOnServer(const QStringList & )), Qt::QueuedConnection);
@@ -2254,42 +2256,45 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
 
 }
 
-void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &message, const QStringList &imageList){
+void MainWindow::slotProcessImageDownloadRequest(const QString &contactID, const QString &imageName){
 
-    //    QRegExp regExp("<img.*>");
-    //    regExp.setCaseSensitivity(Qt::CaseInsensitive);
-    //    regExp.setMinimal(true);
-    //    int pos = 0;
-    //    QStringList imgList;
-    //    while ((pos = regExp.indexIn(htmlOfTextEdit, pos)) != -1) {
-    //        imgList << regExp.cap(0);
-    //        pos += regExp.matchedLength();
-    //    }
-    
-    //    regExp.setPattern("\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"");
-    //    foreach (QString imgTag, imgList) {
 
-    //    }
-    
-    
-    //    QFileInfo fileInfo(iconPath);
-    //    QString fileName = myUserID + "_" + fileInfo.absoluteDir().dirName() + "_" + fileInfo.fileName();
-    //    QString filePath = imageCachePath + "/" + fileName;
-    
-    //    if(!fileInfo.exists()){
-    //        QFile::copy(iconPath, filePath);
-    //    }
-    
-    //    emoticon = QString("<img src=\"" + filePath + "\"> ");
-    
-    
-    
-    
+    QString imageCachePath = Settings::instance()->getPictureCacheDir();
+    QString filePath = imageCachePath + "/" + imageName;
+
+    QFile file(filePath);
+    if(file.exists()){
+        if (file.open(QFile::ReadOnly)) {
+            QByteArray image = file.readAll();
+            file.close();
+
+            QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
+            QFileInfo fileInfo(imageName);
+            if(md5String == fileInfo.baseName()){
+                clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, image);
+                return ;
+            }
+            qCritical()<<"ERROR! Image "<<imageName<<" is damaged!";
+            file.remove();
+
+        }else{
+            qCritical()<< QString("ERROR! Failed to open image '%1'! %2").arg(imageName).arg(file.errorString());
+        }
+    }
+
+    clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, QByteArray());
+
+
+}
+
+void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &message, const QStringList &imageNameList){
+
+
     //Contact *contact = contactsManager->getUser(contactID);
     if(!contact){return;}
     QString contactID = contact->getUserID();
-    if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
-        clientPacketsParser->sendChatMessageToServer(m_socketConnectedToServer, contactID, message);
+    if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE || m_imUser->isSyncAllChatMessagesToServer()){
+        clientPacketsParser->sendChatMessageToServer(m_socketConnectedToServer, contactID, message, imageNameList);
     }else{
         QString contactHostAddress = contact->getLastLoginExternalHostAddress();
         quint16 contactHostPort = contact->getLastLoginExternalHostPort();

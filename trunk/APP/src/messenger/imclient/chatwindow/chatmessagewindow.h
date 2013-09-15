@@ -115,7 +115,7 @@ private:
     void colorChanged(const QColor &c);
     void alignmentChanged(Qt::Alignment a);
 
-    QString getRichMessageBlock() const;
+    QString getRichMessageBlock();
 
 private:
     Ui::MessageWindowUi ui;
