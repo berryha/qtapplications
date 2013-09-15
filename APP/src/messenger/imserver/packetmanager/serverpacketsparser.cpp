@@ -913,8 +913,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     {
         qDebug()<<"--CHAT_MESSAGES_CACHED_ON_SERVER";
 
-
-
         QString userID = peerID;
         QByteArray encryptedData;
         in >> encryptedData;
@@ -927,10 +925,19 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", message = "";
-        stream >> contactID >> message;
+        QString contactID = "", message = "", imageNames = "";
+        stream >> contactID >> message >> imageNames;
 
         saveCachedChatMessageFromIMUser(userID, contactID, message);
+
+        QStringList imageNameList = imageNames.split(",");
+        if(imageNameList.isEmpty()){return;}
+        foreach (QString imageName, imageNameList) {
+            if(!QFile::exists(m_chatImageCacheDir + "/" + imageName)){
+                sendRequestImagePacket(socketID, userID, imageName, userInfo->getSessionEncryptionKey());
+            }
+        }
+
 
     }
         break;
@@ -1037,6 +1044,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString  imageName = "";
         QByteArray image;
         stream >> imageName >> image;
+
+        if(image.isNull()){
+            qCritical()<<"ERROR! Invalid image!";
+            return;
+        }
 
         //TODO:Save image
         Settings settings;

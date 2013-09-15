@@ -67,6 +67,9 @@ public:
     void setAutoDownloadImageFromContact(bool autoDownload);
     bool isAutoDownloadImageFromContact();
 
+    void setSyncAllChatMessagesToServer(bool sync);
+    bool isSyncAllChatMessagesToServer();
+
 
 
 private:
@@ -97,6 +100,7 @@ private:
 
     bool m_showStrangers;
     bool m_autoDownloadImageFromContact;
+    bool m_syncAllChatMessagesToServer;
 
 
 
