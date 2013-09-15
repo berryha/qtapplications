@@ -3,6 +3,9 @@
 #define MESSAGEWINDOW_H
 
 #include <QWidget>
+#include <QStringList>
+
+
 #include "../ui/ui_chatmessagewindow.h"
 #include "./emoticonselecter/emoticonselector.h"
 #include "../contactsmanager/contact.h"
@@ -148,6 +151,8 @@ private:
     Screenshot *m_screenshot;
 
     QStringList m_imagesDownloading;
+    QStringList m_imagesUploading;
+
 
 
 

@@ -393,6 +393,8 @@ void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatu
 
 QString ChatMessageWindow::getRichMessageBlock() const{
 
+    m_imagesUploading.clear();
+
     QString out;
     QXmlStreamReader reader(ui.textEdit->toHtml());
     QXmlStreamWriter writer(&out);
@@ -425,6 +427,7 @@ QString ChatMessageWindow::getRichMessageBlock() const{
                     }else{
                         QFileInfo imgInfo(imgSRC);
                         fileName = imgInfo.fileName();
+                        m_imagesUploading.append(fileName);
                     }
 
                     attributes.clear();
@@ -476,6 +479,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
         return;
     }
 
+
     QString richMessage = getRichMessageBlock();
     richMessage.replace("<span>", "");
     richMessage.replace("</span>", "");
@@ -494,21 +498,19 @@ void ChatMessageWindow::emitSendMsgSignal() {
     ui.textEdit->setFocus();
     ui.textEdit->setCurrentCharFormat(fmt);
 
-    QStringList imageList;
 
     switch(m_chatMessageWindowType){
     case CMWT_Contact:
-        emit sendMsgButtonClicked(m_contact, richMessage, imageList);
+        emit sendMsgButtonClicked(m_contact, richMessage, m_imagesUploading);
         break;
     case CMWT_InterestGroup:
-        emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
+        emit sendMsgButtonClicked(m_interestGroup, richMessage, m_imagesUploading);
         break;
     case CMWT_TempGroup:
         break;
     default:
 
         break;
-
     }
 
 
