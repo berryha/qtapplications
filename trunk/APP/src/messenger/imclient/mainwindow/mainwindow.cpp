@@ -2234,14 +2234,13 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
     }
 
 
-
     QString imageCachePath = Settings::instance()->getPictureCacheDir();
     QString filePath = imageCachePath + "/" + imageName;
 
 
     QFile file(filePath);
     if (!file.open(QFile::WriteOnly)) {
-        qCritical()<< QString("ERROR! Failed to write file '%1'! %2").arg(filePath).arg(file.errorString());
+        qCritical()<< QString("ERROR! Failed to write image '%1'! %2").arg(filePath).arg(file.errorString());
 
         chatWindowManager->processImageDownloadResult(contactID, imageName, false);
         return ;

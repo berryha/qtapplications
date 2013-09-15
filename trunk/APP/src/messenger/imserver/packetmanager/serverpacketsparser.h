@@ -593,6 +593,12 @@ public slots:
             saveUserLastLogoutInfo(userInfo);
             //saveUserInfoToDatabase(userInfo);
             m_userSocketsHash.remove(userInfo->getSocketID());
+
+            QStringList images = imageDownloadingRequestHash.keys(userInfo);
+            foreach (QString imageName, images) {
+                imageDownloadingRequestHash.remove(imageName, userInfo);
+            }
+
         }else{
             userOnline(userInfo);
             saveUserLastLoginInfo(userInfo, userHostAddress, userHostPort, deviceInfo);
@@ -1083,6 +1089,7 @@ private:
     UDTProtocol *m_udtProtocol;
     TCPServer *m_tcpServer;
     QHash<int /*Socket ID*/, UserInfo* /*UserInfo*/> m_userSocketsHash;
+    QMultiHash<QString/*Image Name*/, UserInfo* /*UserInfo*/> imageDownloadingRequestHash;
 
 
     UsersManager usersManager;
@@ -1090,10 +1097,9 @@ private:
 
     QMutex mutex;
 
-    QHash<QString, QByteArray> sessionEncryptionKeysHash;
+    QHash<QString/*User ID*/, QByteArray/*Key*/> sessionEncryptionKeysHash;
 
     QTimer *checkIMUsersOnlineStateTimer;
-
 
 
 

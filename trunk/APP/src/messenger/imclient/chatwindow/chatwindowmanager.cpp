@@ -418,12 +418,19 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
 
 void ChatWindowManager::processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded){
 
-    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
-    if(ccw){
+//    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+//    if(ccw){
+//        if(ccw->isDownloadingImage(imageName)){
+//            ccw->processImageDownloadResult(imageName, downloaded);
+//        }
+//    }
+
+    foreach (ContactChatWidget *ccw, m_contactChatWidgetHash.values()) {
         if(ccw->isDownloadingImage(imageName)){
             ccw->processImageDownloadResult(imageName, downloaded);
         }
     }
+
 
     foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
         if(gcw->isDownloadingImage(imageName)){
