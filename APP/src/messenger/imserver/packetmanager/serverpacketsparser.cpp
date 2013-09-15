@@ -1033,13 +1033,31 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
 
-        quint32 interestGroupID = 0;
-        QString  message = "";
-        stream >> interestGroupID >> message;
+
+        QString  imageName = "";
+        QByteArray image;
+        stream >> imageName >> image;
 
         //TODO:Save image
+        Settings settings;
+        QString cacheDir = settings.getChatImageCacheDir();
+        QString fileName = cacheDir + "/" + imageName;
 
-
+        QFile file(fileName);
+        if(!file.exists()){
+            if(!file.open(QFile::WriteOnly)){
+                qCritical()<< QString("ERROR! Failed to write image '%1'! %2").arg(imageName).arg(file.errorString());
+                return;
+            }
+            file.write(image);
+            file.flush();
+            file.close();
+        }
+        //QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
+        QList<UserInfo *> users = imageDownloadingRequestHash.values(imageName);
+        foreach (UserInfo *user, users) {
+            sendImagePacket(user->getSocketID(), userID, imageName, image, user->getSessionEncryptionKey());
+        }
 
 
     }
@@ -1145,6 +1163,8 @@ bool ServerPacketsParser::decryptData(const QString &userID, QByteArray *destina
 }
 
 void ServerPacketsParser::peerDisconnected(int socketID){
+    //qDebug()<<"--ServerPacketsParser::peerDisconnected(...) "<<" socketID:"<<socketID;
+
     //TODO
 
     if(m_userSocketsHash.contains(socketID)){
@@ -1160,7 +1180,6 @@ void ServerPacketsParser::peerDisconnected(int socketID){
 
     }
 
-    //m_userSocketsHash.remove(socketID);
 
 }
 
