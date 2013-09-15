@@ -48,6 +48,7 @@ public:
 signals:
     void signalSendChatMessageToCantact(Contact *contact, const QString &message, const QStringList &imageList);
     void signalSendChatMessageToInterestGroup(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
+    void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
 
 
 public slots:

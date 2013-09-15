@@ -132,6 +132,7 @@ private slots:
     void slotProcessChatMessageCachedOnServer(const QStringList &messages);
     void slotProcessImageDownloadResult(const QString &contactID, const QString &imageName, const QByteArray &image);
     void slotProcessImageDownloadRequest(const QString &contactID, const QString &imageName);
+    void requestDownloadImage(const QString &contactID, const QString &imageName);
 
 
     void slotProcessInterestGroupChatMessagesReceivedFromContact(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time = "");

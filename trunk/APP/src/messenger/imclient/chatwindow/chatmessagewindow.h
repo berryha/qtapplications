@@ -63,7 +63,6 @@ protected:
 
 
 signals:
-    //    void sendMsgButtonClicked(const QString &contactID, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);

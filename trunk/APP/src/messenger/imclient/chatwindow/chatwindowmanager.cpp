@@ -739,6 +739,8 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
         contactChatWindow->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
 
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
+        connect(contactChatWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
+
 
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
@@ -799,6 +801,7 @@ GroupChatWindow* ChatWindowManager::createInterestGroupChatWindow(InterestGroup 
     groupChatWindow->setWindowIcon(ImageResource::createIconForInterestGroup());
 
     connect(groupChatWindow, SIGNAL(sendMsgButtonClicked(InterestGroup *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup *, const QString &, const QStringList &)));
+    connect(groupChatWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
 
     connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 

@@ -9,6 +9,7 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     setAttribute(Qt::WA_DeleteOnClose);
 
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)));
+    connect(ui.chatMessageWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
 
 
 //        Q_ASSERT_X(contact != 0, "ContactChatWindow", "NULL Contact!");

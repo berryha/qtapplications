@@ -392,6 +392,7 @@ void MainWindow::startNetwork(){
     
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)));
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)));
+    connect(chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)));
 
     
     
@@ -2225,6 +2226,8 @@ void MainWindow::slotProcessInterestGroupChatMessagesCachedOnServer(const QStrin
 }
 
 void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const QString &imageName, const QByteArray &image){
+    qDebug()<<"--MainWindow::slotProcessImageDownloadResult(...)"<<" contactID:"<<contactID<<" imageName:"<<imageName;
+
 
     QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
     QFileInfo fileInfo(imageName);
@@ -2257,7 +2260,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
 }
 
 void MainWindow::slotProcessImageDownloadRequest(const QString &contactID, const QString &imageName){
-
+    qDebug()<<"--MainWindow::slotProcessImageDownloadRequest(...) "<<" contactID:"<<contactID<<" imageName"<<imageName;
 
     QString imageCachePath = Settings::instance()->getPictureCacheDir();
     QString filePath = imageCachePath + "/" + imageName;
@@ -2271,9 +2274,17 @@ void MainWindow::slotProcessImageDownloadRequest(const QString &contactID, const
             QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
             QFileInfo fileInfo(imageName);
             if(md5String == fileInfo.baseName()){
-                clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, image);
+                Contact *contact = m_contactsManager->getUser(contactID);
+                if(!contact || contact->getOnlineState() == IM::ONLINESTATE_OFFLINE || m_imUser->isSyncAllChatMessagesToServer()){
+                    //Send image to server
+                    clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, image, true);
+                }else{
+                    //Send image to contact directly
+                    clientPacketsParser->sendImageToContact(contact->getSocketID(), m_imUser->getUserID(), imageName, image, false);
+                }
                 return ;
             }
+
             qCritical()<<"ERROR! Image "<<imageName<<" is damaged!";
             file.remove();
 
@@ -2282,10 +2293,25 @@ void MainWindow::slotProcessImageDownloadRequest(const QString &contactID, const
         }
     }
 
-    clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, QByteArray());
+    clientPacketsParser->sendImageToContact(m_socketConnectedToServer, contactID, imageName, QByteArray(), true);
 
 
 }
+
+void MainWindow::requestDownloadImage(const QString &contactID, const QString &imageName){
+    qDebug()<<"--MainWindow::requestDownloadImage(...) "<<" contactID:"<<contactID<<" imageName"<<imageName;
+
+    Contact *contact = m_contactsManager->getUser(contactID);
+    if(!contact || contact->getOnlineState() == IM::ONLINESTATE_OFFLINE || m_imUser->isSyncAllChatMessagesToServer()){
+        //Send image downloading request to server
+        clientPacketsParser->requestDownloadImageFromContact(m_socketConnectedToServer, contactID, imageName, true);
+    }else{
+        //Send image downloading request to contact directly
+        clientPacketsParser->requestDownloadImageFromContact(contact->getSocketID(), m_imUser->getUserID(), imageName, false);
+    }
+
+}
+
 
 void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &message, const QStringList &imageNameList){
 
@@ -2296,9 +2322,7 @@ void MainWindow::slotSendChatMessageToContact(Contact *contact, const QString &m
     if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE || m_imUser->isSyncAllChatMessagesToServer()){
         clientPacketsParser->sendChatMessageToServer(m_socketConnectedToServer, contactID, message, imageNameList);
     }else{
-        QString contactHostAddress = contact->getLastLoginExternalHostAddress();
-        quint16 contactHostPort = contact->getLastLoginExternalHostPort();
-        clientPacketsParser->sendChatMessageToContact(m_socketConnectedToServer, contactID, message, contactHostAddress, contactHostPort);
+        clientPacketsParser->sendChatMessageToContact(contact->getSocketID(), contactID, message);
     }
 
     m_contactsManager->saveContactChatMessageToDatabase(m_imUser->getUserID(), contactID, message);
