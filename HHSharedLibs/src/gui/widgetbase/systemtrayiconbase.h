@@ -160,9 +160,9 @@ public:
 
 
     //Flash the icon
-    virtual void showFlash(const QIcon &icon, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-    virtual void showFlash(const QString &iconName, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 1000);
-    virtual void showFlash(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 1000);
+    virtual void showFlash(const QIcon &icon, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 500);
+    virtual void showFlash(const QString &iconName, const QString &toolTip = QString(), QMenu *menu = 0, int millisecondsTimeoutHint = 500);
+    virtual void showFlash(const TrayIconData &trayIconData = TrayIconData(), int millisecondsTimeoutHint = 500);
 
 
 
