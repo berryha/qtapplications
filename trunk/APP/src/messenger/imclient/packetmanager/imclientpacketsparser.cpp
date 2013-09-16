@@ -862,7 +862,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::GROUP_CHAT_MESSAGE):
+    case quint8(IM::GROUP_CHAT_MESSAGE_FROM_SERVER):
     {
 
         QByteArray encryptedData;
@@ -875,8 +875,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
         quint32 interestGroupID = 0;
-        QString message = "";
-        stream  >> interestGroupID >> message;
+        QString senderID = "", message = "";
+        stream  >> interestGroupID >> senderID >> message;
 
         emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, contactID, message, "");
 
