@@ -884,11 +884,11 @@ bool IMUserBase::moveContactToAnotherGroup(const QString &contactID, int oldGrou
 //    addUpdatedProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
 //}
 
-bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool join){
+void IMUserBase::joinOrLeaveInterestGroup(quint32 interestGroupID, bool join){
 
     if(join){
         if(interestGroups.contains(interestGroupID)){
-            return false;
+            return;
         }else{
             interestGroups.append(interestGroupID);
         }
@@ -900,7 +900,10 @@ bool IMUserBase::joinOrLeaveInterestGroup(const QString &interestGroupID, bool j
 
 //    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
 
-    return true;
+}
+
+bool IMUserBase::isMemberOfInterestGroup(quint32 interestGroupID){
+    return interestGroups.contains(interestGroupID);
 }
 
 quint32 IMUserBase::updateInterestGroupInfoVersion(){

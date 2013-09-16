@@ -691,6 +691,29 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::SERVER_RESPONSE_CREATE_INTEREST_GROUP):
+    {
+        qWarning()<<"----SERVER_RESPONSE_CREATE_INTEREST_GROUP";
+
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        quint32 groupID = 0;
+        QString groupName = "";
+        stream >> groupID >> groupName ;
+
+        emit signalCreateInterestGroupResultPacketReceived(groupID, groupName);
+
+    }
+        break;
+
     case quint8(IM::SERVER_RESPONSE_PERSONAL_MESSAGE_INFO):
     {
 
@@ -778,7 +801,6 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     case quint8(IM::REQUEST_CHAT_IMAGE):
     {
         //TODO:
-
 
         QByteArray encryptedData;
         in >> encryptedData;

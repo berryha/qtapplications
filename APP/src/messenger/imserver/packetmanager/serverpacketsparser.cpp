@@ -783,6 +783,36 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::CLIENT_REQUEST_CREATE_INTEREST_GROUP):
+    {
+
+        qDebug()<<"~~CLIENT_REQUEST_CREATE_INTEREST_GROUP";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        QString groupName = 0;
+        stream >> groupName;
+
+        //TODO
+        quint32 groupID = createNewInterestGroup(userInfo, groupName);
+        sendCreateInterestGroupResultPacket(socketID, userInfo, groupID, groupName);
+
+
+    }
+        break;
+
+
 
     case quint8(IM::CLIENT_REQUEST_PERSONAL_MESSAGE_INFO):
     {
@@ -963,10 +993,11 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QString  message = "", imageNames = "";
         stream >> interestGroupID >> message >> imageNames;
 
-        if(userInfo->getInterestGroups().contains(QString::number(interestGroupID))){
+        if(userInfo->isMemberOfInterestGroup(interestGroupID)){
             saveCachedInterestGroupChatMessageFromIMUser(userID, interestGroupID, message);
         }else{
             qCritical()<<QString("User '%1' is not a member of group '%2'!").arg(userID).arg(interestGroupID);
+            return;
         }
 
         QStringList imageNameList = imageNames.split(",");

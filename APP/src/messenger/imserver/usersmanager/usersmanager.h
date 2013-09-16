@@ -105,7 +105,7 @@ public:
     
 /////////////////////////// Group Manager ////////////////////////////////////////    
     InterestGroup* getInterestGroup(quint32 groupID);
-    bool createNewInterestGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName );
+    quint32 createNewInterestGroup(UserInfo* creatorInfo, const QString &groupName);
     QList<UserInfo *> getAllOnlineInterestGroupMembers(quint32 groupID);
 
     QStringList searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);

@@ -861,6 +861,32 @@ public slots:
 
     }
     
+    bool sendCreateInterestGroupResultPacket(bool peerSocketID, UserInfo *userInfo, quint32 groupID, const QString &groupName){
+
+        //TODO:用户信息的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_CREATE_INTEREST_GROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << groupName ;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
     
     bool sendUserPersonalMessagePacket(bool peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendUserPersonalMessagePacket(...)";

@@ -1258,9 +1258,12 @@ bool UsersManager::getUserInterestGroupsFromDB(UserInfo* info){
 
         return false;
     }
-    if(query.first()){
-        info->setInterestGroups(query.value(0).toString().split(","));
+    if(!query.first()){
+        return false;
     }
+
+    info->setInterestGroups(query.value(0).toString().split(","));
+
 
 //    QStringList groups;
 //     while(query.next()){
@@ -1653,14 +1656,14 @@ QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
     }
 
     QStringList infoList;
-    QStringList groups = userInfo->getInterestGroups();
-    foreach (QString groupID, groups) {
-        InterestGroup *group = getInterestGroup(groupID.toUInt());
+    QList<quint32> groups = userInfo->getInterestGroups();
+    foreach (quint32 groupID, groups) {
+        InterestGroup *group = getInterestGroup(groupID);
         if(!group){
             qDebug()<<"invalid group";
             return "";
         }
-        infoList.append(groupID + ":" + QString::number(group->getGroupInfoVersion()) + ":" + QString::number(group->getGroupMemberListInfoVersion()));
+        infoList.append(QString::number(groupID) + ":" + QString::number(group->getGroupInfoVersion()) + ":" + QString::number(group->getGroupMemberListInfoVersion()));
     }
     
     return infoList.join(",");
@@ -1855,64 +1858,56 @@ InterestGroup* UsersManager::getInterestGroup(quint32 groupID){
 
 }
 
-bool UsersManager::createNewInterestGroup(quint32 groupTypeID, quint32 parentGroupID, quint32 creatorSystemID, const QString &groupName ){
+quint32 UsersManager::createNewInterestGroup(UserInfo *creatorInfo, const QString &groupName){
+    qDebug()<<"UsersManager::createNewInterestGroup(...) "<<" creatorID:"<<creatorInfo<<" groupName:"<<groupName;
     
-    
+
+    if(!creatorInfo){return 0;}
+    if(groupName.trimmed().isEmpty()){return 0;}
+
     if(!db.isValid()){
         if(!openDatabase()){
             //*errorType = IM::ERROR_UnKnownError;
-            return false;
+            return 0;
         }
-    } 
+    }
+
     QSqlQuery query(db);
-    QString statement = QString("insert into groups(TypeID, ParentGroup, Creator, GroupName) values(%1, %2, %3, '%4') ").arg(groupTypeID).arg(parentGroupID).arg(creatorSystemID).arg(groupName);
+    QString statement = QString("call sp_InterestGroup_Create(%1, %2, @GroupID); ").arg(creatorInfo->getUserID()).arg(groupName);
     
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not create new group! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
         
-        return false;
+        return 0;
     }
     
     
-    statement = QString("select ID from groups where TypeID=%1 and ParentGroup=%2 and Creator=%3 and GroupName='%4' ").arg(groupTypeID).arg(parentGroupID).arg(creatorSystemID).arg(groupName);
+    statement = QString("select @GroupID; ");
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query group id from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-//        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
         
-        return false;
+        return 0;
     }
     
     if(!query.first()){
-        return false;
+        return 0;
     }
     
     quint32 groupID = query.value(0).toUInt();
+    qDebug()<<"-----------groupID:"<<groupID;
+
     InterestGroup *group = queryInterestGroup(groupID);
     if(!group){
-        return false;
+        return 0;
     }
+
+    creatorInfo->joinOrLeaveInterestGroup(groupID, true);
     
-    
-    return true;
+    return groupID;
     
 }
 
@@ -2233,8 +2228,9 @@ QStringList UsersManager::getCachedInterestGroupChatMessagesForUserFromDB(UserIn
         return QStringList();
     }
 
-    QStringList interestgroups = userInfo->getInterestGroups();
-    if(interestgroups.isEmpty()){return QStringList();}
+    if(userInfo->getInterestGroups().isEmpty()){
+        return QStringList();
+    }
 
     if(!db.isValid()){
         if(!openDatabase()){
