@@ -379,7 +379,8 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalInterestGroupsListPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessInterestGroupsList(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalInterestGroupInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessInterestGroupInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalInterestGroupMembersInfoPacketReceived(const QString &, quint32, quint32 )), this, SLOT(slotProcessInterestGroupMembersInfo(const QString &, quint32, quint32 )), Qt::QueuedConnection);
-    
+    connect(clientPacketsParser, SIGNAL(signalCreateInterestGroupResultPacketReceived(quint32, const QString &)), this, SLOT(slotProcessCreateInterestGroupResult(quint32, const QString &)), Qt::QueuedConnection);
+
     
     //File TX
     connect(clientPacketsParser, SIGNAL(signalContactRequestUploadFile(int, const QString &, const QByteArray &, const QString &, quint64, const QString &)), this, SLOT(processContactRequestUploadFilePacket(int, const QString &, const QByteArray &, const QString &,quint64, const QString &)), Qt::QueuedConnection);
@@ -2370,7 +2371,7 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
     //        return;
     //    }
 
-    QStringList groupsOnServer;
+    QList<quint32> groupsOnServer;
     QStringList infoList = interestGroupsListFromServer.split(",");
     foreach (QString info, infoList) {
         QStringList list = info.split(":");
@@ -2379,7 +2380,7 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
             continue;
         }
         quint32 groupID = list.at(0).toUInt();
-        groupsOnServer.append(QString::number(groupID));
+        groupsOnServer.append(groupID);
         quint32 groupInfoVersion = list.at(1).toUInt();
         quint32 memberListInfoVersion = list.at(2).toUInt();
         qWarning()<<"Server: groupInfoVersion:"<<groupInfoVersion<<" memberListInfoVersion:"<<memberListInfoVersion;
@@ -2403,11 +2404,11 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
         
     }
     
-    QStringList interestGroupsOnLocal = m_imUser->getInterestGroups();
+    QList<quint32> interestGroupsOnLocal = m_imUser->getInterestGroups();
     if(!interestGroupsOnLocal.isEmpty()){
-        foreach (QString groupID, interestGroupsOnLocal) {
+        foreach (quint32 groupID, interestGroupsOnLocal) {
             if(!groupsOnServer.contains(groupID)){
-                m_contactsManager->leaveInterestGroup(groupID.toUInt());
+                m_contactsManager->leaveInterestGroup(groupID);
             }
         }
 
@@ -2499,11 +2500,31 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
     
 }
 
+void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QString &groupName){
+
+    //TODO
+    if(!groupID){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to create group '%1'!").arg(groupName));
+        return;
+    }
+
+    if(m_imUser->isMemberOfInterestGroup(groupID)){return;}
+
+    InterestGroup *group = new InterestGroup(groupID, groupName, this);
+    m_contactsManager->addNewInterestGroupToDatabase(group);
+    group->addMember(m_imUser->getUserID(), 1);
+
+    updateInterestGroupInfoToUI(group);
+
+}
+
 void MainWindow::interestGroupItemActivated(QListWidgetItem * item ){
 
     chatWindowManager->slotNewChatWithInterestGroup(item->data(Qt::UserRole).toUInt());
 
-    //qWarning()<<"interestGroupItemActivated(...):"<<item->data(Qt::UserRole).toUInt();
+}
+
+void MainWindow::handleContextMenuEventOninterestGroupItem(QListWidgetItem * item){
 
 }
 

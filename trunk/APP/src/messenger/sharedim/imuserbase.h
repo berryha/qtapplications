@@ -121,12 +121,15 @@ public:
         return interestGroupInfoVersion;
     }
     
-    QStringList getInterestGroups() const
+    QList<quint32> getInterestGroups() const
     {
         return interestGroups;
     }
     void setInterestGroups(const QStringList &groups){
-        this->interestGroups = groups;
+        this->interestGroups.clear();
+        foreach (QString groupID, groups) {
+            this->interestGroups.append(groupID.toUInt());
+        }
     }
 
     quint32 getPersonalSummaryInfoVersion() const
@@ -138,10 +141,6 @@ public:
         return personalDetailInfoVersion;
     }
 
-    //    QHash<quint32,QString> getPersonalInterestGroupsHash() const
-    //    {
-    //        return personalInterestGroupsHash;
-    //    }
 
     QByteArray getSessionEncryptionKey() const
     {
@@ -202,11 +201,6 @@ public:
     }
 
     
-//    void setInterestGroupsStringFromDatabase(const QString &interestGroupsStringFromDatabase)
-//    {
-//        this->interestGroups = interestGroupsStringFromDatabase.split(",");
-//    }
-
     void setPersonalSummaryInfoVersion(quint32 personalSummaryInfoVersion)
     {
         this->personalSummaryInfoVersion = personalSummaryInfoVersion;
@@ -215,11 +209,6 @@ public:
     {
         this->personalDetailInfoVersion = personalDetailInfoVersion;
     }
-
-    //    void setPersonalInterestGroupsHash(QHash<quint32,QString> personalInterestGroups)
-    //    {
-    //        this->personalInterestGroupsHash = personalInterestGroups;
-    //    }
 
     void setSessionEncryptionKey(const QByteArray &sessionEncryptionKey)
     {
@@ -302,7 +291,8 @@ public slots:
     bool moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID);
 
 
-    bool joinOrLeaveInterestGroup(const QString &interestGroupID, bool join = true);
+    void joinOrLeaveInterestGroup(quint32 interestGroupID, bool join = true);
+    bool isMemberOfInterestGroup(quint32 interestGroupID);
     quint32 updateInterestGroupInfoVersion();
 
 
@@ -337,7 +327,7 @@ private:
     QString personalMessage;
 
 
-    QStringList interestGroups;
+    QList<quint32/*Group ID*/> interestGroups;
     quint32 interestGroupInfoVersion;
     
     quint32 personalSummaryInfoVersion;
