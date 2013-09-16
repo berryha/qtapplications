@@ -25,7 +25,7 @@ const QString URLScheme_Image= "image"; //image://image_name
 
 const QString ImagePath_Normal = "qrc:/chatmessagewindow/image.png";
 const QString ImagePath_Downloading = "qrc:/chatmessagewindow/imagedownloading.gif";
-const QString ImagePath_DownloadingFailed = "qrc::/chatmessagewindow/imagedownloadingfailed.png";
+const QString ImagePath_DownloadingFailed = "qrc:/chatmessagewindow/imagedownloadingfailed.png";
 
 
 
@@ -338,12 +338,12 @@ void ChatMessageWindow::updateImage2(const QString &imageName){
 }
 
 void ChatMessageWindow::processImageDownloadResult(const QString &imageName, bool downloaded){
+
     if(downloaded){
         updateImage(imageName, ImageDownloaded);
     }else{
         updateImage(imageName, ImageDownloadingFailed);
     }
-
 
     m_imagesDownloading.removeAll(imageName);
 

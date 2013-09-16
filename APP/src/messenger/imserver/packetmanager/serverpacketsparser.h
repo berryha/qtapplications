@@ -920,7 +920,7 @@ public slots:
 
 
 
-    bool sendCachedChatMessagesPacket(int peerSocketID, const QStringList &messages, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
+    bool sendCachedChatMessagesPacket(int peerSocketID, const QStringList &messages, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendCachedChatMessagesPacket(...)";
         
         //TODO:缓存消息的格式
@@ -947,6 +947,7 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
 
     }
+
 
     bool sendRequestImagePacket(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendRequestImagePacket(...)";
@@ -1034,6 +1035,33 @@ public slots:
 
     }
 
+    bool sendInterestGroupChatMessagesToMemberPacket(int peerSocketID, quint32 interestGroupID, const QString &senderID, const QString &message, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendInterestGroupChatMessagesToMemberPacket(...)";
+
+        //TODO:缓存消息的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::GROUP_CHAT_MESSAGE_FROM_SERVER));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << interestGroupID << senderID << message;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
 
     void userExceptionalOffline(const QString &peerAddress, quint16 peerPort);
 
@@ -1053,6 +1081,8 @@ private slots:
     //    void slotCheckIMUsersOnlineStatus();
 
     void peerDisconnected(int socketID);
+
+    void sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message);
 
 
 signals:

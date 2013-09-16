@@ -55,7 +55,7 @@ IMUser::IMUser(const QString & userID, QObject *parent)
     m_regServerAddress = "";
 
     m_showStrangers = true;
-    m_autoDownloadImageFromContact = true;
+    m_autoDownloadImageFromContact = false;
     m_syncAllChatMessagesToServer = true;
 
 }

@@ -776,44 +776,44 @@ public slots:
     }
 
 
-    bool sendInterestGroupChatMessageToContact(int peerSocketID, const QString &contactID, quint32 interestGroupID ,const QString &message, const QString &contactHostAddress, quint16 contactHostPort){
-        qDebug()<<"--sendInterestGroupChatMessageToContact(...)";
+//    bool sendInterestGroupChatMessageToContact(int peerSocketID, const QString &contactID, quint32 interestGroupID ,const QString &message, const QString &contactHostAddress, quint16 contactHostPort){
+//        qDebug()<<"--sendInterestGroupChatMessageToContact(...)";
 
-        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
-        packet->setPacketType(quint8(IM::GROUP_CHAT_MESSAGE));
-        packet->setTransmissionProtocol(TP_RUDP);
-        QByteArray ba;
-        QDataStream out(&ba, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_8);
+//        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+//        packet->setPacketType(quint8(IM::GROUP_CHAT_MESSAGE));
+//        packet->setTransmissionProtocol(TP_RUDP);
+//        QByteArray ba;
+//        QDataStream out(&ba, QIODevice::WriteOnly);
+//        out.setVersion(QDataStream::Qt_4_8);
 
-        out << interestGroupID << message;
-        QByteArray encryptedData;
-        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
-        ba.clear();
-        out.device()->seek(0);
-        out << m_myUserID << encryptedData;
-        packet->setPacketData(ba);
+//        out << interestGroupID << message;
+//        QByteArray encryptedData;
+//        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
+//        ba.clear();
+//        out.device()->seek(0);
+//        out << m_myUserID << encryptedData;
+//        packet->setPacketData(ba);
 
-        ba.clear();
-        out.device()->seek(0);
-        QVariant v;
-        v.setValue(*packet);
-        out << v;
-        return m_rtp->sendReliableData(peerSocketID, &ba);
-    }
+//        ba.clear();
+//        out.device()->seek(0);
+//        QVariant v;
+//        v.setValue(*packet);
+//        out << v;
+//        return m_rtp->sendReliableData(peerSocketID, &ba);
+//    }
 
-    bool sendInterestGroupChatMessageToServer(int serverSocketID, quint32 interestGroupID ,const QString &message){
+    bool sendInterestGroupChatMessageToServer(int serverSocketID, quint32 interestGroupID ,const QString &message, const QStringList &imageList){
         qDebug()<<"--sendInterestGroupChatMessageToServer(...)";
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
-        packet->setPacketType(quint8(IM::GROUP_CHAT_MESSAGE));
+        packet->setPacketType(quint8(IM::GROUP_CHAT_MESSAGE_TO_SERVER));
         packet->setTransmissionProtocol(TP_RUDP);
         //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << interestGroupID << message;
+        out << interestGroupID << message << imageList.join(",");
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

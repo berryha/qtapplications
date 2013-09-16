@@ -310,7 +310,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
             QStringList messagesCachedOnServer = cachedChatMessagesForIMUser(userInfo);
             if(!messagesCachedOnServer.isEmpty()){
-                sendCachedChatMessagesPacket(socketID, messagesCachedOnServer, sessionEncryptionKey, peerAddress, peerPort);
+                sendCachedChatMessagesPacket(socketID, messagesCachedOnServer, sessionEncryptionKey);
             }
 
             QList<QStringList> sentApplicationList, receivedApplicationList;
@@ -934,6 +934,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(imageNameList.isEmpty()){return;}
         foreach (QString imageName, imageNameList) {
             if(!QFile::exists(m_chatImageCacheDir + "/" + imageName)){
+                qDebug()<<QString("Image '%1' exists on server!").arg(imageName);
                 sendRequestImagePacket(socketID, userID, imageName, userInfo->getSessionEncryptionKey());
             }
         }
@@ -942,11 +943,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::GROUP_CHAT_MESSAGE):
+    case quint8(IM::GROUP_CHAT_MESSAGE_TO_SERVER):
     {
-        qDebug()<<"--GROUP_CHAT_MESSAGE";
-
-
+        qDebug()<<"--GROUP_CHAT_MESSAGE_TO_SERVER";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -961,14 +960,26 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
         quint32 interestGroupID = 0;
-        QString  message = "";
-        stream >> interestGroupID >> message;
+        QString  message = "", imageNames = "";
+        stream >> interestGroupID >> message >> imageNames;
 
         if(userInfo->getInterestGroups().contains(QString::number(interestGroupID))){
             saveCachedInterestGroupChatMessageFromIMUser(userID, interestGroupID, message);
         }else{
             qCritical()<<QString("User '%1' is not a member of group '%2'!").arg(userID).arg(interestGroupID);
         }
+
+        QStringList imageNameList = imageNames.split(",");
+        if(imageNameList.isEmpty()){return;}
+        foreach (QString imageName, imageNameList) {
+            if(!QFile::exists(m_chatImageCacheDir + "/" + imageName)){
+                qDebug()<<QString("Image '%1' exists on server!").arg(imageName);
+                sendRequestImagePacket(socketID, userID, imageName, userInfo->getSessionEncryptionKey());
+            }
+        }
+
+        //TODO:Send message to all contacts
+        sendInterestGroupChatMessageToMembers(interestGroupID, userID, message);
 
 
     }
@@ -997,6 +1008,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO:Check cached file
         QFile file(m_chatImageCacheDir + "/" + imageName);
         if(file.exists()){
+            qDebug()<<QString("Image '%1' exists on server!").arg(imageName);
             QByteArray ba;
             if (file.open(QFile::ReadOnly)) {
                 ba = file.readAll();
@@ -1039,7 +1051,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
-
 
         QString  imageName = "";
         QByteArray image;
@@ -1192,6 +1203,17 @@ void ServerPacketsParser::peerDisconnected(int socketID){
 
     }
 
+
+}
+
+void ServerPacketsParser::sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message){
+
+    //TODO
+
+     QList<UserInfo *> onlineMembers = getAllOnlineInterestGroupMembers(interestGroupID);
+     foreach (UserInfo *user, onlineMembers) {
+         sendInterestGroupChatMessagesToMemberPacket(user->getSocketID(), interestGroupID, senderID, message, user->getSessionEncryptionKey());
+     }
 
 }
 

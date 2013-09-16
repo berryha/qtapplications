@@ -2228,6 +2228,11 @@ void MainWindow::slotProcessInterestGroupChatMessagesCachedOnServer(const QStrin
 void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const QString &imageName, const QByteArray &image){
     qDebug()<<"--MainWindow::slotProcessImageDownloadResult(...)"<<" contactID:"<<contactID<<" imageName:"<<imageName;
 
+    if(image.isNull()){
+        qCritical()<<QString("ERROR! Image '%1' downloading failed!").arg(imageName);
+        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        return;
+    }
 
     QString md5String = QCryptographicHash::hash(image, QCryptographicHash::Md5).toHex();
     QFileInfo fileInfo(imageName);
@@ -2338,19 +2343,19 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
         return;
     }
 
-    clientPacketsParser->sendInterestGroupChatMessageToServer(m_socketConnectedToServer, interestGroup->getGroupID(), message);
-    //TODO: Send images to server
+    //Send message to server
+    clientPacketsParser->sendInterestGroupChatMessageToServer(m_socketConnectedToServer, interestGroup->getGroupID(), message, imageList);
 
-    QStringList members = interestGroup->members();
-    foreach (QString contactID , members) {
-        Contact *contact = m_contactsManager->getUser(contactID);
-        if(!contact){continue;}
-        if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
-            //            clientPacketsParser->sendChatMessageToServer(contactID, message);
-        }else{
-            clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
-        }
-    }
+//    QStringList members = interestGroup->members();
+//    foreach (QString contactID , members) {
+//        Contact *contact = m_contactsManager->getUser(contactID);
+//        if(!contact){continue;}
+//        if(contact->getOnlineState() == IM::ONLINESTATE_OFFLINE){
+//            //            clientPacketsParser->sendChatMessageToServer(contactID, message);
+//        }else{
+//            clientPacketsParser->sendInterestGroupChatMessageToContact(m_socketConnectedToServer, contactID, interestGroup->getGroupID(), message, contact->getLastLoginExternalHostAddress(), contact->getLastLoginExternalHostPort());
+//        }
+//    }
 
     m_contactsManager->saveInterestGroupChatMessageToDatabase(m_imUser->getUserID(), interestGroup->getGroupID(), message);
 

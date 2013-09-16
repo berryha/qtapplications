@@ -1916,6 +1916,22 @@ bool UsersManager::createNewInterestGroup(quint32 groupTypeID, quint32 parentGro
     
 }
 
+QList<UserInfo *> UsersManager::getAllOnlineInterestGroupMembers(quint32 groupID){
+
+    QList<UserInfo *> onlineMembers;
+
+    InterestGroup * group = getInterestGroup(groupID);
+    if(!group){return onlineMembers;}
+
+    foreach (QString memberID, group->members()) {
+        UserInfo *user = getOnlineUserInfo(memberID);
+        if(user){onlineMembers.append(user);}
+    }
+
+    return onlineMembers;
+
+}
+
 QStringList UsersManager::searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
 
     
