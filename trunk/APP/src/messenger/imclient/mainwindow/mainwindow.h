@@ -71,8 +71,6 @@ public slots:
     void slotUpdateContactsInfo2();
 //    void slotUpdateBlacklistInfo();
 
-    void updateAllInterestGroupsInfoToUI();
-    void updateInterestGroupInfoToUI(InterestGroup *interestGroup);
 
 
 private slots:
@@ -148,8 +146,13 @@ private slots:
     void slotProcessCreateInterestGroupResult(quint32 groupID, const QString &groupName);
 
 
-    void handleContextMenuEventOninterestGroupItem(QListWidgetItem * item);
+    void handleContextMenuEventOnInterestGroupList(const QPoint &point);
+    void slotCreateInterestGroup();
     void interestGroupItemActivated(QListWidgetItem * item );
+    void updateAllInterestGroupsInfoToUI();
+    void addInterestGroupToUI(InterestGroup *interestGroup);
+    void deleteInterestGroupFromUI(InterestGroup *interestGroup);
+    void updateInterestGroupInfoToUI(InterestGroup *interestGroup);
 
 
     void on_toolButtonUserFace_clicked(){showUserInfo(m_imUser);}

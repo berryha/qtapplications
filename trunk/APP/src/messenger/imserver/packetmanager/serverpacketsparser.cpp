@@ -127,8 +127,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     QHostAddress peerAddress = packet->getPeerHostAddress();
     quint16 peerPort = packet->getPeerHostPort();
     quint8 packetType = packet->getPacketType();
-    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" peerID:"<<peerID<<" peerAddress:"<<peerAddress.toString()<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
     int socketID = packet->getSocketID();
+
+    qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" socketID:"<<socketID <<" peerID:"<<peerID<<" peerAddress:"<<peerAddress.toString()<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
 
     PacketHandlerBase::recylePacket(packet);
     switch(packetType){
@@ -807,6 +808,35 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO
         quint32 groupID = createNewInterestGroup(userInfo, groupName);
         sendCreateInterestGroupResultPacket(socketID, userInfo, groupID, groupName);
+
+
+    }
+        break;
+
+    case quint8(IM::CLIENT_REQUEST_DISBAND_INTEREST_GROUP):
+    {
+
+        qDebug()<<"~~CLIENT_REQUEST_DISBAND_INTEREST_GROUP";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        quint32 groupID = 0;
+        stream >> groupID;
+
+        //TODO
+        quint32 groupID = disbandInterestGroup(userInfo, groupID);
+        sendDisbandInterestGroupResultPacket(socketID, userInfo, groupID, groupID);
 
 
     }

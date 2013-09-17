@@ -214,9 +214,11 @@ bool RTP::sendReliableData(int socketID, const QByteArray *byteArray){
     if(m_udtProtocol->isSocketExist(socketID)){
         ok = m_udtProtocol->sendData(socketID, byteArray);
         m_lastErrorString = m_udtProtocol->getLastErrorMessage();
+        //qDebug()<<"Sending UDT data! "<<m_lastErrorString;
     }else{
         ok = m_tcpServer->sendData(socketID, byteArray);
         m_lastErrorString = m_tcpServer->socketErrorString(socketID);
+        //qDebug()<<"Sending TCP data! "<<m_lastErrorString;
     }
 
     return ok;

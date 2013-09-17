@@ -801,7 +801,7 @@ public slots:
 
     }
     
-    bool sendUserInterestGroupInfoPacket(bool peerSocketID, UserInfo *userInfo, quint32 groupID, const QHostAddress &targetHostAddress, quint16 targetHostPort){
+    bool sendUserInterestGroupInfoPacket(int peerSocketID, UserInfo *userInfo, quint32 groupID, const QHostAddress &targetHostAddress, quint16 targetHostPort){
 
         //TODO:用户信息的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -812,6 +812,7 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << getInterestGroupInfoStringForUser(userInfo, groupID) << groupID;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
         ba.clear();
@@ -845,6 +846,7 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << getInterestGroupMembersInfoStringForUser(userInfo, group) << group->getGroupMemberListInfoVersion() << groupID;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
         ba.clear();
@@ -861,7 +863,8 @@ public slots:
 
     }
     
-    bool sendCreateInterestGroupResultPacket(bool peerSocketID, UserInfo *userInfo, quint32 groupID, const QString &groupName){
+    bool sendCreateInterestGroupResultPacket(int peerSocketID, UserInfo *userInfo, quint32 groupID, const QString &groupName){
+        qDebug()<<"--sendCreateInterestGroupResultPacket() "<<" groupID:"<<groupID<<" peerSocketID:"<<peerSocketID;
 
         //TODO:用户信息的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -888,7 +891,7 @@ public slots:
     }
 
     
-    bool sendUserPersonalMessagePacket(bool peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
+    bool sendUserPersonalMessagePacket(int peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendUserPersonalMessagePacket(...)";
 
         //TODO:用户信息的格式

@@ -1646,9 +1646,12 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
 }
 
 
-//Format: groupID:groupVersion,groupID:groupVersion,groupID:groupVersion
 QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
     qDebug()<<"--UsersManager::getInterestGroupsListForUser(...)";
+
+
+    //Interest Groups List Format: GroupID,GroupInfoVersion,MemberListInfoVersion;GroupID,GroupInfoVersion,MemberListInfoVersion
+
 
     if(!userInfo){
         qDebug()<<"invalid userInfo";
@@ -1663,10 +1666,10 @@ QString UsersManager::getInterestGroupsListForUser(UserInfo* userInfo){
             qDebug()<<"invalid group";
             return "";
         }
-        infoList.append(QString::number(groupID) + ":" + QString::number(group->getGroupInfoVersion()) + ":" + QString::number(group->getGroupMemberListInfoVersion()));
+        infoList.append(QString::number(groupID) + "," + QString::number(group->getGroupInfoVersion()) + "," + QString::number(group->getGroupMemberListInfoVersion()));
     }
     
-    return infoList.join(",");
+    return infoList.join(";");
 
 }
 
@@ -1694,24 +1697,18 @@ QString UsersManager::getInterestGroupMembersInfoStringForUser(UserInfo* userInf
 
     QString infoString = "";
     
-    if(!userInfo){
-        return infoString;
-    }
-    
-//    Group *group = getGroup(groupID);
-    if(!group){
-        return infoString;
-    }
+    if(!userInfo){return infoString;}
+    if(!group){return infoString;}
     
     QStringList infoList;
-    QHash <QString/*Member's ID*/, quint32/*Member's Role*/> membersHash = group->getMembersHash();
+    QHash <QString/*Member's ID*/, InterestGroup::MemberRole/*Member's Role*/> membersHash = group->getMembersHash();
     QStringList members = membersHash.keys();
     
     foreach (QString memberUserID, members) {
         UserInfo *memberInfo = getUserInfo(memberUserID);
         if(!memberInfo){continue;}
         QStringList memberInfoList;
-        memberInfoList << memberInfo->getUserID() << QString::number(memberInfo->getPersonalDetailInfoVersion()) << QString::number(membersHash.value(memberUserID));
+        memberInfoList << memberInfo->getUserID() << QString::number(memberInfo->getPersonalSummaryInfoVersion()) << QString::number(membersHash.value(memberUserID));
         infoList.append(memberInfoList.join(QString(CONTACT_INFO_SEPARATOR)));        
     }
     
@@ -1859,8 +1856,7 @@ InterestGroup* UsersManager::getInterestGroup(quint32 groupID){
 }
 
 quint32 UsersManager::createNewInterestGroup(UserInfo *creatorInfo, const QString &groupName){
-    qDebug()<<"UsersManager::createNewInterestGroup(...) "<<" creatorID:"<<creatorInfo<<" groupName:"<<groupName;
-    
+    qDebug()<<"UsersManager::createNewInterestGroup(...) "<<" creatorID:"<<creatorInfo->getUserID()<<" groupName:"<<groupName;
 
     if(!creatorInfo){return 0;}
     if(groupName.trimmed().isEmpty()){return 0;}
@@ -1873,7 +1869,7 @@ quint32 UsersManager::createNewInterestGroup(UserInfo *creatorInfo, const QStrin
     }
 
     QSqlQuery query(db);
-    QString statement = QString("call sp_InterestGroup_Create(%1, %2, @GroupID); ").arg(creatorInfo->getUserID()).arg(groupName);
+    QString statement = QString("call sp_InterestGroup_Create('%1', '%2', @GroupID); ").arg(creatorInfo->getUserID()).arg(groupName);
     
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1910,6 +1906,58 @@ quint32 UsersManager::createNewInterestGroup(UserInfo *creatorInfo, const QStrin
     return groupID;
     
 }
+
+bool UsersManager::disbandInterestGroup(UserInfo *creatorInfo, quint32 groupID){
+    qDebug()<<"UsersManager::disbandInterestGroup(...) "<<" creatorID:"<<creatorInfo->getUserID()<<" groupID:"<<groupID;
+
+    if(!creatorInfo){return false;}
+    InterestGroup *group = getInterestGroup(groupID);
+    if(group->memberRole(creatorInfo->getUserID()) != InterestGroup::Role_Creator){
+        return false;
+    }
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            //*errorType = IM::ERROR_UnKnownError;
+            return false;
+        }
+    }
+
+    QSqlQuery query(db);
+    QString statement = QString("call sp_InterestGroup_Disband(%1); ").arg(groupID);
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not disband group! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return 0;
+    }
+
+    QStringList members = group->members();
+    foreach (QString memberID, members) {
+        UserInfo *member = getOnlineUserInfo(memberID);
+        if(member){
+            member->joinOrLeaveInterestGroup(groupID, false);
+            //TODO:Send info
+        }else{
+            member = getOfflineUserInfo(memberID);
+            member->joinOrLeaveInterestGroup(groupID, false);
+
+            //TODO:Save message
+
+        }
+
+
+
+
+    }
+
+
+    return groupID;
+
+}
+
 
 QList<UserInfo *> UsersManager::getAllOnlineInterestGroupMembers(quint32 groupID){
 
@@ -2379,10 +2427,10 @@ bool UsersManager::queryInterestGroup(InterestGroup *info){
         return false;
     }
 
-    QHash <QString/*Member's ID*/, quint32/*Member's Role*/> membersHash;
+    QHash <QString/*Member's ID*/, InterestGroup::MemberRole/*Member's Role*/> membersHash;
     
     while (query.next()) {
-        membersHash.insert(query.value(0).toString(), query.value(1).toUInt());
+        membersHash.insert(query.value(0).toString(), InterestGroup::MemberRole(query.value(1).toUInt()) );
     }
     
     info->setMembersHash(membersHash);
