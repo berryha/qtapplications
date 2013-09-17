@@ -8,9 +8,8 @@
 
 
 #include <QtGui>
-//#include <QtSql>
-
 #include <QPair>
+#include <QListWidget>
 
 #include "mainwindow.h"
 #include "../about/aboutdialog.h"
@@ -290,6 +289,9 @@ void MainWindow::initUI(){
     m_userInfoTipWindow = new UserInfoTipWindow(this);
     connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
+
+    connect(ui.listWidgetGroups, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenuEventOnInterestGroupList(const QPoint &)));
+    connect(ui.listWidgetGroups, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(interestGroupItemActivated(QListWidgetItem*)));
 
 
 }
@@ -1115,23 +1117,48 @@ void MainWindow::updateAllInterestGroupsInfoToUI(){
     QList<InterestGroup *> interestGroups = m_contactsManager->getInterestGroupsList();
     QIcon ico = ImageResource::createIconForInterestGroup();
     foreach (InterestGroup *group, interestGroups) {
-        QListWidgetItem *item = new QListWidgetItem(ico, group->getGroupName(), ui.listWidgetGroups);
-        item->setData(Qt::UserRole, group->getGroupID());
-        ui.listWidgetGroups->addItem(item);
+//        QListWidgetItem *item = new QListWidgetItem(ico, group->getGroupName(), ui.listWidgetGroups);
+//        item->setData(Qt::UserRole, group->getGroupID());
+//        ui.listWidgetGroups->addItem(item);
+        addInterestGroupToUI(group);
+
     }
     
-    connect(ui.listWidgetGroups, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(interestGroupItemActivated(QListWidgetItem*)));
-
     
+}
+
+void MainWindow::addInterestGroupToUI(InterestGroup *interestGroup){
+
+    if(!interestGroup){return;}
+
+    QIcon ico = ImageResource::createIconForInterestGroup();
+    QListWidgetItem *item = new QListWidgetItem(ico, interestGroup->getGroupName(), ui.listWidgetGroups);
+    item->setData(Qt::UserRole, interestGroup->getGroupID());
+    ui.listWidgetGroups->addItem(item);
+
+}
+
+void MainWindow::deleteInterestGroupFromUI(InterestGroup *interestGroup){
+
+    if(!interestGroup){return;}
+
+    quint32 groupID = interestGroup->getGroupID();
+    for(int i=0; i<ui.listWidgetGroups->count(); i++){
+        QListWidgetItem *item = ui.listWidgetGroups->item(i);
+        if(!item){continue;}
+        if(item->data(Qt::UserRole).toUInt() == groupID){
+            ui.listWidgetGroups->removeItemWidget(item);
+            return;
+        }
+    }
+
 }
 
 void MainWindow::updateInterestGroupInfoToUI(InterestGroup *interestGroup){
 
-    if(!interestGroup){
-        return;
-    }
+    if(!interestGroup){return;}
+
     quint32 groupID = interestGroup->getGroupID();
-    
     for(int i=0; i<ui.listWidgetGroups->count(); i++){
         QListWidgetItem *item = ui.listWidgetGroups->item(i);
         if(!item){continue;}
@@ -1375,10 +1402,9 @@ void MainWindow::handleContextMenuEventOnItem(const QString &contactID, const QP
     if(!groups.isEmpty()){
         QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
         foreach (ContactGroupBase *group, groups) {
-            QAction *action = new QAction(group->getGroupName(), menuMoveContactToGroup);
+            QAction *action = menuMoveContactToGroup->addAction(group->getGroupName());
             action->setData(contactID);
             connect(action, SIGNAL(triggered()), this, SLOT(slotMoveContactToGroup()));
-            menuMoveContactToGroup->addAction(action);
         }
         menuMoveContactToGroup->addSeparator();
     }
@@ -1460,6 +1486,7 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
 }
 
 void MainWindow::slotMoveContactToGroup(){
+
     QAction *action = qobject_cast<QAction *>(sender());
     if(!action){return;}
 
@@ -2367,14 +2394,12 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
     qDebug()<<"--MainWindow::slotProcessInterestGroupsList(..)";
     qDebug()<<"----interestGroupsListFromServer:"<<interestGroupsListFromServer;
 
-    //    if(interestGroupsListFromServer.trimmed().isEmpty()){
-    //        return;
-    //    }
+    //Interest Groups List Format: GroupID,GroupInfoVersion,MemberListInfoVersion;GroupID,GroupInfoVersion,MemberListInfoVersion
 
     QList<quint32> groupsOnServer;
-    QStringList infoList = interestGroupsListFromServer.split(",");
+    QStringList infoList = interestGroupsListFromServer.split(";");
     foreach (QString info, infoList) {
-        QStringList list = info.split(":");
+        QStringList list = info.split(",");
         if(list.size() != 3){
             qCritical()<<"Invalid Interest Group Info!";
             continue;
@@ -2459,13 +2484,13 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
         return;
     }
     
-    QHash <QString/*Member's ID*/, quint32/*Member's Role*/> membersHash;
+    QHash <QString/*Member's ID*/, InterestGroup::MemberRole/*Member's Role*/> membersHash;
     QStringList infoList = interestGroupMembersInfoFromServer.split(QString(PACKET_DATA_SEPARTOR));
     foreach (QString info, infoList) {
         QStringList list = info.split(CONTACT_INFO_SEPARATOR);
         QString contactID = list.at(0);
         quint32 contactInfoVersion = list.at(1).toUInt();
-        quint32 memberRole = list.at(2).toUInt();
+        InterestGroup::MemberRole memberRole = InterestGroup::MemberRole(list.at(2).toUInt());
         qWarning()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
         Contact *contact = m_contactsManager->getUser(contactID);
         if(!contact){
@@ -2474,7 +2499,7 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
             clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
 //            contactsManager->slotAddNewContactToDatabase(contact);
         }else{
-            if(contactInfoVersion > contact->getPersonalDetailInfoVersion()){
+            if(contactInfoVersion != contact->getPersonalSummaryInfoVersion()){
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
         }
@@ -2502,7 +2527,8 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
 
 void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QString &groupName){
 
-    //TODO
+    hideProgressDialog();
+
     if(!groupID){
         QMessageBox::critical(this, tr("Error"), tr("Failed to create group '%1'!").arg(groupName));
         return;
@@ -2510,11 +2536,71 @@ void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QSt
 
     if(m_imUser->isMemberOfInterestGroup(groupID)){return;}
 
-    InterestGroup *group = new InterestGroup(groupID, groupName, this);
-    m_contactsManager->addNewInterestGroupToDatabase(group);
-    group->addMember(m_imUser->getUserID(), 1);
+    InterestGroup *group = new InterestGroup(groupID, "", this);
+    group->setGroupName(groupName);
+    group->setCreatorID(m_imUser->getUserID());
+    group->addMember(m_imUser->getUserID(), InterestGroup::Role_Creator);
 
-    updateInterestGroupInfoToUI(group);
+    m_contactsManager->addNewInterestGroupToDatabase(group);
+
+    addInterestGroupToUI(group);
+    m_contactsManager->saveInterestGroupInfoToDatabase(group);
+
+
+}
+
+void MainWindow::handleContextMenuEventOnInterestGroupList(const QPoint &point){
+
+    QListWidgetItem * item = ui.listWidgetGroups->itemAt(point);
+    QPoint globalPoint = ui.listWidgetGroups->mapToGlobal(point);
+    QMenu contextMenu;
+
+    QAction *actionCreateNewGroup = contextMenu.addAction(tr("Create New Group"));
+    connect(actionCreateNewGroup, SIGNAL(triggered()), this, SLOT(slotCreateInterestGroup()));
+
+    if(!item){
+        contextMenu.exec(globalPoint);
+        return;
+    }
+
+    quint32 groupID = item->data(Qt::UserRole).toUInt();
+
+    QMessageBox::information(this, "", QString::number(groupID));
+
+    contextMenu.exec(globalPoint);
+
+}
+
+void MainWindow::slotCreateInterestGroup(){
+
+    bool ok = false;
+    QString labelText = tr("Group Name:\n(Only word-characters up to 32 are acceptable!)");
+    QString groupName = QInputDialog::getText(this, tr("Create Group"),
+                                                 labelText, QLineEdit::Normal,
+                                                 "", &ok);
+    if (ok && !groupName.isEmpty()){
+        int pos = 0;
+        QRegExpValidator rxValidator(this);
+        QRegExp rx("\\b\\w{0,32}\\b");
+        rxValidator.setRegExp(rx);
+        if(rxValidator.validate(groupName, pos) != QValidator::Acceptable){
+            QMessageBox::critical(this, tr("Error"), tr("Invalid Group Name!"));
+            return ;
+        }
+
+        QList<quint32> groups = m_imUser->getInterestGroups();
+        foreach (quint32 groupID, groups) {
+            InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+            if(!group){continue;}
+            if(group->getGroupName() == groupName){
+                QMessageBox::critical(this, tr("Error"), tr("Group with the same name already exists!"));
+                return;
+            }
+        }
+
+        showProgressDialog();
+        clientPacketsParser->requestCreateInterestGroup(m_socketConnectedToServer, groupName);
+    }
 
 }
 
@@ -2524,9 +2610,6 @@ void MainWindow::interestGroupItemActivated(QListWidgetItem * item ){
 
 }
 
-void MainWindow::handleContextMenuEventOninterestGroupItem(QListWidgetItem * item){
-
-}
 
 void MainWindow::showUserInfo(IMUserBase *user){
 

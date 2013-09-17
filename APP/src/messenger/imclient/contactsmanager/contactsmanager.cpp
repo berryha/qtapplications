@@ -187,8 +187,7 @@ bool ContactsManager::addNewInterestGroupToDatabase(InterestGroup *interestGroup
     }
     QSqlQuery query(localUserDataDB);
 
-    QString queryString = QString("Insert  Into [interestgroups] ([GroupID]) Values('%1')")
-            .arg(groupID);
+    QString queryString = QString("Insert  Into [interestgroups] ([GroupID]) Values(%1)").arg(groupID);
     
     if(!query.exec(queryString)){
         qCritical()<<"Can not insert new interest group data to database! Error:"<<query.lastError().text();
@@ -310,7 +309,7 @@ bool ContactsManager::saveInterestGroupMembersToDatabase(InterestGroup *interest
     }
     
     //TODO:
-    QHash<QString,quint32> membersHash = interestGroup->getMembersHash();
+    QHash<QString,InterestGroup::MemberRole> membersHash = interestGroup->getMembersHash();
     if(membersHash.isEmpty()){
         qCritical()<<"ERROR! Empty membersHash!";
         return false;

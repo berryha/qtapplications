@@ -40,7 +40,7 @@ CREATE TABLE "interestgroupmembers"(
 Drop Table If Exists [interestgroups];
 CREATE TABLE "interestgroups" (
 "GroupID"  integer NOT NULL,
-"TypeID"  int(10),
+"Type"  int(10),
 "ParentGroup"  int(10) DEFAULT NULL,
 "Creator"  int(10),
 "GroupName"  varchar(32),

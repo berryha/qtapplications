@@ -15,7 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
      <number>2</number>
     </property>
     <property name="spacing">
@@ -29,7 +38,16 @@
       <widget class="HEHUI::LoginWidget" name="loginPage"/>
       <widget class="QWidget" name="mainPage">
        <layout class="QGridLayout" name="gridLayout_3">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>3</number>
+        </property>
+        <property name="topMargin">
+         <number>3</number>
+        </property>
+        <property name="rightMargin">
+         <number>3</number>
+        </property>
+        <property name="bottomMargin">
          <number>3</number>
         </property>
         <item row="0" column="0">
@@ -53,7 +71,16 @@
            <enum>QFrame::Plain</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
             <number>3</number>
            </property>
            <property name="spacing">
@@ -132,7 +159,16 @@
            <enum>QFrame::Plain</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
             <number>3</number>
            </property>
            <item row="0" column="0">
@@ -189,8 +225,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>239</width>
-                    <height>270</height>
+                    <width>237</width>
+                    <height>292</height>
                    </rect>
                   </property>
                   <property name="focusPolicy">
@@ -200,7 +236,16 @@
                    <string>Contacts</string>
                   </attribute>
                   <layout class="QGridLayout" name="friendsPageGridLayout">
-                   <property name="margin">
+                   <property name="leftMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="bottomMargin">
                     <number>3</number>
                    </property>
                    <property name="spacing">
@@ -213,8 +258,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>112</width>
-                    <height>112</height>
+                    <width>237</width>
+                    <height>292</height>
                    </rect>
                   </property>
                   <property name="focusPolicy">
@@ -225,7 +270,11 @@
                   </attribute>
                   <layout class="QGridLayout" name="teamPageGridLayout">
                    <item row="0" column="0">
-                    <widget class="QListWidget" name="listWidgetGroups"/>
+                    <widget class="QListWidget" name="listWidgetGroups">
+                     <property name="contextMenuPolicy">
+                      <enum>Qt::CustomContextMenu</enum>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -234,8 +283,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>112</width>
-                    <height>112</height>
+                    <width>237</width>
+                    <height>292</height>
                    </rect>
                   </property>
                   <property name="focusPolicy">
@@ -269,7 +318,16 @@
                <string>Tools</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_9">
-               <property name="margin">
+               <property name="leftMargin">
+                <number>3</number>
+               </property>
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="rightMargin">
+                <number>3</number>
+               </property>
+               <property name="bottomMargin">
                 <number>3</number>
                </property>
                <property name="spacing">
@@ -291,7 +349,16 @@
            <enum>QFrame::Plain</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
             <number>3</number>
            </property>
            <item row="0" column="0">
@@ -370,7 +437,7 @@
      <x>0</x>
      <y>0</y>
      <width>301</width>
-     <height>28</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuView">

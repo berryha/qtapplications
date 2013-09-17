@@ -27,17 +27,21 @@ namespace HEHUI {
 class SHAREDIMLIB_API InterestGroupBase : public IMGroupBase {
     Q_OBJECT
 public:
+
+    enum GroupType{Group_SystemDefault=1, Group_UserCreated=2};
+    enum MemberRole{Role_Creator =1, Role_Administrator=2, Role_Member=3};
+
     InterestGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~InterestGroupBase();
     
     void setGroupInfoString(const QString &infoString);
     QString getGroupInfoString();
     
-    void addMember(const QString &memberuserID, quint32 memberRole);   
+    void addMember(const QString &memberuserID, MemberRole memberRole);
     void deleteMember(const QString &memberuserID);
     bool hasMember(const QString &memberUserID);
     QStringList members() const;
-    quint32 memberRole(const QString &memberUserID);
+    MemberRole memberRole(const QString &memberUserID);
 
     
     
@@ -59,12 +63,12 @@ public:
         return description;
     }
 
-    quint32 getGroupTypeID() const
+    GroupType getGroupTypeID() const
     {
-        return groupTypeID;
+        return m_groupType;
     }
 
-    QHash<QString,quint32> getMembersHash() const
+    QHash<QString,MemberRole> getMembersHash() const
     {
         return membersHash;
     }
@@ -107,13 +111,13 @@ public:
 
     void setGroupTypeID(quint32 groupTypeID)
     {
-        this->groupTypeID = groupTypeID;
+        this->m_groupType = GroupType(groupTypeID);
         addUpdatedProperty(IM::PIG_GroupTypeID, QString::number(groupTypeID));
         
     }
 
 
-    void setMembersHash(QHash<QString,quint32> membersHash)
+    void setMembersHash(QHash<QString,MemberRole> membersHash)
     {
         this->membersHash = membersHash;
     }
@@ -143,7 +147,7 @@ protected:
 
 private:
     
-    quint32 groupTypeID;
+    GroupType m_groupType;
     quint32 parentGroupID;
     QDateTime creationTime;
     
@@ -154,7 +158,7 @@ private:
 //    QDateTime lastUpdateTime;
 
 
-    QHash <QString/*Member's ID*/, quint32/*Member's Role*/> membersHash;
+    QHash <QString/*Member's ID*/, MemberRole/*Member's Role*/> membersHash;
 
 
 };

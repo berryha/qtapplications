@@ -17,7 +17,7 @@ InterestGroupBase::InterestGroupBase(quint32 groupID, const QString &groupName, 
     :IMGroupBase(groupID, groupName, parent)
 {
 	
-    groupTypeID = 0;
+    m_groupType = Group_UserCreated;
     parentGroupID = 0;
     creationTime = QDateTime();
 
@@ -56,7 +56,7 @@ void InterestGroupBase::setGroupInfoString(const QString &infoString){
 QString InterestGroupBase::getGroupInfoString(){
     QStringList infoList;
     infoList << QString::number(getGroupID())
-             << QString::number(groupTypeID) << QString::number(parentGroupID)
+             << QString::number(m_groupType) << QString::number(parentGroupID)
              << getCreatorID() << getGroupName() << creationTime.toString("yyyy.MM.dd hh:mm:ss")
              <<QString::number(getGroupInfoVersion()) <<QString::number(getGroupMemberListInfoVersion())
              << getDescription() << getAnnouncement() <<getRemark()
@@ -66,7 +66,7 @@ QString InterestGroupBase::getGroupInfoString(){
     
 }
 
-void InterestGroupBase::addMember(const QString &memberuserID, quint32 memberRole){
+void InterestGroupBase::addMember(const QString &memberuserID, MemberRole memberRole){
 
     membersHash.insert(memberuserID, memberRole);
 }
@@ -85,7 +85,7 @@ QStringList InterestGroupBase::members() const{
     return membersHash.keys();
 }
 
-quint32 InterestGroupBase::memberRole(const QString &memberUserID){
+InterestGroupBase::MemberRole InterestGroupBase::memberRole(const QString &memberUserID){
     return membersHash.value(memberUserID);
 }
 

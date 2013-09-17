@@ -589,6 +589,32 @@ public slots:
 
     }
 
+    bool requestDisbandInterestGroup(int serverSocketID, quint32 groupID){
+        qDebug()<<"----requestDisbandInterestGroup(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_DISBAND_INTEREST_GROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID;
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+
+    }
 
 
     bool requestPersonalMessage(int serverSocketID, const QString &userID){
