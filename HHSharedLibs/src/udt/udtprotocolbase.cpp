@@ -534,7 +534,7 @@ bool UDTProtocolBase::sendData(UDTSOCKET socket, const QByteArray *byteArray){
 }
 
 bool UDTProtocolBase::sendUDTStreamData(UDTSOCKET socket, const QByteArray *byteArray){
-    //qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
+//    qDebug()<<"--UDTProtocolBase::sendUDTStreamData(...) " <<"socket:"<<socket<<" szie:"<<byteArray->size();
 
     m_errorMessage = "";
 
