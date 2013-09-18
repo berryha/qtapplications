@@ -890,7 +890,34 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
-    
+    bool sendDisbandInterestGroupResultPacket(int peerSocketID, UserInfo *userInfo, quint32 groupID, bool result){
+        qDebug()<<"--sendDisbandInterestGroupResultPacket() "<<" groupID:"<<groupID<<" peerSocketID:"<<peerSocketID;
+
+        //TODO:用户信息的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_DISBAND_INTEREST_GROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << quint8(result?1:0) ;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
+
     bool sendUserPersonalMessagePacket(int peerSocketID, UserInfo *userInfo, const QHostAddress &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendUserPersonalMessagePacket(...)";
 

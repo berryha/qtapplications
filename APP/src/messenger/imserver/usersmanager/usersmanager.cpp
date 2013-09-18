@@ -1931,30 +1931,13 @@ bool UsersManager::disbandInterestGroup(UserInfo *creatorInfo, quint32 groupID){
         QString msg = QString("Can not disband group! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        return 0;
-    }
-
-    QStringList members = group->members();
-    foreach (QString memberID, members) {
-        UserInfo *member = getOnlineUserInfo(memberID);
-        if(member){
-            member->joinOrLeaveInterestGroup(groupID, false);
-            //TODO:Send info
-        }else{
-            member = getOfflineUserInfo(memberID);
-            member->joinOrLeaveInterestGroup(groupID, false);
-
-            //TODO:Save message
-
-        }
-
-
-
-
+        return false;
     }
 
 
-    return groupID;
+
+
+    return true;
 
 }
 
@@ -2395,7 +2378,10 @@ bool UsersManager::queryInterestGroup(InterestGroup *info){
     info->setDescription(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Description)))).toString());
     info->setAnnouncement(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Announcement)))).toString());
     info->setRemark(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Remark)))).toString());
-//    info->setLastUpdateTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_LastUpdateTime)))).toDateTime());
+    info->setState(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_State)))).toUInt());
+
+
+    //    info->setLastUpdateTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_LastUpdateTime)))).toDateTime());
 
     
     info->clearUpdatedProperties();

@@ -24,6 +24,7 @@ InterestGroupBase::InterestGroupBase(quint32 groupID, const QString &groupName, 
     description = "";
     announcement = "";
     remark = "";
+    state = 1;
         
 }
 

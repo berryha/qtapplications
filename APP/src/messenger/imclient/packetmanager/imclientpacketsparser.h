@@ -1302,7 +1302,9 @@ signals:
     void signalInterestGroupInfoPacketReceived(const QString &interestGroupInfoFromServer, quint32 groupID);
     void signalInterestGroupMembersInfoPacketReceived(const QString &interestGroupMembersInfoFromServer, quint32 interestGroupMembersInfoVersionOnServer, quint32 groupID);
     void signalCreateInterestGroupResultPacketReceived(quint32 groupID, const QString &groupName);
-    
+    void signalDisbandInterestGroupResultPacketReceived(quint32 groupID, bool result);
+
+
     void signalPersonalMessagePacketReceived(const QString &userID, const QString &personalMessage);
 
     void signalChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);

@@ -189,6 +189,7 @@ enum Command {
     CLIENT_REQUEST_CREATE_INTEREST_GROUP,
     SERVER_RESPONSE_CREATE_INTEREST_GROUP,
     CLIENT_REQUEST_DISBAND_INTEREST_GROUP,
+    SERVER_RESPONSE_DISBAND_INTEREST_GROUP,
 
 
 
@@ -370,6 +371,7 @@ enum PropertyIDOfGroup{
     PIG_Description,
     PIG_Announcement,
     PIG_Remark,
+    PIG_State,
 //    PIG_LastUpdateTime,
     
     //For Table InterestGroupMembers

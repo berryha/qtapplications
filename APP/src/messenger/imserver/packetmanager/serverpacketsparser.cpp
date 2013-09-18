@@ -835,9 +835,19 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         stream >> groupID;
 
         //TODO
-        quint32 groupID = disbandInterestGroup(userInfo, groupID);
-        sendDisbandInterestGroupResultPacket(socketID, userInfo, groupID, groupID);
+        bool ok = disbandInterestGroup(userInfo, groupID);
+        sendDisbandInterestGroupResultPacket(socketID, userInfo, groupID, ok);
+        if(!ok){return;}
 
+        InterestGroup *group = getInterestGroup(groupID);
+        QStringList members = group->members();
+        members.removeAll(userID);
+        foreach (QString memberID, members) {
+            UserInfo *member = getOnlineUserInfo(memberID);
+            if(!member){continue;}
+            member->joinOrLeaveInterestGroup(groupID, false);
+            sendDisbandInterestGroupResultPacket(member->getSocketID(), member, groupID, ok);
+        }
 
     }
         break;

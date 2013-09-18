@@ -29,7 +29,7 @@ public:
 
 //        static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false);
         static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE);
-        static QIcon createIconForInterestGroup();
+        static QIcon createIconForInterestGroup(bool normal = true);
         
         static QIcon createMixedIcon(const QString &normalIconPath, IM::OnlineState state);
 
