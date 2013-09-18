@@ -147,7 +147,8 @@ bool ContactsManager::loadInterestGroups(){
         interestGroup->setDescription(QVariant(model->record(j).value("Description")).toString());
         interestGroup->setAnnouncement(QVariant(model->record(j).value("Announcement")).toString());
         interestGroup->setRemark(QVariant(model->record(j).value("Remark")).toString());
-        
+        interestGroup->setState(QVariant(model->record(j).value("State")).toUInt());
+
         interestGroup->clearUpdatedProperties();
         
         interestGroupsHash.insert(groupID, interestGroup);
@@ -200,7 +201,7 @@ bool ContactsManager::addNewInterestGroupToDatabase(InterestGroup *interestGroup
     
 }
 
-bool ContactsManager::leaveInterestGroup(quint32 groupID){
+bool ContactsManager::removeInterestGroupFromLocalDB(quint32 groupID){
     
 
     if(!interestGroupsHash.contains(groupID)){
@@ -223,13 +224,6 @@ bool ContactsManager::leaveInterestGroup(quint32 groupID){
     }
     
     interestGroupsHash.remove(groupID);
-    
-    
-    queryString = QString("update  [contacts_detailed_info] set InterestGroupID=0 where InterestGroupID=%1 ").arg(groupID) ;
-    if(!query.exec(queryString)){
-        qCritical()<<"Can not update contacts info to database! Error:"<<query.lastError().text();
-        return false;
-    }
     
     
     return true;
@@ -1092,8 +1086,8 @@ bool ContactsManager::renameContactGroupToDatabase(quint32 groupID, const QStrin
 
 }
 
-bool ContactsManager::deleteGroupFromDatabase(int groupID){
-    qDebug()<<"--ContactsManager::deleteGroupFromDatabase(..) groupID:"<<groupID;
+bool ContactsManager::deleteContactGroupFromDatabase(int groupID){
+    qDebug()<<"--ContactsManager::deleteContactGroupFromDatabase(..) groupID:"<<groupID;
 
     if(!m_imUser->hasContactGroup(groupID)){
         qCritical()<<"ERROR! Contact group does not exist!"<<" Group ID:"<<groupID;

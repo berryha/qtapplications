@@ -31,6 +31,21 @@ public:
     enum GroupType{Group_SystemDefault=1, Group_UserCreated=2};
     enum MemberRole{Role_Creator =1, Role_Administrator=2, Role_Member=3};
 
+    enum LogType{
+        LOG_GroupCreated=1,
+        Log_GroupDisbanded,
+        LOG_ContactInvitedToJoin,
+        Log_ContactRequestToJoin,
+        LOG_ContactJoined,
+        LOG_ContactQuit,
+        LOG_ContactFired,
+        LOG_ContactBanned,
+        LOG_ContactPromoted,
+        LOG_ContactDemoted,
+        LOG_ContactRenamed
+    };
+
+
     InterestGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~InterestGroupBase();
     
@@ -83,6 +98,10 @@ public:
         return remark;
     }
 
+    quint8 getState(){
+        return state;
+    }
+
 //    QDateTime getLastUpdateTime() const{
 //        return lastUpdateTime;
 //    }
@@ -125,7 +144,7 @@ public:
     void setParentGroupID(quint32 parentGroupID)
     {
         this->parentGroupID = parentGroupID;
-        addUpdatedProperty(IM::PIG_ParentGroupID, QString::number(parentGroupID));
+        addUpdatedProperty(IM::PIG_ParentGroupID, QString::number(parentGroupID) );
         
     }
 
@@ -134,6 +153,11 @@ public:
         this->remark = remark;
         addUpdatedProperty(IM::PIG_Remark, "'"+remark+"'");
         
+    }
+
+    void setState(quint8 state){
+        this->state = state;
+        addUpdatedProperty(IM::PIG_State, QString::number(state) );
     }
 
 //    void setLastUpdateTime(QDateTime time){
@@ -154,6 +178,7 @@ private:
     QString description;
     QString announcement;
     QString remark;
+    quint8 state;
 
 //    QDateTime lastUpdateTime;
 

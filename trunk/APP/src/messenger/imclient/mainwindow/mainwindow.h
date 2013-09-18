@@ -144,10 +144,14 @@ private slots:
     void slotProcessInterestGroupInfo(const QString &interestGroupInfoFromServer, quint32 groupID);
     void slotProcessInterestGroupMembersInfo(const QString &interestGroupMembersInfoFromServer, quint32 interestGroupMembersInfoVersionOnServer, quint32 groupID);
     void slotProcessCreateInterestGroupResult(quint32 groupID, const QString &groupName);
+    void slotProcessDisbandInterestGroupResult(quint32 groupID, bool result);
 
 
     void handleContextMenuEventOnInterestGroupList(const QPoint &point);
     void slotCreateInterestGroup();
+    void slotDisbandInterestGroup();
+    void slotDeleteInterestGroupFromLocal();
+
     void interestGroupItemActivated(QListWidgetItem * item );
     void updateAllInterestGroupsInfoToUI();
     void addInterestGroupToUI(InterestGroup *interestGroup);

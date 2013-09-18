@@ -53,8 +53,19 @@ QIcon ImageResource::createIconForContact(const QString &iconIndex, IM::OnlineSt
         return QIcon(getIconFilePathForContact(iconIndex, state));
 }
 
-QIcon ImageResource::createIconForInterestGroup(){
-    static const QIcon groupIcon(QLatin1String(":/resources/images/group.png"));
+QIcon ImageResource::createIconForInterestGroup(bool normal){
+
+    static const QString iconPath = ":/resources/images/group.png";
+    static const QIcon groupIcon(iconPath);
+
+    if(!normal){
+        QIcon icon;
+        QSize size = QImage(iconPath).size();
+        QPixmap pixmap = groupIcon.pixmap(size, QIcon::Disabled);
+        icon.addPixmap(pixmap);
+        return icon;
+    }
+
     return  groupIcon;
 }
 

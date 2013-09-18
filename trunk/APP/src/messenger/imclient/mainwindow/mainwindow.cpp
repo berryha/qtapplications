@@ -382,6 +382,7 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalInterestGroupInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessInterestGroupInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalInterestGroupMembersInfoPacketReceived(const QString &, quint32, quint32 )), this, SLOT(slotProcessInterestGroupMembersInfo(const QString &, quint32, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalCreateInterestGroupResultPacketReceived(quint32, const QString &)), this, SLOT(slotProcessCreateInterestGroupResult(quint32, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalDisbandInterestGroupResultPacketReceived(quint32, bool)), this, SLOT(slotProcessDisbandInterestGroupResult(quint32, bool)), Qt::QueuedConnection);
 
     
     //File TX
@@ -1115,7 +1116,7 @@ void MainWindow::updateAllInterestGroupsInfoToUI(){
     ui.listWidgetGroups->clear();
     
     QList<InterestGroup *> interestGroups = m_contactsManager->getInterestGroupsList();
-    QIcon ico = ImageResource::createIconForInterestGroup();
+//    QIcon ico = ImageResource::createIconForInterestGroup();
     foreach (InterestGroup *group, interestGroups) {
 //        QListWidgetItem *item = new QListWidgetItem(ico, group->getGroupName(), ui.listWidgetGroups);
 //        item->setData(Qt::UserRole, group->getGroupID());
@@ -1131,7 +1132,7 @@ void MainWindow::addInterestGroupToUI(InterestGroup *interestGroup){
 
     if(!interestGroup){return;}
 
-    QIcon ico = ImageResource::createIconForInterestGroup();
+    QIcon ico = ImageResource::createIconForInterestGroup(interestGroup->getState());
     QListWidgetItem *item = new QListWidgetItem(ico, interestGroup->getGroupName(), ui.listWidgetGroups);
     item->setData(Qt::UserRole, interestGroup->getGroupID());
     ui.listWidgetGroups->addItem(item);
@@ -1164,9 +1165,14 @@ void MainWindow::updateInterestGroupInfoToUI(InterestGroup *interestGroup){
         if(!item){continue;}
         if(item->data(Qt::UserRole).toUInt() == groupID){
             item->setText(interestGroup->getGroupName());
-            break;
+
+            QIcon ico = ImageResource::createIconForInterestGroup(interestGroup->getState());
+            item->setIcon(ico);
+            return;
         }
     }
+
+    qCritical()<<"ERROR! Can not find interest group item!";
     
 }
 
@@ -1910,7 +1916,7 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
             m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
             m_imUser->addContactGroup(groupID, groupName);
         }else{
-            ok = m_contactsManager->deleteGroupFromDatabase(groupID);
+            ok = m_contactsManager->deleteContactGroupFromDatabase(groupID);
             m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
             m_imUser->deleteContactGroup(groupID);
         }
@@ -2396,6 +2402,8 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
 
     //Interest Groups List Format: GroupID,GroupInfoVersion,MemberListInfoVersion;GroupID,GroupInfoVersion,MemberListInfoVersion
 
+    QList<quint32> interestGroupsOnLocal = m_imUser->getInterestGroups();
+
     QList<quint32> groupsOnServer;
     QStringList infoList = interestGroupsListFromServer.split(";");
     foreach (QString info, infoList) {
@@ -2406,6 +2414,8 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
         }
         quint32 groupID = list.at(0).toUInt();
         groupsOnServer.append(groupID);
+        interestGroupsOnLocal.removeAll(groupID);
+
         quint32 groupInfoVersion = list.at(1).toUInt();
         quint32 memberListInfoVersion = list.at(2).toUInt();
         qWarning()<<"Server: groupInfoVersion:"<<groupInfoVersion<<" memberListInfoVersion:"<<memberListInfoVersion;
@@ -2428,16 +2438,23 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
         }
         
     }
-    
-    QList<quint32> interestGroupsOnLocal = m_imUser->getInterestGroups();
-    if(!interestGroupsOnLocal.isEmpty()){
-        foreach (quint32 groupID, interestGroupsOnLocal) {
-            if(!groupsOnServer.contains(groupID)){
-                m_contactsManager->leaveInterestGroup(groupID);
-            }
-        }
 
+    foreach (quint32 groupID, interestGroupsOnLocal) {
+        InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+        if(group->getState() == 1 ){
+            group->setState(0);
+            m_contactsManager->saveInterestGroupInfoToDatabase(group);
+        }
     }
+    
+//    QList<quint32> interestGroupsOnLocal = m_imUser->getInterestGroups();
+//    if(!interestGroupsOnLocal.isEmpty()){
+//        foreach (quint32 groupID, interestGroupsOnLocal) {
+//            if(!groupsOnServer.contains(groupID)){
+//                m_contactsManager->leaveInterestGroup(groupID);
+//            }
+//        }
+//    }
     
     m_imUser->setInterestGroupInfoVersion(interestGroupsInfoVersionOnServer);
     
@@ -2549,6 +2566,28 @@ void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QSt
 
 }
 
+void MainWindow::slotProcessDisbandInterestGroupResult(quint32 groupID, bool result){
+
+    hideProgressDialog();
+
+    InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+    if(!group){return;}
+
+    if(!result){
+        QMessageBox::critical(this, tr("Error"), tr("Failed to disband group '%1(%2)'!").arg(group->getGroupName()).arg(groupID));
+        return;
+    }
+
+    QMessageBox::critical(this, tr("Message"), tr("Group '%1(%2)' has been disbanded!").arg(group->getGroupName()).arg(groupID));
+
+    group->setState(0);
+
+    updateInterestGroupInfoToUI(group);
+    m_contactsManager->saveInterestGroupInfoToDatabase(group);
+
+}
+
+
 void MainWindow::handleContextMenuEventOnInterestGroupList(const QPoint &point){
 
     QListWidgetItem * item = ui.listWidgetGroups->itemAt(point);
@@ -2557,15 +2596,34 @@ void MainWindow::handleContextMenuEventOnInterestGroupList(const QPoint &point){
 
     QAction *actionCreateNewGroup = contextMenu.addAction(tr("Create New Group"));
     connect(actionCreateNewGroup, SIGNAL(triggered()), this, SLOT(slotCreateInterestGroup()));
-
     if(!item){
         contextMenu.exec(globalPoint);
         return;
     }
 
     quint32 groupID = item->data(Qt::UserRole).toUInt();
+    InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+
 
     QMessageBox::information(this, "", QString::number(groupID));
+
+
+    if(group->getState()){
+        if(group->getCreatorID() == m_imUser->getUserID()){
+            QAction *actionDisbandGroup = contextMenu.addAction(tr("Disband Group"));
+            actionDisbandGroup->setData(QVariant(groupID));
+            connect(actionDisbandGroup, SIGNAL(triggered()), this, SLOT(slotDisbandInterestGroup()));
+        }
+
+
+    }else{
+        QAction *actionDeleteGroup = contextMenu.addAction(tr("Delete Group Info"));
+        actionDeleteGroup->setData(QVariant(groupID));
+        connect(actionDeleteGroup, SIGNAL(triggered()), this, SLOT(slotDeleteInterestGroupFromLocal()));
+
+
+    }
+
 
     contextMenu.exec(globalPoint);
 
@@ -2603,6 +2661,49 @@ void MainWindow::slotCreateInterestGroup(){
     }
 
 }
+
+void MainWindow::slotDisbandInterestGroup(){
+    QAction *action = qobject_cast<QAction *>(sender());
+    if(!action){return;}
+
+    quint32 groupID = action->data().toUInt();
+    InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+    if(!group){return;}
+
+    int ret = QMessageBox::question(this, tr("Question"),
+                                    tr("Do you really want to disband the group '%1(%2)' ?").arg(group->getGroupName()).arg(groupID),
+                                    QMessageBox::Yes|QMessageBox::No,
+                                    QMessageBox::No);
+
+    if(ret == QMessageBox::No){return;}
+
+    showProgressDialog();
+    clientPacketsParser->requestDisbandInterestGroup(m_socketConnectedToServer, groupID);
+
+}
+
+void MainWindow::slotDeleteInterestGroupFromLocal(){
+    QAction *action = qobject_cast<QAction *>(sender());
+    if(!action){return;}
+
+    quint32 groupID = action->data().toUInt();
+    InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+    if(!group){return;}
+
+    int ret = QMessageBox::question(this, tr("Question"),
+                                    tr("All history messages from this group will be deleted! <p>Do you really want to delete the group '%1(%2)' from local ? </p>").arg(group->getGroupName()).arg(groupID),
+                                    QMessageBox::Yes|QMessageBox::No,
+                                    QMessageBox::No);
+
+    if(ret == QMessageBox::No){return;}
+
+    m_contactsManager->removeInterestGroupFromLocalDB(groupID);
+    deleteInterestGroupFromUI(group);
+
+
+
+}
+
 
 void MainWindow::interestGroupItemActivated(QListWidgetItem * item ){
 
