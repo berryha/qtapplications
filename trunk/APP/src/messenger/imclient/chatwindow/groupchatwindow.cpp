@@ -29,17 +29,29 @@ GroupChatWindow::GroupChatWindow(InterestGroup *interestGroup, QWidget *parent)
 
     ui.textBrowserAnnounce->setHtml(interestGroup->getAnnouncement());
 
+    IMUser *myself = IMUser::instance();
+    QString myID = myself->getUserID();
+
+    //Add members
+    ContactsManager *contactsManager =  ContactsManager::instance();
     QStringList members = interestGroup->members();
+    members.removeAll(myID);
     foreach (const QString &memberID, members) {
-        Contact *contact = ContactsManager::instance()->getUser(memberID);
+        Contact *contact = contactsManager->getUser(memberID);
         QListWidgetItem *item = new QListWidgetItem(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()), contact->getNickName(), ui.listWidgetMembers);
         item->setData(Qt::UserRole, contact->getUserID());
         ui.listWidgetMembers->addItem(item);
-
     }
+
+    //Add myself
+    QListWidgetItem *myItem = new QListWidgetItem(ImageResource::createIconForContact(myself->getFace(), myself->getOnlineState()), myself->getNickName(), ui.listWidgetMembers);
+    myItem->setData(Qt::UserRole, myID);
+    ui.listWidgetMembers->addItem(myItem);
+
 
     connect(ui.listWidgetMembers, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(memberItemActivated(QListWidgetItem*)));
 
+    ui.chatMessageWindow->setEnabled(interestGroup->getState());
 
 }
 

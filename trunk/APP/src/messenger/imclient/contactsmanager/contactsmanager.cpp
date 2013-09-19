@@ -216,7 +216,7 @@ bool ContactsManager::removeInterestGroupFromLocalDB(quint32 groupID){
     QSqlQuery query(localUserDataDB);
     
     
-    QString queryString = QString("delete  from [interestgroups] where ID='%1' ").arg(groupID) ;
+    QString queryString = QString("delete  from [interestgroups] where GroupID='%1' ").arg(groupID) ;
     
     if(!query.exec(queryString)){
         qCritical()<<"Can not delete interest group data from database! Error:"<<query.lastError().text();

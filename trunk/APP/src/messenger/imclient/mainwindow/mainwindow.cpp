@@ -2377,6 +2377,12 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
         return;
     }
 
+    if(!interestGroup->getState()){
+        QMessageBox::critical(this, tr("Error"), tr("Can not send message! The group is disbanded or you are not member of it!"));
+        return;
+    }
+
+
     //Send message to server
     clientPacketsParser->sendInterestGroupChatMessageToServer(m_socketConnectedToServer, interestGroup->getGroupID(), message, imageList);
 
@@ -2620,8 +2626,6 @@ void MainWindow::handleContextMenuEventOnInterestGroupList(const QPoint &point){
         QAction *actionDeleteGroup = contextMenu.addAction(tr("Delete Group Info"));
         actionDeleteGroup->setData(QVariant(groupID));
         connect(actionDeleteGroup, SIGNAL(triggered()), this, SLOT(slotDeleteInterestGroupFromLocal()));
-
-
     }
 
 
@@ -2699,8 +2703,6 @@ void MainWindow::slotDeleteInterestGroupFromLocal(){
 
     m_contactsManager->removeInterestGroupFromLocalDB(groupID);
     deleteInterestGroupFromUI(group);
-
-
 
 }
 
