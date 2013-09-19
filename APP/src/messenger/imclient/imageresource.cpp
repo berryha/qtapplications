@@ -8,7 +8,7 @@
 
 #include <QPainter>
 //#include <QFileInfo>
-//#include <QDebug>
+#include <QDebug>
 
 
 #include "imageresource.h"
