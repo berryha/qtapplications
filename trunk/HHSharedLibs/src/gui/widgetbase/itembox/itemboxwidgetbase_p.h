@@ -74,10 +74,6 @@ public:
 
 //    virtual bool loadContents(const QString &contents) = 0;
 
-    // Convenience to access the widget box icon of a widget. Empty category
-    // matches all
-    virtual QIcon iconForItem(const QString &className,
-                                const QString &category = QString()) const = 0;
 
     // Convenience to find a widget by class name. Empty category matches all
     static bool findItem(const ItemBoxWidgetInterface *ibox,

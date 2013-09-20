@@ -98,11 +98,11 @@ public:
 //    virtual bool save();
 
 //    virtual bool loadContents(const QString &contents);
-    virtual QIcon iconForItem(const QString &itemID, const QString &category = QString()) const;
+
 
     bool updateObjectItemName(const QString &cat_id, const QString &item_id, const QString &itemName);
     bool updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QIcon &icon);
-    bool updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
+//    bool updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
 
 
     void setFilterWidgetVisible(bool visible);

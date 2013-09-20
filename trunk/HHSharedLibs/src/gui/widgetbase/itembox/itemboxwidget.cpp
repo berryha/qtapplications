@@ -279,13 +279,6 @@ void ItemBoxWidget::dropEvent(QDropEvent * event)
 
 }
 
-QIcon ItemBoxWidget::iconForItem(const QString &itemID, const QString &category) const
-{
-    Item itemData;
-    if (!findItem(this, itemID, category, &itemData))
-        return QIcon();
-    return m_treeWidget->iconForItem(itemData.iconName());
-}
 
 bool ItemBoxWidget::updateObjectItemName(const QString &cat_id, const QString &item_id, const QString &itemName){
     return m_treeWidget->updateItemName(cat_id, item_id, itemName);
@@ -295,9 +288,9 @@ bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_id, const QString &i
     return m_treeWidget->updateItemIcon(cat_id, item_id, icon);
 }
 
-bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName){
-    return m_treeWidget->updateItemIcon(cat_id, item_id, iconName);
-}
+//bool ItemBoxWidget::updateObjectItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName){
+//    return m_treeWidget->updateItemIcon(cat_id, item_id, iconName);
+//}
 
 void ItemBoxWidget::setFilterWidgetVisible(bool visible){
     filterWidget->setVisible(visible);

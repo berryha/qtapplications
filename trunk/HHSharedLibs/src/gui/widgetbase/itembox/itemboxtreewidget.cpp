@@ -102,19 +102,6 @@ ItemBoxTreeWidget::ItemBoxTreeWidget(ItemBoxEventHandler *core, QWidget *parent)
     connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(handleMousePress(QTreeWidgetItem*)));
 }
 
-QIcon ItemBoxTreeWidget::iconForItem(QString iconName, QIcon::Mode iconMode) const
-{
-//    if (iconName.isEmpty())
-//        iconName = QLatin1String(qtLogoC);
-
-//    if (iconName.startsWith(QLatin1String(iconPrefixC))) {
-//        const IconCache::const_iterator it = m_pluginIcons.constFind(iconName);
-//        if (it != m_pluginIcons.constEnd())
-//            return it.value();
-//    }
-    return createIconSet(iconName, "", iconMode);
-}
-
 //void ItemBoxTreeWidget::setLoadMode(ItemBoxWidgetBase::LoadMode loadMode){
 //    m_loadMode = loadMode;
 //}
@@ -132,10 +119,10 @@ bool ItemBoxTreeWidget::updateItemIcon(const QString &cat_id, const QString &ite
     return cat->updateItemIcon(item_id, icon);
 }
 
-bool ItemBoxTreeWidget::updateItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName){
-    ItemBoxCategoryListView *cat = categoryView(cat_id);
-    return cat->updateItemIcon(item_id, iconName);
-}
+//bool ItemBoxTreeWidget::updateItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName){
+//    ItemBoxCategoryListView *cat = categoryView(cat_id);
+//    return cat->updateItemIcon(item_id, iconName);
+//}
 
 ItemBoxCategoryListView *ItemBoxTreeWidget::categoryViewAt(int idx) const
 {
@@ -813,7 +800,7 @@ void ItemBoxTreeWidget::addCategory(const Category &cat, int index)
     for (int i = 0; i < widgetCount; ++i) {
         const Item w = cat.item(i);
         if (!categoryView->containsItem(w.name()))
-            categoryView->addItem(w, iconForItem(w.iconName()), isScratchPad);
+            categoryView->addItem(w, w.icon(), isScratchPad);
     }
     adjustSubListSize(cat_item);
 
@@ -923,7 +910,7 @@ void ItemBoxTreeWidget::addItem(int cat_idx, const Item &item)
 
     // The same categories are read from the file $HOME, avoid duplicates
     if (!categoryView->containsItem(item.id())){
-        categoryView->addItem(item, iconForItem(item.iconName(), item.iconMode()), scratch);
+        categoryView->addItem(item, item.icon(), scratch);
         categoryView->updateGeometry();
     }else{
         qWarning()<<"ERROR! Item "<<item.id()<<" already exists!";

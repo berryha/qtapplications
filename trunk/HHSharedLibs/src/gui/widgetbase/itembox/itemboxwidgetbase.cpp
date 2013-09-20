@@ -54,25 +54,25 @@ class ItemBoxItemData : public QSharedData
 {
 public:
     ItemBoxItemData(const QString &aid, const QString &aname,
-                                 const QString &icon_name,
+                                 const QIcon &icon,
                                  ItemBoxWidgetInterface::Item::Type atype);
     QString m_id;
     QString m_name;
-    QString m_icon_name;
-    QIcon::Mode m_icon_mode;
+    QIcon m_icon;
+    //QIcon::Mode m_icon_mode;
     ItemBoxWidgetInterface::Item::Type m_type;
 };
 
 ItemBoxItemData::ItemBoxItemData(const QString &aid, const QString &aname,
-                                                           const QString &icon_name,
+                                                           const QIcon &icon,
                                                            ItemBoxWidgetInterface::Item::Type atype) :
-    m_id(aid), m_name(aname), m_icon_name(icon_name), m_type(atype)
+    m_id(aid), m_name(aname), m_icon(icon), m_type(atype)
 {
 }
 
 ItemBoxWidgetInterface::Item::Item(const QString &aid, const QString &aname,
-                                            const QString &icon_name, Type atype) :
-    m_data(new ItemBoxItemData(aid, aname, icon_name, atype))
+                                            const QIcon &icon, Type atype) :
+    m_data(new ItemBoxItemData(aid, aname, icon, atype))
 {
 }
 
@@ -112,23 +112,23 @@ void ItemBoxWidgetInterface::Item::setName(const QString &aname)
     m_data->m_name = aname;
 }
 
-QString ItemBoxWidgetInterface::Item::iconName() const
+QIcon ItemBoxWidgetInterface::Item::icon() const
 {
-    return m_data->m_icon_name;
+    return m_data->m_icon;
 }
 
-void ItemBoxWidgetInterface::Item::setIconName(const QString &icon_name)
+void ItemBoxWidgetInterface::Item::setIcon(const QIcon &icon)
 {
-    m_data->m_icon_name = icon_name;
+    m_data->m_icon = icon;
 }
 
-QIcon::Mode ItemBoxWidgetInterface::Item::iconMode() const{
-    return m_data->m_icon_mode;
-}
+//QIcon::Mode ItemBoxWidgetInterface::Item::iconMode() const{
+//    return m_data->m_icon_mode;
+//}
 
-void ItemBoxWidgetInterface::Item::setIconMode(QIcon::Mode icon_mode){
-    m_data->m_icon_mode = icon_mode;
-}
+//void ItemBoxWidgetInterface::Item::setIconMode(QIcon::Mode icon_mode){
+//    m_data->m_icon_mode = icon_mode;
+//}
 
 ItemBoxWidgetInterface::Item::Type ItemBoxWidgetInterface::Item::type() const
 {
