@@ -695,7 +695,7 @@ void ContactsManager::addContactToUI(ItemBoxWidget *expandListView, int groupID,
 //    }
     objectItem.setName(contact->displayName());
 
-    objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
+    objectItem.setIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
 
     expandListView->addItem(QString::number(groupID), objectItem);
 
@@ -732,7 +732,7 @@ void ContactsManager::updateContactToUI(ItemBoxWidget *expandListView, int perso
     Q_ASSERT(contact);
 
     expandListView->updateObjectItemName(QString::number(personalContactGroupID), contactID, contact->displayName());
-    expandListView->updateObjectItemIcon(QString::number(personalContactGroupID), contactID, ImageResource::getIconFilePathForContact(contact->getFace(), contact->getOnlineState()));
+    expandListView->updateObjectItemIcon(QString::number(personalContactGroupID), contactID, ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
 
 
 }
@@ -777,7 +777,7 @@ void ContactsManager::slotLoadContactGroupToUI(ItemBoxWidget *expandListView, in
 //        }
         objectItem.setName(contact->displayName());
 
-        objectItem.setIconName(ImageResource::getIconFilePathForContact(contact->getFace(), false));
+        objectItem.setIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
         //objectItem.setIconMode(QIcon::Disabled);
         //objectItem.setCategoryID(groupName);
 
@@ -1529,7 +1529,7 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
 bool ContactsManager::openDatabase(bool reopen){
     qDebug()<<"--ContactsManager::openDatabase(...)";
 
-    userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(m_imUser->getUserID());
+    userPrivateDataFilePath = Settings::instance()->getCurrentUserPrivateDataFilePath();
 
     //Check Local Database
     bool needInitUserDB = false;
@@ -1554,7 +1554,7 @@ bool ContactsManager::openDatabase(bool reopen){
     if(!localUserDataDB.isValid()){
         QSqlError err;
         DatabaseUtility databaseUtility;
-        userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(m_imUser->getUserID());
+        userPrivateDataFilePath = Settings::instance()->getCurrentUserPrivateDataFilePath();
         err = databaseUtility.openDatabase(LOCAL_USERDATA_DB_CONNECTION_NAME,
                                            LOCAL_USERDATA_DB_DRIVER,
                                            "",

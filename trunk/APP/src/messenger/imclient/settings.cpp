@@ -17,7 +17,7 @@ Settings::Settings(const QString &appName, const QString &appVersion, const QStr
     
     key = QString("HEHUI@HEHUI").toUtf8();
     
-    m_userID = "default";
+    m_currentUserID = "default";
     
 }
 
@@ -43,21 +43,9 @@ QString Settings::getDataRootPath() const{
 
 
 
-void Settings::setImageRootPath(const QString &imageRootPath){
-    setValue("MainWindow/ImageRootPath", imageRootPath);
-
-}
-
-QString Settings::getImageRootPath() const{
-
-    QString path = QApplication::applicationDirPath() + QString("/images");
-    if(!QFile::exists(path)){
-        QDir dir;
-        dir.mkpath(path);
-    }
-    return value("MainWindow/ImageRootPath", path).toString();
-
-}
+//void Settings::setImageRootPath(const QString &imageRootPath){
+//    setValue("MainWindow/ImageRootPath", imageRootPath);
+//}
 
 
 
@@ -85,10 +73,54 @@ QString Settings::getImageRootPath() const{
 
 //}
 
+QString Settings::getCurrentUserPrivateDataDir() const{
+    QString userPrivateDataDir = getDataRootPath() + "/" + m_currentUserID;
+    if(!QFile::exists(userPrivateDataDir)){
+        QDir dir;
+        dir.mkpath(userPrivateDataDir);
+    }
+    return userPrivateDataDir;
+
+}
+
+QString Settings::getCurrentUserPrivateDataFilePath() const
+{
+    //QString userPrivateDataFilePath = getDataRootPath() + QDir::separator() + userName + QDir::separator() + QString(LOCAL_USERDATA_DB_NAME);
+    QString userPrivateDataFilePath = getCurrentUserPrivateDataDir() + "/" + QString(LOCAL_USERDATA_DB_NAME);
+    return userPrivateDataFilePath;
+}
+
+QString Settings::getImageRootPath() const{
+    QString path = getCurrentUserPrivateDataDir() + QString("/images");
+    if(!QFile::exists(path)){
+        QDir dir;
+        dir.mkpath(path);
+    }
+    return path;
+}
+
+
+QString Settings::getImageCacheDir(){
+    QString pictureCacheDir = getImageRootPath() + QString("/cache");
+    if(!QFile::exists(pictureCacheDir)){
+        QDir dir;
+        dir.mkpath(pictureCacheDir);
+    }
+    return pictureCacheDir;
+}
+
+QString Settings::getCustomFaceDir(){
+    QString pictureCacheDir = getImageRootPath() + QString("/face");
+    if(!QFile::exists(pictureCacheDir)){
+        QDir dir;
+        dir.mkpath(pictureCacheDir);
+    }
+    return pictureCacheDir;
+}
 
 QString Settings::getCustomEmoticonsDir(){
 
-    QString emoticonsDir = getUserPrivateDataDir(m_userID) + QString("/images/customemoticons");
+    QString emoticonsDir = getImageRootPath() + QString("/customemoticons");
     if(!QFile::exists(emoticonsDir)){
         QDir dir;
         dir.mkpath(emoticonsDir);
@@ -98,32 +130,8 @@ QString Settings::getCustomEmoticonsDir(){
 }
 
 
-QString Settings::getPictureCacheDir(){
-    QString pictureCacheDir = getUserPrivateDataDir(m_userID) + QString("/images/cache");
-    if(!QFile::exists(pictureCacheDir)){
-        QDir dir;
-        dir.mkpath(pictureCacheDir);
-    }
-    return pictureCacheDir;
-}
 
-QString Settings::getUserPrivateDataDir(const QString &userID) const{
-    QString userPrivateDataDir = getDataRootPath() + "/" + userID;
-    if(!QFile::exists(userPrivateDataDir)){
-        QDir dir;
-        dir.mkpath(userPrivateDataDir);
-    }
-    return userPrivateDataDir;
 
-}
-
-QString Settings::getUserPrivateDataFilePath(const QString &userID) const
-{
-    //QString userPrivateDataFilePath = getDataRootPath() + QDir::separator() + userName + QDir::separator() + QString(LOCAL_USERDATA_DB_NAME);
-    QString userPrivateDataFilePath = getUserPrivateDataDir(userID) + "/" + QString(LOCAL_USERDATA_DB_NAME);
-
-    return userPrivateDataFilePath;
-}
 
 
 void Settings::setRecentUser(const QString &userName){
@@ -246,7 +254,7 @@ bool Settings::getSaveConfig() const
 
 
 void Settings::setCurrentUser(const QString &userID){
-    this->m_userID = userID;
+    this->m_currentUserID = userID;
 }
 
 

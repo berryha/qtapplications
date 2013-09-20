@@ -125,7 +125,7 @@ void ChatMessageWindow::initUI(){
     myDisplayName = QString(m_myself->getNickName());
     myUserID = m_myself->getUserID();
 
-    imageCachePath = Settings::instance()->getPictureCacheDir();
+    imageCachePath = Settings::instance()->getImageCacheDir();
 
 
     connect(ui.fontStyleToolButton, SIGNAL(clicked()), this, SLOT(showFontFrame()));

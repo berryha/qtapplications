@@ -28,13 +28,13 @@ public:
 	virtual ~ImageResource();
 
 //        static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false);
-        static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE);
         static QIcon createIconForInterestGroup(bool normal = true);
         
-        static QIcon createMixedIcon(const QString &normalIconPath, IM::OnlineState state);
+        static QIcon createIconForContact(const QString &iconFileNane, IM::OnlineState state);
+        static QString getIconFileFullPathForContact(const QString &iconFileNane) ;
 
-        static QString getIconFilePathForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false) ;
-        static QString getIconFilePathForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE) ;
+        static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false) ;
+        static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE) ;
 
 
 

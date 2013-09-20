@@ -1190,7 +1190,7 @@ void MainWindow::slotUserVerified(){
 
         m_imUser->setOnlineState(m_imUser->getStateAfterLoggedin());
         //systemTray->resetTrayIcon(ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Normal));
-        systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), m_imUser->getOnlineState()));
+        systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), m_imUser->getOnlineState()));
 
         systemTray->resetToolTip(userID);
         //systemTray->setIcon(ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Normal));
@@ -1220,7 +1220,7 @@ void MainWindow::slotUserVerified(){
         //TODO:是否要放在外面
         if(m_imUser->getOnlineState() != IM::ONLINESTATE_INVISIBLE){
             //systemTray->resetTrayIcon(ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Normal));
-            systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), m_imUser->getOnlineState()));
+            systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), m_imUser->getOnlineState()));
 
             emit signalMyOnlineStateChanged(m_socketConnectedToServer, quint8(m_imUser->getOnlineState()));
         }
@@ -2278,7 +2278,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
     }
 
 
-    QString imageCachePath = Settings::instance()->getPictureCacheDir();
+    QString imageCachePath = Settings::instance()->getImageCacheDir();
     QString filePath = imageCachePath + "/" + imageName;
 
 
@@ -2301,7 +2301,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
 void MainWindow::slotProcessImageDownloadRequest(const QString &contactID, const QString &imageName){
     qDebug()<<"--MainWindow::slotProcessImageDownloadRequest(...) "<<" contactID:"<<contactID<<" imageName"<<imageName;
 
-    QString imageCachePath = Settings::instance()->getPictureCacheDir();
+    QString imageCachePath = Settings::instance()->getImageCacheDir();
     QString filePath = imageCachePath + "/" + imageName;
 
     QFile file(filePath);
@@ -2877,7 +2877,7 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
         //TODO
         m_verified = false;
         emit signalServerOnlineStateChanged(false);
-        systemTray->resetTrayIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
+        systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
 
         if(!normalClose){
             requestLogin(m_serverHostAddress, m_serverHostPort);
