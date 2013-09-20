@@ -464,8 +464,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-
-
     case quint8(IM::CLIENT_REQUEST_SEARCH_CONTACTS):
     {
         qDebug()<<"~~CLIENT_REQUEST_SEARCH_CONTACTS";
@@ -486,11 +484,40 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         bool matchExactly = true, searchOnlineUsersOnly = true, searchWebcamUsersOnly = false;
         stream >> propertiesString >> matchExactly >> searchOnlineUsersOnly >> searchWebcamUsersOnly;
         
-        QStringList usersList = searchContact(propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
-        if(!usersList.isEmpty()){
-            sendSearchResultPacket(socketID, usersList, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+        QString usersListString = searchContact(propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
+        if(!usersListString.isEmpty()){
+            sendSearchContactResultPacket(socketID, usersListString, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
         }
         
+    }
+        break;
+
+    case quint8(IM::CLIENT_REQUEST_SEARCH_INTERESTGROUPS):
+    {
+        qDebug()<<"~~CLIENT_REQUEST_SEARCH_INTERESTGROUPS";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        QString keyword = "";
+        int startIndex = 0;
+        stream >> keyword >> startIndex;
+
+        QString groupsListString = searchInterestGroup(keyword, startIndex);
+        if(!groupsListString.isEmpty()){
+            sendSearchInterestGroupResultPacket(socketID, groupsListString, userInfo->getSessionEncryptionKey());
+        }
+
     }
         break;
 

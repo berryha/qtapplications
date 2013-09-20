@@ -667,8 +667,8 @@ public slots:
 
     }
 
-    bool sendSearchResultPacket(int peerSocketID, const QStringList &users, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
-        qDebug()<<"--sendSearchResultPacket(...)";
+    bool sendSearchContactResultPacket(int peerSocketID, const QString &usersString, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
+        qDebug()<<"--sendSearchContactResultPacket(...)";
         
         //TODO:搜索结果的格式
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -678,7 +678,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << users.join(QString(PACKET_DATA_SEPARTOR));
+        out << usersString;
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
@@ -693,7 +693,36 @@ public slots:
         out << v;
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
-    
+
+    bool sendSearchInterestGroupResultPacket(int peerSocketID, const QString &groupsString, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendSearchInterestGroupResultPacket(...)";
+
+        //TODO:搜索结果的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_SEARCH_INTERESTGROUPS));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupsString;
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
+
+
     bool sendAddContactRequestFromUserPacket(int peerSocketID, const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendAddContactRequestFromUserPacket(...)";
         

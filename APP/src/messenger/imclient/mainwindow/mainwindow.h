@@ -121,7 +121,13 @@ private slots:
 
     void slotSearch();
     void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
+    void searchInterestGroup(const QString &keyword, int startIndex = 0);
+
     void addContact(const QString &userID, const QString &verificationMessage);
+
+
+
+
 
     void slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void showContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);

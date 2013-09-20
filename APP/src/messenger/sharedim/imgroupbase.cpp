@@ -108,6 +108,10 @@ QString IMGroupBase::databaseColumnName(IM::PropertyIDOfGroup propertyID) const{
     case IM::PIG_State :
         columnName = "State";
         break;
+    case IM::PIG_Privacy :
+        columnName = "Privacy";
+        break;
+
         
     default:
         columnName = "";

@@ -554,9 +554,30 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString result = "";
         stream >> result;
 
-        emit signalSearchContactsResultPacketReceived(result.split(QString(PACKET_DATA_SEPARTOR)));
+        emit signalSearchContactsResultPacketReceived(result);
 
         qWarning()<<"--SERVER_RESPONSE_SEARCH_CONTACTS";
+    }
+        break;
+
+    case quint8(IM::SERVER_RESPONSE_SEARCH_INTERESTGROUPS):
+    {
+        //TODO:
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+        QString result = "";
+        stream >> result;
+
+        emit signalSearchInterestGroupsResultPacketReceived(result);
+
+        qWarning()<<"--SERVER_RESPONSE_SEARCH_INTERESTGROUPS";
     }
         break;
 

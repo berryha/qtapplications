@@ -63,10 +63,10 @@ QString InterestGroup::databaseColumnName(IM::PropertyIDOfGroup propertyID) cons
     case IM::PIG_State :
         columnName = "State";
         break;
+    case IM::PIG_Privacy :
+        columnName = "Privacy";
+        break;
 
-//    case IM::PIG_LastUpdateTime :
-//        columnName = "LastUpdateTime";
-//        break;
         
     default:
         columnName = "";

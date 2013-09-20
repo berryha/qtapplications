@@ -25,6 +25,7 @@ InterestGroupBase::InterestGroupBase(quint32 groupID, const QString &groupName, 
     announcement = "";
     remark = "";
     state = 1;
+    privacy = Allow_Anyone_To_Join;
         
 }
 

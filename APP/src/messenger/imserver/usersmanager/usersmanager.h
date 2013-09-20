@@ -72,7 +72,7 @@ public:
     bool registerNewUser(const QString &userID, const QString &password, IM::ErrorType *errorType, quint32 *sysID, QString *message = 0);
     void updateUserPassword(const QString &userID, const QString &newPassword, IM::ErrorType *errorType, QString *message = 0);
 
-    QStringList searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
+    QString searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
 
 
     bool saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message);
@@ -110,7 +110,7 @@ public:
 
     QList<UserInfo *> getAllOnlineInterestGroupMembers(quint32 groupID);
 
-    QStringList searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly);
+    QString searchInterestGroup(const QString &keyword, int startIndex);
     bool saveInterestGroupToDatabase(InterestGroup *groupInfo);
 
     bool saveMembershipApplyRequest(quint32 applicantID, quint32 groupID, const QString &message = "");
