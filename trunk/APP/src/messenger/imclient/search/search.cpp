@@ -69,15 +69,17 @@ Search::~Search()
     
 }
 
-void Search::slotSearchContactsResultPacketReceived(const QStringList &users){
+void Search::slotSearchContactsResultPacketReceived(const QString &usersString){
 
     resetUsersInfo();
 
     //TODO
     //FORMAT:UserID,NickName,Gender,Age,Face,FriendshipApply,BusinessAddress,OnlineState
     
-    foreach (QString userInfo, users) {
-        QStringList userInfoList = userInfo.split(QString(CONTACT_INFO_SEPARATOR));
+
+    QStringList usersList = usersString.split(QChar(SEPARTOR_GROUP));
+    foreach (QString userInfo, usersList) {
+        QStringList userInfoList = userInfo.split(QChar(SEPARTOR_RECORD));
         QString userID = userInfoList.at(0);
         Contact *user = new Contact(userID, "", this);
         user->setNickName(userInfoList.at(1));
@@ -94,6 +96,12 @@ void Search::slotSearchContactsResultPacketReceived(const QStringList &users){
     userInfoModel->setUsersList(usersHash.values());
     //QMessageBox::information(this, "Result", users.join("|"));
 }
+
+
+void Search::slotSearchInterestGroupsResultPacketReceived(const QString &groupsString){
+
+}
+
 
 void Search::reset(){
     
@@ -197,6 +205,7 @@ void Search::on_pushButtonCondition_clicked(){
 }
 
 void Search::on_pushButtonSearch_clicked(){
+
     if(ui.tabWidget->currentWidget() == ui.tabUsers){
 
         QStringList propertiesList;
@@ -253,6 +262,13 @@ void Search::on_pushButtonSearch_clicked(){
         ui.pushButtonSearch->setVisible(false);
         
     }else{
+
+        quint32 groupID = ui.lineEditGroupID->text().trimmed().toUInt();
+        QString groupName = ui.lineEditGroupName->text().trimmed();
+        QString creator = ui.lineEditCreator->text().trimmed();
+
+        //emit signalSearchInterestGroup(groupID, groupName, creator);
+
         ui.stackedWidgetGroups->setCurrentWidget(ui.pageGroupsSearchResult);
         ui.pushButtonCondition->setEnabled(true);
         ui.pushButtonCondition->setVisible(true);

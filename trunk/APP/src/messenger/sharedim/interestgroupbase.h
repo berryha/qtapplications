@@ -45,6 +45,12 @@ public:
         LOG_ContactRenamed
     };
 
+    enum Privacy{
+        Allow_Anyone_To_Join=1,
+        Request_Verfication_To_Join,
+        Only_Invited_Can_Join
+    };
+
 
     InterestGroupBase(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
     virtual ~InterestGroupBase();
@@ -160,10 +166,13 @@ public:
         addUpdatedProperty(IM::PIG_State, QString::number(state) );
     }
 
-//    void setLastUpdateTime(QDateTime time){
-//        this->lastUpdateTime = time;
-//        addUpdatedProperty(IM::PIG_LastUpdateTime, "'"+lastUpdateTime.toString("yyyy.MM.dd hh:mm:ss")+"'");
-//    }
+    void setPrivacy(quint8 privacy){
+        this->privacy = Privacy(privacy);
+        addUpdatedProperty(IM::PIG_Privacy, QString::number(privacy) );
+    }
+    quint8 getPrivacy(){
+        return quint8(privacy);
+    }
 
 
 
@@ -179,6 +188,7 @@ private:
     QString announcement;
     QString remark;
     quint8 state;
+    Privacy privacy;
 
 //    QDateTime lastUpdateTime;
 

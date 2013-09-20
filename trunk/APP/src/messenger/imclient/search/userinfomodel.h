@@ -34,7 +34,6 @@
 #include <QObject>
 #include <QAbstractTableModel>
 
-//#include "../../sharedim/imuserbase.h"
 #include "contactsmanager/contact.h"
 
 

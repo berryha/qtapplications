@@ -344,6 +344,34 @@ public slots:
         return m_rtp->sendReliableData(serverSocketID, &ba);
     }
 
+    bool searchInterestGroup(int serverSocketID, const QString &keyword, int startIndex){
+        qDebug()<<"--searchInterestGroup(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_SEARCH_INTERESTGROUPS));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << keyword << startIndex ;
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+    }
+
+
     bool addContact(int serverSocketID, const QString &contactID, const QString &verificationMessage = "", quint32 groupID = ContactGroupBase::Group_Friends_ID){
         qWarning()<<"--addContact(...)";
         
@@ -372,6 +400,7 @@ public slots:
 
     }
     
+
     bool moveContactToGroup(int serverSocketID, const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
         qDebug()<<"--moveContactToGroup(...)";
 
@@ -1290,7 +1319,9 @@ signals:
     void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer);
     void signalCreateOrDeleteContactGroupResultPacketReceived(quint32 groupID, const QString &groupName, bool createGroup, bool result);
 
-    void signalSearchContactsResultPacketReceived(const QStringList &users);
+    void signalSearchContactsResultPacketReceived(const QString &usersString);
+    void signalSearchInterestGroupsResultPacketReceived(const QString &groupsString);
+
     //void signalAddContactResultPacketReceived(const QString &contactID, IM::ErrorType errorType);
     void signalAddContactRequestFromUserPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void signalAddContactResultPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage);

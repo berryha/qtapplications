@@ -67,7 +67,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     contractstree/contractstree.h \
     chatwindow/contactchatwidget.h \
     contactsmanager/contactgroup1.h \
-    deletecontactdialog/deletecontactdialog.h
+    deletecontactdialog/deletecontactdialog.h \
+    search/interestgroupinfomodel.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -101,7 +102,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     networkmanager/clientresourcesmanager.cpp \
     contractstree/contractstree.cpp \
     chatwindow/contactchatwidget.cpp \
-    deletecontactdialog/deletecontactdialog.cpp
+    deletecontactdialog/deletecontactdialog.cpp \
+    search/interestgroupinfomodel.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \

@@ -25,10 +25,13 @@ public:
 signals:
     void signalSearchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly = true, bool searchWebcamUsersOnly = false);
     void signalAddContact(const QString &userID, const QString &verificationMessage);
-    
+    void signalSearchInterestGroup(const QString &keyword, int startIndex);
+
     
 public slots:
-    void slotSearchContactsResultPacketReceived(const QStringList &users);
+    void slotSearchContactsResultPacketReceived(const QString &usersString);
+    void slotSearchInterestGroupsResultPacketReceived(const QString &groupsString);
+
     
 private slots:
     

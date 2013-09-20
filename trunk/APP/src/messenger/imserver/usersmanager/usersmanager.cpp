@@ -335,17 +335,17 @@ void UsersManager::updateUserPassword(const QString &userID, const QString &newP
 
 }
 
-QStringList UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
+QString UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
     qDebug()<<"propertiesString:"<<propertiesString;
     
     if(propertiesString.trimmed().isEmpty()){
-        return QStringList();
+        return QString();
     }
     
     QStringList propertiesList = propertiesString.split(QString(CONTACT_INFO_SEPARATOR));
     if(propertiesList.size() != 6){
         qWarning()<<"ERROR! Invalid propertiesString!";
-        return QStringList();
+        return QString();
     }
 
     QString userID = propertiesList.at(0);
@@ -393,7 +393,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
 
     if(!db.isValid()){
         if(!openDatabase()){
-            return QStringList();
+            return QString();
         }
     }
     QSqlQuery query(db);
@@ -403,7 +403,7 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
         QString msg = QString("Can not search contact for user from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        return QStringList();
+        return QString();
     }
     
     QStringList usersInfoList;
@@ -430,10 +430,10 @@ QStringList UsersManager::searchContact(const QString &propertiesString, bool ma
         }
         userInfoList.append(QString::number(onlineState));
         
-        usersInfoList.append(userInfoList.join(QString(CONTACT_INFO_SEPARATOR)));
+        usersInfoList.append(userInfoList.join(QChar(SEPARTOR_RECORD)));
     }
     
-    return usersInfoList;
+    return usersInfoList.join(QChar(SEPARTOR_GROUP));
     
 }
 
@@ -1958,107 +1958,46 @@ QList<UserInfo *> UsersManager::getAllOnlineInterestGroupMembers(quint32 groupID
 
 }
 
-QStringList UsersManager::searchInterestGroup(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly){
+QString UsersManager::searchInterestGroup(const QString &keyword, int startIndex){
 
-    
-    if(propertiesString.trimmed().isEmpty()){
-        return QStringList();
-    }
-    
-    QStringList queryStringList;
-    QStringList propertiesList = propertiesString.split(QString(CONTACT_INFO_SEPARATOR));
-    if(propertiesList.isEmpty()){
-        return QStringList();
-    }
-    
-    InterestGroup info;
-    
-    foreach (QString property, propertiesList) {
-        QStringList list = property.split("=");
-        IM::PropertyIDOfGroup pi = IM::PropertyIDOfGroup(list.at(0).toUInt());
-        QString value = list.at(1);
-        
-        if(value.trimmed().startsWith("'") && (!matchExactly)){
-            queryStringList.append(info.databaseColumnName(pi)+" like "+value);
-        }else{
-//            if(pi == IM::PI_Age){
-//                QString statement = "";
-//                IMUserBase::AgeSection as = IMUserBase::AgeSection(value.toUInt());
-//                switch(as){
-//                case IMUserBase::AS_16_22:
-//                    statement = " Between 16 And 22";
-//                    break;
-//                case IMUserBase::AS_23_30:
-//                    statement = " Between 23 And 30";
-//                    break;
-//                case IMUserBase::AS_31_40:
-//                    statement = " Between 31 And 40";
-//                    break;
-//                case IMUserBase::AS_40_:
-//                    statement = " > 40";
-//                    break;
-//                default:
-//                    statement = " > 0"; 
-//                }
-                
-//                queryStringList.append(info.databaseColumnName(pi)+" "+statement);
-                
-//            }else{
-                queryStringList.append(info.databaseColumnName(pi)+" = "+value);
-//            }
-            
-        }
 
-    }
-    
-    QString queryString = QString("Select %1, %2, %3, %4, %5, %6 From groups Where %7")
-            .arg(info.databaseColumnName(IM::PIG_GroupID))
-            .arg(info.databaseColumnName(IM::PIG_GroupTypeID))
-            .arg(info.databaseColumnName(IM::PIG_ParentGroupID))
-            .arg(info.databaseColumnName(IM::PIG_GroupName))
-            .arg(info.databaseColumnName(IM::PIG_CreatorID))
-            .arg(info.databaseColumnName(IM::PIG_Description))
-            .arg(queryStringList.join(" And "))
-            ;
     if(!db.isValid()){
         if(!openDatabase()){
-            return QStringList();
+            return QString();
         }
     }
     QSqlQuery query(db);
     
+    quint32 groupID = keyword.toUInt();
+    quint32 endIndex = startIndex + 16;
+    QString queryString;
+        if(groupID){
+        queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg(groupID).arg("").arg(startIndex).arg(endIndex);
+
+    }else{
+        queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg("null").arg(keyword).arg(startIndex).arg(endIndex);
+    }
     if(!query.exec(queryString)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not query user info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not query interest group info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-        
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-        
-        return QStringList();
+                
+        return QString();
     }
     
     QStringList groupsInfoList;
     while(query.next()){  
-        //TODO:query安全性
-        //quint32 groupID = query.value(0).toUInt();
-        //Group *info = getGroup(groupID);       
         
-        QStringList groupList;
+        QStringList infoList;
         for(int i=0; i<6; i++){
-            groupList.append(query.value(i).toString());
+            infoList.append(query.value(i).toString());
 //            qWarning()<<i<<":"<<query.value(i).toString();
         }
-//        groupList.append(QString::number(info->getOnlineState()));
         
-        groupsInfoList.append(groupList.join(QString(GROUP_INFO_SEPARATOR)));
+        groupsInfoList.append(infoList.join(QChar(SEPARTOR_RECORD)));
     }
     
-    return groupsInfoList;
+    return groupsInfoList.join(QChar(SEPARTOR_GROUP));
     
 }
 
@@ -2379,6 +2318,7 @@ bool UsersManager::queryInterestGroup(InterestGroup *info){
     info->setAnnouncement(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Announcement)))).toString());
     info->setRemark(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Remark)))).toString());
     info->setState(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_State)))).toUInt());
+    info->setPrivacy(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_Privacy)))).toUInt());
 
 
     //    info->setLastUpdateTime(QVariant(query.value(record.indexOf(info->databaseColumnName(IM::PIG_LastUpdateTime)))).toDateTime());

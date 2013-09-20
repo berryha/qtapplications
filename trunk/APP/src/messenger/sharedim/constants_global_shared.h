@@ -106,12 +106,19 @@
 #endif
 
 
-#ifndef CONTACT_GROUPS_INFO_ROW_SEPARATOR
-#define CONTACT_GROUPS_INFO_ROW_SEPARATOR	 ";"
+
+#ifndef SEPARTOR_GROUP
+#define SEPARTOR_GROUP 0X1D
 #endif
-#ifndef CONTACT_GROUPS_INFO_FIELD_SEPARATOR
-#define CONTACT_GROUPS_INFO_FIELD_SEPARATOR	 ","
+
+#ifndef SEPARTOR_RECORD
+#define SEPARTOR_RECORD 0X1E
 #endif
+
+#ifndef SEPARTOR_UNIT
+#define SEPARTOR_UNIT 0X1F
+#endif
+
 
 #ifndef MAX_MESSAGE_SIZE
 #define MAX_MESSAGE_SIZE    470
@@ -204,6 +211,10 @@ enum Command {
 
     CLIENT_REQUEST_SEARCH_CONTACTS, //c
     SERVER_RESPONSE_SEARCH_CONTACTS, //s
+
+    CLIENT_REQUEST_SEARCH_INTERESTGROUPS, //c
+    SERVER_RESPONSE_SEARCH_INTERESTGROUPS, //s
+
     CLIENT_REQUEST_ADD_CONTACT, //c
     CLIENT_RESPONSE_ADD_CONTACT_REQUEST, //c, s
     CLIENT_REQUEST_DELETE_CONTACT, //c
@@ -372,7 +383,8 @@ enum PropertyIDOfGroup{
     PIG_Announcement,
     PIG_Remark,
     PIG_State,
-//    PIG_LastUpdateTime,
+    PIG_Privacy,
+
     
     //For Table InterestGroupMembers
     PIG_MemberSysID,
