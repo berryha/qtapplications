@@ -25,15 +25,14 @@ class  Settings : public SettingsBase, public Singleton<Settings>
     friend class Singleton<Settings>;
 
 public:
-    Settings( const QString &appName = APP_NAME, const QString &appVersion = APP_VERSION, const QString fileBaseName = APP_NAME, const QString fileDirPath = QCoreApplication::applicationDirPath(), QObject* = QApplication::instance() );
+    Settings(const QString &appName = APP_NAME, const QString &appVersion = APP_VERSION, const QString fileBaseName = APP_NAME, const QString fileDirPath = QCoreApplication::applicationDirPath(), QObject* = QApplication::instance() );
     ~Settings();
 
 
     void setDataRootPath(const QString &dataRootPath);
     QString getDataRootPath() const;
 
-    void setImageRootPath(const QString &imageRootPath);
-    QString getImageRootPath() const;
+//    void setImageRootPath(const QString &imageRootPath);
 
     //	void setEmoticonsPath(const QString &emoticonsPath);
     //	QString getEmoticonsPath() const;
@@ -41,10 +40,15 @@ public:
     //	void setPortraiticonsPath(const QString &portraiticonsPath);
     //	QString getPortraiticonsPath() const;
 
-    QString getUserPrivateDataDir(const QString &userID) const;
-    QString getUserPrivateDataFilePath(const QString &userID) const;
+
+    QString getCurrentUserPrivateDataDir() const;
+    QString getCurrentUserPrivateDataFilePath() const;
+
+    QString getImageRootPath() const;
+    QString getImageCacheDir();
+    QString getCustomFaceDir();
     QString getCustomEmoticonsDir();
-    QString getPictureCacheDir();
+
 
 
     //登陆框
@@ -92,7 +96,7 @@ private:
 
     //ResourcesManager *resourcesManager;
 
-    QString m_userID;
+    QString m_currentUserID;
 
 };
 

@@ -134,7 +134,7 @@ bool Login::verifyUser() {
     //	}
 
     DatabaseConnecter dc(this);
-    QString userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(user->getUserID());
+    QString userPrivateDataFilePath = Settings::instance()->getCurrentUserPrivateDataFilePath();
     if(!dc.isDatabaseOpened(LOCAL_USERDATA_DB_CONNECTION_NAME,
                             LOCAL_USERDATA_DB_DRIVER,
                             "",

@@ -7,11 +7,14 @@
 
 
 #include <QPainter>
-//#include <QFileInfo>
+#include <QFile>
 #include <QDebug>
 
 
+
 #include "imageresource.h"
+
+#include "settings.h"
 
 
 namespace HEHUI{
@@ -48,10 +51,6 @@ ImageResource::~ImageResource() {
 
 //}
 
-QIcon ImageResource::createIconForContact(const QString &iconIndex, IM::OnlineState state ){
-
-        return QIcon(getIconFilePathForContact(iconIndex, state));
-}
 
 QIcon ImageResource::createIconForInterestGroup(bool normal){
 
@@ -69,7 +68,10 @@ QIcon ImageResource::createIconForInterestGroup(bool normal){
     return  groupIcon;
 }
 
-QIcon ImageResource::createMixedIcon(const QString &normalIconPath, IM::OnlineState state){
+QIcon ImageResource::createIconForContact(const QString &iconFileNane, IM::OnlineState state){
+
+
+    QString normalIconPath = getIconFileFullPathForContact(iconFileNane);
 
     QString pngFilePath = "";
     switch(state){
@@ -123,8 +125,25 @@ QIcon ImageResource::createMixedIcon(const QString &normalIconPath, IM::OnlineSt
 
 }
 
+QString ImageResource::getIconFileFullPathForContact(const QString &iconFileNane ){
 
-QString ImageResource::getIconFilePathForContact(const QString &iconIndex, bool isOnline) {
+    QString fullIconPath;
+    if(iconFileNane.size() < 3){
+        fullIconPath = QString(USER_FACE_FILE_PATH_PREFIX) + "/" + iconFileNane + ".png";
+    }else{
+        fullIconPath = Settings::instance()->getCustomFaceDir() + "/" + iconFileNane;
+    }
+
+    if(!QFile::exists(fullIconPath)){
+        fullIconPath = QString(USER_FACE_FILE_PATH_PREFIX) + "/" + USER_FACE_DEFAULT_INDEX + ".png";
+    }
+
+    return fullIconPath;
+
+}
+
+
+QString ImageResource::getIconFilePathForContact2(const QString &iconIndex, bool isOnline) {
 	QString filePath;
 	QString idx = iconIndex;
 
@@ -142,7 +161,7 @@ QString ImageResource::getIconFilePathForContact(const QString &iconIndex, bool 
 
 }
 
-QString ImageResource::getIconFilePathForContact(const QString &iconIndex, IM::OnlineState state){
+QString ImageResource::getIconFilePathForContact2(const QString &iconIndex, IM::OnlineState state){
 
     QString filePath;
     QString idx = iconIndex;

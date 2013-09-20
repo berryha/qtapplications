@@ -64,7 +64,7 @@
 
 
 #ifndef USER_FACE_FILE_PATH_PREFIX
-#define USER_FACE_FILE_PATH_PREFIX	":/face/"
+#define USER_FACE_FILE_PATH_PREFIX	":/face"
 #endif
 
 #ifndef USER_FACE_DEFAULT_INDEX

@@ -101,7 +101,7 @@
               <string>User</string>
              </property>
              <property name="icon">
-              <iconset resource="../../../managementsystem/clientservice/resources.qrc">
+              <iconset resource="../resources.qrc">
                <normaloff>:/resources/images/app.png</normaloff>:/resources/images/app.png</iconset>
              </property>
              <property name="iconSize">
@@ -833,7 +833,6 @@
   <tabstop>toolButtonUserFace</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../managementsystem/clientservice/resources.qrc"/>
   <include location="../resources.qrc"/>
  </resources>
  <connections>
