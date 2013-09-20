@@ -127,7 +127,7 @@ public:
 
     bool updateItemName(const QString &item_id, const QString &name);
     bool updateItemIcon(const QString &item_id, const QIcon &icon);
-    bool updateItemIcon(const QString &item_id, const QString &iconName);
+//    bool updateItemIcon(const QString &item_id, const QString &iconName);
 
 
 private:
@@ -227,18 +227,18 @@ bool ItemBoxCategoryModel::updateItemIcon(const QString &item_id, const QIcon &i
 
 }
 
-bool ItemBoxCategoryModel::updateItemIcon(const QString &item_id, const QString &iconName){
+//bool ItemBoxCategoryModel::updateItemIcon(const QString &item_id, const QString &iconName){
 
-    QModelIndex idx = index(indexOfItem(item_id));
-    if(!idx.isValid()){
-        return false;
-    }
+//    QModelIndex idx = index(indexOfItem(item_id));
+//    if(!idx.isValid()){
+//        return false;
+//    }
 
-    setData(idx, iconName, Qt::DecorationRole);
+//    setData(idx, iconName, Qt::DecorationRole);
 
-    return true;
+//    return true;
 
-}
+//}
 
 void ItemBoxCategoryModel::addItem(const ItemBoxWidgetInterface::Item &item, const QIcon &icon,bool editable)
 {
@@ -342,11 +342,11 @@ bool ItemBoxCategoryModel::setData(const QModelIndex &index, const QVariant &val
     if(role == Qt::DecorationRole){
         if( value.type() == QVariant::Icon){
             categoryEntry.icon = value.value<QIcon>();
-        }else if(value.type() == QVariant::String){
-            const QString newIconName = value.toString();
-            categoryEntry.item.setIconName(newIconName);
-            categoryEntry.icon = QIcon(newIconName);
-        }
+        }//else if(value.type() == QVariant::String){
+            //const QString newIconName = value.toString();
+            //categoryEntry.item.setIcon(newIconName);
+            //categoryEntry.icon = QIcon(newIconName);
+        //}
     }
 
     emit dataChanged(index, index);
@@ -638,14 +638,14 @@ bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QIcon
 
 }
 
-bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QString &iconName){
-    //qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
+//bool ItemBoxCategoryListView::updateItemIcon(const QString &item_id, const QString &iconName){
+//    //qDebug()<<"----CategoryListView::updateObjectItemIcon(const QString &item_id, const QString &iconName)";
 
-    bool ok = m_model->updateItemIcon(item_id, iconName);
-    viewport()->update();
-    return ok;
+//    bool ok = m_model->updateItemIcon(item_id, iconName);
+//    viewport()->update();
+//    return ok;
 
-}
+//}
 
 bool ItemBoxCategoryListView::event(QEvent *event){
 

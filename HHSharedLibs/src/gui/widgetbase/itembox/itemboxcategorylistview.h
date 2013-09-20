@@ -93,7 +93,7 @@ public:
 
     bool updateItemName(const QString &item_id, const QString &name);
     bool updateItemIcon(const QString &item_id, const QIcon &icon);
-    bool updateItemIcon(const QString &item_id, const QString &iconName);
+//    bool updateItemIcon(const QString &item_id, const QString &iconName);
 
 
 protected:

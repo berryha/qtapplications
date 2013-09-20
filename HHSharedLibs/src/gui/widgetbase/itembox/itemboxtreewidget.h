@@ -110,14 +110,14 @@ public:
 //    bool load(ItemBoxWidgetBase::LoadMode loadMode);
 //    bool loadContents(const QString &contents);
 //    bool save();
-    QIcon iconForItem(QString iconName, QIcon::Mode iconMode = QIcon::Disabled) const;
+
 
 
 //    void setLoadMode(ItemBoxWidgetBase::LoadMode loadMode);
 
     bool updateItemName(const QString &cat_id, const QString &item_id, const QString &itemName);
     bool updateItemIcon(const QString &cat_id, const QString &item_id, const QIcon &icon);
-    bool updateItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
+//    bool updateItemIcon(const QString &cat_id, const QString &item_id, const QString &iconName);
 
 
 signals:

@@ -65,7 +65,7 @@ public:
     public:
         enum Type { Default, Custom };
         Item(const QString &aname = QString(), const QString &xml = QString(),
-                const QString &icon_name = QString(), Type atype = Default);
+             const QIcon &icon = QIcon(), Type atype = Default);
         ~Item();
         Item(const Item &w);
         Item &operator=(const Item &w);
@@ -74,10 +74,10 @@ public:
         void setID(const QString &aid);
         QString name() const;
         void setName(const QString &aname);
-        QString iconName() const;
-        void setIconName(const QString &icon_name);
-        QIcon::Mode iconMode() const;
-        void setIconMode(QIcon::Mode icon_mode);
+        QIcon icon() const;
+        void setIcon(const QIcon &icon);
+        //QIcon::Mode iconMode() const;
+        //void setIconMode(QIcon::Mode icon_mode);
 
         Type type() const;
         void setType(Type atype);
