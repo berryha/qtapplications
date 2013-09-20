@@ -54,7 +54,7 @@
 #endif
 
 #ifndef GROUP_SEPARTOR
-#define PACKET_DATA_SEPARTOR 0X1D
+#define GROUP_SEPARTOR 0X1D
 #endif
 
 #ifndef PACKET_DATA_SEPARTOR
