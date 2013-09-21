@@ -2063,7 +2063,7 @@ void MainWindow::slotProcessPersonalMessage(const QString &userID, const QString
 void MainWindow::slotSearch(){
     if(!search){
         search = new Search();
-        connect(search, SIGNAL(signalSearchContact(const QString &, bool, bool, bool)), this, SLOT(searchContact(const QString &, bool, bool, bool)), Qt::QueuedConnection);
+        connect(search, SIGNAL(signalSearchContact(const QString &, bool, bool, bool, int)), this, SLOT(searchContact(const QString &, bool, bool, bool, int)), Qt::QueuedConnection);
         connect(search, SIGNAL(signalSearchInterestGroup(const QString &, int)), this, SLOT(searchInterestGroup(const QString &, int)));
 
         connect(search, SIGNAL(signalAddContact(const QString&, const QString&)), this, SLOT(addContact(const QString&, const QString&)));
@@ -2077,8 +2077,8 @@ void MainWindow::slotSearch(){
 
 }
 
-void MainWindow::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
-    clientPacketsParser->searchContact(m_socketConnectedToServer, propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
+void MainWindow::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly, int startIndex){
+    clientPacketsParser->searchContact(m_socketConnectedToServer, propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly, startIndex);
 }
 
 void MainWindow::searchInterestGroup(const QString &keyword, int startIndex){

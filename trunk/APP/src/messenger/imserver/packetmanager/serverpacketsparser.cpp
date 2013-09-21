@@ -480,11 +480,13 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         if(!decryptData(userID, &decryptedData, encryptedData)){return;}
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_7);
+
         QString propertiesString = "";
         bool matchExactly = true, searchOnlineUsersOnly = true, searchWebcamUsersOnly = false;
-        stream >> propertiesString >> matchExactly >> searchOnlineUsersOnly >> searchWebcamUsersOnly;
+        int startIndex = 0;
+        stream >> propertiesString >> matchExactly >> searchOnlineUsersOnly >> searchWebcamUsersOnly >> startIndex;
         
-        QString usersListString = searchContact(propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
+        QString usersListString = searchContact(propertiesString, matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly, startIndex);
         if(!usersListString.isEmpty()){
             sendSearchContactResultPacket(socketID, usersListString, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
         }

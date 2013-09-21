@@ -335,7 +335,7 @@ void UsersManager::updateUserPassword(const QString &userID, const QString &newP
 
 }
 
-QString UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly){
+QString UsersManager::searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly, int startIndex){
     qDebug()<<"propertiesString:"<<propertiesString;
     
     if(propertiesString.trimmed().isEmpty()){
@@ -348,7 +348,7 @@ QString UsersManager::searchContact(const QString &propertiesString, bool matchE
         return QString();
     }
 
-    QString userID = propertiesList.at(0);
+    QString userID = propertiesList.at(0).trimmed();
     QString nickName = propertiesList.at(1);
     QString ageSectionString = propertiesList.at(2);
     QString genderString = propertiesList.at(3);
@@ -382,12 +382,17 @@ QString UsersManager::searchContact(const QString &propertiesString, bool matchE
 
 //    User::Gender gd = User::Gender(genderString.toInt());
 
+   quint32 pageSize = SEARCH_RESULT_PAGE_SIZE;
+
    QString queryString ;
 
     if(matchExactly){
+        if(userID.isEmpty() && nickName.trimmed().isEmpty()){
+            return QString();
+        }
         queryString = QString("call sp_Contact_Search_MatchExactly('%1', '%2');").arg(userID).arg(nickName);
     }else{
-        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, %3, '%4', '%5');").arg(startAge).arg(endAge).arg(genderString.toUInt()).arg(hometown).arg(businessAddress);
+        queryString = QString("call sp_Contact_Search_MatchWildcard(%1, %2, %3, '%4', '%5', %6, %7);").arg(startAge).arg(endAge).arg(genderString.toUInt()).arg(hometown).arg(businessAddress).arg(startIndex).arg(pageSize);
     }
     qDebug()<<"----queryString:"<<queryString;
 
@@ -1960,6 +1965,9 @@ QList<UserInfo *> UsersManager::getAllOnlineInterestGroupMembers(quint32 groupID
 
 QString UsersManager::searchInterestGroup(const QString &keyword, int startIndex){
 
+    if(keyword.trimmed().isEmpty()){
+        return QString();
+    }
 
     if(!db.isValid()){
         if(!openDatabase()){
@@ -1969,13 +1977,13 @@ QString UsersManager::searchInterestGroup(const QString &keyword, int startIndex
     QSqlQuery query(db);
     
     quint32 groupID = keyword.toUInt();
-    quint32 endIndex = startIndex + SEARCH_RESULT_PAGE_SIZE;
+    quint32 pageSize = SEARCH_RESULT_PAGE_SIZE;
     QString queryString;
         if(groupID){
-        queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg(groupID).arg("").arg(startIndex).arg(endIndex);
+        queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg(groupID).arg("").arg(startIndex).arg(pageSize);
 
     }else{
-            queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg("null").arg("%"+keyword+"%").arg(startIndex).arg(endIndex);
+            queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg("null").arg("%"+keyword+"%").arg(startIndex).arg(pageSize);
     }
     if(!query.exec(queryString)){
         QSqlError error = query.lastError();
