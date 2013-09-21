@@ -133,6 +133,11 @@
 #endif
 
 
+#ifndef SEARCH_RESULT_PAGE_SIZE
+#define SEARCH_RESULT_PAGE_SIZE 32
+#endif
+
+
 namespace HEHUI {
 
 namespace IM {

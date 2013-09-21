@@ -16,47 +16,59 @@ namespace HEHUI{
 Search::Search(QWidget *parent)
     : QDialog(parent)
 {
-	ui.setupUi(this);
+    ui.setupUi(this);
 
-        ui.comboBoxGender->addItem(tr("Any"), QVariant(IMUser::GENDER_UNKNOWN));
-        ui.comboBoxGender->addItem(tr("Male"), QVariant(IMUser::MALE));
-        ui.comboBoxGender->addItem(tr("Female"), QVariant(IMUser::FEMALE));
-        ui.comboBoxGender->setCurrentIndex(0);
-        
-        ui.comboBoxAge->addItem(tr("Any"), QVariant(IMUser::Age_Any));
-        ui.comboBoxAge->addItem("18-", QVariant(IMUser::Age_1_18));
-        ui.comboBoxAge->addItem("19-30", QVariant(IMUser::Age_19_30));
-        ui.comboBoxAge->addItem("31-40", QVariant(IMUser::Age_31_40));
-        ui.comboBoxAge->addItem("40+", QVariant(IMUser::Age_40_));
-        ui.comboBoxAge->setCurrentIndex(0);
-        
-        ui.pushButtonCondition->setVisible(false);
-        
-        
-//        ui.radioButtonUsersMatchWildcard->click();
-//        ui.radioButtonGroupsMatchWildcard->click();
-        
-        ui.radioButtonUsersMatchExactly->click();
-        ui.labelUsersResult->hide();
-        ui.lineEditUserID->setFocus();
-        ui.radioButtonGroupsMatchExactly->click();
-        ui.labelGroupsResult->hide();
-        
-        connect(this, SIGNAL(accepted()), this, SLOT(reset()));
-        connect(this, SIGNAL(rejected()), this, SLOT(reset()));
-        
-        
-        userInfoModel = new UserInfoModel(this);
-        ui.tableViewUsersResult->setModel(userInfoModel);
-        ui.tableViewUsersResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-        
-        
-        connect(ui.tableViewUsersResult, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotUserSelected(const QModelIndex &)));
-        connect(ui.tableViewUsersResult, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotAddUserAsAContact(const QModelIndex &)));
-        
-        
-        
-        
+    ui.comboBoxGender->addItem(tr("Any"), QVariant(IMUser::GENDER_UNKNOWN));
+    ui.comboBoxGender->addItem(tr("Male"), QVariant(IMUser::MALE));
+    ui.comboBoxGender->addItem(tr("Female"), QVariant(IMUser::FEMALE));
+    ui.comboBoxGender->setCurrentIndex(0);
+
+    ui.comboBoxAge->addItem(tr("Any"), QVariant(IMUser::Age_Any));
+    ui.comboBoxAge->addItem("18-", QVariant(IMUser::Age_1_18));
+    ui.comboBoxAge->addItem("19-30", QVariant(IMUser::Age_19_30));
+    ui.comboBoxAge->addItem("31-40", QVariant(IMUser::Age_31_40));
+    ui.comboBoxAge->addItem("40+", QVariant(IMUser::Age_40_));
+    ui.comboBoxAge->setCurrentIndex(0);
+
+
+
+    //        ui.radioButtonUsersMatchWildcard->click();
+    //        ui.radioButtonGroupsMatchWildcard->click();
+
+    ui.radioButtonUsersMatchExactly->click();
+    ui.lineEditUserID->setFocus();
+
+    connect(this, SIGNAL(accepted()), this, SLOT(reset()));
+    connect(this, SIGNAL(rejected()), this, SLOT(reset()));
+
+
+
+    connect(ui.tableViewUsersResult, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotUserSelected(const QModelIndex &)));
+    connect(ui.tableViewUsersResult, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotAddUserAsAContact(const QModelIndex &)));
+
+    connect(ui.tableViewGroupsResult, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotGroupSelected(const QModelIndex &)));
+    connect(ui.tableViewGroupsResult, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(slotJoinGroup(const QModelIndex &)));
+
+    userInfoModel = new UserInfoModel(this);
+    ui.tableViewUsersResult->setModel(userInfoModel);
+    //ui.tableViewUsersResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui.tableViewUsersResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+    groupInfoModel = new InterestGroupInfoModel(this);
+    ui.tableViewGroupsResult->setModel(groupInfoModel);
+    //ui.tableViewGroupsResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui.tableViewGroupsResult->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+
+    searchContactTimer.setSingleShot(true);
+    searchContactTimer.setInterval(5000);
+
+    searchGroupTimer.setSingleShot(true);
+    searchGroupTimer.setInterval(5000);
+
+
 }
 
 Search::~Search()
@@ -71,49 +83,25 @@ Search::~Search()
 
 void Search::slotSearchContactsResultPacketReceived(const QString &usersString){
 
-    resetUsersInfo();
+    searchContactTimer.stop();
+    ui.pushButtonSearchContact->setEnabled(true);
 
-    //TODO
-    //FORMAT:UserID,NickName,Gender,Age,Face,FriendshipApply,BusinessAddress,OnlineState
-    
-
-    QStringList usersList = usersString.split(QChar(SEPARTOR_GROUP));
-    foreach (QString userInfo, usersList) {
-        QStringList userInfoList = userInfo.split(QChar(SEPARTOR_RECORD));
-        QString userID = userInfoList.at(0);
-        Contact *user = new Contact(userID, "", this);
-        user->setNickName(userInfoList.at(1));
-        user->setGender(Contact::Gender(userInfoList.at(2).toUInt()));
-        user->setAge(userInfoList.at(3).toUInt());
-        user->setFace(userInfoList.at(4));
-        user->setFriendshipApply(IMUserBase::FriendshipApply(userInfoList.at(5).toUInt()));
-        user->setBusinessAddress(userInfoList.at(6));
-        user->setOnlineState(IM::OnlineState(userInfoList.at(7).toUInt()));
-        
-        usersHash.insert(userID, user);
-    }
-    
-    userInfoModel->setUsersList(usersHash.values());
-    //QMessageBox::information(this, "Result", users.join("|"));
+    userInfoModel->setUsersInfoString(usersString);
 }
 
 
 void Search::slotSearchInterestGroupsResultPacketReceived(const QString &groupsString){
+    searchGroupTimer.stop();
+    ui.pushButtonSearchGroup->setEnabled(true);
 
+    groupInfoModel->setGroupsInfo(groupsString);
 }
 
 
-void Search::reset(){
-    
-    resetUsersInfo();
-    
-    ui.pushButtonCondition->click();
+void Search::reset(){   
     
     ui.radioButtonUsersMatchExactly->click();
-    ui.labelUsersResult->hide();
     ui.lineEditUserID->setFocus();
-    ui.radioButtonGroupsMatchExactly->click();
-    ui.labelGroupsResult->hide();
     
     ui.lineEditUserID->clear();
     ui.lineEditNickname->clear();
@@ -121,22 +109,21 @@ void Search::reset(){
     ui.comboBoxGender->setCurrentIndex(0);
     ui.comboBoxAge->setCurrentIndex(0);
     ui.tableViewUsersResult->reset();
+
+    ui.pushButtonSearchContact->setEnabled(true);
+
     
     //TODO:重置
+    groupInfoModel->setGroupsInfo("");
     ui.tableViewGroupsResult->reset();
-    
-    
-}
+    ui.lineEditGroupKeyword->clear();
 
-void Search::resetUsersInfo(){
-    userInfoModel->setUsersList(QList<Contact*>());
-    //userInfoModel->clear();
+    ui.pushButtonSearchGroup->setEnabled(true);
+
+    searchContactTimer.stop();
+    searchGroupTimer.stop();
     
-    QList<Contact *> users = usersHash.values();
-    usersHash.clear();
-    foreach (Contact *user, users) {
-        delete user;
-    }
+    
 }
 
 void Search::slotUserSelected(const QModelIndex &index){
@@ -158,55 +145,56 @@ void Search::slotAddUserAsAContact(const QModelIndex &index){
     
     ui.pushButtonAddAsContact->click();
     
-//    int row = index.row();
-//    Contact *user = usersHash.values().at(row);
-//    QMessageBox::information(this,"", user->getUserID());
+    //    int row = index.row();
+    //    Contact *user = usersHash.values().at(row);
+    //    QMessageBox::information(this,"", user->getUserID());
     
 }
 
+void Search::slotGroupSelected(const QModelIndex &index){
+
+    if(!index.isValid()){
+        ui.pushButtonGroupDetails->setEnabled(false);
+        ui.pushButtonJoinGroup->setEnabled(false);
+    }else{
+        ui.pushButtonGroupDetails->setEnabled(true);
+        ui.pushButtonJoinGroup->setEnabled(true);
+    }
+
+}
+
+void Search::slotJoinGroup(const QModelIndex &index){
+
+    //QModelIndex index = ui.tableViewGroupsResult->currentIndex();
+    if(!index.isValid()){
+        return;
+    }
+
+    ui.pushButtonJoinGroup->click();
+
+    int row = index.row();
+
+    GroupInfo groupInfo = groupInfoModel->getGroupInfo(row);
+    if(groupInfo.isNull()){return;}
+
+    QMessageBox::information(this, QString::number(groupInfo.groupID), groupInfo.groupName);
+
+}
+
+
+
+
 void Search::on_tabWidget_currentChanged( int index ){
-    if(ui.tabWidget->currentWidget() == ui.tabUsers){
-        if(ui.stackedWidgetUsers->currentWidget() == ui.pageUsersSearchCondition){
-            ui.pushButtonCondition->setEnabled(false);
-            ui.pushButtonSearch->setEnabled(true);
-        }else{
-            ui.pushButtonCondition->setEnabled(true);
-            ui.pushButtonSearch->setEnabled(false);
-        }
-    }else{
-        if(ui.stackedWidgetGroups->currentWidget() == ui.pageGroupsSearchCondition){
-            ui.pushButtonCondition->setEnabled(false);
-            ui.pushButtonSearch->setEnabled(true);
-        }else{
-            ui.pushButtonCondition->setEnabled(true);
-            ui.pushButtonSearch->setEnabled(false);
-        }
-    }
+    //    if(ui.tabWidget->currentWidget() == ui.tabUsers){
+
+    //    }else{
+
+    //    }
 
 }
 
-void Search::on_pushButtonCondition_clicked(){
-    if(ui.tabWidget->currentWidget() == ui.tabUsers){
-        ui.stackedWidgetUsers->setCurrentWidget(ui.pageUsersSearchCondition);
-        ui.pushButtonCondition->setEnabled(false);
-        ui.pushButtonCondition->setVisible(false);
-        ui.pushButtonSearch->setEnabled(true);
-        ui.pushButtonSearch->setVisible(true);
-        resetUsersInfo();
-    }else{
-        
-        ui.stackedWidgetGroups->setCurrentWidget(ui.pageGroupsSearchCondition);
-        ui.pushButtonCondition->setEnabled(false);
-        ui.pushButtonCondition->setVisible(false);
-        ui.pushButtonSearch->setEnabled(true);
-        ui.pushButtonSearch->setVisible(true);
-       
-    }
-}
 
-void Search::on_pushButtonSearch_clicked(){
-
-    if(ui.tabWidget->currentWidget() == ui.tabUsers){
+void Search::on_pushButtonSearchContact_clicked(){
 
         QStringList propertiesList;
         QString userID = ui.lineEditUserID->text().trimmed();
@@ -247,35 +235,31 @@ void Search::on_pushButtonSearch_clicked(){
         propertiesList << userID << nickName << QString::number(age) << QString::number(gender) <<hometown << businessAddress;
 
         
-//        if(propertiesList.isEmpty()){
-//            QMessageBox::critical(this, tr("Error"), tr("Search Condition Required!"));
-//            return;
-//        }else{
-            emit signalSearchContact(propertiesList.join(QString(CONTACT_INFO_SEPARATOR)), matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
-//        }
-        
-        
-        ui.stackedWidgetUsers->setCurrentWidget(ui.pageUsersSearchResult);
-        ui.pushButtonCondition->setEnabled(true);
-        ui.pushButtonCondition->setVisible(true);
-        ui.pushButtonSearch->setEnabled(false); 
-        ui.pushButtonSearch->setVisible(false);
-        
-    }else{
+        emit signalSearchContact(propertiesList.join(QString(CONTACT_INFO_SEPARATOR)), matchExactly, searchOnlineUsersOnly, searchWebcamUsersOnly);
 
-        quint32 groupID = ui.lineEditGroupID->text().trimmed().toUInt();
-        QString groupName = ui.lineEditGroupName->text().trimmed();
-        QString creator = ui.lineEditCreator->text().trimmed();
+        searchContactTimer.start();
+        
+        ui.pushButtonSearchContact->setEnabled(false);
+        userInfoModel->setUsersInfoString("");
+        ui.toolButtonPreviousUsersResultPage->setEnabled(false);
+        ui.toolButtonNextUsersResultPage->setEnabled(false);
+        
 
-        //emit signalSearchInterestGroup(groupID, groupName, creator);
+}
 
-        ui.stackedWidgetGroups->setCurrentWidget(ui.pageGroupsSearchResult);
-        ui.pushButtonCondition->setEnabled(true);
-        ui.pushButtonCondition->setVisible(true);
-        ui.pushButtonSearch->setEnabled(false); 
-        ui.pushButtonSearch->setVisible(false);
-       
-    }
+void Search::on_pushButtonSearchGroup_clicked(){
+
+    QString keyword = ui.lineEditGroupKeyword->text().trimmed();
+
+    emit signalSearchInterestGroup(keyword, 0);
+
+    searchGroupTimer.start();
+
+    ui.pushButtonSearchGroup->setEnabled(false);
+    groupInfoModel->setGroupsInfo("");
+    ui.toolButtonPreviousGroupsResultPage->setEnabled(false);
+    ui.toolButtonNextGroupsResultPage->setEnabled(false);
+
 
 }
 
@@ -285,16 +269,8 @@ void Search::on_radioButtonUsersMatchWildcard_clicked(){
 
 void Search::on_radioButtonUsersMatchExactly_clicked(){
     ui.stackedWidgetUsersSearchCondition->setCurrentWidget(ui.pageUsersSearchMatchExactly);
-
 }
 
-void Search::on_radioButtonGroupsMatchWildcard_clicked(){
-    ui.stackedWidgetGroupsSearchCondition->setCurrentWidget(ui.pageGroupsSearchMatchWildcard);
-}
-
-void Search::on_radioButtonGroupsMatchExactly_clicked(){
-    ui.stackedWidgetGroupsSearchCondition->setCurrentWidget(ui.pageGroupsSearchMatchExactly);
-}
 
 void Search::on_pushButtonUserDetails_clicked(){
     QModelIndex index = ui.tableViewUsersResult->currentIndex();
@@ -303,21 +279,27 @@ void Search::on_pushButtonUserDetails_clicked(){
     }
     int row = index.row();
     
-    Contact *user = usersHash.values().at(row);
-    QMessageBox::information(this,"", user->getUserID());
+
+    ContactInfo contactInfo = userInfoModel->getContactInfo(row);
+    if(contactInfo.isNull()){return;}
+
+    QMessageBox::information(this,"", contactInfo.userID);
     
     
 }
 
 void Search::on_pushButtonAddAsContact_clicked(){
+
     QModelIndex index = ui.tableViewUsersResult->currentIndex();
     if(!index.isValid()){
         return;
     }
     int row = index.row();
     
-    Contact *user = usersHash.values().at(row);
-    QString userID = user->getUserID();
+    ContactInfo contactInfo = userInfoModel->getContactInfo(row);
+    if(contactInfo.isNull()){return;}
+
+    QString userID = contactInfo.userID;
     if(userID == IMUser::instance()->getUserID()){
         QMessageBox::critical(this, tr("Error"), tr("You can't add yourself as a contact!"));
         return;
@@ -327,26 +309,70 @@ void Search::on_pushButtonAddAsContact_clicked(){
         return;
     }
     
-    AddContactDialog dlg(user, true, this);
+    Contact user(userID, contactInfo.nickName, this);
+    user.setGender(contactInfo.gender);
+    user.setAge(contactInfo.age);
+    user.setFace(contactInfo.face);
+    user.setFriendshipApply(contactInfo.friendshipApply);
+    user.setBusinessAddress(contactInfo.businessAddress);
+    user.setOnlineState(contactInfo.onlineState);
+
+    AddContactDialog dlg(&user, true, this);
     if(dlg.exec()  == QDialog::Accepted){
-        emit signalAddContact(user->getUserID(), dlg.getMessage());
+        emit signalAddContact(userID, dlg.getMessage());
     }
     
     
-//    if(user->getFriendshipApply() == Contact::FA_AUTO_ACCEPT){
+    //    if(user->getFriendshipApply() == Contact::FA_AUTO_ACCEPT){
     
-//    }
+    //    }
     
     
-//    QMessageBox::information(this,"", user->getUserID());
+    //    QMessageBox::information(this,"", user->getUserID());
     
     
 }
 
+void Search::on_pushButtonGroupDetails_clicked(){
+
+    QModelIndex index = ui.tableViewGroupsResult->currentIndex();
+    if(!index.isValid()){
+        return;
+    }
+    int row = index.row();
+
+    GroupInfo groupInfo = groupInfoModel->getGroupInfo(row);
+    if(groupInfo.isNull()){return;}
+
+    QMessageBox::information(this, QString::number(groupInfo.groupID), groupInfo.groupName);
 
 
 
+}
 
+void Search::on_pushButtonJoinGroup_clicked(){
+
+    QModelIndex index = ui.tableViewGroupsResult->currentIndex();
+    if(!index.isValid()){
+        return;
+    }
+    int row = index.row();
+
+    GroupInfo groupInfo = groupInfoModel->getGroupInfo(row);
+    if(groupInfo.isNull()){return;}
+
+    QMessageBox::information(this, QString::number(groupInfo.groupID), groupInfo.groupName);
+
+}
+
+
+void Search::searchContactTimeout(){
+    ui.pushButtonSearchContact->setEnabled(true);
+}
+
+void Search::searchGroupTimeout(){
+    ui.pushButtonSearchGroup->setEnabled(true);
+}
 
 
 

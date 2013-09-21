@@ -22,19 +22,19 @@
 namespace HEHUI{
 
 class ImageResource : public HEHUI::ImageResourceBase{
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ImageResource(QObject *parent = 0);
-	virtual ~ImageResource();
+    ImageResource(QObject *parent = 0);
+    virtual ~ImageResource();
 
-//        static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false);
-        static QIcon createIconForInterestGroup(bool normal = true);
-        
-        static QIcon createIconForContact(const QString &iconFileNane, IM::OnlineState state);
-        static QString getIconFileFullPathForContact(const QString &iconFileNane) ;
+    //        static QIcon createIconForContact(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false);
+    static QIcon createIconForInterestGroup(bool normal = true);
 
-        static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false) ;
-        static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE) ;
+    static QIcon createIconForContact(const QString &iconFileNane, IM::OnlineState state);
+    static QString getIconFileFullPathForContact(const QString &iconFileNane) ;
+
+    static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), bool isOnline = false) ;
+    static QString getIconFilePathForContact2(const QString &iconIndex = QString(USER_FACE_DEFAULT_INDEX), IM::OnlineState state = IM::ONLINESTATE_OFFLINE) ;
 
 
 

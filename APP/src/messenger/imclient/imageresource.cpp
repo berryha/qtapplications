@@ -21,15 +21,15 @@ namespace HEHUI{
 
 
 ImageResource::ImageResource(QObject *parent)
-	:HEHUI::ImageResourceBase(parent)
+    :HEHUI::ImageResourceBase(parent)
 
 {
-	// TODO Auto-generated constructor stub
+    // TODO Auto-generated constructor stub
 
 }
 
 ImageResource::~ImageResource() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 //QIcon ImageResource::createIconForContact(const QString &iconIndex, bool isOnline){
@@ -108,8 +108,8 @@ QIcon ImageResource::createIconForContact(const QString &iconFileNane, IM::Onlin
         return QIcon(normalIconPath);
     }
 
-//    qWarning()<<"---------fileName:"<<QFileInfo(pngFilePath).fileName();
-//    qWarning()<<"---------exists:"<<QFile(pngFilePath).exists();
+    //    qWarning()<<"---------fileName:"<<QFileInfo(pngFilePath).fileName();
+    //    qWarning()<<"---------exists:"<<QFile(pngFilePath).exists();
 
     QImage image(normalIconPath), pngImage(pngFilePath);
     QPainter painter(&image);
@@ -144,20 +144,20 @@ QString ImageResource::getIconFileFullPathForContact(const QString &iconFileNane
 
 
 QString ImageResource::getIconFilePathForContact2(const QString &iconIndex, bool isOnline) {
-	QString filePath;
-	QString idx = iconIndex;
+    QString filePath;
+    QString idx = iconIndex;
 
-	if(idx.isEmpty()){
-                idx = QString(USER_FACE_DEFAULT_INDEX);
-	}
+    if(idx.isEmpty()){
+        idx = QString(USER_FACE_DEFAULT_INDEX);
+    }
 
-	if(isOnline){
-                filePath = QString(USER_FACE_FILE_PATH_PREFIX) + idx + ".png";
-	}else{
-                filePath = QString(USER_FACE_FILE_PATH_PREFIX) +idx + "off.png";
-	}
+    if(isOnline){
+        filePath = QString(USER_FACE_FILE_PATH_PREFIX) + idx + ".png";
+    }else{
+        filePath = QString(USER_FACE_FILE_PATH_PREFIX) +idx + "off.png";
+    }
 
-	return filePath;
+    return filePath;
 
 }
 
@@ -167,7 +167,7 @@ QString ImageResource::getIconFilePathForContact2(const QString &iconIndex, IM::
     QString idx = iconIndex;
 
     if(idx.isEmpty()){
-            idx = QString(USER_FACE_DEFAULT_INDEX);
+        idx = QString(USER_FACE_DEFAULT_INDEX);
     }
 
 
@@ -183,11 +183,11 @@ QString ImageResource::getIconFilePathForContact2(const QString &iconIndex, IM::
         filePath = QString(USER_FACE_FILE_PATH_PREFIX) +idx + "off.png";
     }
         break;
-//    case IM::ONLINESTATE_INVISIBLE:
-//    {
+        //    case IM::ONLINESTATE_INVISIBLE:
+        //    {
 
-//    }
-//        break;
+        //    }
+        //        break;
     case IM::ONLINESTATE_BUSY:
     {
         filePath = QString(USER_FACE_FILE_PATH_PREFIX) +idx + "busy.png";
