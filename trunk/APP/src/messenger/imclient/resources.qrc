@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/">
+    <file>resources/images/previous.png</file>
+    <file>resources/images/next.png</file>
     <file>resources/images/password.png</file>
     <file>resources/images/tools.png</file>
     <file>resources/images/about.png</file>

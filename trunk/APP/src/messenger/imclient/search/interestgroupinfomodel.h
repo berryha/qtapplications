@@ -20,6 +20,17 @@
 namespace HEHUI {
 
 
+struct GroupInfo{
+    GroupInfo(quint32 groupID = 0, const QString groupName = "");
+    bool isNull();
+
+    quint32 groupID;
+    QString groupName;
+    QString creator;
+    quint8 privacy;
+};
+
+
 class InterestGroupInfoModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -35,22 +46,13 @@ public:
     QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const ;
     QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
-
+    GroupInfo getGroupInfo(int row);
 
 
 signals:
 
 
 private:
-
-    struct GroupInfo{
-        quint32 groupID;
-        QString groupName;
-        QString creator;
-        quint8 privacy;
-
-    };
-
     QList<GroupInfo> groups;
 
 

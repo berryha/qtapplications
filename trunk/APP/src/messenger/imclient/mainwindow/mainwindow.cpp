@@ -2062,7 +2062,7 @@ void MainWindow::slotProcessPersonalMessage(const QString &userID, const QString
 
 void MainWindow::slotSearch(){
     if(!search){
-        search = new Search(this);
+        search = new Search();
         connect(search, SIGNAL(signalSearchContact(const QString &, bool, bool, bool)), this, SLOT(searchContact(const QString &, bool, bool, bool)), Qt::QueuedConnection);
         connect(search, SIGNAL(signalSearchInterestGroup(const QString &, int)), this, SLOT(searchInterestGroup(const QString &, int)));
 

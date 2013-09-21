@@ -16,6 +16,16 @@
 
 namespace HEHUI{
 
+
+GroupInfo::GroupInfo(quint32 groupID, const QString groupName){
+    this->groupID = groupID;
+    this->groupName =groupName;
+}
+
+bool GroupInfo::isNull(){
+    return groupID;
+}
+
 InterestGroupInfoModel::InterestGroupInfoModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
@@ -140,6 +150,9 @@ QVariant InterestGroupInfoModel::headerData ( int section, Qt::Orientation orien
 
 }
 
+GroupInfo InterestGroupInfoModel::getGroupInfo(int row){
+    return groups.at(row);
+}
 
 
 

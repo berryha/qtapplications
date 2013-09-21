@@ -38,6 +38,17 @@
 
 namespace HEHUI {
 
+ContactInfo::ContactInfo(QString userID){
+    this->userID = userID;
+}
+
+bool ContactInfo::isNull(){
+    return userID.trimmed().isEmpty();
+}
+
+
+
+
 UserInfoModel::UserInfoModel(QObject *parent)
 	:QAbstractTableModel(parent)
 {
@@ -46,27 +57,52 @@ UserInfoModel::UserInfoModel(QObject *parent)
 }
 
 UserInfoModel::~UserInfoModel() {
-	usersList.clear();
+    setUsersInfoString("");
 }
 
-void UserInfoModel::setUsersList(const QList<Contact*> &usersList)
-{
+void UserInfoModel::setUsersInfoString(const QString &usersInfoString){
+
+    //TODO
+    //FORMAT:UserID,NickName,Gender,Age,Face,FriendshipApply,BusinessAddress,OnlineState
+
+
+
     beginResetModel();
-    this->usersList = usersList;
+
+    contacts.clear();
+
+    QStringList usersList = usersInfoString.split(QChar(SEPARTOR_GROUP));
+    foreach (QString userInfo, usersList) {
+        QStringList userInfoList = userInfo.split(QChar(SEPARTOR_RECORD));
+        if(userInfoList.size() != 8){continue;}
+
+        ContactInfo contactInfo;
+        contactInfo.userID = userInfoList.at(0);
+        contactInfo.nickName = userInfoList.at(1);
+        contactInfo.gender = Contact::Gender(userInfoList.at(2).toUInt());
+        contactInfo.age = userInfoList.at(3).toUInt();
+        contactInfo.face = userInfoList.at(4);
+        contactInfo.friendshipApply = IMUserBase::FriendshipApply(userInfoList.at(5).toUInt());
+        contactInfo.businessAddress = userInfoList.at(6);
+        contactInfo.onlineState = IM::OnlineState(userInfoList.at(7).toUInt());
+
+        contacts.append(contactInfo);
+    }
+
+
     endResetModel();
+
 }
 
-//void UserInfoModel::clear(){
-//    beginResetModel();
-//    this->usersList = QList<Contact*>();
-//    endResetModel();
-//}
+ContactInfo UserInfoModel::getContactInfo(int row){
+    return contacts.at(row);
+}
 
 int UserInfoModel::rowCount ( const QModelIndex & parent) const {
     if(parent.isValid()){
         return 0;
     }
-    return usersList.size();
+    return contacts.size();
     
 }
 
@@ -75,7 +111,7 @@ int UserInfoModel::columnCount ( const QModelIndex & parent) const{
         return 0;
     }
     
-    return 3;
+    return 5;
     
 }
 
@@ -85,33 +121,39 @@ QVariant UserInfoModel::data ( const QModelIndex & index, int role) const{
     }
     
     int row = index.row();
-    if((row < 0) || (row >= usersList.size())){
+    if((row < 0) || (row >= contacts.size())){
         return QVariant();
     }
     
-    Contact *info = static_cast<Contact *> (usersList.at(row));
+    ContactInfo info = contacts.at(row);
+    if(info.isNull()){
+        return QVariant();
+    }
     
     if(role == Qt::DisplayRole || role == Qt::EditRole){
         switch (index.column()) {
         case 0:
-            return info->getUserID();
+            return info.userID;
             break;
         case 1:
-            return info->getNickName();
+            return info.nickName;
             break;
         case 2:
-            return info->getAge();
+            return info.age;
             break;
-//        case 3:
-//            return info->getAge();
-//            break;
+        case 3:
+            return info.gender;
+            break;
+        case 4:
+            return info.businessAddress;
+            break;
         default:
             return QVariant();
         }
     }else if(role == Qt::DecorationRole){
         switch (index.column()) {
         case 0:
-            return ImageResource::createIconForContact(info->getFace(), info->getOnlineState());
+            return ImageResource::createIconForContact(info.face, info.onlineState);
             break;
         default:
             return QVariant();
@@ -143,7 +185,10 @@ QVariant UserInfoModel::headerData ( int section, Qt::Orientation orientation, i
             return QString(tr("Age"));
             break;
         case 3:
-            return QString(tr(""));
+            return QString(tr("Gender"));
+            break;
+        case 4:
+            return QString(tr("Location"));
             break;
         default:
             return QVariant();

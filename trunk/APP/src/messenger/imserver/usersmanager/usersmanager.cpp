@@ -1969,13 +1969,13 @@ QString UsersManager::searchInterestGroup(const QString &keyword, int startIndex
     QSqlQuery query(db);
     
     quint32 groupID = keyword.toUInt();
-    quint32 endIndex = startIndex + 16;
+    quint32 endIndex = startIndex + SEARCH_RESULT_PAGE_SIZE;
     QString queryString;
         if(groupID){
         queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg(groupID).arg("").arg(startIndex).arg(endIndex);
 
     }else{
-        queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg("null").arg(keyword).arg(startIndex).arg(endIndex);
+            queryString = QString("call sp_InterestGroup_Search(%1, '%2', %3, %4) ;").arg("null").arg("%"+keyword+"%").arg(startIndex).arg(endIndex);
     }
     if(!query.exec(queryString)){
         QSqlError error = query.lastError();

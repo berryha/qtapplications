@@ -40,6 +40,21 @@
 
 namespace HEHUI {
 
+struct ContactInfo{
+    ContactInfo(QString userID = "");
+    bool isNull();
+
+  QString userID;
+  QString nickName;
+  Contact::Gender gender;
+  quint8 age;
+  QString face;
+  QString businessAddress;
+  IM::OnlineState onlineState;
+  IMUserBase::FriendshipApply friendshipApply;
+};
+
+
 class UserInfoModel : public QAbstractTableModel {
 	Q_OBJECT
 
@@ -47,18 +62,19 @@ public:
 	UserInfoModel(QObject *parent = 0);
 	virtual ~UserInfoModel();
 
-    void setUsersList(const QList<Contact*> &usersList);
-//    void clear();
+    void setUsersInfoString(const QString &usersInfoString);
+    ContactInfo getContactInfo(int row);
+
 
     int rowCount ( const QModelIndex & parent = QModelIndex() ) const ;
     int	columnCount ( const QModelIndex & parent = QModelIndex() ) const;
     QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const ;
     QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
-    
 
 private:
-	QList<Contact *> usersList;
+
+    QList<ContactInfo> contacts;
 
 
 };
