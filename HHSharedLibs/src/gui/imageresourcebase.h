@@ -44,13 +44,13 @@
 namespace HEHUI {
 
 class GUI_LIB_API ImageResourceBase :public QObject{
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ImageResourceBase(QObject *parent = 0);
-	virtual ~ImageResourceBase();
+    ImageResourceBase(QObject *parent = 0);
+    virtual ~ImageResourceBase();
 
-         static QIcon createIcon(const QString &iconFileName, const QString &defaultIconName = QString(), QIcon::Mode mode = QIcon::Normal);
-	 static QIcon emptyIcon();
+    static QIcon createIcon(const QString &iconFileName, const QString &defaultIconName = QString(), QIcon::Mode mode = QIcon::Normal);
+    static QIcon emptyIcon();
 
 };
 
