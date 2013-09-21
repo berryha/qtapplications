@@ -120,7 +120,7 @@ private slots:
     void slotProcessPersonalMessage(const QString &userID, const QString &message);
 
     void slotSearch();
-    void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
+    void searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly, int startIndex);
     void searchInterestGroup(const QString &keyword, int startIndex = 0);
 
     void addContact(const QString &userID, const QString &verificationMessage);

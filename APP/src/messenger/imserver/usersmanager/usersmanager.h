@@ -72,7 +72,7 @@ public:
     bool registerNewUser(const QString &userID, const QString &password, IM::ErrorType *errorType, quint32 *sysID, QString *message = 0);
     void updateUserPassword(const QString &userID, const QString &newPassword, IM::ErrorType *errorType, QString *message = 0);
 
-    QString searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly);
+    QString searchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly, bool searchWebcamUsersOnly, int startIndex);
 
 
     bool saveCachedChatMessageFromIMUser(const QString &senderID, const QString &receiverID, const QString &message);
