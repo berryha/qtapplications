@@ -39,44 +39,44 @@
 namespace HEHUI {
 
 ImageResourceBase::ImageResourceBase(QObject *parent)
-	:QObject(parent)
+    :QObject(parent)
 {
-	// TODO Auto-generated constructor stub
+    // TODO Auto-generated constructor stub
 
 }
 
 ImageResourceBase::~ImageResourceBase() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 QIcon ImageResourceBase::createIcon(const QString &iconFileName, const QString &defaultIconName,  QIcon::Mode mode){
-	QString file;
-	if(QFile::exists(iconFileName)){
-		file = iconFileName;
-	}else if(QFile::exists(defaultIconName)){
-		file = defaultIconName;
-	}else{
-		file = QString(":/resources/images/emptyicon.png");
-	}
+    QString file;
+    if(QFile::exists(iconFileName)){
+        file = iconFileName;
+    }else if(QFile::exists(defaultIconName)){
+        file = defaultIconName;
+    }else{
+        file = QString(":/resources/images/emptyicon.png");
+    }
 
 
-	if(mode == QIcon::Disabled){
-		QIcon icon;
-		QSize size = QImage(file).size();
-		QPixmap pixmap = QIcon(file).pixmap(size, mode);
-		icon.addPixmap(pixmap);
-		return icon;
-	}
+    if(mode == QIcon::Disabled){
+        QIcon icon;
+        QSize size = QImage(file).size();
+        QPixmap pixmap = QIcon(file).pixmap(size, mode);
+        icon.addPixmap(pixmap);
+        return icon;
+    }
 
-	return QIcon(file);
+    return QIcon(file);
 
 }
 
 
 QIcon ImageResourceBase::emptyIcon()
 {
-   static const QIcon empty_icon(QLatin1String(":/resources/images/emptyicon.png"));
-   return  empty_icon;
+    static const QIcon empty_icon(QLatin1String(":/resources/images/emptyicon.png"));
+    return  empty_icon;
 }
 
 
