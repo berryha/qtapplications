@@ -618,8 +618,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             }
 
             if(group->getPrivacy() == InterestGroupBase::Allow_Anyone_To_Join){
-                quint32 memberListVersion = memberJoinOrQuitInterestGroup(userID, groupID, join);
-                group->setGroupMemberListInfoVersion(memberListVersion);
+                memberJoinOrQuitInterestGroup(userID, groupID, join);
                 userInfo->joinOrLeaveInterestGroup(groupID, true);
                 //TODO:
                 QStringList members = group->members();

@@ -1946,13 +1946,13 @@ bool UsersManager::disbandInterestGroup(UserInfo *creatorInfo, quint32 groupID){
 
 }
 
-quint32 UsersManager::memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join){
+bool UsersManager::memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join){
     qDebug()<<"UsersManager::memberJoinOrQuitInterestGroup(...) "<<" memberID:"<<memberID<<" groupID:"<<groupID;
 
     if(!db.isValid()){
         if(!openDatabase()){
             //*errorType = IM::ERROR_UnKnownError;
-            return 0;
+            return false;
         }
     }
 
@@ -1964,16 +1964,20 @@ quint32 UsersManager::memberJoinOrQuitInterestGroup(const QString &memberID, qui
         QString msg = QString("Member '%1' failed to %2 group ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        return 0;
+        return false;
     }
 
     statement = QString("select @MemberListVersion; ");
     query.exec(statement);
     if(!query.first()){
-        return 0;
+        return false;
     }
 
-    return query.value(0).toUInt();
+    InterestGroup *group = getInterestGroup(groupID);
+    group->addMember(memberID, InterestGroupBase::Role_Member);
+    group->setGroupMemberListInfoVersion(query.value(0).toUInt());
+
+    return true;
 
 }
 
@@ -2339,13 +2343,6 @@ bool UsersManager::queryInterestGroup(InterestGroup *info){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query group members info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
 
         return false;
     }
