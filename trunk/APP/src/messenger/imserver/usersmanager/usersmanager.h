@@ -107,7 +107,7 @@ public:
     InterestGroup* getInterestGroup(quint32 groupID);
     quint32 createNewInterestGroup(UserInfo* creatorInfo, const QString &groupName);
     bool disbandInterestGroup(UserInfo* creatorInfo, quint32 groupID);
-    quint32 memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join);
+    bool memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join);
 
     QList<UserInfo *> getAllOnlineInterestGroupMembers(quint32 groupID);
 
