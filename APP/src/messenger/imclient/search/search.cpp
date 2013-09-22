@@ -1,6 +1,8 @@
 
 
 #include <QMessageBox>
+#include <QInputDialog>
+
 
 #include "search.h"
 
@@ -398,6 +400,7 @@ void Search::on_pushButtonSearchGroup_clicked(){
     if(groupKeyword.isEmpty()){
         QMessageBox::critical(this, tr("Search"), tr("Keyword needed!"));
         ui.lineEditGroupKeyword->setFocus();
+        return;
     }
 
     emit signalSearchInterestGroup(groupKeyword, 0);
@@ -418,10 +421,10 @@ void Search::on_pushButtonGroupDetails_clicked(){
 
     QModelIndex index = ui.tableViewGroupsResult->currentIndex();
     if(!index.isValid()){
+        qCritical()<<"Error! Invalid Model Index!";
         return;
     }
     int row = index.row();
-
     GroupInfo groupInfo = groupInfoModel->getGroupInfo(row);
     if(groupInfo.isNull()){return;}
 
@@ -442,7 +445,29 @@ void Search::on_pushButtonJoinGroup_clicked(){
     GroupInfo groupInfo = groupInfoModel->getGroupInfo(row);
     if(groupInfo.isNull()){return;}
 
-    QMessageBox::information(this, QString::number(groupInfo.groupID), groupInfo.groupName);
+    if(groupInfo.privacy == quint8(InterestGroupBase::Only_Invited_Can_Join)){
+        QMessageBox::critical(this, tr("Join a Group"), tr("Only invited user can join this group!"));
+        return;
+    }
+
+    QString verificationMessage = "";
+    if(groupInfo.privacy == quint8(InterestGroupBase::Request_Verfication_To_Join)){
+
+        bool ok = false;
+        QString labelText = tr("Verification Message:");
+        verificationMessage = QInputDialog::getText(this, tr("Join a Group"),
+                                                     labelText, QLineEdit::Normal,
+                                                     "", &ok);
+        if (!ok){
+            return;
+        }
+
+    }
+
+
+    emit signalJoinInterestGroup(groupInfo.groupID, verificationMessage);
+
+//    QMessageBox::information(this, QString::number(groupInfo.groupID), groupInfo.groupName);
 
 }
 

@@ -358,6 +358,9 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString, quint32)), this, SLOT(slotProcessContactsInfoVersion(const QString, quint32)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalCreateOrDeleteContactGroupResultPacketReceived(quint32,const QString &,bool,bool)), this, SLOT(slotProcessCreateOrDeleteContactGroupResult(quint32, const QString &,bool,bool)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalUserRequestJoinInterestGroupsPacketReceived(quint32, const QString &, const QString &, const QString &, const QString &)), this, SLOT(slotProcessUserRequestJoinInterestGroup(quint32, const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalUserJoinOrQuitInterestGroupPacketReceived(quint32, const QString &, bool)), this, SLOT(slotProcessUserJoinOrQuitInterestGroup(quint32, const QString &, bool)), Qt::QueuedConnection);
+
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
@@ -1934,6 +1937,25 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
 
 }
 
+void MainWindow::slotProcessUserRequestJoinInterestGroup(quint32 groupID, const QString &verificationMessage, const QString &userID, const QString &nickName, const QString &face){
+
+    qDebug()<<"--MainWindow::slotProcessUserRequestJoinInterestGroup(...)"<<" groupID:"<<groupID<<" verificationMessage:"<<verificationMessage<<" userID:"<<userID;
+
+    //TODO
+
+
+}
+
+void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const QString &memberID, bool join){
+
+    qDebug()<<"--MainWindow::slotProcessUserJoinOrQuitInterestGroup(...)"<<" groupID:"<<groupID;
+
+    //TODO
+
+    QMessageBox::information(this, QString::number(groupID), memberID);
+
+
+}
 
 //void MainWindow::slotProcessSearchContactsResult(const QString &users){
 
@@ -2067,6 +2089,8 @@ void MainWindow::slotSearch(){
         connect(search, SIGNAL(signalSearchInterestGroup(const QString &, int)), this, SLOT(searchInterestGroup(const QString &, int)));
 
         connect(search, SIGNAL(signalAddContact(const QString&, const QString&)), this, SLOT(addContact(const QString&, const QString&)));
+        connect(search, SIGNAL(signalJoinInterestGroup(quint32, const QString&)), this, SLOT(joinInterestGroup(quint32, const QString&)));
+
 
         connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), search, SLOT(slotSearchContactsResultPacketReceived(const QString &)), Qt::QueuedConnection);
         connect(clientPacketsParser, SIGNAL(signalSearchInterestGroupsResultPacketReceived(const QString &)), search, SLOT(slotSearchInterestGroupsResultPacketReceived(const QString &)), Qt::QueuedConnection);
@@ -2089,6 +2113,9 @@ void MainWindow::addContact(const QString &userID, const QString &verificationMe
     clientPacketsParser->addContact(m_socketConnectedToServer, userID, verificationMessage);
 }
 
+void MainWindow::joinInterestGroup(quint32 groupID, const QString &verificationMessage){
+    clientPacketsParser->joinOrQuitInterestGroup(m_socketConnectedToServer, groupID, true, verificationMessage);
+}
 
 
 void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage){

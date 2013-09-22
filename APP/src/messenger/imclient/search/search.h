@@ -31,6 +31,7 @@ signals:
     void signalSearchContact(const QString &propertiesString, bool matchExactly, bool searchOnlineUsersOnly = true, bool searchWebcamUsersOnly = false, int startIndex = 0);
     void signalAddContact(const QString &userID, const QString &verificationMessage);
     void signalSearchInterestGroup(const QString &keyword, int startIndex = 0);
+    void signalJoinInterestGroup(quint32 groupID, const QString &verificationMessage);
 
     
 public slots:

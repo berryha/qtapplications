@@ -436,6 +436,10 @@ void LoginWidget::on_loginToolButton_clicked() {
 
         verifyUser();
 
+        Settings::instance()->setCurrentUser(userID);
+
+
+
         //		bool userVerified = verifyUser();
         //		if(userVerified ){
         //			if(autoLogin){

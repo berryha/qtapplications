@@ -107,14 +107,14 @@ public:
     InterestGroup* getInterestGroup(quint32 groupID);
     quint32 createNewInterestGroup(UserInfo* creatorInfo, const QString &groupName);
     bool disbandInterestGroup(UserInfo* creatorInfo, quint32 groupID);
+    quint32 memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join);
 
     QList<UserInfo *> getAllOnlineInterestGroupMembers(quint32 groupID);
 
     QString searchInterestGroup(const QString &keyword, int startIndex);
     bool saveInterestGroupToDatabase(InterestGroup *groupInfo);
 
-    bool saveMembershipApplyRequest(quint32 applicantID, quint32 groupID, const QString &message = "");
-    bool deleteMembershipApplyRequest(quint32 applicantID, quint32 groupID);
+    bool saveOrDeleteMembershipApplication(const QString &applicantID, quint32 groupID, const QString &message = "", bool save = true);
     bool getMembershipApplyRequest(quint32 groupID, QList<QStringList> *receivedApplicationList);
 
     bool saveCachedInterestGroupChatMessageFromIMUser(const QString &senderID, quint32 interestGroupID, const QString &message);

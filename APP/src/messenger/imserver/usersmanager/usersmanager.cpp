@@ -1946,6 +1946,37 @@ bool UsersManager::disbandInterestGroup(UserInfo *creatorInfo, quint32 groupID){
 
 }
 
+quint32 UsersManager::memberJoinOrQuitInterestGroup(const QString &memberID, quint32 groupID, bool join){
+    qDebug()<<"UsersManager::memberJoinOrQuitInterestGroup(...) "<<" memberID:"<<memberID<<" groupID:"<<groupID;
+
+    if(!db.isValid()){
+        if(!openDatabase()){
+            //*errorType = IM::ERROR_UnKnownError;
+            return 0;
+        }
+    }
+
+    QSqlQuery query(db);
+    QString statement = QString("call sp_InterestGroup_MemberJoinOrQuit('%1', %2, %3, @MemberListVersion); ").arg(memberID).arg(groupID).arg(join?1:0);
+
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Member '%1' failed to %2 group ! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+
+        return 0;
+    }
+
+    statement = QString("select @MemberListVersion; ");
+    query.exec(statement);
+    if(!query.first()){
+        return 0;
+    }
+
+    return query.value(0).toUInt();
+
+}
+
 
 QList<UserInfo *> UsersManager::getAllOnlineInterestGroupMembers(quint32 groupID){
 
@@ -1997,7 +2028,7 @@ QString UsersManager::searchInterestGroup(const QString &keyword, int startIndex
     while(query.next()){  
         
         QStringList infoList;
-        for(int i=0; i<6; i++){
+        for(int i=0; i<5; i++){
             infoList.append(query.value(i).toString());
 //            qWarning()<<i<<":"<<query.value(i).toString();
         }
@@ -2053,7 +2084,7 @@ bool UsersManager::saveInterestGroupToDatabase(InterestGroup *groupInfo){
     
 }
 
-bool UsersManager::saveMembershipApplyRequest(quint32 applicantID, quint32 groupID, const QString &message){
+bool UsersManager::saveOrDeleteMembershipApplication(const QString &applicantID, quint32 groupID, const QString &message, bool save){
 
 
     if(!db.isValid()){
@@ -2062,50 +2093,13 @@ bool UsersManager::saveMembershipApplyRequest(quint32 applicantID, quint32 group
         }
     }
     QSqlQuery query(db);
-    QString statement = QString("insert into membershipapply(ApplicantSystemID, GroupID, ExtraMessage) values('%1',  '%2', '%3' ) ")
-            .arg(applicantID).arg(groupID).arg(message);
+    QString statement = QString("call sp_InterestGroup_SaveOrDeleteMembershipApplication('%1',  %2, '%3' ); ")
+            .arg(applicantID).arg(groupID).arg(message).arg(save?1:0);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not write membership application info to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
-        return false;
-    }
-
-    return true;
-
-}
-
-bool UsersManager::deleteMembershipApplyRequest(quint32 applicantID, quint32 groupID){
-
-
-    if(!db.isValid()){
-        if(!openDatabase()){
-            return false;
-        }
-    }
-    QSqlQuery query(db);
-    QString statement = QString("delete from membership where ApplicantSystemID='%1' and GroupID='%2' ").arg(applicantID).arg(groupID);
-
-    if(!query.exec(statement)){
-        QSqlError error = query.lastError();
-        QString msg = QString("Can not delete membership application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
-        qCritical()<<msg;
-
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
 
         return false;
     }

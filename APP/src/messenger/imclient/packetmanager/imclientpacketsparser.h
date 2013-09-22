@@ -400,6 +400,35 @@ public slots:
 
     }
     
+    bool joinOrQuitInterestGroup(int serverSocketID, quint32 groupID, bool join, const QString &verificationMessage = ""){
+        qWarning()<<"--joinOrQuitInterestGroup(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_JOIN_OR_QUIT_INTERESTGROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        //packet->setRemainingRetransmissionTimes(int(PACKET_RETRANSMISSION_TIMES));
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << quint8(join?1:0) << verificationMessage;
+
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+
+    }
+
 
     bool moveContactToGroup(int serverSocketID, const QString &contactID, quint32 oldGroupID, quint32 newGroupID){
         qDebug()<<"--moveContactToGroup(...)";
@@ -1318,9 +1347,12 @@ signals:
     void signalContactGroupsInfoPacketReceived(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void signalContactsInfoVersionPacketReceived(const QString &contactsInfoVersionString, quint32 contactGroupsInfoVersionOnServer);
     void signalCreateOrDeleteContactGroupResultPacketReceived(quint32 groupID, const QString &groupName, bool createGroup, bool result);
+    void signalUserRequestJoinInterestGroupsPacketReceived(quint32 groupID, const QString &verificationMessage, const QString &userID, const QString &nickName, const QString &face);
+    void signalUserJoinOrQuitInterestGroupPacketReceived(quint32 groupID, const QString &memberID, bool join);
 
     void signalSearchContactsResultPacketReceived(const QString &usersString);
     void signalSearchInterestGroupsResultPacketReceived(const QString &groupsString);
+
 
     //void signalAddContactResultPacketReceived(const QString &contactID, IM::ErrorType errorType);
     void signalAddContactRequestFromUserPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);

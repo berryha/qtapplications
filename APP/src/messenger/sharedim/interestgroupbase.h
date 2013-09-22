@@ -63,6 +63,7 @@ public:
     bool hasMember(const QString &memberUserID);
     QStringList members() const;
     MemberRole memberRole(const QString &memberUserID);
+    QStringList getAdmins(bool includeCreator = true);
 
     
     
