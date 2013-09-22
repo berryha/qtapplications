@@ -721,6 +721,63 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
+    bool sendUserJoinInterestGroupRequestToAdminPacket(int peerSocketID, quint32 groupID, const QString &verificationMessage, UserInfo *userInfo){
+        qDebug()<<"--sendJoinInterestGroupRequestFromUserPacket(...)";
+
+        //TODO:搜索结果的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::USER_REQUEST_JOIN_INTERESTGROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << verificationMessage << userInfo->getUserID() << userInfo->getUserName() << userInfo->getFace();
+
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, userInfo->getSessionEncryptionKey(), true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
+
+    bool sendUserJoinOrQuitInterestGroupResultToUserPacket(int peerSocketID, quint32 groupID, const QString &memberID, bool join, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendUserJoinOrQuitInterestGroupResultToUserPacket(...)";
+
+        //TODO:搜索结果的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_JOIN_OR_QUIT_INTERESTGROUP));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << groupID << memberID << quint8(join?1:0);
+
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
 
 
     bool sendAddContactRequestFromUserPacket(int peerSocketID, const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage, const QByteArray &sessionEncryptionKey, const QHostAddress &targetHostAddress, quint16 targetHostPort){

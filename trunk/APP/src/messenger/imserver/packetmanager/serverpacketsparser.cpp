@@ -585,6 +585,89 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::CLIENT_REQUEST_JOIN_OR_QUIT_INTERESTGROUP):
+    {
+        qDebug()<<"--CLIENT_REQUEST_JOIN_INTERESTGROUP";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        quint32 groupID = 0;
+        quint8 join = 0;
+        QString verificationMessage = "";
+        stream >> groupID >> join >> verificationMessage;
+
+        InterestGroup *group = getInterestGroup(groupID);
+        if(!group){return;}
+
+        if(join){
+            if(userInfo->isMemberOfInterestGroup(groupID)){
+                qWarning()<<QString("'%1' is already a member of group '%2' !").arg(userID).arg(groupID);
+                return;
+                //TODO:Send Error Message
+            }
+
+            if(group->getPrivacy() == InterestGroupBase::Allow_Anyone_To_Join){
+                quint32 memberListVersion = memberJoinOrQuitInterestGroup(userID, groupID, join);
+                group->setGroupMemberListInfoVersion(memberListVersion);
+                userInfo->joinOrLeaveInterestGroup(groupID, true);
+                //TODO:
+                QStringList members = group->members();
+                foreach (QString memberID, members) {
+                    UserInfo *member = getOnlineUserInfo(memberID);
+                    if(!member){continue;}
+                    sendUserJoinOrQuitInterestGroupResultToUserPacket(member->getSocketID(), groupID, memberID, true, member->getSessionEncryptionKey());
+                }
+
+            }else if(group->getPrivacy() == InterestGroupBase::Request_Verfication_To_Join){
+                QStringList admins = group->getAdmins(true);
+                bool requestSent = false;
+                foreach (QString adminID, admins) {
+                    UserInfo *adminInfo = getOnlineUserInfo(userID);
+                    if(!adminInfo){continue;}
+                    sendUserJoinInterestGroupRequestToAdminPacket(adminInfo->getSocketID(), groupID, verificationMessage, userInfo);
+                    requestSent = true;
+                }
+                if(!requestSent){
+                    saveOrDeleteMembershipApplication(userID, groupID, verificationMessage, true);
+                }
+
+
+            }else{
+                //TODO
+
+
+
+            }
+
+
+        }else{
+            if(!userInfo->isMemberOfInterestGroup(groupID)){
+                qWarning()<<QString("'%1' is not a member of group '%2' !").arg(userID).arg(groupID);
+                return;
+                //TODO:Send Error Message
+            }
+
+        }
+
+
+
+
+
+
+    }
+        break;
+
     case quint8(IM::CLIENT_REQUEST_MOVE_CONTACT):
     {
         qDebug()<<"~~CLIENT_REQUEST_MOVE_CONTACT";

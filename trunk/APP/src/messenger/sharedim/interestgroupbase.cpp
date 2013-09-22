@@ -91,6 +91,14 @@ InterestGroupBase::MemberRole InterestGroupBase::memberRole(const QString &membe
     return membersHash.value(memberUserID);
 }
 
+QStringList InterestGroupBase::getAdmins(bool includeCreator){
+    QStringList admins = membersHash.keys(Role_Administrator);
+    if(includeCreator){
+        admins.append(membersHash.keys(Role_Creator));
+    }
+
+}
+
 
 
 

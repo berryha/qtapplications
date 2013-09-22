@@ -581,6 +581,53 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::USER_REQUEST_JOIN_INTERESTGROUP):
+    {
+        //TODO:
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        quint32 groupID = 0;
+        QString verificationMessage = "", userID = "", nickName = "", face = "";
+        stream >> groupID >> verificationMessage >> userID >> nickName >> face;
+
+        emit signalUserRequestJoinInterestGroupsPacketReceived(groupID, verificationMessage, userID, nickName, face);
+
+        qWarning()<<"--User_REQUEST_JOIN_INTERESTGROUP";
+    }
+        break;
+
+    case quint8(IM::SERVER_RESPONSE_JOIN_OR_QUIT_INTERESTGROUP):
+    {
+        //TODO:
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        quint32 groupID = 0;
+        QString memberID = "";
+        quint8 join = 0;
+        stream >> groupID >> memberID >> join;
+
+        emit signalUserJoinOrQuitInterestGroupPacketReceived(groupID, memberID, join);
+
+        qWarning()<<"--SERVER_RESPONSE_JOIN_OR_QUIT_INTERESTGROUP";
+    }
+        break;
+
     case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
     {
 

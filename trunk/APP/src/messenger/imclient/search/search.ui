@@ -28,7 +28,7 @@
         <normaloff>:/resources/images/contact_male.png</normaloff>:/resources/images/contact_male.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Users</string>
+       <string>Make New Friends</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="1" column="1">
@@ -355,7 +355,7 @@
         <normaloff>:/resources/images/group.png</normaloff>:/resources/images/group.png</iconset>
       </attribute>
       <attribute name="title">
-       <string>Groups</string>
+       <string>Join a Group</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>

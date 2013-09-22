@@ -23,7 +23,7 @@ GroupInfo::GroupInfo(quint32 groupID, const QString groupName){
 }
 
 bool GroupInfo::isNull(){
-    return groupID;
+    return !groupID;
 }
 
 InterestGroupInfoModel::InterestGroupInfoModel(QObject *parent) :
