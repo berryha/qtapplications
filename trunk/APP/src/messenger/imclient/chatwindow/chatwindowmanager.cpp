@@ -226,6 +226,14 @@ bool ChatWindowManager::closeInterestGroupChatWindow(InterestGroup *group){
 
 }
 
+void ChatWindowManager::interestGroupMemberJoinedOrQuitted(quint32 groupID, const QString &memberID, bool join){
+
+    GroupChatWindow *gcw = m_groupChatWidgetHash.value(groupID);
+    if(!gcw){return;}
+
+    gcw->memberJoinedOrQuitted(memberID, join);
+
+}
 
 void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
     qDebug()<<"----ChatWindowManager::slotNewChatWithContact(const QString &id)~~~";

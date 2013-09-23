@@ -21,6 +21,7 @@ public:
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
 
+
 protected:
     void closeEvent(QCloseEvent * event);
 

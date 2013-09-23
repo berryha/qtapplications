@@ -19,6 +19,7 @@ public:
     bool isDownloadingImage(const QString &imageName);
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
+    void memberJoinedOrQuitted(const QString &memberID, bool join);
 
 protected:
     void closeEvent(QCloseEvent * event);
@@ -35,6 +36,10 @@ public slots:
 
 private slots:
     void memberItemActivated(QListWidgetItem *memberItem);
+
+private:
+    QListWidgetItem * memberItem(const QString &memberID);
+
 
 private:
     Ui::GroupChatWindowClass ui;

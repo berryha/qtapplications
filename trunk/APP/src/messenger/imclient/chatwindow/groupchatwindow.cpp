@@ -81,6 +81,26 @@ void GroupChatWindow::processImageDownloadResult(const QString &imageName, bool 
     ui.chatMessageWindow->processImageDownloadResult(imageName, downloaded);
 }
 
+void GroupChatWindow::memberJoinedOrQuitted(const QString &memberID, bool join){
+
+    QListWidgetItem * item = memberItem(memberID);
+
+    if(join){
+        if(item){return;}
+
+        Contact *contact = ContactsManager::instance()->getUser(memberID);
+        QListWidgetItem *item = new QListWidgetItem(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()), contact->getNickName(), ui.listWidgetMembers);
+        item->setData(Qt::UserRole, contact->getUserID());
+        ui.listWidgetMembers->addItem(item);
+    }else{
+        if(!item){return;}
+
+        item = ui.listWidgetMembers->takeItem(ui.listWidgetMembers->row(item));
+        delete item;
+    }
+
+}
+
 void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
@@ -91,6 +111,19 @@ void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
     QString memberID = memberItem->data(Qt::UserRole).toString();
 
     QMessageBox::information(this, "memberID", memberID);
+}
+
+QListWidgetItem * GroupChatWindow::memberItem(const QString &memberID){
+
+    int count = ui.listWidgetMembers->count();
+    for(int i=0; i<count; i++){
+        QListWidgetItem *item = ui.listWidgetMembers->item(i);
+        if(!item){continue;}
+        if(memberID == item->data(Qt::UserRole).toString()){
+            return item;
+        }
+    }
+
 }
 
 
