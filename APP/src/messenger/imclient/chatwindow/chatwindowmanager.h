@@ -42,6 +42,7 @@ public:
     bool closeContactChatWindow(Contact *contact);
     bool closeInterestGroupChatWindow(InterestGroup *group);
 
+    void interestGroupMemberJoinedOrQuitted(quint32 groupID, const QString &memberID, bool join);
 
 
 
