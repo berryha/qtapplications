@@ -69,6 +69,7 @@ QString InterestGroupBase::getGroupInfoString(){
 }
 
 void InterestGroupBase::addMember(const QString &memberuserID, MemberRole memberRole){
+    qDebug()<<"--InterestGroupBase::addMember(...) "<<" memberuserID:"<<memberuserID;
 
     membersHash.insert(memberuserID, memberRole);
 }
