@@ -273,6 +273,8 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         UserInfo *userInfo = logUserIn(userID, encryptedPassword, IM::OnlineState(onlineStateCode), &errorType);
         if(userInfo){
 
+            userInfo->setSocketID(socketID);
+
             QByteArray sessionEncryptionKey = userInfo->getSessionEncryptionKey();
             sendClientLoginSucceededPacket(socketID, userID, userInfo->encryptedPassword(), sessionEncryptionKey,
                                            userInfo->getPersonalSummaryInfoVersion(),
@@ -618,13 +620,15 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             }
 
             if(group->getPrivacy() == InterestGroupBase::Allow_Anyone_To_Join){
-                memberJoinOrQuitInterestGroup(userID, groupID, join);
-                userInfo->joinOrLeaveInterestGroup(groupID, true);
+                bool ok = memberJoinOrQuitInterestGroup(userInfo, group, join);
+                if(!ok){return;}
                 //TODO:
                 QStringList members = group->members();
                 foreach (QString memberID, members) {
                     UserInfo *member = getOnlineUserInfo(memberID);
                     if(!member){continue;}
+                    qDebug()<<"----------memberID:"<<memberID;
+
                     sendUserJoinOrQuitInterestGroupResultToUserPacket(member->getSocketID(), groupID, memberID, true, member->getSessionEncryptionKey());
                 }
 
