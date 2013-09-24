@@ -124,7 +124,6 @@ private slots:
     void searchInterestGroup(const QString &keyword, int startIndex = 0);
 
     void addContact(const QString &userID, const QString &verificationMessage);
-    void joinInterestGroup(quint32 groupID, const QString &verificationMessage);
 
 
 
@@ -160,6 +159,8 @@ private slots:
     void slotCreateInterestGroup();
     void slotDisbandInterestGroup();
     void slotDeleteInterestGroupFromLocal();
+    void joinInterestGroup(quint32 groupID, const QString &verificationMessage);
+    void slotQuitInterestGroup();
 
     void interestGroupItemActivated(QListWidgetItem * item );
     void updateAllInterestGroupsInfoToUI();
@@ -168,7 +169,7 @@ private slots:
     void updateInterestGroupInfoToUI(InterestGroup *interestGroup);
 
 
-    void on_toolButtonUserFace_clicked(){showUserInfo(m_imUser);}
+    void on_toolButtonUserFace_clicked(){showUserInfo(m_myself);}
     void showUserInfo(IMUserBase *user);
 
 
@@ -240,7 +241,8 @@ private:
     QProgressDialog *progressDialog;
 
     ContactsManager *m_contactsManager;
-    IMUser *m_imUser;
+    IMUser *m_myself;
+    QString m_myUserID;
     IM::OnlineState stateBeforeLocking;
 
     PacketHandlerBase *m_packetHandler;

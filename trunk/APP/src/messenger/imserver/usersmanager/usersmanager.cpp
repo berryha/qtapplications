@@ -1254,13 +1254,6 @@ bool UsersManager::getUserInterestGroupsFromDB(UserInfo* info){
         QString msg = QString("Can not query user interest groups info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
 
-        //TODO:数据库重启，重新连接
-        //MySQL数据库重启，重新连接
-        if(error.number() == 2006){
-            query.clear();
-            openDatabase(true);
-        }
-
         return false;
     }
     if(!query.first()){
@@ -1979,10 +1972,14 @@ bool UsersManager::memberJoinOrQuitInterestGroup(UserInfo *userInfo, InterestGro
         return false;
     }
 
-    group->addMember(memberID, InterestGroupBase::Role_Member);
+    if(join){
+        group->addMember(memberID, InterestGroupBase::Role_Member);
+    }else{
+        group->deleteMember(memberID);
+    }
     group->setGroupMemberListInfoVersion(query.value(0).toUInt());
 
-    userInfo->joinOrLeaveInterestGroup(groupID, true);
+    userInfo->joinOrLeaveInterestGroup(groupID, join);
 
 
     return true;

@@ -103,6 +103,7 @@ enum SystemTrayIconDataType{
     STIDT_FriendshipApplicationFromContact,
     STIDT_ContactChatMessage,
     STIDT_InterestGroupChatMessage,
+    STIDT_InterestGroupMemberJoinedOrQuitted
     
 
 

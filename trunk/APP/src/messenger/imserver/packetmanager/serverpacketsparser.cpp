@@ -589,7 +589,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::CLIENT_REQUEST_JOIN_OR_QUIT_INTERESTGROUP):
     {
-        qDebug()<<"--CLIENT_REQUEST_JOIN_INTERESTGROUP";
+        qDebug()<<"--CLIENT_REQUEST_JOIN_OR_QUIT_INTERESTGROUP";
 
         QString userID = peerID;
         QByteArray encryptedData;
@@ -614,21 +614,19 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
         if(join){
             if(userInfo->isMemberOfInterestGroup(groupID)){
-                qWarning()<<QString("'%1' is already a member of group '%2' !").arg(userID).arg(groupID);
+                qWarning()<<QString("ERROR! Failed to join group! '%1' is already a member of group '%2' !").arg(userID).arg(groupID);
                 return;
                 //TODO:Send Error Message
             }
 
             if(group->getPrivacy() == InterestGroupBase::Allow_Anyone_To_Join){
-                bool ok = memberJoinOrQuitInterestGroup(userInfo, group, join);
+                bool ok = memberJoinOrQuitInterestGroup(userInfo, group, true);
                 if(!ok){return;}
                 //TODO:
                 QStringList members = group->members();
                 foreach (QString memberID, members) {
                     UserInfo *member = getOnlineUserInfo(memberID);
                     if(!member){continue;}
-                    qDebug()<<"----------memberID:"<<memberID;
-
                     sendUserJoinOrQuitInterestGroupResultToUserPacket(member->getSocketID(), groupID, memberID, true, member->getSessionEncryptionKey());
                 }
 
@@ -655,11 +653,24 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
         }else{
+            //Quit Group
             if(!userInfo->isMemberOfInterestGroup(groupID)){
-                qWarning()<<QString("'%1' is not a member of group '%2' !").arg(userID).arg(groupID);
+                qWarning()<<QString("ERROR! Failed to quit group! '%1' is not a member of group '%2' !").arg(userID).arg(groupID);
                 return;
                 //TODO:Send Error Message
             }
+
+            bool ok = memberJoinOrQuitInterestGroup(userInfo, group, false);
+            if(!ok){return;}
+            //TODO:
+            QStringList members = group->members();
+            foreach (QString memberID, members) {
+                UserInfo *member = getOnlineUserInfo(memberID);
+                if(!member){continue;}
+                sendUserJoinOrQuitInterestGroupResultToUserPacket(member->getSocketID(), groupID, memberID, false, member->getSessionEncryptionKey());
+            }
+            sendUserJoinOrQuitInterestGroupResultToUserPacket(userInfo->getSocketID(), groupID, userID, false, userInfo->getSessionEncryptionKey());
+
 
         }
 
