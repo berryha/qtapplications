@@ -100,8 +100,15 @@ QStringList InterestGroupBase::getAdmins(bool includeCreator){
 
 }
 
+bool InterestGroupBase::isAdmin(const QString &memberUserID){
+    MemberRole role = membersHash.value(memberUserID);
+    return ( (role == Role_Administrator) || role == Role_Creator );
+}
 
-
+bool InterestGroupBase::isCreator(const QString &memberUserID){
+    MemberRole role = membersHash.value(memberUserID);
+    return ( role == Role_Creator );
+}
 
 
 

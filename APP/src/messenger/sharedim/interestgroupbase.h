@@ -64,6 +64,8 @@ public:
     QStringList members() const;
     MemberRole memberRole(const QString &memberUserID);
     QStringList getAdmins(bool includeCreator = true);
+    bool isAdmin(const QString &memberUserID);
+    bool isCreator(const QString &memberUserID);
 
     
     
