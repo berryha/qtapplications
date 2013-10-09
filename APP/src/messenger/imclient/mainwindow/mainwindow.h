@@ -5,8 +5,9 @@
 #include <QTranslator>
 
 
+#include "ui_mainwindow.h"
 
-#include "../ui/ui_mainwindow.h"
+
 #include "contactsmanager/contactsmanager.h"
 #include "../chatwindow/chatwindowmanager.h"
 #include "../networkmanager/clientresourcesmanager.h"
@@ -107,6 +108,7 @@ private slots:
     void slotProcessContactStateChanged(const QString &contactID, quint8 onlineStateCode, const QString &contactHostAddress, quint16 contactHostPort);
     void slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString);
     void slotProcessUserInfo(const QString &userID/*, const QString &userInfo*/);
+    //IMPORTANT
     void slotProcessContactGroupsInfo(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
     void slotProcessContactGroupsInfo2(const QString &contactGroupsInfo, quint32 personalContactGroupsInfoVersionOnServer);
 

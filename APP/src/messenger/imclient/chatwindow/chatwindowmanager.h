@@ -7,7 +7,9 @@
 #include <QCloseEvent>
 
 
-#include "../ui/ui_chatwindowmanager.h"
+#include "ui_chatwindowmanager.h"
+
+
 #include "../contactsmanager/contact.h"
 //#include "chatmessagewindow.h"
 #include "groupchatwindow.h"

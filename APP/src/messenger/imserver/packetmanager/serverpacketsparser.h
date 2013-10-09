@@ -330,8 +330,10 @@ public slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
+
         //out << userID << quint8(0) << quint8(errorType);
         out << m_serverName << quint8(0) << errorTypeCode;
+
         packet->setPacketData(ba);
 
         ba.clear();
@@ -356,12 +358,14 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << sessionEncryptionKey;
+        out << sessionEncryptionKey << personalSummaryInfoVersion << personalDetailInfoVersionOnServer << personalContactGroupsInfoVersionOnServer << interestGroupInfoVersionOnServer << blacklistInfoVersionOnServer;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, encryptedPassword, true);
         ba.clear();
         out.device()->seek(0);
-        out << m_serverName << quint8(1) << encryptedData << personalSummaryInfoVersion << personalDetailInfoVersionOnServer << personalContactGroupsInfoVersionOnServer << interestGroupInfoVersionOnServer << blacklistInfoVersionOnServer;
+
+        out << m_serverName << quint8(1) << encryptedData ;
         //qWarning()<<"---encryptedData.size():"<<encryptedData.size() <<"--encryptedPassword:"<<encryptedPassword.toBase64();
         //qWarning()<<"---sessionEncryptionKey From Server:"<<sessionEncryptionKey.toBase64();
 

@@ -15,7 +15,7 @@ VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}.$${VER_CMP}
 QMAKE_TARGET_COMPANY	= "He Hui"
 QMAKE_TARGET_PRODUCT	= "He Hui"
 QMAKE_TARGET_DESCRIPTION    = "Crossplatform Tools Based On Qt Of LGPL Edition"
-QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2010 He Hui"
+QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2013 He Hui"
 
 APP_ORG = "He Hui"
 APP_AUTHOR = "He Hui"

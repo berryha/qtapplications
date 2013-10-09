@@ -6,7 +6,9 @@
 #include <QStringList>
 
 
-#include "../ui/ui_chatmessagewindow.h"
+#include "ui_chatmessagewindow.h"
+
+
 #include "./emoticonselecter/emoticonselector.h"
 #include "../contactsmanager/contact.h"
 #include "contactsmanager/interestgroup.h"
