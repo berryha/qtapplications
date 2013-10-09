@@ -288,7 +288,7 @@ public slots:
     bool addNewContact(const QString &contactID, int groupID);
     bool deleteContact(const QString &contactID);
     bool moveFriendContact2(const QString &contactID, int oldGroupID, int newGroupID);
-    bool moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID);
+    void moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID);
 
 
     void joinOrLeaveInterestGroup(quint32 interestGroupID, bool join = true);

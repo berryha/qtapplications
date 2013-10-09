@@ -28,16 +28,14 @@ HHSharedLibs += HHSharedIM
 include (../sharedim/sharedim.pri)
 
 # #
-UI_DIR = ./ui
+#UI_DIR = ./ui
 
 # ##
-DEPENDPATH += . \
-    about \
-    debug \
-    mainwindow
+#DEPENDPATH += .
+
 INCLUDEPATH += . \
-    mainwindow \
-    about
+    packetmanager \
+    usersmanager
 
 # Input
 HEADERS += \

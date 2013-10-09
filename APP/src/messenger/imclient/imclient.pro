@@ -24,14 +24,8 @@ include (../sharedim/sharedim.pri)
 UI_DIR = ./ui
 
 # ##
-DEPENDPATH += . \
-    about \
-    debug \
-    mainwindow
-INCLUDEPATH += . \
-    mainwindow \
-    about \
-    chatwindow
+DEPENDPATH += .
+INCLUDEPATH += .
 
 # Input
 HEADERS += contactinfowidget/contactinfowidget.h \
