@@ -855,7 +855,7 @@ bool IMUserBase::moveFriendContact2(const QString &contactID, int oldGroupID, in
 
 }
 
-bool IMUserBase::moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID){
+void IMUserBase::moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID){
 
     ContactGroupBase *oldContactGroup = personalContactGroupsHash.value(oldGroupID);
     ContactGroupBase *newContactGroup = personalContactGroupsHash.value(newGroupID);
