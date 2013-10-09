@@ -317,16 +317,16 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         if(loginResultCode){
             QByteArray encryptedData;
-            quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, personalMessageInfoVersionOnServer = 1;
-            in >> encryptedData >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> personalMessageInfoVersionOnServer;
+            in >> encryptedData ;
 
             QByteArray decryptedData;
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
-
             //TODO
             QDataStream stream(&decryptedData, QIODevice::ReadOnly);
             stream.setVersion(QDataStream::Qt_4_8);
-            stream >> sessionEncryptionKey;
+
+            quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, personalMessageInfoVersionOnServer = 1;
+            stream >> sessionEncryptionKey >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> personalMessageInfoVersionOnServer;
 
             user->setSessionEncryptionKey(sessionEncryptionKey);
 
