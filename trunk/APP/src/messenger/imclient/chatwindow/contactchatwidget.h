@@ -32,7 +32,7 @@ signals:
 
 
 public slots:
-    void appendMessageReceivedFromContact(const QString &message, Contact *contact = 0, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+    void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime );
 
 
 

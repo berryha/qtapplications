@@ -12,7 +12,7 @@
 #include "../contactsmanager/contact.h"
 #include "../../sharedim/constants_global_shared.h"
 
-
+#include "../servertime/servertime.h"
 
 //#include "imageresource.h"
 //#include "../../shared/gui/imageresourcebase.h"
@@ -266,8 +266,8 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
     //URL: contact://contactid
-    QString msg = QString("<span><a title=\"%1\" href=\"%2://%1\">%3</a> %4</span>").arg(userID).arg(URLScheme_Contact).arg(nickName).arg(datetime);
-    
+    QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(nickName).arg(userID).arg(URLScheme_Contact).arg(datetime);
+
     //Find Div tag
     //QRegExp regExp("<div.+>.*</div>");
     //regExp.setCaseSensitivity(Qt::CaseInsensitive);
@@ -493,6 +493,11 @@ void ChatMessageWindow::emitSendMsgSignal() {
     richMessage += QString("</div>");
 
     appendChatMessage(richMessage, m_myself, QDateTime::currentDateTime().toString("hh:mm:ss"));
+
+    qDebug();
+    qDebug()<<"------------00-----------Server Time:"<<ServerTime::instance()->time();
+    qDebug()<<"------------00-----------Local Time:"<<QDateTime::currentDateTime();
+    qDebug();
 
     ui.textEdit->clear();
     ui.textEdit->setFocus();

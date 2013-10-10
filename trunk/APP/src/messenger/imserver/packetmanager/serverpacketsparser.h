@@ -360,6 +360,9 @@ public slots:
 
         out << sessionEncryptionKey << personalSummaryInfoVersion << personalDetailInfoVersionOnServer << personalContactGroupsInfoVersionOnServer << interestGroupInfoVersionOnServer << blacklistInfoVersionOnServer;
 
+        uint serverTime = QDateTime::currentDateTime().toUTC().toTime_t();
+        out << serverTime;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, encryptedPassword, true);
         ba.clear();

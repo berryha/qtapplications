@@ -357,13 +357,7 @@ void ChatWindowManager::slotNewMessageReceivedFromContact(const QString &contact
     }
 
 
-
-    if(time.trimmed().isEmpty()){
-        contactChatWindow->appendMessageReceivedFromContact(message);
-    }else{
-        contactChatWindow->appendMessageReceivedFromContact(message, 0, time);
-    }
-
+    contactChatWindow->appendMessageReceivedFromContact(message, 0, time);
 
 }
 

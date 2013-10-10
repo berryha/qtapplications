@@ -31,6 +31,7 @@
 
 #include "imclientpacketsparser.h"
 
+#include "../servertime/servertime.h"
 
 
 
@@ -326,7 +327,11 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             stream.setVersion(QDataStream::Qt_4_8);
 
             quint32 personalSummaryInfoVersionOnServer = 1, personalDetailInfoVersionOnServer = 1, personalContactGroupsInfoVersionOnServer = 1, interestGroupsInfoVersionOnServer = 1, personalMessageInfoVersionOnServer = 1;
-            stream >> sessionEncryptionKey >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> personalMessageInfoVersionOnServer;
+            uint serverTime = 0;
+            stream >> sessionEncryptionKey >> personalSummaryInfoVersionOnServer >> personalDetailInfoVersionOnServer >> personalContactGroupsInfoVersionOnServer >> interestGroupsInfoVersionOnServer >> personalMessageInfoVersionOnServer >> serverTime;
+
+            Q_ASSERT(serverTime);
+            ServerTime::instance()->startSync(serverTime);
 
             user->setSessionEncryptionKey(sessionEncryptionKey);
 
