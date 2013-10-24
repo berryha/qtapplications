@@ -171,6 +171,13 @@ private slots:
     void updateInterestGroupInfoToUI(InterestGroup *interestGroup);
 
 
+    //Recent Chats
+    void setupRecentChats(const QStringList &contacts, const QList<quint32> &interestGroups);
+    void addOrRemoveRecentChatContact(Contact *contact, bool add = true);
+    void addOrRemoveRecentChatGroup(InterestGroup *interestGroup, bool add = true);
+
+
+
     void on_toolButtonUserFace_clicked(){showUserInfo(m_myself);}
     void showUserInfo(IMUserBase *user);
 
@@ -236,6 +243,11 @@ private:
     ItemBoxWidget *friendBox;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
+
+    QTreeWidgetItem *m_recentChatGroupsItem;
+    QTreeWidgetItem *m_recentChatFriendsItem;
+    QTreeWidgetItem *m_recentChatStrangersItem;
+
 
     UserInfoTipWindow *m_userInfoTipWindow;
     //ContactInfoWidget *m_ContactInfoWidget;

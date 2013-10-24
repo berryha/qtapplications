@@ -20,8 +20,8 @@ include(../../HHSharedLibs.pri)
 HHSharedLibs += HHSharedIM
 include (../sharedim/sharedim.pri)
 
-# #
-#UI_DIR = ./ui
+#
+UI_DIR = ./ui
 
 # ##
 DEPENDPATH += .
@@ -64,7 +64,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     contactsmanager/contactgroup1.h \
     deletecontactdialog/deletecontactdialog.h \
     search/interestgroupinfomodel.h \
-    servertime/servertime.h
+    servertime/servertime.h \
+    mainwindow/sheet_delegate_p.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -100,7 +101,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     chatwindow/contactchatwidget.cpp \
     deletecontactdialog/deletecontactdialog.cpp \
     search/interestgroupinfomodel.cpp \
-    servertime/servertime.cpp
+    servertime/servertime.cpp \
+    mainwindow/sheet_delegate.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \

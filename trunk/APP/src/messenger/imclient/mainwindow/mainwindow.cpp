@@ -12,6 +12,7 @@
 #include <QListWidget>
 
 #include "mainwindow.h"
+#include "sheet_delegate_p.h"
 #include "../about/aboutdialog.h"
 
 #include "../settings.h"
@@ -286,6 +287,23 @@ void MainWindow::initUI(){
     friendBox = new ItemBoxWidget(this, ui.friendsPage);
     ui.friendsPageGridLayout->addWidget(friendBox, 0, 0, 1, 1);
     //}
+
+
+    m_recentChatGroupsItem = new QTreeWidgetItem();
+    m_recentChatGroupsItem->setText(0, tr("Groups"));
+    ui.treeWidgetRecentChats->addTopLevelItem(m_recentChatGroupsItem);
+
+    m_recentChatFriendsItem= new QTreeWidgetItem();
+    m_recentChatFriendsItem->setText(0, tr("Friends"));
+    ui.treeWidgetRecentChats->addTopLevelItem(m_recentChatFriendsItem);
+
+    m_recentChatStrangersItem= new QTreeWidgetItem();
+    m_recentChatStrangersItem->setText(0, tr("Strangers"));
+    ui.treeWidgetRecentChats->addTopLevelItem(m_recentChatStrangersItem);
+
+    ui.treeWidgetRecentChats->setItemDelegate(new SheetDelegate(ui.treeWidgetRecentChats, ui.treeWidgetRecentChats));
+    ui.treeWidgetRecentChats->expandAll();
+
 
 
     m_userInfoTipWindow = new UserInfoTipWindow(this);
@@ -1202,6 +1220,156 @@ void MainWindow::updateInterestGroupInfoToUI(InterestGroup *interestGroup){
     
 }
 
+void MainWindow::setupRecentChats(const QStringList &contacts, const QList<quint32> &interestGroups){
+    qDebug()<<"--MainWindow::setupRecentChats(...) "<<" contacts:"<<contacts;
+
+    if(!contacts.isEmpty()){
+        foreach (QString contactID, contacts) {
+            Contact *c = m_contactsManager->getUser(contactID);
+            if(!c){continue;}
+
+            addOrRemoveRecentChatContact(c, true);
+        }
+    }
+
+    if(!interestGroups.isEmpty()){
+        foreach (quint32 groupID, interestGroups) {
+            InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+            if(!group){continue;}
+
+            addOrRemoveRecentChatGroup(group, true);
+        }
+    }
+
+}
+
+void MainWindow::addOrRemoveRecentChatContact(Contact *contact, bool add){
+
+    if(!contact){
+        return;
+    }
+
+    QString contactID = contact->getUserID();
+
+    QTreeWidgetItem *existedFriendItem = 0;
+    for(int i=0; i<m_recentChatFriendsItem->childCount(); i++){
+        QTreeWidgetItem *item = m_recentChatFriendsItem->child(i);
+        if(!item){continue;}
+        if(item->data(0, Qt::UserRole).toString() == contactID){
+            existedFriendItem = item;
+            break;
+        }
+    }
+
+    QTreeWidgetItem *existedStrangerItem = 0;
+    for(int i=0; i<m_recentChatStrangersItem->childCount(); i++){
+        QTreeWidgetItem *item = m_recentChatStrangersItem->child(i);
+        if(!item){continue;}
+        if(item->data(0, Qt::UserRole).toString() == contactID){
+            existedStrangerItem = item;
+            break;
+        }
+    }
+
+    if(add){
+        QTreeWidgetItem *topItem = 0;
+
+        if(contact->isFriend()){
+            if(existedFriendItem){
+                m_recentChatFriendsItem->removeChild(existedFriendItem);
+                m_recentChatFriendsItem->insertChild(0, existedFriendItem);
+                return;
+            }else if(existedStrangerItem){
+                m_recentChatStrangersItem->removeChild(existedStrangerItem);
+                m_recentChatFriendsItem->insertChild(0, existedStrangerItem);
+                return;
+            }
+
+            topItem = m_recentChatFriendsItem;
+
+        }else{
+            if(existedStrangerItem){
+                m_recentChatStrangersItem->removeChild(existedFriendItem);
+                m_recentChatStrangersItem->insertChild(0, existedStrangerItem);
+                return;
+            }else if(existedFriendItem){
+                m_recentChatFriendsItem->removeChild(existedFriendItem);
+                m_recentChatStrangersItem->addChild(existedFriendItem);
+            }
+
+            topItem = m_recentChatStrangersItem;
+
+        }
+
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setText(0, contact->displayName());
+        item->setData(0, Qt::UserRole, QVariant(contactID));
+
+        QIcon ico = ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState());
+        item->setIcon(0, ico);
+
+        topItem->insertChild(0, item);
+
+    }else{
+        if(existedFriendItem){
+            m_recentChatFriendsItem->removeChild(existedFriendItem);
+            delete existedFriendItem;
+        }
+
+        if(existedStrangerItem){
+            m_recentChatStrangersItem->removeChild(existedStrangerItem);
+            delete existedStrangerItem;
+        }
+
+    }
+
+
+}
+
+void MainWindow::addOrRemoveRecentChatGroup(InterestGroup *interestGroup, bool add){
+
+    if(!interestGroup){
+        return;
+    }
+
+    quint32 groupID = interestGroup->getGroupID();
+
+    QTreeWidgetItem *existedItem = 0;
+    for(int i=0; i<m_recentChatGroupsItem->childCount(); i++){
+        QTreeWidgetItem *item = m_recentChatGroupsItem->child(i);
+        if(!item){continue;}
+        if(item->data(0, Qt::UserRole).toUInt() == groupID){
+            existedItem = item;
+            break;
+        }
+    }
+
+    if(add){
+        if(existedItem){
+            m_recentChatGroupsItem->removeChild(existedItem);
+            m_recentChatGroupsItem->insertChild(0, existedItem);
+            return;
+        }
+
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setText(0, interestGroup->getGroupName());
+        item->setData(0, Qt::UserRole, QVariant(groupID));
+
+        QIcon ico = ImageResource::createIconForInterestGroup(interestGroup->getState());
+        item->setIcon(0, ico);
+
+        m_recentChatGroupsItem->insertChild(0, item);
+    }else{
+        if(existedItem){
+            m_recentChatGroupsItem->removeChild(existedItem);
+            delete existedItem;
+        }
+
+    }
+
+
+}
+
 void MainWindow::slotUserVerified(){
     qDebug()<<"--MainWindow::slotUserVerified()";
 
@@ -1810,6 +1978,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 
 
     //TODO:Setup recent contacts
+    setupRecentChats(recentContacts, recentInterestGroups);
 
 
     ui.stackedWidget->setCurrentWidget(ui.mainPage);
