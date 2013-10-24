@@ -1783,18 +1783,16 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     QStringList strangers = users.keys();
     strangersGroup->setMembers(strangers);
 
-
-    foreach (QString recentContactID, recentContacts) {
-
-    }
-
-
     QList<Contact*> strangersList;
     int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
     foreach (Contact *contact, users.values()) {
         contact->setContactGroupID(strangersGroupID);
         //m_contactsManager->addContactToUI(friendBox, strangersGroupID, contact->getUserID());
-        strangersList.append(contact);
+
+        if(recentContacts.contains(contact->getUserID())){
+            strangersList.append(contact);
+        }
+
     }
     m_contactsManager->slotLoadContactGroupToUI(friendBox, strangersGroupID, strangersGroup->getGroupName(), strangersList);
 
@@ -1809,6 +1807,11 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 //    slotUpdateContactsInfo();
 
     ui.contactsToolBox->setEnabled(true);
+
+
+    //TODO:Setup recent contacts
+
+
     ui.stackedWidget->setCurrentWidget(ui.mainPage);
     setWindowTitle(m_myUserID);
 
