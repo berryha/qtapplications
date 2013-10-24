@@ -14,6 +14,8 @@
 #include "../imageresource.h"
 //#include "../shared/global_app.h"
 
+#include "../servertime/servertime.h"
+
 //#include "../../shared/core/database/databaseutility.h"
 //#include "../../shared/core/user.h"
 //#include "../../shared/gui/databaseconnecter/databaseconnecter.h"
@@ -363,7 +365,7 @@ bool ContactsManager::saveContactChatMessageToDatabase(const QString &senderID, 
 
     QSqlQuery query(localUserDataDB);
 
-    QString statement = QString("insert into contactchatmessages(SenderID, ReceiverID, Message, Time) values('%1', '%2', '%3', '%4') ").arg(senderID).arg(receiverID).arg(message).arg(t);
+    QString statement = QString("insert into contactchatmessages(SenderID, ReceiverID, Message, DeliveryTime) values('%1', '%2', '%3', '%4') ").arg(senderID).arg(receiverID).arg(message).arg(t);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -397,7 +399,7 @@ bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &send
 
     QSqlQuery query(localUserDataDB);
 
-    QString statement = QString("insert into interestgroupchatmessages(SenderID, GroupID, Message, Time) values('%1', '%2', '%3', '%4') ").arg(senderID).arg(interestGroupID).arg(message).arg(t);
+    QString statement = QString("insert into interestgroupchatmessages(SenderID, GroupID, Message, DeliveryTime) values('%1', '%2', '%3', '%4') ").arg(senderID).arg(interestGroupID).arg(message).arg(t);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -647,6 +649,63 @@ void ContactsManager::slotFetchAllContactsInfoFromDB(){
 
     contactsModel->deleteLater();
 
+
+}
+
+void ContactsManager::slotFetchRecentChatsFromDB(QStringList *contacts, QList<quint32> *interestGroups){
+    qDebug()<<"ContactsManager::slotFetchRecentChatsFromDB()";
+
+    Q_ASSERT(contacts);
+    Q_ASSERT(interestGroups);
+
+
+    QDateTime time = ServerTime::instance()->time();
+    if(time.isNull()){
+        time = QDateTime::currentDateTime();
+    }
+    time = time.addDays(-7);
+    QString timeString = time.toString("yyyy-MM-dd hh:mm:ss");
+
+
+    QSqlQuery query(localUserDataDB);
+
+    QString statement = QString("SELECT DISTINCT SenderID AS Contacts FROM contactchatmessages where SenderID <> '%1' and DeliveryTime > '%2' UNION SELECT DISTINCT ReceiverID FROM contactchatmessages where ReceiverID <> '%1' and DeliveryTime > '%2'; ").arg(m_imUser->getUserID()).arg(timeString);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query recent contacts from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return ;
+    }
+
+    QStringList contactList;
+    while (query.next()) {
+        contactList.append(query.value(0).toString());
+    }
+    if(contacts){
+        *contacts = contactList;
+    }
+
+
+    statement = QString("SELECT DISTINCT GroupID AS Groups FROM interestgroupchatmessages where DeliveryTime > '%1' ; ").arg(timeString);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query recent chat groups from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return ;
+    }
+
+    QList<quint32> groupList;
+    while (query.next()) {
+        groupList.append(query.value(0).toUInt());
+    }
+
+    if(interestGroups){
+        *interestGroups = groupList;
+    }
+
+
+
+    return ;
 
 }
 

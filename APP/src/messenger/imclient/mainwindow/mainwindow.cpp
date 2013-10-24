@@ -18,6 +18,7 @@
 #include "../imageresource.h"
 
 #include "../search/addcontactdialog.h"
+#include "../servertime/servertime.h"
 
 #include "../../sharedim/constants_global_shared.h"
 
@@ -1739,6 +1740,11 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     m_myself->setContactGroupsInfoString(contactGroupsInfo);
     m_contactsManager->slotFetchAllContactsInfoFromDB();
 
+    QStringList recentContacts;
+    QList<quint32> recentInterestGroups;
+    m_contactsManager->slotFetchRecentChatsFromDB(&recentContacts, &recentInterestGroups);
+
+
     QList<ContactGroupBase *> groups = m_myself->getContactGroups(false, false);
     ContactGroupBase * strangersGroup = m_myself->strangersGroup();
     groups.removeAll(strangersGroup);
@@ -1776,6 +1782,13 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 
     QStringList strangers = users.keys();
     strangersGroup->setMembers(strangers);
+
+
+    foreach (QString recentContactID, recentContacts) {
+
+    }
+
+
     QList<Contact*> strangersList;
     int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
     foreach (Contact *contact, users.values()) {
@@ -2162,23 +2175,25 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
 
 
 void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time){
-    qDebug()<<"--MainWindow::slotProcessChatMessageReceivedFromContact(...)--Contact:"<<contactID<<" Message:"<<message<<" Time:"<<time;
+    qDebug()<<"--MainWindow::slotProcessChatMessageReceivedFromContact(...)--Contact:"<<contactID<<" Message:"<<message;
 
 
     Contact *contact = m_contactsManager->getUser(contactID);
     if(!contact){return;}
 
-    m_contactsManager->saveContactChatMessageToDatabase(m_myUserID, contactID, message, time);
+    QString timeString = time;
+    if(timeString.isEmpty()){
+        timeString = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    }
+
+
+    m_contactsManager->saveContactChatMessageToDatabase(contactID, m_myUserID, message, timeString);
 
     if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
-        chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, time);
+        chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, timeString);
     }else{
         //TODO:
         QHash<QString/*Time*/, QVariant/*Message*/> data;
-        QString timeString = time;
-        if(timeString.isEmpty()){
-            timeString = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
-        }
 
         if(systemTray->trayIconDataExists(contactID)){
             data = systemTray->getData(contactID).toHash();
@@ -2238,21 +2253,25 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
 //        contactsManager->slotAddNewContactToDatabase(contact);
     }
 
-    m_contactsManager->saveInterestGroupChatMessageToDatabase(contactID, interestGroupID, message, time);
+
+    QString timeString = time;
+    if(timeString.isEmpty()){
+        timeString = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    }
+
+
+    m_contactsManager->saveInterestGroupChatMessageToDatabase(contactID, interestGroupID, message, timeString);
 
 
     if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
-        chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, time);
+        chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, timeString);
     }else{
         //TODO:
         QHash<QString/*Time*/, QVariant/*Contact ID, Message*/ > data;
         //QHash<QString/*Time*/, QStringList/*Contact ID, Message*/ > data;
 
         QString interestGroupIDString = QString::number(interestGroupID);
-        QString timeString = time;
-        if(timeString.isEmpty()){
-            timeString = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss");
-        }
+
         if(systemTray->trayIconDataExists(interestGroupIDString)){
             data = systemTray->getData(interestGroupIDString).toHash();
             QStringList list;

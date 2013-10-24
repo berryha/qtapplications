@@ -70,10 +70,13 @@ void ServerTime::startSync(uint time_t){
 
 }
 
-QDateTime ServerTime::time(){
+QDateTime ServerTime::time() {
     return m_startTime.addSecs(count);
 }
 
+QString ServerTime::timeString(const QString &format) const{
+    return m_startTime.addSecs(count).toString(format);
+}
 
 ServerTime::ServerTime()
     :QObject()

@@ -65,34 +65,12 @@ int main(int argc, char *argv[])
     a.setOrganizationDomain(APP_ORG_DOMAIN);
     //showSplashMessage(splash, QString(APP_NAME) + " " + QString(APP_VERSION));
 
-    //Login
-    //	User *user = User::instance();
-    //	Login login(user, 0);
-    //	if (!login.isVerified()) {
-    //		return 0;
-    //	}
 
 
     //创建主窗口
     //Create the main window
     MainWindow mw;
 
-    //ClientNetworkManager networkManager(&mw, ClientNetworkManager::LAN, ClientNetworkManager::P2P);
-    //ClientNetworkManager *networkManager = ClientNetworkManager::instance();
-    //networkManager->slotStartUDPCastListening(UDP_MULTICAST_GROUP_IP, UDP_CAST_GROUP_PORT);
-
-    //ChatWindowManager *chatWindowManager = ChatWindowManager::instance();
-
-    //QObject::connect(&mw, SIGNAL(signalUserOnlineStateChanged(UserBase::OnlineState)), networkManager, SLOT(slotChangeUserOnlineState(UserBase::OnlineState)));
-    //QObject::connect(&mw, SIGNAL(signalRequestContactInfo(const QString &)), networkManager, SLOT(slotRequestClientInfo(const QString &)));
-
-//    QObject::connect(networkManager, SIGNAL(signalContactOnlineStateChanged(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotChangeContactOnlineState(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-//    QObject::connect(networkManager, SIGNAL(signalContactInfoReceivedFromContact(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotUpdateContactInfo(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-
-    //QObject::connect(&networkManager, SIGNAL(signalContactOnlineStateChanged(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotChangeContactOnlineState(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-//    QObject::connect(networkManager, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &)), &mw, SLOT(slotProcessChatMessageReceivedFromContact(const QString &, const QString &)));
-
-//    QObject::connect(networkManager, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &)), chatWindowManager, SLOT(slotNewMessageReceivedFromContact(const QString &, const QString &)));
 
 
 

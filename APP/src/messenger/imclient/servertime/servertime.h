@@ -53,6 +53,7 @@ public:
 
     void startSync(uint time_t);
     QDateTime time();
+    QString timeString(const QString &format = "yyyy-MM-dd hh:mm:ss") const;
 
 
 private:

@@ -512,12 +512,7 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
     }
 
 
-    if(time.trimmed().isEmpty()){
-        groupChatWindow->appendMessageReceivedFromContact(message, contact);
-    }else{
-        groupChatWindow->appendMessageReceivedFromContact(message, contact, time);
-    }
-
+    groupChatWindow->appendMessageReceivedFromContact(message, contact, time);
 
 }
 

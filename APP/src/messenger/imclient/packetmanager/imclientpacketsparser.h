@@ -1417,7 +1417,7 @@ signals:
 
 
 private:
-    quint16 getLastReceivedPacketSN(const QString &peerID);
+//    quint16 getLastReceivedPacketSN(const QString &peerID);
 
 private:
 
@@ -1429,7 +1429,7 @@ private:
     //PacketHandlerBase *m_packetHandlerBase;
 
 
-    QDateTime serverLastOnlineTime;
+    //QDateTime serverLastOnlineTime;
 
     QMutex mutex;
 

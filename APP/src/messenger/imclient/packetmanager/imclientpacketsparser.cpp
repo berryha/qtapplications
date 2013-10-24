@@ -81,7 +81,7 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
     
 
 
-    serverLastOnlineTime = QDateTime();
+    //serverLastOnlineTime = QDateTime();
 
     user = IMUser::instance();
     m_myUserID = user->getUserID();
@@ -186,7 +186,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString version;
         in >> port >> version;
 
-        serverLastOnlineTime = QDateTime::currentDateTime();
+        //serverLastOnlineTime = QDateTime::currentDateTime();
 
         emit signalServerDeclarePacketReceived(peerAddress.toString(), port, peerID, version);
 
@@ -198,7 +198,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint16 port;
         in >> port;
 
-        serverLastOnlineTime = QDateTime::currentDateTime();
+        //serverLastOnlineTime = QDateTime::currentDateTime();
 
         emit signalServerOnlinePacketReceived(peerAddress.toString(), port, peerID);
         qDebug()<<"~~ServerOnline";
@@ -870,7 +870,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString message = "";
         stream  >> message;
 
-        emit signalChatMessageReceivedFromContact(contactID, message, "");
+        emit signalChatMessageReceivedFromContact(contactID, message, ServerTime::instance()->timeString());
 
     }
         break;
@@ -997,7 +997,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString senderID = "", message = "";
         stream  >> interestGroupID >> senderID >> message;
 
-        emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, contactID, message, "");
+        emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, contactID, message, ServerTime::instance()->timeString());
 
     }
         break;
@@ -1180,46 +1180,46 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 //}
 
 
-quint16 IMClientPacketsParser::getLastReceivedPacketSN(const QString &peerID){
-    quint16 lastpacketSN = 0;
+//quint16 IMClientPacketsParser::getLastReceivedPacketSN(const QString &peerID){
+//    quint16 lastpacketSN = 0;
 
-    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
-    if(list.isEmpty()){
-        return lastpacketSN;
-    }
+//    QList< QPair<quint16 /*Packet Serial Number*/, QDateTime/*Received Time*/> > list = m_receivedPacketsHash.values(peerID);
+//    if(list.isEmpty()){
+//        return lastpacketSN;
+//    }
 
-    QDateTime lastpacketTime(QDate(1970, 1, 1));
-    for(int i=0; i<list.size(); i++){
-        QPair<quint16, QDateTime> pair = list.at(i);
-        QDateTime time = pair.second;
-        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-            m_receivedPacketsHash.remove(peerID, pair);
-        }else{
-            if(time > lastpacketTime){
-                lastpacketTime = time;
-                lastpacketSN = pair.first;
-            }
-        }
-    }
-    //    foreach ( QPair<quint16, QDateTime> pair, list) {
-    //        QDateTime time = pair.second;
-    //        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
-    //            m_receivedPacketsHash.remove(peerID, pair);
-    //            list.removeOne(pair);
-    //        }else{
-    //            if(time > lastpacketTime){
-    //                lastpacketTime = time;
-    //                lastpacketSN = pair.first;
-    //            }
-    //        }
-    //    }
+//    QDateTime lastpacketTime(QDate(1970, 1, 1));
+//    for(int i=0; i<list.size(); i++){
+//        QPair<quint16, QDateTime> pair = list.at(i);
+//        QDateTime time = pair.second;
+//        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
+//            m_receivedPacketsHash.remove(peerID, pair);
+//        }else{
+//            if(time > lastpacketTime){
+//                lastpacketTime = time;
+//                lastpacketSN = pair.first;
+//            }
+//        }
+//    }
+//    //    foreach ( QPair<quint16, QDateTime> pair, list) {
+//    //        QDateTime time = pair.second;
+//    //        if(time.addSecs(UDP_PACKET_WAITING_FOR_REPLY_TIMEOUT) < QDateTime::currentDateTime()){
+//    //            m_receivedPacketsHash.remove(peerID, pair);
+//    //            list.removeOne(pair);
+//    //        }else{
+//    //            if(time > lastpacketTime){
+//    //                lastpacketTime = time;
+//    //                lastpacketSN = pair.first;
+//    //            }
+//    //        }
+//    //    }
 
-    //TODO:TX Rate
+//    //TODO:TX Rate
 
-    return lastpacketSN;
+//    return lastpacketSN;
 
 
-}
+//}
 
 
 
