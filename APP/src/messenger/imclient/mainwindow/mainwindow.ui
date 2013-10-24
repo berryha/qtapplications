@@ -269,6 +269,21 @@
                    <string>Groups</string>
                   </attribute>
                   <layout class="QGridLayout" name="teamPageGridLayout">
+                   <property name="leftMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="spacing">
+                    <number>1</number>
+                   </property>
                    <item row="0" column="0">
                     <widget class="QListWidget" name="listWidgetGroups">
                      <property name="contextMenuPolicy">
@@ -278,7 +293,7 @@
                    </item>
                   </layout>
                  </widget>
-                 <widget class="QWidget" name="blacklistPage">
+                 <widget class="QWidget" name="recentChatsPage">
                   <property name="geometry">
                    <rect>
                     <x>0</x>
@@ -291,11 +306,53 @@
                    <enum>Qt::TabFocus</enum>
                   </property>
                   <attribute name="label">
-                   <string>Blacklist</string>
+                   <string>Recent Chats</string>
                   </attribute>
-                  <layout class="QGridLayout" name="blacklistPageGridLayout">
+                  <layout class="QGridLayout" name="recentChatsPageGridLayout">
+                   <property name="leftMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="spacing">
+                    <number>1</number>
+                   </property>
                    <item row="0" column="0">
-                    <widget class="QListWidget" name="listWidgetBlacklist"/>
+                    <widget class="QTreeWidget" name="treeWidgetRecentChats">
+                     <property name="editTriggers">
+                      <set>QAbstractItemView::NoEditTriggers</set>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>22</width>
+                       <height>22</height>
+                      </size>
+                     </property>
+                     <property name="textElideMode">
+                      <enum>Qt::ElideMiddle</enum>
+                     </property>
+                     <property name="indentation">
+                      <number>0</number>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <attribute name="headerVisible">
+                      <bool>false</bool>
+                     </attribute>
+                     <column>
+                      <property name="text">
+                       <string>Recent Chats</string>
+                      </property>
+                     </column>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
