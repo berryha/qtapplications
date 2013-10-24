@@ -57,7 +57,7 @@ public:
     bool isDownloadingImage(const QString &imageName);
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
-    void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime = QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss.zzz"));
+    void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime);
 
 
 protected:

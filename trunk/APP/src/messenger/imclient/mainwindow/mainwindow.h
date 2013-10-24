@@ -134,14 +134,14 @@ private slots:
     void slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void showContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
 
-    void slotProcessChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time = "");
+    void slotProcessChatMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
     void slotProcessChatMessageCachedOnServer(const QStringList &messages);
     void slotProcessImageDownloadResult(const QString &contactID, const QString &imageName, const QByteArray &image);
     void slotProcessImageDownloadRequest(const QString &contactID, const QString &imageName);
     void requestDownloadImage(const QString &contactID, const QString &imageName);
 
 
-    void slotProcessInterestGroupChatMessagesReceivedFromContact(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time = "");
+    void slotProcessInterestGroupChatMessagesReceivedFromContact(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
     void slotProcessInterestGroupChatMessagesCachedOnServer(const QStringList &messages);
 
     void slotSendChatMessageToContact(Contact *contact, const QString &message, const QStringList &imageNameList);

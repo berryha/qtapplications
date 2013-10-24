@@ -251,11 +251,6 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
 
-    qDebug()<<"----Message Received From Contact! contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
-
-
-
-
     //        QString msg = "<dl>";
     //        msg += QString("<dt>%1  %2  </dt>").arg(contact->getNickName()).arg(datetime);
     //        msg += "<dd >";
@@ -263,10 +258,17 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
     //        msg += "</dd >";
     //        msg += "</dl >";
 
+    qDebug()<<"----Message Received From Contact! contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
 
+    QString timeString = datetime;
+    QDateTime dt = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss");
+    if(dt.date() == ServerTime::instance()->time().date() ){
+        timeString = dt.toString("hh:mm:ss");
+    }
 
     //URL: contact://contactid
-    QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(nickName).arg(userID).arg(URLScheme_Contact).arg(datetime);
+    QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(nickName).arg(userID).arg(URLScheme_Contact).arg(timeString);
+
 
     //Find Div tag
     //QRegExp regExp("<div.+>.*</div>");
@@ -492,12 +494,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
     }
     richMessage += QString("</div>");
 
-    appendChatMessage(richMessage, m_myself, QDateTime::currentDateTime().toString("hh:mm:ss"));
-
-    qDebug();
-    qDebug()<<"------------00-----------Server Time:"<<ServerTime::instance()->time();
-    qDebug()<<"------------00-----------Local Time:"<<QDateTime::currentDateTime();
-    qDebug();
+    appendChatMessage(richMessage, m_myself, ServerTime::instance()->timeString());
 
     ui.textEdit->clear();
     ui.textEdit->setFocus();
