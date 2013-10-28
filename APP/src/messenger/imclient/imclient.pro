@@ -48,7 +48,6 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     login/loginwidget.h \
     chatwindow/chatmessagewindow.h \
     chatwindow/chatwindowmanager.h \
-    contactwidget/contactwidget.h \
     contactsmanager/contactsmanager.h \
     login/login.h \
     about/aboutdialog.h \
@@ -65,7 +64,9 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     deletecontactdialog/deletecontactdialog.h \
     search/interestgroupinfomodel.h \
     servertime/servertime.h \
-    mainwindow/sheet_delegate_p.h
+    contactbox/sheet_delegate_p.h \
+    contactbox/contactwidget.h \
+    contactbox/contactbox.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -85,7 +86,6 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     contactsmanager/contactgroup.cpp \
     chatwindow/chatmessagewindow.cpp \
     chatwindow/chatwindowmanager.cpp \
-    contactwidget/contactwidget.cpp \
     contactsmanager/contactsmanager.cpp \
     login/login.cpp \
     main.cpp \
@@ -102,7 +102,9 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     deletecontactdialog/deletecontactdialog.cpp \
     search/interestgroupinfomodel.cpp \
     servertime/servertime.cpp \
-    mainwindow/sheet_delegate.cpp
+    contactbox/sheet_delegate.cpp \
+    contactbox/contactwidget.cpp \
+    contactbox/contactbox.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
@@ -112,12 +114,12 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     login/loginwidget.ui \
     chatwindow/chatmessagewindow.ui \
     chatwindow/chatwindowmanager.ui \
-    contactwidget/contactwidget.ui \
     about/aboutdialog.ui \
     mainwindow/mainwindow.ui \
     login/applyforregistrationwidget.ui \
     search/addcontactdialog.ui \
-    deletecontactdialog/deletecontactdialog.ui
+    deletecontactdialog/deletecontactdialog.ui \
+    contactbox/contactwidget.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
     resources/images/chatmessagewindow/chatmessagewindow.qrc \

@@ -19,7 +19,7 @@
 #include "informationtips/userinfotipwindow.h"
 #include "contactinfowidget/contactinfowidget.h"
 #include "deletecontactdialog/deletecontactdialog.h"
-
+#include "../contactbox/contactbox.h"
 
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedGUI/hmainwindowbase.h"
@@ -243,6 +243,8 @@ private:
     ItemBoxWidget *friendBox;
     //    ExpandListView *teamWidgetBox;
     //    ExpandListView *blacklistWidgetBox;
+
+    ContactBox  *m_contactBox;
 
     QTreeWidgetItem *m_recentChatGroupsItem;
     QTreeWidgetItem *m_recentChatFriendsItem;
