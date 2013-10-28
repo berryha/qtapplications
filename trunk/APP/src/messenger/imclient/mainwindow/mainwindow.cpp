@@ -12,7 +12,7 @@
 #include <QListWidget>
 
 #include "mainwindow.h"
-#include "sheet_delegate_p.h"
+#include "../contactbox/sheet_delegate_p.h"
 #include "../about/aboutdialog.h"
 
 #include "../settings.h"
@@ -287,6 +287,9 @@ void MainWindow::initUI(){
     friendBox = new ItemBoxWidget(this, ui.friendsPage);
     ui.friendsPageGridLayout->addWidget(friendBox, 0, 0, 1, 1);
     //}
+
+    m_contactBox= new ContactBox(ui.pageContacts);
+    ui.gridLayoutPageContacts->addWidget(m_contactBox, 0, 0, 1, 1);
 
 
     m_recentChatGroupsItem = new QTreeWidgetItem();
@@ -1988,6 +1991,8 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     if(contactGroupsInfo.trimmed().isEmpty()){
         QMessageBox::critical(this, tr("Error"), tr("Invalid contact groups info!"));
     }
+
+    m_contactBox->loadAllContacts();
 
 }
 
