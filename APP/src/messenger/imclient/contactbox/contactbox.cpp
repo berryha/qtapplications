@@ -43,6 +43,7 @@ ContactBox::ContactBox(QWidget *parent) :
 {
 
     //setFocusPolicy(Qt::NoFocus);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setIndentation(0);
     setRootIsDecorated(false);
     setColumnCount(1);
@@ -55,6 +56,9 @@ ContactBox::ContactBox(QWidget *parent) :
 
     connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(handleMousePress(QTreeWidgetItem*)));
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(handleMouseDoubleClick(QTreeWidgetItem*)));
+
+    connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(handleCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+
 
     m_contactsManager = ContactsManager::instance();
     m_myself = IMUser::instance();
@@ -134,6 +138,11 @@ void ContactBox::updateContactItemInfo(Contact *contact){
 
     QTreeWidgetItem *item = contactsHash.value(contact);
     if(!item){return;}
+
+    ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+    if(!wgt){return;}
+
+    wgt->updateContactToUI();
 
 
 }
@@ -283,6 +292,32 @@ void ContactBox::handleMouseDoubleClick(QTreeWidgetItem* item){
     }
 
     emit signalContactItemActivated(contact);
+
+}
+
+void ContactBox::handleCurrentItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous){
+
+
+    if(previous && (previous->parent() != 0) ){
+        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(previous, 0) );
+        if(!wgt){return;}
+        wgt->setExpanded(false);
+
+        previous->setSizeHint(0, wgt->sizeHint());
+
+    }
+
+    if(current &&(current->parent() != 0) ){
+        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(current, 0) );
+        if(!wgt){return;}
+        wgt->setExpanded(true);
+
+        current->setSizeHint(0, wgt->sizeHint());
+
+    }
+
+
+    updateGeometries();
 
 }
 

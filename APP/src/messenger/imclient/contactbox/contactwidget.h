@@ -21,6 +21,10 @@ public:
 
     void updateContactToUI();
 
+
+    void setExpanded(bool expand);
+
+
 private:
     Ui::ContactWidgetClass ui;
 
