@@ -2167,7 +2167,6 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
                 contact->setContactGroupID(groupID);
                 m_contactsManager->saveContactInfoToDatabase(contactID);
             }
-            //m_contactsManager->addContactToUI(friendBox, groupID, contactID);
             list.append(contact);
         }
 
@@ -2182,8 +2181,6 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
     foreach (Contact *contact, users.values()) {
         contact->setContactGroupID(strangersGroupID);
-        //m_contactsManager->addContactToUI(friendBox, strangersGroupID, contact->getUserID());
-
         if(recentContacts.contains(contact->getUserID())){
             strangersList.append(contact);
         }

@@ -92,6 +92,8 @@ public slots:
 private slots:
     void handleMousePress(QTreeWidgetItem* item);
     void handleMouseDoubleClick(QTreeWidgetItem* item);
+    void handleCurrentItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
+
 
     void handleContextMenuEventOnContactGroup(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
     void handleContextMenuEventOnContact(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
