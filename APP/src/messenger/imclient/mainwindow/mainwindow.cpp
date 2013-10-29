@@ -2201,7 +2201,21 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 
 //    slotUpdateContactsInfo();
 
+
+
+    m_contactBox->loadAllContacts();
+    m_contactBox->collapseAll();
+    m_contactBox->setContactGroupItemExpanded(m_myself->friendsGroup(), true);
+
+    if(!m_myself->isStrangersShown()){
+        m_contactBox->setContactGroupItemHidden(m_myself->strangersGroup(), true);
+    }
+
+
+
+
     ui.contactsToolBox->setEnabled(true);
+
 
 
     //TODO:Setup recent contacts
@@ -2216,9 +2230,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
         QMessageBox::critical(this, tr("Error"), tr("Invalid contact groups info!"));
     }
 
-    m_contactBox->loadAllContacts();
-    m_contactBox->collapseAll();
-    m_contactBox->setContactGroupItemExpanded(m_myself->friendsGroup(), true);
+
 
 }
 
@@ -2361,12 +2373,15 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
             ok = m_contactsManager->deleteContactGroupFromDatabase(groupID);
             m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
             m_myself->deleteContactGroup(groupID);
+
         }
 
         if(ok){
             m_myself->updatePersonalContactGroupsInfoVersion();
             m_myself->saveMyInfoToLocalDatabase();
         }
+
+        m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
 
     }else{
         QString errorMsg = tr("Failed to %1 group '%2'! ").arg(createGroup?tr("create"):tr("delete")).arg(groupName);
@@ -2399,6 +2414,8 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
         m_contactsManager->addContactToUI(friendBox, groupID, contactID);
 
         m_myself->saveMyInfoToLocalDatabase();
+
+        m_contactBox->addOrRemoveContactItem(contact, true);
 
 
         //show trayicon info
@@ -2469,6 +2486,9 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     //}else{
         m_contactsManager->moveContactToUI(friendBox, existingGroupID, newGroupID, contactID);
     //}
+
+
+        m_contactBox->moveContact(contact, m_myself->getContactGroup(existingGroupID), m_myself->getContactGroup(newGroupID));
 
     
 }

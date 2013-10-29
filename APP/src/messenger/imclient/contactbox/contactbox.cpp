@@ -78,8 +78,6 @@ ContactBox::~ContactBox(){
 void ContactBox::loadAllContacts(){
 
     QList<ContactGroupBase *> groups = m_myself->getContactGroups(false, false);
-    //ContactGroupBase * strangersGroup = m_myself->strangersGroup();
-    //groups.removeAll(strangersGroup);
 
     QHash<QString/*Contact ID*/, Contact*> users = m_contactsManager->getAllUsers();
 
@@ -96,8 +94,6 @@ void ContactBox::loadAllContacts(){
             }
 
             addOrRemoveContactItem(contact, true);
-
-
         }
 
     }
@@ -209,8 +205,23 @@ void ContactBox::setContactGroupItemExpanded(ContactGroupBase *contactGroup, boo
 
 }
 
+void ContactBox::setContactGroupItemHidden(ContactGroupBase *contactGroup, bool hide){
 
+    QTreeWidgetItem *groupItem = contactGroupsHash.value(contactGroup);
+    if(!groupItem){return;}
 
+    setItemHidden(groupItem, hide);
+
+}
+
+void ContactBox::setContactItemHidden(Contact *contact, bool hide){
+
+    QTreeWidgetItem *item = contactsHash.value(contact);
+    if(!item){return;}
+
+    setItemHidden(item, hide);
+
+}
 
 void ContactBox::contextMenuEvent(QContextMenuEvent *e)
 {
@@ -272,8 +283,6 @@ void ContactBox::handleMouseDoubleClick(QTreeWidgetItem* item){
     }
 
     emit signalContactItemActivated(contact);
-
-    QMessageBox::information(this, tr(""), item->data(0, Qt::DisplayRole).toString());
 
 }
 
