@@ -33,19 +33,11 @@ void ContactWidget::updateContactToUI(){
 void ContactWidget::setExpanded(bool expand){
 
     if(expand){
-//        ui.frameTools->show();
-//        ui.toolButtonFace->setIconSize(QSize(42, 42));
-        ui.frameExpanded->show();
-        ui.frameLite->hide();
-
-
+        ui.frameTools->show();
+        ui.toolButtonFace->setIconSize(QSize(42, 42));
     }else{
-//        ui.frameTools->hide();
-//        ui.toolButtonFace->setIconSize(QSize(22, 22));
-        ui.frameExpanded->hide();
-        ui.frameLite->show();
-
-
+        ui.frameTools->hide();
+        ui.toolButtonFace->setIconSize(QSize(16, 16));
     }
 
 
