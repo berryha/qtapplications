@@ -66,14 +66,19 @@ public:
     void addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, bool add);
     void updateContactGroupItemInfo(ContactGroupBase *contactGroup);
 
+    void moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e);
-    void resizeEvent(QResizeEvent *e);
+//    void resizeEvent(QResizeEvent *e);
 
 
 signals:
-    void signalRenameContactGroup(quint32 groupID, const QString &newGroupName);
-    void signalCreateOrDeleteContactGroup(quint32 groupID, const QString &newGroupName, bool create);
+    void signalContextMenuEventOnContactGroup(ContactGroupBase *group, const QPoint &global_mouse_pos);
+    void signalContextMenuEventOnContact(Contact *contact, const QPoint &global_mouse_pos);
+    void signalContactItemActivated(Contact *contact);
+    void signalTooltipEventOnContact(Contact *contact, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+
 
 public slots:
 
@@ -85,6 +90,7 @@ private slots:
 
     void handleContextMenuEventOnContactGroup(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
     void handleContextMenuEventOnContact(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
+
     void handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
 
 

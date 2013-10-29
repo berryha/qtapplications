@@ -79,6 +79,14 @@ private slots:
     void slotUserVerified();
     void slotLockUI();
 
+
+    void handleContextMenuEventOnContactGroup(ContactGroupBase *contactGroup, const QPoint &global_mouse_pos);
+    void handleContextMenuEventOnContact(Contact *contact, const QPoint &global_mouse_pos);
+    void handleContactItemActivated(Contact *contact);
+    void handleTooltipEventOnContactItem(Contact *contact, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+
+
+
     void showProgressDialog(const QString &labelText = "", const QString & cancelButtonText = "", int minimum = 0, int maximum = 0);
     void hideProgressDialog();
 

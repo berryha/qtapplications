@@ -290,6 +290,12 @@ void MainWindow::initUI(){
 
     m_contactBox= new ContactBox(ui.pageContacts);
     ui.gridLayoutPageContacts->addWidget(m_contactBox, 0, 0, 1, 1);
+    connect(m_contactBox, SIGNAL(signalContextMenuEventOnContactGroup(ContactGroupBase *, const QPoint &)), this, SLOT(handleContextMenuEventOnContactGroup(ContactGroupBase *, const QPoint &)));
+    connect(m_contactBox, SIGNAL(signalContextMenuEventOnContact(Contact *, const QPoint &)), this, SLOT(handleContextMenuEventOnContact(Contact *, const QPoint &)));
+    connect(m_contactBox, SIGNAL(signalContactItemActivated(Contact *)), this, SLOT(handleContactItemActivated(Contact *)));
+    connect(m_contactBox, SIGNAL(signalTooltipEventOnContact(Contact *, const QPoint &, const QPoint &)), this, SLOT(handleTooltipEventOnContactItem(Contact *, const QPoint &)));
+
+
 
 
     m_recentChatGroupsItem = new QTreeWidgetItem();
@@ -1442,6 +1448,214 @@ void MainWindow::slotLockUI(){
 
 }
 
+void MainWindow::handleContextMenuEventOnContactGroup(ContactGroupBase *contactGroup, const QPoint &global_mouse_pos){
+
+
+    if(!contactGroup){return;}
+    int groupID = contactGroup->getGroupID();
+
+
+    m_userInfoTipWindow->hideUserInfoTip();
+
+    QMenu contextMenu;
+    contextMenu.addAction(tr("Expand all"), m_contactBox, SLOT(expandAll()));
+    contextMenu.addAction(tr("Collapse all"), m_contactBox, SLOT(collapseAll()));
+    contextMenu.addSeparator();
+
+        QAction actionRenameGroupName(tr("Rename Group"), &contextMenu);
+        QAction actionDeleteGroup(tr("Delete Group"), &contextMenu);
+        QAction actionCreateNewGroup(tr("Create New Group"), &contextMenu);
+
+        if(ContactGroupBase::isUserCreatedGroup(groupID)){
+            contextMenu.addAction(&actionRenameGroupName);
+            if(m_myself->countOfContactGroupMembers(groupID) == 0){
+                contextMenu.addAction(&actionDeleteGroup);
+            }
+        }
+
+        contextMenu.addAction(&actionCreateNewGroup);
+
+        QAction *action = contextMenu.exec(global_mouse_pos);
+        if(action == &actionRenameGroupName){
+            bool ok = false;
+            QString labelText = tr("New Name:\n(Only word-characters up to 16 are acceptable!)");
+            QString newGroupName = QInputDialog::getText(this, tr("Rename Group"),
+                                                         labelText, QLineEdit::Normal,
+                                                         contactGroup->getGroupName(), &ok);
+            if (ok && !newGroupName.isEmpty()){
+                int pos = 0;
+                QRegExpValidator rxValidator(this);
+                QRegExp rx("\\b\\w{0,16}\\b");
+                rxValidator.setRegExp(rx);
+                if(rxValidator.validate(newGroupName, pos) != QValidator::Acceptable){
+                    QMessageBox::critical(this, tr("Error"), tr("Invalid Group Name!"));
+                    return ;
+                }
+
+                if(m_myself->hasContactGroup(newGroupName)){
+                    QMessageBox::critical(this, tr("Error"), tr("Group with the same name already exists!"));
+                    return;
+                }
+
+//                showProgressDialog();
+
+                clientPacketsParser->renameContactGroup(m_socketConnectedToServer, groupID, newGroupName);
+
+                m_contactsManager->renameContactGroupToDatabase(groupID, newGroupName);
+                m_contactsManager->renameContactGroupToUI(friendBox, groupID, newGroupName);
+                m_myself->renameContactGroup(groupID, newGroupName);
+
+                m_contactBox->updateContactGroupItemInfo(contactGroup);
+
+            }
+
+
+        }else if(action == &actionDeleteGroup){
+            QString groupName = m_myself->getContactGroupName(groupID);
+            int ret = QMessageBox::question(this, tr("Delete Contact Group"), tr("Are you sure you want to delete the the group '%1' ?").arg(groupName), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+            if(ret == QMessageBox::No){return;}
+            showProgressDialog();
+            clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, groupID, "", false);
+//            m_contactsManager->deleteGroupFromDatabase(groupIDString);
+//            m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupIDString);
+
+
+        }else if(action == &actionCreateNewGroup){
+
+            bool ok = false;
+            QString labelText = tr("Group Name:\n(Only word-characters up to 16 are acceptable!)");
+            QString newGroupName = QInputDialog::getText(this, tr("Create New Group"),
+                                                         labelText, QLineEdit::Normal,
+                                                         "", &ok);
+            if (ok && !newGroupName.isEmpty()){
+                int pos = 0;
+                QRegExpValidator rxValidator(this);
+                QRegExp rx("\\b\\w{0,16}\\b");
+                rxValidator.setRegExp(rx);
+                if(rxValidator.validate(newGroupName, pos) != QValidator::Acceptable){
+                    QMessageBox::critical(this, tr("Error"), tr("Invalid Group Name!"));
+                    return ;
+                }
+                //TODO:
+                m_myself->saveMyInfoToLocalDatabase();
+                if(m_myself->hasContactGroup(newGroupName)){
+                    QMessageBox::critical(this, tr("Error"), tr("Group already exists!"));
+                    return;
+                }
+
+                showProgressDialog();
+
+//                int newGroupID = m_contactsManager->slotAddNewContactGroupToDatabase(0, newGroupName);
+                clientPacketsParser->createOrDeleteContactGroup(m_socketConnectedToServer, 0, newGroupName, true);
+//                m_contactsManager->slotAddNewContactGroupToUI(friendBox, newGroupID, newGroupName);
+
+            }
+
+        }
+
+
+
+}
+
+void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint &global_mouse_pos){
+
+
+    m_userInfoTipWindow->hideUserInfoTip();
+
+    if(!contact){
+        QMessageBox::critical(this, tr("Error"), tr("Contact does not exist!"));
+        return;
+    }
+    QString contactID = contact->getUserID();
+
+    QMenu menu;
+
+    int oldGroupID = contact->getContactGroupID();
+    QList<ContactGroupBase *> groups = m_myself->getContactGroups();
+    groups.removeAll(m_myself->getContactGroup(oldGroupID));
+
+    if(!groups.isEmpty()){
+        QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
+        foreach (ContactGroupBase *group, groups) {
+            QAction *action = menuMoveContactToGroup->addAction(group->getGroupName());
+            action->setData(contactID);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotMoveContactToGroup()));
+        }
+        menuMoveContactToGroup->addSeparator();
+    }
+//    QAction actionMoveToBlacklist(tr("Blacklist"), menuMoveContactToGroup);
+//    actionMoveToBlacklist.setData(contactID);
+//    connect(&actionMoveToBlacklist, SIGNAL(triggered()), this, SLOT(slotMoveContactToBlacklist()));
+//    menuMoveContactToGroup->addAction(&actionMoveToBlacklist);
+
+
+    QAction actionDeleteContact(tr("Delete Contact"), &menu);
+    menu.addAction(&actionDeleteContact);
+
+    QAction actionBlockContact(tr("Block Contact"), &menu);
+    menu.addAction(&actionBlockContact);
+
+    QAction *executedAction = menu.exec(global_mouse_pos);
+    if(executedAction == &actionDeleteContact){
+        if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
+            //TODO:Close chat window
+            if(!chatWindowManager->closeContactChatWindow(contact)){
+                return;
+            }
+            m_contactsManager->slotdeleteContactFromDatabase(contact);
+            m_contactsManager->deleteContactFromUI(friendBox, oldGroupID, contactID);
+
+            m_contactBox->addOrRemoveContactItem(contact, false);
+        }else if(oldGroupID == ContactGroupBase::Group_Blacklist_ID){
+            slotRequestDeleteContact(contactID);
+            showProgressDialog();
+        }else{
+            showDeleteContactDialog(contact, false);
+        }
+
+    }else if(executedAction == &actionBlockContact){
+        showDeleteContactDialog(contact, true);
+    }
+
+
+
+}
+
+void MainWindow::handleContactItemActivated(Contact *contact){
+    chatWindowManager->slotNewChatWithContact(contact->getUserID());
+}
+
+void MainWindow::handleTooltipEventOnContactItem(Contact *contact, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
+
+    if(!contact){
+        m_userInfoTipWindow->hideUserInfoTip();
+        return;
+    }
+
+
+    //QString tip = QString("<b><h4>ID:%1</h4></b>").arg(contactID);
+    //QToolTip::showText(global_mouse_pos, tip);
+
+
+    QSize userInfoTipWindowSize = m_userInfoTipWindow->size();
+    QPoint p = ui.contactsToolBox->mapToGlobal(QPoint(0,0));
+    int x = p.x()-userInfoTipWindowSize.width();
+    if(x < 0){
+        x = p.x() + ui.contactsToolBox->width();
+    }
+
+    //    qDebug()<<"global_item_topLeft_pos:x:"<<global_item_topLeft_pos.x()<<" y:"<<global_item_topLeft_pos.y();
+    //    qDebug()<<"global_mouse_pos:x:"<<global_mouse_pos.x()<<" y:"<<global_mouse_pos.y();
+    //    qDebug()<<"x:"<<x<<" y:"<<global_item_topLeft_pos.y();
+
+    m_userInfoTipWindow->showUserInfoTip(contact, mapTo(this, QPoint(x, global_item_topLeft_pos.y())) );
+
+    activateWindow();
+    raise();
+
+}
+
+
 void MainWindow::showProgressDialog(const QString &labelText, const QString & cancelButtonText, int minimum, int maximum){
     if(!progressDialog){
         progressDialog = new QProgressDialog(this);
@@ -1713,6 +1927,8 @@ void MainWindow::slotMoveContactToGroup(){
         m_contactsManager->saveContactInfoToDatabase(contactID);
         m_contactsManager->moveContactToUI(friendBox, oldGroupID, newGroupID, contactID);
 
+        m_contactBox->moveContact(contact, m_myself->getContactGroup(oldGroupID), group);
+
         return;
     }
 
@@ -1889,6 +2105,8 @@ void MainWindow::slotProcessUserInfo(const QString &userID/*, const QString &use
         if(!contact){return;}
 //        contact->setPersonalInfoString(userInfo);
 //        contactsManager->saveContactInfoToDatabase(userID);
+
+        m_contactBox->updateContactItemInfo(contact);
 
         quint32 contactGroupID = contact->getContactGroupID();
         if(contactGroupID){
