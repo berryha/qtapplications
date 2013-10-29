@@ -293,7 +293,7 @@ void MainWindow::initUI(){
     connect(m_contactBox, SIGNAL(signalContextMenuEventOnContactGroup(ContactGroupBase *, const QPoint &)), this, SLOT(handleContextMenuEventOnContactGroup(ContactGroupBase *, const QPoint &)));
     connect(m_contactBox, SIGNAL(signalContextMenuEventOnContact(Contact *, const QPoint &)), this, SLOT(handleContextMenuEventOnContact(Contact *, const QPoint &)));
     connect(m_contactBox, SIGNAL(signalContactItemActivated(Contact *)), this, SLOT(handleContactItemActivated(Contact *)));
-    connect(m_contactBox, SIGNAL(signalTooltipEventOnContact(Contact *, const QPoint &, const QPoint &)), this, SLOT(handleTooltipEventOnContactItem(Contact *, const QPoint &)));
+    connect(m_contactBox, SIGNAL(signalTooltipEventOnContact(Contact *, const QPoint &, const QPoint &)), this, SLOT(handleTooltipEventOnContactItem(Contact *, const QPoint &, const QPoint &)));
 
 
 
@@ -1606,6 +1606,7 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
             m_contactsManager->deleteContactFromUI(friendBox, oldGroupID, contactID);
 
             m_contactBox->addOrRemoveContactItem(contact, false);
+
         }else if(oldGroupID == ContactGroupBase::Group_Blacklist_ID){
             slotRequestDeleteContact(contactID);
             showProgressDialog();
@@ -2000,8 +2001,10 @@ void MainWindow::slotDeleteContactResultReceived(const QString &contactID, bool 
 
     m_contactsManager->deleteContact(contactID, addToBlacklist);
     m_contactsManager->saveContactInfoToDatabase(contactID);
+
     m_contactsManager->moveContactToUI(friendBox, groupID, contact->getContactGroupID(), contactID);
 
+    m_contactBox->addOrRemoveContactItem(contact, false);
 }
 
 void MainWindow::slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message){
@@ -2048,6 +2051,8 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
     //TODO:Tip
     m_contactsManager->updateContactToUI(friendBox, contact->getContactGroupID(), contactID);
 
+    m_contactBox->updateContactItemInfo(contact);
+
     QString nickname = contact->getNickName();
     switch(state){
     case IM::ONLINESTATE_ONLINE:
@@ -2085,6 +2090,7 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
         contact->setLastLoginExternalHostPort(infoList.at(3).toUInt());
         m_contactsManager->updateContactToUI(friendBox, contact->getContactGroupID(), contactID);
 
+        m_contactBox->updateContactItemInfo(contact);
     }
 
 
@@ -2211,6 +2217,8 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
     }
 
     m_contactBox->loadAllContacts();
+    m_contactBox->collapseAll();
+    m_contactBox->setContactGroupItemExpanded(m_myself->friendsGroup(), true);
 
 }
 

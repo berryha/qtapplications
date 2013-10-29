@@ -576,11 +576,18 @@ QString IMUserBase::getContactGroupsInfoString() const{
 QList<ContactGroupBase *> IMUserBase::getContactGroups(bool noStrangers, bool noBlacklisted){
 
     QList<ContactGroupBase *> groups = personalContactGroupsHash.values();
-    if(noStrangers){
-        groups.removeAll(m_strangersGroup);
+
+    groups.removeAll(m_friendsGroup);
+    groups.insert(0, m_friendsGroup);
+
+    groups.removeAll(m_strangersGroup);
+    groups.removeAll(m_blacklistGroup);
+
+    if(!noStrangers){
+        groups.append(m_strangersGroup);
     }
-    if(noBlacklisted){
-        groups.removeAll(m_blacklistGroup);
+    if(!noBlacklisted){
+        groups.append(m_blacklistGroup);
     }
 
     return groups;

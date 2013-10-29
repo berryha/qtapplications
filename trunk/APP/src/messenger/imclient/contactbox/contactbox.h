@@ -68,6 +68,10 @@ public:
 
     void moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);
 
+    void setContactGroupItemExpanded(ContactGroupBase *contactGroup, bool expanded);
+
+
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e);
 //    void resizeEvent(QResizeEvent *e);
