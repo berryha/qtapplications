@@ -78,8 +78,8 @@ ContactBox::~ContactBox(){
 void ContactBox::loadAllContacts(){
 
     QList<ContactGroupBase *> groups = m_myself->getContactGroups(false, false);
-    ContactGroupBase * strangersGroup = m_myself->strangersGroup();
-    groups.removeAll(strangersGroup);
+    //ContactGroupBase * strangersGroup = m_myself->strangersGroup();
+    //groups.removeAll(strangersGroup);
 
     QHash<QString/*Contact ID*/, Contact*> users = m_contactsManager->getAllUsers();
 
@@ -199,6 +199,16 @@ void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup
     newContactGroupItem->addChild(contactItem);
 
 }
+
+void ContactBox::setContactGroupItemExpanded(ContactGroupBase *contactGroup, bool expanded){
+
+    QTreeWidgetItem *groupItem = contactGroupsHash.value(contactGroup);
+    if(!groupItem){return;}
+
+    setItemExpanded(groupItem, expanded);
+
+}
+
 
 
 
