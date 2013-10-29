@@ -37,9 +37,15 @@
 #include <QTreeWidget>
 #include <QContextMenuEvent>
 
+
+
+
 #include "contactwidget.h"
 #include "../contactsmanager/contact.h"
 #include "../contactsmanager/contactsmanager.h"
+#include "../informationtips/userinfotipwindow.h"
+#include "../packetmanager/imclientpacketsparser.h"
+
 
 namespace HEHUI {
 
@@ -50,6 +56,7 @@ class ContactBox : public QTreeWidget
     Q_OBJECT
 public:
     explicit ContactBox(QWidget *parent = 0);
+    ~ContactBox();
 
     void loadAllContacts();
 
@@ -65,7 +72,8 @@ protected:
 
 
 signals:
-
+    void signalRenameContactGroup(quint32 groupID, const QString &newGroupName);
+    void signalCreateOrDeleteContactGroup(quint32 groupID, const QString &newGroupName, bool create);
 
 public slots:
 
@@ -73,12 +81,22 @@ public slots:
 
 private slots:
     void handleMousePress(QTreeWidgetItem* item);
+    void handleMouseDoubleClick(QTreeWidgetItem* item);
+
+    void handleContextMenuEventOnContactGroup(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
+    void handleContextMenuEventOnContact(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
+    void handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+
 
 
 private:
 
     ContactsManager *m_contactsManager;
     IMUser *m_myself;
+
+    UserInfoTipWindow *m_userInfoTipWindow;
+
+
 
     QHash<Contact*, QTreeWidgetItem*> contactsHash;
     QHash<ContactGroupBase*, QTreeWidgetItem*> contactGroupsHash;
