@@ -54,6 +54,8 @@ ContactBox::ContactBox(QWidget *parent) :
 
     setItemDelegate(new SheetDelegate(this, this));
 
+//    setStyleSheet("QTreeView::item:hover {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1); border: 1px solid #bfcde4;}");
+
     connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(handleMousePress(QTreeWidgetItem*)));
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(handleMouseDoubleClick(QTreeWidgetItem*)));
 
@@ -124,6 +126,11 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
         if(!item){return;}
 
         contactsHash.remove(contact);
+
+        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+        if(wgt){
+            delete wgt;
+        }
 
         parentItem->removeChild(item);
         delete item;
@@ -232,25 +239,104 @@ void ContactBox::setContactItemHidden(Contact *contact, bool hide){
 
 }
 
-void ContactBox::contextMenuEvent(QContextMenuEvent *e)
-{
-    QTreeWidgetItem *item = itemAt(e->pos());
-    if(!item){return;}
+bool ContactBox::event(QEvent *event){
 
-    //    const bool scratchpad_menu = item != 0
-    //                            && item->parent() != 0
-    //                          ;
+    switch(event->type()){
+    case QEvent::FocusIn:
+    {
 
 
-    if(item->parent() == 0){
-        handleContextMenuEventOnContactGroup(item, mapToGlobal(e->pos()));
-    }else{
-        handleContextMenuEventOnContact(item, mapToGlobal(e->pos()));
+    }
+        break;
+
+    case QEvent::ContextMenu:
+    {
+        QContextMenuEvent *e = static_cast<QContextMenuEvent *> (event);
+        if(!e){return false;}
+
+        QTreeWidgetItem *item = itemAt(e->pos());
+        if(!item){return false;}
+
+        if(item->parent() == 0){
+            handleContextMenuEventOnContactGroup(item, mapToGlobal(e->pos()));
+        }else{
+            handleContextMenuEventOnContact(item, mapToGlobal(e->pos()));
+        }
+
+        return true;
+    }
+        break;
+    case QEvent::ToolTip:
+    {
+        QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+        if(!helpEvent){return false;}
+
+        QTreeWidgetItem *item = itemAt(helpEvent->pos());
+        if(!item){return false;}
+        if(item->parent() == 0){return false;}
+        Contact *contact = contactsHash.key(item);
+        if(!contact){return false;}
+
+        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+        if(!wgt){return false;}
+        if(!wgt->isMouseUnderFace()){return false;}
+
+        QPoint globalvisualRectTopLeft = mapToGlobal(wgt->frameGeometry().topLeft());
+        QPoint globalMousePos = helpEvent->globalPos();
+        emit signalTooltipEventOnContact(contact, globalvisualRectTopLeft, globalMousePos);
+
+        return true;
+    }
+        break;
+    case QEvent::Resize:
+    {
+        QResizeEvent *e = static_cast<QResizeEvent *>(event);
+        QTreeWidget::resizeEvent(e);
+        updateGeometries();
+    }
+        break;
+
+//    case QEvent::HoverEnter:
+//    {
+//        QHoverEvent *e = static_cast<QHoverEvent *>(event);
+//        QTreeWidgetItem *item = itemAt(e->pos());
+//        if(!item){return false;}
+//        if(item->parent() == 0){return false;}
+//        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+//        if(!wgt){return false;}
+
+//        wgt->setForegroundRole(QPalette::AlternateBase);
+//        repaint();
+
+//        qDebug()<<"----QEvent::HoverEnter";
+//    }
+//        break;
+
+    default:
+        break;
+
     }
 
-    e->accept();
+
+    return QTreeWidget::event(event);
 
 }
+
+
+
+//void ContactBox::contextMenuEvent(QContextMenuEvent *e)
+//{
+//    QTreeWidgetItem *item = itemAt(e->pos());
+//    if(!item){return;}
+
+//    if(item->parent() == 0){
+//        handleContextMenuEventOnContactGroup(item, mapToGlobal(e->pos()));
+//    }else{
+//        handleContextMenuEventOnContact(item, mapToGlobal(e->pos()));
+//    }
+
+//    e->accept();
+//}
 
 //void ContactBox::resizeEvent(QResizeEvent *e)
 //{
@@ -345,19 +431,19 @@ void ContactBox::handleContextMenuEventOnContact(QTreeWidgetItem* item, const QP
 
 }
 
-void ContactBox::handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
+//void ContactBox::handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
 
-    qDebug()<<"--MainWindow::handleTooltipEventOnItem()";
+//    qDebug()<<"--MainWindow::handleTooltipEventOnItem()";
 
 
-    Contact *contact = contactsHash.key(item);
-    if(!contact){
-        return;
-    }
+//    Contact *contact = contactsHash.key(item);
+//    if(!contact){
+//        return;
+//    }
 
-    emit signalTooltipEventOnContact(contact, global_item_topLeft_pos, global_mouse_pos);
+//    emit signalTooltipEventOnContact(contact, global_item_topLeft_pos, global_mouse_pos);
 
-}
+//}
 
 
 

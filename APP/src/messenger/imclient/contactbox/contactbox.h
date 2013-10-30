@@ -74,7 +74,8 @@ public:
 
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *e);
+    bool event(QEvent *event);
+//    void contextMenuEvent(QContextMenuEvent *e);
 //    void resizeEvent(QResizeEvent *e);
 
 
@@ -98,7 +99,7 @@ private slots:
     void handleContextMenuEventOnContactGroup(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
     void handleContextMenuEventOnContact(QTreeWidgetItem* item, const QPoint &global_mouse_pos);
 
-    void handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
+//    void handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
 
 
 

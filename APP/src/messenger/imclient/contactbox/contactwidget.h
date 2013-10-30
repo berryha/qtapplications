@@ -24,6 +24,11 @@ public:
 
     void setExpanded(bool expand);
 
+    bool isMouseUnderFace();
+
+protected:
+//    bool eventFilter(QObject *obj, QEvent *event);
+
 
 private:
     Ui::ContactWidgetClass ui;

@@ -46,7 +46,7 @@
 #include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
 
-
+#include <QDebug>
 
 namespace HEHUI {
 
@@ -127,6 +127,7 @@ void SheetDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     } else {
         QItemDelegate::paint(painter, option, index);
     }
+
 }
 
 QSize SheetDelegate::sizeHint(const QStyleOptionViewItem &opt, const QModelIndex &index) const
