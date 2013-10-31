@@ -54,7 +54,6 @@ ContactBox::ContactBox(QWidget *parent) :
 
     setItemDelegate(new SheetDelegate(this, this));
 
-//    setStyleSheet("QTreeView::item:hover {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1); border: 1px solid #bfcde4;}");
 
     connect(this, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(handleMousePress(QTreeWidgetItem*)));
     connect(this, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(handleMouseDoubleClick(QTreeWidgetItem*)));
@@ -70,6 +69,8 @@ ContactBox::ContactBox(QWidget *parent) :
     //connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
 
+
+//    setStyleSheet("QTreeView::item:hover {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1); border: 1px solid #bfcde4;}" );
 
 
 }
@@ -119,7 +120,8 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
         if(item){return;}
 
         item = new QTreeWidgetItem(parentItem);
-        setItemWidget(item, 0, new ContactWidget(contact, this));
+        ContactWidget *wgt = new ContactWidget(contact, this);
+        setItemWidget(item, 0, wgt);
 
         contactsHash.insert(contact, item);
     }else{
@@ -242,12 +244,6 @@ void ContactBox::setContactItemHidden(Contact *contact, bool hide){
 bool ContactBox::event(QEvent *event){
 
     switch(event->type()){
-    case QEvent::FocusIn:
-    {
-
-
-    }
-        break;
 
     case QEvent::ContextMenu:
     {
@@ -296,7 +292,7 @@ bool ContactBox::event(QEvent *event){
     }
         break;
 
-//    case QEvent::HoverEnter:
+//    case QEvent::Enter:
 //    {
 //        QHoverEvent *e = static_cast<QHoverEvent *>(event);
 //        QTreeWidgetItem *item = itemAt(e->pos());
@@ -305,8 +301,7 @@ bool ContactBox::event(QEvent *event){
 //        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
 //        if(!wgt){return false;}
 
-//        wgt->setForegroundRole(QPalette::AlternateBase);
-//        repaint();
+//        item->setBackground(0, QBrush(Qt::gray));
 
 //        qDebug()<<"----QEvent::HoverEnter";
 //    }
@@ -317,6 +312,7 @@ bool ContactBox::event(QEvent *event){
 
     }
 
+//    qDebug()<<"event:"<<event->type();
 
     return QTreeWidget::event(event);
 
