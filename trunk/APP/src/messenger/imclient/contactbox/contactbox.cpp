@@ -110,11 +110,12 @@ void ContactBox::loadAllContacts(){
 
 void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
 
-    QTreeWidgetItem *parentItem = contactGroupsHash.value(m_myself->getContactGroup(contact->getContactGroupID()));
+    ContactGroupBase *group = m_myself->getContactGroup(contact->getContactGroupID());
+
+    QTreeWidgetItem *parentItem = contactGroupsHash.value(group);
     if(!parentItem){return;}
 
     QTreeWidgetItem *item = contactsHash.value(contact);
-
 
     if(add){
         if(item){return;}
@@ -139,6 +140,8 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
         item = 0;
 
     }
+
+    updateContactGroupItemInfo(group);
 
 
 }
@@ -168,7 +171,7 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
         if(item){return;}
 
         item = new QTreeWidgetItem();
-        item->setText(0, contactGroup->getGroupName());
+        item->setText(0, contactGroup->getGroupName() + " [0/0]");
         addTopLevelItem(item);
 
         contactGroupsHash.insert(contactGroup, item);
@@ -190,12 +193,25 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
 void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
 
     QTreeWidgetItem *item = contactGroupsHash.value(contactGroup);
-    if(!item){
-        return;
+    if(!item){return;}
+
+    int onlineCount = 0;
+
+    int memberCount = item->childCount();
+    for(int i=0; i<memberCount; i++){
+        QTreeWidgetItem *memberItem = item->child(i);
+        if(!memberItem){continue;}
+
+        Contact *contact = contactsHash.key(memberItem);
+        if(!contact){continue;}
+        if(contact->getOnlineState() != IM::ONLINESTATE_OFFLINE && (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) ){
+            onlineCount++;
+        }
     }
 
+
     //TODO
-    item->setText(0, contactGroup->getGroupName());
+    item->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
 
 }
 

@@ -82,14 +82,13 @@ bool ContactWidget::isMouseUnderFace(){
 
 bool ContactWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    qDebug()<<"ContactWidget::eventFilter:"<<event->type();
+    //qDebug()<<"ContactWidget::eventFilter:"<<event->type();
 
 
     switch (event->type()) {
     case QEvent::Enter:
     {
-        //ui.labelDisplayName->setText(ui.labelDisplayName->text()+"(Enter)");
-        qDebug()<<"----QEvent::Enter"<<" "<<this;
+        //qDebug()<<"----QEvent::Enter"<<" "<<this;
 
         if(!isExpanded()){
             setBackgroundRole(QPalette::Midlight);
@@ -100,12 +99,12 @@ bool ContactWidget::eventFilter(QObject *obj, QEvent *event)
         break;
     case QEvent::Leave:
     {
-        //ui.labelDisplayName->setText(ui.labelDisplayName->text()+"(Leave)");
+        //qDebug()<<"----QEvent::Leave"<<" "<<this;
+
         if(!isExpanded()){
             setBackgroundRole(QPalette::Base);
         }
 
-        qDebug()<<"----QEvent::Leave"<<" "<<this;
 
         return true;
     }
