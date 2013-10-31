@@ -19,31 +19,30 @@ ContactWidget::ContactWidget(Contact *contact, QWidget *parent)
 {
 	ui.setupUi(this);
 
-
     Q_ASSERT(m_contact);
 
-    updateContactToUI();
+    timer = 0;
+    iconIndex = 0;
 
+
+
+    installEventFilter(this);
+    setAutoFillBackground(true);
+
+    updateContactToUI();
     setExpanded(false);
 
-
-
-
-    //setStyleSheet(":hover { background: yellow; }");
-
-    //ui.labelDisplayName->setStyleSheet("{color: palette(link);}");
-
-//setMouseTracking(true);
-
-//    ui.toolButtonFace->installEventFilter(this);
-    installEventFilter(this);
-
-    setAutoFillBackground(true);
 
 }
 
 ContactWidget::~ContactWidget()
 {
+
+    if(timer){
+        timer->stop();
+        delete timer;
+    }
+
 
 }
 
@@ -77,6 +76,31 @@ bool ContactWidget::isExpanded(){
 bool ContactWidget::isMouseUnderFace(){
     QPoint mousePoint = mapFromGlobal(QCursor::pos());
     return ui.pushButtonFace->rect().contains(mousePoint);
+}
+
+void ContactWidget::flashFace(bool flash){
+
+    if(flash){
+        if(!timer){
+            timer = new QTimer(this);
+            timer->setInterval(500);
+            connect(timer, SIGNAL(timeout()), this, SLOT(slotFlashFace()));
+        }
+
+        timer->start();
+    }else{
+        if(timer){
+            //disconnect(timer, SIGNAL(timeout()), 0, 0);
+            timer->stop();
+            delete timer;
+            timer = 0;
+        }
+    }
+
+
+
+
+
 }
 
 
@@ -148,6 +172,21 @@ bool ContactWidget::eventFilter(QObject *obj, QEvent *event)
 
 //}
 
+
+void ContactWidget::slotFlashFace(){
+    iconIndex++;
+    if(iconIndex > 1){
+        iconIndex = 0;
+    }
+
+    if(iconIndex){
+        ui.pushButtonFace->setIcon(ImageResource::createIconForContact(m_contact->getFace(), m_contact->getOnlineState()));
+    }else{
+        ui.pushButtonFace->setIcon(ImageResource::emptyIcon());
+    }
+
+
+}
 
 
 

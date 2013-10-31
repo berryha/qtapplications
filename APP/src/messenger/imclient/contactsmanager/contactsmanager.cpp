@@ -441,6 +441,26 @@ Contact * ContactsManager::createNewContact(const QString &contactID, int groupI
 
 }
 
+int ContactsManager::onlineContactGroupMembersCount(int contactGroupID){
+
+    ContactGroupBase *group = m_imUser->getContactGroup(contactGroupID);
+    if(!group){return 0;}
+
+    int onlineCount = 0;
+    QStringList members = group->members();
+    foreach (QString contactID, members) {
+        Contact *contact = contactHash.value(contactID);
+        if(!contact){continue;}
+        IM::OnlineState state = contact->getOnlineState();
+        if(state != IM::ONLINESTATE_OFFLINE && (state != IM::ONLINESTATE_INVISIBLE) ){
+            onlineCount++;
+        }
+    }
+
+    return onlineCount;
+
+}
+
 void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
     qDebug()<<"ContactsManager::slotFetchAllContactsInfo(...)";
 

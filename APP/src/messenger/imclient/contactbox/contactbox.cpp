@@ -195,22 +195,21 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
     QTreeWidgetItem *item = contactGroupsHash.value(contactGroup);
     if(!item){return;}
 
-    int onlineCount = 0;
+    int onlineCount = m_contactsManager->onlineContactGroupMembersCount(contactGroup->getGroupID());
+    int memberCount = contactGroup->countOfMembers();
 
-    int memberCount = item->childCount();
-    for(int i=0; i<memberCount; i++){
-        QTreeWidgetItem *memberItem = item->child(i);
-        if(!memberItem){continue;}
+//    int memberCount = item->childCount();
+//    for(int i=0; i<memberCount; i++){
+//        QTreeWidgetItem *memberItem = item->child(i);
+//        if(!memberItem){continue;}
 
-        Contact *contact = contactsHash.key(memberItem);
-        if(!contact){continue;}
-        if(contact->getOnlineState() != IM::ONLINESTATE_OFFLINE && (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) ){
-            onlineCount++;
-        }
-    }
+//        Contact *contact = contactsHash.key(memberItem);
+//        if(!contact){continue;}
+//        if(contact->getOnlineState() != IM::ONLINESTATE_OFFLINE && (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) ){
+//            onlineCount++;
+//        }
+//    }
 
-
-    //TODO
     item->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
 
 }
@@ -254,6 +253,22 @@ void ContactBox::setContactItemHidden(Contact *contact, bool hide){
     if(!item){return;}
 
     setItemHidden(item, hide);
+
+}
+
+void ContactBox::chatMessageReceivedFromContact(Contact *contact){
+
+    if(!contact){return ;}
+
+    QTreeWidgetItem *item = contactsHash.value(contact);
+    if(!item){return;}
+    if(item->parent() == 0){return;}
+
+    ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+    if(!wgt){return ;}
+    wgt->flashFace(true);
+
+    //TODO:Flash group text
 
 }
 
@@ -391,6 +406,11 @@ void ContactBox::handleMouseDoubleClick(QTreeWidgetItem* item){
 
     emit signalContactItemActivated(contact);
 
+    ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+    if(!wgt){return ;}
+    wgt->flashFace(false);
+
+
 }
 
 void ContactBox::handleCurrentItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous){
@@ -416,6 +436,14 @@ void ContactBox::handleCurrentItemChanged(QTreeWidgetItem * current, QTreeWidget
 
 
     updateGeometries();
+
+
+    QTreeWidgetItem *item = current->parent();
+    if(item){
+        item->setForeground(0, QBrush(Qt::red));
+
+
+    }
 
 }
 

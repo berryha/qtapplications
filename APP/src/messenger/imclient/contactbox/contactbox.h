@@ -73,6 +73,9 @@ public:
     void setContactItemHidden(Contact *contact, bool hide);
 
 
+    void chatMessageReceivedFromContact(Contact *contact);
+
+
 protected:
     bool event(QEvent *event);
 //    void contextMenuEvent(QContextMenuEvent *e);
@@ -110,12 +113,11 @@ private:
 
     UserInfoTipWindow *m_userInfoTipWindow;
 
-
-
     QHash<Contact*, QTreeWidgetItem*> contactsHash;
     QHash<ContactGroupBase*, QTreeWidgetItem*> contactGroupsHash;
 
-
+//    QTimer *flashTimer;
+//    QHash<QTreeWidgetItem*, QString> flashItems;
 
 };
 

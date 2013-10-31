@@ -2613,6 +2613,9 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
     if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
         chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, timeString);
     }else{
+
+        m_contactBox->chatMessageReceivedFromContact(contact);
+
         //TODO:
         QHash<QString/*Time*/, QVariant/*Message*/> data;
 
