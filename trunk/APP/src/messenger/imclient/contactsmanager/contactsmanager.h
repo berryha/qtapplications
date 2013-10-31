@@ -68,6 +68,7 @@ public:
 
 
     Contact * createNewContact(const QString &contactID, int groupID = ContactGroupBase::Group_Strangers_ID, const QString &nickname = "", const QString &face = "");
+    int onlineContactGroupMembersCount(int contactGroupID);
 
 public slots:
     //void slotUpdateContactsInfo2();
@@ -96,14 +97,12 @@ public slots:
     void slotChangeContactOnlineState(const QString &contactID, quint8 onlineStateCode, const QString &peerAddress, quint16 peerPort, const QString &greetingInfo);
 
 
-
-
 //    QString getPersonalContactGroupName(int personalContactGroupID) ;
     bool slotAddNewContactGroupToDatabase(quint32 groupID, const QString &groupName);
     bool renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName);
     bool deleteContactGroupFromDatabase(int groupID);
-
     bool resetAllContactGroupInDatabase();
+
 
 
     bool getMyInfoFormLocalDatabase();

@@ -27,15 +27,25 @@ public:
 
     bool isMouseUnderFace();
 
+    void flashFace(bool flash);
+
+
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 //    bool event(QEvent *event);
+
+private slots:
+    void slotFlashFace();
 
 private:
     Ui::ContactWidgetClass ui;
 
 
     Contact *m_contact;
+
+    QTimer *timer;
+    int iconIndex;
 
 
 };
