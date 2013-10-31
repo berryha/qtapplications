@@ -534,9 +534,9 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalCreateOrDeleteContactGroupResultPacketReceived(groupID, groupName, createGroup, result);
 
-        if(contactGroupsVersionOnServer != (user->getPersonalContactGroupsVersion() + 1) ){
-            requestPersonalContactGroupsInfo(socketID);
-        }
+//        if(contactGroupsVersionOnServer != (user->getPersonalContactGroupsVersion() + 1) ){
+//            requestPersonalContactGroupsInfo(socketID);
+//        }
 
         qWarning()<<"--SERVER_RESPONSE_CREATE_OR_DELETE_CONTACT_GROUP";
 

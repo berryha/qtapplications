@@ -67,6 +67,7 @@ public:
     void updateContactGroupItemInfo(ContactGroupBase *contactGroup);
 
     void moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);
+    void moveContact2(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);
 
     void setContactGroupItemExpanded(ContactGroupBase *contactGroup, bool expanded);
     void setContactGroupItemHidden(ContactGroupBase *contactGroup, bool hide);

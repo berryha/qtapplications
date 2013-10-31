@@ -184,10 +184,11 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
 //            return;
 //        }
 
+        if(!item){return;}
+
         contactGroupsHash.remove(contactGroup);
 
         takeTopLevelItem(indexOfTopLevelItem((item)));
-
         delete item;
         item = 0;
 
@@ -225,9 +226,43 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
 
 }
 
+
 void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup){
 
-    QTreeWidgetItem *contactItem = contactsHash.take(contact);
+    QTreeWidgetItem *contactItem = contactsHash.value(contact);
+    if(!contactItem){
+        qCritical()<<"ERROR! Invalid QTreeWidgetItem!";
+        return;
+    }
+
+    QTreeWidgetItem *oldContactGroupItem = contactGroupsHash.value(oldContactGroup);
+    QTreeWidgetItem *newContactGroupItem = contactGroupsHash.value(newContactGroup);
+    if(!oldContactGroupItem || !newContactGroupItem){return;}
+    if(oldContactGroupItem == newContactGroupItem){return;}
+
+
+    removeItemWidget(contactItem, 0);
+    oldContactGroupItem->removeChild(contactItem);
+    updateContactGroupItemInfo(oldContactGroup);
+
+    newContactGroupItem->addChild(contactItem);
+    ContactWidget *wgt = new ContactWidget(contact, this);
+    setItemWidget(contactItem, 0, wgt);
+    updateContactGroupItemInfo(newContactGroup);
+
+
+    updateGeometries();
+
+    if(flashContactItems.contains(contact)){
+        flashContactItems[contact] = newContactGroupItem;
+        wgt->flashFace(true);
+    }
+
+}
+
+void ContactBox::moveContact2(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup){
+
+    QTreeWidgetItem *contactItem = contactsHash.value(contact);
     if(!contactItem){
         qCritical()<<"ERROR! Invalid QTreeWidgetItem!";
         return;
@@ -245,6 +280,7 @@ void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup
     }
     delete wgt;
     oldContactGroupItem->removeChild(contactItem);
+    contactsHash.remove(contact);
     delete contactItem;
     updateContactGroupItemInfo(oldContactGroup);
 

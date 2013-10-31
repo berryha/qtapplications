@@ -1858,17 +1858,11 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
 
     qDebug()<<"--MainWindow::handleTooltipEventOnItem()--contactID:"<<contactID;
 
-
     Contact *contact = m_contactsManager->getUser(contactID);
     if(!contact){
         m_userInfoTipWindow->hideUserInfoTip();
         return;
     }
-
-
-    //QString tip = QString("<b><h4>ID:%1</h4></b>").arg(contactID);
-    //QToolTip::showText(global_mouse_pos, tip);
-
 
     QSize userInfoTipWindowSize = m_userInfoTipWindow->size();
     QPoint p = ui.contactsToolBox->mapToGlobal(QPoint(0,0));
@@ -1877,15 +1871,10 @@ void MainWindow::handleTooltipEventOnItem(const QString &contactID, const QPoint
         x = p.x() + ui.contactsToolBox->width();
     }
 
-    //    qDebug()<<"global_item_topLeft_pos:x:"<<global_item_topLeft_pos.x()<<" y:"<<global_item_topLeft_pos.y();
-    //    qDebug()<<"global_mouse_pos:x:"<<global_mouse_pos.x()<<" y:"<<global_mouse_pos.y();
-    //    qDebug()<<"x:"<<x<<" y:"<<global_item_topLeft_pos.y();
-
     m_userInfoTipWindow->showUserInfoTip(contact, mapTo(this, QPoint(x, global_item_topLeft_pos.y())) );
 
     activateWindow();
     raise();
-
 
 }
 
@@ -2350,15 +2339,21 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
     if(result){
         bool ok = false;
 
+
         if(createGroup){
             ok = m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
-            m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
             m_myself->addContactGroup(groupID, groupName);
+
+            m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
+
+            //m_contactsManager->slotAddNewContactGroupToUI(friendBox, groupID, groupName);
         }else{
+            m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
+
             ok = m_contactsManager->deleteContactGroupFromDatabase(groupID);
-            m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
             m_myself->deleteContactGroup(groupID);
 
+            //m_contactsManager->slotDeleteContactGroupFromUI(friendBox, groupID);
         }
 
         if(ok){
@@ -2366,7 +2361,6 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
             m_myself->saveMyInfoToLocalDatabase();
         }
 
-        m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
 
     }else{
         QString errorMsg = tr("Failed to %1 group '%2'! ").arg(createGroup?tr("create"):tr("delete")).arg(groupName);
