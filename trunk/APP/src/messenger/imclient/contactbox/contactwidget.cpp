@@ -24,10 +24,6 @@ ContactWidget::ContactWidget(Contact *contact, QWidget *parent)
 
     updateContactToUI();
 
-
-//    ui.toolButtonFace->installEventFilter(this);
-//    installEventFilter(this);
-
     setExpanded(false);
 
 
@@ -37,7 +33,12 @@ ContactWidget::ContactWidget(Contact *contact, QWidget *parent)
 
     //ui.labelDisplayName->setStyleSheet("{color: palette(link);}");
 
+//setMouseTracking(true);
 
+//    ui.toolButtonFace->installEventFilter(this);
+    installEventFilter(this);
+
+    setAutoFillBackground(true);
 
 }
 
@@ -57,14 +58,20 @@ void ContactWidget::setExpanded(bool expand){
     if(expand){
         ui.frameTools->show();
         ui.pushButtonFace->setIconSize(QSize(36, 36));
+        setBackgroundRole(QPalette::Highlight);
+
     }else{
         ui.frameTools->hide();
         ui.pushButtonFace->setIconSize(QSize(22, 22));
+        setBackgroundRole(QPalette::Base);
     }
 
     updateGeometry();
 
+}
 
+bool ContactWidget::isExpanded(){
+    return ui.frameTools->isVisible();
 }
 
 bool ContactWidget::isMouseUnderFace(){
@@ -73,46 +80,74 @@ bool ContactWidget::isMouseUnderFace(){
 }
 
 
-//bool ContactWidget::eventFilter(QObject *obj, QEvent *event)
-//{
-//    qDebug()<<"--------0:"<<event->type();
+bool ContactWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    qDebug()<<"ContactWidget::eventFilter:"<<event->type();
 
 
-//    switch (event->type()) {
+    switch (event->type()) {
+    case QEvent::Enter:
+    {
+        //ui.labelDisplayName->setText(ui.labelDisplayName->text()+"(Enter)");
+        qDebug()<<"----QEvent::Enter"<<" "<<this;
+
+        if(!isExpanded()){
+            setBackgroundRole(QPalette::Midlight);
+        }
+
+        return true;
+    }
+        break;
+    case QEvent::Leave:
+    {
+        //ui.labelDisplayName->setText(ui.labelDisplayName->text()+"(Leave)");
+        if(!isExpanded()){
+            setBackgroundRole(QPalette::Base);
+        }
+
+        qDebug()<<"----QEvent::Leave"<<" "<<this;
+
+        return true;
+    }
+        break;
+
+//    case QEvent::MouseButtonPress:
+//    {
+//        setBackgroundRole(QPalette::Highlight);
+//        qDebug()<<"----QEvent::MouseButtonPress"<<" "<<this;
+//        return false;
+//    }
+//        break;
+
+    default:
+        break;
+    }
+
+    return QObject::eventFilter(obj, event);
+
+}
+
+//bool ContactWidget::event(QEvent *event){
+
+//    switch(event->type()){
+
 //    case QEvent::Enter:
 //    {
-//        qDebug()<<"----QEvent::Enter";
-//        setBackgroundRole(QPalette::LinkVisited	);
-//        repaint();
+//        QHoverEvent *e = static_cast<QHoverEvent *>(event);
+//        qDebug()<<"----QEvent::HoverEnter";
 //    }
 //        break;
-//    case QEvent::Leave:
-//    {
-//        qDebug()<<"----QEvent::Leave";
 
-//    }
-//        break;
 //    default:
 //        break;
+
 //    }
 
-//    return QObject::eventFilter(obj, event);
+//    qDebug()<<"-----1-----:"<<event->type();
 
-
-////    if (event->type() == QEvent::HoverEnter) {
-
-//////        if(obj == ui.toolButtonFace){
-////            qDebug()<<"------------!!!------!!!---------------";
-//////        }
-
-////        return true;
-////    } else {
-////        // standard event processing
-////        return QObject::eventFilter(obj, event);
-////    }
+//    return QWidget::event(event);
 
 //}
-
 
 
 

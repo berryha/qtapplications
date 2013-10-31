@@ -23,12 +23,13 @@ public:
 
 
     void setExpanded(bool expand);
+    bool isExpanded();
 
     bool isMouseUnderFace();
 
 protected:
-//    bool eventFilter(QObject *obj, QEvent *event);
-
+    bool eventFilter(QObject *obj, QEvent *event);
+//    bool event(QEvent *event);
 
 private:
     Ui::ContactWidgetClass ui;

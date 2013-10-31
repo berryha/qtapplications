@@ -56,6 +56,8 @@
 
 
 #include <QtWidgets/QItemDelegate>
+//#include <QtWidgets/QStyledItemDelegate>
+
 #include <QtWidgets/QTreeView>
 
 namespace HEHUI {
