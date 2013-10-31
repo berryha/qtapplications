@@ -68,7 +68,7 @@ ContactBox::ContactBox(QWidget *parent) :
     m_userInfoTipWindow = new UserInfoTipWindow(this);
     //connect(m_userInfoTipWindow, SIGNAL(showUserInfoRequested(IMUserBase*)), this, SLOT(showUserInfo(IMUserBase*)));
 
-
+    flashTimer = 0;
 
 //    setStyleSheet("QTreeView::item:hover {background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1); border: 1px solid #bfcde4;}" );
 
@@ -139,6 +139,8 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
         delete item;
         item = 0;
 
+        flashContactItems.remove(contact);
+
     }
 
     updateContactGroupItemInfo(group);
@@ -178,12 +180,21 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
 
     }else{
 
+//        if(item->childCount()){
+//            return;
+//        }
+
         contactGroupsHash.remove(contactGroup);
 
         takeTopLevelItem(indexOfTopLevelItem((item)));
 
         delete item;
         item = 0;
+
+        QList<Contact*> keys = flashContactItems.keys(item);
+        foreach (Contact *c, keys) {
+            flashContactItems.remove(c);
+        }
 
     }
 
@@ -227,6 +238,10 @@ void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup
     oldContactGroupItem->removeChild(contactItem);
     newContactGroupItem->addChild(contactItem);
 
+    if(flashContactItems.contains(contact)){
+        flashContactItems[contact] = newContactGroupItem;
+    }
+
 }
 
 void ContactBox::setContactGroupItemExpanded(ContactGroupBase *contactGroup, bool expanded){
@@ -268,7 +283,10 @@ void ContactBox::chatMessageReceivedFromContact(Contact *contact){
     if(!wgt){return ;}
     wgt->flashFace(true);
 
+    flashContactItems.insert(contact, item->parent());
+
     //TODO:Flash group text
+    startFlashTimer();
 
 }
 
@@ -410,6 +428,10 @@ void ContactBox::handleMouseDoubleClick(QTreeWidgetItem* item){
     if(!wgt){return ;}
     wgt->flashFace(false);
 
+    flashContactItems.remove(contact);
+//    updateContactGroupItemInfo(m_myself->getContactGroup(contact->getContactGroupID()));
+    updateContactGroupItemInfo(contactGroupsHash.key(item->parent()));
+
 
 }
 
@@ -485,7 +507,45 @@ void ContactBox::handleContextMenuEventOnContact(QTreeWidgetItem* item, const QP
 
 //}
 
+void ContactBox::startFlashTimer(){
 
+    if(!flashTimer){
+        flashTimer = new QTimer(this);
+        flashTimer->setInterval(500);
+        connect(flashTimer, SIGNAL(timeout()), this, SLOT(flash()));
+
+    }
+    if(!flashTimer->isActive()){
+        flashIndex = 0;
+        flashTimer->start();
+    }
+
+}
+
+void ContactBox::flash(){
+
+    if(flashContactItems.isEmpty()){
+        flashTimer->stop();
+    }
+
+    flashIndex++;
+    if(flashIndex > 1){
+        flashIndex = 0;
+    }
+
+    QSet<QTreeWidgetItem*> items = flashContactItems.values().toSet();
+    foreach (QTreeWidgetItem *item, items) {
+
+        if(flashIndex){
+            item->setText(0, "");
+        }else{
+            ContactGroupBase *group = contactGroupsHash.key(item);
+            updateContactGroupItemInfo(group);
+        }
+
+    }
+
+}
 
 
 

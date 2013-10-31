@@ -2404,7 +2404,10 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
 
         //Save contact to default group
         quint32 groupID = ContactGroupBase::Group_Friends_ID;
-        Contact *contact =  m_contactsManager->createNewContact(contactID, groupID, userNickName, userFace);
+        Contact *contact = m_contactsManager->getUser(contactID);
+        if(!contact){
+            contact =  m_contactsManager->createNewContact(contactID, groupID, userNickName, userFace);
+        }
         Q_ASSERT(contact);
         //contact->setContactGroupID(groupID);
         //m_contactsManager->saveContactInfoToDatabase(contactID);

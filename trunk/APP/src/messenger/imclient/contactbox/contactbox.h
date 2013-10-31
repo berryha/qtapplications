@@ -104,7 +104,8 @@ private slots:
 
 //    void handleTooltipEventOnContact(QTreeWidgetItem* item, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
 
-
+    void startFlashTimer();
+    void flash();
 
 private:
 
@@ -116,8 +117,9 @@ private:
     QHash<Contact*, QTreeWidgetItem*> contactsHash;
     QHash<ContactGroupBase*, QTreeWidgetItem*> contactGroupsHash;
 
-//    QTimer *flashTimer;
-//    QHash<QTreeWidgetItem*, QString> flashItems;
+    QTimer *flashTimer;
+    int flashIndex;
+    QHash<Contact *, QTreeWidgetItem*/*ContactGroup Item*/> flashContactItems;
 
 };
 
