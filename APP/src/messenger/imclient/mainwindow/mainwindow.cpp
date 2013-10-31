@@ -2176,6 +2176,7 @@ void MainWindow::slotProcessContactGroupsInfo(const QString &contactGroupsInfo, 
 
     QStringList strangers = users.keys();
     strangersGroup->setMembers(strangers);
+    qDebug()<<"--------strangers:"<<strangers;
 
     QList<Contact*> strangersList;
     int strangersGroupID = ContactGroupBase::Group_Strangers_ID;
