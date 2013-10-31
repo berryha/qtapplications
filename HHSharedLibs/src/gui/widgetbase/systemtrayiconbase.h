@@ -51,7 +51,7 @@ public :
     enum TrayIconType{TRAYICON_Normal, TRAYICON_Flash, TRAYICON_Animation};
     
     TrayIconData(QObject *parent = 0);
-    TrayIconData(int dataType, const QString &id,
+    TrayIconData(int dataType, const QString &id, const QString &owner,
                  const QString &toolTip = "", QMenu *menu = 0, const QVariant &data = QVariant(),
                  TrayIconType trayIconType = TRAYICON_Normal, QList<QIcon> iconList = QList<QIcon>(),
                  QObject *parent = 0);
@@ -74,6 +74,13 @@ public :
     }
     QString getID() const{
         return id;
+    }
+
+    void setOwner(const QString &owner){
+        this->owner = owner;
+    }
+    QString getOwner() const{
+        return owner;
     }
     
     void setToolTip(const QString &toolTip){
@@ -131,6 +138,7 @@ public :
 private:
     int dataType;
     QString id;
+    QString owner;
     QString toolTip;
     QMenu *menu;
     QVariant data;
@@ -186,7 +194,11 @@ public:
 
     void appendTrayIconData(const TrayIconData &trayIconData);
     void removeTrayIconData(const QString &trayIconDataID);
-    void removeAllTrayIconData();
+    void removeTrayIconData(const QString &owner, int dataType);
+
+    void removeAllTrayIconData(const QString &owner = "");
+    void removeAllTrayIconData(int dataType);
+
     bool setTrayIconData(const QString &trayIconDataID, const QVariant &data);
 
     void updateSystemTrayIcon();

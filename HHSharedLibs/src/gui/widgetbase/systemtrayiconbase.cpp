@@ -45,6 +45,7 @@ TrayIconData::TrayIconData(QObject *parent)
 
     dataType = -1;
     id = "";
+    owner = "";
     toolTip = "";
     menu = 0;
     data = QVariant();
@@ -56,7 +57,7 @@ TrayIconData::TrayIconData(QObject *parent)
     
 }
 
-TrayIconData::TrayIconData(int dataType, const QString &id, 
+TrayIconData::TrayIconData(int dataType, const QString &id, const QString &owner,
                            const QString &toolTip, QMenu *menu , const QVariant &data, 
                            TrayIconType trayIconType, QList<QIcon> iconList,
                            QObject *parent)
@@ -65,6 +66,7 @@ TrayIconData::TrayIconData(int dataType, const QString &id,
     
     this->dataType = dataType;
     this->id = id;
+    this->owner = owner;
     this->toolTip = toolTip;
     this->menu = menu;
     this->data = data;
@@ -87,6 +89,7 @@ TrayIconData::TrayIconData(const TrayIconData &trayIconData)
 TrayIconData & TrayIconData::operator =(const TrayIconData &trayIconData){
     this->dataType = trayIconData.getDataType();
     this->id = trayIconData.getID();
+    this->owner= trayIconData.getOwner();
     this->toolTip = trayIconData.getToolTip();
     this->menu = trayIconData.getMenu();
     this->data = trayIconData.getData();
@@ -479,7 +482,8 @@ void SystemTrayIconBase::appendTrayIconData(const TrayIconData &trayIconData){
     
     trayIconDataHash.insert(trayIconData.getID(), trayIconData);
      
-    
+    updateSystemTrayIcon();
+
 }
 
 void SystemTrayIconBase::removeTrayIconData(const QString &trayIconDataID){
@@ -492,15 +496,55 @@ void SystemTrayIconBase::removeTrayIconData(const QString &trayIconDataID){
         
 }
 
-void SystemTrayIconBase::removeAllTrayIconData(){
+void SystemTrayIconBase::removeTrayIconData(const QString &owner, int dataType){
+    stop();
+
+//    QHash<QString/*Tray Icon Data ID*/, TrayIconData> trayIconDataHash;
+    QList<TrayIconData> dataList = trayIconDataHash.values();
+    foreach (TrayIconData data, dataList) {
+        if(data.getOwner() == owner && (dataType == data.getDataType()) ){
+            trayIconDataHash.remove(data.getID());
+        }
+    }
+
+    updateSystemTrayIcon();
+
+}
+
+void SystemTrayIconBase::removeAllTrayIconData(const QString &owner){
 
     stop();
-    trayIconDataHash.clear();
+
+    if(owner.isEmpty()){
+        trayIconDataHash.clear();
+    }else{
+        QList<TrayIconData> dataList = trayIconDataHash.values();
+        foreach (TrayIconData data, dataList) {
+            if(data.getOwner() == owner){
+                trayIconDataHash.remove(data.getID());
+            }
+        }
+    }
     
-    updateSystemTrayIcon();
-     
+    updateSystemTrayIcon();  
     
 }
+
+void SystemTrayIconBase::removeAllTrayIconData(int dataType){
+
+    stop();
+
+    QList<TrayIconData> dataList = trayIconDataHash.values();
+    foreach (TrayIconData data, dataList) {
+        if(data.getDataType() == dataType){
+            trayIconDataHash.remove(data.getID());
+        }
+    }
+
+    updateSystemTrayIcon();
+
+}
+
 
 bool SystemTrayIconBase::setTrayIconData(const QString &trayIconDataID, const QVariant &data){
 
