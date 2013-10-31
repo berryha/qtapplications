@@ -74,6 +74,7 @@ public:
 
 
     void chatMessageReceivedFromContact(Contact *contact);
+    void chatMessageFromContactRead(Contact *contact);
 
 
 protected:

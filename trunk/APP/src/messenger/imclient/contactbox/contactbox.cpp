@@ -227,16 +227,31 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
 
 void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup){
 
-    QTreeWidgetItem *contactItem = contactsHash.value(contact);
-    if(!contactItem){return;}
+    QTreeWidgetItem *contactItem = contactsHash.take(contact);
+    if(!contactItem){
+        qCritical()<<"ERROR! Invalid QTreeWidgetItem!";
+        return;
+    }
 
     QTreeWidgetItem *oldContactGroupItem = contactGroupsHash.value(oldContactGroup);
     QTreeWidgetItem *newContactGroupItem = contactGroupsHash.value(newContactGroup);
     if(!oldContactGroupItem || !newContactGroupItem){return;}
     if(oldContactGroupItem == newContactGroupItem){return;}
 
+    ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(contactItem, 0) );
+    if(!wgt){
+        qCritical()<<"ERROR! Invalid ContactWidget!";
+        return;
+    }
+    delete wgt;
     oldContactGroupItem->removeChild(contactItem);
-    newContactGroupItem->addChild(contactItem);
+    delete contactItem;
+    updateContactGroupItemInfo(oldContactGroup);
+
+
+    addOrRemoveContactItem(contact, true);
+
+    updateGeometries();
 
     if(flashContactItems.contains(contact)){
         flashContactItems[contact] = newContactGroupItem;
@@ -287,6 +302,24 @@ void ContactBox::chatMessageReceivedFromContact(Contact *contact){
 
     //TODO:Flash group text
     startFlashTimer();
+
+}
+
+void ContactBox::chatMessageFromContactRead(Contact *contact){
+
+    if(!contact){return ;}
+
+    QTreeWidgetItem *item = contactsHash.value(contact);
+    if(!item){return;}
+    if(item->parent() == 0){return;}
+
+    ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+    if(!wgt){return ;}
+    wgt->flashFace(false);
+
+    flashContactItems.remove(contact);
+    updateContactGroupItemInfo(contactGroupsHash.key(item->parent()));
+
 
 }
 
@@ -456,16 +489,7 @@ void ContactBox::handleCurrentItemChanged(QTreeWidgetItem * current, QTreeWidget
 
     }
 
-
     updateGeometries();
-
-
-    QTreeWidgetItem *item = current->parent();
-    if(item){
-        item->setForeground(0, QBrush(Qt::red));
-
-
-    }
 
 }
 

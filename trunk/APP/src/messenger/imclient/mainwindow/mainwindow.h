@@ -267,6 +267,7 @@ private:
     ContactsManager *m_contactsManager;
     IMUser *m_myself;
     QString m_myUserID;
+    QString m_systemID;
     IM::OnlineState stateBeforeLocking;
 
     PacketHandlerBase *m_packetHandler;
