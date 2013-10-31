@@ -91,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
     m_myself = IMUser::instance();
     m_myUserID = "";
+    m_systemID = "system";
     stateBeforeLocking = IM::ONLINESTATE_OFFLINE;
 
 
@@ -685,7 +686,7 @@ void MainWindow::setupSystemTray() {
     
     QIcon defTrayIcon = 	ImageResource::createIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), "", QIcon::Disabled);
     
-    TrayIconData data(STIDT_Unknown, "DefaultSystemTrayIconData");
+    TrayIconData data(STIDT_Unknown, "DefaultSystemTrayIconData", m_myUserID);
     data.setToolTip(APP_NAME);
     data.setMenu(trayMenu);
     data.setFirstIcon(defTrayIcon);
@@ -763,7 +764,6 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     {
         if(reason == QSystemTrayIcon::DoubleClick){
             systemTray->removeTrayIconData(data.getID());
-            systemTray->updateSystemTrayIcon();
 
             QString contactID = data.getData().toString();
             getNewContactSettings(contactID);
@@ -775,7 +775,6 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     {
         if(reason == QSystemTrayIcon::DoubleClick){
             systemTray->removeTrayIconData(data.getID());
-            systemTray->updateSystemTrayIcon();
 
             QStringList list = data.getData().toString().split(QChar(PACKET_DATA_SEPARTOR));
             if(list.size() == 4){
@@ -790,7 +789,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     {
         QString contactID = data.getID();
         systemTray->removeTrayIconData(contactID);
-        systemTray->updateSystemTrayIcon();
+        m_contactBox->chatMessageFromContactRead(m_contactsManager->getUser(contactID));
 
         QHash<QString/*Time*/, QVariant/*Message*/> hashData = data.getData().toHash();
         QStringList times = hashData.keys();
@@ -808,7 +807,6 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     {
         quint32 interestGroupID = data.getID().toUInt();
         systemTray->removeTrayIconData(data.getID());
-        systemTray->updateSystemTrayIcon();
 
         //QHash<QString/*Time*/, QStringList/*Contact ID, Message*/ > hashData = data.getData().toHash();
         QHash<QString/*Time*/, QVariant/*Contact ID, Message*/ > hashData = data.getData().toHash();
@@ -826,7 +824,6 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
     case STIDT_InterestGroupMemberJoinedOrQuitted:
     {
         systemTray->removeTrayIconData(data.getID());
-        systemTray->updateSystemTrayIcon();
 
         QStringList list = data.getData().toStringList();
         quint32 groupID = list.at(0).toUInt();
@@ -851,22 +848,6 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
 
     }
     
-    
-    //     switch (reason) {
-    //     case QSystemTrayIcon::Trigger:
-
-    //     case QSystemTrayIcon::DoubleClick:
-    //     {
-
-    //     }
-    //         break;
-    //     case QSystemTrayIcon::MiddleClick:
-    //    	 slotAbout();
-    //         break;
-    //     default:
-    //         ;
-    //     }
-
 
 }
 
@@ -1623,7 +1604,11 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
 }
 
 void MainWindow::handleContactItemActivated(Contact *contact){
-    chatWindowManager->slotNewChatWithContact(contact->getUserID());
+
+    QString contactID = contact->getUserID();
+    chatWindowManager->slotNewChatWithContact(contactID);
+
+    systemTray->removeAllTrayIconData(contactID);
 }
 
 void MainWindow::handleTooltipEventOnContactItem(Contact *contact, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos){
@@ -1924,9 +1909,11 @@ void MainWindow::slotMoveContactToGroup(){
         }
         quint32 newGroupID = group->getGroupID();
         clientPacketsParser->moveContactToGroup(m_socketConnectedToServer, contactID, oldGroupID, newGroupID);
+        m_myself->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
         m_contactsManager->moveContact(contactID, oldGroupID, newGroupID);
         m_contactsManager->saveContactInfoToDatabase(contactID);
-        m_contactsManager->moveContactToUI(friendBox, oldGroupID, newGroupID, contactID);
+
+        //m_contactsManager->moveContactToUI(friendBox, oldGroupID, newGroupID, contactID);
 
         m_contactBox->moveContact(contact, m_myself->getContactGroup(oldGroupID), group);
 
@@ -2424,14 +2411,13 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
             getNewContactSettings(contactID);
         }else{
             //TODO
-            TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
+            TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
             data.setToolTip(contactID);
             data.settrayIconType(TrayIconData::TRAYICON_Flash);
             data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
             data.setData(contactID);
             
             systemTray->appendTrayIconData(data);
-            systemTray->updateSystemTrayIcon();
         }
         
     }
@@ -2560,7 +2546,7 @@ void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const 
         showContactRequestFromUser(userID, userNickName, userFace, verificationMessage);
     }else{
 
-        TrayIconData data(STIDT_FriendshipApplicationFromContact, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
+        TrayIconData data(STIDT_FriendshipApplicationFromContact, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
         data.setToolTip(userID);
         data.settrayIconType(TrayIconData::TRAYICON_Flash);
         data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
@@ -2570,7 +2556,6 @@ void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const 
         data.setData(list.join(QChar(PACKET_DATA_SEPARTOR)));
 
         systemTray->appendTrayIconData(data);
-        systemTray->updateSystemTrayIcon();
     }
 
 
@@ -2627,7 +2612,7 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
             data.insertMulti(timeString, message);
             systemTray->setData(contactID, QVariant(data));
         }else{
-            TrayIconData trayIconData(STIDT_ContactChatMessage, contactID);
+            TrayIconData trayIconData(STIDT_ContactChatMessage, contactID, contactID);
             trayIconData.setToolTip(contactID);
             trayIconData.settrayIconType(TrayIconData::TRAYICON_Flash);
             trayIconData.setFirstIcon(ImageResource::createIconForContact(contact->getFace(), IM::ONLINESTATE_ONLINE));
@@ -2706,7 +2691,7 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
             data.insertMulti(timeString, list);
             systemTray->setData(interestGroupIDString, QVariant(data));
         }else{
-            TrayIconData trayIconData(STIDT_InterestGroupChatMessage, interestGroupIDString);
+            TrayIconData trayIconData(STIDT_InterestGroupChatMessage, interestGroupIDString, interestGroupIDString);
             trayIconData.setToolTip(group->getGroupName());
             trayIconData.settrayIconType(TrayIconData::TRAYICON_Flash);
             trayIconData.setFirstIcon(ImageResource::createIconForInterestGroup());
@@ -3141,7 +3126,7 @@ void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const Q
 
         }else{
             //TODO
-            TrayIconData data(STIDT_InterestGroupMemberJoinedOrQuitted, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"));
+            TrayIconData data(STIDT_InterestGroupMemberJoinedOrQuitted, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
             data.setToolTip(tr("System Message"));
             data.settrayIconType(TrayIconData::TRAYICON_Flash);
             data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
@@ -3151,7 +3136,6 @@ void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const Q
             data.setData(list);
 
             systemTray->appendTrayIconData(data);
-            systemTray->updateSystemTrayIcon();
         }
     }
 
