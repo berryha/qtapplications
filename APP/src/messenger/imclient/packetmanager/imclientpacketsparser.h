@@ -458,7 +458,7 @@ public slots:
 
     }
 
-    bool responseAddContactRequestFromUser(int serverSocketID, const QString &userID, bool acceptRequest, const QString &extraMessage = ""){
+    bool responseAddContactRequestFromUser(int serverSocketID, const QString &userID, bool acceptRequest, quint32 groupID = ContactGroupBase::Group_Friends_ID, const QString &extraMessage = ""){
         qDebug()<<"--responseAddContactRequestFromUser(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
@@ -469,7 +469,13 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << userID << acceptRequest << extraMessage;
+        out << userID << acceptRequest;
+        if(acceptRequest){
+            out << groupID;
+        }else{
+            out << extraMessage;
+        }
+
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

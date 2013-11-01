@@ -1233,6 +1233,7 @@ private slots:
 
     void sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message);
 
+    void addContactForUser(int socketID, UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID);
 
 signals:
     void  signalHeartbeatPacketReceived(const QString &clientAddress, const QString &userID);

@@ -525,67 +525,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
-    {
-        qDebug()<<"--CLIENT_REQUEST_ADD_CONTACT";
-        
-        QString userID = peerID;
-        QByteArray encryptedData;
-        in >> encryptedData;
-        
-        UserInfo *userInfo = getUserInfo(userID);
-        if(!userInfo){return;}
-
-        //解密数据
-        QByteArray decryptedData;
-        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
-        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
-        stream.setVersion(QDataStream::Qt_4_7);
-        QString contactID = "", verificationMessage = "";
-        quint32 groupID = ContactGroupBase::Group_Friends_ID;
-        stream >> contactID >> verificationMessage >> groupID;
-        
-        if(userID == contactID){return;}
-        
-        UserInfo *contactInfo = getUserInfo(contactID);
-        if(!contactInfo){return;}
-        
-        if(userInfo->hasFriendContact(contactID)){
-            //sendAddContactResultPacket(contactID, IM::ERROR_RequestDenied, "Contact already exists!", userInfo->getSessionEncryptionKey(), clientAddress, clientPort);
-            //TODO:Send Error Message
-            qWarning()<<QString("'%1' already has contact '%2' !").arg(userID).arg(contactID);
-            return;
-        }
-        
-        if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
-            //quint32 groupID = userInfo->defaultFriendContactGroupID();
-            if(addNewContactForUserFromDB(userID, contactID, groupID)){
-                sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
-                userInfo->addNewContact(contactID, groupID);
-            }else{
-                sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
-            }
-
-            contactInfo->addNewContact(userID, contactInfo->defaultFriendContactGroupID());
-            addNewContactForUserFromDB(contactID, userID, groupID);
-            if(contactInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
-                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
-            }else{
-                //TODO:保存消息到数据库
-                saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage, UserInfo::FAR_ACCEPTED, true);
-            }
-        }else{
-            if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
-                //TODO:保存请求到数据库
-                saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage);
-            }else{
-                sendAddContactRequestFromUserPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
-            }
-        }
-        
-
-    }
-        break;
 
     case quint8(IM::CLIENT_REQUEST_JOIN_OR_QUIT_INTERESTGROUP):
     {
@@ -682,6 +621,70 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
+    case quint8(IM::CLIENT_REQUEST_ADD_CONTACT):
+    {
+        qDebug()<<"--CLIENT_REQUEST_ADD_CONTACT";
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+        QString contactID = "", verificationMessage = "";
+        quint32 groupID = ContactGroupBase::Group_Friends_ID;
+        stream >> contactID >> verificationMessage >> groupID;
+
+        if(userID == contactID){return;}
+
+        UserInfo *contactInfo = getUserInfo(contactID);
+        if(!contactInfo){return;}
+
+        if(userInfo->hasFriendContact(contactID)){
+            //sendAddContactResultPacket(contactID, IM::ERROR_RequestDenied, "Contact already exists!", userInfo->getSessionEncryptionKey(), clientAddress, clientPort);
+            //TODO:Send Error Message
+            qWarning()<<QString("'%1' already has contact '%2' !").arg(userID).arg(contactID);
+            return;
+        }
+
+        if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
+            addContactForUser(socketID, userInfo, contactInfo, groupID);
+
+//            if(addNewContactForUserInDB(userID, contactID, groupID)){
+//                sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+//                userInfo->addNewContact(contactID, groupID);
+//            }else{
+//                sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+//            }
+
+//            contactInfo->addNewContact(userID, contactInfo->defaultFriendContactGroupID());
+//            addNewContactForUserInDB(contactID, userID, groupID);
+//            if(contactInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
+//                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
+//            }else{
+//                //TODO:保存消息到数据库
+//                saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage, UserInfo::FAR_ACCEPTED, true);
+//            }
+
+        }else{
+            if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
+                //TODO:保存请求到数据库
+                saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage);
+            }else{
+                sendAddContactRequestFromUserPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+            }
+        }
+
+
+    }
+        break;
+
     case quint8(IM::CLIENT_REQUEST_MOVE_CONTACT):
     {
         qDebug()<<"~~CLIENT_REQUEST_MOVE_CONTACT";
@@ -735,22 +738,32 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         stream.setVersion(QDataStream::Qt_4_7);
         QString contactID = "", extraMessage = "";
         bool acceptRequest = true;
-        stream >> contactID >> acceptRequest >> extraMessage;
-        
+        quint32 groupID = ContactGroupBase::Group_Friends_ID;
+        stream >> contactID >> acceptRequest;
+
+        if(acceptRequest){
+            stream >> groupID;
+        }else{
+            stream >> extraMessage;
+        }
+
         UserInfo *contactInfo = getUserInfo(contactID);
         if(!contactInfo){return;}
+
         
         //TODO:
         if(acceptRequest){
-            contactInfo->addNewContact(userID, UserInfo::defaultFriendContactGroupID());
+            addContactForUser(socketID, userInfo, contactInfo, groupID);
 
-            if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
-                //TODO:保存请求到数据库
-                saveFriendshipApplyRequestToDB(contactID, userID, extraMessage, UserInfo::FAR_ACCEPTED, false, true);
-                return;
-            }else{
-                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
-            }
+//            contactInfo->addNewContact(userID, UserInfo::defaultFriendContactGroupID());
+
+//            if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
+//                //TODO:保存请求到数据库
+//                saveFriendshipApplyRequestToDB(contactID, userID, extraMessage, UserInfo::FAR_ACCEPTED, false, true);
+//                return;
+//            }else{
+//                sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
+//            }
 
         }else{
             if(!extraMessage.trimmed().isEmpty()){
@@ -1411,6 +1424,32 @@ void ServerPacketsParser::sendInterestGroupChatMessageToMembers(quint32 interest
      foreach (UserInfo *user, onlineMembers) {
          sendInterestGroupChatMessagesToMemberPacket(user->getSocketID(), interestGroupID, senderID, message, user->getSessionEncryptionKey());
      }
+
+}
+
+void ServerPacketsParser::addContactForUser(int socketID, UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID){
+
+    QString userID = userInfo->getUserID();
+    QString contactID = contactInfo->getUserID();
+
+    //quint32 groupID = userInfo->defaultFriendContactGroupID();
+    if(addNewContactForUserInDB(userID, contactID, groupID)){
+        sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+        userInfo->addNewContact(contactID, groupID);
+    }else{
+        sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+    }
+
+    contactInfo->addNewContact(userID, contactInfo->defaultFriendContactGroupID());
+    addNewContactForUserInDB(contactID, userID, groupID);
+
+    if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
+        //TODO:保存请求到数据库
+        saveFriendshipApplyRequestToDB(contactID, userID, "", UserInfo::FAR_ACCEPTED, false, true);
+        return;
+    }else{
+        sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
+    }
 
 }
 

@@ -68,10 +68,12 @@ AddContactDialog::AddContactDialog(Contact *user, const QString &requestMessage,
     ui.pushButtonReject->setText(tr("&Reject"));
     ui.pushButtonReject->setEnabled(true);
     ui.pushButtonReject->show();
+
     ui.pushButtonAddAsAContact->setText(tr("&Accept"));
+//    ui.pushButtonAddAsAContact->setFocus();
 
     initContactGroupCombox();
-    ui.lineEditRename->setFocus();
+    //ui.lineEditRename->setFocus();
 
 
 
@@ -124,6 +126,8 @@ bool AddContactDialog::requestRejected(){
 void AddContactDialog::on_pushButtonAddAsAContact_clicked(){
     m_rejectRequest = false;
 
+    accept();
+    return;
 
     if(ui.groupBoxSettings->isVisible() || m_requestToAddContact){
         accept();
@@ -191,13 +195,14 @@ inline void AddContactDialog::initUI(){
 
 inline void AddContactDialog::initContactGroupCombox(){
 
-    //ui.comboBoxGroup->addItems(m_imUser->contactGroupNames());
+    ui.comboBoxGroup->clear();
+
     QList<ContactGroupBase *> groups = m_imUser->getContactGroups();
-    groups.removeAll(m_imUser->getContactGroup(ContactGroupBase::Group_Friends_ID));
+    //groups.removeAll(m_imUser->getContactGroup(ContactGroupBase::Group_Friends_ID));
     foreach (ContactGroupBase *group, groups) {
         ui.comboBoxGroup->addItem(group->getGroupName(), QVariant(group->getGroupID()));
     }
-    ui.comboBoxGroup->insertItem(0, ContactGroupBase::Group_Friends_Name, QVariant(ContactGroupBase::Group_Friends_ID));
+    //ui.comboBoxGroup->insertItem(0, ContactGroupBase::Group_Friends_Name, QVariant(ContactGroupBase::Group_Friends_ID));
     ui.comboBoxGroup->setCurrentIndex(0);
 
 

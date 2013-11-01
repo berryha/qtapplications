@@ -651,7 +651,7 @@ bool UsersManager::getUserLastLoginInfo(UserInfo *userInfo){
 
 }
 
-bool UsersManager::addNewContactForUserFromDB(const QString &userID, const QString &contactID, quint32 contactGroupID){
+bool UsersManager::addNewContactForUserInDB(const QString &userID, const QString &contactID, quint32 contactGroupID){
 
 
     if(!db.isValid()){

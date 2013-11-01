@@ -218,42 +218,17 @@
                   <enum>Qt::TabFocus</enum>
                  </property>
                  <property name="currentIndex">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
-                 <widget class="QWidget" name="friendsPage">
+                 <widget class="QWidget" name="pageContacts">
                   <property name="geometry">
                    <rect>
                     <x>0</x>
                     <y>0</y>
                     <width>237</width>
-                    <height>262</height>
+                    <height>292</height>
                    </rect>
                   </property>
-                  <property name="focusPolicy">
-                   <enum>Qt::TabFocus</enum>
-                  </property>
-                  <attribute name="label">
-                   <string>Contacts</string>
-                  </attribute>
-                  <layout class="QGridLayout" name="friendsPageGridLayout">
-                   <property name="leftMargin">
-                    <number>3</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>3</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>3</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>3</number>
-                   </property>
-                   <property name="spacing">
-                    <number>1</number>
-                   </property>
-                  </layout>
-                 </widget>
-                 <widget class="QWidget" name="pageContacts">
                   <attribute name="label">
                    <string>Contacts</string>
                   </attribute>
@@ -280,8 +255,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>237</width>
-                    <height>262</height>
+                    <width>98</width>
+                    <height>76</height>
                    </rect>
                   </property>
                   <property name="focusPolicy">
@@ -320,8 +295,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>237</width>
-                    <height>262</height>
+                    <width>98</width>
+                    <height>76</height>
                    </rect>
                   </property>
                   <property name="focusPolicy">

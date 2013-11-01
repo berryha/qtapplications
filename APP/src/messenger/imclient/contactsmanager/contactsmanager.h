@@ -151,7 +151,7 @@ private:
 
     QHash<quint32/*Grup ID*/, InterestGroup*> interestGroupsHash;
 
-    IMUser *m_imUser;
+    IMUser *m_myself;
 
 
 
