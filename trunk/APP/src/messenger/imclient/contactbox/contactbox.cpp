@@ -248,6 +248,7 @@ void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup
     newContactGroupItem->addChild(contactItem);
     ContactWidget *wgt = new ContactWidget(contact, this);
     setItemWidget(contactItem, 0, wgt);
+    contactItem->setSizeHint(0, wgt->sizeHint());
     updateContactGroupItemInfo(newContactGroup);
 
 

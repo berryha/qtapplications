@@ -287,6 +287,11 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
     }
 
 
+    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages = contact->takeUnreadMessages();
+    foreach (QString time, unreadMessages.keys()) {
+        ccw->appendMessageReceivedFromContact(unreadMessages.value(time), 0, time);
+    }
+
 
     showNormal();
     activateWindow();

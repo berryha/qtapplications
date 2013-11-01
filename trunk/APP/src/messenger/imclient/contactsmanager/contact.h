@@ -106,6 +106,9 @@ public:
     bool isStranger();
     bool isBlacklisted();
 
+    void appandUnreadMessage(const QString &time, const QString &message);
+    QMap<QString/*Time String*/, QString/*Message*/> takeUnreadMessages();
+
 
 private:
 
@@ -117,6 +120,8 @@ private:
     bool m_showRemarkName;
 
     int m_socketID;
+
+    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages;
 
 
 
