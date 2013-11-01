@@ -1539,7 +1539,7 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
     QList<ContactGroupBase *> groups = m_myself->getContactGroups();
     groups.removeAll(m_myself->getContactGroup(oldGroupID));
 
-    if(!groups.isEmpty()){
+    if(!groups.isEmpty() && contact->isFriend()){
         QMenu *menuMoveContactToGroup = menu.addMenu(tr("Move To"));
         foreach (ContactGroupBase *group, groups) {
             QAction *action = menuMoveContactToGroup->addAction(group->getGroupName());
@@ -1554,22 +1554,40 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
 //    menuMoveContactToGroup->addAction(&actionMoveToBlacklist);
 
 
+    QAction actionAddAsContact(tr("Add to Contact List"), &menu);
+    if(!contact->isFriend()){
+        menu.addAction(&actionAddAsContact);
+    }
+
     QAction actionDeleteContact(tr("Delete Contact"), &menu);
     menu.addAction(&actionDeleteContact);
 
     QAction actionBlockContact(tr("Block Contact"), &menu);
     menu.addAction(&actionBlockContact);
 
+
     QAction *executedAction = menu.exec(global_mouse_pos);
-    if(executedAction == &actionDeleteContact){
+    if(executedAction == &actionAddAsContact){
+        if(contact->isStranger()){
+            AddContactDialog dlg(contact, true, this);
+            if(dlg.exec() != QDialog::Accepted){return;}
+            addContact(contactID, dlg.getMessage());
+
+        }else if(contact->isBlacklisted()){
+            AddContactDialog dlg(contact, true, this);
+            if(dlg.exec() != QDialog::Accepted){return;}
+            slotRequestDeleteContact(contactID);
+            addContact(contactID, dlg.getMessage());
+        }
+
+    }else if(executedAction == &actionDeleteContact){
         if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
             //TODO:Close chat window
             if(!chatWindowManager->closeContactChatWindow(contact)){
                 return;
             }
-            m_contactsManager->slotdeleteContactFromDatabase(contact);
-
             m_contactBox->addOrRemoveContactItem(contact, false);
+            m_contactsManager->slotdeleteContactFromDatabase(contact);
 
         }else if(oldGroupID == ContactGroupBase::Group_Blacklist_ID){
             slotRequestDeleteContact(contactID);
