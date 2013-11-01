@@ -24,7 +24,6 @@
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedGUI/hmainwindowbase.h"
 #include "HHSharedGUI/hsystemtrayiconbase.h"
-#include "HHSharedGUI/ItemBox"
 
 
 
@@ -33,7 +32,7 @@
 namespace HEHUI {
 
 
-class MainWindow: public MainWindowBase, public ItemBoxEventHandler  {
+class MainWindow: public MainWindowBase {
     Q_OBJECT
 
 public:
@@ -82,24 +81,12 @@ private slots:
 
     void handleContextMenuEventOnContactGroup(ContactGroupBase *contactGroup, const QPoint &global_mouse_pos);
     void handleContextMenuEventOnContact(Contact *contact, const QPoint &global_mouse_pos);
-    void handleContactItemActivated(Contact *contact);
+    void requestChatWithContact(Contact *contact);
     void handleTooltipEventOnContactItem(Contact *contact, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
-
-
 
     void showProgressDialog(const QString &labelText = "", const QString & cancelButtonText = "", int minimum = 0, int maximum = 0);
     void hideProgressDialog();
 
-
-    //ItemBoxEventHandler
-//    void handleItemPressed(const QString &item_id, const QPoint &globalPos);
-//    void handleItemDoubleClicked(const QModelIndex & index);
-//    void handleItemEntered(const QModelIndex & index );
-
-    void handleItemActivated(const QString &id);
-    void handleContextMenuEventOnCategory(const QString &cat_id, const QPoint &global_mouse_pos, QMenu *contextMenu);
-    void handleContextMenuEventOnItem(const QString &item_id, const QPoint &global_mouse_pos, QMenu *contextMenu);
-    void handleTooltipEventOnItem(const QString &item_id, const QPoint &global_item_topLeft_pos, const QPoint &global_mouse_pos);
 
 
     void slotMoveContactToGroup();
@@ -246,11 +233,7 @@ private:
     QMenu *pluginsMenu;
 
     ChatWindowManager *chatWindowManager;
-//    ExpandListViewManager *expandListViewManager;
-//    ItemBoxEventHandler *m_boxCore;
-    ItemBoxWidget *friendBox;
-    //    ExpandListView *teamWidgetBox;
-    //    ExpandListView *blacklistWidgetBox;
+
 
     ContactBox  *m_contactBox;
 

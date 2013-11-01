@@ -223,6 +223,16 @@ bool Contact::isBlacklisted(){
     return contactGroupID == defaultBlacklistContactGroupID();
 }
 
+void Contact::appandUnreadMessage(const QString &time, const QString &message){
+    unreadMessages.insertMulti(time, message);
+}
+
+QMap<QString/*Time String*/, QString/*Message*/> Contact::takeUnreadMessages(){
+
+    QMap<QString, QString> messages = unreadMessages;
+    unreadMessages.clear();
+    return messages;
+}
 
 
 

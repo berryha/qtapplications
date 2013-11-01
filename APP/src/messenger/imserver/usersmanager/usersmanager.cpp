@@ -1588,7 +1588,7 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
     QSqlQuery query(db);
 
     //QString statement = QString("select ReceiverID, Result, ExtraMessage from friendshipapply where SenderID='%1' and SenderRead = '0' ").arg(userID);
-    QString statement = QString("call sp_GetFriendshipApplyRequestSentByUser('%1'); ").arg(userID);
+    QString statement = QString("call sp_FriendshipApplyRequest_SentByUser_Get('%1'); ").arg(userID);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not get friendship application info from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -1611,7 +1611,7 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
     }
 
     //statement = QString("select SenderID, Result, ExtraMessage from friendshipapply where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
-    statement = QString("call sp_GetFriendshipApplyRequestSentToUser('%1'); ").arg(userID);
+    statement = QString("call sp_FriendshipApplyRequest_SentToUser_Get('%1'); ").arg(userID);
     query.clear();
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -1635,7 +1635,7 @@ bool UsersManager::getFriendshipApplyRequest(const QString &userID, QList<QStrin
 //    query.exec(statement);
 //    statement = QString("update friendshipapply set ReceiverRead = '1' where ReceiverID='%1' and ReceiverRead = '0' ").arg(userID);
 
-    statement = QString("call sp_UpdateFriendshipApplyRequestForUser('%1'); ").arg(userID);
+    statement = QString("call sp_FriendshipApplyRequest_ForUser_Update('%1'); ").arg(userID);
     query.exec(statement);
 
 
