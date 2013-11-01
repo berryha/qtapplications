@@ -40,7 +40,7 @@ ContactsManager::ContactsManager(QObject *parent)
     //userPrivateDataFilePath = Settings::instance()->getUserPrivateDataFilePath(IMUser::instance()->getUserID());
     //openDatabase();
 
-    m_imUser = IMUser::instance();
+    m_myself = IMUser::instance();
     //Q_ASSERT_X(m_imUser->getOnlineState() != IM::ONLINESTATE_OFFLINE, "ContactsManager::ContactsManager(QObject *parent)", "User is not online!");
 
 
@@ -418,6 +418,12 @@ Contact * ContactsManager::createNewContact(const QString &contactID, int groupI
 
 
     Q_ASSERT(!contactHash.contains(contactID));
+    Q_ASSERT(contactID != m_myself->getUserID());
+
+    if(contactID == m_myself->getUserID()){
+        qCritical()<<"ERROR! Contact ID is myself!";
+        return 0;
+    }
 
     Contact *contact = 0;
 //    if(contactHash.contains(contactID)){
@@ -443,7 +449,7 @@ Contact * ContactsManager::createNewContact(const QString &contactID, int groupI
 
 int ContactsManager::onlineContactGroupMembersCount(int contactGroupID){
 
-    ContactGroupBase *group = m_imUser->getContactGroup(contactGroupID);
+    ContactGroupBase *group = m_myself->getContactGroup(contactGroupID);
     if(!group){return 0;}
 
     int onlineCount = 0;
@@ -489,7 +495,7 @@ void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
 //        quint32 groupInfoVersion = QVariant(model->record(i).value("GroupInfoVersion")).toUInt();
 //        quint32 memberListVersion = QVariant(model->record(i).value("MemberListVersion")).toUInt();
 
-        ContactGroupBase *group = m_imUser->addContactGroup(groupID, groupName);
+        ContactGroupBase *group = m_myself->addContactGroup(groupID, groupName);
         Q_ASSERT(group);
 //        group->setGroupName(groupName);
 //        group->setGroupInfoVersion(groupInfoVersion);
@@ -577,7 +583,7 @@ void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
 //    expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Blacklist_ID), true);
 
-    if(!m_imUser->isStrangersShown()){
+    if(!m_myself->isStrangersShown()){
         expandListView->setCategoryHidden(QString::number(ContactGroupBase::Group_Strangers_ID), true);
     }
 
@@ -689,7 +695,7 @@ void ContactsManager::slotFetchRecentChatsFromDB(QStringList *contacts, QList<qu
 
     QSqlQuery query(localUserDataDB);
 
-    QString statement = QString("SELECT DISTINCT SenderID AS Contacts FROM contactchatmessages where SenderID <> '%1' and DeliveryTime > '%2' UNION SELECT DISTINCT ReceiverID FROM contactchatmessages where ReceiverID <> '%1' and DeliveryTime > '%2'; ").arg(m_imUser->getUserID()).arg(timeString);
+    QString statement = QString("SELECT DISTINCT SenderID AS Contacts FROM contactchatmessages where SenderID <> '%1' and DeliveryTime > '%2' UNION SELECT DISTINCT ReceiverID FROM contactchatmessages where ReceiverID <> '%1' and DeliveryTime > '%2'; ").arg(m_myself->getUserID()).arg(timeString);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not query recent contacts from database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
@@ -937,13 +943,13 @@ bool ContactsManager::deleteContact(const QString &contactID, bool addToBlacklis
     int oldGroupID = contact->getContactGroupID();
     if(addToBlacklist){
         contact->setContactGroupID(ContactGroupBase::Group_Blacklist_ID);
-        m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Blacklist_ID);
+        m_myself->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Blacklist_ID);
     }else{
         contact->setContactGroupID(ContactGroupBase::Group_Strangers_ID);
         //if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
         //    m_imUser->strangersGroup()->deleteMember(contactID);
         //}else{
-            m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Strangers_ID);
+            m_myself->moveContactToAnotherGroup(contactID, oldGroupID, ContactGroupBase::Group_Strangers_ID);
         //}
     }
 
@@ -958,7 +964,7 @@ bool ContactsManager::moveContact(const QString &contactID, quint32 oldGroupID, 
     }
     contact->setContactGroupID(newGroupID);
 
-    m_imUser->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
+    m_myself->moveContactToAnotherGroup(contactID, oldGroupID, newGroupID);
 
     return true;
 
@@ -1009,7 +1015,7 @@ bool ContactsManager::slotAddNewContactToDatabase(Contact *contact){
 
     contactHash.insert(contact->getUserID(), contact);
 
-    m_imUser->addNewContact(contactUID, contactsGroupID);
+    m_myself->addNewContact(contactUID, contactsGroupID);
 
     return true;
     
@@ -1043,7 +1049,7 @@ bool ContactsManager::slotdeleteContactFromDatabase(Contact *contact){
         return false;
     }
 
-    m_imUser->deleteContact(contactID);
+    m_myself->deleteContact(contactID);
 
     delete contact;
     contact = 0;
@@ -1138,7 +1144,7 @@ bool ContactsManager::slotAddNewContactGroupToDatabase(quint32 groupID, const QS
 
 bool ContactsManager::renameContactGroupToDatabase(quint32 groupID, const QString &new_groupName){
 
-    if(!m_imUser->hasContactGroup(groupID)){
+    if(!m_myself->hasContactGroup(groupID)){
         return false;
     }
 
@@ -1168,7 +1174,7 @@ bool ContactsManager::renameContactGroupToDatabase(quint32 groupID, const QStrin
 bool ContactsManager::deleteContactGroupFromDatabase(int groupID){
     qDebug()<<"--ContactsManager::deleteContactGroupFromDatabase(..) groupID:"<<groupID;
 
-    if(!m_imUser->hasContactGroup(groupID)){
+    if(!m_myself->hasContactGroup(groupID)){
         qCritical()<<"ERROR! Contact group does not exist!"<<" Group ID:"<<groupID;
         return false;
     }
@@ -1240,7 +1246,7 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
 
     //IMUser *m_imUser = IMUser::instance();
     QSqlRecord record;
-    QString statement = QString("select * from my_detailed_info where UserID='%2' ").arg(m_imUser->getUserID());
+    QString statement = QString("select * from my_detailed_info where UserID='%2' ").arg(m_myself->getUserID());
 
     
     if(!query.exec(statement)){
@@ -1258,9 +1264,9 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
     //    }
     query.first();
     if(!query.isValid()){
-        qCritical()<<QString("Can not query user info! Invalid record! User ID:%1").arg(m_imUser->getUserID());
+        qCritical()<<QString("Can not query user info! Invalid record! User ID:%1").arg(m_myself->getUserID());
         
-        statement = QString("Insert Into my_detailed_info(UserID) Values('%1')").arg(m_imUser->getUserID());
+        statement = QString("Insert Into my_detailed_info(UserID) Values('%1')").arg(m_myself->getUserID());
         if(!query.exec(statement)){
             qCritical()<<"Can not insert data! "<<query.lastError().text();
         }
@@ -1316,46 +1322,46 @@ bool ContactsManager::getMyInfoFormLocalDatabase(){
 ///////////////////////////////
 
 //    m_imUser->setSysID(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_SysID)))).toUInt());
-    m_imUser->setTrueName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_TrueName)))).toString());
-    m_imUser->setNickName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_NickName)))).toString());
-    m_imUser->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Gender)))).toUInt()));
-    m_imUser->setAge(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Age)))).toInt());
-    m_imUser->setFace(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Face)))).toString());
+    m_myself->setTrueName(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_TrueName)))).toString());
+    m_myself->setNickName(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_NickName)))).toString());
+    m_myself->setGender(IMUserBase::Gender(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_Gender)))).toUInt()));
+    m_myself->setAge(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_Age)))).toInt());
+    m_myself->setFace(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_Face)))).toString());
 
-    m_imUser->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalContactGroupsInfoVersion)))).toInt());
-    m_imUser->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
-    m_imUser->setPersonalMessageInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalMessageInfoVersion)))).toInt());
+    m_myself->setPersonalContactGroupsVersion(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalContactGroupsInfoVersion)))).toInt());
+    m_myself->setInterestGroupInfoVersion(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_InterestGroupsInfoVersion)))).toUInt());
+    m_myself->setPersonalMessageInfoVersion(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalMessageInfoVersion)))).toInt());
 
-    m_imUser->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
-    m_imUser->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
-    m_imUser->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_FriendshipApply)))).toUInt()));
-    m_imUser->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_ShortTalk)))).toUInt()));
-    m_imUser->setUserRole(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Role)))).toInt());
-    m_imUser->setDescription(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_Description)))).toString());
-    m_imUser->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_AccountState)))).toUInt()));
-    m_imUser->setPersonalMessage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalMessage)))).toString());
+    m_myself->setPersonalSummaryInfoVersion(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalSummaryInfoVersion)))).toInt());
+    m_myself->setPersonalDetailInfoVersion(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalDetailInfoVersion)))).toInt());
+    m_myself->setFriendshipApply(IMUserBase::FriendshipApply(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_FriendshipApply)))).toUInt()));
+    m_myself->setShortTalk(IMUserBase::ShortTalk(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_ShortTalk)))).toUInt()));
+    m_myself->setUserRole(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_Role)))).toInt());
+    m_myself->setDescription(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_Description)))).toString());
+    m_myself->setAccountState(IMUserBase::AccountState(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_AccountState)))).toUInt()));
+    m_myself->setPersonalMessage(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalMessage)))).toString());
 
-    m_imUser->setHomeAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomeAddress)))).toString());
-    m_imUser->setHomePhoneNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomePhoneNumber)))).toString());
-    m_imUser->setHomeZipCode(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_HomeZipCode)))).toString());
-    m_imUser->setPersonalHomepage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalHomepage)))).toString());
-    m_imUser->setPersonalEmailAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_PersonalEmailAddress)))).toString());
+    m_myself->setHomeAddress(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_HomeAddress)))).toString());
+    m_myself->setHomePhoneNumber(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_HomePhoneNumber)))).toString());
+    m_myself->setHomeZipCode(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_HomeZipCode)))).toString());
+    m_myself->setPersonalHomepage(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalHomepage)))).toString());
+    m_myself->setPersonalEmailAddress(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_PersonalEmailAddress)))).toString());
 
-    m_imUser->setCompanyName(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_CompanyName)))).toString());
-    m_imUser->setJobTitle(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_JobTitle)))).toString());
-    m_imUser->setBusinessAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessAddress)))).toString());
-    m_imUser->setBusinessPhoneNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessPhoneNumber)))).toString());
-    m_imUser->setBusinessZipCode(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessZipCode)))).toString());
-    m_imUser->setBusinessFaxNumber(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessFaxNumber)))).toString());
-    m_imUser->setBusinessHomepage(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessHomepage)))).toString());
-    m_imUser->setBusinessEmailAddress(QVariant(query.value(record.indexOf(m_imUser->databaseColumnName(IM::PI_BusinessEmailAddress)))).toString());
+    m_myself->setCompanyName(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_CompanyName)))).toString());
+    m_myself->setJobTitle(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_JobTitle)))).toString());
+    m_myself->setBusinessAddress(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessAddress)))).toString());
+    m_myself->setBusinessPhoneNumber(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessPhoneNumber)))).toString());
+    m_myself->setBusinessZipCode(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessZipCode)))).toString());
+    m_myself->setBusinessFaxNumber(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessFaxNumber)))).toString());
+    m_myself->setBusinessHomepage(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessHomepage)))).toString());
+    m_myself->setBusinessEmailAddress(QVariant(query.value(record.indexOf(m_myself->databaseColumnName(IM::PI_BusinessEmailAddress)))).toString());
 
 
 
 ///////////////////////////////
 
 
-    m_imUser->clearUpdatedProperties();
+    m_myself->clearUpdatedProperties();
 
     return true;
     
@@ -1368,7 +1374,7 @@ bool ContactsManager::saveMyInfoToDatabase(){
     qDebug()<<"--ContactsManager::saveMyInfoToDatabase()";
     
     //IMUser *info = IMUser::instance();
-    IMUser *info = m_imUser;
+    IMUser *info = m_myself;
     QStringList updateSQLStatements;
     QString summaryInfoStatement = info->getUpdateSQLStatement(true);
     QString detailInfoStatement = info->getUpdateSQLStatement(false);
@@ -1692,7 +1698,7 @@ bool ContactsManager::initLocalDatabase(QString *errorMessage){
     }
 
 
-    QString statement = QString("insert into my_detailed_info(UserID) values('%1')").arg(m_imUser->getUserID());
+    QString statement = QString("insert into my_detailed_info(UserID) values('%1')").arg(m_myself->getUserID());
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not initialize user database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());

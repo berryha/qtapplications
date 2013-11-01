@@ -81,7 +81,7 @@ public:
     bool saveUserLastLoginInfo(UserInfo* userInfo, const QString &userHostAddress, quint16 userHostPort, const QString &deviceInfo);
     bool saveUserLastLogoutInfo(UserInfo* userInfo);
     
-    bool addNewContactForUserFromDB(const QString &userID, const QString &contactID, quint32 contactGroupID);
+    bool addNewContactForUserInDB(const QString &userID, const QString &contactID, quint32 contactGroupID);
     bool deleteContactForUserFromDB(const QString &userID, const QString &contactID, bool deleteMeFromOpposition = false, bool addToBlacklist = false);
     bool moveContactForUserInDB(UserInfo *userInfo, const QString &contactID, quint32 newGroupID);
 

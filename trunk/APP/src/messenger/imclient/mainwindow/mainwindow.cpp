@@ -2293,9 +2293,6 @@ void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const 
         systemTray->appendTrayIconData(data);
     }
 
-
-
-
 }
 
 void MainWindow::showContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage){
@@ -2307,9 +2304,10 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
     AddContactDialog dlg(&user, verificationMessage, this);
     if(dlg.exec() == QDialog::Accepted){
         if(dlg.requestRejected()){
-            clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, false, dlg.getMessage());
+            clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, false, 0, dlg.getMessage());
         }else{
-            clientPacketsParser->addContact(m_socketConnectedToServer, userID, dlg.getMessage(), dlg.getGroupID());
+            clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, true, dlg.getGroupID(), "");
+//            clientPacketsParser->addContact(m_socketConnectedToServer, userID, dlg.getMessage(), dlg.getGroupID());
         }
     }
 
@@ -2700,10 +2698,8 @@ void MainWindow::slotProcessInterestGroupInfo(const QString &interestGroupInfoFr
 }
 
 void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGroupMembersInfoFromServer, quint32 interestGroupMembersInfoVersionOnServer, quint32 groupID){
-    qDebug()<<"--MainWindow::slotProcessInterestGroupMembersInfo(...)";
-    //qDebug()<<"interestGroupMembersInfoFromServer:"<<interestGroupMembersInfoFromServer;
-    qDebug()<<"interestGroupMembersInfoVersionOnServer:"<<interestGroupMembersInfoVersionOnServer;
-    qDebug()<<"groupID:"<<groupID;
+    qDebug()<<"--MainWindow::slotProcessInterestGroupMembersInfo(...) "<<" groupID:"<<groupID;
+    //qDebug()<<"interestGroupMembersInfoVersionOnServer:"<<interestGroupMembersInfoVersionOnServer;
 
     InterestGroup *interestGroup = m_contactsManager->getInterestGroup(groupID);
     if(!interestGroup){
@@ -2718,7 +2714,11 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
         QString contactID = list.at(0);
         quint32 contactInfoVersion = list.at(1).toUInt();
         InterestGroup::MemberRole memberRole = InterestGroup::MemberRole(list.at(2).toUInt());
-        qWarning()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
+        membersHash.insert(contactID, memberRole);
+
+        qDebug()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
+        if(contactID == m_myself->getUserID()){continue;}
+
         Contact *contact = m_contactsManager->getUser(contactID);
         if(!contact){
             contact =  m_contactsManager->createNewContact(contactID);
@@ -2730,8 +2730,6 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
         }
-        
-        membersHash.insert(contactID, memberRole);
         
     }
     
