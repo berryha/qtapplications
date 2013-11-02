@@ -813,7 +813,7 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
-    bool sendAddContactResultPacket(int peerSocketID, const QString &contactID, const QString &contactNickName, const QString &contactFace, quint8 errorTypeCode, const QString &reasonMessage, const QByteArray &sessionEncryptionKey, const QString &targetHostAddress, quint16 targetHostPort){
+    bool sendAddContactResultPacket(int peerSocketID, const QString &contactID, const QString &contactNickName, const QString &contactFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage, const QByteArray &sessionEncryptionKey, const QString &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendAddContactResultPacket(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -823,7 +823,8 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << contactNickName << contactFace << errorTypeCode << reasonMessage;
+        out << contactID << contactNickName << contactFace << contactGroupID << errorTypeCode << reasonMessage;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
@@ -1233,7 +1234,7 @@ private slots:
 
     void sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message);
 
-    void addContactForUser(int socketID, UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID);
+    void addContactForUser(UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID);
 
 signals:
     void  signalHeartbeatPacketReceived(const QString &clientAddress, const QString &userID);

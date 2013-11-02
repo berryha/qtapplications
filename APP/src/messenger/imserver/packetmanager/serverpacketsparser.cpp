@@ -326,9 +326,9 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     UserInfo::FriendshipApplyResult faResult = UserInfo::FriendshipApplyResult(infoList.at(1).toUInt());
                     QString message = infoList.at(2);
                     if(faResult == UserInfo::FAR_ACCEPTED ){
-                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), userInfo->groupIDThatContactBelongsTo(receiverID), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
                     }else{
-                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
+                        sendAddContactResultPacket(socketID, receiverID, receiver->getNickName(), receiver->getFace(), -1, IM::ERROR_RequestDenied, message, sessionEncryptionKey, peerAddress.toString(), userInfo->getLastLoginExternalHostPort() );
                     }
                 }
             }
@@ -343,7 +343,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     if(faResult == UserInfo::FAR_UNKNOWN ){
                         sendAddContactRequestFromUserPacket(socketID, senderID, sender->getNickName(), sender->getFace(), message, sessionEncryptionKey, peerAddress, peerPort );
                     }else if(faResult == UserInfo::FAR_ACCEPTED ){
-                        sendAddContactResultPacket(socketID, senderID, sender->getNickName(), sender->getFace(), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), peerPort);
+                        sendAddContactResultPacket(socketID, senderID, sender->getNickName(), sender->getFace(), userInfo->groupIDThatContactBelongsTo(senderID), IM::ERROR_NoError, message, sessionEncryptionKey, peerAddress.toString(), peerPort);
                     }/*else{
                         sendAddContactResultPacket(senderID, sender->getNickName(), sender->getFace(), IM::ERROR_RequestDenied, message, sessionEncryptionKey, clientAddress.toString(), clientPort );
                     }*/
@@ -653,8 +653,12 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
             return;
         }
 
+        if(!userInfo->hasContactGroup(groupID)){
+            groupID = ContactGroupBase::Group_Friends_ID;
+        }
+
         if(contactInfo->getFriendshipApply() == UserInfo::FA_AUTO_ACCEPT){
-            addContactForUser(socketID, userInfo, contactInfo, groupID);
+            addContactForUser(userInfo, contactInfo, groupID);
 
 //            if(addNewContactForUserInDB(userID, contactID, groupID)){
 //                sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
@@ -677,7 +681,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 //TODO:保存请求到数据库
                 saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage);
             }else{
-                sendAddContactRequestFromUserPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+                sendAddContactRequestFromUserPacket(contactInfo->getSocketID(), userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
             }
         }
 
@@ -741,11 +745,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         quint32 groupID = ContactGroupBase::Group_Friends_ID;
         stream >> contactID >> acceptRequest;
 
-        if(acceptRequest){
-            stream >> groupID;
-        }else{
-            stream >> extraMessage;
-        }
+        stream >> groupID >> extraMessage;
 
         UserInfo *contactInfo = getUserInfo(contactID);
         if(!contactInfo){return;}
@@ -753,7 +753,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         
         //TODO:
         if(acceptRequest){
-            addContactForUser(socketID, userInfo, contactInfo, groupID);
+            addContactForUser(userInfo, contactInfo, groupID);
 
 //            contactInfo->addNewContact(userID, UserInfo::defaultFriendContactGroupID());
 
@@ -772,7 +772,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                     saveFriendshipApplyRequestToDB(contactID, userID, extraMessage, UserInfo::FAR_DENIED, false, true);
                     return;
                 }else{
-                    sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
+                    sendAddContactResultPacket(contactInfo->getSocketID(), userID, userInfo->getNickName(), userInfo->getFace(), -1, IM::ERROR_RequestDenied, extraMessage, contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
                 }
             }
             
@@ -1427,28 +1427,27 @@ void ServerPacketsParser::sendInterestGroupChatMessageToMembers(quint32 interest
 
 }
 
-void ServerPacketsParser::addContactForUser(int socketID, UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID){
+void ServerPacketsParser::addContactForUser(UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID){
 
     QString userID = userInfo->getUserID();
     QString contactID = contactInfo->getUserID();
 
-    //quint32 groupID = userInfo->defaultFriendContactGroupID();
     if(addNewContactForUserInDB(userID, contactID, groupID)){
-        sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+        sendAddContactResultPacket(userInfo->getSocketID(), contactID, contactInfo->getNickName(), contactInfo->getFace(), groupID, IM::ERROR_NoError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
         userInfo->addNewContact(contactID, groupID);
     }else{
-        sendAddContactResultPacket(socketID, contactID, contactInfo->getNickName(), contactInfo->getFace(), IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+        sendAddContactResultPacket(userInfo->getSocketID(), contactID, contactInfo->getNickName(), contactInfo->getFace(), groupID, IM::ERROR_ServerError, "", userInfo->getSessionEncryptionKey(), userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
     }
 
-    contactInfo->addNewContact(userID, contactInfo->defaultFriendContactGroupID());
-    addNewContactForUserInDB(contactID, userID, groupID);
-
+    quint32 defaultGroupID = contactInfo->defaultFriendContactGroupID();
+    contactInfo->addNewContact(userID, defaultGroupID);
+    addNewContactForUserInDB(contactID, userID, defaultGroupID);
     if(contactInfo->getOnlineState() == IM::ONLINESTATE_OFFLINE){
         //TODO:保存请求到数据库
         saveFriendshipApplyRequestToDB(contactID, userID, "", UserInfo::FAR_ACCEPTED, false, true);
         return;
     }else{
-        sendAddContactResultPacket(socketID, userID, userInfo->getNickName(), userInfo->getFace(), IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
+        sendAddContactResultPacket(contactInfo->getSocketID(), userID, userInfo->getNickName(), userInfo->getFace(), defaultGroupID, IM::ERROR_NoError, "", contactInfo->getSessionEncryptionKey(), contactInfo->getLastLoginExternalHostAddress(), contactInfo->getLastLoginExternalHostPort());
     }
 
 }

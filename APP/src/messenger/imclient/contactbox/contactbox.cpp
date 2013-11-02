@@ -118,7 +118,17 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
     QTreeWidgetItem *item = contactsHash.value(contact);
 
     if(add){
-        if(item){return;}
+        if(item){
+            QTreeWidgetItem *currentParentItem = item->parent();
+            if(!currentParentItem){return;}
+            if(currentParentItem == parentItem){return;}
+
+            ContactGroupBase *currentGroup = contactGroupsHash.key(currentParentItem);
+            if(currentGroup == group){return;}
+            moveContact(contact, currentGroup, group);
+
+            return;
+        }
 
         item = new QTreeWidgetItem(parentItem);
         ContactWidget *wgt = new ContactWidget(contact, this);
@@ -207,22 +217,25 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
     QTreeWidgetItem *item = contactGroupsHash.value(contactGroup);
     if(!item){return;}
 
-    int onlineCount = m_contactsManager->onlineContactGroupMembersCount(contactGroup->getGroupID());
-    int memberCount = contactGroup->countOfMembers();
+//    int onlineCount = m_contactsManager->onlineContactGroupMembersCount(contactGroup->getGroupID());
+//    int memberCount = contactGroup->countOfMembers();
+//    item->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
 
-//    int memberCount = item->childCount();
-//    for(int i=0; i<memberCount; i++){
-//        QTreeWidgetItem *memberItem = item->child(i);
-//        if(!memberItem){continue;}
 
-//        Contact *contact = contactsHash.key(memberItem);
-//        if(!contact){continue;}
-//        if(contact->getOnlineState() != IM::ONLINESTATE_OFFLINE && (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) ){
-//            onlineCount++;
-//        }
-//    }
+    int onlineCount = 0;
+    int memberCount = item->childCount();
+    for(int i=0; i<memberCount; i++){
+        QTreeWidgetItem *memberItem = item->child(i);
+        if(!memberItem){continue;}
 
+        Contact *contact = contactsHash.key(memberItem);
+        if(!contact){continue;}
+        if(contact->getOnlineState() != IM::ONLINESTATE_OFFLINE && (contact->getOnlineState() != IM::ONLINESTATE_INVISIBLE) ){
+            onlineCount++;
+        }
+    }
     item->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
+
 
 }
 
