@@ -64,7 +64,9 @@ public:
     void updateContactItemInfo(Contact *contact);
 
     void addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, bool add);
+    void insertContactGroupItem(ContactGroupBase *contactGroup);
     void updateContactGroupItemInfo(ContactGroupBase *contactGroup);
+    void updateContactGroupItemInfo(QTreeWidgetItem *contactGroupItem);
 
     void moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);
     void moveContact2(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup);

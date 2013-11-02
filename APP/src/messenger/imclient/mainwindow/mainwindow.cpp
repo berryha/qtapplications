@@ -1770,7 +1770,9 @@ void MainWindow::slotDeleteContactResultReceived(const QString &contactID, bool 
 
     //if(contact->isStranger() || contact->isBlacklisted()){return;}
 
-    int groupID = contact->getContactGroupID();
+    //int groupID = contact->getContactGroupID();
+
+    //TODO
 
     m_contactsManager->deleteContact(contactID, addToBlacklist);
     m_contactsManager->saveContactInfoToDatabase(contactID);
@@ -2118,9 +2120,10 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
             ok = m_contactsManager->slotAddNewContactGroupToDatabase(groupID, groupName);
             m_myself->addContactGroup(groupID, groupName);
 
-            m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
+            m_contactBox->insertContactGroupItem(m_myself->getContactGroup(groupID));
+            //m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), true);
         }else{
-            m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), createGroup);
+            m_contactBox->addOrRemoveContactGroupItem(m_myself->getContactGroup(groupID), false);
 
             ok = m_contactsManager->deleteContactGroupFromDatabase(groupID);
             m_myself->deleteContactGroup(groupID);

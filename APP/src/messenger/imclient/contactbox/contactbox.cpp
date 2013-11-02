@@ -110,14 +110,16 @@ void ContactBox::loadAllContacts(){
 
 void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
 
-    ContactGroupBase *group = m_myself->getContactGroup(contact->getContactGroupID());
+    qDebug()<<"--------------------contact->getContactGroupID():"<<contact->getContactGroupID();
 
-    QTreeWidgetItem *parentItem = contactGroupsHash.value(group);
+    QTreeWidgetItem *parentItem = contactGroupsHash.value(m_myself->getContactGroup(contact->getContactGroupID()));
     if(!parentItem){return;}
-
     QTreeWidgetItem *item = contactsHash.value(contact);
 
     if(add){
+
+        ContactGroupBase *group = m_myself->getContactGroup(contact->getContactGroupID());
+
         if(item){
             QTreeWidgetItem *currentParentItem = item->parent();
             if(!currentParentItem){return;}
@@ -140,21 +142,25 @@ void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
 
         contactsHash.remove(contact);
 
-        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
-        if(wgt){
-            delete wgt;
-        }
-
+        parentItem = item->parent();
+        removeItemWidget(item, 0);
         parentItem->removeChild(item);
         delete item;
         item = 0;
+
+//        ContactWidget *wgt = qobject_cast<ContactWidget *>( itemWidget(item, 0) );
+//        if(wgt){
+//            delete wgt;
+//        }
+//        parentItem->removeChild(item);
+//        delete item;
+//        item = 0;
 
         flashContactItems.remove(contact);
 
     }
 
-    updateContactGroupItemInfo(group);
-
+    updateContactGroupItemInfo(parentItem);
 
 }
 
@@ -185,7 +191,7 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
         item = new QTreeWidgetItem();
         item->setText(0, contactGroup->getGroupName() + " [0/0]");
         addTopLevelItem(item);
-
+        qDebug()<<"------------contactGroup->getGroupName():"<<contactGroup->getGroupName()<<" item:"<<item;
         contactGroupsHash.insert(contactGroup, item);
 
     }else{
@@ -212,10 +218,38 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
 
 }
 
+void ContactBox::insertContactGroupItem(ContactGroupBase *contactGroup){
+
+    QTreeWidgetItem *item = contactGroupsHash.value(contactGroup);
+    if(item){return;}
+
+    item = new QTreeWidgetItem();
+    item->setText(0, contactGroup->getGroupName() + " [0/0]");
+
+
+    int index = indexOfTopLevelItem(contactGroupsHash.value(m_myself->strangersGroup()));
+    if(index == -1){
+        index = 0;
+    }
+
+
+    insertTopLevelItem(index, item);
+
+    contactGroupsHash.insert(contactGroup, item);
+}
+
 void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
 
     QTreeWidgetItem *item = contactGroupsHash.value(contactGroup);
     if(!item){return;}
+    updateContactGroupItemInfo(item);
+}
+
+void ContactBox::updateContactGroupItemInfo(QTreeWidgetItem *contactGroupItem){
+
+    if(!contactGroupItem){return;}
+    ContactGroupBase *contactGroup = contactGroupsHash.key(contactGroupItem);
+    if(!contactGroup){return;}
 
 //    int onlineCount = m_contactsManager->onlineContactGroupMembersCount(contactGroup->getGroupID());
 //    int memberCount = contactGroup->countOfMembers();
@@ -223,9 +257,9 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
 
 
     int onlineCount = 0;
-    int memberCount = item->childCount();
+    int memberCount = contactGroupItem->childCount();
     for(int i=0; i<memberCount; i++){
-        QTreeWidgetItem *memberItem = item->child(i);
+        QTreeWidgetItem *memberItem = contactGroupItem->child(i);
         if(!memberItem){continue;}
 
         Contact *contact = contactsHash.key(memberItem);
@@ -234,11 +268,9 @@ void ContactBox::updateContactGroupItemInfo(ContactGroupBase *contactGroup){
             onlineCount++;
         }
     }
-    item->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
-
+    contactGroupItem->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
 
 }
-
 
 void ContactBox::moveContact(Contact *contact, ContactGroupBase *oldContactGroup, ContactGroupBase *newContactGroup){
 
