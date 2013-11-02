@@ -112,7 +112,7 @@ private slots:
 
 
     //void slotProcessSearchContactsResult(const QString &users);
-    void slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage);
+    void slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage);
     void getNewContactSettings(const QString &contactID);
     void slotProcessPersonalMessage(const QString &userID, const QString &message);
 

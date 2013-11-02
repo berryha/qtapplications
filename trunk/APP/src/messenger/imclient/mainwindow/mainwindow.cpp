@@ -375,7 +375,7 @@ void MainWindow::startNetwork(){
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalAddContactResultPacketReceived(const QString &, const QString &, const QString &, quint8, const QString & )), this, SLOT(slotProcessAddContactResult(const QString &, const QString &, const QString &, quint8, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAddContactResultPacketReceived(const QString &, const QString &, const QString &, int, quint8, const QString & )), this, SLOT(slotProcessAddContactResult(const QString &, const QString &, const QString &, int, quint8, const QString &)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalDeleteContactResultPacketReceived(const QString &, bool, bool)), this, SLOT(slotDeleteContactResultReceived(const QString &, bool, bool)), Qt::QueuedConnection);
 
@@ -2143,7 +2143,7 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
 
 //}
 
-void MainWindow::slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, quint8 errorTypeCode, const QString &reasonMessage){
+void MainWindow::slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage){
     qDebug()<<"--MainWindow::slotProcessAddContactResult(...) "<<"  contactID:"<<contactID;
 
     IM::ErrorType type = IM::ErrorType(errorTypeCode);
@@ -2161,6 +2161,11 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
         //contact->setContactGroupID(groupID);
         //m_contactsManager->saveContactInfoToDatabase(contactID);
 
+
+        if(contact->getContactGroupID() != contactGroupID){
+            contact->setContactGroupID(groupID);
+            m_contactsManager->saveContactInfoToDatabase(contactID);
+        }
         m_myself->saveMyInfoToLocalDatabase();
 
         m_contactBox->addOrRemoveContactItem(contact, true);

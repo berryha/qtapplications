@@ -666,11 +666,12 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         stream.setVersion(QDataStream::Qt_4_8);
         QString userID = "", userNickName = "", userFace = "", reasonMessage = "";
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
-        
-        stream >> userID >> userNickName >> userFace >> errorTypeCode >> reasonMessage;
+        int contactGroupID = ContactGroupBase::Group_Strangers_ID;
+
+        stream >> userID >> userNickName >> userFace >> contactGroupID >> errorTypeCode >> reasonMessage;
 
         //emit signalAddContactResultPacketReceived(contactID, IM::ErrorType(errorTypeCode));
-        emit signalAddContactResultPacketReceived(userID, userNickName, userFace, errorTypeCode, reasonMessage);
+        emit signalAddContactResultPacketReceived(userID, userNickName, userFace, contactGroupID, errorTypeCode, reasonMessage);
         
     }
         break;
