@@ -1768,11 +1768,8 @@ void MainWindow::slotDeleteContactResultReceived(const QString &contactID, bool 
         return;
     }
 
-    //if(contact->isStranger() || contact->isBlacklisted()){return;}
 
-    //int groupID = contact->getContactGroupID();
-
-    //TODO
+    systemTray->removeAllTrayIconData(contactID);
 
     m_contactsManager->deleteContact(contactID, addToBlacklist);
     m_contactsManager->saveContactInfoToDatabase(contactID);
@@ -2179,7 +2176,7 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
             getNewContactSettings(contactID);
         }else{
             //TODO
-            TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
+            TrayIconData data(STIDT_FriendshipApplicationResult, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), contactID);
             data.setToolTip(contactID);
             data.settrayIconType(TrayIconData::TRAYICON_Flash);
             data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
@@ -2307,7 +2304,7 @@ void MainWindow::slotProcessContactRequestFromUser(const QString &userID, const 
         showContactRequestFromUser(userID, userNickName, userFace, verificationMessage);
     }else{
 
-        TrayIconData data(STIDT_FriendshipApplicationFromContact, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
+        TrayIconData data(STIDT_FriendshipApplicationFromContact, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), userID);
         data.setToolTip(userID);
         data.settrayIconType(TrayIconData::TRAYICON_Flash);
         data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
@@ -2887,7 +2884,7 @@ void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const Q
 
         }else{
             //TODO
-            TrayIconData data(STIDT_InterestGroupMemberJoinedOrQuitted, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), m_systemID);
+            TrayIconData data(STIDT_InterestGroupMemberJoinedOrQuitted, QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz"), QString::number(groupID));
             data.setToolTip(tr("System Message"));
             data.settrayIconType(TrayIconData::TRAYICON_Flash);
             data.setFirstIcon(QIcon(":/resources/images/systemmessage.png"));
