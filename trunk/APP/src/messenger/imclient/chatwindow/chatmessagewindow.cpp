@@ -158,7 +158,7 @@ void ChatMessageWindow::initUI(){
 
     m_screenshot = 0;
 
-    connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui.pushButtonClose, SIGNAL(clicked()), this, SIGNAL(signalCloseWindow()));
     connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
 
 
