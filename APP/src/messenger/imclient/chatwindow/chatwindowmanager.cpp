@@ -664,6 +664,42 @@ void ChatWindowManager::slotcloseTab(){
     
 //}
 
+void ChatWindowManager::handleCloseWindowRequest(){
+
+    switch (m_chatWindowDisplayStyle) {
+    case TabbedChatWindow:
+    {
+        slotcloseTab();
+    }
+        break;
+    case MDIChatWindow:
+    {
+        QMdiSubWindow * subWindow = ui.mdiArea->currentSubWindow();
+        if(subWindow){
+            subWindow->close();
+        }
+    }
+        break;
+    case SeparatedChatWindow:
+    {
+        ContactChatWidget *ccw = qobject_cast<ContactChatWidget *>(sender());
+        if(ccw){
+            ccw->close();
+        }
+
+        GroupChatWindow *gcw = qobject_cast<GroupChatWindow *>(sender());
+        if(gcw){
+            gcw->close();
+        }
+
+    }
+        break;
+    default:
+        break;
+    }
+
+}
+
 void ChatWindowManager::handleChatWindowClosed(){
     qDebug()<<"----ChatWindowManager::handleChatWindowClosed()";
 
@@ -743,8 +779,9 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
         connect(contactChatWindow, SIGNAL(sendMsgButtonClicked(Contact *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)));
         connect(contactChatWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
 
-
+        connect(contactChatWindow, SIGNAL(signalCloseWindow()), this, SLOT(handleCloseWindowRequest()));
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
+
 
         QString contactID = contact->getUserID();
         m_contactChatWidgetHash.insert(contactID, contactChatWindow);
@@ -805,6 +842,7 @@ GroupChatWindow* ChatWindowManager::createInterestGroupChatWindow(InterestGroup 
     connect(groupChatWindow, SIGNAL(sendMsgButtonClicked(InterestGroup *, const QString &, const QStringList &)), this, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup *, const QString &, const QStringList &)));
     connect(groupChatWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
 
+    connect(groupChatWindow, SIGNAL(signalCloseWindow()), this, SLOT(handleCloseWindowRequest()));
     connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
 
     quint32 groutID = group->getGroupID();

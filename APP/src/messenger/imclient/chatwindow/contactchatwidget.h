@@ -29,7 +29,7 @@ signals:
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void toBeDstroyed();
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
-
+    void signalCloseWindow();
 
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime );

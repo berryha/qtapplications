@@ -70,7 +70,7 @@ private slots:
     void slotNewTab();
     void slotcloseTab();
 
-
+    void handleCloseWindowRequest();
     void handleChatWindowClosed();
     void showContextMenu(const QPoint &pos);
     void handleContactChatHistoryMenuAction();

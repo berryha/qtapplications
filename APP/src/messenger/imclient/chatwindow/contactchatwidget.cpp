@@ -11,20 +11,7 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)));
     connect(ui.chatMessageWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
 
-
-//        Q_ASSERT_X(contact != 0, "ContactChatWindow", "NULL Contact!");
-
-//        ui.chatMessageWindow->setContact(contact);
-
-
-//        QString displayName = contact->getNickName();
-//        QString contactID = contact->getUserID();
-//        if (displayName.isEmpty()) {
-//            displayName = contactID;
-//        }else if(contactID != displayName){
-//            displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
-//        }
-//        setWindowTitle(displayName);
+    connect(ui.chatMessageWindow, SIGNAL(signalCloseWindow()), this, SIGNAL(signalCloseWindow()));
 
 
     m_displayName = tr("Unknown");
