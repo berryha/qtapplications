@@ -601,7 +601,7 @@ void ContactsManager::slotFetchAllContactsInfo2(ItemBoxWidget *expandListView){
 void ContactsManager::slotFetchAllContactsInfoFromDB(){
     qDebug()<<"ContactsManager::slotFetchAllContactsInfoFromDB()";
 
-    Q_ASSERT(contactHash.isEmpty());
+    //Q_ASSERT(contactHash.isEmpty());
     foreach (Contact *contact, contactHash.values()) {
         delete contact;
         contact = 0;
