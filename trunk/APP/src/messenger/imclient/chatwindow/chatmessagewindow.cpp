@@ -96,29 +96,10 @@ void ChatMessageWindow::initUI(){
     page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
-
     m_mainWebFrame = page->mainFrame();
     connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrameToBottom(const QSize &)));
 
-
-
     ui.mainSplitter->setStretchFactor(1, 1);
-
-
-    //    QString displayName = contact->getNickName();
-    //    QString contactID = contact->getUserID();
-
-    //    if (displayName.isEmpty()) {
-    //        displayName = contactID;
-    //    }else if(contactID != displayName){
-    //        displayName = contact->getNickName() + "("  + contact->getUserID() + ")";
-    //    }
-    //    setWindowTitle(displayName);
-    //TODO:
-    //setWindowIcon(ImageResource::createMixedIcon((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), contact->getOnlineState()));
-
-
-
 
 
     m_myself = IMUser::instance();
@@ -127,6 +108,8 @@ void ChatMessageWindow::initUI(){
 
     imageCachePath = Settings::instance()->getImageCacheDir();
 
+    smileyPopup = new EmoticonSelector();
+    connect(smileyPopup, SIGNAL(signalEmoticonSelected(const QString&, bool)), this, SLOT(insertEmoticon(const QString&, bool)));
 
     connect(ui.fontStyleToolButton, SIGNAL(clicked()), this, SLOT(showFontFrame()));
     connect(ui.emotionToolButton, SIGNAL(clicked()), this, SLOT(showEmotions()));
@@ -162,11 +145,8 @@ void ChatMessageWindow::initUI(){
     ui.fontFrame->setVisible(false);
 
 
-    connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
+    connect(ui.pushButtonMessageHistory, SIGNAL(clicked(bool)), this, SLOT(showMessageHistory(bool)));
 
-
-    smileyPopup = new EmoticonSelector();
-    connect(smileyPopup, SIGNAL(signalEmoticonSelected(const QString&, bool)), this, SLOT(insertEmoticon(const QString&, bool)));
 
 
     m_defaultFontName = ui.fontComboBox->currentText();
@@ -177,6 +157,9 @@ void ChatMessageWindow::initUI(){
     m_styleString = "";
 
     m_screenshot = 0;
+
+    connect(ui.pushButtonClose, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
 
 
 }
@@ -467,15 +450,23 @@ QString ChatMessageWindow::getRichMessageBlock(){
 void ChatMessageWindow::emitSendMsgSignal() {
     //TODO:是否要转换成UTF8
 
+
+    if(m_myself->getOnlineState() == IM::ONLINESTATE_OFFLINE){
+        QToolTip::showText(ui.textEdit->mapToGlobal(QPoint(0, 0)), tr("You are offline!"));
+        return;
+    }
+
     QString message = ui.textEdit->toPlainText();
 
     if(message.isEmpty()){
         ui.textEdit->setFocus();
+        QToolTip::showText(ui.textEdit->mapToGlobal(QPoint(0, 0)), tr("You can't send empty message!"));
         return;
     }
 
     if(message.size() > MAX_MESSAGE_SIZE){
-        QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
+        QToolTip::showText(ui.textEdit->mapToGlobal(QPoint(0, 0)), tr("The message is too long!"));
+        //QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
         qCritical()<<"ERROR! Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
         ui.textEdit->setFocus();
         return;
@@ -646,6 +637,15 @@ void ChatMessageWindow::emitSendMsgSignal2() {
 
 }
 
+void ChatMessageWindow::showMessageHistory(bool show){
+    if(show){
+
+    }else{
+
+    }
+
+}
+
 void ChatMessageWindow::scrollWebFrameToBottom(const QSize & contentsSize){
     m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
 }
@@ -753,6 +753,7 @@ void ChatMessageWindow::insertEmoticon( const QString &iconPath, bool isSystemEm
 
 
 }
+
 
 void ChatMessageWindow::insertImage() {
     QFileDialog::Options options;

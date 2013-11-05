@@ -235,20 +235,34 @@
                </widget>
               </item>
               <item>
-               <spacer name="topSpacer">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Expanding</enum>
-                </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>10</width>
+                  <width>40</width>
                   <height>20</height>
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonMessageHistory">
+                <property name="text">
+                 <string>Message &amp;History</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -426,9 +440,9 @@ p, li { white-space: pre-wrap; }
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="historyPushButton">
+          <widget class="QPushButton" name="pushButtonClose">
            <property name="text">
-            <string>&amp;History</string>
+            <string>&amp;Close</string>
            </property>
           </widget>
          </item>

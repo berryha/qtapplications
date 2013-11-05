@@ -644,8 +644,10 @@ void LoginWidget::slotProcessLoginResult(quint8 errorTypeCode, const QString &er
         break;
         case IM::ERROR_KickedOut:
         {
-            errorMsg = tr("You have been kicked out!");
             emit signalKickedOff();
+            return;
+
+            errorMsg = tr("You have been kicked out!");
         }
         break;
         case IM::ERROR_Timeout:

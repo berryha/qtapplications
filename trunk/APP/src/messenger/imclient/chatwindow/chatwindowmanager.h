@@ -110,11 +110,6 @@ private:
     QList<quint32> m_groupChatHistoryList;
 
 
-    //QList<QPair<Contact*, QMdiSubWindow*> > pairList;
-
-
-
-
 
 };
 

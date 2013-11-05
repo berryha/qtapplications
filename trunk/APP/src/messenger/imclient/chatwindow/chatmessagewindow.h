@@ -78,6 +78,9 @@ private slots:
     void emitSendMsgSignal();
     void emitSendMsgSignal2();
 
+    void showMessageHistory(bool show);
+
+
     void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
     void updateImage2(const QString &imageName);
 
@@ -103,6 +106,7 @@ private slots:
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
+
     void scrollWebFrameToBottom(const QSize &contentsSize);
     void linkClicked(const QUrl & url);
 
@@ -122,17 +126,17 @@ private:
     Ui::MessageWindowUi ui;
     QWebFrame *m_mainWebFrame;
 
-
-
     //const QString &contactID;
     IMUser *m_myself;
+    QString myDisplayName;
+    QString myUserID;
+
     Contact *m_contact;
     //    ContactGroup *m_contactGroup;
     InterestGroup *m_interestGroup;
     ChatMessageWindowType m_chatMessageWindowType;
 
-    QString myDisplayName;
-    QString myUserID;
+
     QString imageCachePath;
 
 
