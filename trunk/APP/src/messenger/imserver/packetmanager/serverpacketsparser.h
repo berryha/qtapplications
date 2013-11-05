@@ -321,7 +321,7 @@ public slots:
 
     }
 
-    bool sendClientLoginFailedPacket(int peerSocketID, const QString &userID, quint8 errorTypeCode){
+    bool sendClientLoginFailedPacket(int peerSocketID, const QString &userID, quint8 errorTypeCode, const QString &errorMessage = ""){
         qDebug()<<"--sendClientLoginFailedPacket(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -332,7 +332,7 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         //out << userID << quint8(0) << quint8(errorType);
-        out << m_serverName << quint8(0) << errorTypeCode;
+        out << m_serverName << quint8(0) << errorTypeCode << errorMessage;
 
         packet->setPacketData(ba);
 
@@ -1251,6 +1251,8 @@ signals:
 
 
 private:
+    UserInfo* logUserIn(const QString &userID, const QByteArray &encryptedPassword, IM::OnlineState loginState, IM::ErrorType *errorType);
+
 
 
 private:

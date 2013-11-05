@@ -110,8 +110,6 @@ void ContactBox::loadAllContacts(){
 
 void ContactBox::addOrRemoveContactItem(Contact *contact, bool add){
 
-    qDebug()<<"--------------------contact->getContactGroupID():"<<contact->getContactGroupID();
-
     QTreeWidgetItem *parentItem = contactGroupsHash.value(m_myself->getContactGroup(contact->getContactGroupID()));
     if(!parentItem){return;}
     QTreeWidgetItem *item = contactsHash.value(contact);
@@ -191,7 +189,6 @@ void ContactBox::addOrRemoveContactGroupItem(ContactGroupBase *contactGroup, boo
         item = new QTreeWidgetItem();
         item->setText(0, contactGroup->getGroupName() + " [0/0]");
         addTopLevelItem(item);
-        qDebug()<<"------------contactGroup->getGroupName():"<<contactGroup->getGroupName()<<" item:"<<item;
         contactGroupsHash.insert(contactGroup, item);
 
     }else{

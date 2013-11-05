@@ -166,7 +166,7 @@ enum Command {
     SERVER_RESPONSE_CLIENT_REQUEST_UPDATE_PASSWORD,
 
     CLIENT_REQUEST_LOGIN, //c
-    SERVER_RESPONSE_CLIENT_REQUEST_LOGIN,
+    SERVER_RESPONSE_CLIENT_REQUEST_LOGIN, //s
     CLIENT_LOGIN_INFO, //c
     SERVER_RESPONSE_CLIENT_LOGIN_RESULT, //s
     SERVER_RESPONSE_CLIENT_LOGIN_REDIRECTION, //s
@@ -295,10 +295,11 @@ enum ErrorType {
     ERROR_IDBlacklisted,
     ERROR_IDNotExist,
     ERROR_PasswordIncorrect,
+    ERROR_Duplicate_Login,
     
-    ERROR_Offline,
     ERROR_Timeout,
     ERROR_ConnectionFailed,
+    ERROR_KickedOut,
 
 
     ERROR_RequestDenied,
@@ -411,6 +412,8 @@ enum RegistrationMode{
     RM_ServerCreatePasswordOnly
 
 };
+
+
 
 
 

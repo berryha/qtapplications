@@ -1287,6 +1287,7 @@ private slots:
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
+
         out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin()) << deviceInfo ;
         packet->setPacketData(ba);
 
@@ -1339,7 +1340,7 @@ signals:
     void signalUpdatePasswordResultReceived(quint8 errorTypeCode, const QString &message);
     
     void signalLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
-    void signalLoginResultReceived(quint8 errorType);
+    void signalLoginResultReceived(quint8 errorType, const QString &errorMessage = "");
     void signalClientLastLoginInfoPacketReceived(const QString &extIPAddress, const QString &loginTime, const QString &LogoutTime, const QString &deviceInfo);
     //void signalContactStateChangedPacketReceived(const QString &contactID, IM::OnlineState onlineState, const QString &contactHostAddress, quint16 contactHostPort);
     void signalContactStateChangedPacketReceived(const QString &contactID, quint8 onlineState, const QString &contactHostAddress, quint16 contactHostPort);
@@ -1415,10 +1416,12 @@ signals:
     void signalFileTXStatusChanged(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status);
     void signalFileTXError(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
 
-
+public:
+    QStringList runningNICAddresses();
 
 private:
 //    quint16 getLastReceivedPacketSN(const QString &peerID);
+
 
 private:
 

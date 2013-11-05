@@ -1481,6 +1481,57 @@ void ServerPacketsParser::addContactForUser(UserInfo *userInfo, UserInfo *contac
 //}
 
 
+UserInfo* ServerPacketsParser::logUserIn(const QString &userID, const QByteArray &encryptedPassword, IM::OnlineState loginState, IM::ErrorType *errorType){
+    //qWarning()<<"logUserIn(...)";
+
+    UserInfo *userInfo = getUserInfo(userID);
+    if(!userInfo){
+        *errorType = IM::ERROR_IDNotExist;
+        return 0;
+    }
+
+    //TODO:密码保存方式
+    QByteArray decryptedPassword;
+    Cryptography cryptography;
+    cryptography.teaCrypto(&decryptedPassword, encryptedPassword, userInfo->encryptedPassword(), false);
+
+    if(decryptedPassword != QByteArray::fromBase64(userInfo->getPassword().toUtf8())){
+        *errorType = IM::ERROR_PasswordIncorrect;
+        userInfo->authenticationFailed();
+        return 0;
+    }else{
+
+        //Check Duplicate Login
+        if(userInfo->getOnlineState() != IM::ONLINESTATE_OFFLINE){
+            //Kick user off
+            QString msg = tr("Your account has been logged in from other place!");
+            sendClientLoginFailedPacket(userInfo->getSocketID(), userID, quint8(IM::ERROR_KickedOut), msg);
+            m_rtp->closeSocket(userInfo->getSocketID());
+            processUserOnlineStatusChanged(userInfo, IM::ONLINESTATE_OFFLINE, userInfo->getLastLoginExternalHostAddress(), userInfo->getLastLoginExternalHostPort());
+        }
+
+
+        *errorType = IM::ERROR_NoError;
+        userInfo->setOnlineState(loginState);
+        userInfo->setSessionEncryptionKey(ServerUtilities::generateSessionEncryptionKey());
+        userOnline(userInfo);
+
+
+        //Get contact groups info
+        getUserAllContactGroupsInfoFromDatabase(userInfo);
+
+        //Load interest groups
+        getUserInterestGroupsFromDB(userInfo);
+
+        //Load Last login info
+        getUserLastLoginInfo(userInfo);
+
+        //qWarning()<<"getSessionEncryptionKey:"<<userInfo->getSessionEncryptionKey().toBase64();
+    }
+
+
+    return userInfo;
+}
 
 
 

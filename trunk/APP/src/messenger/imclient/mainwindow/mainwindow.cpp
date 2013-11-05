@@ -357,12 +357,14 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
     connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
+    connect(ui.loginPage, SIGNAL(signalKickedOff()), this, SLOT(slotProcessKickedOff()));
+
     connect(this,SIGNAL(signalMyOnlineStateChanged(int, quint8)), clientPacketsParser, SLOT(changeMyOnlineState(int, quint8)));
     
     connect(clientPacketsParser, SIGNAL(signalUpdatePasswordResultReceived(quint8, const QString&)), this, SLOT(slotProcessUpdatePasswordResult(quint8, const QString&)), Qt::QueuedConnection);
     
     connect(clientPacketsParser, SIGNAL(signalLoginServerRedirected(const QString &, quint16, const QString &)), this, SLOT(slotProcessLoginServerRedirected(const QString &, quint16, const QString &)), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalLoginResultReceived(quint8)), this, SLOT(slotProcessLoginResult(quint8)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalLoginResultReceived(quint8, const QString &)), this, SLOT(slotProcessLoginResult(quint8, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalClientLastLoginInfoPacketReceived(const QString &, const QString &, const QString &, const QString &)), this, SLOT(slotProcessClientLastLoginInfo(const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalContactStateChangedPacketReceived(const QString &, quint8, const QString &, quint16)), this, SLOT(slotProcessContactStateChanged(const QString &, quint8, const QString &, quint16)));
@@ -1371,20 +1373,15 @@ void MainWindow::slotUserVerified(){
 
         ui.labelUserNickName->setText(m_myself->getNickName());
         ui.labelUserID->setText(m_myUserID);
-        
-        //        clientPacketsParser->startHeartbeat();
 
-        //contactsManager = ContactsManager::instance();
         
         m_contactsManager->loadInterestGroups();
-        updateAllInterestGroupsInfoToUI();
-        
-        
+        updateAllInterestGroupsInfoToUI();    
         
     }else{
         //解锁时恢复在线状态
         //Restore user online state after unlocking
-        ui.stackedWidget->setCurrentWidget(ui.mainPage);
+//        ui.stackedWidget->setCurrentWidget(ui.mainPage);
         m_myself->setOnlineState(stateBeforeLocking);
         
         //TODO:是否要放在外面
@@ -1395,6 +1392,8 @@ void MainWindow::slotUserVerified(){
             emit signalMyOnlineStateChanged(m_socketConnectedToServer, quint8(m_myself->getOnlineState()));
         }
     }
+
+    ui.stackedWidget->setCurrentWidget(ui.mainPage);
 
     ui.loginPage->switchUI(LoginWidget::NORMAL);
     
@@ -1790,14 +1789,11 @@ void MainWindow::slotProcessLoginServerRedirected(const QString &serverAddress, 
 
 }
 
-void MainWindow::slotProcessLoginResult(quint8 errorTypeCode){
+void MainWindow::slotProcessLoginResult(quint8 errorTypeCode, const QString &errorMessage){
 
     destoryLoginTimer();
+    ui.loginPage->slotProcessLoginResult(errorTypeCode, errorMessage);
 
-    //TODO:处理登陆结果
-    //    QMessageBox::information(this, "A", "slotProcessLoginResult");
-    ui.loginPage->slotProcessLoginResult(errorTypeCode);
-    //    QMessageBox::information(this, "B", "slotProcessLoginResult");
 
 }
 
@@ -2127,7 +2123,7 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
         }
 
         if(ok){
-            m_myself->updatePersonalContactGroupsInfoVersion();
+//            m_myself->updatePersonalContactGroupsInfoVersion();
             m_myself->saveMyInfoToLocalDatabase();
         }
 
@@ -3094,6 +3090,32 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
 
 }
 
+void MainWindow::slotProcessKickedOff(){
+
+    //ui.stackedWidget->setCurrentWidget(ui.mainPage);
+    offline();
+
+    QString text = tr("You have been disconnected as someone has signed in with your ID on another computer!");
+    QString informativeText = "";
+    QMessageBox msgBox(this);
+    QPushButton *signinAgainButton = msgBox.addButton(tr("&Sign in again"), QMessageBox::ActionRole);
+    QPushButton *okButton = msgBox.addButton(QMessageBox::Ok);
+    msgBox.setDefaultButton(okButton);
+    msgBox.setWindowTitle(tr("Offline Alert"));
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText(text);
+    msgBox.setInformativeText(informativeText);
+    //msgBox.setDetailedText(detailMessage);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == signinAgainButton){
+        requestLogin(m_serverHostAddress, m_serverHostPort);
+    }else if(msgBox.clickedButton() == okButton){
+
+    }
+
+}
+
 void MainWindow::loginTimeout(){
 
     destoryLoginTimer();
@@ -3181,6 +3203,20 @@ void MainWindow::requestRegistration(){
 
 }
 
+void MainWindow::offline(){
+    qDebug()<<"--MainWindow::offline()";
+
+    m_myself->setOnlineState(IM::ONLINESTATE_OFFLINE);
+
+    m_rtp->closeSocket(m_socketConnectedToServer);
+    m_socketConnectedToServer = INVALID_SOCK_ID;
+    m_verified = false;
+    systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
+
+    emit signalServerOnlineStateChanged(false);
+
+}
+
 void MainWindow::peerConnected(int socketID, const QString &peerAddress, quint16 peerPort){
     qWarning()<<QString("Connected! "+peerAddress+":"+QString::number(peerPort));
 
@@ -3209,9 +3245,10 @@ void MainWindow::peerDisconnected(const QHostAddress &peerAddress, quint16 peerP
 
     if(peerAddress == m_serverHostAddress && peerPort == m_serverHostPort){
         //TODO
-        m_verified = false;
-        emit signalServerOnlineStateChanged(false);
-        systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
+//        m_verified = false;
+//        emit signalServerOnlineStateChanged(false);
+//        systemTray->resetTrayIcon(ImageResource::createIconForContact((QString(RESOURCE_PATH)+QString(APP_ICON_PATH)), IM::ONLINESTATE_OFFLINE));
+        offline();
 
         if(!normalClose){
             requestLogin(m_serverHostAddress, m_serverHostPort);
@@ -3224,8 +3261,9 @@ void MainWindow::peerDisconnected(int socketID){
     qWarning()<<"Peer Disconnected! Socket ID:"<<socketID;
 
     if(socketID == m_socketConnectedToServer){
-        m_socketConnectedToServer = INVALID_SOCK_ID;
-        QMessageBox::critical(this, tr("Error"), tr("Disconnected from server!"));
+        //m_socketConnectedToServer = INVALID_SOCK_ID;
+        //QMessageBox::critical(this, tr("Error"), tr("Disconnected from server!"));
+        offline();
         return;
     }
 

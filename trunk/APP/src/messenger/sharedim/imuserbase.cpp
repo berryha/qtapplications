@@ -336,6 +336,9 @@ void IMUserBase::clearUpdatedProperties(){
 
 
 quint32 IMUserBase::updatePersonalContactGroupsInfoVersion(){
+    return 0;
+
+
     this->personalContactGroupsInfoVersion++;
     
     addUpdatedPersonalInfoProperty(IM::PI_PersonalContactGroupsInfoVersion, QString::number(personalContactGroupsInfoVersion), true);
@@ -974,7 +977,7 @@ int IMUserBase::getUnusedContactGroupID(){
         continue;
     }
 
-    qDebug()<<"Unused Contact ID:"<<id;
+//    qDebug()<<"Unused Contact Group ID:"<<id;
     return id;
 
 }

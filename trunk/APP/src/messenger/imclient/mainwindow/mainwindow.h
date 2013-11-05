@@ -97,7 +97,7 @@ private slots:
     void slotProcessUpdatePasswordResult(quint8 errorTypeCode, const QString &message);
 
     void slotProcessLoginServerRedirected(const QString &serverAddress, quint16 serverPort, const QString &serverName);
-    void slotProcessLoginResult(quint8 errorTypeCode);
+    void slotProcessLoginResult(quint8 errorTypeCode, const QString &errorMessage);
     void slotProcessClientLastLoginInfo(const QString &extIPAddress, const QString &loginTime, const QString &LogoutTime, const QString &deviceInfo);
 
     void slotProcessContactStateChanged(const QString &contactID, quint8 onlineStateCode, const QString &contactHostAddress, quint16 contactHostPort);
@@ -178,12 +178,14 @@ private slots:
 
 
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
+    void slotProcessKickedOff();
     void loginTimeout();
     void destoryLoginTimer();
 
     void requestRegistrationServerInfo();
     void requestRegistration();
 
+    void offline();
 
     void peerConnected(int socketID, const QString &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
