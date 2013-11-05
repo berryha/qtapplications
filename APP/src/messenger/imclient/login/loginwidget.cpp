@@ -401,7 +401,7 @@ void LoginWidget::on_loginToolButton_clicked() {
     
     if (userName().isEmpty()) {
 
-        QMessageBox::critical(this, tr("What's your name?"), tr(
+        QMessageBox::critical(this, tr("Error"), tr(
                                   "<b>ID Required!</b>"));
 
         ui.idComboBox->setFocus();
@@ -409,7 +409,7 @@ void LoginWidget::on_loginToolButton_clicked() {
 
     } else if (passWord().isEmpty()) {
 
-        QMessageBox::critical(this, tr("What's your password?"), tr(
+        QMessageBox::critical(this, tr("Error"), tr(
                                   "<b>Password Required!</b>"));
         ui.passwordLineEdit->setFocus();
         return;
@@ -590,7 +590,7 @@ void LoginWidget::loginTimeout(){
 
 
 
-void LoginWidget::slotProcessLoginResult(quint8 errorTypeCode){
+void LoginWidget::slotProcessLoginResult(quint8 errorTypeCode, const QString &errorMessage){
 
     IM::ErrorType errorType = IM::ErrorType(errorTypeCode);
     
@@ -608,83 +608,83 @@ void LoginWidget::slotProcessLoginResult(quint8 errorTypeCode){
 
     }else{
         localServer->close();
-        switchUI(NORMAL);
-        QString errorMessage = "";
+//        switchUI(NORMAL);
+        QString errorMsg = "";
 
         switch(errorType){
         case IM::ERROR_SoftwareVersionExpired:
         {
-            errorMessage = tr("Application has expired!");
+            errorMsg = tr("Application has expired!");
         }
         break;
         case IM::ERROR_IPBanned:
         {
-            errorMessage = tr("Your IP address has been banned!");
+            errorMsg = tr("Your IP address has been banned!");
         }
         break;
         case IM::ERROR_IDBanned:
         {
-            errorMessage = tr("Your ID has been banned!");
+            errorMsg = tr("Your ID has been banned!");
         }
         break;
         case IM::ERROR_IDBlacklisted:
         {
-            errorMessage = tr("Your ID has been blacklisted!");
+            errorMsg = tr("Your ID has been blacklisted!");
         }
         break;
         case IM::ERROR_IDNotExist:
         {
-            errorMessage = tr("ID does not exist!");
+            errorMsg = tr("ID does not exist!");
         }
         break;
         case IM::ERROR_PasswordIncorrect:
         {
-            errorMessage = tr("Incorrect Password!");
+            errorMsg = tr("Incorrect Password!");
         }
         break;
-        case IM::ERROR_Offline:
+        case IM::ERROR_KickedOut:
         {
-            errorMessage = tr("");
+            errorMsg = tr("You have been kicked out!");
+            emit signalKickedOff();
         }
         break;
         case IM::ERROR_Timeout:
         {
-            errorMessage = tr("Request Timeout!");
+            errorMsg = tr("Request Timeout!");
         }
         break;
         case IM::ERROR_RequestDenied:
         {
-            errorMessage = tr("Request Denied!");
+            errorMsg = tr("Request Denied!");
         }
         break;
         case IM::ERROR_AuthenticationNeeded:
         {
-            errorMessage = tr("Authentication Needed!");
+            errorMsg = tr("Authentication Needed!");
         }
         break;
         case IM::ERROR_AuthenticationFailed:
         {
-            errorMessage = tr("Authentication Failed!");
+            errorMsg = tr("Authentication Failed!");
         }
         break;
         case IM::ERROR_UnKnownError:
         {
-            errorMessage = tr("UnKnown Error!");
+            errorMsg = tr("UnKnown Error!");
         }
         break;
         default:
         {
-            errorMessage = tr("UnKnown Error!");
+            errorMsg = tr("UnKnown Error!");
         }
         break;
 
         }
 
-        QMessageBox::critical(this, tr("Login Failed"), errorMessage);
+        switchUI(NORMAL);
 
-
-
-
+        errorMsg = errorMsg + "\n" + errorMessage;
+        QMessageBox::critical(this, tr("Login Failed"), errorMsg);
 
     }
 
@@ -716,6 +716,10 @@ bool LoginWidget::checkServerAddress(){
 }
 
 bool LoginWidget::canLogin(){
+
+
+    return true;
+
     if(user->isRootMode()){
         return true;
     }

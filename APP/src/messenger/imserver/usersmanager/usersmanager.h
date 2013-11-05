@@ -67,7 +67,7 @@ public:
 
     bool canUserLogin(const QString &userID, const QString &clientVersion, IM::ErrorType *errorType);
     void getUserLoginServer(const QString &userID, QHostAddress *serverAddress, quint16 *serverPort);
-    UserInfo* logUserIn(const QString &userID, const QByteArray &encryptedPassword, IM::OnlineState loginState, IM::ErrorType *errorType);
+//    UserInfo* logUserIn(const QString &userID, const QByteArray &encryptedPassword, IM::OnlineState loginState, IM::ErrorType *errorType);
     
     bool registerNewUser(const QString &userID, const QString &password, IM::ErrorType *errorType, quint32 *sysID, QString *message = 0);
     void updateUserPassword(const QString &userID, const QString &newPassword, IM::ErrorType *errorType, QString *message = 0);
@@ -129,7 +129,7 @@ public:
 /////////////////////////// ---Group Manager--- ////////////////////////////////////////    
     
 
-private:
+protected:
 
     UserInfo * queryUserInfo(const QString &imUserID);
     bool queryUserInfo(UserInfo *info);

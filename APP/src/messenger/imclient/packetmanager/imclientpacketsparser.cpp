@@ -27,9 +27,11 @@
  ***************************************************************************
  */
 
-
-
 #include "imclientpacketsparser.h"
+
+
+#include <QNetworkInterface>
+
 
 #include "../servertime/servertime.h"
 
@@ -316,6 +318,8 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 loginResultCode = 10;
         in >> loginResultCode;
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
+        QString errorMessage = "";
+
         if(loginResultCode){
             QByteArray encryptedData;
             in >> encryptedData ;
@@ -336,6 +340,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             user->setSessionEncryptionKey(sessionEncryptionKey);
 
             errorTypeCode = quint8(IM::ERROR_NoError);
+            errorMessage = "";
 
             //TODO:
             user->loadMyInfoFromLocalDatabase();
@@ -347,12 +352,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             if(personalMessageInfoVersionOnServer != user->getPersonalMessageInfoVersion()){requestPersonalMessage(socketID, m_myUserID);}
 
         }else{
-            in >> errorTypeCode;
-            //emit signalLoginResultReceived(IM::ErrorType(errorTypeCode));
-
+            in >> errorTypeCode >> errorMessage;
         }
 
-        emit signalLoginResultReceived(errorTypeCode);
+        emit signalLoginResultReceived(errorTypeCode, errorMessage);
 
 
         qWarning()<<"--SERVER_RESPONSE_CLIENT_LOGIN_RESULT";
@@ -1224,7 +1227,26 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
 
+QStringList IMClientPacketsParser::runningNICAddresses(){
 
+    QStringList addresses;
+
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        if ( (interface.flags() & QNetworkInterface::IsRunning) && ( !(interface.flags() & QNetworkInterface::IsLoopBack)) ) {
+            foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+                //qDebug()<<"IP:"<<entry.ip()<<" Hardware Address:"<<interface.hardwareAddress()<<" Flags:"<<interface.flags();
+                QHostAddress ip = entry.ip();
+                if(ip.protocol() == QAbstractSocket::IPv6Protocol){continue;}
+                if(ip.isLoopback()){continue;}
+
+                addresses.append(ip.toString());
+            }
+        }
+    }
+
+    return addresses;
+
+}
 
 
 

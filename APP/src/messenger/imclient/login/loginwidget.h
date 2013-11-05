@@ -77,11 +77,12 @@ signals:
     void signalUserVerified();
     void signalServerFound(const QString &serverAddress, quint16 serverRTPListeningPort, const QString &serverName, const QString &version);
 
+    void signalKickedOff();
 
 public slots:
 
     //        void serverFound(const QString &serverAddress, quint16 serverUDPListeningPort, quint16 serverTCPListeningPort, const QString &serverName, const QString &version);
-    void slotProcessLoginResult(quint8 errorTypeCode);
+    void slotProcessLoginResult(quint8 errorTypeCode, const QString &errorMessage = "");
 
     void slotCheckAutoLogin();
 
