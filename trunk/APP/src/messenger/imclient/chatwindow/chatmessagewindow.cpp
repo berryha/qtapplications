@@ -97,7 +97,7 @@ void ChatMessageWindow::initUI(){
     connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
     m_mainWebFrame = page->mainFrame();
-    connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrameToBottom(const QSize &)));
+    connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrame(const QSize &)));
 
     ui.mainSplitter->setStretchFactor(1, 1);
 
@@ -158,6 +158,10 @@ void ChatMessageWindow::initUI(){
 
     m_screenshot = 0;
 
+    m_properScrollBarValue = 0;
+
+    lastUnACKedMessageFromContact = "";
+
     connect(ui.pushButtonClose, SIGNAL(clicked()), this, SIGNAL(signalCloseWindow()));
     connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
 
@@ -209,11 +213,7 @@ bool ChatMessageWindow::isDownloadingImage(const QString &imageName){
 void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime){
     qDebug()<<"--ChatMessageWindow::appendChatMessage(...)";
 
-
-    QString userID;
-    QString nickName;
-
-
+    QString userID = "", nickName = "";
     if(!sender){
         userID = m_contact->getUserID();
         nickName = m_contact->getNickName();
@@ -230,6 +230,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
                 nickName = remarkName;
             }
         }
+        lastUnACKedMessageFromContact = QString("%1:%2").arg(nickName).arg(message);
     }
 
 
@@ -296,6 +297,8 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
         }
     }
 
+
+
     qDebug();
     qDebug()<<"------msg:"<<msg;
     qDebug();
@@ -304,7 +307,6 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
     qDebug();
 
     //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
-
 
 
 }
@@ -444,6 +446,16 @@ QString ChatMessageWindow::getRichMessageBlock(){
 
 
     return out.simplified();
+
+}
+
+void ChatMessageWindow::tipLastUnACKedMessageFromContact(){
+
+    if(lastUnACKedMessageFromContact.isEmpty()){
+        return;
+    }
+
+    QToolTip::showText(ui.webView->mapToGlobal(ui.webView->geometry().bottomLeft()), lastUnACKedMessageFromContact);
 
 }
 
@@ -646,8 +658,27 @@ void ChatMessageWindow::showMessageHistory(bool show){
 
 }
 
-void ChatMessageWindow::scrollWebFrameToBottom(const QSize & contentsSize){
-    m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
+void ChatMessageWindow::scrollWebFrame(const QSize & contentsSize){
+
+
+    int frameHeight = m_mainWebFrame->geometry().size().height();
+    if(contentsSize.height() <= frameHeight){
+        m_properScrollBarValue = 0;
+        return;
+    }
+
+    int curScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
+
+    if(m_properScrollBarValue == curScrollBarValue){
+        m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
+        m_properScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
+    }else{
+        m_properScrollBarValue = contentsSize.height() - frameHeight;
+        tipLastUnACKedMessageFromContact();
+    }
+
+    lastUnACKedMessageFromContact = "";
+
 }
 
 
