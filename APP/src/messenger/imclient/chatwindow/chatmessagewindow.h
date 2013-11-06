@@ -80,10 +80,8 @@ private slots:
 
     void showMessageHistory(bool show);
 
-
     void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
     void updateImage2(const QString &imageName);
-
 
 
     void showFontFrame();
@@ -105,7 +103,6 @@ private slots:
 
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
-
 
     void scrollWebFrameToBottom(const QSize &contentsSize);
     void linkClicked(const QUrl & url);
