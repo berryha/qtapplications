@@ -104,7 +104,7 @@ private slots:
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
-    void scrollWebFrameToBottom(const QSize &contentsSize);
+    void scrollWebFrame(const QSize &contentsSize);
     void linkClicked(const QUrl & url);
 
 
@@ -118,6 +118,8 @@ private:
     void alignmentChanged(Qt::Alignment a);
 
     QString getRichMessageBlock();
+
+    void tipLastUnACKedMessageFromContact();
 
 private:
     Ui::MessageWindowUi ui;
@@ -155,7 +157,9 @@ private:
     QStringList m_imagesDownloading;
     QStringList m_imagesUploading;
 
+    int m_properScrollBarValue;
 
+    QString lastUnACKedMessageFromContact;
 
 
 
