@@ -21,6 +21,15 @@
      </property>
      <widget class="QWidget" name="gridLayoutWidget">
       <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>3</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>0</number>
+       </property>
        <item row="0" column="0">
         <widget class="QWebView" name="webView">
          <property name="sizePolicy">
@@ -39,6 +48,16 @@
          </property>
          <property name="renderHints">
           <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::SmoothPixmapTransform|QPainter::TextAntialiasing</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelUnACKedMessage">
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
          </property>
         </widget>
        </item>

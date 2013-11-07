@@ -520,10 +520,10 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
         QStringList message;
         message.append(QVariant(query.value(0)).toString());
         message.append(QVariant(query.value(1)).toString());
-        message.append(QVariant(query.value(2)).toDateTime().toString("yyyy.MM.dd hh:mm:ss"));
+        message.append(QVariant(query.value(2)).toDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 
+        //MESSAGE FORMAT:Sender 0X1E Message 0X1E Time
         messages.append(message.join(QString(PACKET_DATA_SEPARTOR)));
-
     }
 
 //    statement = QString("delete from cachedchatmessages where RecieverID='%1' ").arg(imUserID);

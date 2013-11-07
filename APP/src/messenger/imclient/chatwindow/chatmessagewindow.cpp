@@ -92,6 +92,10 @@ void ChatMessageWindow::initUI(){
     ui.webView->setHtml(htmlForMessagesView);
     //connect(ui.webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
+    ui.labelUnACKedMessage->setBackgroundRole(QPalette::Midlight);
+    ui.labelUnACKedMessage->hide();
+
+
     QWebPage *page = ui.webView->page();
     page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
@@ -455,7 +459,10 @@ void ChatMessageWindow::tipLastUnACKedMessageFromContact(){
         return;
     }
 
-    QToolTip::showText(ui.webView->mapToGlobal(ui.webView->geometry().bottomLeft()), lastUnACKedMessageFromContact);
+    ui.labelUnACKedMessage->setText(lastUnACKedMessageFromContact);
+    ui.labelUnACKedMessage->show();
+
+    QTimer::singleShot(3000, ui.labelUnACKedMessage, SLOT(hide()));
 
 }
 
