@@ -846,7 +846,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << message;
+        out << m_myUserID << message;
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKeyWithContactHash.value(contactID), true);
         ba.clear();
@@ -1439,6 +1439,7 @@ private:
 
     IMUser *user;
     QString m_myUserID;
+    QString m_serverName;
 
     Cryptography *cryptography;
     QByteArray sessionEncryptionKey;

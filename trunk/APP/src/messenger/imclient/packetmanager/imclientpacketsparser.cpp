@@ -87,6 +87,7 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
 
     user = IMUser::instance();
     m_myUserID = user->getUserID();
+    m_serverName = "";
 
     cryptography = new Cryptography();
     sessionEncryptionKey = QByteArray();
@@ -321,6 +322,9 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString errorMessage = "";
 
         if(loginResultCode){
+
+            m_serverName = peerID;
+
             QByteArray encryptedData;
             in >> encryptedData ;
 
@@ -862,17 +866,24 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         //TODO:
 
         QByteArray encryptedData;
-        QString contactID = peerID;
         in >> encryptedData;
 
         QByteArray decryptedData;
-        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
+        if(peerID == m_serverName){
+            //FROM SERVER
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+            qDebug()<<"Chat message from server!";
+        }else{
+            //FROM CONTACT
+            cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(peerID), false);
+            qDebug()<<"Chat message from contact!";
+        }
         //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
 
-        QString message = "";
-        stream  >> message;
+        QString contactID = "", message = "";
+        stream  >> contactID >> message;
 
         emit signalChatMessageReceivedFromContact(contactID, message, ServerTime::instance()->timeString());
 

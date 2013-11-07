@@ -356,10 +356,10 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalRegistrationServerInfoReceived(quint8, bool, const QString &, quint8, const QString &, bool)), ui.loginPage, SIGNAL(signalRegistrationServerInfoReceived(quint8, bool, const QString &, quint8, const QString &, bool)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), ui.loginPage, SIGNAL(signalRegistrationResultReceived(quint8, quint32, const QString&)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalRequestLogin(const QHostAddress &, quint16 )), this, SLOT(requestLogin(const QHostAddress &, quint16)));
-    connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)));
+    connect(ui.loginPage, SIGNAL(signalLookForServer(const QHostAddress &, quint16 )), clientPacketsParser, SLOT(sendClientLookForServerPacket(const QHostAddress &, quint16)), Qt::QueuedConnection);
     connect(ui.loginPage, SIGNAL(signalKickedOff()), this, SLOT(slotProcessKickedOff()));
 
-    connect(this,SIGNAL(signalMyOnlineStateChanged(int, quint8)), clientPacketsParser, SLOT(changeMyOnlineState(int, quint8)));
+    connect(this,SIGNAL(signalMyOnlineStateChanged(int, quint8)), clientPacketsParser, SLOT(changeMyOnlineState(int, quint8)), Qt::QueuedConnection);
     
     connect(clientPacketsParser, SIGNAL(signalUpdatePasswordResultReceived(quint8, const QString&)), this, SLOT(slotProcessUpdatePasswordResult(quint8, const QString&)), Qt::QueuedConnection);
     
@@ -367,8 +367,8 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalLoginResultReceived(quint8, const QString &)), this, SLOT(slotProcessLoginResult(quint8, const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalClientLastLoginInfoPacketReceived(const QString &, const QString &, const QString &, const QString &)), this, SLOT(slotProcessClientLastLoginInfo(const QString &, const QString &, const QString &, const QString &)), Qt::QueuedConnection);
 
-    connect(clientPacketsParser, SIGNAL(signalContactStateChangedPacketReceived(const QString &, quint8, const QString &, quint16)), this, SLOT(slotProcessContactStateChanged(const QString &, quint8, const QString &, quint16)));
-    connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )));
+    connect(clientPacketsParser, SIGNAL(signalContactStateChangedPacketReceived(const QString &, quint8, const QString &, quint16)), this, SLOT(slotProcessContactStateChanged(const QString &, quint8, const QString &, quint16)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalContactsOnlineInfoPacketReceived(const QString & )), this, SLOT(slotProcessContactsOnlineInfo(const QString & )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalUserInfoPacketReceived(const QString &)), this, SLOT(slotProcessUserInfo(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactGroupsInfoPacketReceived(const QString &, quint32 )), this, SLOT(slotProcessContactGroupsInfo(const QString &, quint32 )), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalContactsInfoVersionPacketReceived(const QString, quint32)), this, SLOT(slotProcessContactsInfoVersion(const QString, quint32)), Qt::QueuedConnection);
@@ -412,24 +412,10 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalFileTXError(int, const QString &, const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int, const QString &, const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
     
-    connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)));
-    connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)));
-    connect(chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)));
+    connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)), Qt::QueuedConnection);
+    connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), Qt::QueuedConnection);
+    connect(chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)), Qt::QueuedConnection);
 
-    
-    
-    
-
-    //QObject::connect(&mw, SIGNAL(signalUserOnlineStateChanged(UserBase::OnlineState)), networkManager, SLOT(slotChangeUserOnlineState(UserBase::OnlineState)));
-    //QObject::connect(&mw, SIGNAL(signalRequestContactInfo(const QString &)), networkManager, SLOT(slotRequestClientInfo(const QString &)));
-
-    //    QObject::connect(networkManager, SIGNAL(signalContactOnlineStateChanged(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotChangeContactOnlineState(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-    //    QObject::connect(networkManager, SIGNAL(signalContactInfoReceivedFromContact(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotUpdateContactInfo(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-
-    //QObject::connect(&networkManager, SIGNAL(signalContactOnlineStateChanged(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)), &mw, SLOT(slotChangeContactOnlineState(const QString &, UserBase::OnlineState, const QString &, quint16 , const QString &)));
-    //    QObject::connect(networkManager, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &)), &mw, SLOT(slotProcessChatMessageReceivedFromContact(const QString &, const QString &)));
-
-    //    QObject::connect(networkManager, SIGNAL(signalChatMessageReceivedFromContact(const QString &, const QString &)), chatWindowManager, SLOT(slotNewMessageReceivedFromContact(const QString &, const QString &)));
 
 
 
@@ -447,16 +433,6 @@ void MainWindow::startNetwork(){
 
 
     networkStarted = true;
-
-
-    //    QString section = serviceName() + "/LastCheckUpdate";
-    //    QSettings settings(QCoreApplication::applicationDirPath()+"/.settings", QSettings::IniFormat, this);
-    //    QDateTime time = settings.value(section, QDateTime()).toDateTime();
-    //    if(time.isNull() || (time.addDays(1) < QDateTime::currentDateTime())){
-    //        update();
-    //        settings.setValue(section, QDateTime::currentDateTime());
-    //    }
-    //update();
 
 
 #if defined(Q_OS_WIN32)
@@ -1840,6 +1816,7 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
 }
 
 void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfoString){
+    qDebug()<<"--MainWindow::slotProcessContactsOnlineInfo(...)"<<" contactsOnlineInfoString:"<<contactsOnlineInfoString;
 
     QStringList contactsOnlineInfo = contactsOnlineInfoString.split(QString(UNIT_SEPARTOR));
     foreach (QString infoString, contactsOnlineInfo) {
@@ -1847,9 +1824,11 @@ void MainWindow::slotProcessContactsOnlineInfo(const QString &contactsOnlineInfo
         QString contactID = infoList.at(0);
         Contact *contact = m_contactsManager->getUser(contactID);
         if(!contact){
+            qDebug()<<"---------------XXXXXXXXXXXXX:"<<contactID;
             continue;
         }
         contact->setOnlineState(IM::OnlineState(infoList.at(1).toUInt()));
+        qDebug()<<"-----------------------OnlineState:"<<contact->getOnlineState();
         contact->setLastLoginExternalHostAddress(infoList.at(2));
         contact->setLastLoginExternalHostPort(infoList.at(3).toUInt());
 

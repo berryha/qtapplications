@@ -1098,6 +1098,35 @@ public slots:
 
     }
 
+    bool sendContactChatMessagePacket(int peerSocketID, const QString &senderID, const QString &message, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendContactChatMessagePacket(...)";
+
+        //TODO:缓存消息的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::CHAT_MESSAGE_FROM_CONTACT));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << senderID << message;
+
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
+
 
     bool sendRequestImagePacket(int peerSocketID, const QString &contactID, const QString &imageName, const QByteArray &sessionEncryptionKey){
         qDebug()<<"--sendRequestImagePacket(...)";
