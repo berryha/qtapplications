@@ -159,6 +159,7 @@ void ChatMessageWindow::initUI(){
     textSize(m_defaultFontSize);
 
     m_styleString = "";
+    m_simpleStyleTag = "";
 
     m_screenshot = 0;
 
@@ -266,7 +267,16 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
     //if(pos != -1){
     //    msg += regExp.cap(0);
     //}
-    msg += message;
+
+
+    if(userID != myUserID){
+        QString richMessage = simpleTextToRichTextMessage(message);
+        msg += richMessage;
+    }else{
+        msg += message;
+    }
+
+
 
     QWebElement doc = m_mainWebFrame->documentElement();
     QWebElement div = doc.findFirst("div");
@@ -303,12 +313,12 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
 
-    qDebug();
-    qDebug()<<"------msg:"<<msg;
-    qDebug();
-    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
+//    qDebug();
+//    qDebug()<<"------msg:"<<msg;
+//    qDebug();
+//    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
 
-    qDebug();
+//    qDebug();
 
     //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
@@ -453,6 +463,62 @@ QString ChatMessageWindow::getRichMessageBlock(){
 
 }
 
+QString ChatMessageWindow::richTextToSimpleTextMessage(const QString &richTextMessage){
+
+    QString msg = richTextMessage;
+
+    if(msg.trimmed().isEmpty()){
+        return msg;
+    }
+
+    //remove last </p>
+    msg = msg.left(msg.length() - 4);
+    msg.replace("<br/>", "\\r\\n");
+    msg.replace("<p>", "");
+    msg.replace("</p>", "\\n");
+
+    msg = m_simpleStyleTag + QChar('|') + msg;
+
+    return msg;
+
+}
+
+QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleTextMessage){
+
+    QString msg = simpleTextMessage;
+    if(msg.trimmed().isEmpty()){
+        msg = "<p></p>";
+        return msg;
+    }
+
+    int separateIndex = msg.indexOf(QChar('|'));
+    if(separateIndex == -1){return "<p></p>";}
+    QString styleTag = msg.left(separateIndex);
+    msg.remove(0, separateIndex+1);
+
+//    QStringList list = msg.split(QChar('|'));
+//    if(list.size() != 2){return "<p></p>";}
+//    QString styleTag = list.at(0);
+//    msg = list.at(1);
+
+    msg = "<p>" + msg + "</p>";
+    msg.replace("\\r\\n", "</br>");
+
+    msg.replace("\\n", "</p><p>");
+
+    QString divStyle = simpleStyleTagToStyleString(styleTag);
+
+    if(divStyle.trimmed().isEmpty()){
+        msg = QString("<div>") + msg;
+    }else{
+        msg = QString("<div style=\"%1\">").arg(divStyle) + msg;
+    }
+    msg += QString("</div>");
+
+    return msg;
+
+}
+
 void ChatMessageWindow::tipLastUnACKedMessageFromContact(){
 
     if(lastUnACKedMessageFromContact.isEmpty()){
@@ -495,6 +561,9 @@ void ChatMessageWindow::emitSendMsgSignal() {
     QString richMessage = getRichMessageBlock();
     richMessage.replace("<span>", "");
     richMessage.replace("</span>", "");
+    qDebug()<<"-----------0-----------richMessage:"<<richMessage;
+
+    QString simpleTextMessage = richTextToSimpleTextMessage(richMessage);
 
 
     if(m_styleString.trimmed().isEmpty()){
@@ -503,8 +572,8 @@ void ChatMessageWindow::emitSendMsgSignal() {
         richMessage = QString("<div style=\"%1\">").arg(m_styleString) + richMessage;
     }
     richMessage += QString("</div>");
-
     appendChatMessage(richMessage, m_myself, ServerTime::instance()->timeString());
+
 
     ui.textEdit->clear();
     ui.textEdit->setFocus();
@@ -513,10 +582,10 @@ void ChatMessageWindow::emitSendMsgSignal() {
 
     switch(m_chatMessageWindowType){
     case CMWT_Contact:
-        emit sendMsgButtonClicked(m_contact, richMessage, m_imagesUploading);
+        emit sendMsgButtonClicked(m_contact, simpleTextMessage, m_imagesUploading);
         break;
     case CMWT_InterestGroup:
-        emit sendMsgButtonClicked(m_interestGroup, richMessage, m_imagesUploading);
+        emit sendMsgButtonClicked(m_interestGroup, simpleTextMessage, m_imagesUploading);
         break;
     case CMWT_TempGroup:
         break;
@@ -983,40 +1052,105 @@ void ChatMessageWindow::colorChanged(const QColor &c) {
 void ChatMessageWindow::getStyleString(){
 
     QString styleInfo = "";
+    QStringList tags;
     
-    if(ui.fontComboBox->currentText() != m_defaultFontName){
-        styleInfo = QString("font-family:'%1';").arg(ui.fontComboBox->currentText());
+    QString fontFamily = ui.fontComboBox->currentText();
+    if(fontFamily != m_defaultFontName){
+        styleInfo = QString("font-family:'%1';").arg(fontFamily);
+        tags.append(fontFamily);
+    }else{
+        tags.append("");
     }
-    
-    if(ui.fontSizeComboBox->currentText() != m_defaultFontSize){
-        styleInfo = QString("font-size:%1pt;").arg(ui.fontSizeComboBox->currentText());
+
+
+    QString fontSize = ui.fontSizeComboBox->currentText();
+    if(fontSize != m_defaultFontSize){
+        styleInfo += QString("font-size:%1pt;").arg(fontSize);
+        tags.append(fontSize);
+    }else{
+        tags.append("");
     }
     
     if(ui.fontBoldToolButton->isChecked()){
         styleInfo += QString("font-weight:bold;");
+        tags.append("b");
+    }else{
+        tags.append("");
     }
     
     if(ui.fontItalicToolButton->isChecked()){
         styleInfo += QString("font-style:italic;");
+        tags.append("i");
+    }else{
+        tags.append("");
     }
     
     if(ui.fontUnderlineToolButton->isChecked()){
         styleInfo += QString("text-decoration:underline;");
+        tags.append("u");
+    }else{
+        tags.append("");
     }
     
-    if(fmt.foreground().color().name() != "#000000"){
-        styleInfo += QString("color:%1;").arg(fmt.foreground().color().name());
+    QString colorName = fmt.foreground().color().name();
+    if(colorName != "#000000"){
+        styleInfo += QString("color:%1;").arg(colorName);
+        tags.append(colorName);
+    }else{
+        tags.append("");
     }
     
     //styleInfo += "position: relative;";
     
     m_styleString = styleInfo;
+
+    //m_simpleStyleTag FORMAT: font-family;font-size;font-weight:bold;font-style:italic;text-decoration:underline;color;
+    m_simpleStyleTag = tags.join(";");
     
-
-
 }  
 
+QString ChatMessageWindow::simpleStyleTagToStyleString(const QString &tagsString){
 
+    //tagsString FORMAT: font-family;font-size;font-weight:bold;font-style:italic;text-decoration:underline;color;
+
+    QStringList styleList = tagsString.split(";");
+    if(styleList.size() != 6){return "";}
+
+    QString styleInfo = "";
+
+    QString fontFamily = styleList.at(0);
+    if(!fontFamily.isEmpty()){
+        styleInfo = QString("font-family:'%1';").arg(fontFamily);
+    }
+
+    QString fontSize = styleList.at(1);
+    if(!fontSize.isEmpty()){
+        styleInfo += QString("font-size:%1pt;").arg(fontSize);
+    }
+
+    QString fontBold = styleList.at(2);
+    if(!fontBold.isEmpty()){
+        styleInfo += QString("font-weight:bold;");
+    }
+
+    QString fontItalic = styleList.at(3);
+    if(!fontItalic.isEmpty()){
+        styleInfo += QString("font-style:italic;");
+    }
+
+    QString fontUnderline = styleList.at(4);
+    if(!fontUnderline.isEmpty()){
+        styleInfo += QString("text-decoration:underline;");
+    }
+
+    QString fontColorName = styleList.at(5);
+    if(!fontColorName.isEmpty()){
+        styleInfo += QString("color:%1;").arg(fontColorName);
+    }
+
+    return styleInfo;
+
+}
 
 
 
