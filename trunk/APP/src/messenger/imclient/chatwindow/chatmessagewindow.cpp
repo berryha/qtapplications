@@ -561,10 +561,8 @@ void ChatMessageWindow::emitSendMsgSignal() {
     QString richMessage = getRichMessageBlock();
     richMessage.replace("<span>", "");
     richMessage.replace("</span>", "");
-    qDebug()<<"-----------0-----------richMessage:"<<richMessage;
 
     QString simpleTextMessage = richTextToSimpleTextMessage(richMessage);
-
 
     if(m_styleString.trimmed().isEmpty()){
         richMessage = QString("<div>") + richMessage;
@@ -595,10 +593,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
     }
 
 
-
 //    qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
-
-
 
 }
 
