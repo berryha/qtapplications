@@ -91,11 +91,11 @@ private slots:
     void takeScreenshot();
     void screenshotDone(const QImage &image);
 
-    void textBold();
-    void textUnderline();
-    void textItalic();
     void textFamily(const QString &f);
     void textSize(const QString &p);
+    void textBold();
+    void textItalic();
+    void textUnderline();
     void textColor();
 
     void currentCharFormatChanged(const QTextCharFormat &format);
@@ -111,6 +111,7 @@ private slots:
 private:
     void initUI();
     void getStyleString();
+    QString simpleStyleTagToStyleString(const QString &tagsString);
 
     void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
     void fontChanged(const QFont &f);
@@ -118,6 +119,10 @@ private:
     void alignmentChanged(Qt::Alignment a);
 
     QString getRichMessageBlock();
+
+    QString richTextToSimpleTextMessage(const QString &richTextMessage);
+    QString simpleTextToRichTextMessage(const QString &simpleTextMessage);
+
 
     void tipLastUnACKedMessageFromContact();
 
@@ -151,6 +156,8 @@ private:
     QString m_defaultFontName;
     QString m_defaultFontSize;
     QString m_styleString;
+    QString m_simpleStyleTag;
+
 
     Screenshot *m_screenshot;
 
