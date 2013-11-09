@@ -235,7 +235,6 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
                 nickName = remarkName;
             }
         }
-        lastUnACKedMessageFromContact = QString("%1:%2").arg(nickName).arg(message);
     }
 
 
@@ -270,8 +269,14 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
     if(userID != myUserID){
-        QString richMessage = simpleTextToRichTextMessage(message);
+        QString richMessage = contactsSimpleTextToRichTextMessage(message);
         msg += richMessage;
+
+        if(m_properScrollBarValue != m_mainWebFrame->scrollBarValue(Qt::Vertical)){
+            lastUnACKedMessageFromContact = contactsSimpleTextToPlainTipTextMessage(message);
+            lastUnACKedMessageFromContact = nickName + ":" + lastUnACKedMessageFromContact;
+        }
+
     }else{
         msg += message;
     }
@@ -463,7 +468,7 @@ QString ChatMessageWindow::getRichMessageBlock(){
 
 }
 
-QString ChatMessageWindow::richTextToSimpleTextMessage(const QString &richTextMessage){
+QString ChatMessageWindow::myRichTextToSimpleTextMessage(const QString &richTextMessage){
 
     QString msg = richTextMessage;
 
@@ -483,7 +488,7 @@ QString ChatMessageWindow::richTextToSimpleTextMessage(const QString &richTextMe
 
 }
 
-QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleTextMessage){
+QString ChatMessageWindow::contactsSimpleTextToRichTextMessage(const QString &simpleTextMessage){
 
     QString msg = simpleTextMessage;
     if(msg.trimmed().isEmpty()){
@@ -501,6 +506,7 @@ QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleText
 //    QString styleTag = list.at(0);
 //    msg = list.at(1);
 
+
     msg = "<p>" + msg + "</p>";
     msg.replace("\\r\\n", "</br>");
 
@@ -514,6 +520,38 @@ QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleText
         msg = QString("<div style=\"%1\">").arg(divStyle) + msg;
     }
     msg += QString("</div>");
+
+    return msg;
+
+}
+
+QString ChatMessageWindow::contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage){
+
+
+    QString msg = simpleTextMessage;
+    if(msg.trimmed().isEmpty()){
+        return "";
+    }
+
+    int separateIndex = msg.indexOf(QChar('|'));
+    if(separateIndex == -1){return "<p></p>";}
+    msg.remove(0, separateIndex+1);
+
+    msg.replace("\\r\\n", " ");
+    msg.replace("\\n", " ");
+
+    QRegExp regExp("<img.*/>");
+    regExp.setCaseSensitivity(Qt::CaseInsensitive);
+    regExp.setMinimal(true);
+    int pos = 0;
+    QStringList list;
+    while ((pos = regExp.indexIn(msg, pos)) != -1) {
+        list << regExp.cap(0);
+        pos += regExp.matchedLength();
+    }
+    foreach (QString str, list) {
+        msg.replace(str, tr("[Image]"));
+    }
 
     return msg;
 
@@ -562,7 +600,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
     richMessage.replace("<span>", "");
     richMessage.replace("</span>", "");
 
-    QString simpleTextMessage = richTextToSimpleTextMessage(richMessage);
+    QString simpleTextMessage = myRichTextToSimpleTextMessage(richMessage);
 
     if(m_styleString.trimmed().isEmpty()){
         richMessage = QString("<div>") + richMessage;
@@ -817,7 +855,7 @@ void ChatMessageWindow::insertEmoticon( const QString &iconPath, bool isSystemEm
     QString emoticon ;
     
     if(isSystemEmoticon){
-        emoticon = QString("<img src=\"" + iconPath + "/\"> ");
+        emoticon = QString("<img src=\"" + iconPath + "\"/> ");
     }else{
         QFileInfo fileInfo(iconPath);
         QString fileName = myUserID + "_" + fileInfo.absoluteDir().dirName() + "_" + fileInfo.fileName();

@@ -2188,7 +2188,7 @@ void MainWindow::getNewContactSettings(const QString &contactID){
     
     int existingGroupID = m_myself->groupIDThatContactBelongsTo(contactID);
 
-    AddContactDialog dlg(contact, false, this);
+    AddContactDialog dlg(contact, false);
     dlg.exec();
     quint32 newGroupID = dlg.getGroupID();
     QString remarkName = dlg.getNewName();
@@ -2299,7 +2299,7 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
     Contact user(userID, userNickName, this);
     user.setFace(userFace);
 
-    AddContactDialog dlg(&user, verificationMessage, this);
+    AddContactDialog dlg(&user, verificationMessage);
     if(dlg.exec() == QDialog::Accepted){
         if(dlg.requestRejected()){
             clientPacketsParser->responseAddContactRequestFromUser(m_socketConnectedToServer, userID, false, 0, dlg.getMessage());
