@@ -326,6 +326,7 @@ void ChatWindowManager::slotNewMessageReceivedFromContact(const QString &contact
         update();
         showNormal();
         raise();
+        QApplication::alert(this);
     }
         break;
     case MDIChatWindow:
@@ -344,6 +345,8 @@ void ChatWindowManager::slotNewMessageReceivedFromContact(const QString &contact
         update();
         showNormal();
         raise();
+        QApplication::alert(this);
+
     }
         break;
     case SeparatedChatWindow:

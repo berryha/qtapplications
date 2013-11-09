@@ -120,8 +120,9 @@ private:
 
     QString getRichMessageBlock();
 
-    QString richTextToSimpleTextMessage(const QString &richTextMessage);
-    QString simpleTextToRichTextMessage(const QString &simpleTextMessage);
+    QString myRichTextToSimpleTextMessage(const QString &richTextMessage);
+    QString contactsSimpleTextToRichTextMessage(const QString &simpleTextMessage);
+    QString contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage);
 
 
     void tipLastUnACKedMessageFromContact();
