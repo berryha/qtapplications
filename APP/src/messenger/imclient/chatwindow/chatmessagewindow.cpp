@@ -269,7 +269,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
     if(userID != myUserID){
-        QString richMessage = contactsSimpleTextToRichTextMessage(message);
+        QString richMessage = simpleTextToRichTextMessage(message);
         msg += richMessage;
 
         if(m_properScrollBarValue != m_mainWebFrame->scrollBarValue(Qt::Vertical)){
@@ -488,7 +488,7 @@ QString ChatMessageWindow::myRichTextToSimpleTextMessage(const QString &richText
 
 }
 
-QString ChatMessageWindow::contactsSimpleTextToRichTextMessage(const QString &simpleTextMessage){
+QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleTextMessage){
 
     QString msg = simpleTextMessage;
     if(msg.trimmed().isEmpty()){

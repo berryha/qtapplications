@@ -121,7 +121,7 @@ private:
     QString getRichMessageBlock();
 
     QString myRichTextToSimpleTextMessage(const QString &richTextMessage);
-    QString contactsSimpleTextToRichTextMessage(const QString &simpleTextMessage);
+    QString simpleTextToRichTextMessage(const QString &simpleTextMessage);
     QString contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage);
 
 
