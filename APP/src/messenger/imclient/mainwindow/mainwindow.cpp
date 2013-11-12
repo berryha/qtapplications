@@ -2309,7 +2309,6 @@ void MainWindow::showContactRequestFromUser(const QString &userID, const QString
         }
     }
 
-
 }
 
 

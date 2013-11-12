@@ -680,7 +680,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
                 //TODO:保存请求到数据库
                 saveFriendshipApplyRequestToDB(userID, contactID, verificationMessage);
             }else{
-                sendAddContactRequestFromUserPacket(contactInfo->getSocketID(), userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, userInfo->getSessionEncryptionKey(), peerAddress, peerPort);
+                sendAddContactRequestFromUserPacket(contactInfo->getSocketID(), userID, userInfo->getNickName(), userInfo->getFace(), verificationMessage, contactInfo->getSessionEncryptionKey(), peerAddress, peerPort);
             }
         }
 
