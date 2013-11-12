@@ -377,7 +377,7 @@ void MainWindow::startNetwork(){
 
     //connect(clientPacketsParser, SIGNAL(signalSearchContactsResultPacketReceived(const QString &)), this, SLOT(slotProcessSearchContactsResult(const QString &)), Qt::QueuedConnection);
     connect(clientPacketsParser, SIGNAL(signalAddContactRequestFromUserPacketReceived(const QString &, const QString &, const QString &, const QString & )), this, SLOT(slotProcessContactRequestFromUser(const QString &, const QString &, const QString &, const QString & )), Qt::QueuedConnection);
-    connect(clientPacketsParser, SIGNAL(signalAddContactResultPacketReceived(const QString &, const QString &, const QString &, int, quint8, const QString & )), this, SLOT(slotProcessAddContactResult(const QString &, const QString &, const QString &, int, quint8, const QString &)), Qt::QueuedConnection);
+    connect(clientPacketsParser, SIGNAL(signalAddContactResultPacketReceived(const QString &, const QString &, const QString &, int, quint8, const QString &, quint8 )), this, SLOT(slotProcessAddContactResult(const QString &, const QString &, const QString &, int, quint8, const QString &, quint8)), Qt::QueuedConnection);
 
     connect(clientPacketsParser, SIGNAL(signalDeleteContactResultPacketReceived(const QString &, bool, bool)), this, SLOT(slotDeleteContactResultReceived(const QString &, bool, bool)), Qt::QueuedConnection);
 
@@ -2118,7 +2118,7 @@ void MainWindow::slotProcessCreateOrDeleteContactGroupResult(quint32 groupID, co
 
 //}
 
-void MainWindow::slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage){
+void MainWindow::slotProcessAddContactResult(const QString &contactID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage, quint8 onlineStateCode){
     qDebug()<<"--MainWindow::slotProcessAddContactResult(...) "<<"  contactID:"<<contactID;
 
     IM::ErrorType type = IM::ErrorType(errorTypeCode);
@@ -2133,6 +2133,7 @@ void MainWindow::slotProcessAddContactResult(const QString &contactID, const QSt
             contact =  m_contactsManager->createNewContact(contactID, groupID, userNickName, userFace);
         }
         Q_ASSERT(contact);
+        contact->setOnlineState(IM::OnlineState(onlineStateCode));
         //contact->setContactGroupID(groupID);
         //m_contactsManager->saveContactInfoToDatabase(contactID);
 

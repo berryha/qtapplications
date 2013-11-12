@@ -1359,7 +1359,7 @@ signals:
 
     //void signalAddContactResultPacketReceived(const QString &contactID, IM::ErrorType errorType);
     void signalAddContactRequestFromUserPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
-    void signalAddContactResultPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage);
+    void signalAddContactResultPacketReceived(const QString &userID, const QString &userNickName, const QString &userFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage, quint8 onlineStateCode);
 
     void signalDeleteContactResultPacketReceived(const QString &contactID, bool contactDeleted, bool addToBlacklist = false);
 

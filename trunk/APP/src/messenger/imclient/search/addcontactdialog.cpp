@@ -15,8 +15,7 @@ AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, Q
     initUI();
     
     m_requestToAddContact = true;
-    
-        
+            
     if(requestToAddNewContact){
         ui.groupBoxUserInfo->setTitle(tr("The following user will be added."));
         ui.pushButtonReject->setText(tr("&Cancel"));
@@ -37,11 +36,9 @@ AddContactDialog::AddContactDialog(Contact *user, bool requestToAddNewContact, Q
 
 
         ui.groupBoxSettings->show();
+        ui.lineEditRename->setText(user->getRemarkName());
         ui.lineEditRename->setFocus();
     }
-
-
-
 
     
 }
@@ -51,7 +48,6 @@ AddContactDialog::AddContactDialog(Contact *user, const QString &requestMessage,
 {
     
     initUI();
-
     
     m_requestToAddContact = false;
     
@@ -74,8 +70,6 @@ AddContactDialog::AddContactDialog(Contact *user, const QString &requestMessage,
 
     initContactGroupCombox();
     //ui.lineEditRename->setFocus();
-
-
 
 }
 

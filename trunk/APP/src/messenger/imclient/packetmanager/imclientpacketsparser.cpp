@@ -654,7 +654,6 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString userID = "", userNickName = "", userFace = "", verificationMessage = "";
         stream >> userID >> userNickName >> userFace >> verificationMessage;
 
-        //emit signalAddContactResultPacketReceived(contactID, IM::ErrorType(errorTypeCode));
         emit signalAddContactRequestFromUserPacketReceived(userID, userNickName, userFace, verificationMessage);
         
     }
@@ -674,11 +673,11 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString userID = "", userNickName = "", userFace = "", reasonMessage = "";
         quint8 errorTypeCode = quint8(IM::ERROR_UnKnownError);
         int contactGroupID = ContactGroupBase::Group_Strangers_ID;
+        quint8 onlineStateCode = quint8(IM::ONLINESTATE_OFFLINE);
 
-        stream >> userID >> userNickName >> userFace >> contactGroupID >> errorTypeCode >> reasonMessage;
+        stream >> userID >> userNickName >> userFace >> contactGroupID >> errorTypeCode >> reasonMessage >> onlineStateCode;
 
-        //emit signalAddContactResultPacketReceived(contactID, IM::ErrorType(errorTypeCode));
-        emit signalAddContactResultPacketReceived(userID, userNickName, userFace, contactGroupID, errorTypeCode, reasonMessage);
+        emit signalAddContactResultPacketReceived(userID, userNickName, userFace, contactGroupID, errorTypeCode, reasonMessage, onlineStateCode);
         
     }
         break;

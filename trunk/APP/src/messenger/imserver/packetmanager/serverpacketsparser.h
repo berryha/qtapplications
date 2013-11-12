@@ -814,7 +814,7 @@ public slots:
         return m_rtp->sendReliableData(peerSocketID, &ba);
     }
 
-    bool sendAddContactResultPacket(int peerSocketID, const QString &contactID, const QString &contactNickName, const QString &contactFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage, const QByteArray &sessionEncryptionKey, const QString &targetHostAddress, quint16 targetHostPort){
+    bool sendAddContactResultPacket(int peerSocketID, const QString &contactID, const QString &contactNickName, const QString &contactFace, int contactGroupID, quint8 errorTypeCode, const QString &reasonMessage, quint8 onlineStateCode, const QByteArray &sessionEncryptionKey, const QString &targetHostAddress, quint16 targetHostPort){
         qDebug()<<"--sendAddContactResultPacket(...)";
         
         Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
@@ -824,7 +824,7 @@ public slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << contactID << contactNickName << contactFace << contactGroupID << errorTypeCode << reasonMessage;
+        out << contactID << contactNickName << contactFace << contactGroupID << errorTypeCode << reasonMessage << onlineStateCode;
 
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
