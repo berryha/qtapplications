@@ -46,6 +46,7 @@ public:
 
     void interestGroupMemberJoinedOrQuitted(quint32 groupID, const QString &memberID, bool join);
 
+    void contactOnlineStateChanged(Contact *contact);
 
 
 signals:

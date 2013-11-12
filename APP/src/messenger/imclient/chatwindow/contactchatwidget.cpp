@@ -60,6 +60,11 @@ void ContactChatWidget::processImageDownloadResult(const QString &imageName, boo
     return ui.chatMessageWindow->processImageDownloadResult(imageName, downloaded);
 }
 
+void ContactChatWidget::contactOnlineStateChanged(){
+    //TODO
+
+}
+
 
 void ContactChatWidget::closeEvent(QCloseEvent * event){
 

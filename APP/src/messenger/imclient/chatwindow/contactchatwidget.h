@@ -20,6 +20,7 @@ public:
     bool isDownloadingImage(const QString &imageName);
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
+    void contactOnlineStateChanged();
 
 
 protected:

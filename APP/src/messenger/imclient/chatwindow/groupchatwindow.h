@@ -19,6 +19,9 @@ public:
     bool isDownloadingImage(const QString &imageName);
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
+    void contactOnlineStateChanged(Contact *contact);
+
+
     void memberJoinedOrQuitted(const QString &memberID, bool join);
 
 protected:
