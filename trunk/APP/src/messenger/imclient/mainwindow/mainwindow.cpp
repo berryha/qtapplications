@@ -3048,6 +3048,8 @@ void MainWindow::requestLogin(const QHostAddress &serverHostAddress, quint16 ser
     }
     if(m_socketConnectedToServer == INVALID_SOCK_ID){
         qCritical()<<tr("Can not connect to host! %1").arg(errorMessage);
+
+        ui.loginPage->slotProcessLoginResult(IM::ERROR_ConnectionFailed);
         return;
     }
 

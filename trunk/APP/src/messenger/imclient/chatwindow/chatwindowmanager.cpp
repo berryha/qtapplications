@@ -235,6 +235,50 @@ void ChatWindowManager::interestGroupMemberJoinedOrQuitted(quint32 groupID, cons
 
 }
 
+void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
+
+    if(!contact){return;}
+
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contact->getUserID());
+    if(!ccw){return;}
+    ccw->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+    ccw->contactOnlineStateChanged();
+
+    switch (m_chatWindowDisplayStyle) {
+    case TabbedChatWindow:
+    {
+
+//        ccw = findContactChatTabWidget(contact);
+//        if(!ccw){break;}
+        ui.tabWidget->setTabIcon(ui.tabWidget->indexOf(ccw), ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+    }
+        break;
+    case MDIChatWindow:
+    {
+        QMdiSubWindow * subWindow = findChatWithContactMdiSubWindow(contact);
+        if(!subWindow){break;}
+        subWindow->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+    }
+        break;
+    case SeparatedChatWindow:
+    {
+//        ccw = m_contactChatWidgetHash.value(contactID);
+//        if(!ccw){break;}
+//        ccw->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+    }
+        return;
+    default:
+        break;
+    }
+
+
+    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
+        gcw->contactOnlineStateChanged(contact);
+    }
+
+
+}
+
 void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
     qDebug()<<"----ChatWindowManager::slotNewChatWithContact(const QString &id)~~~";
 

@@ -265,7 +265,7 @@ void ContactBox::updateContactGroupItemInfo(QTreeWidgetItem *contactGroupItem){
             onlineCount++;
         }
     }
-    contactGroupItem->setText(0, contactGroup->getGroupName() + QString(" [%1\/%2]").arg(onlineCount).arg(memberCount) );
+    contactGroupItem->setText(0, contactGroup->getGroupName() + QString(" [%1/%2]").arg(onlineCount).arg(memberCount) );
 
 }
 

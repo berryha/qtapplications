@@ -655,6 +655,11 @@ void LoginWidget::slotProcessLoginResult(quint8 errorTypeCode, const QString &er
             errorMsg = tr("Request Timeout!");
         }
         break;
+        case IM::ERROR_ConnectionFailed:
+        {
+            errorMsg = tr("Connection Failed!");
+        }
+        break;
         case IM::ERROR_RequestDenied:
         {
             errorMsg = tr("Request Denied!");

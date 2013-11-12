@@ -82,6 +82,15 @@ void GroupChatWindow::processImageDownloadResult(const QString &imageName, bool 
     ui.chatMessageWindow->processImageDownloadResult(imageName, downloaded);
 }
 
+void GroupChatWindow::contactOnlineStateChanged(Contact *contact){
+    //TODO
+
+    QListWidgetItem * item = memberItem(contact->getUserID());
+    if(!item){return;}
+
+    item->setIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
+}
+
 void GroupChatWindow::memberJoinedOrQuitted(const QString &memberID, bool join){
 
     QListWidgetItem * item = memberItem(memberID);
