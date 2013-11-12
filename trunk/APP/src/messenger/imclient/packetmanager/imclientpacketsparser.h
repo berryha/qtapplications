@@ -384,6 +384,7 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << contactID << verificationMessage << groupID;
+
         QByteArray encryptedData;
         cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();

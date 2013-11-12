@@ -798,6 +798,7 @@ public slots:
         out.setVersion(QDataStream::Qt_4_8);
 
         out << userID << userNickName << userFace << verificationMessage;
+
         QByteArray encryptedData;
         crypto(&encryptedData, ba, sessionEncryptionKey, true);
         ba.clear();
