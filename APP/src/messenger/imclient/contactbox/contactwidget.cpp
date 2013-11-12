@@ -94,12 +94,10 @@ void ContactWidget::flashFace(bool flash){
             timer->stop();
             delete timer;
             timer = 0;
+
+            ui.pushButtonFace->setIcon(ImageResource::createIconForContact(m_contact->getFace(), m_contact->getOnlineState()));
         }
     }
-
-
-
-
 
 }
 
