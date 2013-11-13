@@ -371,7 +371,7 @@ void TCPBase::processSocketError(QAbstractSocket::SocketError error){
         QMutexLocker locker(&mutex);
         socketID = m_socketsHash.key(socket);
     }
-    Q_ASSERT(socket > 0);
+    Q_ASSERT(socket);
 
 
     qDebug()<<"TCP Socket Error! "<<error<<" socketID:"<<socketID;

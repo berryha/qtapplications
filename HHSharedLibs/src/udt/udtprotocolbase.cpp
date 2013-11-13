@@ -811,7 +811,7 @@ void UDTProtocolBase::waitingForNewConnection(int msecTimeout){
 }
 
 UDTSOCKET UDTProtocolBase::acceptNewConnection(){
-    //qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
+//    qDebug()<<"--UDTProtocolBase::acceptNewConnection()";
 
     sockaddr_storage clientaddr;
     int addrlen = sizeof(clientaddr);
@@ -852,6 +852,7 @@ UDTSOCKET UDTProtocolBase::acceptNewConnection(){
 
     char peerAddress[NI_MAXHOST];
     char peerPort[NI_MAXSERV];
+
     getnameinfo((sockaddr *)&clientaddr, addrlen, peerAddress, sizeof(peerAddress), peerPort, sizeof(peerPort), NI_NUMERICHOST|NI_NUMERICSERV);
     //cout << "New Connection: " << peerAddress << ":" << peerPort << " UDTSOCKET:"<< peer << endl;
     qDebug()<<QString("New Connection:%1:%2, UDTSOCKET:%3").arg(peerAddress).arg(peerPort).arg(peer);
