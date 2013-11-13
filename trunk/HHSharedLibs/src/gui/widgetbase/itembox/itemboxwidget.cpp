@@ -254,12 +254,12 @@ void ItemBoxWidget::moveItem(const QString &old_cat_id, const QString &new_cat_i
 //    return m_view->save();
 //}
 
-static const void *checkDragEvent(QDropEvent * event,
-                                               bool acceptEventsFromWidgetBox)
-{
+//static const void *checkDragEvent(QDropEvent * event,
+//                                               bool acceptEventsFromWidgetBox)
+//{
 
 
-}
+//}
 
 void ItemBoxWidget::dragEnterEvent (QDragEnterEvent * event)
 {
