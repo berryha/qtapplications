@@ -47,6 +47,9 @@ void TCPServer::processData(int socketID, QByteArray *data){
 //        m_packetHandlerBase->appendIncomingPacket(packet);
 
         emit packetReceived(packet);
+
+    }else{
+        qWarning()<<"ERROR! Can not convert TCP data to Packet!";
     }
 
 
