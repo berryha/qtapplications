@@ -44,6 +44,8 @@ ResourcesManager::ResourcesManager(QObject *parent)
     //    qRegisterMetaTypeStreamOperators<HEHUI::Packet>("HEHUI::Packet");
     //}
 
+    qRegisterMetaType<QHostAddress>("QHostAddress");
+
 }
 
 ResourcesManager::~ResourcesManager() {
