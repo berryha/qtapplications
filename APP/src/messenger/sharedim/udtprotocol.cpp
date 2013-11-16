@@ -69,6 +69,9 @@ inline void UDTProtocol::convertDataToPacket(UDTSOCKET socket, QByteArray *data)
 //        m_packetHandlerBase->appendIncomingPacket(packet);
 
         emit packetReceived(packet);
+
+    }else{
+        qWarning()<<"ERROR! Can not convert UDT data to Packet!";
     }
 
 }
