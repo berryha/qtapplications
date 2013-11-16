@@ -234,6 +234,8 @@ void UDPSocket::readPendingDatagrams() {
 
             emit signalNewUDPPacketReceived(packet);
 
+        }else{
+            qWarning()<<"ERROR! Can not convert UDP data to Packet!";
         }
 
     }
