@@ -181,9 +181,6 @@ void ServerManagerWindow::slotRequestForLANServer(const QString &ip, quint16 por
     //        }
     //        clientPacketsParser->sendClientLookForServerPacket(QHostAddress(ip), port);
     emit signalLookForServer(QHostAddress(ip), port);
-
-
-
 }
 
 void ServerManagerWindow::slotTestServers(){
