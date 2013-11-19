@@ -66,7 +66,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     servertime/servertime.h \
     contactbox/sheet_delegate_p.h \
     contactbox/contactwidget.h \
-    contactbox/contactbox.h
+    contactbox/contactbox.h \
+    chatwindow/messageview.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -104,7 +105,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     servertime/servertime.cpp \
     contactbox/sheet_delegate.cpp \
     contactbox/contactwidget.cpp \
-    contactbox/contactbox.cpp
+    contactbox/contactbox.cpp \
+    chatwindow/messageview.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
