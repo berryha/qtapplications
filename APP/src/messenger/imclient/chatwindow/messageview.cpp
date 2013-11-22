@@ -141,13 +141,13 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
 
 
 //    qDebug();
-//    qDebug()<<"------msg:"<<msg;
+    qDebug()<<"------msg:"<<msg;
 //    qDebug();
-//    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
+    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
 
 //    qDebug();
 
-    //qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+    qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 }
@@ -160,6 +160,49 @@ void MessageView::appendHTML(const QString &htmlTag){
     div.appendInside(htmlTag);
 
 }
+
+void MessageView::updateImage(const QString &imageName, ImageDownloadStatus downloadStatus){
+
+    QWebElement doc = m_mainWebFrame->documentElement();
+    QWebElementCollection elements = doc.findAll("img");
+    foreach (QWebElement element, elements){
+
+        //QString imageSRC = element.attribute("src");
+        QString imageID = element.attribute("id").trimmed();
+        if(imageID != imageName){continue;}
+
+
+        //if(imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
+            switch (downloadStatus) {
+            case ImageDownloading:
+            {
+                element.setAttribute("src", ImagePath_Downloading);
+            }
+                break;
+            case ImageDownloaded:
+            {
+                element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
+                element.removeAttribute("id");
+            }
+                break;
+
+            case ImageDownloadingFailed:
+            {
+                element.setAttribute("src", ImagePath_DownloadingFailed);
+            }
+                break;
+            default:
+                break;
+            }
+
+        //}
+
+
+
+    }
+
+}
+
 
 void MessageView::scrollWebFrame(const QSize & contentsSize){
 
@@ -214,47 +257,6 @@ void MessageView::linkClicked(const QUrl & url){
 
 }
 
-void MessageView::updateImage(const QString &imageName, ImageDownloadStatus downloadStatus){
-
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElementCollection elements = doc.findAll("img");
-    foreach (QWebElement element, elements){
-
-        //QString imageSRC = element.attribute("src");
-        QString imageID = element.attribute("id").trimmed();
-        if(imageID != imageName){continue;}
-
-
-        //if(imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
-            switch (downloadStatus) {
-            case ImageDownloading:
-            {
-                element.setAttribute("src", ImagePath_Downloading);
-            }
-                break;
-            case ImageDownloaded:
-            {
-                element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
-                element.removeAttribute("id");
-            }
-                break;
-
-            case ImageDownloadingFailed:
-            {
-                element.setAttribute("src", ImagePath_DownloadingFailed);
-            }
-                break;
-            default:
-                break;
-            }
-
-        //}
-
-
-
-    }
-
-}
 
 QString MessageView::simpleTextToRichTextMessage(const QString &simpleTextMessage){
 

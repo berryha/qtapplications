@@ -63,10 +63,11 @@ public slots:
     void appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime);
     void appendHTML(const QString &htmlTag);
 
+    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
+
 private slots:
     void scrollWebFrame(const QSize &contentsSize);
     void linkClicked(const QUrl & url);
-    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
 
 
 private:

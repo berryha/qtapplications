@@ -7,7 +7,7 @@
 
 
 #include "ui_chatmessagewindow.h"
-
+#include "messageview.h"
 
 #include "./emoticonselecter/emoticonselector.h"
 #include "../contactsmanager/contact.h"
@@ -33,7 +33,7 @@ class ChatMessageWindow: public QWidget {
 
 public:
     enum ChatMessageWindowType{CMWT_Unknown, CMWT_Contact, CMWT_InterestGroup, CMWT_TempGroup};
-    enum ImageDownloadStatus{ImageDownloading, ImageDownloaded, ImageDownloadingFailed};
+//    enum ImageDownloadStatus{ImageDownloading, ImageDownloaded, ImageDownloadingFailed};
 
     ChatMessageWindow(QWidget *parent = 0);
     ChatMessageWindow(Contact *m_contact, QWidget *parent = 0);
@@ -43,7 +43,7 @@ public:
     ~ChatMessageWindow();
 
     QTextEdit *messageEditor();
-    QWebView *messageBrowser();
+    MessageView *messageBrowser();
 
     void setContact(Contact *c);
     Contact * getContact();
@@ -76,12 +76,12 @@ public slots:
 private slots:
 
     void emitSendMsgSignal();
-    void emitSendMsgSignal2();
+//    void emitSendMsgSignal2();
 
     void showMessageHistory(bool show);
 
-    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
-    void updateImage2(const QString &imageName);
+//    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
+//    void updateImage2(const QString &imageName);
 
 
     void showFontFrame();
@@ -104,9 +104,11 @@ private slots:
     //void insertEmotion(const QString &emotionName);
     void insertEmoticon(const QString &iconPath, bool isSystemEmoticon);
 
-    void scrollWebFrame(const QSize &contentsSize);
-    void linkClicked(const QUrl & url);
+//    void scrollWebFrame(const QSize &contentsSize);
+//    void linkClicked(const QUrl & url);
 
+    void requestDownloadImage(const QString &contactID, const QString &imageName);
+    void tipLastUnACKedMessageFromContact(const QString &tip);
 
 private:
     void initUI();
@@ -121,15 +123,16 @@ private:
     QString getRichMessageBlock();
 
     QString myRichTextToSimpleTextMessage(const QString &richTextMessage);
-    QString simpleTextToRichTextMessage(const QString &simpleTextMessage);
-    QString contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage);
+//    QString simpleTextToRichTextMessage(const QString &simpleTextMessage);
+//    QString contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage);
 
 
-    void tipLastUnACKedMessageFromContact();
 
 private:
     Ui::MessageWindowUi ui;
-    QWebFrame *m_mainWebFrame;
+
+    MessageView *m_messageView;
+//    QWebFrame *m_mainWebFrame;
 
     //const QString &contactID;
     IMUser *m_myself;
@@ -144,13 +147,9 @@ private:
 
     QString imageCachePath;
 
-
     //EmotionsListPage *emotionsListPage;
 
     EmoticonSelector *smileyPopup;
-
-
-    //QString htmlForMessagesView;
 
     QTextCharFormat fmt;
 
@@ -165,9 +164,8 @@ private:
     QStringList m_imagesDownloading;
     QStringList m_imagesUploading;
 
-    int m_properScrollBarValue;
-
-    QString lastUnACKedMessageFromContact;
+//    int m_properScrollBarValue;
+//    QString lastUnACKedMessageFromContact;
 
 
 

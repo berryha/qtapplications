@@ -80,6 +80,14 @@ void ChatMessageWindow::initUI(){
 
     ui.setupUi(this);
 
+    m_messageView = new MessageView(this);
+    m_messageView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    connect(m_messageView, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)));
+    connect(m_messageView, SIGNAL(signalTipLastUnACKedMessageFromContact(const QString &)), this, SLOT(tipLastUnACKedMessageFromContact(const QString &)) );
+
+
+    ui.gridLayoutMessageView->addWidget(m_messageView, 0, 0, 1, 1);
+
     static QString htmlForMessagesView = "";
     if(htmlForMessagesView.isEmpty()){
         QFile file(":/text/resources/text/sample.html");
@@ -89,19 +97,19 @@ void ChatMessageWindow::initUI(){
             htmlForMessagesView = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-16\" /><title>Chat</title></head><body><div></div></body></html>";
         }
     }
-    ui.webView->setHtml(htmlForMessagesView);
+    m_messageView->setHtml(htmlForMessagesView);
     //connect(ui.webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
     ui.labelUnACKedMessage->setBackgroundRole(QPalette::Midlight);
     ui.labelUnACKedMessage->hide();
 
 
-    QWebPage *page = ui.webView->page();
-    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
+//    QWebPage *page = m_messageView->page();
+//    page->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+//    connect(page, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
-    m_mainWebFrame = page->mainFrame();
-    connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrame(const QSize &)));
+//    m_mainWebFrame = page->mainFrame();
+//    connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrame(const QSize &)));
 
     ui.mainSplitter->setStretchFactor(1, 1);
 
@@ -163,9 +171,9 @@ void ChatMessageWindow::initUI(){
 
     m_screenshot = 0;
 
-    m_properScrollBarValue = 0;
+//    m_properScrollBarValue = 0;
 
-    lastUnACKedMessageFromContact = "";
+//    lastUnACKedMessageFromContact = "";
 
     connect(ui.pushButtonClose, SIGNAL(clicked()), this, SIGNAL(signalCloseWindow()));
     connect(ui.sendMsgPushButton, SIGNAL(clicked()), this, SLOT(emitSendMsgSignal()));
@@ -177,8 +185,8 @@ QTextEdit *ChatMessageWindow::messageEditor() {
     return ui.textEdit;
 }
 
-QWebView *ChatMessageWindow::messageBrowser() {
-    return ui.webView;
+MessageView *ChatMessageWindow::messageBrowser() {
+    return m_messageView;
 }
 
 void ChatMessageWindow::setContact(Contact *c){
@@ -237,84 +245,69 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
         }
     }
 
-
-
-    //        QString msg = "<dl>";
-    //        msg += QString("<dt>%1  %2  </dt>").arg(contact->getNickName()).arg(datetime);
-    //        msg += "<dd >";
-    //        msg += QString(" %1 ").arg(message);
-    //        msg += "</dd >";
-    //        msg += "</dl >";
-
-    qDebug()<<"----Message Received From Contact! contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
-
-    QString timeString = datetime;
-    QDateTime dt = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss");
-    if(dt.date() == ServerTime::instance()->time().date() ){
-        timeString = dt.toString("hh:mm:ss");
-    }
-
-    //URL: contact://contactid
-    QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(nickName).arg(userID).arg(URLScheme_Contact).arg(timeString);
-
-
-    //Find Div tag
-    //QRegExp regExp("<div.+>.*</div>");
-    //regExp.setCaseSensitivity(Qt::CaseInsensitive);
-    //regExp.setMinimal(true);
-    //int pos = regExp.indexIn(message);
-    //if(pos != -1){
-    //    msg += regExp.cap(0);
-    //}
-
-
-    if(userID != myUserID){
-        QString richMessage = simpleTextToRichTextMessage(message);
-        msg += richMessage;
-
-        if(m_properScrollBarValue != m_mainWebFrame->scrollBarValue(Qt::Vertical)){
-            lastUnACKedMessageFromContact = contactsSimpleTextToPlainTipTextMessage(message);
-            lastUnACKedMessageFromContact = nickName + ":" + lastUnACKedMessageFromContact;
-        }
-
-    }else{
-        msg += message;
-    }
+    m_messageView->appendChatMessage(userID, nickName, message, datetime);
 
 
 
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElement div = doc.findFirst("div");
-    div.appendInside(msg);
+//    QString timeString = datetime;
+//    QDateTime dt = QDateTime::fromString(datetime, "yyyy-MM-dd hh:mm:ss");
+//    if(dt.date() == ServerTime::instance()->time().date() ){
+//        timeString = dt.toString("hh:mm:ss");
+//    }
+
+//    //URL: contact://contactid
+//    QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(nickName).arg(userID).arg(URLScheme_Contact).arg(timeString);
 
 
-    //Modify images path
-    QWebElement messageElement = div.lastChild();
-    QWebElementCollection elements = messageElement.findAll("img");
-    foreach (QWebElement element, elements){
-        QString imageSRC = element.attribute("src");
-        if(!imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
-            QString localCacheImage = imageCachePath + "/" + imageSRC;
-            if(QFile::exists(localCacheImage)){
-                element.setAttribute("src", "file://" + localCacheImage);
-            }else{
-                //Need to download the image
-                element.setAttribute("id", imageSRC);
-                if(m_myself->isAutoDownloadImageFromContact()){
-                    //Download image
-                    element.setAttribute("src", ImagePath_Downloading);
-                    m_imagesDownloading.append(imageSRC);
-                    emit signalRequestDownloadImage(userID, imageSRC);
-                }else{
-                    element.setAttribute("src", ImagePath_Normal);
-                }
-            }
-            //URL: image://imagename
-            QString url = QString("%1://%2@%3").arg(URLScheme_Image).arg(userID).arg(imageSRC);
-            element.setOuterXml(QString("<a href=\"%1\">%2</a>").arg(url).arg(element.toOuterXml()));
 
-        }
-    }
+
+//    if(userID != myUserID){
+//        QString richMessage = simpleTextToRichTextMessage(message);
+//        msg += richMessage;
+
+//        if(m_properScrollBarValue != m_mainWebFrame->scrollBarValue(Qt::Vertical)){
+//            lastUnACKedMessageFromContact = contactsSimpleTextToPlainTipTextMessage(message);
+//            lastUnACKedMessageFromContact = nickName + ":" + lastUnACKedMessageFromContact;
+//        }
+
+//    }else{
+//        msg += message;
+//    }
+
+
+
+//    QWebElement doc = m_mainWebFrame->documentElement();
+//    QWebElement div = doc.findFirst("div");
+//    div.appendInside(msg);
+
+
+//    //Modify images path
+//    QWebElement messageElement = div.lastChild();
+//    QWebElementCollection elements = messageElement.findAll("img");
+//    foreach (QWebElement element, elements){
+//        QString imageSRC = element.attribute("src");
+//        if(!imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
+//            QString localCacheImage = imageCachePath + "/" + imageSRC;
+//            if(QFile::exists(localCacheImage)){
+//                element.setAttribute("src", "file://" + localCacheImage);
+//            }else{
+//                //Need to download the image
+//                element.setAttribute("id", imageSRC);
+//                if(m_myself->isAutoDownloadImageFromContact()){
+//                    //Download image
+//                    element.setAttribute("src", ImagePath_Downloading);
+//                    m_imagesDownloading.append(imageSRC);
+//                    emit signalRequestDownloadImage(userID, imageSRC);
+//                }else{
+//                    element.setAttribute("src", ImagePath_Normal);
+//                }
+//            }
+//            //URL: image://imagename
+//            QString url = QString("%1://%2@%3").arg(URLScheme_Image).arg(userID).arg(imageSRC);
+//            element.setOuterXml(QString("<a href=\"%1\">%2</a>").arg(url).arg(element.toOuterXml()));
+
+//        }
+//    }
 
 
 
@@ -330,72 +323,73 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 }
 
-void ChatMessageWindow::updateImage2(const QString &imageName){
+//void ChatMessageWindow::updateImage2(const QString &imageName){
 
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElementCollection elements = doc.findAll("img");
-    foreach (QWebElement element, elements){
-        //if(element.attribute("src") == imageName){
-        if(element.attribute("id") == imageName){
-            element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
-        }
-    }
+//    QWebElement doc = m_mainWebFrame->documentElement();
+//    QWebElementCollection elements = doc.findAll("img");
+//    foreach (QWebElement element, elements){
+//        //if(element.attribute("src") == imageName){
+//        if(element.attribute("id") == imageName){
+//            element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
+//        }
+//    }
 
-}
+//}
 
 void ChatMessageWindow::processImageDownloadResult(const QString &imageName, bool downloaded){
 
     if(downloaded){
-        updateImage(imageName, ImageDownloaded);
+        m_messageView->updateImage(imageName, MessageView::ImageDownloaded);
     }else{
-        updateImage(imageName, ImageDownloadingFailed);
+        m_messageView->updateImage(imageName, MessageView::ImageDownloadingFailed);
     }
 
     m_imagesDownloading.removeAll(imageName);
 
 }
 
-void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatus downloadStatus){
+//void ChatMessageWindow::updateImage(const QString &imageName, ImageDownloadStatus downloadStatus){
 
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElementCollection elements = doc.findAll("img");
-    foreach (QWebElement element, elements){
-
-        //QString imageSRC = element.attribute("src");
-        QString imageID = element.attribute("id").trimmed();
-        if(imageID != imageName){continue;}
+//    m_messageView->updateImage(imageName, downloadStatus);
 
 
-        //if(imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
-            switch (downloadStatus) {
-            case ImageDownloading:
-            {
-                element.setAttribute("src", ImagePath_Downloading);
-            }
-                break;
-            case ImageDownloaded:
-            {
-                element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
-                element.removeAttribute("id");
-            }
-                break;
+//    QWebElement doc = m_mainWebFrame->documentElement();
+//    QWebElementCollection elements = doc.findAll("img");
+//    foreach (QWebElement element, elements){
 
-            case ImageDownloadingFailed:
-            {
-                element.setAttribute("src", ImagePath_DownloadingFailed);
-            }
-                break;
-            default:
-                break;
-            }
-
-        //}
+//        //QString imageSRC = element.attribute("src");
+//        QString imageID = element.attribute("id").trimmed();
+//        if(imageID != imageName){continue;}
 
 
+//        //if(imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
+//            switch (downloadStatus) {
+//            case ImageDownloading:
+//            {
+//                element.setAttribute("src", ImagePath_Downloading);
+//            }
+//                break;
+//            case ImageDownloaded:
+//            {
+//                element.setAttribute("src", "file://" + imageCachePath +"/"+imageName);
+//                element.removeAttribute("id");
+//            }
+//                break;
 
-    }
+//            case ImageDownloadingFailed:
+//            {
+//                element.setAttribute("src", ImagePath_DownloadingFailed);
+//            }
+//                break;
+//            default:
+//                break;
+//            }
 
-}
+//        //}
+
+//    }
+
+//}
 
 QString ChatMessageWindow::getRichMessageBlock(){
 
@@ -488,82 +482,94 @@ QString ChatMessageWindow::myRichTextToSimpleTextMessage(const QString &richText
 
 }
 
-QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleTextMessage){
+//QString ChatMessageWindow::simpleTextToRichTextMessage(const QString &simpleTextMessage){
 
-    QString msg = simpleTextMessage;
-    if(msg.trimmed().isEmpty()){
-        msg = "<p></p>";
-        return msg;
-    }
+//    QString msg = simpleTextMessage;
+//    if(msg.trimmed().isEmpty()){
+//        msg = "<p></p>";
+//        return msg;
+//    }
 
-    int separateIndex = msg.indexOf(QChar('|'));
-    if(separateIndex == -1){return "<p></p>";}
-    QString styleTag = msg.left(separateIndex);
-    msg.remove(0, separateIndex+1);
+//    int separateIndex = msg.indexOf(QChar('|'));
+//    if(separateIndex == -1){return "<p></p>";}
+//    QString styleTag = msg.left(separateIndex);
+//    msg.remove(0, separateIndex+1);
 
-//    QStringList list = msg.split(QChar('|'));
-//    if(list.size() != 2){return "<p></p>";}
-//    QString styleTag = list.at(0);
-//    msg = list.at(1);
-
-
-    msg = "<p>" + msg + "</p>";
-    msg.replace("\\r\\n", "</br>");
-
-    msg.replace("\\n", "</p><p>");
-
-    QString divStyle = simpleStyleTagToStyleString(styleTag);
-
-    if(divStyle.trimmed().isEmpty()){
-        msg = QString("<div>") + msg;
-    }else{
-        msg = QString("<div style=\"%1\">").arg(divStyle) + msg;
-    }
-    msg += QString("</div>");
-
-    return msg;
-
-}
-
-QString ChatMessageWindow::contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage){
+////    QStringList list = msg.split(QChar('|'));
+////    if(list.size() != 2){return "<p></p>";}
+////    QString styleTag = list.at(0);
+////    msg = list.at(1);
 
 
-    QString msg = simpleTextMessage;
-    if(msg.trimmed().isEmpty()){
-        return "";
-    }
+//    msg = "<p>" + msg + "</p>";
+//    msg.replace("\\r\\n", "</br>");
 
-    int separateIndex = msg.indexOf(QChar('|'));
-    if(separateIndex == -1){return "<p></p>";}
-    msg.remove(0, separateIndex+1);
+//    msg.replace("\\n", "</p><p>");
 
-    msg.replace("\\r\\n", " ");
-    msg.replace("\\n", " ");
+//    QString divStyle = simpleStyleTagToStyleString(styleTag);
 
-    QRegExp regExp("<img.*/>");
-    regExp.setCaseSensitivity(Qt::CaseInsensitive);
-    regExp.setMinimal(true);
-    int pos = 0;
-    QStringList list;
-    while ((pos = regExp.indexIn(msg, pos)) != -1) {
-        list << regExp.cap(0);
-        pos += regExp.matchedLength();
-    }
-    foreach (QString str, list) {
-        msg.replace(str, tr("[Image]"));
-    }
+//    if(divStyle.trimmed().isEmpty()){
+//        msg = QString("<div>") + msg;
+//    }else{
+//        msg = QString("<div style=\"%1\">").arg(divStyle) + msg;
+//    }
+//    msg += QString("</div>");
 
-    return msg;
+//    return msg;
 
-}
+//}
 
-void ChatMessageWindow::tipLastUnACKedMessageFromContact(){
+//QString ChatMessageWindow::contactsSimpleTextToPlainTipTextMessage(const QString &simpleTextMessage){
 
-    if(lastUnACKedMessageFromContact.isEmpty()){
+
+//    QString msg = simpleTextMessage;
+//    if(msg.trimmed().isEmpty()){
+//        return "";
+//    }
+
+//    int separateIndex = msg.indexOf(QChar('|'));
+//    if(separateIndex == -1){return "<p></p>";}
+//    msg.remove(0, separateIndex+1);
+
+//    msg.replace("\\r\\n", " ");
+//    msg.replace("\\n", " ");
+
+//    QRegExp regExp("<img.*/>");
+//    regExp.setCaseSensitivity(Qt::CaseInsensitive);
+//    regExp.setMinimal(true);
+//    int pos = 0;
+//    QStringList list;
+//    while ((pos = regExp.indexIn(msg, pos)) != -1) {
+//        list << regExp.cap(0);
+//        pos += regExp.matchedLength();
+//    }
+//    foreach (QString str, list) {
+//        msg.replace(str, tr("[Image]"));
+//    }
+
+//    return msg;
+
+//}
+
+
+void ChatMessageWindow::requestDownloadImage(const QString &contactID, const QString &imageName){
+
+    if(m_imagesDownloading.contains(imageName)){
         return;
     }
 
-    ui.labelUnACKedMessage->setText(lastUnACKedMessageFromContact);
+    m_imagesDownloading.append(imageName);
+    emit signalRequestDownloadImage(contactID, imageName);
+
+}
+
+void ChatMessageWindow::tipLastUnACKedMessageFromContact(const QString &tip){
+
+    if(tip.isEmpty()){
+        return;
+    }
+
+    ui.labelUnACKedMessage->setText(tip);
     ui.labelUnACKedMessage->show();
 
     QTimer::singleShot(3000, ui.labelUnACKedMessage, SLOT(hide()));
@@ -636,127 +642,127 @@ void ChatMessageWindow::emitSendMsgSignal() {
 }
 
 
-void ChatMessageWindow::emitSendMsgSignal2() {
-    //TODO:是否要转换成UTF8
+//void ChatMessageWindow::emitSendMsgSignal2() {
+//    //TODO:是否要转换成UTF8
     
-    QString message = ui.textEdit->toPlainText();
+//    QString message = ui.textEdit->toPlainText();
 
-    if(message.isEmpty()){
-        ui.textEdit->setFocus();
-        return;
-    }
+//    if(message.isEmpty()){
+//        ui.textEdit->setFocus();
+//        return;
+//    }
 
-    if(message.size() > MAX_MESSAGE_SIZE){
-        QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
-        qCritical()<<"ERROR! Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
-        ui.textEdit->setFocus();
-        return;
-    }
+//    if(message.size() > MAX_MESSAGE_SIZE){
+//        QMessageBox::critical(this, tr("Error"), tr("The message is too long!"));
+//        qCritical()<<"ERROR! Message too long! HTML:"<<ui.textEdit->toHtml().size()<<" Plain:"<<ui.textEdit->toPlainText().size();
+//        ui.textEdit->setFocus();
+//        return;
+//    }
 
-    QString richMessage = "";
-
-
-
-    QString htmlOfTextEdit = ui.textEdit->toHtml();
-
-    QRegExp regExp("<p.*</p>");
-    regExp.setCaseSensitivity(Qt::CaseInsensitive);
-    regExp.setMinimal(true);
-    int pos = 0;
-    QStringList list;
-    while ((pos = regExp.indexIn(htmlOfTextEdit, pos)) != -1) {
-        list << regExp.cap(0);
-        pos += regExp.matchedLength();
-    }
-
-    if(m_styleString.trimmed().isEmpty()){
-        richMessage += QString("<div>");
-    }else{
-        richMessage += QString("<div style = \"%1\">").arg(m_styleString);
-    }
-    foreach (QString str, list) {
-        str.replace(QRegExp("\\bstyle=\".*;\"", Qt::CaseInsensitive), "");
-        str.replace(QRegExp("src=\":/", Qt::CaseInsensitive), "src=\"qrc:/");
-        richMessage += str;
-    }
-    richMessage += QString("</div>");
-
-
-    QString temp = QString("<div><span>%1 %2</span>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")) + richMessage +"</div>";
-    QWebElement doc = m_mainWebFrame->documentElement();
-    QWebElement div = doc.findFirst("div");
-    div.appendInside(temp);
-
-
-    ui.textEdit->clear();
-    ui.textEdit->setFocus();
-    ui.textEdit->setCurrentCharFormat(fmt);
-
-
-    qDebug()<<"-------richMessage1:"<<richMessage;
-
-
-    regExp.setPattern("<img.*>");
-    pos = 0;
-    QStringList imgList;
-    while ((pos = regExp.indexIn(richMessage, pos)) != -1) {
-        imgList << regExp.cap(0);
-        pos += regExp.matchedLength();
-    }
-    QStringList imageList;
-    regExp.setPattern("\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"");
-    foreach (QString imgsrcTag, imgList) {
-        QString iconPath;
-        pos = 0;
-        if((pos = regExp.indexIn(imgsrcTag, pos)) != -1){
-            iconPath = regExp.cap(0);
-            iconPath = iconPath.replace("\"", "");
-            richMessage.replace(iconPath, QFileInfo(iconPath).fileName());
-            imageList.append(iconPath);
-        }
-
-    }
-
-    qDebug()<<"-------richMessage2:"<<richMessage;
-
-
-    switch(m_chatMessageWindowType){
-    case CMWT_Contact:
-        emit sendMsgButtonClicked(m_contact, richMessage, imageList);
-        break;
-    case CMWT_InterestGroup:
-        emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
-        break;
-    case CMWT_TempGroup:
-        break;
-    default:
-
-        break;
-
-    }
+//    QString richMessage = "";
 
 
 
+//    QString htmlOfTextEdit = ui.textEdit->toHtml();
 
-    //        QWebElement e(div);
-    //        //e.setInnerXml(richMessage);
-    //        e.replace(richMessage);
-    //        //e.appendInside(richMessage);
-    //        qWarning()<<"---e:"<<e.toInnerXml();
+//    QRegExp regExp("<p.*</p>");
+//    regExp.setCaseSensitivity(Qt::CaseInsensitive);
+//    regExp.setMinimal(true);
+//    int pos = 0;
+//    QStringList list;
+//    while ((pos = regExp.indexIn(htmlOfTextEdit, pos)) != -1) {
+//        list << regExp.cap(0);
+//        pos += regExp.matchedLength();
+//    }
 
-    //        QWebElementCollection elements = e.findAll("img");
-    //        foreach (QWebElement element, elements){
-    //            element.setAttribute("style", "background-color: #f0f090");
-    //            qWarning()<<element.toInnerXml();
-    //        }
+//    if(m_styleString.trimmed().isEmpty()){
+//        richMessage += QString("<div>");
+//    }else{
+//        richMessage += QString("<div style = \"%1\">").arg(m_styleString);
+//    }
+//    foreach (QString str, list) {
+//        str.replace(QRegExp("\\bstyle=\".*;\"", Qt::CaseInsensitive), "");
+//        str.replace(QRegExp("src=\":/", Qt::CaseInsensitive), "src=\"qrc:/");
+//        richMessage += str;
+//    }
+//    richMessage += QString("</div>");
+
+
+//    QString temp = QString("<div><span>%1 %2</span>").arg(myDisplayName).arg(QDateTime::currentDateTime().toString("hh:mm:ss")) + richMessage +"</div>";
+//    QWebElement doc = m_mainWebFrame->documentElement();
+//    QWebElement div = doc.findFirst("div");
+//    div.appendInside(temp);
+
+
+//    ui.textEdit->clear();
+//    ui.textEdit->setFocus();
+//    ui.textEdit->setCurrentCharFormat(fmt);
+
+
+//    qDebug()<<"-------richMessage1:"<<richMessage;
+
+
+//    regExp.setPattern("<img.*>");
+//    pos = 0;
+//    QStringList imgList;
+//    while ((pos = regExp.indexIn(richMessage, pos)) != -1) {
+//        imgList << regExp.cap(0);
+//        pos += regExp.matchedLength();
+//    }
+//    QStringList imageList;
+//    regExp.setPattern("\"(([a-zA-Z]:/\\w)|(/\\w)).+\\.((png)|(gif)|(jpg)|(jpeg))\"");
+//    foreach (QString imgsrcTag, imgList) {
+//        QString iconPath;
+//        pos = 0;
+//        if((pos = regExp.indexIn(imgsrcTag, pos)) != -1){
+//            iconPath = regExp.cap(0);
+//            iconPath = iconPath.replace("\"", "");
+//            richMessage.replace(iconPath, QFileInfo(iconPath).fileName());
+//            imageList.append(iconPath);
+//        }
+
+//    }
+
+//    qDebug()<<"-------richMessage2:"<<richMessage;
+
+
+//    switch(m_chatMessageWindowType){
+//    case CMWT_Contact:
+//        emit sendMsgButtonClicked(m_contact, richMessage, imageList);
+//        break;
+//    case CMWT_InterestGroup:
+//        emit sendMsgButtonClicked(m_interestGroup, richMessage, imageList);
+//        break;
+//    case CMWT_TempGroup:
+//        break;
+//    default:
+
+//        break;
+
+//    }
 
 
 
-    //qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+
+//    //        QWebElement e(div);
+//    //        //e.setInnerXml(richMessage);
+//    //        e.replace(richMessage);
+//    //        //e.appendInside(richMessage);
+//    //        qWarning()<<"---e:"<<e.toInnerXml();
+
+//    //        QWebElementCollection elements = e.findAll("img");
+//    //        foreach (QWebElement element, elements){
+//    //            element.setAttribute("style", "background-color: #f0f090");
+//    //            qWarning()<<element.toInnerXml();
+//    //        }
 
 
 
-}
+//    //qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+
+
+
+//}
 
 void ChatMessageWindow::showMessageHistory(bool show){
     if(show){
@@ -767,30 +773,6 @@ void ChatMessageWindow::showMessageHistory(bool show){
 
 }
 
-void ChatMessageWindow::scrollWebFrame(const QSize & contentsSize){
-
-
-    int frameHeight = m_mainWebFrame->geometry().size().height();
-    if(contentsSize.height() <= frameHeight){
-        m_properScrollBarValue = 0;
-        return;
-    }
-
-    int curScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
-
-    if(m_properScrollBarValue == curScrollBarValue){
-        m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
-        m_properScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
-    }else{
-        m_properScrollBarValue = contentsSize.height() - frameHeight;
-        tipLastUnACKedMessageFromContact();
-    }
-
-    lastUnACKedMessageFromContact = "";
-
-}
-
-
 void ChatMessageWindow::showFontFrame() {
     if (ui.fontStyleToolButton->isChecked()) {
         ui.fontFrame->setVisible(true);
@@ -799,42 +781,61 @@ void ChatMessageWindow::showFontFrame() {
     }
 }
 
-void ChatMessageWindow::linkClicked(const QUrl & url){
-    QString scheme = url.scheme();
-
-    if(scheme == URLScheme_Image){
-        QString userID = url.userInfo();
-        QString imageName = url.host();
+//void ChatMessageWindow::scrollWebFrame(const QSize & contentsSize){
 
 
-        if(m_imagesDownloading.contains(imageName)){
-            return;
-        }
+//    int frameHeight = m_mainWebFrame->geometry().size().height();
+//    if(contentsSize.height() <= frameHeight){
+//        m_properScrollBarValue = 0;
+//        return;
+//    }
 
+//    int curScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
 
+//    if(m_properScrollBarValue == curScrollBarValue){
+//        m_mainWebFrame->setScrollBarValue(Qt::Vertical, contentsSize.height());
+//        m_properScrollBarValue = m_mainWebFrame->scrollBarValue(Qt::Vertical);
+//    }else{
+//        m_properScrollBarValue = contentsSize.height() - frameHeight;
+//        tipLastUnACKedMessageFromContact();
+//    }
 
-        QString localCacheImage = imageCachePath + "/" + imageName;
-        if(QFile::exists(localCacheImage)){
-            //TODO:Show image
-        }else{
-            //Download image
-            updateImage(imageName, ImageDownloading);
-            m_imagesDownloading.append(imageName);
-            emit signalRequestDownloadImage(userID, imageName);
-        }
+//    lastUnACKedMessageFromContact = "";
 
-
-    }else if(scheme == URLScheme_Contact){
-        //TODO
-
-    }
+//}
 
 
 
-    qDebug()<<"URL scheme:"<<scheme<<" host:"<<url.host()<<" userInfo:"<<url.userInfo();
 
+//void ChatMessageWindow::linkClicked(const QUrl & url){
+//    QString scheme = url.scheme();
 
-}
+//    if(scheme == URLScheme_Image){
+//        QString userID = url.userInfo();
+//        QString imageName = url.host();
+
+//        if(m_imagesDownloading.contains(imageName)){
+//            return;
+//        }
+
+//        QString localCacheImage = imageCachePath + "/" + imageName;
+//        if(QFile::exists(localCacheImage)){
+//            //TODO:Show image
+//        }else{
+//            //Download image
+//            m_messageView->updateImage(imageName, MessageView::ImageDownloading);
+//            m_imagesDownloading.append(imageName);
+//            emit signalRequestDownloadImage(userID, imageName);
+//        }
+
+//    }else if(scheme == URLScheme_Contact){
+//        //TODO
+
+//    }
+
+//    qDebug()<<"URL scheme:"<<scheme<<" host:"<<url.host()<<" userInfo:"<<url.userInfo();
+
+//}
 
 void ChatMessageWindow::showEmotions() {
     QPoint p = ui.emotionToolButton->mapToGlobal(QPoint(0, 0));
