@@ -22,7 +22,7 @@ ChatWindowManager::ChatWindowManager(QWidget *parent)
     m_chatWindowDisplayStyle = TabbedChatWindow;
     ui.stackedWidget->setCurrentWidget(ui.pageTabWidget);
 
-
+//    m_preferedSize = size();
 }
 
 ChatWindowManager::~ChatWindowManager()
@@ -64,6 +64,9 @@ void ChatWindowManager::closeEvent(QCloseEvent *e) {
     }
 
     e->ignore();
+
+//    resize(m_preferedSize);
+//    updateGeometry();
 
 
 /*

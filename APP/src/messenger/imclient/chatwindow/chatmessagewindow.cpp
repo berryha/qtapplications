@@ -80,6 +80,7 @@ void ChatMessageWindow::initUI(){
 
     ui.setupUi(this);
 
+
     m_messageView = new MessageView(this);
     m_messageView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     connect(m_messageView, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)));
@@ -157,7 +158,7 @@ void ChatMessageWindow::initUI(){
     ui.fontFrame->setVisible(false);
 
 
-    connect(ui.pushButtonMessageHistory, SIGNAL(clicked(bool)), this, SLOT(showMessageHistory(bool)));
+    connect(ui.pushButtonMessageHistory, SIGNAL(clicked(bool)), this, SIGNAL(signalShowMessageHistory(bool)));
 
 
 
@@ -764,14 +765,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
 
 //}
 
-void ChatMessageWindow::showMessageHistory(bool show){
-    if(show){
 
-    }else{
-
-    }
-
-}
 
 void ChatMessageWindow::showFontFrame() {
     if (ui.fontStyleToolButton->isChecked()) {

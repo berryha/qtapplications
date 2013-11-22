@@ -75,6 +75,12 @@ MessageView::MessageView(QWidget *parent) :
     m_mainWebFrame = m_page->mainFrame();
     connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrame(const QSize &)));
 
+    setMinimumSize(sizeHint());
+
+}
+
+QSize MessageView::sizeHint(){
+    return QSize(400, 300);
 }
 
 void MessageView::appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime){
@@ -88,7 +94,6 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
 
     //URL: contact://contactid
     QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(displayName).arg(userID).arg(URLScheme_Contact).arg(timeString);
-
 
 
     if(userID != myUserID){

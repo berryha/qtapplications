@@ -17,12 +17,15 @@ GroupChatWindow::GroupChatWindow(InterestGroup *interestGroup, QWidget *parent)
     ui.setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
 
+    m_messageHistoryView = 0;
+
     Q_ASSERT_X(interestGroup != 0, "GroupChatWindow", "Invalid InterestGroup!");
 
     ui.chatMessageWindow->setInterestGroup(interestGroup);
 
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(InterestGroup*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(InterestGroup*, const QString&, const QStringList&)));
     connect(ui.chatMessageWindow, SIGNAL(signalRequestDownloadImage(const QString&, const QString&)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
+    connect(ui.chatMessageWindow, SIGNAL(signalShowMessageHistory(bool)), this, SLOT(showMessageHistory(bool)));
     connect(ui.chatMessageWindow, SIGNAL(signalCloseWindow()), this, SIGNAL(signalCloseWindow()));
 
 
@@ -53,6 +56,7 @@ GroupChatWindow::GroupChatWindow(InterestGroup *interestGroup, QWidget *parent)
     connect(ui.listWidgetMembers, SIGNAL(itemActivated(QListWidgetItem*)), this, SLOT(memberItemActivated(QListWidgetItem*)));
 
     ui.chatMessageWindow->setEnabled(interestGroup->getState());
+
 
 }
 
@@ -111,6 +115,11 @@ void GroupChatWindow::memberJoinedOrQuitted(const QString &memberID, bool join){
 
 }
 
+QSize GroupChatWindow::sizeHint(){
+    return QSize(800, 600);
+}
+
+
 void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
@@ -123,6 +132,22 @@ void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
     QMessageBox::information(this, "memberID", memberID);
 }
 
+void GroupChatWindow::showMessageHistory(bool show){
+    if(show){
+        m_messageHistoryView = new MessageHistoryView(this);
+        ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
+        ui.tabWidget->setCurrentWidget(m_messageHistoryView);
+    }else{
+        ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
+        delete m_messageHistoryView;
+        m_messageHistoryView = 0;
+
+//        adjustSize();
+        updateGeometry();
+    }
+
+}
+
 QListWidgetItem * GroupChatWindow::memberItem(const QString &memberID){
 
     int count = ui.listWidgetMembers->count();
@@ -133,6 +158,8 @@ QListWidgetItem * GroupChatWindow::memberItem(const QString &memberID){
             return item;
         }
     }
+
+    return 0;
 
 }
 

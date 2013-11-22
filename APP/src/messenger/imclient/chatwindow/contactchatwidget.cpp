@@ -5,12 +5,12 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     : QWidget(parent), m_contact(contact)
 {
 	ui.setupUi(this);
-
     setAttribute(Qt::WA_DeleteOnClose);
+
 
     connect(ui.chatMessageWindow, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)), this, SIGNAL(sendMsgButtonClicked(Contact*, const QString&, const QStringList&)));
     connect(ui.chatMessageWindow, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)));
-
+    connect(ui.chatMessageWindow, SIGNAL(signalShowMessageHistory(bool)), this, SLOT(showMessageHistory(bool)));
     connect(ui.chatMessageWindow, SIGNAL(signalCloseWindow()), this, SIGNAL(signalCloseWindow()));
 
 
@@ -19,6 +19,9 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     if(contact){
         setContact(contact);
     }
+
+    m_messageHistoryView = 0;
+
 
 }
 
@@ -65,6 +68,9 @@ void ContactChatWidget::contactOnlineStateChanged(){
 
 }
 
+QSize ContactChatWidget::sizeHint(){
+    return QSize(800, 600);
+}
 
 void ContactChatWidget::closeEvent(QCloseEvent * event){
 
@@ -79,5 +85,25 @@ void ContactChatWidget::closeEvent(QCloseEvent * event){
 
 void ContactChatWidget::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime ){
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
+}
+
+void ContactChatWidget::showMessageHistory(bool show){
+
+    if(show){
+        m_messageHistoryView = new MessageHistoryView(this);
+        ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
+        ui.tabWidget->setCurrentWidget(m_messageHistoryView);
+
+    }else{
+        ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
+        delete m_messageHistoryView;
+        m_messageHistoryView = 0;
+
+//        adjustSize();
+//        resize(640, 480);
+        updateGeometry();
+
+    }
+
 }
 
