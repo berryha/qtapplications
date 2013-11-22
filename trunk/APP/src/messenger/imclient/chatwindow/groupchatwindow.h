@@ -4,6 +4,8 @@
 #include <QWidget>
 #include "ui_groupchatwindow.h"
 
+#include "messagehistoryview.h"
+
 namespace HEHUI {
 
 class GroupChatWindow : public QWidget
@@ -24,6 +26,9 @@ public:
 
     void memberJoinedOrQuitted(const QString &memberID, bool join);
 
+    QSize sizeHint();
+
+
 protected:
     void closeEvent(QCloseEvent * event);
 
@@ -39,6 +44,7 @@ public slots:
 
 private slots:
     void memberItemActivated(QListWidgetItem *memberItem);
+    void showMessageHistory(bool show);
 
 private:
     QListWidgetItem * memberItem(const QString &memberID);
@@ -48,6 +54,9 @@ private:
     Ui::GroupChatWindowClass ui;
 
     InterestGroup *m_interestGroup;
+
+    MessageHistoryView *m_messageHistoryView;
+
 
 
 };

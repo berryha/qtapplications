@@ -68,6 +68,7 @@ signals:
     void sendMsgButtonClicked(Contact *contact, const QString &message, const QStringList &imageList);
     void sendMsgButtonClicked(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
+    void signalShowMessageHistory(bool show);
     void signalCloseWindow();
 
 public slots:
@@ -78,7 +79,6 @@ private slots:
     void emitSendMsgSignal();
 //    void emitSendMsgSignal2();
 
-    void showMessageHistory(bool show);
 
 //    void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);
 //    void updateImage2(const QString &imageName);

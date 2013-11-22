@@ -54,6 +54,8 @@ public:
 
     explicit MessageView(QWidget *parent = 0);
 
+    QSize sizeHint();
+
 
 signals:
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);

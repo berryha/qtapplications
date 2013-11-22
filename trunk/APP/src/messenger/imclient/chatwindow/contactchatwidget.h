@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "ui_contactchatwidget.h"
-
+#include "messagehistoryview.h"
 
 class ContactChatWidget : public QWidget
 {
@@ -22,6 +22,7 @@ public:
 
     void contactOnlineStateChanged();
 
+    QSize sizeHint();
 
 protected:
     void closeEvent(QCloseEvent * event);
@@ -35,7 +36,8 @@ signals:
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime );
 
-
+private slots:
+    void showMessageHistory(bool show);
 
 private:
     Ui::ContactChatWidgetClass ui;
@@ -43,6 +45,8 @@ private:
     Contact *m_contact;
 
     QString m_displayName;
+
+    MessageHistoryView *m_messageHistoryView;
 
 
 

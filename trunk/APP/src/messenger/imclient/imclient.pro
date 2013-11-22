@@ -67,7 +67,8 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     contactbox/sheet_delegate_p.h \
     contactbox/contactwidget.h \
     contactbox/contactbox.h \
-    chatwindow/messageview.h
+    chatwindow/messageview.h \
+    chatwindow/messagehistoryview.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -106,7 +107,8 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     contactbox/sheet_delegate.cpp \
     contactbox/contactwidget.cpp \
     contactbox/contactbox.cpp \
-    chatwindow/messageview.cpp
+    chatwindow/messageview.cpp \
+    chatwindow/messagehistoryview.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
@@ -121,7 +123,8 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     login/applyforregistrationwidget.ui \
     search/addcontactdialog.ui \
     deletecontactdialog/deletecontactdialog.ui \
-    contactbox/contactwidget.ui
+    contactbox/contactwidget.ui \
+    chatwindow/messagehistoryview.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
     resources/images/chatmessagewindow/chatmessagewindow.qrc \

@@ -110,7 +110,7 @@ private:
     QStringList m_contactChatHistoryList;
     QList<quint32> m_groupChatHistoryList;
 
-
+//    QSize m_preferedSize;
 
 };
 
