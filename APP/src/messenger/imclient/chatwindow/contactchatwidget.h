@@ -48,6 +48,7 @@ private:
 
     MessageHistoryView *m_messageHistoryView;
 
+    QSize m_preferedSize;
 
 
 };

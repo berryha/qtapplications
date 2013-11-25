@@ -19,7 +19,7 @@ ChatWindowManager::ChatWindowManager(QWidget *parent)
     initTabWidget();
 
 
-    m_chatWindowDisplayStyle = TabbedChatWindow;
+    m_chatWindowDisplayStyle = SeparatedChatWindow;
     ui.stackedWidget->setCurrentWidget(ui.pageTabWidget);
 
 //    m_preferedSize = size();
@@ -845,6 +845,7 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
 //        subWindow->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
 
 //        connect(subWindow, SIGNAL(destroyed()), this, SLOT(chatWindowClosed()));
+
 
         return contactChatWindow;
 

@@ -6,15 +6,104 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>132</height>
+    <width>579</width>
+    <height>92</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Message History</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+  <layout class="QVBoxLayout" name="verticalLayoutMain">
+   <item>
+    <widget class="QFrame" name="frameSearch">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Time From:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dateTimeEditStartTime">
+        <property name="currentSection">
+         <enum>QDateTimeEdit::YearSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>yyyy-M-d hh:mm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>To:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="dateTimeEditEndTime">
+        <property name="currentSection">
+         <enum>QDateTimeEdit::YearSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>yyyy-M-d hh:mm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelContent">
+        <property name="text">
+         <string>Content:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditContent">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButtonSearch">
+        <property name="toolTip">
+         <string>Search</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources.qrc">
+          <normaloff>:/resources/images/find.png</normaloff>:/resources/images/find.png</iconset>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>3</number>
@@ -30,6 +119,12 @@
        <property name="icon">
         <iconset resource="../resources.qrc">
          <normaloff>:/resources/images/find.png</normaloff>:/resources/images/find.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -86,9 +181,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinBoxCurrentPage">
+      <widget class="QSpinBox" name="spinBoxPageIndex">
        <property name="toolTip">
         <string>Current Page Number</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>9999</number>
        </property>
       </widget>
      </item>
@@ -126,79 +227,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QFrame" name="frameSearch">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Time From:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dateTimeEdit">
-        <property name="currentSection">
-         <enum>QDateTimeEdit::DaySection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>yyyy-M-d hh:mm</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>To:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="dateTimeEdit_2">
-        <property name="currentSection">
-         <enum>QDateTimeEdit::DaySection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>yyyy-M-d hh:mm</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelContact">
-        <property name="text">
-         <string>Contact:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item>
-       <widget class="QToolButton" name="toolButtonSearch">
-        <property name="toolTip">
-         <string>Search</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources.qrc">
-          <normaloff>:/resources/images/find.png</normaloff>:/resources/images/find.png</iconset>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
   </layout>
  </widget>

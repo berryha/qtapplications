@@ -75,13 +75,12 @@ MessageView::MessageView(QWidget *parent) :
     m_mainWebFrame = m_page->mainFrame();
     connect(m_mainWebFrame, SIGNAL(contentsSizeChanged(const QSize &)), this, SLOT(scrollWebFrame(const QSize &)));
 
-    setMinimumSize(sizeHint());
 
 }
 
-QSize MessageView::sizeHint(){
-    return QSize(400, 300);
-}
+//QSize MessageView::sizeHint(){
+//    return QSize(540, 300);
+//}
 
 void MessageView::appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime){
     qDebug()<<"----MessageView::appendChatMessage(...) contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
