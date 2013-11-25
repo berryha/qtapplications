@@ -1,5 +1,4 @@
 #include "messagehistoryview.h"
-#include "ui_messagehistoryview.h"
 
 #include "messageview.h"
 
@@ -7,10 +6,9 @@ namespace HEHUI {
 
 
 MessageHistoryView::MessageHistoryView(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::MessageHistoryViewUI)
+    QWidget(parent)
 {
-    ui->setupUi(this);
+    ui.setupUi(this);
 
 
     m_messageView = new MessageView(this);
@@ -18,7 +16,7 @@ MessageHistoryView::MessageHistoryView(QWidget *parent) :
     //connect(m_messageView, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)));
 
 
-    ui->gridLayout->addWidget(m_messageView, 0, 0, 1, 1);
+    ui.verticalLayoutMain->insertWidget(0, m_messageView);
 
     static QString htmlForMessagesView = "";
     if(htmlForMessagesView.isEmpty()){
@@ -31,14 +29,43 @@ MessageHistoryView::MessageHistoryView(QWidget *parent) :
     }
     m_messageView->setHtml(htmlForMessagesView);
 
+//    ui.frameSearch->hide();
 
 }
 
 MessageHistoryView::~MessageHistoryView()
 {
-    delete ui;
 
+    delete m_messageView;
 
+}
+
+void MessageHistoryView::on_toolButtonShowSearchFrame_clicked(bool checked){
+    ui.frameSearch->setVisible(checked);
+
+}
+
+void MessageHistoryView::on_toolButtonSearch_clicked(){
+
+}
+
+void MessageHistoryView::on_toolButtonFirstPage_clicked(){
+
+}
+
+void MessageHistoryView::on_toolButtonPreviousPage_clicked(){
+
+}
+
+void MessageHistoryView::on_spinBoxPageIndex_valueChanged(int i){
+
+}
+
+void MessageHistoryView::on_toolButtonNextPage_clicked(){
+
+}
+
+void MessageHistoryView::on_toolButtonLastPage_clicked(){
 
 }
 

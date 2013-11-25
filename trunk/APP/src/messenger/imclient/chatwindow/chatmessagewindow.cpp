@@ -87,7 +87,7 @@ void ChatMessageWindow::initUI(){
     connect(m_messageView, SIGNAL(signalTipLastUnACKedMessageFromContact(const QString &)), this, SLOT(tipLastUnACKedMessageFromContact(const QString &)) );
 
 
-    ui.gridLayoutMessageView->addWidget(m_messageView, 0, 0, 1, 1);
+    ui.verticalLayoutMessageView->insertWidget(0, m_messageView);
 
     static QString htmlForMessagesView = "";
     if(htmlForMessagesView.isEmpty()){
@@ -323,6 +323,10 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 
 }
+
+//QSize ChatMessageWindow::minimumSizeHint(){
+//    return ui.fontFrame->size();
+//}
 
 //void ChatMessageWindow::updateImage2(const QString &imageName){
 

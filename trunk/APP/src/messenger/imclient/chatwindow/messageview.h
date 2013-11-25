@@ -54,7 +54,7 @@ public:
 
     explicit MessageView(QWidget *parent = 0);
 
-    QSize sizeHint();
+//    QSize sizeHint();
 
 
 signals:
