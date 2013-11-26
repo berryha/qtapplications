@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>579</width>
+    <width>486</width>
     <height>92</height>
    </rect>
   </property>
@@ -32,17 +32,23 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Time From:</string>
+         <string>Date From:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="dateTimeEditStartTime">
+       <widget class="QDateEdit" name="dateEditStartDate">
+        <property name="toolTip">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="whatsThis">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::YearSection</enum>
         </property>
         <property name="displayFormat">
-         <string>yyyy-M-d hh:mm</string>
+         <string>yy-M-d</string>
         </property>
        </widget>
       </item>
@@ -54,12 +60,18 @@
        </widget>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="dateTimeEditEndTime">
+       <widget class="QDateEdit" name="dateEditEndDate">
+        <property name="toolTip">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="whatsThis">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
         <property name="currentSection">
          <enum>QDateTimeEdit::YearSection</enum>
         </property>
         <property name="displayFormat">
-         <string>yyyy-M-d hh:mm</string>
+         <string>yy-M-d</string>
         </property>
        </widget>
       </item>

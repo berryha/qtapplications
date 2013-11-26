@@ -22,7 +22,7 @@ public:
 
     void contactOnlineStateChanged();
 
-    QSize sizeHint();
+//    QSize sizeHint();
 
 protected:
     void closeEvent(QCloseEvent * event);
@@ -38,6 +38,8 @@ public slots:
 
 private slots:
     void showMessageHistory(bool show);
+
+    void setPreferedSize();
 
 private:
     Ui::ContactChatWidgetClass ui;

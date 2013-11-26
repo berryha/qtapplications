@@ -23,9 +23,10 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     m_messageHistoryView = 0;
 
 
-    m_preferedSize = size();
+    m_preferedSize = QSize();
 
-    setMinimumWidth(m_preferedSize.width());
+    QTimer::singleShot(1, this, SLOT(setPreferedSize()));
+
 
 
 }
@@ -73,10 +74,9 @@ void ContactChatWidget::contactOnlineStateChanged(){
 
 }
 
-QSize ContactChatWidget::sizeHint(){
-    return QSize(640, 480);
-//    return m_preferedSize;
-}
+//QSize ContactChatWidget::sizeHint(){
+//    return QSize(640, 480);
+//}
 
 void ContactChatWidget::closeEvent(QCloseEvent * event){
 
@@ -99,30 +99,25 @@ void ContactChatWidget::showMessageHistory(bool show){
         if(!m_messageHistoryView){
             m_messageHistoryView = new MessageHistoryView(this);
             ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
-//            m_messageHistoryView->adjustSize();
-//            ui.tabWidget->adjustSize();
         }
         ui.tabWidget->setCurrentWidget(m_messageHistoryView);
-
-        adjustSize();
-//        updateGeometry();
 
     }else{
         ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
         delete m_messageHistoryView;
         m_messageHistoryView = 0;
 
-
-        QPoint tl = geometry().topLeft();
-
-        setGeometry(tl.x(), tl.y(), m_preferedSize.width(), m_preferedSize.height());
-
-//        adjustSize();
-//        repaint();
-
-
+        resize(m_preferedSize);
     }
 
 
+}
+
+void ContactChatWidget::setPreferedSize(){
+    if(!m_preferedSize.isValid()){
+        m_preferedSize = size();
+        setMinimumSize(m_preferedSize);
+        //ui.chatMessageWindow->setMinimumWidth(ui.chatMessageWindow->width());
+    }
 }
 

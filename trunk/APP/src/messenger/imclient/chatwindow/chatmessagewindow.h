@@ -59,7 +59,7 @@ public:
 
     void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime);
 
-//    QSize minimumSizeHint();
+//    QSize sizeHint();
 
 protected:
     void closeEvent(QCloseEvent * event);
