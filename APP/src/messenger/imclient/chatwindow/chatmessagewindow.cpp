@@ -156,6 +156,7 @@ void ChatMessageWindow::initUI(){
     ui.textEdit->setFocus();
     ui.fontStyleToolButton->setChecked(false);
     ui.fontFrame->setVisible(false);
+//    ui.fontComboBox->hide();
 
 
     connect(ui.pushButtonMessageHistory, SIGNAL(clicked(bool)), this, SIGNAL(signalShowMessageHistory(bool)));
@@ -324,8 +325,8 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 }
 
-//QSize ChatMessageWindow::minimumSizeHint(){
-//    return ui.fontFrame->size();
+//QSize ChatMessageWindow::sizeHint(){
+//    return QSize(640, 480);
 //}
 
 //void ChatMessageWindow::updateImage2(const QString &imageName){

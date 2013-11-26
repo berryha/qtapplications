@@ -57,6 +57,9 @@ GroupChatWindow::GroupChatWindow(InterestGroup *interestGroup, QWidget *parent)
 
     ui.chatMessageWindow->setEnabled(interestGroup->getState());
 
+    m_preferedSize = QSize();
+
+    QTimer::singleShot(1, this, SLOT(setPreferedSize()));
 
 }
 
@@ -115,9 +118,9 @@ void GroupChatWindow::memberJoinedOrQuitted(const QString &memberID, bool join){
 
 }
 
-QSize GroupChatWindow::sizeHint(){
-    return QSize(800, 600);
-}
+//QSize GroupChatWindow::sizeHint(){
+//    return QSize(800, 600);
+//}
 
 
 void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime){
@@ -134,19 +137,28 @@ void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
 
 void GroupChatWindow::showMessageHistory(bool show){
     if(show){
-        m_messageHistoryView = new MessageHistoryView(this);
-        ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
+        if(!m_messageHistoryView){
+            m_messageHistoryView = new MessageHistoryView(this);
+            ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
+        }
         ui.tabWidget->setCurrentWidget(m_messageHistoryView);
     }else{
         ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
         delete m_messageHistoryView;
         m_messageHistoryView = 0;
 
-//        adjustSize();
-        updateGeometry();
+        resize(m_preferedSize);
     }
 
 }
+
+void GroupChatWindow::setPreferedSize(){
+    if(!m_preferedSize.isValid()){
+        m_preferedSize = size();
+        setMinimumSize(m_preferedSize);
+    }
+}
+
 
 QListWidgetItem * GroupChatWindow::memberItem(const QString &memberID){
 

@@ -29,7 +29,10 @@ MessageHistoryView::MessageHistoryView(QWidget *parent) :
     }
     m_messageView->setHtml(htmlForMessagesView);
 
-//    ui.frameSearch->hide();
+    QDate date = QDate::currentDate();
+    ui.dateEditStartDate->setDate(date);
+    ui.dateEditEndDate->setDate(date);
+    ui.frameSearch->hide();
 
 }
 

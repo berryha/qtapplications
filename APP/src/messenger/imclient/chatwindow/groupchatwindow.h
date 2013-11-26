@@ -26,7 +26,7 @@ public:
 
     void memberJoinedOrQuitted(const QString &memberID, bool join);
 
-    QSize sizeHint();
+//    QSize sizeHint();
 
 
 protected:
@@ -46,6 +46,8 @@ private slots:
     void memberItemActivated(QListWidgetItem *memberItem);
     void showMessageHistory(bool show);
 
+    void setPreferedSize();
+
 private:
     QListWidgetItem * memberItem(const QString &memberID);
 
@@ -57,6 +59,7 @@ private:
 
     MessageHistoryView *m_messageHistoryView;
 
+    QSize m_preferedSize;
 
 
 };
