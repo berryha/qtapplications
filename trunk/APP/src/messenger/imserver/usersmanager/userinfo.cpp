@@ -84,7 +84,29 @@ void UserInfo::init(){
 
     m_sysID = 0;
 
+    interestGroups.clear();
 
+
+}
+
+void UserInfo::joinOrLeaveInterestGroup(quint32 interestGroupID, bool join){
+
+    if(join){
+        if(interestGroups.contains(interestGroupID)){
+            return;
+        }else{
+            interestGroups.append(interestGroupID);
+        }
+    }else{
+        interestGroups.removeAll(interestGroupID);
+    }
+
+    updateInterestGroupInfoVersion();
+
+}
+
+bool UserInfo::isMemberOfInterestGroup(quint32 interestGroupID){
+    return interestGroups.contains(interestGroupID);
 }
 
 bool UserInfo::isOnLine(){

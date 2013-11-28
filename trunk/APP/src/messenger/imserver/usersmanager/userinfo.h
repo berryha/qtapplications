@@ -76,8 +76,19 @@ public:
     void setSysID(quint32 sysID){this->m_sysID = sysID;}
     quint32 getSysID(){return m_sysID;}
 
+    QList<quint32> getInterestGroups() const
+    {
+        return interestGroups;
+    }
+    void setInterestGroups(const QStringList &groups){
+        this->interestGroups.clear();
+        foreach (QString groupID, groups) {
+            this->interestGroups.append(groupID.toUInt());
+        }
+    }
 
-public slots:
+    void joinOrLeaveInterestGroup(quint32 interestGroupID, bool join = true);
+    bool isMemberOfInterestGroup(quint32 interestGroupID);
 
 
 private:
@@ -103,7 +114,7 @@ private:
 
     quint32 m_sysID;
 
-
+    QList<quint32/*Group ID*/> interestGroups;
 
 
 

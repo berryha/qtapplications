@@ -2623,12 +2623,11 @@ void MainWindow::slotSendChatMessageToInterestGroup(InterestGroup *interestGroup
 }
 
 void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsListFromServer, quint32 interestGroupsInfoVersionOnServer){
-    qDebug()<<"--MainWindow::slotProcessInterestGroupsList(..)";
-    qDebug()<<"----interestGroupsListFromServer:"<<interestGroupsListFromServer;
+    qDebug()<<"--MainWindow::slotProcessInterestGroupsList(..) "<<"----interestGroupsListFromServer:"<<interestGroupsListFromServer;
 
     //Interest Groups List Format: GroupID,GroupInfoVersion,MemberListInfoVersion;GroupID,GroupInfoVersion,MemberListInfoVersion
 
-    QList<quint32> interestGroupsOnLocal = m_myself->getInterestGroups();
+    QList<InterestGroup *> interestGroupsOnLocal = m_contactsManager->getInterestGroupsList();
 
     QList<quint32> groupsOnServer;
     QStringList infoList = interestGroupsListFromServer.split(";");
@@ -2640,15 +2639,15 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
         }
         quint32 groupID = list.at(0).toUInt();
         groupsOnServer.append(groupID);
-        interestGroupsOnLocal.removeAll(groupID);
 
         quint32 groupInfoVersion = list.at(1).toUInt();
         quint32 memberListInfoVersion = list.at(2).toUInt();
-        qWarning()<<"Server: groupInfoVersion:"<<groupInfoVersion<<" memberListInfoVersion:"<<memberListInfoVersion;
+        //qDebug()<<"Server: groupInfoVersion:"<<groupInfoVersion<<" memberListInfoVersion:"<<memberListInfoVersion;
 
         InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
         if(group){
-            qWarning()<<"Local: groupInfoVersion:"<<group->getGroupInfoVersion()<<" memberListInfoVersion:"<<group->getGroupMemberListInfoVersion();
+            //qDebug()<<"Local: groupInfoVersion:"<<group->getGroupInfoVersion()<<" memberListInfoVersion:"<<group->getGroupMemberListInfoVersion();
+            interestGroupsOnLocal.removeAll(group);
 
             if(groupInfoVersion != group->getGroupInfoVersion()){
                 clientPacketsParser->requestInterestGroupInfo(m_socketConnectedToServer, groupID);
@@ -2665,23 +2664,15 @@ void MainWindow::slotProcessInterestGroupsList(const QString &interestGroupsList
         
     }
 
-    foreach (quint32 groupID, interestGroupsOnLocal) {
-        InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+    foreach (InterestGroup *group, interestGroupsOnLocal) {
+        if(!group){continue;}
         if(group->getState() == 1 ){
             group->setState(0);
             m_contactsManager->saveInterestGroupInfoToDatabase(group);
         }
     }
     
-//    QList<quint32> interestGroupsOnLocal = m_imUser->getInterestGroups();
-//    if(!interestGroupsOnLocal.isEmpty()){
-//        foreach (quint32 groupID, interestGroupsOnLocal) {
-//            if(!groupsOnServer.contains(groupID)){
-//                m_contactsManager->leaveInterestGroup(groupID);
-//            }
-//        }
-//    }
-    
+
     m_myself->setInterestGroupInfoVersion(interestGroupsInfoVersionOnServer);
     
     m_myself->saveMyInfoToLocalDatabase();
@@ -2777,7 +2768,8 @@ void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QSt
         return;
     }
 
-    if(m_myself->isMemberOfInterestGroup(groupID)){return;}
+    //if(m_myself->isMemberOfInterestGroup(groupID)){return;}
+    if(m_contactsManager->getInterestGroupIDsList().contains(groupID)){return;}
 
     InterestGroup *group = new InterestGroup(groupID, "", this);
     group->setGroupName(groupName);
@@ -2959,9 +2951,18 @@ void MainWindow::slotCreateInterestGroup(){
             return ;
         }
 
-        QList<quint32> groups = m_myself->getInterestGroups();
-        foreach (quint32 groupID, groups) {
-            InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+//        QList<quint32> groups = m_myself->getInterestGroups();
+//        foreach (quint32 groupID, groups) {
+//            InterestGroup *group = m_contactsManager->getInterestGroup(groupID);
+//            if(!group){continue;}
+//            if(group->getGroupName() == groupName){
+//                QMessageBox::critical(this, tr("Error"), tr("Group with the same name already exists!"));
+//                return;
+//            }
+//        }
+
+        QList<InterestGroup *> interestGroupsOnLocal = m_contactsManager->getInterestGroupsList();
+        foreach (InterestGroup *group, interestGroupsOnLocal) {
             if(!group){continue;}
             if(group->getGroupName() == groupName){
                 QMessageBox::critical(this, tr("Error"), tr("Group with the same name already exists!"));
