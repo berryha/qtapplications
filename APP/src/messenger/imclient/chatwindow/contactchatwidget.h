@@ -33,13 +33,22 @@ signals:
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
     void signalCloseWindow();
 
+    void signalRequestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID);
+
+
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime );
 
+    void processContactHistoryMessage(const QStringList &messages, bool canFetchMore);
+
+
 private slots:
     void showMessageHistory(bool show);
+    void requestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword);
 
     void setPreferedSize();
+
+
 
 private:
     Ui::ContactChatWidgetClass ui;

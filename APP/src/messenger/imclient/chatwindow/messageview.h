@@ -62,7 +62,7 @@ signals:
     void signalTipLastUnACKedMessageFromContact(const QString &tip);
 
 public slots:
-    void appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime);
+    void appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime, bool richTextMessage);
     void appendHTML(const QString &htmlTag);
 
     void updateImage(const QString &imageName, ImageDownloadStatus downloadStatus);

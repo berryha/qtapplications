@@ -123,9 +123,6 @@ private slots:
     void addContact(const QString &userID, const QString &verificationMessage);
 
 
-
-
-
     void slotProcessContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
     void showContactRequestFromUser(const QString &userID, const QString &userNickName, const QString &userFace, const QString &verificationMessage);
 
@@ -171,11 +168,13 @@ private slots:
     void addOrRemoveRecentChatContact(Contact *contact, bool add = true);
     void addOrRemoveRecentChatGroup(InterestGroup *interestGroup, bool add = true);
 
+    //History Message
+    void getContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID);
+    void getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID);
 
 
     void on_toolButtonUserFace_clicked(){showUserInfo(m_myself);}
     void showUserInfo(IMUserBase *user);
-
 
     void requestLogin(const QHostAddress &serverHostAddress, quint16 serverPort);
     void slotProcessKickedOff();

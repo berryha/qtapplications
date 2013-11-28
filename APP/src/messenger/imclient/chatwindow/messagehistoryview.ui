@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>92</height>
+    <width>412</width>
+    <height>121</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,61 +28,38 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Date From:</string>
+         <string>Time From:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QDateEdit" name="dateEditStartDate">
-        <property name="toolTip">
-         <string>Date Format:Year-Month-Day</string>
-        </property>
-        <property name="whatsThis">
-         <string>Date Format:Year-Month-Day</string>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::YearSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>yy-M-d</string>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>To:</string>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateEdit" name="dateEditEndDate">
-        <property name="toolTip">
-         <string>Date Format:Year-Month-Day</string>
-        </property>
-        <property name="whatsThis">
-         <string>Date Format:Year-Month-Day</string>
-        </property>
-        <property name="currentSection">
-         <enum>QDateTimeEdit::YearSection</enum>
-        </property>
-        <property name="displayFormat">
-         <string>yy-M-d</string>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QLabel" name="labelContent">
         <property name="text">
          <string>Content:</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1" colspan="3">
        <widget class="QLineEdit" name="lineEditContent">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -92,7 +69,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="4">
        <widget class="QToolButton" name="toolButtonSearch">
         <property name="toolTip">
          <string>Search</string>
@@ -109,6 +86,38 @@
         </property>
         <property name="autoRaise">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDateTimeEdit" name="dateTimeEditStartTime">
+        <property name="toolTip">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="whatsThis">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::YearSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>yyyy-M-d hh:mm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QDateTimeEdit" name="dateTimeEditEndTime">
+        <property name="toolTip">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="whatsThis">
+         <string>Date Format:Year-Month-Day</string>
+        </property>
+        <property name="currentSection">
+         <enum>QDateTimeEdit::YearSection</enum>
+        </property>
+        <property name="displayFormat">
+         <string>yyyy-M-d hh:mm</string>
         </property>
        </widget>
       </item>
@@ -136,7 +145,7 @@
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -161,6 +170,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButtonFirstPage">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>First Page</string>
        </property>
@@ -174,11 +186,18 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButtonPreviousPage">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Previous Page</string>
        </property>
        <property name="text">
         <string>&lt;</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/resources/images/previous.png</normaloff>:/resources/images/previous.png</iconset>
        </property>
        <property name="autoRaise">
         <bool>true</bool>
@@ -194,6 +213,9 @@
      </item>
      <item>
       <widget class="QSpinBox" name="spinBoxPageIndex">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Current Page Number</string>
        </property>
@@ -214,11 +236,18 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButtonNextPage">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Next Page</string>
        </property>
        <property name="text">
         <string>&gt;</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/resources/images/next.png</normaloff>:/resources/images/next.png</iconset>
        </property>
        <property name="autoRaise">
         <bool>true</bool>
@@ -227,6 +256,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButtonLastPage">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Last Page</string>
        </property>

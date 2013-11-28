@@ -415,6 +415,8 @@ void MainWindow::startNetwork(){
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)), Qt::QueuedConnection);
     connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), Qt::QueuedConnection);
     connect(chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)), Qt::QueuedConnection);
+    connect(chatWindowManager, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), this, SLOT(getContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), Qt::QueuedConnection);
+    connect(chatWindowManager, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), this, SLOT(getGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), Qt::QueuedConnection);
 
 
 
@@ -1322,6 +1324,24 @@ void MainWindow::addOrRemoveRecentChatGroup(InterestGroup *interestGroup, bool a
 
 
 }
+
+void MainWindow::getContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID){
+
+    QStringList messages;
+    bool canFetchMore = false;
+    m_contactsManager->getContactHistoryMessage(startTime, endTime, content, requestBackword, contactID, &messages, &canFetchMore);
+    chatWindowManager->processContactHistoryMessage(messages, canFetchMore, contactID);
+
+}
+
+void MainWindow::getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID){
+
+    QStringList messages;
+    bool canFetchMore = false;
+    m_contactsManager->getGrouptHistoryMessage(startTime, endTime, content, requestBackword, groupID, &messages, &canFetchMore);
+    chatWindowManager->processGrouptHistoryMessage(messages, canFetchMore, groupID);
+}
+
 
 void MainWindow::slotUserVerified(){
     qDebug()<<"--MainWindow::slotUserVerified()";

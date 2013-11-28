@@ -497,6 +497,37 @@ void ChatWindowManager::processImageDownloadResult(const QString &contactID, con
 
 }
 
+void ChatWindowManager::processContactHistoryMessage(const QStringList &messages, bool canFetchMore, const QString &contactID){
+
+    Contact *contact = ContactsManager::instance()->getUser(contactID);
+    if(!contact){
+        qCritical()<<"Error:No such contact:"<<contactID;
+        return;
+    }
+
+    ContactChatWidget *contactChatWindow = m_contactChatWidgetHash.value(contactID);
+    if(!contactChatWindow){return;}
+
+    contactChatWindow->processContactHistoryMessage(messages, canFetchMore);
+}
+
+void ChatWindowManager::processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore, quint32 groupID){
+
+    InterestGroup *group = ContactsManager::instance()->getInterestGroup(groupID);
+    if(!group){
+        qCritical()<<"Error:No such interest group:"<<groupID;
+        return;
+    }
+
+
+    GroupChatWindow *groupChatWindow = m_groupChatWidgetHash.value(groupID);
+    if(!groupChatWindow){return;}
+
+    groupChatWindow->processGrouptHistoryMessage(messages, canFetchMore);
+
+}
+
+
 void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time){
 
     InterestGroup *group = ContactsManager::instance()->getInterestGroup(interestGroupID);
@@ -831,7 +862,7 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
 
         connect(contactChatWindow, SIGNAL(signalCloseWindow()), this, SLOT(handleCloseWindowRequest()));
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
-
+        connect(contactChatWindow, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), this, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)));
 
         QString contactID = contact->getUserID();
         m_contactChatWidgetHash.insert(contactID, contactChatWindow);
@@ -895,6 +926,8 @@ GroupChatWindow* ChatWindowManager::createInterestGroupChatWindow(InterestGroup 
 
     connect(groupChatWindow, SIGNAL(signalCloseWindow()), this, SLOT(handleCloseWindowRequest()));
     connect(groupChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
+
+    connect(groupChatWindow, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), this, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)));
 
     quint32 groutID = group->getGroupID();
     m_groupChatWidgetHash.insert(groutID, groupChatWindow);

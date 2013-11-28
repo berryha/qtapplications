@@ -10,6 +10,12 @@
     <height>217</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Message Window</string>
   </property>
@@ -402,14 +408,27 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButtonMessageHistory">
+               <widget class="QToolButton" name="toolButtonMessageHistory">
                 <property name="text">
                  <string>Message &amp;History</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="../resources/images/chatmessagewindow/chatmessagewindow.qrc">
+                  <normaloff>:/messageeditor/messageeditor/face.png</normaloff>:/messageeditor/messageeditor/face.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>22</width>
+                  <height>22</height>
+                 </size>
                 </property>
                 <property name="checkable">
                  <bool>true</bool>
                 </property>
-                <property name="flat">
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
+                </property>
+                <property name="autoRaise">
                  <bool>true</bool>
                 </property>
                </widget>

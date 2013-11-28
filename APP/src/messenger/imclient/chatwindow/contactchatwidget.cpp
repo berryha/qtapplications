@@ -93,31 +93,54 @@ void ContactChatWidget::appendMessageReceivedFromContact(const QString &message,
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
+void ContactChatWidget::processContactHistoryMessage(const QStringList &messages, bool canFetchMore){
+    if(m_messageHistoryView){
+        m_messageHistoryView->appendHistoryChatMessages(messages, canFetchMore);
+    }
+}
+
 void ContactChatWidget::showMessageHistory(bool show){
 
+    ui.chatMessageWindow->resize(0,0);
+
     if(show){
+        setMinimumSize(QSize(0, 0));
+
         if(!m_messageHistoryView){
             m_messageHistoryView = new MessageHistoryView(this);
+            m_messageHistoryView->setMinimumWidth(m_messageHistoryView->width());
+            connect(m_messageHistoryView, SIGNAL(signalRequestHistoryMessage(const QString &, const QString &, const QString &, bool)), this, SLOT(requestContactHistoryMessage(const QString &, const QString &, const QString &, bool)));
+
             ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
         }
         ui.tabWidget->setCurrentWidget(m_messageHistoryView);
 
     }else{
+        setMinimumSize(m_preferedSize);
+
         ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
         delete m_messageHistoryView;
         m_messageHistoryView = 0;
 
         resize(m_preferedSize);
+
+
     }
 
 
+}
+
+void ContactChatWidget::requestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword){
+    Q_ASSERT(m_contact);
+    emit signalRequestContactHistoryMessage(startTime, endTime, content, requestBackword, m_contact->getUserID());
 }
 
 void ContactChatWidget::setPreferedSize(){
     if(!m_preferedSize.isValid()){
         m_preferedSize = size();
         setMinimumSize(m_preferedSize);
-        //ui.chatMessageWindow->setMinimumWidth(ui.chatMessageWindow->width());
+        ui.chatMessageWindow->setMinimumWidth(ui.chatMessageWindow->width());
     }
+
 }
 

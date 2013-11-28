@@ -38,13 +38,19 @@ signals:
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
     void signalCloseWindow();
 
+    void signalRequestGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID);
+
+
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime);
 
+    void processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore);
 
 private slots:
     void memberItemActivated(QListWidgetItem *memberItem);
     void showMessageHistory(bool show);
+    void requestGroupHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword);
+
 
     void setPreferedSize();
 
