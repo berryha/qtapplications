@@ -154,6 +154,7 @@ bool ContactsManager::loadInterestGroups(){
         interestGroup->clearUpdatedProperties();
         
         interestGroupsHash.insert(groupID, interestGroup);
+        //m_myself->addInterestGroup(groupID);
 
         qApp->processEvents();
     }
@@ -198,6 +199,7 @@ bool ContactsManager::addNewInterestGroupToDatabase(InterestGroup *interestGroup
     }
     
     interestGroupsHash.insert(groupID, interestGroup);
+    //m_myself->addInterestGroup(groupID);
     
     return true;
     
@@ -238,8 +240,7 @@ bool ContactsManager::saveInterestGroupInfoToDatabase(InterestGroup *interestGro
     if(!interestGroup){
         return false;
     }
-    
-    
+        
     if(!localUserDataDB.isValid()){
         if(!openDatabase()){
             return false;
@@ -253,7 +254,7 @@ bool ContactsManager::saveInterestGroupInfoToDatabase(InterestGroup *interestGro
     }
     
     QString statement = QString("update interestgroups set %1 where GroupID='%2' ").arg(updateSQLStatement).arg(interestGroup->getGroupID());
-
+    qDebug()<<"statement:"<<statement;
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
         QString msg = QString("Can not save interest group info to database! Group ID:%1, %2 Error Type:%3 Error NO.:%4").arg(interestGroup->getGroupID()).arg(error.text()).arg(error.type()).arg(error.number());
@@ -270,9 +271,18 @@ bool ContactsManager::saveInterestGroupInfoToDatabase(InterestGroup *interestGro
 
 
 QList<InterestGroup *> ContactsManager::getInterestGroupsList(){
-
     return interestGroupsHash.values();
 }
+
+QList<quint32> ContactsManager::getInterestGroupIDsList(){
+    return interestGroupsHash.keys();
+}
+
+//bool ContactsManager::isMemberOfInterestGroup(quint32 groupID){
+//    InterestGroup *group = interestGroupsHash.value(groupID);
+//    if(!group){return false;}
+//    return group->getState();
+//}
 
 bool ContactsManager::saveInterestGroupMemberToDatabase(quint32 groupID, const QString &userID, quint32 memberRole){
 

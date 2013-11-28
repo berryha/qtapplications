@@ -59,6 +59,10 @@ public:
     bool removeInterestGroupFromLocalDB(quint32 groupID);
     bool saveInterestGroupInfoToDatabase(InterestGroup *interestGroup);
     QList<InterestGroup *> getInterestGroupsList();
+    QList<quint32 > getInterestGroupIDsList();
+
+//    bool isMemberOfInterestGroup(quint32 groupID);
+
     bool saveInterestGroupMemberToDatabase(quint32 groupID, const QString &userID, quint32 memberRole);
 
     bool saveInterestGroupMembersToDatabase(InterestGroup *interestGroup);

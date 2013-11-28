@@ -117,7 +117,7 @@ void IMUserBase::init(){
     personalMessageInfoVersion = 0;
     personalMessage = "";
 
-    interestGroups.clear();
+//    interestGroups.clear();
     
     personalDetailInfoVersion = 0;
     personalContactGroupsInfoVersion = 0;
@@ -894,27 +894,27 @@ void IMUserBase::moveContactToAnotherGroup(const QString &contactID, int oldGrou
 //    addUpdatedProperty(IM::PI_Blacklist, "'"+getBlacklistInfoString()+"'");
 //}
 
-void IMUserBase::joinOrLeaveInterestGroup(quint32 interestGroupID, bool join){
+//void IMUserBase::joinOrLeaveInterestGroup(quint32 interestGroupID, bool join){
 
-    if(join){
-        if(interestGroups.contains(interestGroupID)){
-            return;
-        }else{
-            interestGroups.append(interestGroupID);
-        }
-    }else{
-        interestGroups.removeAll(interestGroupID);
-    }
+//    if(join){
+//        if(interestGroups.contains(interestGroupID)){
+//            return;
+//        }else{
+//            interestGroups.append(interestGroupID);
+//        }
+//    }else{
+//        interestGroups.removeAll(interestGroupID);
+//    }
 
-    updateInterestGroupInfoVersion();
+//    updateInterestGroupInfoVersion();
 
-//    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
+////    addUpdatedPersonalInfoProperty(IM::PI_InterestGroupsInfoString, "'"+interestGroups.join(",")+"'");
 
-}
+//}
 
-bool IMUserBase::isMemberOfInterestGroup(quint32 interestGroupID){
-    return interestGroups.contains(interestGroupID);
-}
+//bool IMUserBase::isMemberOfInterestGroup(quint32 interestGroupID){
+//    return interestGroups.contains(interestGroupID);
+//}
 
 quint32 IMUserBase::updateInterestGroupInfoVersion(){
 

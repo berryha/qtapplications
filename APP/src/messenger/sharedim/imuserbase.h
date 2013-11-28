@@ -121,16 +121,20 @@ public:
         return interestGroupInfoVersion;
     }
     
-    QList<quint32> getInterestGroups() const
-    {
-        return interestGroups;
-    }
-    void setInterestGroups(const QStringList &groups){
-        this->interestGroups.clear();
-        foreach (QString groupID, groups) {
-            this->interestGroups.append(groupID.toUInt());
-        }
-    }
+//    QList<quint32> getInterestGroups() const
+//    {
+//        return interestGroups;
+//    }
+//    void setInterestGroups(const QStringList &groups){
+//        this->interestGroups.clear();
+//        foreach (QString groupID, groups) {
+//            this->interestGroups.append(groupID.toUInt());
+//        }
+//    }
+//    void addInterestGroup(quint32 groupID){
+//        this->interestGroups.append(groupID);
+//    }
+
 
     quint32 getPersonalSummaryInfoVersion() const
     {
@@ -291,8 +295,8 @@ public slots:
     void moveContactToAnotherGroup(const QString &contactID, int oldGroupID, int newGroupID);
 
 
-    void joinOrLeaveInterestGroup(quint32 interestGroupID, bool join = true);
-    bool isMemberOfInterestGroup(quint32 interestGroupID);
+//    void joinOrLeaveInterestGroup(quint32 interestGroupID, bool join = true);
+//    bool isMemberOfInterestGroup(quint32 interestGroupID);
     quint32 updateInterestGroupInfoVersion();
 
 
@@ -327,7 +331,7 @@ private:
     QString personalMessage;
 
 
-    QList<quint32/*Group ID*/> interestGroups;
+//    QList<quint32/*Group ID*/> interestGroups;
     quint32 interestGroupInfoVersion;
     
     quint32 personalSummaryInfoVersion;
