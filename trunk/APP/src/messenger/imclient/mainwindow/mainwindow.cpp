@@ -2781,7 +2781,6 @@ void MainWindow::slotProcessCreateInterestGroupResult(quint32 groupID, const QSt
     addInterestGroupToUI(group);
     m_contactsManager->saveInterestGroupInfoToDatabase(group);
 
-
 }
 
 void MainWindow::slotProcessDisbandInterestGroupResult(quint32 groupID, bool result){
