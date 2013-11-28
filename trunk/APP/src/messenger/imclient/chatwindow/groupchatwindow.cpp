@@ -127,6 +127,12 @@ void GroupChatWindow::appendMessageReceivedFromContact(const QString &message, C
     ui.chatMessageWindow->appendChatMessage(message, contact, datetime);
 }
 
+void GroupChatWindow::processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore){
+    if(m_messageHistoryView){
+        m_messageHistoryView->appendHistoryChatMessages(messages, canFetchMore);
+    }
+}
+
 void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
     //TODO:
 
@@ -136,13 +142,24 @@ void GroupChatWindow::memberItemActivated(QListWidgetItem *memberItem){
 }
 
 void GroupChatWindow::showMessageHistory(bool show){
+
+    ui.chatMessageWindow->resize(0,0);
+
     if(show){
+        setMinimumSize(QSize(0, 0));
+
         if(!m_messageHistoryView){
             m_messageHistoryView = new MessageHistoryView(this);
+            m_messageHistoryView->setMinimumWidth(m_messageHistoryView->width());
+
+            connect(m_messageHistoryView, SIGNAL(signalRequestHistoryMessage(const QString &, const QString &, const QString &, bool)), this, SLOT(requestGroupHistoryMessage(const QString &, const QString &, const QString &, bool)));
+
             ui.tabWidget->addTab(m_messageHistoryView, tr("Message History"));
         }
         ui.tabWidget->setCurrentWidget(m_messageHistoryView);
     }else{
+        setMinimumSize(m_preferedSize);
+
         ui.tabWidget->removeTab(ui.tabWidget->indexOf(m_messageHistoryView));
         delete m_messageHistoryView;
         m_messageHistoryView = 0;
@@ -152,10 +169,17 @@ void GroupChatWindow::showMessageHistory(bool show){
 
 }
 
+void GroupChatWindow::requestGroupHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword){
+    Q_ASSERT(m_interestGroup);
+    emit signalRequestGrouptHistoryMessage(startTime, endTime, content, requestBackword, m_interestGroup->getGroupID());
+}
+
 void GroupChatWindow::setPreferedSize(){
     if(!m_preferedSize.isValid()){
         m_preferedSize = size();
         setMinimumSize(m_preferedSize);
+        ui.chatMessageWindow->setMinimumWidth(ui.chatMessageWindow->width());
+
     }
 }
 

@@ -57,9 +57,9 @@ public:
     bool isDownloadingImage(const QString &imageName);
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
-    void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime);
+    void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime, bool richTextMessage = false);
 
-//    QSize sizeHint();
+//    QSize minimumSizeHint();
 
 protected:
     void closeEvent(QCloseEvent * event);

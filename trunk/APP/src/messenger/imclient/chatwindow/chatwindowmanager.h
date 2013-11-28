@@ -54,6 +54,8 @@ signals:
     void signalSendChatMessageToInterestGroup(InterestGroup *interestGroup, const QString &message, const QStringList &imageList);
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
 
+    void signalRequestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID);
+    void signalRequestGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID);
 
 public slots:
     void slotNewChatWithContact(const QString &contactID);
@@ -62,8 +64,11 @@ public slots:
     void slotNewChatWithInterestGroup(quint32 interestGroupID);
     void slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time);
 
-
     void processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded);
+
+    void processContactHistoryMessage(const QStringList &messages, bool canFetchMore, const QString &contactID);
+    void processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore, quint32 groupID);
+
 
 private slots:
     void initTabWidget();

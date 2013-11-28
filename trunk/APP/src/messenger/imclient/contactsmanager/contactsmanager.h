@@ -114,6 +114,10 @@ public slots:
 
 //    bool saveContactGroupsInfoToDatabase();
 
+    bool getContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID, QStringList *messages, bool *canFetchMore);
+    bool getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID, QStringList *messages, bool *canFetchMore);
+
+
 
     bool openDatabase(bool reopen = false);
     bool initLocalDatabase(QString *errorMessage = 0);

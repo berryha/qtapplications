@@ -156,10 +156,10 @@ void ChatMessageWindow::initUI(){
     ui.textEdit->setFocus();
     ui.fontStyleToolButton->setChecked(false);
     ui.fontFrame->setVisible(false);
-//    ui.fontComboBox->hide();
+    ui.fontComboBox->hide();
 
 
-    connect(ui.pushButtonMessageHistory, SIGNAL(clicked(bool)), this, SIGNAL(signalShowMessageHistory(bool)));
+    connect(ui.toolButtonMessageHistory, SIGNAL(clicked(bool)), this, SIGNAL(signalShowMessageHistory(bool)));
 
 
 
@@ -225,7 +225,7 @@ bool ChatMessageWindow::isDownloadingImage(const QString &imageName){
     return m_imagesDownloading.contains(imageName);
 }
 
-void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime){
+void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime, bool richTextMessage){
     qDebug()<<"--ChatMessageWindow::appendChatMessage(...)";
 
     QString userID = "", nickName = "";
@@ -247,7 +247,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
         }
     }
 
-    m_messageView->appendChatMessage(userID, nickName, message, datetime);
+    m_messageView->appendChatMessage(userID, nickName, message, datetime, richTextMessage);
 
 
 
@@ -325,7 +325,7 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 }
 
-//QSize ChatMessageWindow::sizeHint(){
+//QSize ChatMessageWindow::minimumSizeHint(){
 //    return QSize(640, 480);
 //}
 
@@ -620,7 +620,7 @@ void ChatMessageWindow::emitSendMsgSignal() {
         richMessage = QString("<div style=\"%1\">").arg(m_styleString) + richMessage;
     }
     richMessage += QString("</div>");
-    appendChatMessage(richMessage, m_myself, ServerTime::instance()->timeString());
+    appendChatMessage(richMessage, m_myself, ServerTime::instance()->timeString(), true);
 
 
     ui.textEdit->clear();

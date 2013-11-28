@@ -1567,6 +1567,151 @@ bool ContactsManager::saveContactInfoToDatabase(const QString &contactID){
     
 }
 
+bool ContactsManager::getContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID, QStringList *messages, bool *canFetchMore){
+
+    if(!messages || !canFetchMore){
+        return false;
+    }
+
+    if(!localUserDataDB.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(localUserDataDB);
+
+    int rowCount = HISTORY_MESSAGES_PAGE_SIZE+1;
+
+    QString statement = QString("SELECT SenderID, ReceiverID, Message, DeliveryTime From contactchatmessages where (SenderID = '%1' or ReceiverID = '%1') and Message like '%%2%' and  DeliveryTime between '%3' and '%4' order by DeliveryTime %5 LIMIT %6 ").arg(contactID).arg(content).arg(startTime).arg(endTime).arg(requestBackword?"desc":"asc").arg(rowCount);
+    qDebug()<<"statement:"<<statement;
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query contact chat message from database! Contact ID:%1, %2 Error Type:%3 Error NO.:%4").arg(contactID).arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+    QString myID = m_myself->getUserID();
+    QString myDisplayName = m_myself->getNickName();
+
+    while (query.next()) {
+        QStringList infoList;
+
+        QString senderID = query.value(0).toString();
+        QString displayName;
+        if(senderID == myID){
+            displayName = myDisplayName;
+        }else{
+            Contact *contact = contactHash.value(senderID);
+            Q_ASSERT(contact);
+            if(!contact){
+                qCritical()<<"ERROR! Contact does not exist!";
+                continue;
+            }
+            displayName = contact->displayName();
+        }
+
+        infoList.append(senderID);
+        infoList.append(displayName);
+        infoList.append(query.value(2).toString());
+        infoList.append(query.value(3).toString());
+
+        if(requestBackword){
+            messages->prepend(infoList.join(QString(PACKET_DATA_SEPARTOR)));
+        }else{
+            messages->append(infoList.join(QString(PACKET_DATA_SEPARTOR)));
+        }
+    }
+
+    if(messages->size() == rowCount){
+        if(requestBackword){
+            messages->removeFirst();
+        }else{
+            messages->removeLast();
+        }
+
+        *canFetchMore = true;
+    }else{
+        *canFetchMore = false;
+    }
+
+    return true;
+}
+
+bool ContactsManager::getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID, QStringList *messages, bool *canFetchMore){
+
+    if(!messages || !canFetchMore){
+        return false;
+    }
+
+    if(!localUserDataDB.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(localUserDataDB);
+
+    int rowCount = HISTORY_MESSAGES_PAGE_SIZE + 1;
+
+    QString statement = QString("SELECT SenderID, GroupID, Message, DeliveryTime From interestgroupchatmessages where GroupID = %1 and Message like '%%2%' and DeliveryTime between '%3' and '%4' order by DeliveryTime %5 LIMIT %6 ").arg(groupID).arg(content).arg(startTime).arg(endTime).arg(requestBackword?"desc":"asc").arg(rowCount);
+    qDebug()<<"statement:"<<statement;
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query group chat message from database! Group ID:%1, %2 Error Type:%3 Error NO.:%4").arg(groupID).arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+    QString myID = m_myself->getUserID();
+    QString myDisplayName = m_myself->getNickName();
+
+    while (query.next()) {
+        QStringList infoList;
+
+        QString senderID = query.value(0).toString();
+        QString displayName;
+        if(senderID == myID){
+            displayName = myDisplayName;
+        }else{
+            Contact *contact = contactHash.value(senderID);
+            Q_ASSERT(contact);
+            if(!contact){
+                qCritical()<<"ERROR! Contact does not exist!";
+                continue;
+            }
+            displayName = contact->displayName();
+        }
+
+        infoList.append(senderID);
+        infoList.append(displayName);
+        infoList.append(query.value(2).toString());
+        infoList.append(query.value(3).toString());
+
+        if(requestBackword){
+            messages->prepend(infoList.join(QString(PACKET_DATA_SEPARTOR)));
+        }else{
+            messages->append(infoList.join(QString(PACKET_DATA_SEPARTOR)));
+        }
+    }
+
+    if(messages->size() == rowCount){
+        if(requestBackword){
+            messages->removeFirst();
+        }else{
+            messages->removeLast();
+        }
+
+        *canFetchMore = true;
+    }else{
+        *canFetchMore = false;
+    }
+
+    return true;
+
+}
+
+
+
 
 //bool ContactsManager::saveContactGroupsInfoToDatabase(){
     

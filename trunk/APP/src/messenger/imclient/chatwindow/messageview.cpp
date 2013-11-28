@@ -82,7 +82,7 @@ MessageView::MessageView(QWidget *parent) :
 //    return QSize(540, 300);
 //}
 
-void MessageView::appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime){
+void MessageView::appendChatMessage(const QString &userID, const QString &displayName, const QString &message, const QString &datetime, bool richTextMessage){
     qDebug()<<"----MessageView::appendChatMessage(...) contactID:"<<userID<<" Time:"<<datetime<<" Msg:"<<message;;
 
     QString timeString = datetime;
@@ -95,7 +95,7 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
     QString msg = QString("<span>%1(<a title=\"%2\" href=\"%3://%2\">%2</a>) %4</span>").arg(displayName).arg(userID).arg(URLScheme_Contact).arg(timeString);
 
 
-    if(userID != myUserID){
+    if(!richTextMessage){
         QString richMessage = simpleTextToRichTextMessage(message);
         msg += richMessage;
 
@@ -145,13 +145,13 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
 
 
 //    qDebug();
-    qDebug()<<"------msg:"<<msg;
+//    qDebug()<<"------msg:"<<msg;
 //    qDebug();
-    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
+//    qDebug()<<"------messageElement: "<<messageElement.toOuterXml();
 
 //    qDebug();
 
-    qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+//    qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 }
