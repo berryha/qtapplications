@@ -1262,7 +1262,7 @@ private slots:
 
     void peerDisconnected(int socketID);
 
-    void sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message);
+    void sendInterestGroupChatMessageToMembers(quint32 interestGroupID, UserInfo *sender, const QString &message);
 
     void addContactForUser(UserInfo *userInfo, UserInfo *contactInfo, quint32 groupID);
 

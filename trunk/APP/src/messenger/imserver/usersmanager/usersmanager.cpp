@@ -463,20 +463,20 @@ bool UsersManager::saveCachedChatMessageFromIMUser(const QString &senderID, cons
     QString msg = message;
     msg.replace("'", "\\'");
     msg.replace("\"", "\\\"");
-    QString statement = QString("call sp_CacheChatMessage_FromContact('%1', '%2', '%3' )  ").arg(senderID).arg(receiverID).arg(msg);
+    QString statement = QString("call sp_CacheChatMessage_FromContact_Save('%1', '%2', '%3' )  ").arg(senderID).arg(receiverID).arg(msg);
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not save data to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not save contact chat message to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
         qCritical()<<msg;
         return false;
     }
 
 
-    if((query.lastError().type() != QSqlError::NoError)){
-        qCritical()<<QString("Can not save data to database! Error: %1").arg(query.lastError().text());
-        return false;
-    }
+//    if((query.lastError().type() != QSqlError::NoError)){
+//        qCritical()<<QString("Can not save data to database! Error: %1").arg(query.lastError().text());
+//        return false;
+//    }
 
     return true;
 
@@ -500,7 +500,7 @@ QStringList UsersManager::cachedChatMessagesForIMUser(UserInfo* userInfo){
 
     //QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' and TransmittingTime>'%2'  ").arg(imUserID).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
     //QString statement = QString("select SenderID, Message, TransmittingTime from cachedchatmessages where RecieverID='%1' ").arg(imUserID);
-    QString statement = QString("call sp_GetCachedChatMessages('%1', '%2'); ").arg(imUserID).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
+    QString statement = QString("call sp_CacheChatMessage_FromContact_Get('%1', '%2'); ").arg(imUserID).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
@@ -2183,11 +2183,11 @@ bool UsersManager::saveCachedInterestGroupChatMessageFromIMUser(const QString &s
     QString msg = message;
     msg.replace("'", "\\'");
     msg.replace("\"", "\\\"");
-    QString statement = QString("insert into cachedinterestgroupchatmessages(SenderID, InterestGroupID, Message) values('%1', '%2', '%3' )  ").arg(senderID).arg(interestGroupID).arg(msg);
-
+    //QString statement = QString("insert into CachedInterestGroupChatMessages(SenderID, InterestGroupID, Message) values('%1', '%2', '%3' )  ").arg(senderID).arg(interestGroupID).arg(msg);
+    QString statement = QString("call sp_CachedChatMessages_FromInterestGroup_Save('%1', %2, '%3');  ").arg(senderID).arg(interestGroupID).arg(msg);
     if(!query.exec(statement)){
         QSqlError error = query.lastError();
-        QString msg = QString("Can not save data to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        QString msg = QString("Can not save group chat message to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
 //        logMessage(msg, QtServiceBase::Error);
         qCritical()<<msg;
 
@@ -2202,10 +2202,10 @@ bool UsersManager::saveCachedInterestGroupChatMessageFromIMUser(const QString &s
     }
 
 
-    if((query.lastError().type() != QSqlError::NoError)){
-        qCritical()<<QString("Can not save data to database! Error: %1").arg(query.lastError().text());
-        return false;
-    }
+//    if((query.lastError().type() != QSqlError::NoError)){
+//        qCritical()<<QString("Can not save data to database! Error: %1").arg(query.lastError().text());
+//        return false;
+//    }
 
     return true;
 
@@ -2232,7 +2232,7 @@ QStringList UsersManager::getCachedInterestGroupChatMessagesForUserFromDB(UserIn
 //    QString imUserID = userInfo->getUserID();
 
     //QString statement = QString("select InterestGroupID, SenderID,  Message, TransmittingTime from cachedinterestgroupchatmessages where InterestGroupID in (%1) and TransmittingTime>'%2'  ").arg(interestgroups.join(",")).arg(userInfo->getLastLoginTime().toString("yyyy-MM-dd hh:mm:ss"));
-    QString statement = QString("call sp_GetCachedInterestGroupChatMessages('%1', '%2');  ").arg(userInfo->getUserID()).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
+    QString statement = QString("call sp_CachedChatMessages_FromInterestGroup_Get('%1', '%2');  ").arg(userInfo->getUserID()).arg(userInfo->getLastLogoutTime().toString("yyyy-MM-dd hh:mm:ss"));
 
     if(!query.exec(statement)){
         QSqlError error = query.lastError();

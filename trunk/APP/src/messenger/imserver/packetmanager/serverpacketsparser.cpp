@@ -1196,7 +1196,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         }
 
         //TODO:Send message to all contacts
-        sendInterestGroupChatMessageToMembers(interestGroupID, userID, message);
+        sendInterestGroupChatMessageToMembers(interestGroupID, userInfo, message);
 
 
     }
@@ -1423,11 +1423,15 @@ void ServerPacketsParser::peerDisconnected(int socketID){
 
 }
 
-void ServerPacketsParser::sendInterestGroupChatMessageToMembers(quint32 interestGroupID, const QString &senderID, const QString &message){
+void ServerPacketsParser::sendInterestGroupChatMessageToMembers(quint32 interestGroupID, UserInfo *sender, const QString &message){
 
     //TODO
+    Q_ASSERT(sender);
+    if(!sender){return;}
 
      QList<UserInfo *> onlineMembers = getAllOnlineInterestGroupMembers(interestGroupID);
+     onlineMembers.removeAll(sender);
+     QString senderID = sender->getUserID();
      foreach (UserInfo *user, onlineMembers) {
          sendInterestGroupChatMessagesToMemberPacket(user->getSocketID(), interestGroupID, senderID, message, user->getSessionEncryptionKey());
      }
