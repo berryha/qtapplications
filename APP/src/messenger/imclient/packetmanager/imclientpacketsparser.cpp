@@ -1241,9 +1241,9 @@ QStringList IMClientPacketsParser::runningNICAddresses(){
 
     QStringList addresses;
 
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-        if ( (interface.flags() & QNetworkInterface::IsRunning) && ( !(interface.flags() & QNetworkInterface::IsLoopBack)) ) {
-            foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+    foreach (QNetworkInterface nic, QNetworkInterface::allInterfaces()) {
+        if ( (nic.flags() & QNetworkInterface::IsRunning) && ( !(nic.flags() & QNetworkInterface::IsLoopBack)) ) {
+            foreach (QNetworkAddressEntry entry, nic.addressEntries()) {
                 //qDebug()<<"IP:"<<entry.ip()<<" Hardware Address:"<<interface.hardwareAddress()<<" Flags:"<<interface.flags();
                 QHostAddress ip = entry.ip();
                 if(ip.protocol() == QAbstractSocket::IPv6Protocol){continue;}
