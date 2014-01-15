@@ -60,6 +60,12 @@ contains(HHSharedLibs, HHSharedUDT){
     win32:win32-g++:DEFINES += __MINGW__
 }
 
+contains(HHSharedLibs, HHSharedENET){
+    include(src/enet/enet.pri)
+    INCLUDEPATH += src/enet
+    DEPENDPATH += src/enet
+}
+
 win32{
     contains(HHSharedLibs, HHSharedWindowsManagement){
         include(src/windowsmanagement/windowsmanagement.pri)

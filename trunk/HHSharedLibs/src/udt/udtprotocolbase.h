@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QHostAddress>
 #include <QMutex>
-
+#include <QHash>
 
 
 //#ifdef Q_OS_WIN32
@@ -41,8 +41,6 @@
 #endif
 
 
-#include <QObject>
-#include <QHash>
 
 //#define UDT_API Q_DECL_EXPORT
 
