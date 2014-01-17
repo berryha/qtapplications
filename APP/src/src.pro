@@ -6,8 +6,8 @@ CONFIG += ordered \
 
 SUBDIRS += managementsystem \
     plugins \
-    messenger #\
-    #test
+    messenger \
+    test
 
 #TRANSLATIONS += ts_zh_CN.ts \
 #    ts_zh_TW.ts

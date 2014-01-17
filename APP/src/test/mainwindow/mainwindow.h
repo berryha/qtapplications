@@ -40,13 +40,14 @@
 //#include "../ui/ui_mainwindow.h"
 #include "ui_mainwindow.h"
 #include "../shared/app_constants.h"
-//#include "../../shared/gui/widgetbase/mainwindowbase.h"
 #include "HHSharedGUI/hmainwindowbase.h"
 
-#include "rudp/rudp.h"
-#include "tcp/tcpwidget.h"
-#include "udt/udt.h"
+//#include "tcp/tcpwidget.h"
+//#include "udt/udt.h"
 
+
+
+#include "enet/enetwidget.h"
 
 namespace HEHUI {
 
@@ -110,13 +111,11 @@ private:
 
     QMenu *pluginsMenu;
 
+//    TCPWidget *tcpWidget;
 
-    RUDPWidget *rudpWidger;
+//    UDTWidget *udtWidget;
 
-    TCPWidget *tcpWidget;
-
-    UDTWidget *udtWidget;
-
+    ENETWidget *enetWidget;
 
 
 };

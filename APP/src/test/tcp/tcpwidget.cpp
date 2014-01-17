@@ -206,7 +206,7 @@ void TCPWidget::send(){
     int size = ui.spinBoxDataSize->value();
     //data.resize(ui.spinBoxDataSize->value());
     for(int i=0; i<size; i++){
-        data.append(QString::number(i).toAscii());
+        data.append(QString::number(i).toLatin1());
         if(data.size() >= size){break;}
     }
     data.resize(size);
