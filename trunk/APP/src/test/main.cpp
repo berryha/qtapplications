@@ -3,12 +3,14 @@
 #include <QApplication>
 #include <QSplashScreen>
 
+
+
+
 #include "./mainwindow/mainwindow.h"
 #include "./shared/app_constants.h"
 
 #include "HHSharedCore/hlogdebug.h"
 
-#include "screenshot/screenshot.h"
 
 
 void showSplashMessage(QSplashScreen *s, const QString &str){
@@ -22,27 +24,22 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+
+    a.addLibraryPath(QCoreApplication::applicationDirPath());
+    a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(PLUGINS_MAIN_DIR));
+    a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(MYLIBS_DIR));
+    qDebug()<<"----main(....)~~Library Paths"<<QCoreApplication::libraryPaths ();
+
+
     for(int i = 0; i < argc; i++){
         if(QString(argv[i]).toLower() == "-log"){
-            qInstallMsgHandler(logDebug);
+            qInstallMessageHandler(logDebug);
             qAddPostRoutine(closeDebugLog);
         }
     }
 
 
 
-    QDate date = QDate::currentDate();
-    if(date.year() != 2012 || date.month() > 9){
-        QMessageBox::critical(0, QObject::tr("Error"), QObject::tr("Application has expired!"));
-        qDebug()<<"Application has expired! Please update!";
-        return 0;
-    }
-
-
-    //a.addLibraryPath(QCoreApplication::applicationDirPath());
-    a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(PLUGINS_MAIN_DIR));
-    a.addLibraryPath(QCoreApplication::applicationDirPath() + QDir::separator () + QString(MYLIBS_DIR));
-    qDebug()<<"----main(....)~~Library Paths"<<a.libraryPaths ();
 
 
     //创建Splash Screen

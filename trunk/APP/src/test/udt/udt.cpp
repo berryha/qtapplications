@@ -242,10 +242,11 @@ bool UDTWidget::startRUDPServer(quint16 port){
 void UDTWidget::send(){
 
     QByteArray data;
-    int size = ui.spinBoxDataSize->value();
+    int size = ui.spinBox->value() * 1024;
+    int msec = QDateTime::currentDateTime().time().msec();
     //data.resize(ui.spinBoxDataSize->value());
     for(int i=0; i<size; i++){
-        data.append(QString::number(i).toAscii());
+        data.append(QString::number(i+msec).toLatin1());
         if(data.size() >= size){break;}
     }
     data.resize(size);

@@ -36,10 +36,6 @@
 #include "../about/aboutdialog.h"
 #include "../shared/settings.h"
 
-//#include "../../shared/core/database/databaseutility.h"
-//#include "../../shared/gui/login/loginbase.h"
-//#include "../../shared/gui/plugin/guiinterface.h"
-//#include "../../shared/gui/plugin/pluginmanager/pluginmanagerwindow.h"
 
 #include "HHSharedCore/hdatabaseutility.h"
 #include "HHSharedGUI/hloginbase.h"
@@ -110,9 +106,13 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
 //    ui.mdiArea->addSubWindow(tcpWidget);
 //    tcpWidget->show();
 
-    udtWidget = new UDTWidget(this);
-    ui.mdiArea->addSubWindow(udtWidget);
-    udtWidget->show();
+//    udtWidget = new UDTWidget(this);
+//    ui.mdiArea->addSubWindow(udtWidget);
+//    udtWidget->show();
+
+    enetWidget = new ENETWidget(this);
+    ui.mdiArea->addSubWindow(enetWidget);
+    enetWidget->show();
 
 }
 

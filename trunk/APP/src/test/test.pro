@@ -3,8 +3,10 @@ TARGET = test
 TEMPLATE = app
 QT += core \
     gui \
+widgets \
     sql \
-    network
+    network \
+concurrent
 
 # include config file
 include( ../config_global.pri )
@@ -12,7 +14,8 @@ include( ../config_global.pri )
 HHSharedLibs += HHSharedGUI \
     HHSharedCore \
     HHSharedNetwork \
-    HHSharedUDT
+    HHSharedUDT \
+    HHSharedENET
 
 include(../HHSharedLibs.pri)
 
@@ -41,35 +44,34 @@ INCLUDEPATH += . \
     about
 
 # Input
-HEADERS += rudp/clientpacketsparser.h \
-    screenshot/selecttargetimagewidget.h \
-    screenshot/screenshot.h \
-    rudp/rudp.h \
+HEADERS += \
     #shared/global_app.h \
     about/aboutdialog.h \
     mainwindow/mainwindow.h \
     shared/settings.h \
+    enet/enetwidget.h \
+    enet/enetprotocol.h \
     udt/udtsocket.h \
     udt/udt.h \
     tcp/tcp.h \
     tcp/tcpwidget.h
-SOURCES += rudp/clientpacketsparser.cpp \
-    screenshot/selecttargetimagewidget.cpp \
-    screenshot/screenshot.cpp \
-    rudp/rudp.cpp \
+
+SOURCES += \
     shared/settings.cpp \
     main.cpp \
     about/aboutdialog.cpp \
     mainwindow/mainwindow.cpp \
+    enet/enetwidget.cpp \
+    enet/enetprotocol.cpp \
     udt/udtsocket.cpp \
     udt/udt.cpp \
     tcp/tcp.cpp \
     tcp/tcpwidget.cpp
-FORMS += screenshot/selecttargetimagewidget.ui \
-    screenshot/screenshot.ui \
-    rudp/rudp.ui \
+
+FORMS += \
     about/aboutdialog.ui \
     mainwindow/mainwindow.ui \
+    enet/enetwidget.ui \
     udt/udt.ui \
     tcp/tcpwidget.ui
 RESOURCES += resources.qrc
@@ -84,6 +86,6 @@ win32 {
     HEADERS +=
     SOURCES +=
 
-    #LIBS += -lws2_32
+#    LIBS += -lws2_32
 
 }
