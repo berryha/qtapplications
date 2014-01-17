@@ -1,4 +1,6 @@
+
 #include "enetprotocolbase.h"
+#include "enetprotocolbase_p.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -18,7 +20,8 @@
 namespace HEHUI {
 
 
-ENETProtocolBase::ENETProtocolBase(QObject *parent) :
+//////////////////////////////////////////////////////////////////////////////////////
+ENETProtocolBasePrivate::ENETProtocolBasePrivate(QObject *parent) :
     QObject(parent)
 {
 
@@ -34,16 +37,16 @@ ENETProtocolBase::ENETProtocolBase(QObject *parent) :
 
 }
 
-ENETProtocolBase::~ENETProtocolBase(){
+ENETProtocolBasePrivate::~ENETProtocolBasePrivate(){
     close();
 }
 
 
-bool ENETProtocolBase::isListening() const {
+bool ENETProtocolBasePrivate::isListening() const {
     return m_listening;
 }
 
-bool ENETProtocolBase::getPeerAddressInfo(quint32 peerID, QString *address, quint16 *port){
+bool ENETProtocolBasePrivate::getPeerAddressInfo(quint32 peerID, QString *address, quint16 *port){
     if(!peersHash.contains(peerID)){
         qCritical()<<"ERROR! Failed to get peer host address! No such peer!";
         return false;
@@ -68,7 +71,7 @@ bool ENETProtocolBase::getPeerAddressInfo(quint32 peerID, QString *address, quin
 
 }
 
-bool ENETProtocolBase::getLocalListeningAddressInfo(QString *address, quint16 *port){
+bool ENETProtocolBasePrivate::getLocalListeningAddressInfo(QString *address, quint16 *port){
 
     if(!localServer){
         return false;
@@ -92,7 +95,29 @@ bool ENETProtocolBase::getLocalListeningAddressInfo(QString *address, quint16 *p
 
 }
 
-bool ENETProtocolBase::listen(quint16 port, const QHostAddress &localAddress, unsigned int maximumNumberOfPeers){
+void ENETProtocolBasePrivate::setPeerPrivateData(quint32 peerID, void *data){
+
+    if(!peersHash.contains(peerID)){
+        qCritical()<<"ERROR! Failed to get peer host address! No such peer!";
+        return;
+    }
+
+    ENetPeer *peer = peersHash.value(peerID);
+    setPeerPrivateData(peer, data);
+}
+
+void * ENETProtocolBasePrivate::getPeerPrivateData(quint32 peerID){
+
+    if(!peersHash.contains(peerID)){
+        qCritical()<<"ERROR! Failed to get peer host address! No such peer!";
+        return false;
+    }
+
+    ENetPeer *peer = peersHash.value(peerID);
+    return peer->data;
+}
+
+bool ENETProtocolBasePrivate::listen(quint16 port, const QHostAddress &localAddress, unsigned int maximumNumberOfPeers){
 
     if(localServer){
         qCritical()<<"ERROR! ENET Server already listening!";
@@ -110,24 +135,29 @@ bool ENETProtocolBase::listen(quint16 port, const QHostAddress &localAddress, un
     }
 
     ENetAddress localListeningAddress;
-    enet_address_set_host(&localListeningAddress, localAddress.toString().toStdString().c_str());
+
+    if(enet_address_set_host(&localListeningAddress, qPrintable(localAddress.toString()))){
+        qCritical()<<"ERROR! Failed to set host address!";
+        return false;
+    }
+    //    enet_address_set_host(&localListeningAddress, localAddress.toString().toStdString().c_str());
     localListeningAddress.port = port;
 
     return listen(&localListeningAddress, maximumNumberOfPeers);
 
-//    localServer = enet_host_create(&localListeningAddress, maximumNumberOfPeers, 0, 0);
-//    if(localServer == 0)
-//    {
-//        qCritical()<<"ERROR! Failed to create ENET server!";
-//         enet_deinitialize();
-//        return false;
-//    }
+    //    localServer = enet_host_create(&localListeningAddress, maximumNumberOfPeers, 0, 0);
+    //    if(localServer == 0)
+    //    {
+    //        qCritical()<<"ERROR! Failed to create ENET server!";
+    //         enet_deinitialize();
+    //        return false;
+    //    }
 
-//    return true;
+    //    return true;
 }
 
 
-void ENETProtocolBase::close(){
+void ENETProtocolBasePrivate::close(){
 
     m_listening = false;
     while (m_threadCount) {
@@ -148,11 +178,85 @@ void ENETProtocolBase::close(){
 
 }
 
-void ENETProtocolBase::startWaitingForIOInOneThread(unsigned int msecWaitForIOTimeout){
-    QtConcurrent::run(this, &ENETProtocolBase::waitForIO, msecWaitForIOTimeout);
+void ENETProtocolBasePrivate::startWaitingForIOInAnotherThread(unsigned int msecWaitForIOTimeout){
+    QtConcurrent::run(this, &ENETProtocolBasePrivate::waitForIO, msecWaitForIOTimeout);
 }
 
-bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, quint32 *peerID, unsigned int msecTimeout){
+void ENETProtocolBasePrivate::waitForIO(int msecTimeout){
+    qDebug()<<"--ENETProtocolBasePrivate::waitForIO(...)";
+
+    m_threadCount++;
+
+    ENetEvent event;
+    while(m_listening)
+    {
+        int eventsCount = enet_host_service(localServer, &event, msecTimeout);
+        if(eventsCount < 0 ){
+            qCritical()<<"ERROR! Error getting events!";
+            continue;
+        }
+        if(eventsCount == 0){
+            //qDebug()<<"No Event!";
+            continue;
+        }
+
+        switch(event.type){
+        case ENET_EVENT_TYPE_CONNECT:
+        {
+            ENetPeer *peer = event.peer;
+            qDebug()<<"------CONNECT-----Peer:"<<event.peer<<" connectID:"<<event.peer->connectID;
+
+            peersHash.insert(peer->connectID, peer);
+
+            ENetAddress remote = peer->address;
+            char ip[256];
+            enet_address_get_host_ip(&remote,ip,256);
+
+            emit connected(peer->connectID, QString(ip), remote.port);
+            break;
+        }
+        case ENET_EVENT_TYPE_RECEIVE:
+        {
+            QByteArray byteArray(reinterpret_cast<const char *>(event.packet->data), event.packet->dataLength);
+            emit dataReceived(event.peer->connectID, byteArray);
+
+            enet_packet_destroy(event.packet);
+            break;
+        }
+        case  ENET_EVENT_TYPE_DISCONNECT: //失去连接
+        {
+            ENetPeer *peer = event.peer;
+
+            ENetAddress remote = peer->address;
+            char ip[256];
+            enet_address_get_host_ip(&remote,ip,256);
+
+            quint32 peerID = peersHash.key(event.peer);
+            peersHash.remove(peerID);
+
+            qDebug()<<"------DISCONNECT-----peer:"<<peer;
+
+            emit disconnected(peerID, QString(ip), remote.port);
+
+            qDebug() <<"NO. " <<peer->data <<"Peer closed!" ;
+            break;
+
+        }
+        default:
+            qWarning("Unknown ENET event type received.");
+            break;
+
+        }
+
+        m_threadCount--;
+
+    }
+
+    qDebug()<<"--------------Exit Function waitForIO---------------";
+
+}
+
+bool ENETProtocolBasePrivate::connectToHost(const QHostAddress &address, quint16 port, quint32 *peerID, unsigned int msecTimeout, quint32 channels){
 
     if(!localServer){
         qCritical()<<"ERROR! ENET Server is not running!";
@@ -160,21 +264,25 @@ bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, 
     }
 
     ENetAddress peerAddress;
-    enet_address_set_host(&peerAddress, address.toString().toStdString().c_str());
+    if(enet_address_set_host(&peerAddress, qPrintable(address.toString()))){
+        qCritical()<<"ERROR! Failed to set host address!";
+        return false;
+    }
     peerAddress.port = port;
 
-    ENetPeer *peer = enet_host_connect(localServer, &peerAddress, 2, 0);
+    ENetPeer *peer = enet_host_connect(localServer, &peerAddress, channels, 0);
     if(peer == NULL)
     {
-        qCritical()<<"ERROR! Failed to connect to peer!";
+        qCritical()<<"ERROR! Failed to connect to peer "<< address.toString();
         return false;
     }
 
-    //TODO
 
+    //TODO
     unsigned int timeBase = timeGetTime();
     while (peer->state != ENET_PEER_STATE_CONNECTED) {
-        msleep(10);
+        //msleep(10);
+        qApp->processEvents();
         if(timeGetTime() - timeBase > msecTimeout){
             qCritical()<<"ERROR! Connecting to peer timeout!";
             enet_peer_reset (peer);
@@ -183,15 +291,15 @@ bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, 
     }
 
 
-//    ENetEvent event;
-//    if (enet_host_service(localServer, &event, msecTimeout) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
-//    {
-//        return true;
-//    }else{
-//        qCritical()<<"ERROR! Failed to connect to peer!";
-//        enet_peer_reset (peer);
-//        return false;
-//    }
+    //    ENetEvent event;
+    //    if (enet_host_service(localServer, &event, msecTimeout) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
+    //    {
+    //        return true;
+    //    }else{
+    //        qCritical()<<"ERROR! Failed to connect to peer!";
+    //        enet_peer_reset (peer);
+    //        return false;
+    //    }
 
     if(peerID){
         *peerID = peer->connectID;
@@ -202,37 +310,48 @@ bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, 
 
 }
 
-bool ENETProtocolBase::sendData(ENetPeer *peer, const QByteArray *byteArray){
+bool ENETProtocolBasePrivate::sendData(ENetPeer *peer, const QByteArray *byteArray, bool reliable, quint8 channel){
 
-    ENetPacket *packet = enet_packet_create(byteArray->constData(), byteArray->size(), ENET_PACKET_FLAG_RELIABLE);
-    int result = enet_peer_send(peer, 0, packet);
+    ENetPacket *packet = enet_packet_create(byteArray->constData(), byteArray->size(), (reliable?ENET_PACKET_FLAG_RELIABLE:ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT) );
+    int result = enet_peer_send(peer, channel, packet);
     if(result < 0){
         qCritical()<<"ERROR! Failed to send data!";
+        enet_packet_destroy(packet);
         return false;
     }
 
-    enet_host_flush (localServer);
+   //enet_host_flush (localServer);
 
     return true;
 }
 
-bool ENETProtocolBase::sendData(quint32 peerID, const QByteArray *byteArray){
+bool ENETProtocolBasePrivate::sendData(quint32 peerID, const QByteArray *byteArray, bool reliable, quint8 channel){
     ENetPeer *peer = peersHash.value(peerID);
     if(!peer){
         return false;
     }
 
-    return sendData(peer, byteArray);
+    return sendData(peer, byteArray, reliable, channel);
 }
 
-void ENETProtocolBase::disconnectNow(ENetPeer *peer){
+void ENETProtocolBasePrivate::disconnectNow(ENetPeer *peer){
+
+    ENetAddress remoteAddress = peer->address;
+    quint32 peerID = peer->connectID;
+    peersHash.remove(peerID);
+
     //No ENET_EVENT_DISCONNECT event will be generated.
-      enet_peer_disconnect_now(peer, 0);
+    enet_peer_disconnect_now(peer, 0);
 
-      peersHash.remove(peer->connectID);
+    char ip[256];
+    enet_address_get_host_ip(&remoteAddress, ip, 256);
+    emit disconnected(peerID, QString(ip), remoteAddress.port);
+
 }
 
-void ENETProtocolBase::disconnectNow(quint32 peerID){
+
+
+void ENETProtocolBasePrivate::disconnectNow(quint32 peerID){
     ENetPeer *peer = peersHash.value(peerID);
     if(!peer){
         return;
@@ -240,12 +359,12 @@ void ENETProtocolBase::disconnectNow(quint32 peerID){
     disconnectNow(peer);
 }
 
-void ENETProtocolBase::disconnect(ENetPeer *peer){
+void ENETProtocolBasePrivate::disconnect(ENetPeer *peer){
     //An ENET_EVENT_DISCONNECT event will be generated by enet_host_service() once the disconnection is complete.
     enet_peer_disconnect(peer, 0);
 }
 
-void ENETProtocolBase::disconnect(quint32 peerID){
+void ENETProtocolBasePrivate::disconnect(quint32 peerID){
     ENetPeer *peer = peersHash.value(peerID);
     if(!peer){
         return;
@@ -253,13 +372,13 @@ void ENETProtocolBase::disconnect(quint32 peerID){
     disconnect(peer);
 }
 
-void ENETProtocolBase::disconnectLater(ENetPeer *peer){
+void ENETProtocolBasePrivate::disconnectLater(ENetPeer *peer){
     //An ENET_EVENT_DISCONNECT event will be generated by enet_host_service() once the disconnection is complete.
     //All queued outgoing packets are sent.
     enet_peer_disconnect_later(peer, 0);
 }
 
-void ENETProtocolBase::disconnectLater(quint32 peerID){
+void ENETProtocolBasePrivate::disconnectLater(quint32 peerID){
     ENetPeer *peer = peersHash.value(peerID);
     if(!peer){
         return;
@@ -267,94 +386,28 @@ void ENETProtocolBase::disconnectLater(quint32 peerID){
     disconnectLater(peer);
 }
 
-bool ENETProtocolBase::listen(ENetAddress *localListeningAddress, unsigned int maximumNumberOfPeers){
+bool ENETProtocolBasePrivate::listen(ENetAddress *localListeningAddress, unsigned int maximumNumberOfPeers){
 
     if(localServer){
         qCritical()<<"ERROR! ENET Server already listening!";
         return false;
     }
 
-    localServer = enet_host_create(localListeningAddress, maximumNumberOfPeers, 0, 0, 0);
+    unsigned int peers = (maximumNumberOfPeers>ENET_PROTOCOL_MAXIMUM_PEER_ID)?ENET_PROTOCOL_MAXIMUM_PEER_ID:maximumNumberOfPeers;
+    localServer = enet_host_create(localListeningAddress, peers, 0, 0, 0);
     if(localServer == 0)
     {
         qCritical()<<"ERROR! Failed to create ENET server!";
-         enet_deinitialize();
+        enet_deinitialize();
         return false;
     }
 
-    return true;
+    m_listening = true;
+    return m_listening;
 }
 
-void ENETProtocolBase::waitForIO(int msecTimeout){
 
-    m_threadCount++;
-
-    ENetEvent event;
-    while(m_listening)
-    {
-
-        int eventsCount = enet_host_service(localServer, &event, msecTimeout);
-        if(eventsCount < 0 ){
-            qCritical()<<"ERROR! Error getting events!";
-            continue;
-        }
-
-//        if(eventsCount == 0){
-//            msleep(10);
-//        }
-
-        if(event.type==ENET_EVENT_TYPE_CONNECT)
-         {
-          static unsigned int num=0;
-          ENetAddress remote = event.peer->address;
-          char ip[256];
-          enet_address_get_host_ip(&remote,ip,256);
-          qDebug()<<"IP: "<<ip<<" NO.:"<<num;
-          event.peer->data=(void*)num++;
-
-          qDebug()<<"------CONNECT-----connectID:"<<event.peer->connectID;
-
-          ENetPeer *peer = event.peer;
-          peersHash.insert(peer->connectID, peer);
-
-          emit connected(peer->connectID, QString(ip), remote.port);
-        }
-         else if(event.type==ENET_EVENT_TYPE_RECEIVE)
-         {
-          qDebug() <<"Data received from " <<event.peer->data <<", Sent from " <<event.channelID <<" Channel" ;
-          qDebug() <<"Size:" <<event.packet->dataLength ;
-          qDebug() <<"Data:" <<(char*)event.packet->data ;
-
-          QByteArray byteArray;
-          byteArray.resize(event.packet->dataLength);
-          byteArray.append( (char*)event.packet->data );
-
-          processReceivedData(event.peer->connectID, &byteArray);
-
-          enet_packet_destroy(event.packet);
-         }
-         else if(event.type==ENET_EVENT_TYPE_DISCONNECT) //失去连接
-         {
-            ENetAddress remote = event.peer->address;
-            char ip[256];
-            enet_address_get_host_ip(&remote,ip,256);
-
-            peersHash.remove(event.peer->connectID);
-
-            qDebug()<<"------DISCONNECT-----connectID:"<<event.peer->connectID;
-
-            emit disconnected(event.peer->connectID, QString(ip), remote.port);
-
-          qDebug() <<"NO. " <<event.peer->data <<"Peer closed!" ;
-        }
-
-    }
-
-    m_threadCount--;
-
-}
-
-inline void ENETProtocolBase::msleep(int msec){
+inline void ENETProtocolBasePrivate::msleep(int msec){
 
 #ifdef Q_OS_WIN32
     Sleep(msec);
@@ -363,6 +416,105 @@ inline void ENETProtocolBase::msleep(int msec){
 #endif
 
 }
+
+void ENETProtocolBasePrivate::setPeerPrivateData(ENetPeer *peer, void *data){
+    if(!peer){
+        return;
+    }
+
+    peer->data = data;
+
+}
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+ENETProtocolBase::ENETProtocolBase(QObject *parent) :
+    QObject(parent)
+{
+
+    m_basePrivate = new ENETProtocolBasePrivate(this);
+
+    connect(m_basePrivate, SIGNAL(connected(quint32,QString,quint16)), this, SIGNAL(connected(quint32,QString,quint16)));
+    connect(m_basePrivate, SIGNAL(disconnected(quint32,QString,quint16)), this, SIGNAL(disconnected(quint32,QString,quint16)));
+    connect(m_basePrivate, SIGNAL(dataReceived(quint32, const QByteArray &)), this, SLOT(processReceivedData(quint32, const QByteArray &)));
+
+
+    if(enet_initialize())
+    {
+        qCritical()<<"ERROR! Failed to initialize ENET!";
+    }
+
+}
+
+ENETProtocolBase::~ENETProtocolBase(){
+    delete m_basePrivate;
+}
+
+bool ENETProtocolBase::isListening() const{
+    return m_basePrivate->isListening();
+}
+
+bool ENETProtocolBase::getPeerAddressInfo(quint32 peerID, QString *address, quint16 *port){
+    return m_basePrivate->getPeerAddressInfo(peerID, address, port);
+}
+
+bool ENETProtocolBase::getLocalListeningAddressInfo(QString *address, quint16 *port){
+    return m_basePrivate->getLocalListeningAddressInfo(address, port);
+}
+
+bool ENETProtocolBase::listen(quint16 port, const QHostAddress &localAddress, unsigned int maximumNumberOfPeers){
+    return m_basePrivate->listen(port, localAddress, maximumNumberOfPeers);
+}
+
+void ENETProtocolBase::close(){
+    return m_basePrivate->close();
+}
+
+void ENETProtocolBase::startWaitingForIOInAnotherThread(unsigned int msecWaitForIOTimeout){
+    m_basePrivate->startWaitingForIOInAnotherThread(msecWaitForIOTimeout);
+}
+
+bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, quint32 *peerID, unsigned int msecTimeout, quint32 channels){
+    return m_basePrivate->connectToHost(address, port, peerID, msecTimeout, channels);
+}
+
+bool ENETProtocolBase::sendData(quint32 peerID, const QByteArray *byteArray, bool reliable, quint8 channel){
+    return m_basePrivate->sendData(peerID, byteArray, reliable, channel);
+}
+
+void ENETProtocolBase::disconnectNow(quint32 peerID){
+    m_basePrivate->disconnectNow(peerID);
+}
+
+void ENETProtocolBase::disconnect(quint32 peerID){
+    m_basePrivate->disconnect(peerID);
+}
+
+void ENETProtocolBase::disconnectLater(quint32 peerID){
+    m_basePrivate->disconnectLater(peerID);
+}
+
+void ENETProtocolBase::waitForIO(int msecTimeout){
+    m_basePrivate->waitForIO(msecTimeout);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 } //namespace HEHUI

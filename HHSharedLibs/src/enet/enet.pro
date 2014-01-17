@@ -33,7 +33,8 @@ DEPENDPATH += $${INCLUDEPATH}
 # RCC_DIR = ./tmp
 # Input
 HEADERS += \
-    enetprotocolbase.h
+    enetprotocolbase.h \
+    enetprotocolbase_p.h
 
 SOURCES += \
     enetprotocolbase.cpp
