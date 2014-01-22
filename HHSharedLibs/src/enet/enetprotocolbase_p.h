@@ -41,7 +41,7 @@ public slots:
     void close();
 
     //Call this function after server is listening
-    void startWaitingForIOInAnotherThread(unsigned int msecWaitForIOTimeout = 20);
+    void startWaitingForIOInAnotherThread(unsigned int msecWaitForIOTimeout = 10);
     void waitForIO(int msecTimeout = 20);
 
     //Connect to peer
