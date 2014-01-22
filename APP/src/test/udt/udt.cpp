@@ -227,7 +227,7 @@ bool UDTWidget::startRUDPServer(quint16 port){
     }
     qDebug()<<"serverSocket:"<<serverSocket;
 
-    udtProtocol->startWaitingForIOInSeparateThread();
+    udtProtocol->startWaitingForIOInOneThread(20);
 
     udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
     ui.textBrowser->append("Listening on port:"+QString::number(localPort));
@@ -242,35 +242,42 @@ bool UDTWidget::startRUDPServer(quint16 port){
 void UDTWidget::send(){
 
     QByteArray data;
-    int size = ui.spinBox->value() * 1024;
+    int size = ui.spinBoxDataSize->value() * 1024;
     int msec = QDateTime::currentDateTime().time().msec();
-    //data.resize(ui.spinBoxDataSize->value());
     for(int i=0; i<size; i++){
         data.append(QString::number(i+msec).toLatin1());
         if(data.size() >= size){break;}
     }
     data.resize(size);
-
     QString md5 = Cryptography::MD5(data).toBase64();
 
 
-    ui.textBrowser->append("----"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
-    ui.textBrowser->append("Start Sending Data To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" MD5:"+md5 );
 
     int count = ui.spinBoxSendCount->value();
     int sent= 0;
     int failed = 0;
 
-    int i = 0;
-    while (i<count) {
-        udtProtocol->sendUDTStreamData(peerSockeet, &data);
 
-        i++;
+    ui.textBrowser->append("Start Sending Data To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" MD5:"+md5 +" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz") );
+
+    QByteArray a("0x0000");
+    udtProtocol->sendUDTStreamData(peerSockeet, &a);
+
+    for(int i=0;i<count;i++) {
+        if(udtProtocol->sendUDTStreamData(peerSockeet, &data)){
+            sent++;
+        }else{
+            ui.textBrowser->append(udtProtocol->getLastErrorMessage());
+
+            failed++;
+        }
+        qApp->processEvents();
     }
 
+    QByteArray b("0xFFFF");
+    udtProtocol->sendUDTStreamData(peerSockeet, &b);
 
-    ui.textBrowser->append("Sent:"+QString::number(sent)+" Failed:"+QString::number(failed)+" Data Sent To "+m_peerAddress.toString()+":"+QString::number(m_peerPort) );
-    ui.textBrowser->append("----"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
+    ui.textBrowser->append("Sent:"+QString::number(sent)+" Failed:"+QString::number(failed)+" Data Sent To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz") );
 
 
 }
@@ -327,14 +334,28 @@ void UDTWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort){
 
 void UDTWidget::dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data){
 
+    if(data == QByteArray("0x0000")){
+        startTime = QDateTime::currentDateTime();
+        ui.textBrowser->append("---START---" + startTime.toString("mm:ss:zzz"));
+        totalDataSize = 0;
+        m_receivedDataCount = 0;
 
+        return;
+    }
+    if(data == QByteArray("0xFFFF")){
+        endTime = QDateTime::currentDateTime();
+        ui.textBrowser->append("---END---" + endTime.toString("mm:ss:zzz"));
+        ui.textBrowser->append(QString("Total Data Size:%1 KB, Speed:%2 KB/S ").arg(totalDataSize/1024).arg((float)(totalDataSize*1000)/(startTime.msecsTo(endTime)*1024)) + endTime.toString(" mm:ss:zzz"));
+
+        return;
+    }
+
+    totalDataSize += data.size();
 
     m_receivedDataCount++;
     QString md5 = Cryptography::MD5(data).toBase64();
 
-    ui.textBrowser->append(QString::number(m_receivedDataCount)+" Data Received From "+peerAddress+":"+QString::number(peerPort)+" MD5:"+md5+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
-
-
+    ui.textBrowser->append(QString::number(m_receivedDataCount)+" MD5:"+md5);
 
 
 }
