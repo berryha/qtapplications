@@ -106,9 +106,9 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
 //    ui.mdiArea->addSubWindow(tcpWidget);
 //    tcpWidget->show();
 
-//    udtWidget = new UDTWidget(this);
-//    ui.mdiArea->addSubWindow(udtWidget);
-//    udtWidget->show();
+    udtWidget = new UDTWidget(this);
+    ui.mdiArea->addSubWindow(udtWidget);
+    udtWidget->show();
 
     enetWidget = new ENETWidget(this);
     ui.mdiArea->addSubWindow(enetWidget);

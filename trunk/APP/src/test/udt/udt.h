@@ -73,7 +73,8 @@ private:
 
     quint16 m_receivedDataCount;
 
-
+    QDateTime startTime, endTime;
+    quint64 totalDataSize;
 
 
 

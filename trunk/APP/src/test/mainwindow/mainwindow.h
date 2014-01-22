@@ -43,7 +43,7 @@
 #include "HHSharedGUI/hmainwindowbase.h"
 
 //#include "tcp/tcpwidget.h"
-//#include "udt/udt.h"
+#include "udt/udt.h"
 
 
 
@@ -113,7 +113,7 @@ private:
 
 //    TCPWidget *tcpWidget;
 
-//    UDTWidget *udtWidget;
+    UDTWidget *udtWidget;
 
     ENETWidget *enetWidget;
 

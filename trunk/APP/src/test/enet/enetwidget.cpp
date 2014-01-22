@@ -124,7 +124,7 @@ bool ENETWidget::startRUDPServer(quint16 port){
         return false;
     }
 
-    enetProtocol->startWaitingForIOInAnotherThread();
+    enetProtocol->startWaitingForIOInAnotherThread(20);
 
     enetProtocol->getLocalListeningAddressInfo(0, &localPort);
 
