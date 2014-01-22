@@ -37,7 +37,7 @@
 #endif
 
 #ifndef MAX_DATA_BLOCK_SIZE
-#define MAX_DATA_BLOCK_SIZE 1024000
+#define MAX_DATA_BLOCK_SIZE 2048000
 #endif
 
 

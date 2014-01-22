@@ -662,7 +662,7 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
 
         acceptNewConnection();
 
-        beginTime = QDateTime::currentDateTime();
+//        beginTime = QDateTime::currentDateTime();
         count = UDT::epoll_wait(epollID, &readfds, &writefds, msecWaitForIOTimeout);
         if(count > 0){
             //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
@@ -683,20 +683,11 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             writefds.clear();
         }
 
-        curTime = QDateTime::currentDateTime();
-        interval = beginTime.msecsTo(curTime);
-        if(interval < msecWaitForIOTimeout){
-            msleep(msecWaitForIOTimeout - interval);
-
-            //#ifndef Q_OS_WIN32
-            //   timespec ts;
-            //   ts.tv_sec = 0;
-            //   ts.tv_nsec = 1000000; //1 ms
-            //   nanosleep(&ts, NULL);
-            //#else
-            //   Sleep(1);
-            //#endif
-        }
+//        curTime = QDateTime::currentDateTime();
+//        interval = beginTime.msecsTo(curTime);
+//        if(interval < msecWaitForIOTimeout){
+//            msleep(msecWaitForIOTimeout - interval);
+//        }
         //QCoreApplication::processEvents();
     }
     m_threadCount--;
