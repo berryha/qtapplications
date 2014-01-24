@@ -1194,18 +1194,22 @@ void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket, bool socketExists)
 
     QMutexLocker locker(&m_epollMutex);
 
-    if(UDT::epoll_remove_usock(epollID, socket) < 0){
-        qWarning()<<"ERROR! epoll_remove_usock Failed! "<< UDT::getlasterror().getErrorMessage();
-        //fprintf(stderr, "epoll_remove_usock error\n");
-        return;
+    if(UDT::epoll_remove_usock(epollID, socket)){
+        fprintf(stderr, "ERROR! epoll_remove_usock: %s\n", UDT::getlasterror().getErrorMessage());
     }
-    //UDT::epoll_remove_usock(epollID, socket);
-
-    if(!socketExists){
-        return;
+    if(UDT::close(socket)){
+        fprintf(stderr, "ERROR! UDT::close: %s\n", UDT::getlasterror().getErrorMessage());
     }
 
-    UDT::close(socket);
+
+//    if(UDT::epoll_remove_usock(epollID, socket) < 0){
+//        qWarning()<<"ERROR! epoll_remove_usock Failed! "<< UDT::getlasterror().getErrorMessage();
+//        return;
+//    }
+//    if(!socketExists){
+//        return;
+//    }
+//    UDT::close(socket);
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
     recycleCachedData(data);
