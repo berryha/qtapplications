@@ -6,13 +6,6 @@
 #include <QDebug>
 #include <QtConcurrent>
 
-//#ifdef Q_OS_WIN32
-//#define WIN32_LEAN_AND_MEAN
-//#include<winsock2.h>
-//#include<windows.h>
-////#else
-
-//#endif
 
 
 
@@ -279,11 +272,11 @@ bool ENETProtocolBasePrivate::connectToHost(const QHostAddress &address, quint16
 
 
     //TODO
-    unsigned int timeBase = timeGetTime();
+    unsigned int timeBase = enet_time_get ();
     while (peer->state != ENET_PEER_STATE_CONNECTED) {
         //msleep(10);
         qApp->processEvents();
-        if(timeGetTime() - timeBase > msecTimeout){
+        if(enet_time_get() - timeBase > msecTimeout){
             qCritical()<<"ERROR! Connecting to peer timeout!";
             enet_peer_reset (peer);
             return false;
