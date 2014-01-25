@@ -65,16 +65,16 @@ UDTWidget::~UDTWidget()
 //    m_packetHandlerBase = 0;
 
     if(udtProtocol){
-        udtProtocol->closeUDTProtocol();
+        udtProtocol->close();
     }
-    delete udtProtocol;
+    udtProtocol->deleteLater();
 
 }
 
 void UDTWidget::listen(){
 
     if(isListening){
-        udtProtocol->closeUDTProtocol();
+        udtProtocol->close();
         ui.toolButtonListen->setText("Listen");
         isListening = false;
         return;
@@ -124,70 +124,8 @@ void UDTWidget::connectToPeer(){
         ui.toolButtonConnect->setText("Connecting...");
 
         peerSockeet = udtProtocol->connectToHost(m_peerAddress, m_peerPort, 0, false);
-        UDTSocketStatus status = udtProtocol->getUDTSocketStatus(peerSockeet);
-        qDebug();
-        qDebug()<<"peerSockeet:"<<peerSockeet<<" status:"<<status;
-        switch(status){
-        case INIT: //1
-        {
-            //qDebug()<<"INIT";
-        }
-            break;
-        case OPENED: //2
-        {
-            //qDebug()<<"OPENED";
-        }
-            break;
-        case LISTENING: //3
-        {
-            //qDebug()<<"LISTENING";
-
-        }
-            break;
-        case CONNECTING: //4
-        {
-            //qDebug()<<"CONNECTING";
-        }
-            break;
-        case CONNECTED: //5
-        {
-            qDebug()<<"CONNECTED";
-
-        }
-            break;
-        case BROKEN: //6
-        {
-            qDebug()<<"BROKEN";
-        }
-            break;
-        case CLOSING: //7
-        {
-            //qDebug()<<"CLOSING";
-        }
-            break;
-        case CLOSED: //8
-        {
-            qDebug()<<"CLOSED";
-        }
-            break;
-        case NONEXIST: //9
-        {
-            qDebug()<<"NONEXIST";
-        }
-            break;
-        default:
-            break;
-
-
-        }
 
         qDebug();
-
-
-
-
-
-
 
 
 
@@ -203,7 +141,7 @@ void UDTWidget::connectToPeer(){
 
         //UDTSTATUS status = UDT::getsockstate(peerSockeet);
         //qDebug()<<"status:"<<status;
-        connected(m_peerAddress, m_peerPort);
+        connected(peerSockeet, m_peerAddress.toString(), m_peerPort);
 
     }
 
@@ -214,8 +152,8 @@ bool UDTWidget::startRUDPServer(quint16 port){
 
     if(!udtProtocol){
         udtProtocol = new UDTProtocolTest(true, 0, this);
-        connect(udtProtocol, SIGNAL(connected(const QHostAddress &, quint16)), this, SLOT(connected(const QHostAddress &, quint16)));
-        connect(udtProtocol, SIGNAL(disconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
+        connect(udtProtocol, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(connected(int, const QString &, quint16)));
+        connect(udtProtocol, SIGNAL(disconnected(int)), this, SLOT(disconnected(int)));
 
         connect(udtProtocol, SIGNAL(dataReceived(const QString &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QString &, quint16, const QByteArray &)));
 
@@ -227,7 +165,7 @@ bool UDTWidget::startRUDPServer(quint16 port){
     }
     qDebug()<<"serverSocket:"<<serverSocket;
 
-    udtProtocol->startWaitingForIOInOneThread(20);
+    udtProtocol->startWaitingForIOInOneThread(1);
 
     udtProtocol->getAddressInfoFromSocket(udtProtocol->getServerSocket(), 0, &localPort, false);
     ui.textBrowser->append("Listening on port:"+QString::number(localPort));
@@ -289,9 +227,9 @@ void UDTWidget::clean(){
 
 }
 
-void UDTWidget::connected(const QHostAddress &peerAddress, quint16 peerPort){
+void UDTWidget::connected(int socket, const QString &peerAddress, quint16 peerPort){
 
-    ui.textBrowser->append("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
+    ui.textBrowser->append("Connected! "+peerAddress+":"+QString::number(peerPort)+QString(" Socket:%1").arg(socket));
 
     //if(!isListening){
         ui.lineEditIP->setEnabled(false);
@@ -319,6 +257,21 @@ void UDTWidget::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quin
 
 void UDTWidget::disconnected(const QHostAddress &peerAddress, quint16 peerPort){
     ui.textBrowser->append("Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
+
+    if(!isListening){
+        ui.lineEditIP->setEnabled(true);
+        ui.spinBoxRemotePort->setEnabled(true);
+        ui.toolButtonConnect->setText("Connect");
+        ui.toolButtonConnect->setEnabled(true);
+        ui.toolButtonSend->setEnabled(false);
+    }
+
+    isConnected = false;
+
+}
+
+void UDTWidget::disconnected(int socket){
+    ui.textBrowser->append(QString("Disconnected! Socket:%1").arg(socket));
 
     if(!isListening){
         ui.lineEditIP->setEnabled(true);
