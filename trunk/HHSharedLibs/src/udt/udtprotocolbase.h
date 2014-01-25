@@ -42,21 +42,19 @@
 
 
 
-//#define UDT_API Q_DECL_EXPORT
-
-#include "./udt/src/udt.h"
-#include "./udt/src/ccc.h"
 
 
-#include <iostream>
-using namespace std;
+
+
 
 #include "udtlib.h"
 
 
 namespace HEHUI {
 
-typedef UDTSTATUS UDTSocketStatus;
+//typedef UDTSTATUS UDTSocketStatus;
+typedef int UDTSOCKET;
+class CCC;
 
 class UDT_LIB_API UDTProtocolBase :public QObject{
     Q_OBJECT
@@ -113,10 +111,10 @@ public:
         int UDT_RCVTIMEO;
 
         bool UDT_REUSEADDR;
-        int64_t UDT_MAXBW;
+        qint64 UDT_MAXBW;
 
-        int32_t UDT_STATE; //Read only!
-        int32_t UDT_EVENT; //Read only!
+        qint32 UDT_STATE; //Read only!
+        qint32 UDT_EVENT; //Read only!
 
     };
 
@@ -134,7 +132,7 @@ public:
 
     bool getAddressInfoFromSocket(UDTSOCKET socket, QString *address, quint16 *port, bool getPeerInfo = true);
 
-    UDTSocketStatus getUDTSocketStatus(UDTSOCKET socket);
+    //UDTSocketStatus getUDTSocketStatus(UDTSOCKET socket);
     bool isSocketListening(UDTSOCKET socket);
     bool isConnecting(UDTSOCKET socket);
     bool isSocketConnected(UDTSOCKET socket);
@@ -157,6 +155,9 @@ public slots:
     //Start the server to listen,  implement the virtual function startWaitingForIO()
     UDTSOCKET listen(quint16 port = 0, const QHostAddress &localAddress= QHostAddress::Any);
 
+    //Close the server
+    void close();
+
     //Call this function after server is listening
     void startWaitingForNewConnectionInOneThread(int msecWaitForNewConnectionTimeout = 1);
     void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = 1, int msecWaitForOutputTimeout = 1);
@@ -176,8 +177,7 @@ public slots:
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
 
-    //Close the server
-    void closeUDTProtocol();
+
 
 
 protected:
@@ -193,8 +193,8 @@ protected:
 
 
 private slots:
-    void readDataFromSocket(UDTSOCKET socket);
-    void writeDataToSocket(UDTSOCKET socket);
+    void processSocketReadyToRead(UDTSOCKET socket);
+    void processSocketReadyToWrite(UDTSOCKET socket);
 
     void processStreamDataAfterReceived(UDTSOCKET socket, QByteArray *byteArray);
 
@@ -212,7 +212,7 @@ private:
     void msleep(int msec);
 
     bool addSocketToEpoll(UDTSOCKET socket);
-    void removeSocketFromEpoll(UDTSOCKET socket, bool socketExists = true);
+    void removeSocketFromEpoll(UDTSOCKET socket);
 
 
 
