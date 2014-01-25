@@ -23,7 +23,7 @@ RTP::RTP(QObject *parent) :
 RTP::~RTP(){
 
     if(m_udtProtocol){
-        m_udtProtocol->closeUDTProtocol();
+        m_udtProtocol->close();
         delete m_udtProtocol;
         m_udtProtocol = 0;
     }
@@ -65,7 +65,7 @@ void RTP::startServers(const QHostAddress &localAddress, quint16 localPort, bool
 
 void RTP::stopServers(){
     if(m_udtProtocol){
-        m_udtProtocol->closeUDTProtocol();
+        m_udtProtocol->close();
     }
 
     if(m_tcpServer){

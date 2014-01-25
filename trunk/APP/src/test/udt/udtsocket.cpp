@@ -30,14 +30,14 @@ bool UDTProtocolTest::sendData(UDTSOCKET socket, const QByteArray *byteArray){
 }
 
 void UDTProtocolTest::streamDataReceived(UDTSOCKET socket, QByteArray *data){
-    qDebug()<<"--UDTProtocolTest::streamDataReceived(...) "<<"socket:"<<socket;
+    //qDebug()<<"--UDTProtocolTest::streamDataReceived(...) "<<"socket:"<<socket;
 
     convertDataToPacket(socket, data);
 
 }
 
 void UDTProtocolTest::messageDataReceived(UDTSOCKET socket, QByteArray *data){
-    qDebug()<<"--UDTProtocolTest::messageDataReceived(...) "<<"socket:"<<socket;
+    //qDebug()<<"--UDTProtocolTest::messageDataReceived(...) "<<"socket:"<<socket;
 
     convertDataToPacket(socket, data);
 

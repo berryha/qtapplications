@@ -12,6 +12,7 @@
 #include "HHSharedCore/hlogdebug.h"
 
 
+#include <iostream>
 
 
 int main(int argc, char **argv)
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
     //HEHUI::ClientService service(argc, argv, "ClientService", "Client Service For Computer Management System");
     HEHUI::ClientService service(argc, argv, SERVICE_NAME, APP_NAME);
 
-    cout<<qPrintable(QString(APP_NAME) + " Build " + QString(APP_VERSION))<<endl<<endl;
+    std::cout<<qPrintable(QString(APP_NAME) + " Build " + QString(APP_VERSION))<<std::endl<<std::endl;
 
     //reset the message handler
     qInstallMessageHandler(0);

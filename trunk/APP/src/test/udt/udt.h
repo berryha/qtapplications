@@ -44,9 +44,10 @@ private slots:
 
 
 
-    void connected(const QHostAddress &peerAddress, quint16 peerPort);
+    void connected(int socket, const QString &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);
     void disconnected(const QHostAddress &peerAddress, quint16 peerPort);
+    void disconnected(int socket);
 
     void dataReceived(const QString &peerAddress, quint16 peerPort, const QByteArray &data);
 
