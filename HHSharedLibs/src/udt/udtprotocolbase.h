@@ -163,8 +163,6 @@ public slots:
     void startWaitingForIOInSeparateThread(int msecWaitForInputTimeout = 1, int msecWaitForOutputTimeout = 1);
     void startWaitingForIOInOneThread(int msecWaitForIOTimeout = 1);
 
-
-
     //Connect to peer
     UDTSOCKET connectToHost(const QHostAddress &address, quint16 port, SocketOptions *options = 0, bool waitWhileConnecting = true, int msecTimeout = 5000, bool monitor = true);
 
@@ -177,14 +175,13 @@ public slots:
     bool sendUDTMessageData(UDTSOCKET socket, const QByteArray *byteArray, int ttl = -1, bool inorder = true);
 
 
-
-
-
 protected:
     void waitForIO(int msecTimeout = 1);
+
     void waitForReading(int msecTimeout = 1);
     void waitForWriting(int msecTimeout = 1);
     void waitingForNewConnection(int msecTimeout = 1);
+
     UDTSOCKET acceptNewConnection();
 
     //Send & Receive File
@@ -213,8 +210,6 @@ private:
 
     bool addSocketToEpoll(UDTSOCKET socket);
     void removeSocketFromEpoll(UDTSOCKET socket);
-
-
 
 
 private:
