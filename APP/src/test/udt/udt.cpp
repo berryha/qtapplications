@@ -65,6 +65,7 @@ UDTWidget::~UDTWidget()
 //    m_packetHandlerBase = 0;
 
     if(udtProtocol){
+        udtProtocol->closeSocket(peerSockeet);
         udtProtocol->close();
     }
     udtProtocol->deleteLater();
