@@ -858,7 +858,7 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
     case CONNECTING: //4
     case CONNECTED: //5
     {
-        qDebug()<<"----R------ Status:"<<status<<" ----------";
+        //qDebug()<<"----R------ Status:"<<status<<" ----------";
     }
         break;
     case BROKEN: //6
@@ -949,7 +949,7 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
 }
 
 void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
-    qDebug()<<"--UDTProtocolBase::processSocketReadyToWrite() "<<"socket:"<<socket<<" status:"<<UDT::getsockstate(socket);
+    //qDebug()<<"--UDTProtocolBase::processSocketReadyToWrite() "<<"socket:"<<socket<<" status:"<<UDT::getsockstate(socket);
 
 
 
