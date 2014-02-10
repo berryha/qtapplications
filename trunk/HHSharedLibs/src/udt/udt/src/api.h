@@ -246,7 +246,8 @@ private:
    bool m_bGCStatus;					// if the GC thread is working (true)
 
    pthread_t m_GCThread;
-   #ifndef WIN32
+// #ifndef WIN32
+   #ifdef __WINPTHREADS_VERSION
       static void* garbageCollect(void*);
    #else
       static DWORD WINAPI garbageCollect(LPVOID);

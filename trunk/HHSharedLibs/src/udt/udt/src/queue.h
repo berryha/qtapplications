@@ -397,7 +397,8 @@ public:
    int sendto(const sockaddr* addr, CPacket& packet);
 
 private:
-#ifndef WIN32
+//   #ifndef WIN32
+#ifdef __WINPTHREADS_VERSION
    static void* worker(void* param);
 #else
    static DWORD WINAPI worker(LPVOID param);
@@ -457,7 +458,8 @@ public:
    int recvfrom(int32_t id, CPacket& packet);
 
 private:
-#ifndef WIN32
+//#ifndef WIN32
+#ifdef __WINPTHREADS_VERSION
    static void* worker(void* param);
 #else
    static DWORD WINAPI worker(LPVOID param);

@@ -53,7 +53,8 @@ written by
 #include "udt.h"
 
 
-#ifdef WIN32
+//#ifdef WIN32
+#ifndef __WINPTHREADS_VERSION
    // Windows compability
    typedef HANDLE pthread_t;
    typedef HANDLE pthread_mutex_t;
