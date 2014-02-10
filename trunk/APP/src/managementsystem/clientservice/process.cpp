@@ -19,7 +19,7 @@
 namespace HEHUI {
 
 Process::Process(QObject *parent)
-        :QObject(parent)
+    :QObject(parent)
 {
     process = new QProcess(this);
     process->setReadChannelMode(QProcess::MergedChannels);
@@ -37,7 +37,7 @@ Process::Process(QObject *parent)
 }
 
 Process::~Process() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 bool Process::isRunning(){
@@ -70,8 +70,8 @@ void Process::stopProcess(){
         //emit signalProcessStateChanged(false, "Process Killed.");
     }
 
-//    delete process;
-//    process = 0;
+    //    delete process;
+    //    process = 0;
 
     m_running = false;
     m_exeFilePath = "";
@@ -103,12 +103,12 @@ void Process::writeDataToProcess(const QString &data){
     process->write((data+"\n").toLocal8Bit());
     //process->write((data+"\n").toLatin1();
 
-//    QTextCodec *codec = QTextCodec::codecForName("UTF-16LE");
-//    process->write(codec->fromUnicode(data+"\n"));
+    //    QTextCodec *codec = QTextCodec::codecForName("UTF-16LE");
+    //    process->write(codec->fromUnicode(data+"\n"));
 
     //QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-16LE"));
 
-   // process->write((data+"\n").toStdString().c_str());
+    // process->write((data+"\n").toStdString().c_str());
 
 
 }

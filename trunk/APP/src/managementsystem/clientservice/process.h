@@ -13,43 +13,42 @@
 #include <QProcess>
 
 
-
 namespace HEHUI {
 
 class Process : public QObject{
-	Q_OBJECT
+    Q_OBJECT
 public:
-        Process(QObject *parent = 0);
-	virtual ~Process();
+    Process(QObject *parent = 0);
+    virtual ~Process();
 
-        bool isRunning();
+    bool isRunning();
 
 signals:
-        void signalProcessStateChanged(bool running, const QString &message = "");
-        void signalProcessOutputRead(const QString &output);
+    void signalProcessStateChanged(bool running, const QString &message = "");
+    void signalProcessOutputRead(const QString &output);
 
 
 public slots:
-        void startProcess(const QString &exeFilePath = "cmd.exe");
-        void stopProcess();
-        void writeDataToProcess(const QString &data);
+    void startProcess(const QString &exeFilePath = "cmd.exe");
+    void stopProcess();
+    void writeDataToProcess(const QString &data);
 
 
 
 private slots:
-        void readProcessOutput();
-        void readProcessError();
-        void processErrorOccured(QProcess::ProcessError error);
+    void readProcessOutput();
+    void readProcessError();
+    void processErrorOccured(QProcess::ProcessError error);
 
-        void processStarted();
+    void processStarted();
 
 private:
 
-        QString m_exeFilePath;
+    QString m_exeFilePath;
 
-        QProcess *process;
+    QProcess *process;
 
-        bool m_running;
+    bool m_running;
 
 
 };
