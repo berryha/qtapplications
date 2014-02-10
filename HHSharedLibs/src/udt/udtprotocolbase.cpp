@@ -865,7 +865,7 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
     {
         removeSocketFromEpoll(socket);
         emit disconnected(socket);
-        qDebug()<<"-------R--------socket:"<<socket<<" BROKEN";
+        qWarning()<<"-------R--------socket:"<<socket<<" BROKEN";
         return;
     }
         break;
@@ -974,7 +974,7 @@ void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
     {
         removeSocketFromEpoll(socket);
         emit disconnected(socket);
-        qDebug()<<"------W---------socket:"<<socket<<" BROKEN";
+        qWarning()<<"------W---------socket:"<<socket<<" BROKEN";
         return;
     }
         break;
@@ -1136,10 +1136,12 @@ void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket){
     QMutexLocker locker(&m_epollMutex);
 
     if(UDT::epoll_remove_usock(epollID, socket)){
-        fprintf(stderr, "ERROR! epoll_remove_usock: %s\n", UDT::getlasterror().getErrorMessage());
+        qCritical()<<QString("ERROR! epoll_remove_usock: %1 Socket: %2").arg(UDT::getlasterror().getErrorMessage()).arg(socket);
+        //fprintf(stderr, "ERROR! epoll_remove_usock: %s\n", UDT::getlasterror().getErrorMessage());
     }
     if(UDT::close(socket)){
-        fprintf(stderr, "ERROR! UDT::close: %s\n", UDT::getlasterror().getErrorMessage());
+        qCritical()<<QString("ERROR! UDT::close: %1 Socket: %2").arg(UDT::getlasterror().getErrorMessage()).arg(socket);
+        //fprintf(stderr, "ERROR! UDT::close: %s\n", UDT::getlasterror().getErrorMessage());
     }
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
