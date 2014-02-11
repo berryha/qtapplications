@@ -158,7 +158,7 @@ bool ServerService::startMainService(){
 //        qWarning()<<QString("UDT listening on port %1!").arg(UDT_LISTENING_PORT);
 //    }
 //    connect(m_udtProtocol, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-    m_udtProtocol->startWaitingForIOInOneThread(50);
+    m_udtProtocol->startWaitingForIOInOneThread(20);
     //m_udtProtocol->startWaitingForIOInSeparateThread(10, 500);
 
 
@@ -865,7 +865,7 @@ void ServerService::processClientOnlineStatusChangedPacket(int socketID, const Q
     }
 
     qWarning();
-    qWarning()<<QString("Client '%1' From %2:%3 %4 via %5! Time:%6 Socket:%7").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(m_rtp->isUDTSocket(socketID)?"UDT":"TCP").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss")).arg(socketID);
+    qWarning()<<QString("Client '%1' From %2:%3 %4 via %5! Time:%6 Socket: %7").arg(clientName).arg(ip).arg(port).arg(online?"Online":"Offline").arg(m_rtp->isUDTSocket(socketID)?"UDT":"TCP").arg(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss")).arg(socketID);
     qWarning()<<QString("Total Online Clients:%1").arg(clientSocketsHash.size());
 
 

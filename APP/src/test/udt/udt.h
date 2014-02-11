@@ -78,7 +78,7 @@ private:
     quint64 totalDataSize;
 
 
-
+    bool streamMode;
 
 
 };
