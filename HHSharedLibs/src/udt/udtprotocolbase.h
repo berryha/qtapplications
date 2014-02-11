@@ -82,8 +82,8 @@ public:
             //UDT_LINGER.l_linger = 180;
             UDT_RENDEZVOUS = false;
 
-            UDT_SNDTIMEO = 1000; //UDT Default:-1
-            UDT_RCVTIMEO = 1000; //UDT Default:-1
+            UDT_SNDTIMEO = 30000; //UDT Default:-1
+            UDT_RCVTIMEO = 30000; //UDT Default:-1
 
             UDT_REUSEADDR = true;
             UDT_MAXBW = -1;

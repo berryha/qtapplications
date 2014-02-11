@@ -494,18 +494,22 @@ UDTSOCKET UDTProtocolBase::connectToHost(const QHostAddress &address, quint16 po
 void UDTProtocolBase::closeSocket(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::closeSocket(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
 
-
     QMutexLocker locker(&m_epollMutex);
 
-    UDT::epoll_remove_usock(epollID, socket);
+//    if( (UDT::INVALID_SOCK == socket) || (UDT::getsockstate(socket) == NONEXIST) ){
+//        qDebug()<<"INVALID_SOCK";
+//        return;
+//    }
 
-    if( (UDT::INVALID_SOCK == socket) || (UDT::getsockstate(socket) == NONEXIST) ){
-        qDebug()<<"INVALID_SOCK";
-
-        return;
+    if(UDT::close(socket) == UDT::ERROR){
+        qCritical()<<QString("ERROR! UDT::close: %1 Socket: %2 ").arg(UDT::getlasterror().getErrorMessage()).arg(socket)<<"Thread: "<<(QThread::currentThreadId());
+        //fprintf(stderr, "ERROR! UDT::close: %s\n", UDT::getlasterror().getErrorMessage());
     }
 
-    UDT::close(socket);
+    if(UDT::epoll_remove_usock(epollID, socket) == UDT::ERROR){
+        qCritical()<<QString("ERROR! epoll_remove_usock: %1 Socket: %2 ").arg(UDT::getlasterror().getErrorMessage()).arg(socket) <<"Thread: "<<(QThread::currentThreadId());
+        //fprintf(stderr, "ERROR! epoll_remove_usock: %s\n", UDT::getlasterror().getErrorMessage());
+    }
 
     QByteArray *data = m_cachedDataInfoHash.take(socket);
     recycleCachedData(data);
@@ -625,7 +629,7 @@ bool UDTProtocolBase::sendUDTMessageData(UDTSOCKET socket, const QByteArray *byt
 
     if (UDT::ERROR == ss || 0 == ss)
     {
-        m_errorMessage = tr("Failed to send message data!") + UDT::getlasterror().getErrorMessage();
+        m_errorMessage = tr("Failed to send message data! ") + UDT::getlasterror().getErrorMessage();
         qDebug()<<m_errorMessage;
 
         return false;
@@ -664,15 +668,20 @@ void UDTProtocolBase::waitForIO(int msecWaitForIOTimeout){
             //qDebug()<<QString("epoll returned %1 sockets ready to IO | %2 in read set, %3 in write set").arg(count).arg(readfds.size()).arg(writefds.size());
             //printf("epoll returned %d sockets ready to IO | %d in read set, %d in write set\n", count, readfds.size(), writefds.size());
 
-            for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
-                processSocketReadyToRead(*it);
+            if(readfds.size()){
+                for( std::set<UDTSOCKET>::const_iterator it = readfds.begin(); it != readfds.end(); ++it){
+                    processSocketReadyToRead(*it);
+                }
+                readfds.clear();
             }
-            readfds.clear();
 
-            for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
-                processSocketReadyToWrite(*it);
+            if(writefds.size()){
+                for( std::set<UDTSOCKET>::const_iterator it = writefds.begin(); it != writefds.end(); ++it){
+                    processSocketReadyToWrite(*it);
+                }
+                writefds.clear();
             }
-            writefds.clear();
+
         }
 
         //QCoreApplication::processEvents();
@@ -863,9 +872,11 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        removeSocketFromEpoll(socket);
-        emit disconnected(socket);
         qWarning()<<"-------R--------socket:"<<socket<<" BROKEN";
+
+        closeSocket(socket);
+        emit disconnected(socket);
+        qWarning();
         return;
     }
         break;
@@ -877,17 +888,19 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
         break;
     case CLOSED: //8
     {
-        removeSocketFromEpoll(socket);
+        closeSocket(socket);
         emit disconnected(socket);
 
-        qDebug()<<"-------R-------socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
+        qDebug()<<"-------R-------socket:"<<socket<<" CLOSED"<<" ThreadID: "<<QThread::currentThreadId();
         return;
     }
         break;
     case NONEXIST: //9
     {
-        removeSocketFromEpoll(socket);
-        qCritical()<<"-------R-------socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
+        qCritical()<<"-------R-------socket:"<<socket<<" NONEXIST"<<" ThreadID: "<<QThread::currentThreadId();
+
+        closeSocket(socket);
+        qCritical();
         return;
     }
         break;
@@ -972,9 +985,11 @@ void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        removeSocketFromEpoll(socket);
-        emit disconnected(socket);
         qWarning()<<"------W---------socket:"<<socket<<" BROKEN";
+
+        closeSocket(socket);
+        emit disconnected(socket);
+        qWarning();
         return;
     }
         break;
@@ -986,7 +1001,7 @@ void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
         break;
     case CLOSED: //8
     {
-        removeSocketFromEpoll(socket);
+        closeSocket(socket);
         emit disconnected(socket);
 
         qDebug()<<"-------W-------socket:"<<socket<<" CLOSED"<<" ThreadID:"<<QThread::currentThreadId();
@@ -995,8 +1010,10 @@ void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
         break;
     case NONEXIST: //9
     {
-        removeSocketFromEpoll(socket);
         qCritical()<<"-------W-------socket:"<<socket<<" NONEXIST"<<" ThreadID:"<<QThread::currentThreadId();
+
+        closeSocket(socket);
+        qCritical();
         return;
     }
         break;
@@ -1097,8 +1114,10 @@ void UDTProtocolBase::setSocketOptions(UDTSOCKET socket, SocketOptions *options)
     UDT::setsockopt(socket, 0, UDT_REUSEADDR, &(opts->UDT_REUSEADDR), sizeof(bool));
     UDT::setsockopt(socket, 0, UDT_MAXBW, &(opts->UDT_MAXBW), sizeof(int64_t));
 
-
-
+//    bool block = false;
+//    int size = sizeof(bool);
+//    UDT::getsockopt(socket, 0, UDT_SNDSYN, &block, &size);
+//    qWarning()<<"UDT_SNDSYN:"<<block;
 
 }
 
@@ -1132,15 +1151,14 @@ bool UDTProtocolBase::addSocketToEpoll(UDTSOCKET socket){
 void UDTProtocolBase::removeSocketFromEpoll(UDTSOCKET socket){
     qDebug()<<"--UDTProtocolBase::removeSocketFromEpoll(...) "<<"socket:"<<socket<<" ThreadID:"<<QThread::currentThreadId();
 
-
     QMutexLocker locker(&m_epollMutex);
 
-    if(UDT::epoll_remove_usock(epollID, socket)){
-        qCritical()<<QString("ERROR! epoll_remove_usock: %1 Socket: %2").arg(UDT::getlasterror().getErrorMessage()).arg(socket);
+    if(UDT::epoll_remove_usock(epollID, socket) == UDT::ERROR){
+        qCritical()<<QString("ERROR! epoll_remove_usock: %1 Socket: %2 ").arg(UDT::getlasterror().getErrorMessage()).arg(socket) <<"Thread: "<<(QThread::currentThreadId());
         //fprintf(stderr, "ERROR! epoll_remove_usock: %s\n", UDT::getlasterror().getErrorMessage());
     }
-    if(UDT::close(socket)){
-        qCritical()<<QString("ERROR! UDT::close: %1 Socket: %2").arg(UDT::getlasterror().getErrorMessage()).arg(socket);
+    if(UDT::close(socket) == UDT::ERROR){
+        qCritical()<<QString("ERROR! UDT::close: %1 Socket: %2 ").arg(UDT::getlasterror().getErrorMessage()).arg(socket)<<"Thread: "<<(QThread::currentThreadId());
         //fprintf(stderr, "ERROR! UDT::close: %s\n", UDT::getlasterror().getErrorMessage());
     }
 
