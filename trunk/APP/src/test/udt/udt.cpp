@@ -28,6 +28,7 @@ UDTWidget::UDTWidget(QWidget *parent)
 //        QtConcurrent::run(clientPacketsParser, &ClientPacketsParser::run);
 
         udtProtocol = 0;
+        serverSocket = peerSockeet = UDTProtocolBase::INVALID_UDT_SOCK;
 
         isListening = false;
         isConnected = false;
@@ -42,6 +43,11 @@ UDTWidget::UDTWidget(QWidget *parent)
 //        connect(rudpSocket, SIGNAL(signalConnectToPeerTimeout(const QHostAddress &, quint16)), this, SLOT(signalConnectToPeerTimeout(const QHostAddress &, quint16)));
 //        connect(rudpSocket, SIGNAL(peerDisconnected(const QHostAddress &, quint16)), this, SLOT(disconnected(const QHostAddress &, quint16)));
 //        connect(rudpSocket, SIGNAL(dataReceived(const QHostAddress &, quint16, const QByteArray &)), this, SLOT(dataReceived(const QHostAddress &, quint16, const QByteArray &)));
+
+
+
+        streamMode = true;
+
 
 }
 
@@ -152,7 +158,15 @@ void UDTWidget::connectToPeer(){
 bool UDTWidget::startRUDPServer(quint16 port){
 
     if(!udtProtocol){
-        udtProtocol = new UDTProtocolTest(true, 0, this);
+        UDTProtocolTest::SocketOptions opt;
+//        opt.UDT_SNDSYN = false;
+//        opt.UDT_RCVSYN = false;
+//        opt.UDT_SNDTIMEO = -1;
+//        opt.UDT_RCVTIMEO = -1;
+//        opt.UDP_SNDBUF = 10240000;
+//        opt.UDP_RCVBUF = 10240000;
+
+        udtProtocol = new UDTProtocolTest(streamMode, &opt, this);
         connect(udtProtocol, SIGNAL(connected(int, const QString &, quint16)), this, SLOT(connected(int, const QString &, quint16)));
         connect(udtProtocol, SIGNAL(disconnected(int)), this, SLOT(disconnected(int)));
 
@@ -202,8 +216,15 @@ void UDTWidget::send(){
     QByteArray a("0x0000");
     udtProtocol->sendUDTStreamData(peerSockeet, &a);
 
+
+    bool ok = false;
     for(int i=0;i<count;i++) {
-        if(udtProtocol->sendUDTStreamData(peerSockeet, &data)){
+        if(streamMode){
+            ok = udtProtocol->sendUDTStreamData(peerSockeet, &data);
+        }else{
+            ok = udtProtocol->sendUDTMessageData(peerSockeet, &data);
+        }
+        if(ok){
             sent++;
         }else{
             ui.textBrowser->append(udtProtocol->getLastErrorMessage());
@@ -240,6 +261,8 @@ void UDTWidget::connected(int socket, const QString &peerAddress, quint16 peerPo
         ui.toolButtonSend->setEnabled(true);
     //}
     isConnected = true;
+
+    peerSockeet = socket;
 
 
 }
@@ -283,6 +306,7 @@ void UDTWidget::disconnected(int socket){
     }
 
     isConnected = false;
+    peerSockeet = UDTProtocolBase::INVALID_UDT_SOCK;
 
 }
 
