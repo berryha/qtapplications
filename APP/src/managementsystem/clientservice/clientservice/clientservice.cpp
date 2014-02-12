@@ -393,7 +393,8 @@ void ClientService::serverFound(const QString &serverAddress, quint16 serverUDTL
     m_serverInstanceID = 0;
 
     int msec = QDateTime::currentDateTime().toString("zzz").toUInt();
-    Utilities::msleep(10*msec);
+    msec = msec<100?(msec*1000):(msec*10);
+    Utilities::msleep(msec);
 
     QString errorMessage;
     if(m_socketConnectedToServer == INVALID_SOCK_ID){
@@ -2065,7 +2066,9 @@ void ClientService::peerDisconnected(const QHostAddress &peerAddress, quint16 pe
 //            lookForServerTimer->setSingleShot(true);
 //            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
 //        }
-        lookForServerTimer->start(60000);
+
+        int interval = QDateTime::currentDateTime().toString("zzz").toUInt() * 100;
+        lookForServerTimer->start(6000 + interval);
 
     }else if(peerAddress.toString() == m_adminAddress && peerPort == m_adminPort){
 
@@ -2095,7 +2098,9 @@ void ClientService::peerDisconnected(int socketID){
 //            lookForServerTimer->setSingleShot(true);
 //            connect(lookForServerTimer, SIGNAL(timeout()), this, SLOT(checkHasAnyServerBeenFound()));
 //        }
-        lookForServerTimer->start(60000);
+
+        int interval = QDateTime::currentDateTime().toString("zzz").toUInt() * 100;
+        lookForServerTimer->start(6000 + interval);
 
     }else if(socketID == m_socketConnectedToAdmin){
         qWarning()<<"Admin Offline!";
