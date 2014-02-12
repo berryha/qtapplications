@@ -873,10 +873,10 @@ void UDTProtocolBase::processSocketReadyToRead(UDTSOCKET socket){
     case BROKEN: //6
     {
         qWarning()<<"-------R--------socket:"<<socket<<" BROKEN";
-
         closeSocket(socket);
-        emit disconnected(socket);
         qWarning();
+
+        emit disconnected(socket);
         return;
     }
         break;
