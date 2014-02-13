@@ -41,13 +41,13 @@ DEFINES += GUI_LIBRARY_EXPORT
 # define link libs
 # LIBS += -L$$SHARED_LIB_FOLDER
 
-CONFIG( debug, debug|release ):
+#CONFIG( debug, debug|release ):
 
 # Debug
 # unix:LIBS += -lHHSharedCore_debug
 # win32:LIBS += -lHHSharedCored$${VER_MAJ}
 # mac:LIBS += -lHHSharedCored
-else:
+#else:
 # Release
 # win32:LIBS += -lHHSharedCore$${VER_MAJ}
 # else:LIBS += -lHHSharedCore
