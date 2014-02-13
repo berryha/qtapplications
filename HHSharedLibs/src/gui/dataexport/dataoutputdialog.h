@@ -29,8 +29,8 @@ public:
         ~DataOutputDialog();
 	
 
-	QTableView *getTableView(){return tableView;};
-	void setTableView(QTableView *tv){tableView = tv;};
+    QTableView *getTableView(){return tableView;}
+    void setTableView(QTableView *tv){tableView = tv;}
 
 
 protected:
