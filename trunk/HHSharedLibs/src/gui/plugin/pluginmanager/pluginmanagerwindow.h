@@ -35,7 +35,7 @@
 
 
 #include "plugininfomodel.h"
-#include "../../ui/ui_pluginmanagerwindow.h"
+#include "ui_pluginmanagerwindow.h"
 
 #include "../../guilib.h"
 

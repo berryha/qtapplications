@@ -43,15 +43,22 @@ SOURCES += \
     #udtprotocolforfiletransmission.cpp
 RESOURCES += 
 
-
-win32 { 
-
 ####Add the following code to "udt.h" before "#define NO_BUSY_WAITING" ####
+#ifdef WIN32
+    #ifdef __WINPTHREADS_VERSION
+        #define USE_PTHREADS
+    #endif
+#else
+    #define USE_PTHREADS
+#endif
+
 #ifdef NO_UDT_DLL
 #undef UDT_API
 #define UDT_API
 #endif
 ###########################################################################
+
+win32 { 
 
     DEFINES += WIN32  _WIN32_WINNT=0x0501 NO_UDT_DLL
     #DEFINES += WIN32 LEGACY_WIN32 _WIN32_WINNT=0x0500 NO_UDT_DLL
@@ -101,7 +108,7 @@ INSTALLS += target
 QMAKE_TARGET_COMPANY = "UDT"
 QMAKE_TARGET_PRODUCT = "UDT4"
 QMAKE_TARGET_DESCRIPTION = "UDP-based data transfer protocol"
-QMAKE_TARGET_COPYRIGHT = "Copyright (C) 2001 - 2011 Yunhong Gu. All rights reserved."
+QMAKE_TARGET_COPYRIGHT = "Copyright (C) 2001 - 2014 Yunhong Gu. All rights reserved."
 PACKAGE_DOMAIN = "http://udt.sf.net"
 
 

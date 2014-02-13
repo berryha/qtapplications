@@ -60,7 +60,7 @@ else:
 # }
 
 # ##
-UI_DIR = ./ui
+#UI_DIR = ./ui
 
 # OBJECTS_DIR = ./tmp
 # MOC_DIR = ./tmp

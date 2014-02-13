@@ -35,7 +35,7 @@
 #include <QWidget>
 #include <QCloseEvent>
 
-#include "../ui/ui_progressdlg.h"
+#include "ui_progressdlg.h"
 
 #include "../guilib.h"
 
