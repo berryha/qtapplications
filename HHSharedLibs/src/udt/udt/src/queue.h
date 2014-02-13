@@ -398,7 +398,7 @@ public:
 
 private:
 //   #ifndef WIN32
-#ifdef __WINPTHREADS_VERSION
+#ifdef USE_PTHREADS
    static void* worker(void* param);
 #else
    static DWORD WINAPI worker(LPVOID param);
@@ -459,7 +459,7 @@ public:
 
 private:
 //#ifndef WIN32
-#ifdef __WINPTHREADS_VERSION
+#ifdef USE_PTHREADS
    static void* worker(void* param);
 #else
    static DWORD WINAPI worker(LPVOID param);

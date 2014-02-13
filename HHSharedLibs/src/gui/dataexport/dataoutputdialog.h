@@ -8,7 +8,7 @@
 #include <QFile>
 
 
-#include "../ui/ui_dataoutputdialog.h"
+#include "ui_dataoutputdialog.h"
 
 #include "../guilib.h"
 

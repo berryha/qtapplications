@@ -202,7 +202,7 @@ int CUDTUnited::startup()
 
    m_bClosing = false;
 //   #ifndef WIN32
-   #ifdef __WINPTHREADS_VERSION
+   #ifdef USE_PTHREADS
       pthread_mutex_init(&m_GCStopLock, NULL);
       pthread_cond_init(&m_GCStopCond, NULL);
       pthread_create(&m_GCThread, NULL, garbageCollect, this);
@@ -232,7 +232,7 @@ int CUDTUnited::cleanup()
 
    m_bClosing = true;
 //   #ifndef WIN32
-   #ifdef __WINPTHREADS_VERSION
+   #ifdef USE_PTHREADS
       pthread_cond_signal(&m_GCStopCond);
       pthread_join(m_GCThread, NULL);
       pthread_mutex_destroy(&m_GCStopLock);
@@ -1466,7 +1466,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
 }
 
 //#ifndef WIN32
-#ifdef __WINPTHREADS_VERSION
+#ifdef USE_PTHREADS
    void* CUDTUnited::garbageCollect(void* p)
 #else
    DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)

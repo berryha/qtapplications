@@ -247,7 +247,7 @@ private:
 
    pthread_t m_GCThread;
 // #ifndef WIN32
-   #ifdef __WINPTHREADS_VERSION
+   #ifdef USE_PTHREADS
       static void* garbageCollect(void*);
    #else
       static DWORD WINAPI garbageCollect(LPVOID);

@@ -37,7 +37,7 @@
 #include <QDialog>
 #include <QMessageBox>
 
-#include "../ui/ui_databaseconnecterdialog.h"
+#include "ui_databaseconnecterdialog.h"
 #include "../../core/global_core.h"
 
 class DatabaseConnecterDialog : public QDialog

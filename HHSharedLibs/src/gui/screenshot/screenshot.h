@@ -36,7 +36,7 @@
 #include <QEvent>
 
 
-#include "../ui/ui_screenshot.h"
+#include "ui_screenshot.h"
 
 #include "selecttargetimagewidget.h"
 

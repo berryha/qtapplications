@@ -93,6 +93,15 @@ written by
    #define UDT_API __attribute__ ((visibility("default")))
 #endif
 
+//PTHREADS
+#ifdef WIN32
+    #ifdef __WINPTHREADS_VERSION
+        #define USE_PTHREADS
+    #endif
+#else
+    #define USE_PTHREADS
+#endif
+
 #ifdef NO_UDT_DLL
 #undef UDT_API
 #define UDT_API

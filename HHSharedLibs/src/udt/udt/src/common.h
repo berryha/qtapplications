@@ -54,7 +54,7 @@ written by
 
 
 //#ifdef WIN32
-#ifndef __WINPTHREADS_VERSION
+#ifndef USE_PTHREADS
    // Windows compability
    typedef HANDLE pthread_t;
    typedef HANDLE pthread_mutex_t;

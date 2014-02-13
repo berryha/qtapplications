@@ -39,7 +39,7 @@
 #include <QResizeEvent>
 
 
-#include "../ui/ui_selecttargetimagewidget.h"
+#include "ui_selecttargetimagewidget.h"
 
 namespace HEHUI {
 

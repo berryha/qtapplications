@@ -21,7 +21,7 @@ include( ../buildlib_config.pri )
 DEFINES += WM_LIBRARY_EXPORT _WIN32_WINNT=0x0500
 
 # #
-UI_DIR = ./ui
+#UI_DIR = ./ui
 
 # OBJECTS_DIR = ./tmp
 # MOC_DIR = ./tmp

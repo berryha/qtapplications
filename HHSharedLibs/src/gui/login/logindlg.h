@@ -5,7 +5,7 @@
 #include <QDialog>
 #include <QMessageBox>
 
-#include "../ui/ui_logindlg.h"
+#include "ui_logindlg.h"
 #include "../databaseconnecter/databaseconnecterdialog.h"
 #include "../../core/singleton.h"
 #include "../../core/user.h"
