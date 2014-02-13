@@ -48,3 +48,4 @@ mac:ICON = ./resources/images/app.icns
 # QMAKE_TARGET_COMPANY	= "He Hui Team"
 QMAKE_TARGET_PRODUCT = "Main Application For Management System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Application Based On Qt"
+

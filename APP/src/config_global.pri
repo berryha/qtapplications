@@ -1,5 +1,5 @@
 # get current path
-PACKAGE_PWD	= $$PWD
+PACKAGE_PWD = $$PWD
 
 SOURCE_TREE = $$PWD/../
 
