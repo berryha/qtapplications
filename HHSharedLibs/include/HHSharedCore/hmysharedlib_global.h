@@ -1,2 +1,2 @@
 
-#include "../../src/core/mysharedlib_global.h"
+#include "../../src/core/core_lib.h"
