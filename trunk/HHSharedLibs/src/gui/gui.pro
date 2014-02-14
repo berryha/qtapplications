@@ -20,9 +20,16 @@ QT += core \
 # include config file
 include( ../buildlib_config.pri )
 
-#HHSharedLibs += HHSharedCore
-#include(../core/core_lib.pri)
-include(../core/core_source.pri)
+
+##################### HHSharedCore #####################
+#### 1.Link With HHSharedCore DLL ####
+HHSharedLibs += HHSharedCore
+include(../core/core_lib.pri)
+
+#### 2.Build With HHSharedCore Source ####
+#DEFINES += CORE_LIB_LIBRARY_EXPORT
+#include(../core/core_source.pri)
+##################### HHSharedCore #####################
 
 
 # include source 
