@@ -1,5 +1,5 @@
 
-include(windowsmanagement.pri)
+include(windowsmanagement_lib.pri)
 
 isEmpty(LIB_NAME){
     LIB_NAME = HHSharedWindowsManagement
@@ -18,6 +18,9 @@ QT += core
 # include config file
 include( ../buildlib_config.pri )
 
+# include source
+include(windowsmanagement_source.pri)
+
 DEFINES += WM_LIBRARY_EXPORT _WIN32_WINNT=0x0500
 
 # #
@@ -26,35 +29,7 @@ DEFINES += WM_LIBRARY_EXPORT _WIN32_WINNT=0x0500
 # OBJECTS_DIR = ./tmp
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
-# Input
-HEADERS += \
-    windowsmanagement.h \
-    wmlib.h \
-    adsi.h
-FORMS += 
-SOURCES += windowsmanagement.cpp \
-    adsi.cpp
-RESOURCES += 
-win32 { 
-    INCLUDEPATH += resources/lib/AutoIt3 \
-                    resources/lib/WinAPI
-    LIBS += -luser32 \
-        -lNetAPI32 \
-        -lAdvapi32 \
-        -lMpr \
-        -lWinspool \
-        -lVersion \
-        -Lresources/lib/AutoIt3 \
-        -lautoitx3 \
-        -Lresources/lib/WinAPI \
-        -lWindowsAPI
 
-    win32-g++{
-        INCLUDEPATH += resources/lib/WinAPI_GCC
-        LIBS += -Lresources/lib/WinAPI_GCC
-    }
-
-}
 
 
 
@@ -83,5 +58,5 @@ INSTALLS += target
 #QMAKE_TARGET_COMPANY	= "He Hui Team"
 QMAKE_TARGET_PRODUCT	= "M$ Windows Management Library"
 QMAKE_TARGET_DESCRIPTION	= "M$ Windows Management Library Based On Qt"
-#QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2010 He Hui"
+#QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2014 He Hui"
 

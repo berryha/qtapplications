@@ -31,7 +31,7 @@
 #ifndef GLOBAL_CORE_H_
 #define GLOBAL_CORE_H_
 
- #include "mysharedlib_global.h"
+ #include "core_lib.h"
 
 #ifdef Q_OS_WIN
 #define OS_IS_WINDOWS 1

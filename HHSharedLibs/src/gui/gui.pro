@@ -1,4 +1,4 @@
-include(gui.pri)
+include(gui_lib.pri)
 isEmpty(LIB_NAME):LIB_NAME = HHSharedGUI
 
 # ##
@@ -19,9 +19,14 @@ QT += core \
 
 # include config file
 include( ../buildlib_config.pri )
-HHSharedLibs += HHSharedCore
-include(../core/core.pri)
 
+#HHSharedLibs += HHSharedCore
+#include(../core/core_lib.pri)
+include(../core/core_source.pri)
+
+
+# include source 
+include(gui_source.pri)
 include (./widgetbase/itembox/itembox.pri)
 
 DEFINES += GUI_LIBRARY_EXPORT
@@ -66,55 +71,7 @@ DEFINES += GUI_LIBRARY_EXPORT
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
 # Input
-HEADERS += screenshot/screenshot.h \
-    screenshot/selecttargetimagewidget.h \
-    dataexport/dataoutputdialog.h \
-    preference/preferenceswindow.h \
-    plugin/pluginmanager/pluginmanagerwindow.h \
-    plugin/pluginmanager/plugininfomodel.h \
-    plugin/guiinterface.h \
-    progress/progressdlg.h \
-    widgetbase/systemtrayiconbase.h \
-    imageresourcebase.h \
-    plugin/guipluginbase.h \
-    login/loginbase.h \
-    settingsbase.h \
-    databaseconnecter/databaseconnecter.h \
-    databaseconnecter/databaseconnecterdialog.h \
-    login/logindlg.h \
-    dataprint.h \
-    widgetbase/mainwindowbase.h \
-    widgetbase/widgetbase.h \
-    guilib.h
-FORMS += screenshot/screenshot.ui \
-    screenshot/selecttargetimagewidget.ui \
-    dataexport/dataoutputdialog.ui \
-    preference/preferenceswindow.ui \
-    plugin/pluginmanager/pluginmanagerwindow.ui \
-    progress/progressdlg.ui \
-    databaseconnecter/databaseconnecterdialog.ui \
-    login/logindlg.ui
-SOURCES += screenshot/screenshot.cpp \
-    screenshot/selecttargetimagewidget.cpp \
-    dataexport/dataoutputdialog.cpp \
-    preference/preferenceswindow.cpp \
-    plugin/pluginmanager/pluginmanagerwindow.cpp \
-    plugin/pluginmanager/plugininfomodel.cpp \
-    progress/progressdlg.cpp \
-    widgetbase/systemtrayiconbase.cpp \
-    imageresourcebase.cpp \
-    plugin/guipluginbase.cpp \
-    login/loginbase.cpp \
-    settingsbase.cpp \
-    databaseconnecter/databaseconnecter.cpp \
-    databaseconnecter/databaseconnecterdialog.cpp \
-    login/logindlg.cpp \
-    dataprint.cpp \
-    widgetbase/mainwindowbase.cpp \
-    widgetbase/widgetbase.cpp
 
-RESOURCES += \
-            gui.qrc
 # ##
 # DESTDIR = $${LIB_PATH}
 # DLLDESTDIR = ../../bin

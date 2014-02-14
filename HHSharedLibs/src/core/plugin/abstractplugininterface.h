@@ -34,7 +34,7 @@
 #define ABSTRACTPLUGININTERFACE_H_
 
 //#include <QObject>
-#include "../mysharedlib_global.h"
+#include "../core_lib.h"
 
 
 namespace HEHUI {

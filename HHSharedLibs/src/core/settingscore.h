@@ -35,7 +35,7 @@
 #include <QSettings>
 #include <QCoreApplication>
 
-#include "mysharedlib_global.h"
+#include "core_lib.h"
 
 
 class CORE_LIB_API SettingsCore : public QSettings

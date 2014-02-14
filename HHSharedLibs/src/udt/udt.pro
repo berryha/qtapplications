@@ -1,4 +1,4 @@
-include(udt.pri)
+include(udt_lib.pri)
 isEmpty(LIB_NAME):LIB_NAME = HHSharedUDT
 
 # ##
@@ -16,8 +16,10 @@ QT -= gui
 
 # include config file
 include( ../buildlib_config.pri )
-#UDT
-#include( ./udt/build_with_udt.pri )
+
+# include source 
+include(udt_source.pri)
+#include UDT Source
 include( ./build_with_udt.pri )
 
 DEFINES += UDT_LIBRARY_EXPORT
@@ -32,16 +34,7 @@ DEPENDPATH += $${INCLUDEPATH}
 # OBJECTS_DIR = ./tmp
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
-# Input
-HEADERS += \
-    udtlib.h \
-    udtprotocolbase.h #\
-    #udtprotocolforfiletransmission.h \
 
-SOURCES += \
-    udtprotocolbase.cpp #\
-    #udtprotocolforfiletransmission.cpp
-RESOURCES += 
 
 ####Add the following code to "udt.h" before "#define NO_BUSY_WAITING" ####
 #ifdef WIN32
@@ -65,7 +58,7 @@ win32 {
     #win32-g++:DEFINES += __MINGW__
     win32-g++{
         DEFINES += __MINGW__
-        INCLUDEPATH += resources/lib/WinAPI_GCC
+        #INCLUDEPATH += resources/lib/WinAPI_GCC
         #LIBS += -Lresources/lib/WinAPI_GCC
     }
 

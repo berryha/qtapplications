@@ -67,4 +67,4 @@
 */
 
 
-#endif // MYSHAREDLIB_GLOBAL_H
+#endif // WMLIB_H

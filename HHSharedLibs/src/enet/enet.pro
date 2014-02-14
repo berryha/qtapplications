@@ -1,4 +1,4 @@
-include(enet.pri)
+include(enet_lib.pri)
 isEmpty(LIB_NAME):LIB_NAME = HHSharedENET
 
 # ##
@@ -16,7 +16,10 @@ QT -= gui
 
 # include config file
 include( ../buildlib_config.pri )
-#ENET
+
+# include source 
+include(enet_source.pri)
+#ENET Source
 include( ./build_with_enet.pri )
 
 DEFINES += ENET_LIBRARY_EXPORT
@@ -31,14 +34,7 @@ DEPENDPATH += $${INCLUDEPATH}
 # OBJECTS_DIR = ./tmp
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
-# Input
-HEADERS += \
-    enetprotocolbase.h \
-    enetprotocolbase_p.h
 
-SOURCES += \
-    enetprotocolbase.cpp
-RESOURCES += 
 
 
 
@@ -61,7 +57,7 @@ INSTALLS += target
 QMAKE_TARGET_COMPANY = "ENET"
 QMAKE_TARGET_PRODUCT = "ENET 1.3"
 QMAKE_TARGET_DESCRIPTION = "UDP-based data transfer protocol"
-QMAKE_TARGET_COPYRIGHT = "Copyright (c) 2002-2013 Lee Salzman"
+QMAKE_TARGET_COPYRIGHT = "Copyright (c) 2002-2014 Lee Salzman"
 PACKAGE_DOMAIN = "http://enet.bespin.org"
 
 

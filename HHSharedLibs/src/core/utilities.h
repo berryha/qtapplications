@@ -40,7 +40,7 @@
 #include <QTranslator>
 #include <QMutex>
 
-#include "mysharedlib_global.h"
+#include "core_lib.h"
 
 
 

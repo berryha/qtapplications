@@ -41,7 +41,7 @@
 #include <QByteArray>
 #include <QCryptographicHash>
 
-#include "../mysharedlib_global.h"
+#include "../core_lib.h"
 
 
 using namespace std;

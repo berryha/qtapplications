@@ -39,7 +39,7 @@
 #include <QSqlError>
 
 #include "../global_core.h"
-#include "../mysharedlib_global.h"
+#include "../core_lib.h"
 
 
 class CORE_LIB_API DatabaseUtility :public QObject {

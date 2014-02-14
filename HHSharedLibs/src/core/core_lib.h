@@ -1,6 +1,6 @@
 /*
  ****************************************************************************
- * mysharedlib_global.h
+ * core_lib.h
  *
  * Created on: 2009-4-27
  *     Author: 贺辉
@@ -29,8 +29,8 @@
 
 
 
-#ifndef MYSHAREDLIB_GLOBAL_H
-#define MYSHAREDLIB_GLOBAL_H
+#ifndef CORELIB_H
+#define CORELIB_H
 
 
 #include <QtCore/QtGlobal>
@@ -66,4 +66,4 @@
 */
 
 
-#endif // MYSHAREDLIB_GLOBAL_H
+#endif // CORELIB_H
