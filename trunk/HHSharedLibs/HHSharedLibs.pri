@@ -25,7 +25,7 @@ isEmpty(HHSharedLibs){
 }
 
 contains(HHSharedLibs, HHSharedCore){
-    include(src/core/core.pri)
+    include(src/core/core_lib.pri)
     INCLUDEPATH += src/core
     DEPENDPATH += src/core
     #HEADERS += $${HHSHAREDLIBS_ROOT_PATH}/include/HHSharedCore
@@ -34,26 +34,26 @@ contains(HHSharedLibs, HHSharedCore){
 }
 
 contains(HHSharedLibs, HHSharedGUI){
-    include(src/gui/gui.pri)
+    include(src/gui/gui_lib.pri)
     INCLUDEPATH += src/gui
     DEPENDPATH += src/gui
     #HEADERS += ./include/HHSharedGUI
 }
 
 contains(HHSharedLibs, HHSharedNetwork){
-    include(src/network/network.pri)
+    include(src/network/network_lib.pri)
     INCLUDEPATH += src/network
     DEPENDPATH += src/network
 }
 
 contains(HHSharedLibs, HHSharedService){
-    include(src/service/service.pri)
+    include(src/service/service_lib.pri)
     INCLUDEPATH += src/service
     DEPENDPATH += src/service
 }
 
 contains(HHSharedLibs, HHSharedUDT){
-    include(src/udt/udt.pri)
+    include(src/udt/udt_lib.pri)
     INCLUDEPATH += src/udt
     DEPENDPATH += src/udt
 
@@ -61,14 +61,14 @@ contains(HHSharedLibs, HHSharedUDT){
 }
 
 contains(HHSharedLibs, HHSharedENET){
-    include(src/enet/enet.pri)
+    include(src/enet/enet_lib.pri)
     INCLUDEPATH += src/enet
     DEPENDPATH += src/enet
 }
 
 win32{
     contains(HHSharedLibs, HHSharedWindowsManagement){
-        include(src/windowsmanagement/windowsmanagement.pri)
+        include(src/windowsmanagement/windowsmanagement_lib.pri)
         INCLUDEPATH += src/windowsmanagement
         DEPENDPATH += src/windowsmanagement
     }

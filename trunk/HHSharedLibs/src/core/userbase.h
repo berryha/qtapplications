@@ -36,7 +36,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 
-#include "mysharedlib_global.h"
+#include "core_lib.h"
 
 namespace HEHUI {
 

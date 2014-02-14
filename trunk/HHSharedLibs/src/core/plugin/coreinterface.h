@@ -36,7 +36,7 @@
 #include <QObject>
 
 #include "abstractplugininterface.h"
-#include "../mysharedlib_global.h"
+#include "../core_lib.h"
 
 
 namespace HEHUI {

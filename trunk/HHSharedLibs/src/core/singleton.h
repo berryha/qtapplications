@@ -32,7 +32,7 @@
 #include <QMetaObject>
 
 
-#include "mysharedlib_global.h"
+#include "core_lib.h"
 
 
 class CORE_LIB_API SingletonExpose

@@ -65,4 +65,4 @@
 */
 
 
-#endif // MYSHAREDLIB_GLOBAL_H
+#endif // GUILIB_H

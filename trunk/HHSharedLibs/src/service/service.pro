@@ -1,5 +1,5 @@
 
-include(service.pri)
+include(service_lib.pri)
 
 isEmpty(LIB_NAME){
     LIB_NAME = HHSharedService
@@ -17,6 +17,9 @@ QT += core
 # include config file
 include( ../buildlib_config.pri )
 
+# include source 
+include(service_source.pri)
+
 # include the service
 CONFIG( debug, debug|release ) {
         #Output Debugging Messages
@@ -25,12 +28,6 @@ CONFIG( debug, debug|release ) {
 include(./3rdparty/qtservice/src/qtservice.pri)
 
 DEFINES += SERVICE_LIBRARY_EXPORT
-
-DEPENDPATH += . \
-            service
-INCLUDEPATH += . \
-        service
-
 
 
 
@@ -41,26 +38,7 @@ INCLUDEPATH += . \
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
 
-# Input
-HEADERS += \
-    service/service.h \
-    servicelib.h
-SOURCES += service/service.cpp
-FORMS += 
 
-
-RESOURCES += 
-win32 { 
-    HEADERS += 
-    SOURCES += 
-    INCLUDEPATH +=
-    LIBS += 
-
-}
-unix { 
-    HEADERS += 
-    SOURCES += 
-}
 
 
 

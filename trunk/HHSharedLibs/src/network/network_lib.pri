@@ -4,8 +4,9 @@
 
 
 
-LIB_NAME = HHSharedService
+LIB_NAME = HHSharedNetwork
 
 include(../common.pri)
+
 
 

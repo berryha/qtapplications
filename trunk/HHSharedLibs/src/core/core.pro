@@ -1,4 +1,4 @@
-include(core.pri)
+include(core_lib.pri)
 isEmpty(LIB_NAME):LIB_NAME = HHSharedCore
 
 # ##
@@ -16,7 +16,11 @@ QT -= gui
 # include config file
 include(../buildlib_config.pri)
 
+# include source 
+include(core_source.pri)
+
 DEFINES += CORE_LIB_LIBRARY_EXPORT
+
 
 # #
 # DEFINES += MYSHAREDLIB_LIBRARY_EXPORT
@@ -31,38 +35,7 @@ DEFINES += CORE_LIB_LIBRARY_EXPORT
 # MOC_DIR = ./tmp
 # RCC_DIR = ./tmp
 # Input
-HEADERS += logdebug.h \
-    cryptography/tea/teacrypt.h \
-    cryptography/cryptography.h \
-    plugin/abstractplugininterface.h \
-    plugin/coreinterface.h \
-    plugin/pluginmanager.h \
-    plugin/corepluginbase.h \
-    userbase.h \
-    utilities.h \
-    settingscore.h \
-    global_core.h \
-    database/databaseutility.h \
-    mysharedlib_global.h \
-    singleton.h \
-    user.h \
-    error.h
-FORMS += 
-SOURCES += cryptography/tea/teacrypt.cpp \
-    cryptography/cryptography.cpp \
-    plugin/pluginmanager.cpp \
-    plugin/corepluginbase.cpp \
-    userbase.cpp \
-    utilities.cpp \
-    settingscore.cpp \
-    database/databaseutility.cpp \
-    singleton.cpp \
-    user.cpp \
-    error.cpp
-RESOURCES += 
-win32:LIBS += -Lresources/lib \
-    -lwsock32 \
-    -lws2_32
+
 
 # ##
 # DESTDIR = $${LIB_PATH}

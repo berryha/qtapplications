@@ -64,4 +64,4 @@
 */
 
 
-#endif // MYSHAREDLIB_GLOBAL_H
+#endif // NETWORKLIB_H

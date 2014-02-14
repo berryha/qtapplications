@@ -66,4 +66,4 @@
 */
 
 
-#endif // MYSHAREDLIB_GLOBAL_H
+#endif // SERVICELIB_H
