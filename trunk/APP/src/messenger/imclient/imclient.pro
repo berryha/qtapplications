@@ -17,16 +17,13 @@ HHSharedLibs += HHSharedCore \
     HHSharedNetwork \
     HHSharedUDT
 include(../../HHSharedLibs.pri)
+
 HHSharedLibs += HHSharedIM
 include (../sharedim/sharedim.pri)
 
 #
 UI_DIR = ./ui
 
-# ##
-DEPENDPATH += .
-INCLUDEPATH += . \
-               chatwindow
 
 # Input
 HEADERS += contactinfowidget/contactinfowidget.h \
