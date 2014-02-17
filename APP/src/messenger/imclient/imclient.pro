@@ -127,6 +127,8 @@ RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/chatmessagewindow/chatmessagewindow.qrc \
     resources.qrc
 
+INCLUDEPATH += chatwindow
+
 # win32:RC_FILE = iconresource.rc
 #win32:APP_ICON = resources/images/app.ico
 win32:RC_ICONS = resources/images/app.ico
