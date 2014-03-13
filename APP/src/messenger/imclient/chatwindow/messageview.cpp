@@ -31,16 +31,14 @@
 #include "messageview.h"
 
 
-
-
 #include <QWebElement>
 #include <QFile>
 
 
 
-
 #include "../servertime/servertime.h"
 #include "../settings.h"
+#include "../imageviewer/imageviewer.h"
 
 
 
@@ -242,6 +240,10 @@ void MessageView::linkClicked(const QUrl & url){
         QString localCacheImage = imageCachePath + "/" + imageName;
         if(QFile::exists(localCacheImage)){
             //TODO:Show image
+            QStringList images;
+            images.append(localCacheImage);
+            ImageViewer::instance()->show();
+            ImageViewer::instance()->setImages(images);
         }else{
             //Download image
             updateImage(imageName, ImageDownloading);

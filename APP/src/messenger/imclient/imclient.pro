@@ -9,6 +9,8 @@ QT += core \
     xml \
     webkit \
     webkitwidgets
+qtHaveModule(printsupport): QT += printsupport
+
 
 # include config file
 include( ../config.pri )
@@ -65,7 +67,10 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     contactbox/contactwidget.h \
     contactbox/contactbox.h \
     chatwindow/messageview.h \
-    chatwindow/messagehistoryview.h
+    chatwindow/messagehistoryview.h \
+    imageviewer/animationcontroler.h \
+    imageviewer/imageviewer.h \
+    imageviewer/imageviewercontroler.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -105,7 +110,10 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     contactbox/contactwidget.cpp \
     contactbox/contactbox.cpp \
     chatwindow/messageview.cpp \
-    chatwindow/messagehistoryview.cpp
+    chatwindow/messagehistoryview.cpp \
+    imageviewer/animationcontroler.cpp \
+    imageviewer/imageviewer.cpp \
+    imageviewer/imageviewercontroler.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
@@ -121,11 +129,15 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     search/addcontactdialog.ui \
     deletecontactdialog/deletecontactdialog.ui \
     contactbox/contactwidget.ui \
-    chatwindow/messagehistoryview.ui
+    chatwindow/messagehistoryview.ui \
+    imageviewer/animationcontroler.ui \
+    imageviewer/imageviewercontroler.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
     resources/images/chatmessagewindow/chatmessagewindow.qrc \
+    resources/images/imageviewer/imageviewer.qrc \
     resources.qrc
+
 
 INCLUDEPATH += chatwindow
 
