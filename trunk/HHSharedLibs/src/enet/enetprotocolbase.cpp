@@ -197,7 +197,7 @@ void ENETProtocolBasePrivate::waitForIO(int msecTimeout){
         case ENET_EVENT_TYPE_CONNECT:
         {
             ENetPeer *peer = event.peer;
-            qDebug()<<"------CONNECT-----Peer:"<<event.peer<<" connectID:"<<event.peer->connectID;
+            qDebug()<<"------CONNECT-----Peer:"<<peer<<" connectID:"<<peer->connectID;
 
             peersHash.insert(peer->connectID, peer);
 
@@ -219,6 +219,7 @@ void ENETProtocolBasePrivate::waitForIO(int msecTimeout){
         case  ENET_EVENT_TYPE_DISCONNECT: //失去连接
         {
             ENetPeer *peer = event.peer;
+            qDebug()<<"------DISCONNECT-----Peer:"<<peer<<" connectID:"<<peer->connectID;
 
             ENetAddress remote = peer->address;
             char ip[256];
@@ -226,8 +227,6 @@ void ENETProtocolBasePrivate::waitForIO(int msecTimeout){
 
             quint32 peerID = peersHash.key(event.peer);
             peersHash.remove(peerID);
-
-            qDebug()<<"------DISCONNECT-----peer:"<<peer;
 
             emit disconnected(peerID, QString(ip), remote.port);
 
