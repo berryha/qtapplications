@@ -118,16 +118,17 @@ void IMUserBase::init(){
     personalMessage = "";
 
 //    interestGroups.clear();
-    
-    personalDetailInfoVersion = 0;
-    personalContactGroupsInfoVersion = 0;
     interestGroupInfoVersion = 0;
 
+    personalSummaryInfoVersion = 0;
+    personalDetailInfoVersion = 0;
+    personalContactGroupsInfoVersion = 0;
 
     onlineState = IM::ONLINESTATE_OFFLINE;
     friendshipApply = FA_AUTO_ACCEPT;
     shortTalk = ST_PROMPT;
     userRole = 0;
+    accountState = AS_Normal;
 
     sessionEncryptionKey = encryptedPassword();
     

@@ -999,11 +999,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     {
 
         QByteArray encryptedData;
-        QString contactID = peerID;
         in >> encryptedData;
 
         QByteArray decryptedData;
-        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(contactID), false);
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
         //TODO
         QDataStream stream(&decryptedData, QIODevice::ReadOnly);
         stream.setVersion(QDataStream::Qt_4_8);
@@ -1011,7 +1010,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         QString senderID = "", message = "";
         stream  >> interestGroupID >> senderID >> message;
 
-        emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, contactID, message, ServerTime::instance()->timeString());
+        emit signalInterestGroupChatMessageReceivedFromContact(interestGroupID, senderID, message, ServerTime::instance()->timeString());
 
     }
         break;
