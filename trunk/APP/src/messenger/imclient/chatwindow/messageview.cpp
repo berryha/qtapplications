@@ -121,7 +121,8 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
         if(!imageSRC.trimmed().startsWith("qrc:/", Qt::CaseInsensitive)){
             QString localCacheImage = imageCachePath + "/" + imageSRC;
             if(QFile::exists(localCacheImage)){
-                element.setAttribute("src", "file://" + localCacheImage);
+                //element.setAttribute("src", "file://" + localCacheImage);
+                element.setAttribute("src", QUrl::fromLocalFile(localCacheImage).toString());
             }else{
                 //Need to download the image
                 element.setAttribute("id", imageSRC);
@@ -149,7 +150,7 @@ void MessageView::appendChatMessage(const QString &userID, const QString &displa
 
 //    qDebug();
 
-//    qDebug()<<"HTML:\n"<<m_mainWebFrame->toHtml();
+//    qWarning()<<"HTML:\n"<<m_mainWebFrame->toHtml();
 
 
 }
