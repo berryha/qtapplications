@@ -38,6 +38,7 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QToolTip>
+#include <QScreen>
 
 #include "screenshot.h"
 
@@ -52,20 +53,21 @@ Screenshot::Screenshot(QWidget *parent, Qt::WindowFlags fl)
     ui.setupUi(this);
 
 
-    originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
+//    originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
+    QScreen *screen = QApplication::primaryScreen();
+    if (screen){
+        originalPixmap = screen->grabWindow(0);
+    }else{
+        originalPixmap = QPixmap();
+    }
 
     backgroundImage = QImage(originalPixmap.size(), QImage::Format_ARGB32_Premultiplied);
-
-
 
     drawBackground();
 
     showFullScreen();
 
     m_targetPixmapWidget = 0;
-
-
-
 
 }
 
