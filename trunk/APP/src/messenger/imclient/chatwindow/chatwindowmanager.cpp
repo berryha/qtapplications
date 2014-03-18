@@ -207,6 +207,16 @@ void ChatWindowManager::switchChatWindowDisplayStyle(ChatWindowManager::ChatWind
 
 }
 
+bool ChatWindowManager::isContactChatWindowOpen(const QString &contactID){
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+    return ccw;
+}
+
+bool ChatWindowManager::isInterestGroupChatWindowOpen(int groupID){
+    GroupChatWindow *gcw = m_groupChatWidgetHash.value(groupID);
+    return gcw;
+}
+
 bool ChatWindowManager::closeContactChatWindow(Contact *contact){
 
     Q_ASSERT(contact);
@@ -282,8 +292,64 @@ void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
 
 }
 
+
+
+void ChatWindowManager::processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded){
+
+//    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+//    if(ccw){
+//        if(ccw->isDownloadingImage(imageName)){
+//            ccw->processImageDownloadResult(imageName, downloaded);
+//        }
+//    }
+
+    foreach (ContactChatWidget *ccw, m_contactChatWidgetHash.values()) {
+        if(ccw->isDownloadingImage(imageName)){
+            ccw->processImageDownloadResult(imageName, downloaded);
+        }
+    }
+
+
+    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
+        if(gcw->isDownloadingImage(imageName)){
+            gcw->processImageDownloadResult(imageName, downloaded);
+        }
+    }
+
+}
+
+void ChatWindowManager::processContactHistoryMessage(const QStringList &messages, bool canFetchMore, const QString &contactID){
+
+    Contact *contact = ContactsManager::instance()->getUser(contactID);
+    if(!contact){
+        qCritical()<<"Error:No such contact:"<<contactID;
+        return;
+    }
+
+    ContactChatWidget *contactChatWindow = m_contactChatWidgetHash.value(contactID);
+    if(!contactChatWindow){return;}
+
+    contactChatWindow->processContactHistoryMessage(messages, canFetchMore);
+}
+
+void ChatWindowManager::processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore, quint32 groupID){
+
+    InterestGroup *group = ContactsManager::instance()->getInterestGroup(groupID);
+    if(!group){
+        qCritical()<<"Error:No such interest group:"<<groupID;
+        return;
+    }
+
+
+    GroupChatWindow *groupChatWindow = m_groupChatWidgetHash.value(groupID);
+    if(!groupChatWindow){return;}
+
+    groupChatWindow->processGrouptHistoryMessage(messages, canFetchMore);
+
+}
+
 void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
-    qDebug()<<"----ChatWindowManager::slotNewChatWithContact(const QString &id)~~~";
+    qDebug()<<"----ChatWindowManager::slotNewChatWithContact(const QString &id)~~~ contactID:"<<contactID;
 
     Contact *contact = ContactsManager::instance()->getUser(contactID);
     if(!contact){
@@ -328,7 +394,7 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
         ccw->activateWindow();
         QApplication::alert(ccw);
     }
-        return;
+        break;
     default:
         break;
     }
@@ -340,7 +406,10 @@ void ChatWindowManager::slotNewChatWithContact(const QString &contactID){
     }
 
 
-    showNormal();
+    if(m_chatWindowDisplayStyle != SeparatedChatWindow){
+        showNormal();
+    }
+
     activateWindow();
     raise();
 
@@ -467,68 +536,27 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
     }
 
 
-    update();
-    showNormal();
+    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages = group->takeUnreadMessages();
+    foreach (QString time, unreadMessages.keys()) {
+        groupChatWindow->appendMessageReceivedFromContact(unreadMessages.value(time), 0, time);
+    }
+
+
+    if(m_chatWindowDisplayStyle != SeparatedChatWindow){
+        showNormal();
+    }
+
+    activateWindow();
     raise();
 
-}
-
-void ChatWindowManager::processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded){
-
-//    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
-//    if(ccw){
-//        if(ccw->isDownloadingImage(imageName)){
-//            ccw->processImageDownloadResult(imageName, downloaded);
-//        }
-//    }
-
-    foreach (ContactChatWidget *ccw, m_contactChatWidgetHash.values()) {
-        if(ccw->isDownloadingImage(imageName)){
-            ccw->processImageDownloadResult(imageName, downloaded);
-        }
-    }
-
-
-    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
-        if(gcw->isDownloadingImage(imageName)){
-            gcw->processImageDownloadResult(imageName, downloaded);
-        }
-    }
+//    update();
+//    showNormal();
+//    raise();
 
 }
-
-void ChatWindowManager::processContactHistoryMessage(const QStringList &messages, bool canFetchMore, const QString &contactID){
-
-    Contact *contact = ContactsManager::instance()->getUser(contactID);
-    if(!contact){
-        qCritical()<<"Error:No such contact:"<<contactID;
-        return;
-    }
-
-    ContactChatWidget *contactChatWindow = m_contactChatWidgetHash.value(contactID);
-    if(!contactChatWindow){return;}
-
-    contactChatWindow->processContactHistoryMessage(messages, canFetchMore);
-}
-
-void ChatWindowManager::processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore, quint32 groupID){
-
-    InterestGroup *group = ContactsManager::instance()->getInterestGroup(groupID);
-    if(!group){
-        qCritical()<<"Error:No such interest group:"<<groupID;
-        return;
-    }
-
-
-    GroupChatWindow *groupChatWindow = m_groupChatWidgetHash.value(groupID);
-    if(!groupChatWindow){return;}
-
-    groupChatWindow->processGrouptHistoryMessage(messages, canFetchMore);
-
-}
-
 
 void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interestGroupID, const QString &contactID, const QString &message, const QString &time){
+    qDebug()<<"--ChatWindowManager::slotNewMessageReceivedFromInterestGroup(...) interestGroupID:"<<interestGroupID<<" contactID:"<<contactID<<" message:"<<message;
 
     InterestGroup *group = ContactsManager::instance()->getInterestGroup(interestGroupID);
     if(!group){
@@ -544,7 +572,6 @@ void ChatWindowManager::slotNewMessageReceivedFromInterestGroup(quint32 interest
         qCritical()<<"Error:No such contact:"<<contactID;
         return;
     }
-
 
 
     GroupChatWindow *groupChatWindow = 0;

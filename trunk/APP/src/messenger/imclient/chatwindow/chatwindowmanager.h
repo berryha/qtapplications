@@ -41,6 +41,9 @@ public:
     ChatWindowDisplayStyle getChatWindowDisplayStyle();
     void switchChatWindowDisplayStyle(ChatWindowDisplayStyle style);
 
+    bool isContactChatWindowOpen(const QString &contactID);
+    bool isInterestGroupChatWindowOpen(int groupID);
+
     bool closeContactChatWindow(Contact *contact);
     bool closeInterestGroupChatWindow(InterestGroup *group);
 

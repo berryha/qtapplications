@@ -64,8 +64,8 @@ public:
 //    bool isMemberOfInterestGroup(quint32 groupID);
 
     bool saveInterestGroupMemberToDatabase(quint32 groupID, const QString &userID, quint32 memberRole);
-
     bool saveInterestGroupMembersToDatabase(InterestGroup *interestGroup);
+    bool fetchAllInterestGroupMembers(InterestGroup *interestGroup);
 
     bool saveContactChatMessageToDatabase(const QString &senderID, const QString &receiverID, const QString &message, const QString &time = "");
     bool saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time = "");
@@ -120,7 +120,6 @@ public slots:
 
     bool getContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID, QStringList *messages, bool *canFetchMore);
     bool getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID, QStringList *messages, bool *canFetchMore);
-
 
 
     bool openDatabase(bool reopen = false);

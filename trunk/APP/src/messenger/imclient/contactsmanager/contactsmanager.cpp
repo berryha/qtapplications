@@ -156,6 +156,8 @@ bool ContactsManager::loadInterestGroups(){
         interestGroupsHash.insert(groupID, interestGroup);
         //m_myself->addInterestGroup(groupID);
 
+        fetchAllInterestGroupMembers(interestGroup);
+
         qApp->processEvents();
     }
     
@@ -349,10 +351,43 @@ bool ContactsManager::saveInterestGroupMembersToDatabase(InterestGroup *interest
         
     }
     
-    
-    
     return true;
     
+}
+
+bool ContactsManager::fetchAllInterestGroupMembers(InterestGroup *interestGroup){
+
+    if(!interestGroup){
+        qCritical()<<"ERROR! Invalid InterestGroup!";
+        return false;
+    }
+
+    if(!localUserDataDB.isValid()){
+        if(!openDatabase()){
+            return false;
+        }
+    }
+    QSqlQuery query(localUserDataDB);
+
+    quint32 groupID = interestGroup->getGroupID();
+    QString statement = QString("select MemberID, MemberRole from interestgroupmembers where GroupID=%1 ").arg(groupID);
+    if(!query.exec(statement)){
+        QSqlError error = query.lastError();
+        QString msg = QString("Can not query interest group members from database! Group ID:%1, %2 Error Type:%3 Error NO.:%4").arg(groupID).arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<<msg;
+        return false;
+    }
+
+    QHash<QString, InterestGroup::MemberRole> membersHash;
+
+    while (query.next()) {
+        membersHash.insert(query.value(0).toString(), InterestGroup::MemberRole(query.value(1).toUInt()));
+    }
+
+    interestGroup->setMembersHash(membersHash);
+
+    return true;
+
 }
 
 bool ContactsManager::saveContactChatMessageToDatabase(const QString &senderID, const QString &receiverID, const QString &message, const QString &time){
@@ -390,9 +425,10 @@ bool ContactsManager::saveContactChatMessageToDatabase(const QString &senderID, 
 }
 
 bool ContactsManager::saveInterestGroupChatMessageToDatabase(const QString &senderID, quint32 interestGroupID, const QString &message, const QString &time){
+    qDebug()<<"--ContactsManager::saveInterestGroupChatMessageToDatabase(...) senderID:"<<senderID<<" interestGroupID:"<<interestGroupID<<" message:"<<message;
 
     if(message.isEmpty()){
-        qWarning()<<"Empty InterestGroupID Chat Message!";
+        qWarning()<<"Empty Interest Group Chat Message!";
         return false;
     }
 
@@ -1833,7 +1869,7 @@ bool ContactsManager::openDatabase(bool reopen){
 }
 
 bool ContactsManager::initLocalDatabase(QString *errorMessage){
-    qWarning()<<"--ContactsManager::initLocalDatabase(...)";
+    //qWarning()<<"--ContactsManager::initLocalDatabase(...)";
 
     if(!localUserDataDB.isValid() || !localUserDataDB.isOpen()){
         if(errorMessage){

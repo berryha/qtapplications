@@ -256,10 +256,7 @@ void MessageView::linkClicked(const QUrl & url){
 
     }
 
-
-
     qDebug()<<"URL scheme:"<<scheme<<" host:"<<url.host()<<" userInfo:"<<url.userInfo();
-
 
 }
 

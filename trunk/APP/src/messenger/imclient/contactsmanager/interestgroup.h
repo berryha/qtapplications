@@ -12,7 +12,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QStringList>
-#include <QHash>
+#include <QMap>
 
 #include "../../sharedim/interestgroupbase.h"
 
@@ -23,10 +23,13 @@ class InterestGroup : public InterestGroupBase {
     Q_OBJECT
 public:
     InterestGroup(quint32 groupID = 0, const QString &groupName = "", QObject *parent = 0);
-	virtual ~InterestGroup();
+    virtual ~InterestGroup();
 
 
-        QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
+    QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
+
+    void appandUnreadMessage(const QString &time, const QString &message);
+    QMap<QString/*Time String*/, QString/*Message*/> takeUnreadMessages();
 
 
 protected:
@@ -34,6 +37,7 @@ protected:
 private:
     
 
+    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages;
 
 
 

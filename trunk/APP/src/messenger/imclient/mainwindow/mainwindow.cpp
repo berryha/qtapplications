@@ -2349,7 +2349,8 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
 
     m_contactsManager->saveContactChatMessageToDatabase(contactID, m_myUserID, message, timeString);
 
-    if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
+    //if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
+    if(chatWindowManager->isContactChatWindowOpen(contactID) || autoShowChatMessageFromContact){
         chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, timeString);
     }else{
 
@@ -2428,10 +2429,14 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
     m_contactsManager->saveInterestGroupChatMessageToDatabase(contactID, interestGroupID, message, timeString);
 
 
-    if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
+//    if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
+    if(chatWindowManager->isInterestGroupChatWindowOpen(interestGroupID) || autoShowChatMessageFromContact){
         chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, timeString);
     }else{
         //TODO:
+        group->appandUnreadMessage(timeString, message);
+
+
         QHash<QString/*Time*/, QVariant/*Contact ID, Message*/ > data;
         //QHash<QString/*Time*/, QStringList/*Contact ID, Message*/ > data;
 
@@ -2725,22 +2730,23 @@ void MainWindow::slotProcessInterestGroupMembersInfo(const QString &interestGrou
         InterestGroup::MemberRole memberRole = InterestGroup::MemberRole(list.at(2).toUInt());
         membersHash.insert(contactID, memberRole);
 
-        qDebug()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
         if(contactID == m_myself->getUserID()){continue;}
+        qDebug()<<"contactID:"<<contactID<<" contactInfoVersion:"<<contactInfoVersion<<" memberRole:"<<memberRole;
 
         Contact *contact = m_contactsManager->getUser(contactID);
         if(!contact){
             contact =  m_contactsManager->createNewContact(contactID);
+            //clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
+
 //            contact = new Contact(contactID, this);
-            clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
 //            contactsManager->slotAddNewContactToDatabase(contact);
-        }else{
+        }//else{
             if(contactInfoVersion != contact->getPersonalSummaryInfoVersion()){
                 clientPacketsParser->requestContactInfo(m_socketConnectedToServer, contactID);
             }
-        }
-        
-    }
+        //}
+
+            }
     
     interestGroup->setMembersHash(membersHash);
     
