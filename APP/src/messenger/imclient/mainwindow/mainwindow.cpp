@@ -2385,7 +2385,7 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
 void MainWindow::slotProcessChatMessageCachedOnServer(const QStringList &messages){
     qDebug()<<"--MainWindow::slotProcessChatMessageCachedOnServer(...)";
 
-    qWarning()<<"----ChatMessageCachedOnServer! Messages:"<<messages;
+    qDebug()<<"----ChatMessageCachedOnServer! Messages:"<<messages;
 
 
     foreach (QString messageString, messages) {

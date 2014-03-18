@@ -968,7 +968,7 @@ void ChatMessageWindow::screenshotDone(const QImage &image){
         return ;
     }
 
-    QString format = "png";
+    QString format = "jpg";
     QString fileName = imageCachePath + QString("/Screenshot%1.%2").arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss")).arg(format);
     if(!img.save(fileName, format.toLatin1())){
         QMessageBox::critical(this, tr("Screenshot"), tr("Can not save image!"));

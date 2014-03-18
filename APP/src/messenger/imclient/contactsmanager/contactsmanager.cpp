@@ -1280,7 +1280,7 @@ bool ContactsManager::resetAllContactGroupInDatabase(){
 
 
 bool ContactsManager::getMyInfoFormLocalDatabase(){
-    qWarning()<<"--getMyInfoFormLocalDatabase()";
+    qDebug()<<"--getMyInfoFormLocalDatabase()";
 
 
     if(!localUserDataDB.isValid()){

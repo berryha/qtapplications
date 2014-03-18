@@ -225,7 +225,7 @@ public slots:
             qCritical()<<"Invalid User ID!";
             return false;
         }
-        qWarning()<<"m_myUserID:"<<m_myUserID;
+        qWarning()<<"My User ID:"<<m_myUserID;
 
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
 

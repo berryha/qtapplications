@@ -297,7 +297,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         }
 
-        qWarning()<<"--SERVER_RESPONSE_CLIENT_REQUEST_LOGIN";
+        qDebug()<<"--SERVER_RESPONSE_CLIENT_REQUEST_LOGIN";
     }
         break;
 
@@ -362,7 +362,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         emit signalLoginResultReceived(errorTypeCode, errorMessage);
 
 
-        qWarning()<<"--SERVER_RESPONSE_CLIENT_LOGIN_RESULT";
+        qDebug()<<"--SERVER_RESPONSE_CLIENT_LOGIN_RESULT";
 
     }
         break;
@@ -389,7 +389,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalClientLastLoginInfoPacketReceived(extIPAddress, loginTime, LogoutTime, deviceInfo);
 
-        qWarning()<<"--CLIENT_LAST_LOGIN_INFO";
+        qDebug()<<"--CLIENT_LAST_LOGIN_INFO";
     }
         break;
 
@@ -443,7 +443,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
     case quint8(IM::SERVER_RESPONSE_USER_INFO):
     {
-        qWarning()<<"--SERVER_RESPONSE_USER_SUMMARY_INFO";
+        qDebug()<<"--SERVER_RESPONSE_USER_SUMMARY_INFO";
         
 
         //TODO:
@@ -493,7 +493,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalContactGroupsInfoPacketReceived(groupsInfo, personalContactGroupsInfoVersionOnServer);
         
-        qWarning()<<"--CONTACT_GROUPS_INFO";
+        qDebug()<<"--CONTACT_GROUPS_INFO";
 
     }
         break;
@@ -516,7 +516,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalContactsInfoVersionPacketReceived(contactsInfoVersionString, contactGroupsInfoVersionOnServer);
 
-        qWarning()<<"--CONTACTS_INFO_VERSION";
+        qDebug()<<"--CONTACTS_INFO_VERSION";
 
     }
         break;
