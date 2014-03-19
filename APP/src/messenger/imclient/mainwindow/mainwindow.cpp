@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon) :
 
 
 
-    chatWindowManager = 0;
+    m_chatWindowManager = 0;
     //    expandListViewManager = 0;
     m_userInfoTipWindow = 0;
 
@@ -269,7 +269,7 @@ void MainWindow::initUI(){
     //changeStyle(Settings::instance()->getStyle());
 
 
-    chatWindowManager = ChatWindowManager::instance();
+    m_chatWindowManager = ChatWindowManager::instance();
 
 
     m_contactBox= new ContactBox(ui.pageContacts);
@@ -412,11 +412,11 @@ void MainWindow::startNetwork(){
     connect(clientPacketsParser, SIGNAL(signalFileTXError(int, const QString &, const QByteArray &, quint8 , const QString &)), this, SLOT(processFileTXErrorFromPeer(int, const QString &, const QByteArray &, quint8 , const QString &)), Qt::QueuedConnection);
 
     
-    connect(chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)), Qt::QueuedConnection);
-    connect(chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), Qt::QueuedConnection);
-    connect(chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)), Qt::QueuedConnection);
-    connect(chatWindowManager, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), this, SLOT(getContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), Qt::QueuedConnection);
-    connect(chatWindowManager, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), this, SLOT(getGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), Qt::QueuedConnection);
+    connect(m_chatWindowManager, SIGNAL(signalSendChatMessageToCantact(Contact *, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToContact(Contact *, const QString &, const QStringList &)), Qt::QueuedConnection);
+    connect(m_chatWindowManager, SIGNAL(signalSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), this, SLOT(slotSendChatMessageToInterestGroup(InterestGroup*, const QString &, const QStringList &)), Qt::QueuedConnection);
+    connect(m_chatWindowManager, SIGNAL(signalRequestDownloadImage(const QString &, const QString &)), this, SLOT(requestDownloadImage(const QString &, const QString &)), Qt::QueuedConnection);
+    connect(m_chatWindowManager, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), this, SLOT(getContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), Qt::QueuedConnection);
+    connect(m_chatWindowManager, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), this, SLOT(getGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), Qt::QueuedConnection);
 
 
 
@@ -780,7 +780,7 @@ void MainWindow::slotIconActivated(QSystemTrayIcon::ActivationReason reason)
         times.sort();
         foreach(QString time, times){
             QStringList list = hashData.value(time).toStringList();
-            chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, list.at(0), list.at(1), time);
+            m_chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, list.at(0), list.at(1), time);
         }
 
     }
@@ -1330,7 +1330,7 @@ void MainWindow::getContactHistoryMessage(const QString &startTime, const QStrin
     QStringList messages;
     bool canFetchMore = false;
     m_contactsManager->getContactHistoryMessage(startTime, endTime, content, requestBackword, contactID, &messages, &canFetchMore);
-    chatWindowManager->processContactHistoryMessage(messages, canFetchMore, contactID);
+    m_chatWindowManager->processContactHistoryMessage(messages, canFetchMore, contactID);
 
 }
 
@@ -1339,7 +1339,7 @@ void MainWindow::getGrouptHistoryMessage(const QString &startTime, const QString
     QStringList messages;
     bool canFetchMore = false;
     m_contactsManager->getGrouptHistoryMessage(startTime, endTime, content, requestBackword, groupID, &messages, &canFetchMore);
-    chatWindowManager->processGrouptHistoryMessage(messages, canFetchMore, groupID);
+    m_chatWindowManager->processGrouptHistoryMessage(messages, canFetchMore, groupID);
 }
 
 
@@ -1578,7 +1578,7 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
     }else if(executedAction == &actionDeleteContact){
         if(oldGroupID == ContactGroupBase::Group_Strangers_ID){
             //TODO:Close chat window
-            if(!chatWindowManager->closeContactChatWindow(contact)){
+            if(!m_chatWindowManager->closeContactChatWindow(contact)){
                 return;
             }
             m_contactBox->addOrRemoveContactItem(contact, false);
@@ -1602,7 +1602,7 @@ void MainWindow::handleContextMenuEventOnContact(Contact *contact, const QPoint 
 void MainWindow::requestChatWithContact(Contact *contact){
 
     QString contactID = contact->getUserID();
-    chatWindowManager->slotNewChatWithContact(contactID);
+    m_chatWindowManager->slotNewChatWithContact(contactID);
 
     systemTray->removeAllTrayIconData(contactID);
 }
@@ -1829,6 +1829,8 @@ void MainWindow::slotProcessContactStateChanged(const QString &contactID, quint8
     default:
         break;
     }
+
+    m_chatWindowManager->contactOnlineStateChanged(contact);
 
     update();
 
@@ -2350,8 +2352,8 @@ void MainWindow::slotProcessChatMessageReceivedFromContact(const QString &contac
     m_contactsManager->saveContactChatMessageToDatabase(contactID, m_myUserID, message, timeString);
 
     //if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
-    if(chatWindowManager->isContactChatWindowOpen(contactID) || autoShowChatMessageFromContact){
-        chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, timeString);
+    if(m_chatWindowManager->isContactChatWindowOpen(contactID) || autoShowChatMessageFromContact){
+        m_chatWindowManager->slotNewMessageReceivedFromContact(contactID, message, timeString);
     }else{
 
         m_contactBox->chatMessageReceivedFromContact(contact);
@@ -2430,8 +2432,8 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
 
 
 //    if(chatWindowManager->isVisible() || autoShowChatMessageFromContact){
-    if(chatWindowManager->isInterestGroupChatWindowOpen(interestGroupID) || autoShowChatMessageFromContact){
-        chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, timeString);
+    if(m_chatWindowManager->isInterestGroupChatWindowOpen(interestGroupID) || autoShowChatMessageFromContact){
+        m_chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, timeString);
     }else{
         //TODO:
         group->appandUnreadMessage(contact, message, timeString);
@@ -2489,7 +2491,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
 
     if(image.isNull()){
         qCritical()<<QString("ERROR! Image '%1' downloading failed!").arg(imageName);
-        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        m_chatWindowManager->processImageDownloadResult(contactID, imageName, false);
         return;
     }
 
@@ -2498,7 +2500,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
     if(md5String != fileInfo.baseName()){
         qCritical()<<"ERROR! Image from "<<contactID<<" is damaged!";
 
-        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        m_chatWindowManager->processImageDownloadResult(contactID, imageName, false);
         return;
     }
 
@@ -2511,7 +2513,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
     if (!file.open(QFile::WriteOnly)) {
         qCritical()<< QString("ERROR! Failed to write image '%1'! %2").arg(filePath).arg(file.errorString());
 
-        chatWindowManager->processImageDownloadResult(contactID, imageName, false);
+        m_chatWindowManager->processImageDownloadResult(contactID, imageName, false);
         return ;
     }
     file.write(image);
@@ -2519,7 +2521,7 @@ void MainWindow::slotProcessImageDownloadResult(const QString &contactID, const 
     file.close();
 
 
-    chatWindowManager->processImageDownloadResult(contactID, imageName, true);
+    m_chatWindowManager->processImageDownloadResult(contactID, imageName, true);
 
 }
 
@@ -2841,7 +2843,7 @@ void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const Q
             group->setState(0);
             updateInterestGroupInfoToUI(group);
 
-            chatWindowManager->closeInterestGroupChatWindow(group);
+            m_chatWindowManager->closeInterestGroupChatWindow(group);
         }
         //TODO:Notify User
 
@@ -2857,7 +2859,7 @@ void MainWindow::slotProcessUserJoinOrQuitInterestGroup(quint32 groupID, const Q
         group->updateMemberListInfoVersion();
         //TODO
 
-        chatWindowManager->interestGroupMemberJoinedOrQuitted(groupID, memberID, join);
+        m_chatWindowManager->interestGroupMemberJoinedOrQuitted(groupID, memberID, join);
 
     }
 
@@ -3045,9 +3047,19 @@ void MainWindow::slotQuitInterestGroup(){
 }
 
 void MainWindow::interestGroupItemActivated(QListWidgetItem * item ){
-    QVariant groupID = item->data(Qt::UserRole);
-    chatWindowManager->slotNewChatWithInterestGroup(groupID.toUInt());
-    systemTray->removeAllTrayIconData(groupID.toString());
+
+    QVariant data = item->data(Qt::UserRole);
+    quint32 interestGroupID = data.toUInt();
+//    InterestGroup *group = m_contactsManager->getInterestGroup(interestGroupID);
+//    if(!group){
+//        qCritical()<<"Error:No such interest group:"<<interestGroupID;
+//        return;
+//    }
+//    item->setText(group->getGroupName());
+
+
+    m_chatWindowManager->slotNewChatWithInterestGroup(interestGroupID);
+    systemTray->removeAllTrayIconData(data.toString());
 }
 
 

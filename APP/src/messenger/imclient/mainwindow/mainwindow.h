@@ -233,7 +233,7 @@ private:
     QMenu *trayMenu;
     QMenu *pluginsMenu;
 
-    ChatWindowManager *chatWindowManager;
+    ChatWindowManager *m_chatWindowManager;
 
 
     ContactBox  *m_contactBox;

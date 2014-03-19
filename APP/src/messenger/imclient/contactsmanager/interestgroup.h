@@ -37,6 +37,7 @@ public:
     };
     void appandUnreadMessage(Contact *contact, const QString &message, const QString &time);
     QList<GroupChatMessage> takeUnreadMessages();
+    int unreadMessagesCount();
 
 
 protected:

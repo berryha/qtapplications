@@ -99,6 +99,10 @@ QList<InterestGroup::GroupChatMessage> InterestGroup::takeUnreadMessages(){
     return messages;
 }
 
+int InterestGroup::unreadMessagesCount(){
+    return unreadMessages.size();
+}
+
 
 
 

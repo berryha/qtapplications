@@ -92,6 +92,10 @@ void GroupChatWindow::processImageDownloadResult(const QString &imageName, bool 
 void GroupChatWindow::contactOnlineStateChanged(Contact *contact){
     //TODO
 
+    if(!m_interestGroup->hasMember(contact->getUserID())){
+        return;
+    }
+
     QListWidgetItem * item = memberItem(contact->getUserID());
     if(!item){return;}
 
