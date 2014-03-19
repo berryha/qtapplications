@@ -252,6 +252,10 @@ void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
 
     if(!contact){return;}
 
+    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
+        gcw->contactOnlineStateChanged(contact);
+    }
+
     ContactChatWidget *ccw = m_contactChatWidgetHash.value(contact->getUserID());
     if(!ccw){return;}
     ccw->setWindowIcon(ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
@@ -260,9 +264,6 @@ void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
     switch (m_chatWindowDisplayStyle) {
     case TabbedChatWindow:
     {
-
-//        ccw = findContactChatTabWidget(contact);
-//        if(!ccw){break;}
         ui.tabWidget->setTabIcon(ui.tabWidget->indexOf(ccw), ImageResource::createIconForContact(contact->getFace(), contact->getOnlineState()));
     }
         break;
@@ -283,12 +284,6 @@ void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
     default:
         break;
     }
-
-
-    foreach (GroupChatWindow *gcw, m_groupChatWidgetHash.values()) {
-        gcw->contactOnlineStateChanged(contact);
-    }
-
 
 }
 
