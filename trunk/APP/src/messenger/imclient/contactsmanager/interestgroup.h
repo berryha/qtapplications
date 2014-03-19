@@ -15,6 +15,7 @@
 #include <QMap>
 
 #include "../../sharedim/interestgroupbase.h"
+#include "contact.h"
 
 
 namespace HEHUI {
@@ -28,23 +29,21 @@ public:
 
     QString databaseColumnName(IM::PropertyIDOfGroup propertyID) const;
 
-    void appandUnreadMessage(const QString &time, const QString &message);
-    QMap<QString/*Time String*/, QString/*Message*/> takeUnreadMessages();
+
+    struct GroupChatMessage{
+        Contact *contact;
+        QString message;
+        QString time;
+    };
+    void appandUnreadMessage(Contact *contact, const QString &message, const QString &time);
+    QList<GroupChatMessage> takeUnreadMessages();
 
 
 protected:
 
 private:
-    
 
-    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages;
-
-
-
-
-
-
-
+    QList<GroupChatMessage> unreadMessages;
 
 
 };

@@ -530,16 +530,23 @@ void ChatWindowManager::slotNewChatWithInterestGroup(quint32 interestGroupID){
         groupChatWindow->activateWindow();
         QApplication::alert(groupChatWindow);
     }
-        return;
+        break;
     default:
         break;
     }
 
 
-    QMap<QString/*Time String*/, QString/*Message*/> unreadMessages = group->takeUnreadMessages();
-    foreach (QString time, unreadMessages.keys()) {
-        groupChatWindow->appendMessageReceivedFromContact(unreadMessages.value(time), 0, time);
+    QList<InterestGroup::GroupChatMessage> unreadMessages = group->takeUnreadMessages();
+
+    for(int i=0; i<unreadMessages.size(); i++){
+        InterestGroup::GroupChatMessage chatMessage = unreadMessages.at(i);
+        groupChatWindow->appendMessageReceivedFromContact(chatMessage.message, chatMessage.contact, chatMessage.time);
     }
+
+    //QMap<QString/*Time String*/, QString/*Message*/> unreadMessages = group->takeUnreadMessages();
+//    foreach (QString time, unreadMessages.keys()) {
+//        groupChatWindow->appendMessageReceivedFromContact(unreadMessages.value(time), 0, time);
+//    }
 
 
     if(m_chatWindowDisplayStyle != SeparatedChatWindow){
