@@ -82,20 +82,22 @@ QString InterestGroup::databaseColumnName(IM::PropertyIDOfGroup propertyID) cons
 
 }
 
-void InterestGroup::appandUnreadMessage(const QString &time, const QString &message){
-    unreadMessages.insertMulti(time, message);
+void InterestGroup::appandUnreadMessage(Contact *contact, const QString &message, const QString &time){
+    Q_ASSERT(contact);
+
+    GroupChatMessage chatMessage;
+    chatMessage.contact = contact;
+    chatMessage.message = message;
+    chatMessage.time = time;
+    unreadMessages.append(chatMessage);
 }
 
-QMap<QString/*Time String*/, QString/*Message*/> InterestGroup::takeUnreadMessages(){
+QList<InterestGroup::GroupChatMessage> InterestGroup::takeUnreadMessages(){
 
-    QMap<QString, QString> messages = unreadMessages;
+    QList<GroupChatMessage> messages = unreadMessages;
     unreadMessages.clear();
     return messages;
 }
-
-
-
-
 
 
 

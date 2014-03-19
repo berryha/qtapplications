@@ -2434,7 +2434,7 @@ void MainWindow::slotProcessInterestGroupChatMessagesReceivedFromContact(quint32
         chatWindowManager->slotNewMessageReceivedFromInterestGroup(interestGroupID, contactID, message, timeString);
     }else{
         //TODO:
-        group->appandUnreadMessage(timeString, message);
+        group->appandUnreadMessage(contact, message, timeString);
 
 
         QHash<QString/*Time*/, QVariant/*Contact ID, Message*/ > data;
@@ -3045,7 +3045,9 @@ void MainWindow::slotQuitInterestGroup(){
 }
 
 void MainWindow::interestGroupItemActivated(QListWidgetItem * item ){
-    chatWindowManager->slotNewChatWithInterestGroup(item->data(Qt::UserRole).toUInt());
+    QVariant groupID = item->data(Qt::UserRole);
+    chatWindowManager->slotNewChatWithInterestGroup(groupID.toUInt());
+    systemTray->removeAllTrayIconData(groupID.toString());
 }
 
 
