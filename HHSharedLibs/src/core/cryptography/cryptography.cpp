@@ -34,6 +34,7 @@
 #include "cryptography.h"
 #include "tea/teacrypt.h"
 
+#include <QFile>
 
 
 namespace HEHUI {
@@ -51,6 +52,26 @@ QByteArray Cryptography::MD5(const QByteArray &data){
 
 QByteArray Cryptography::SHA1(const QByteArray &data){
     return QCryptographicHash::hash(data, QCryptographicHash::Sha1);
+}
+
+QString Cryptography::getFileMD5(const QString &fileName){
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly)) {
+        qCritical("ERROR! Failed to open file!");
+        return QString();
+    }
+
+    QCryptographicHash md5Hash(QCryptographicHash::Md5);
+    while (!file.atEnd()) {
+        QByteArray block = file.read(1024);
+        if(block.isEmpty()){
+            qCritical("ERROR! Failed to read file!");
+            return QString();
+        }
+        md5Hash.addData(block);
+    }
+
+    return QString(md5Hash.result().toHex());
 }
 
 /*
