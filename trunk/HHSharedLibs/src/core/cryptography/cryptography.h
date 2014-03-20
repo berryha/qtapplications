@@ -56,6 +56,7 @@ public:
 
     static QByteArray MD5(const QByteArray &data);
     static QByteArray SHA1(const QByteArray &data);
+    static QString getFileMD5(const QString &fileName);
 
 //    int stringToByte(unsigned char* destination, string &source);
     void charToByte(unsigned char* destination, const char *source, int sourceLength);
