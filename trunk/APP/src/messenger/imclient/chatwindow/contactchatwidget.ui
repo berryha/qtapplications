@@ -16,8 +16,11 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
-   <string>ContactChatWindow</string>
+   <string notr="true">ContactChatWindow</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
