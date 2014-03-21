@@ -70,7 +70,9 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     chatwindow/messagehistoryview.h \
     imageviewer/animationcontroler.h \
     imageviewer/imageviewer.h \
-    imageviewer/imageviewercontroler.h
+    imageviewer/imageviewercontroler.h \
+    chatwindow/filetransmitter/filetransmissionlistwidget.h \
+    chatwindow/filetransmitter/progressinfowidget.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -113,7 +115,9 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     chatwindow/messagehistoryview.cpp \
     imageviewer/animationcontroler.cpp \
     imageviewer/imageviewer.cpp \
-    imageviewer/imageviewercontroler.cpp
+    imageviewer/imageviewercontroler.cpp \
+    chatwindow/filetransmitter/filetransmissionlistwidget.cpp \
+    chatwindow/filetransmitter/progressinfowidget.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \
@@ -131,7 +135,9 @@ FORMS += contactinfowidget/contactinfowidget.ui \
     contactbox/contactwidget.ui \
     chatwindow/messagehistoryview.ui \
     imageviewer/animationcontroler.ui \
-    imageviewer/imageviewercontroler.ui
+    imageviewer/imageviewercontroler.ui \
+    chatwindow/filetransmitter/filetransmissionlistwidget.ui \
+    chatwindow/filetransmitter/progressinfowidget.ui
 RESOURCES += resources/images/emoticons/emoticons.qrc \
     resources/images/face/face.qrc \
     resources/images/chatmessagewindow/chatmessagewindow.qrc \

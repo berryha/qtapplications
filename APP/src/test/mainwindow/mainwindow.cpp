@@ -114,6 +114,8 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
     ui.mdiArea->addSubWindow(enetWidget);
     enetWidget->show();
 
+
+
 }
 
 MainWindow::~MainWindow() {
@@ -352,6 +354,7 @@ void MainWindow::setupSystemTray() {
 
     systemTray->setContextMenu(trayMenu);
     systemTray->show();
+
 
 }
 

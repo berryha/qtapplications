@@ -73,7 +73,23 @@ void ChatMessageWindow::closeEvent(QCloseEvent * event){
     }
 
     event->accept();
+}
 
+bool ChatMessageWindow::eventFilter(QObject *obj, QEvent *event){
+
+    switch (event->type()) {
+    case QEvent::DragEnter:
+    case QEvent::DragMove:
+    case QEvent::Drop:
+    {
+        return true;
+    }
+        break;
+    default:
+        break;
+    }
+
+    return QWidget::eventFilter(obj, event);
 }
 
 void ChatMessageWindow::initUI(){
@@ -100,6 +116,8 @@ void ChatMessageWindow::initUI(){
     }
     m_messageView->setHtml(htmlForMessagesView);
     //connect(ui.webView, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
+    m_messageView->installEventFilter(this);
+
 
     ui.labelUnACKedMessage->setBackgroundRole(QPalette::Midlight);
     ui.labelUnACKedMessage->hide();

@@ -5,7 +5,6 @@
 
 
 
-
 #include "./mainwindow/mainwindow.h"
 #include "./shared/app_constants.h"
 

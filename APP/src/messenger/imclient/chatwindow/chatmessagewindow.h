@@ -63,6 +63,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent * event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 
 signals:

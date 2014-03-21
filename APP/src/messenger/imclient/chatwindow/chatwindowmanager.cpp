@@ -287,8 +287,6 @@ void ChatWindowManager::contactOnlineStateChanged(Contact *contact){
 
 }
 
-
-
 void ChatWindowManager::processImageDownloadResult(const QString &contactID, const QString &imageName, bool downloaded){
 
 //    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
