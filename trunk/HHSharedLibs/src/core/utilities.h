@@ -69,6 +69,9 @@ public:
 
     static QString simplifyRichTextFilter(const QString &in, bool *isPlainTextPtr = 0);
 
+    //Get the current time of day, returned in millisecond
+    static quint64 timeGet();
+
 private:
     static QList<QTranslator *>translators;
     static QMutex *translatorsMutex;

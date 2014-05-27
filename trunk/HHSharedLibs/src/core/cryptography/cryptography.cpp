@@ -54,11 +54,11 @@ QByteArray Cryptography::SHA1(const QByteArray &data){
     return QCryptographicHash::hash(data, QCryptographicHash::Sha1);
 }
 
-QString Cryptography::getFileMD5(const QString &fileName){
+QByteArray Cryptography::getFileMD5(const QString &fileName){
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
         qCritical("ERROR! Failed to open file!");
-        return QString();
+        return QByteArray();
     }
 
     QCryptographicHash md5Hash(QCryptographicHash::Md5);
@@ -66,12 +66,16 @@ QString Cryptography::getFileMD5(const QString &fileName){
         QByteArray block = file.read(1024);
         if(block.isEmpty()){
             qCritical("ERROR! Failed to read file!");
-            return QString();
+            return QByteArray();
         }
         md5Hash.addData(block);
     }
 
-    return QString(md5Hash.result().toHex());
+    return md5Hash.result();
+}
+
+QString Cryptography::getFileMD5HexString(const QString &fileName){
+    return QString(getFileMD5(fileName).toHex());
 }
 
 /*

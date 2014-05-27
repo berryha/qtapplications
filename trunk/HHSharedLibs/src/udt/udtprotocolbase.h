@@ -199,7 +199,7 @@ private slots:
     virtual void messageDataReceived(UDTSOCKET socket, QByteArray *data) = 0;
 
 private:
-    struct CachedDataInfo;
+    //struct CachedDataInfo;
     void recycleCachedData(QByteArray *data);
     QByteArray *getCachedData();
 
