@@ -46,10 +46,13 @@
 #include "utilities.h"
 
 #ifdef Q_OS_WIN32
-#include <windows.h>
+    #include <windows.h>
+    #include <time.h>
 #else
-#include <unistd.h>
+    #include <unistd.h>
+    #include <sys/time.h>
 #endif
+
 
 
 
@@ -328,6 +331,19 @@ QString Utilities::simplifyRichTextFilter(const QString &in, bool *isPlainTextPt
     if (isPlainTextPtr)
         *isPlainTextPtr = !paragraphAlignmentFound && elementCount == 4u; //
     return out;
+}
+
+quint64 Utilities::timeGet(){
+#ifdef Q_OS_WIN32
+    return timeGetTime ();
+#else
+    struct timeval timeVal;
+
+    gettimeofday (& timeVal, NULL);
+
+    return timeVal.tv_sec * 1000 + timeVal.tv_usec / 1000;
+#endif
+
 }
 
 

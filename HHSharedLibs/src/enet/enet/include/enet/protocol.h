@@ -5,7 +5,7 @@
 #ifndef __ENET_PROTOCOL_H__
 #define __ENET_PROTOCOL_H__
 
-#include "./types.h"
+#include "enet/types.h"
 
 enum
 {
@@ -17,7 +17,6 @@ enum
    ENET_PROTOCOL_MINIMUM_CHANNEL_COUNT   = 1,
    ENET_PROTOCOL_MAXIMUM_CHANNEL_COUNT   = 255,
    ENET_PROTOCOL_MAXIMUM_PEER_ID         = 0xFFF,
-   ENET_PROTOCOL_MAXIMUM_PACKET_SIZE     = 1024 * 1024 * 1024,
    ENET_PROTOCOL_MAXIMUM_FRAGMENT_COUNT  = 1024 * 1024
 };
 
