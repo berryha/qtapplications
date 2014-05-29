@@ -338,9 +338,7 @@ quint64 Utilities::timeGet(){
     return timeGetTime ();
 #else
     struct timeval timeVal;
-
     gettimeofday (& timeVal, NULL);
-
     return timeVal.tv_sec * 1000 + timeVal.tv_usec / 1000;
 #endif
 
