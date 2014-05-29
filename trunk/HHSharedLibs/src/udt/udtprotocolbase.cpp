@@ -985,7 +985,7 @@ void UDTProtocolBase::processSocketReadyToWrite(UDTSOCKET socket){
         break;
     case BROKEN: //6
     {
-        qWarning()<<"------W---------socket:"<<socket<<" BROKEN";
+        qDebug()<<"------W---------socket:"<<socket<<" BROKEN";
 
         closeSocket(socket);
         emit disconnected(socket);

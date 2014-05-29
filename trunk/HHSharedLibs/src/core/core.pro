@@ -22,6 +22,12 @@ include(core_source.pri)
 DEFINES += CORE_LIB_LIBRARY_EXPORT
 
 
+win32 {
+    win32-g++{
+        LIBS += -lwinmm
+    }
+}
+
 # #
 # DEFINES += MYSHAREDLIB_LIBRARY_EXPORT
 # #
