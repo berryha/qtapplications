@@ -49,7 +49,9 @@ HEADERS += \
     serverlib.h \
     resourcesmanagerinstance.h \
     usersmanager/interestgroup.h \
-    usersmanager/contactgroup1.h
+    usersmanager/contactgroup1.h \
+    filetransmitter/serverfiletransmissionpacketsparser.h \
+    filetransmitter/serverfiletransmissionmanager.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \
@@ -59,7 +61,9 @@ SOURCES += \
     usersmanager/userinfo.cpp \
     resourcesmanagerinstance.cpp \
     usersmanager/contactgroup.cpp \
-    usersmanager/interestgroup.cpp
+    usersmanager/interestgroup.cpp \
+    filetransmitter/serverfiletransmissionmanager.cpp \
+    filetransmitter/serverfiletransmissionpacketsparser.cpp
 FORMS += 
 RESOURCES += resources.qrc
 win32 { 

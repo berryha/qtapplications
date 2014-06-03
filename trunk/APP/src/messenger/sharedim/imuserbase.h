@@ -243,10 +243,9 @@ public:
         return this->lastLoginDeviceInfo;
     }
 
-
-
-
-
+    void setSocketID(int socketID){this->m_socketID = socketID;}
+    int getSocketID(){return m_socketID;}
+    bool isConnected(){return m_socketID != INVALID_SOCK_ID;}
 
 
 
@@ -352,6 +351,9 @@ private:
     QMutex *updatedPropertiesMutex;
 
     QString lastLoginDeviceInfo;
+
+    int m_socketID;
+
 
 
 };

@@ -173,6 +173,9 @@ private slots:
     void getGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID);
 
 
+
+
+
     void on_toolButtonUserFace_clicked(){showUserInfo(m_myself);}
     void showUserInfo(IMUserBase *user);
 
@@ -192,18 +195,24 @@ private slots:
     void peerDisconnected(int socketID);
 
 //////////////////////////////
-    //File TX
-    void startFileManager();
-    void processContactRequestUploadFilePacket(int socketID, const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size, const QString &localFileSaveDir);
-    void processContactRequestDownloadFilePacket(int socketID, const QString &contactID, const QString &localBaseDir, const QString &fileName, const QString &remoteFileSaveDir);
-    void processFileDataRequestPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
-    void processFileDataReceivedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
-    void processFileTXStatusChangedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status);
-    void processFileTXErrorFromPeer(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+    //FILE TX
+    void slotSendUploadingFileRequest(Contact *contact, const QString &filePath, const QByteArray &fileMD5);
+    void slotCancelSendingFileRequest(Contact *contact, const QByteArray &fileMD5);
+    void slotAcceptPeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5, const QString &localSavePath);
+    void slotDeclinePeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5);
 
-    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
-    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
+
+    //File TX
+
+
+//    void processFileDataRequestPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int startPieceIndex, int endPieceIndex);
+//    void processFileDataReceivedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &sha1);
+//    void processFileTXStatusChangedPacket(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 status);
+//    void processFileTXErrorFromPeer(int socketID, const QString &contactID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+
+//    void fileDataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+//    void fileTXError(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
+//    void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 
 private:
@@ -254,7 +263,7 @@ private:
     QString m_systemID;
     IM::OnlineState stateBeforeLocking;
 
-    PacketHandlerBase *m_packetHandler;
+    //PacketHandlerBase *m_packetHandler;
     ClientResourcesManager *m_resourcesManager;
     IMClientPacketsParser *clientPacketsParser;
     bool networkStarted;
@@ -279,9 +288,9 @@ private:
     bool m_verified;
     QTimer *m_loginTimer;
 
-    FileManager *m_fileManager;
-    QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
-    QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
+//    FileManager *m_fileManager;
+//    QHash<int/*File TX Request ID*/, int/*Socket ID*/> fileTXRequestHash;
+//    QMultiHash<int/*Socket ID*/, QByteArray/*File MD5*/> fileTXSocketHash;
 
 
 };

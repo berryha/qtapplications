@@ -70,8 +70,7 @@ public:
     //    QString getUpdateSQLStatement() const;
     //    void clearUpdatedProperties();
 
-    void setSocketID(int socketID){this->m_socketID = socketID;}
-    int getSocketID(){return m_socketID;}
+
 
     void setSysID(quint32 sysID){this->m_sysID = sysID;}
     quint32 getSysID(){return m_sysID;}
@@ -110,7 +109,6 @@ private:
     //    QHash<IM::PropertyID/*Property ID*/, QString/*SQL Update Statement*/> updatedProperties;
     //    QMutex *updatedPropertiesMutex;
 
-    int m_socketID;
 
     quint32 m_sysID;
 

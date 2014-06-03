@@ -101,6 +101,35 @@ public slots:
 
     //    }
 
+    bool forwardDataForward(int peerSocketID, const QByteArray &data, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--forwardDataForward(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+
+        packet->setPacketType(quint8(IM::ForwardedDataByServer));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+        out << data;
+
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+    }
+
+
     bool sendServerDeclarePacket(const QHostAddress peerAddress, quint16 peerPort){
         qWarning()<<"--sendServerDeclarePacket(...)"<<" Peer Address:"<<peerAddress.toString()<<":"<<peerPort;
 
@@ -162,7 +191,6 @@ public slots:
         v.setValue(*packet);
         out << v;
         return m_ipmcServer->sendDatagram(ba, targetAddress, targetPort);
-
 
     }
 
@@ -1243,6 +1271,10 @@ public slots:
 
     }
 
+
+
+
+
     void userExceptionalOffline(const QString &peerAddress, quint16 peerPort);
 
 
@@ -1310,7 +1342,7 @@ private:
 
     QMutex mutex;
 
-    QHash<QString/*User ID*/, QByteArray/*Key*/> sessionEncryptionKeysHash;
+//    QHash<QString/*User ID*/, QByteArray/*Key*/> sessionEncryptionKeysHash;
 
     QTimer *checkIMUsersOnlineStateTimer;
 

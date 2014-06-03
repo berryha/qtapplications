@@ -80,8 +80,6 @@ void UserInfo::init(){
     timeToLiftTheBan = QDateTime();
     //    timeLastHeartbeatPacketReceived = QDateTime();
 
-    m_socketID = INVALID_SOCK_ID;
-
     m_sysID = 0;
 
     interestGroups.clear();

@@ -58,6 +58,7 @@ public:
     void processImageDownloadResult(const QString &imageName, bool downloaded);
 
     void appendChatMessage(const QString &message, IMUserBase *sender, const QString &datetime, bool richTextMessage = false);
+    void appendSystemMessage(const QString &message, bool richTextMessage = false);
 
 //    QSize minimumSizeHint();
 
@@ -72,9 +73,6 @@ signals:
     void signalRequestDownloadImage(const QString &contactID, const QString &imageName);
     void signalShowMessageHistory(bool show);
     void signalCloseWindow();
-
-public slots:
-    
 
 private slots:
 

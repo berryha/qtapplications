@@ -1,5 +1,8 @@
 #include "contactchatwidget.h"
 
+#include <QMessageBox>
+
+
 #include "HHSharedCore/hcryptography.h"
 
 
@@ -31,6 +34,9 @@ ContactChatWidget::ContactChatWidget(Contact *contact, QWidget *parent)
     m_preferedSize = QSize();
 
     m_fileTransmissionListWidget = 0;
+
+    m_socketConnectedToPeer = INVALID_SOCK_ID;
+
 
     QTimer::singleShot(1, this, SLOT(setPreferedSize()));
 
@@ -123,13 +129,37 @@ void ContactChatWidget::dropEvent(QDropEvent *event){
         return;
     }
 
-    showFileTransmissionListWidget(true);
+
+    bool userOffline = (m_contact->getOnlineState() == IM::ONLINESTATE_OFFLINE);
+    bool yesToAll = false;
 
     foreach (QString file, files) {
-        QString md5 = Cryptography::getFileMD5(file);
+        QByteArray md5 = Cryptography::getFileMD5(file);
         if(md5.isEmpty()){continue;}
-        m_fileTransmissionListWidget->slotSendFileRequestToContact(file, md5);
+
+        if(userOffline && (!yesToAll)){
+            int ret = QMessageBox::question(this, tr("Contact Offline"),
+                                            tr("Contact is offline! Do you want to send offline file to server?"),
+                                            QMessageBox::YesToAll | QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                            QMessageBox::Yes
+                                            );
+
+            if(ret == QMessageBox::YesToAll){
+                yesToAll = true;
+            }else if(ret == QMessageBox::No){
+                continue;
+            }else if(ret == QMessageBox::Cancel){
+                return;
+            }
+
+        }
+
+        if(!m_fileTransmissionListWidget){
+            showFileTransmissionListWidget(true);
+        }
+        m_fileTransmissionListWidget->slotSendUploadingFileRequest(file, md5, userOffline);
     }
+
 
 }
 
@@ -179,15 +209,14 @@ void ContactChatWidget::showFileTransmissionListWidget(bool show){
         setMinimumSize(QSize(0, 0));
 
         if(!m_fileTransmissionListWidget){
-            m_fileTransmissionListWidget = new FileTransmissionListWidget(this);
+            m_fileTransmissionListWidget = new FileTransmissionListWidget(this, this);
             m_fileTransmissionListWidget->setMinimumWidth(m_fileTransmissionListWidget->width());
-            connect(m_fileTransmissionListWidget, SIGNAL(cancelSendingFileRequest(const QString &)), this, SIGNAL(cancelSendingFileRequest(const QString &)));
-            connect(m_fileTransmissionListWidget, SIGNAL(abortFileTransmission(const QString &)), this, SIGNAL(abortFileTransmission(const QString &)));
-            connect(m_fileTransmissionListWidget, SIGNAL(acceptFileRequest(const QString &, const QString &)), this, SIGNAL(acceptFileRequest(const QString &, const QString &)));
-            connect(m_fileTransmissionListWidget, SIGNAL(declineFileRequest(const QString &)), this, SIGNAL(declineFileRequest(const QString &)));
-            connect(m_fileTransmissionListWidget, SIGNAL(signlaCloseWidget()), this, SLOT(closeFileTransmissionListWidget()));
-
-
+//            connect(m_fileTransmissionListWidget, SIGNAL(sendFileRequest(const QString &, const QByteArray &)), this, SIGNAL(signalSendUploadintFileRequest(const QString &, const QByteArray &)));
+//            connect(m_fileTransmissionListWidget, SIGNAL(cancelSendingFileRequest(const QByteArray &)), this, SIGNAL(signalCancelSendingUploadingFileRequest(const QByteArray &)));
+//            connect(m_fileTransmissionListWidget, SIGNAL(abortFileTransmission(const QByteArray &)), this, SIGNAL(signalAbortFileTransmission(const QByteArray &)));
+//            connect(m_fileTransmissionListWidget, SIGNAL(acceptFileRequest(const QByteArray &, const QString &)), this, SIGNAL(signalAcceptPeerUploadFileRequest(const QByteArray &, const QString &)));
+//            connect(m_fileTransmissionListWidget, SIGNAL(declineFileRequest(const QByteArray &)), this, SIGNAL(signalDeclinePeerUploadFileRequest(const QByteArray &)));
+//            connect(m_fileTransmissionListWidget, SIGNAL(signlaCloseWidget()), this, SLOT(closeFileTransmissionListWidget()));
 
             ui.tabWidget->addTab(m_fileTransmissionListWidget, tr("File Transmitter"));
         }
@@ -205,7 +234,33 @@ void ContactChatWidget::showFileTransmissionListWidget(bool show){
 
 }
 
-void ContactChatWidget::updateFileTransmissionProgress(const QString &fileMD5, int percent){
+void ContactChatWidget::slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QByteArray &fileMD5){
+
+    if(!m_fileTransmissionListWidget){
+        showFileTransmissionListWidget(true);
+    }
+
+    m_fileTransmissionListWidget->slotFileRequestReceivedFromContact(fileName, size, fileMD5);
+
+}
+
+void ContactChatWidget::fileUploadRequestResponsed(const QByteArray &fileMD5Sum, bool accepted, const QString &message){
+    Q_ASSERT(m_fileTransmissionListWidget);
+    if(!m_fileTransmissionListWidget){
+        return;
+    }
+
+    if(accepted){
+        ui.chatMessageWindow->appendSystemMessage("Uploading file request accepted!");
+    }else{
+        ui.chatMessageWindow->appendSystemMessage("Uploading file request denied!!");
+        m_fileTransmissionListWidget->slotCloseProgressInfoWidget(fileMD5Sum);
+    }
+
+}
+
+
+void ContactChatWidget::updateFileTransmissionProgress(const QByteArray &fileMD5, int percent){
     Q_ASSERT(m_fileTransmissionListWidget);
     if(!m_fileTransmissionListWidget){
         return;
@@ -218,6 +273,10 @@ void ContactChatWidget::updateFileTransmissionProgress(const QString &fileMD5, i
 
 void ContactChatWidget::closeFileTransmissionListWidget(){
     showFileTransmissionListWidget(false);
+}
+
+void ContactChatWidget::cancelFileTransmission(const QByteArray &fileMD5Sum){
+    m_fileTransmissionListWidget->slotCloseProgressInfoWidget(fileMD5Sum);
 }
 
 void ContactChatWidget::requestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword){

@@ -343,6 +343,10 @@ void ChatMessageWindow::appendChatMessage(const QString &message, IMUserBase *se
 
 }
 
+void ChatMessageWindow::appendSystemMessage(const QString &message, bool richTextMessage){
+    m_messageView->appendHTML(message);
+}
+
 //QSize ChatMessageWindow::minimumSizeHint(){
 //    return QSize(640, 480);
 //}

@@ -8,15 +8,22 @@
 
 #include <QDebug>
 
+#include "filetransmissionlistwidget.h"
 
-ProgressInfoWidget::ProgressInfoWidget(QWidget *parent) :
+
+//namespace HEHUI {
+
+ProgressInfoWidget::ProgressInfoWidget(FileTransmissionListWidget *wgt, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ProgressInfoWidget)
+    ui(new Ui::ProgressInfoWidget),
+    listWidget(wgt)
 {
     ui->setupUi(this);
 
     m_sendingMode = true;
     //m_transmitting = false;
+
+    Q_ASSERT(wgt);
 
 }
 
@@ -25,7 +32,7 @@ ProgressInfoWidget::~ProgressInfoWidget()
     delete ui;
 }
 
-void ProgressInfoWidget::requestToSendFile(const QString &filePath, const QString &fileMD5){
+void ProgressInfoWidget::requestToSendFile(const QString &filePath, const QByteArray &fileMD5){
     m_sendingMode = true;
     m_filePath = filePath;
     m_fileMD5 = fileMD5;
@@ -38,11 +45,11 @@ void ProgressInfoWidget::requestToSendFile(const QString &filePath, const QStrin
     ui->labelFileName->setText(info.fileName());
     ui->labelFileName->setToolTip(filePath);
 
-    qDebug()<<"---------------MD5:"<<fileMD5;
+    qDebug()<<"---------------MD5:"<<fileMD5.toHex();
 
 }
 
-void ProgressInfoWidget::requestToReceiveFile(const QString &fileName, qint64 size, const QString &fileMD5){
+void ProgressInfoWidget::requestToReceiveFile(const QString &fileName, qint64 size, const QByteArray &fileMD5){
     m_sendingMode = false;
     m_filePath = fileName;
     m_fileMD5 = fileMD5;
@@ -65,19 +72,22 @@ void ProgressInfoWidget::on_toolButtonFile_clicked(){
 }
 
 void ProgressInfoWidget::on_pushButtonSendOfflineFile_clicked(){
-    //TODO
+    listWidget->slotSendUploadingFileRequest(m_filePath, m_fileMD5, true);
 }
 
 void ProgressInfoWidget::on_pushButtonCancel_clicked(){
-    emit cancelSendingFileRequest(m_fileMD5);
+//    emit cancelSendingFileRequest(m_fileMD5);
+    listWidget->slotCancelSendingFileRequest(m_fileMD5);
 }
 
 void ProgressInfoWidget::on_toolButtonAbort_clicked(){
-    emit abortFileTransmission(m_fileMD5);
+//    emit abortFileTransmission(m_fileMD5);
+    listWidget->slotAbortFileTransmission(m_fileMD5);
 }
 
 void ProgressInfoWidget::on_pushButtonAccept_clicked(){
-    emit acceptFileRequest(m_fileMD5, "");
+//    emit acceptFileRequest(m_fileMD5, "");
+    listWidget->slotAcceptFileRequest(m_fileMD5, "");
 }
 
 void ProgressInfoWidget::on_pushButtonSaveAs_clicked(){
@@ -86,13 +96,15 @@ void ProgressInfoWidget::on_pushButtonSaveAs_clicked(){
                                QDir::homePath() + QDir::separator() + m_filePath
                                );
     if(!fileName.isEmpty()){
-        emit acceptFileRequest(m_fileMD5, fileName);
+//        emit acceptFileRequest(m_fileMD5, fileName);
+        listWidget->slotAcceptFileRequest(m_fileMD5, fileName);
     }
 
 }
 
 void ProgressInfoWidget::on_pushButtonDecline_clicked(){
-    emit declineFileRequest(m_fileMD5);
+//    emit declineFileRequest(m_fileMD5);
+    listWidget->slotDeclineFileRequest(m_fileMD5);
 }
 
 QString ProgressInfoWidget::getFileSizeString(qint64 fileSize) const{
@@ -108,3 +120,8 @@ QString ProgressInfoWidget::getFileSizeString(qint64 fileSize) const{
     return sizeString;
 }
 
+
+
+
+
+//} //namespace HEHUI

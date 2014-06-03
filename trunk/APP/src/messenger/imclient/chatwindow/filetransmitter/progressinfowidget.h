@@ -3,28 +3,39 @@
 
 #include <QWidget>
 
+
+
+//namespace HEHUI {
+
+
+
+class FileTransmissionListWidget;
+
+
 namespace Ui {
 class ProgressInfoWidget;
 }
+
 
 class ProgressInfoWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ProgressInfoWidget(QWidget *parent = 0);
+    explicit ProgressInfoWidget(FileTransmissionListWidget *wgt, QWidget *parent = 0);
     ~ProgressInfoWidget();
 
-    void requestToSendFile(const QString &filePath, const QString &fileMD5);
-    void requestToReceiveFile(const QString &fileName, qint64 size, const QString &fileMD5);
+    void requestToSendFile(const QString &filePath, const QByteArray &fileMD5);
+    void requestToReceiveFile(const QString &fileName, qint64 size, const QByteArray &fileMD5);
 
 
 signals:
-    void cancelSendingFileRequest(const QString &fileMD5);
-    void abortFileTransmission(const QString &fileMD5);
 
-    void acceptFileRequest(const QString &fileMD5, const QString &localSavePath);
-    void declineFileRequest(const QString &fileMD5);
+//    void cancelSendingFileRequest(const QString &fileMD5);
+//    void abortFileTransmission(const QString &fileMD5);
+
+//    void acceptFileRequest(const QString &fileMD5, const QString &localSavePath);
+//    void declineFileRequest(const QString &fileMD5);
 
 public slots:
     void updateProgress(int percent);
@@ -48,9 +59,12 @@ private:
     bool m_sendingMode;
     //bool m_transmitting;
     QString m_filePath;
-    QString m_fileMD5;
+    QByteArray m_fileMD5;
 
+    FileTransmissionListWidget *listWidget;
 
 };
+
+//} //namespace HEHUI
 
 #endif // PROGRESSINFOWIDGET_H

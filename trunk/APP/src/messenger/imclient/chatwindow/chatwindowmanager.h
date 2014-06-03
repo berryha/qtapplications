@@ -15,6 +15,10 @@
 #include "groupchatwindow.h"
 #include "contactchatwidget.h"
 
+
+//#include "../../sharedim/filetransmitter/filetransmissionmanager.h"
+#include "filetransmitter/clientfiletransmissionmanager.h"
+
 //#include "../../shared/core/singleton.h"
 #include "HHSharedCore/hsingleton.h"
 
@@ -60,6 +64,19 @@ signals:
     void signalRequestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID);
     void signalRequestGrouptHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, quint32 groupID);
 
+
+    //FILE TX
+    void signalSendUploadingFileRequest(Contact *contact, const QString &filePath, const QByteArray &fileMD5);
+    void signalCancelSendingFileUploadingRequest(Contact *contact, const QByteArray &fileMD5);
+    //void signalAbortFileTransmission(const QString &fileMD5);
+    void signalAcceptPeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5, const QString &localSavePath);
+    void signalDeclinePeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5);
+
+//    void signalCancelSendingFileRequest(const QString &fileMD5);
+//    void signalAbortFileTransmission(const QString &fileMD5);
+//    void signalAcceptFileRequest(const QString &fileMD5, const QString &localSavePath);
+//    void signalDeclineFileRequest(const QString &fileMD5);
+
 public slots:
     void slotNewChatWithContact(const QString &contactID);
     void slotNewMessageReceivedFromContact(const QString &contactID, const QString &message, const QString &time);
@@ -72,6 +89,12 @@ public slots:
     void processContactHistoryMessage(const QStringList &messages, bool canFetchMore, const QString &contactID);
     void processGrouptHistoryMessage(const QStringList &messages, bool canFetchMore, quint32 groupID);
 
+    void contactRequestUploadFile(const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size);
+    void fileUploadRequestResponsed(const QString &contactID, const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+
+    void contactRequestDownloadFile(const QString &contactID, const QString &localBaseDir, const QString &fileName);
+    void fileDownloadRequestAccepted(const QString &contactID, const QString &remoteFileName, const QByteArray &fileMD5Sum, quint64 size);
+    void fileDownloadRequestDenied(const QString &contactID, const QString &remoteFileName, const QString &message);
 
 private slots:
     void initTabWidget();
@@ -90,6 +113,14 @@ private slots:
     void switchToTabbedView();
     void switchToSeparatedView();
 
+    //File TX
+    void sendUploadingFileRequest(const QString &filePath, const QByteArray &fileMD5, bool offline);
+    void cancelSendingFileRequest(const QByteArray &fileMD5);
+    void abortFileTransmission(const QByteArray &fileMD5);
+    void acceptPeerUploadFileRequest(const QByteArray &fileMD5, const QString &localSavePath);
+    void declineFileRequest(const QByteArray &fileMD5);
+
+
 
 private:
     //	bool isChatWindowOpened(Contact *contact);
@@ -98,13 +129,14 @@ private:
     QMdiSubWindow* findChatWithContactMdiSubWindow(Contact *contact);
     ContactChatWidget * findContactChatTabWidget(Contact *contact);
 
-
-
     GroupChatWindow* createInterestGroupChatWindow(InterestGroup *group);
     QMdiSubWindow* findChatWithInterestGroupMdiSubWindow(InterestGroup *group);
     GroupChatWindow * findInterestGroupChatTabWidget(InterestGroup *group);
 
     QMenu * chatHistoryMenu();
+
+    void initFileTransmission();
+
 
 private:
     Ui::ChatWindowManagerClass ui;
@@ -119,6 +151,14 @@ private:
     QList<quint32> m_groupChatHistoryList;
 
 //    QSize m_preferedSize;
+
+
+    ClientFileTransmissionManager *m_fileTransmissionManager;
+    ClientFileTransmissionPacketsParser *m_fileTransmissionPacketsParser;
+    int m_socketConnectedToServer;
+//    QHostAddress serverAddress;
+//    quint16 serverPort;
+
 
 };
 
