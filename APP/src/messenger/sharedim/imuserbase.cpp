@@ -136,8 +136,9 @@ void IMUserBase::init(){
     
 
     lastLoginDeviceInfo = "";
-    
-    
+
+    m_socketID = INVALID_SOCK_ID;
+
 
 }
 

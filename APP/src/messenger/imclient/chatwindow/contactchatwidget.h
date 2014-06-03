@@ -47,16 +47,22 @@ signals:
 
     void signalRequestContactHistoryMessage(const QString &startTime, const QString &endTime, const QString &content, bool requestBackword, const QString &contactID);
 
-    void cancelSendingFileRequest(const QString &fileMD5);
-    void abortFileTransmission(const QString &fileMD5);
-    void acceptFileRequest(const QString &fileMD5, const QString &localSavePath);
-    void declineFileRequest(const QString &fileMD5);
+    void signalSendUploadingFileRequest(const QString &filePath, const QByteArray &fileMD5, bool offline = false);
+    void signalCancelSendingUploadingFileRequest(const QByteArray &fileMD5);
+    void signalAbortFileTransmission(const QByteArray &fileMD5);
+    void signalAcceptPeerUploadFileRequest(const QByteArray &fileMD5, const QString &localSavePath);
+    void signalDeclinePeerUploadFileRequest(const QByteArray &fileMD5);
 
 public slots:
     void appendMessageReceivedFromContact(const QString &message, Contact *contact, const QString &datetime );
 
     void processContactHistoryMessage(const QStringList &messages, bool canFetchMore);
 
+    void slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QByteArray &fileMD5);
+    void fileUploadRequestResponsed(const QByteArray &fileMD5Sum, bool accepted, const QString &message);
+
+    void closeFileTransmissionListWidget();
+    void cancelFileTransmission(const QByteArray &fileMD5Sum);
 
 private slots:
     void showMessageHistory(bool show);
@@ -65,8 +71,8 @@ private slots:
     void setPreferedSize();
 
     void showFileTransmissionListWidget(bool show);
-    void updateFileTransmissionProgress(const QString &fileMD5, int percent);
-    void closeFileTransmissionListWidget();
+
+    void updateFileTransmissionProgress(const QByteArray &fileMD5, int percent);
 
 
 private:
@@ -82,6 +88,7 @@ private:
 
     FileTransmissionListWidget *m_fileTransmissionListWidget;
 
+    int m_socketConnectedToPeer;
 
 };
 

@@ -14,8 +14,10 @@
 #include <QCoreApplication>
 
 
+#include "HHSharedCore/hcryptography.h"
+
 #ifndef FILE_PIECE_LENGTH
-#define FILE_PIECE_LENGTH 524288 //512 KB
+#define FILE_PIECE_LENGTH 10240 //10 KB
 #endif
 
 #define SUFFIX_TEMP_FILE ".tf"
@@ -32,12 +34,12 @@ FileManager::FileManager(QObject *parent)
 {
     m_quit = false;
     readId = 0;
-//    startVerification = false;
+    //    startVerification = false;
     m_wokeUp = false;
 
     //qsrand(QDateTime::currentDateTime().toTime_t());
 
-//    qRegisterMetaType<FileManager::Error>("FileManager::Error");
+    //    qRegisterMetaType<FileManager::Error>("FileManager::Error");
 }
 
 FileManager::~FileManager()
@@ -46,16 +48,13 @@ FileManager::~FileManager()
     cond.wakeOne();
     wait();
 
-
-
     foreach (FileMetaInfo *metaInfo, fileMetaInfoHash) {
-            metaInfo->file->close();
-            delete metaInfo->file;
-            //fileMetaInfoHash.remove(metaInfo->md5sum);
-            delete metaInfo;
+        metaInfo->file->close();
+        delete metaInfo->file;
+        //fileMetaInfoHash.remove(metaInfo->md5sum);
+        delete metaInfo;
     }
     fileMetaInfoHash.clear();
-
 
 }
 
@@ -237,14 +236,14 @@ void FileManager::run()
             if(request.pieceIndex >= info->verifiedPieces.size()){continue;}
             QByteArray block = readBlock(request.id, info, request.pieceIndex);
             if(block.isEmpty()){continue;}
-            if(!info->sha1Sums.contains(request.pieceIndex)){
-                QByteArray dataSHA1SUM = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
-                info->sha1Sums.insert(request.pieceIndex, dataSHA1SUM);
-//                qDebug()<<"-------------pieceIndex:"<<request.pieceIndex<<" MD5:"<<dataSHA1SUM.toBase64();
+            if(!info->hashSums.contains(request.pieceIndex)){
+                QByteArray hashSUM = QCryptographicHash::hash(block, QCryptographicHash::Md5);
+                info->hashSums.insert(request.pieceIndex, hashSUM);
+//                                qDebug()<<"-------------pieceIndex:"<<request.pieceIndex<<" MD5:"<<hashSUM.toHex();
             }
-//                Q_ASSERT(dataSHA1SUM == info->sha1Sums.value(request.pieceIndex));
+            //                Q_ASSERT(dataSHA1SUM == info->sha1Sums.value(request.pieceIndex));
 
-            emit dataRead(request.id, request.fileMD5, request.pieceIndex, block, info->sha1Sums.value(request.pieceIndex));
+            emit dataRead(request.id, request.fileMD5, request.pieceIndex, block, info->hashSums.value(request.pieceIndex));
         }
 
         // Write pending write requests
@@ -259,15 +258,15 @@ void FileManager::run()
         }
 
         // Process pending verification requests
-//        if (startVerification) {
-//            newPendingVerificationRequests = pendingVerificationRequests;
-//            pendingVerificationRequests.clear();
-////            verifyFileContents();
-//            VerifyAllPendingFiles();
-//            startVerification = false;
-//        }
+        //        if (startVerification) {
+        //            newPendingVerificationRequests = pendingVerificationRequests;
+        //            pendingVerificationRequests.clear();
+        ////            verifyFileContents();
+        //            VerifyAllPendingFiles();
+        //            startVerification = false;
+        //        }
         mutex.unlock();
-//        newPendingVerificationRequests.clear();
+        //        newPendingVerificationRequests.clear();
 
     } while (!m_quit);
 
@@ -320,32 +319,11 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
         return 0;
     }
 
-    QByteArray fileMD5Sum = QCryptographicHash::hash(file->readAll(), QCryptographicHash::Md5);
+    //QByteArray fileMD5Sum = QCryptographicHash::hash(file->readAll(), QCryptographicHash::Md5);
+    QByteArray fileMD5Sum = Cryptography::getFileMD5(localSavePath);
+
     file->seek(0);
     qint64 fileSize = file->size();
-//    QHash<int/*Piece Index*/, QByteArray/*SHA1 Hash*/> sha1Sums;
-//    int pieceIndex = 0;
-//    QByteArray block;
-//    while (!file->atEnd()) {
-//        block.clear();
-//        qint64 sizeToRead = qMin<qint64>(FILE_PIECE_LENGTH, fileSize - file->pos());
-//        block.resize(sizeToRead);
-
-//        qint64 read = file->read(block.data(), sizeToRead);
-//        if(read != sizeToRead && !file->atEnd()){
-//            *errorString = tr("Failed to read data from file '%1'! %2").arg(localSavePath).arg(file->errorString());
-//            //emit error(FILE_READ_ERROR, errString);
-//            file->close();
-//            delete file;
-//            return 0;
-//        }
-//        sha1Sums.insert(pieceIndex, QCryptographicHash::hash(block, QCryptographicHash::Sha1));
-//        qDebug()<<"----pieceIndex:"<<pieceIndex<<" size:"<<block.size()/*<<" sha1:"<<sha1Sums.value(pieceIndex)*/;
-//        pieceIndex++;
-
-//        QCoreApplication::processEvents();
-//    }
-
     int pieceCount = fileSize / FILE_PIECE_LENGTH;
     if(fileSize % FILE_PIECE_LENGTH){
         pieceCount++;
@@ -356,7 +334,7 @@ const FileManager::FileMetaInfo * FileManager::tryToSendFile( const QString &loc
     info->md5sum = fileMD5Sum;
     info->size = fileSize;
     //info->pieceLength = pieceLength;
-//    info->sha1Sums = sha1Sums;
+    //    info->sha1Sums = sha1Sums;
     info->verifiedPieces.resize(pieceCount);
     info->verifiedPieces.fill(true);
     //info->newFile = true;
@@ -458,9 +436,9 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
 
     {
         QMutexLocker locker(&mutex);
-//        while(fileMetaInfoHash.contains(info->fileID)){
-//            info->fileID = qrand();
-//        }
+        //        while(fileMetaInfoHash.contains(info->fileID)){
+        //            info->fileID = qrand();
+        //        }
         fileMetaInfoHash.insert(fileMD5Sum, info);
         cond.wakeOne();
     }
@@ -479,18 +457,6 @@ const FileManager::FileMetaInfo * FileManager::tryToReceiveFile(QByteArray fileM
 
 //}
 
-//QByteArray FileManager::calcFileMD5(const QString &filePath){
-
-//    QFile file(filePath);
-//    if (!file.open(QFile::ReadOnly)) {
-//        errString = tr("Failed to open file %1: %2").arg(filePath).arg(file.errorString());
-//        emit error();
-//        return QByteArray();
-//    }
-
-//    return QCryptographicHash::hash(file.readAll(), QCryptographicHash::Md5);
-
-//}
 
 void FileManager::closeFile(const QString &filePath){
 
@@ -638,8 +604,8 @@ QByteArray FileManager::readBlock(int requestID, FileMetaInfo *info, int pieceIn
     return block;
 }
 
-bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM){
-    qDebug()<<"--FileManager::writeBlock(...) "<<"pieceIndex:"<<pieceIndex<<" data size:"<<data.size()<<" MD5:"<<dataSHA1SUM.toBase64();
+bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataHashSUM){
+    qDebug()<<"--FileManager::writeBlock(...) "<<"pieceIndex:"<<pieceIndex<<" data size:"<<data.size()<<" MD5:"<<dataHashSUM.toHex();
 
     if(!info){
         QString errString = tr("Failed to read file info!");
@@ -647,8 +613,8 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
         return false;
     }
 
-    QByteArray sha1Sum = QCryptographicHash::hash(data, QCryptographicHash::Sha1);
-    if(sha1Sum != dataSHA1SUM){
+    QByteArray hashSUM = QCryptographicHash::hash(data, QCryptographicHash::Md5);
+    if(hashSUM != dataHashSUM){
         emit pieceVerified(info->md5sum, pieceIndex, false, 0);
         return false;
     }
@@ -680,13 +646,13 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
         return false;
     }
 
-    info->sha1Sums.insert(pieceIndex, dataSHA1SUM);
+    info->hashSums.insert(pieceIndex, dataHashSUM);
 
-//    QByteArray block = readBlock(0, info, pieceIndex);
-//    QByteArray su = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
-//    qDebug()<<"-------------pieceIndex:"<<pieceIndex<<" MD5:"<<su.toBase64()<<" ==?"<<(sha1Sum==su);
+    //    QByteArray block = readBlock(0, info, pieceIndex);
+    //    QByteArray su = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
+    //    qDebug()<<"-------------pieceIndex:"<<pieceIndex<<" MD5:"<<su.toBase64()<<" ==?"<<(sha1Sum==su);
 
-////////////////////////////////////////
+    ////////////////////////////////////////
 
     info->verifiedPieces.setBit(pieceIndex);
 
@@ -709,12 +675,12 @@ bool FileManager::writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArra
             QFile::remove(info->infoFileName);
             qWarning()<<"File Received!";
 
-//            info->file->open(QIODevice::ReadOnly);
-//            info->file->seek(0);
-//            QByteArray fileMD5Sum = QCryptographicHash::hash(info->file->readAll(), QCryptographicHash::Md5);
-//            if(fileMD5Sum != info->md5sum){
-//                qCritical()<<"Damaged! MD5:"<<fileMD5Sum.toBase64()<<" info->md5sum:"<<info->md5sum.toBase64();
-//            }
+            //            info->file->open(QIODevice::ReadOnly);
+            //            info->file->seek(0);
+            //            QByteArray fileMD5Sum = QCryptographicHash::hash(info->file->readAll(), QCryptographicHash::Md5);
+            //            if(fileMD5Sum != info->md5sum){
+            //                qCritical()<<"Damaged! MD5:"<<fileMD5Sum.toBase64()<<" info->md5sum:"<<info->md5sum.toBase64();
+            //            }
         }
     }
 
@@ -795,10 +761,10 @@ bool FileManager::verifySinglePiece(FileMetaInfo *info, int pieceIndex)
     //qint64 startReadIndex = (quint64(pieceIndex) * FILE_PIECE_LENGTH);
 
     QByteArray block = readBlock(0, info, pieceIndex);
-    QByteArray sha1Sum = QCryptographicHash::hash(block, QCryptographicHash::Sha1);
+    QByteArray hashSum = QCryptographicHash::hash(block, QCryptographicHash::Md5);
 
     bool verified = false;
-    if (sha1Sum != info->sha1Sums.value(pieceIndex)){
+    if (hashSum != info->hashSums.value(pieceIndex)){
         verified = false;
     }else{
         info->verifiedPieces.setBit(pieceIndex);

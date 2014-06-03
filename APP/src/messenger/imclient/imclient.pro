@@ -72,7 +72,9 @@ HEADERS += contactinfowidget/contactinfowidget.h \
     imageviewer/imageviewer.h \
     imageviewer/imageviewercontroler.h \
     chatwindow/filetransmitter/filetransmissionlistwidget.h \
-    chatwindow/filetransmitter/progressinfowidget.h
+    chatwindow/filetransmitter/progressinfowidget.h \
+    chatwindow/filetransmitter/clientfiletransmissionmanager.h \
+    chatwindow/filetransmitter/clientfiletransmissionpacketsparser.h
 SOURCES += contactinfowidget/contactinfowidget.cpp \
     informationtips/userinfotipwindow.cpp \
     chatwindow/groupchatwindow.cpp \
@@ -117,7 +119,9 @@ SOURCES += contactinfowidget/contactinfowidget.cpp \
     imageviewer/imageviewer.cpp \
     imageviewer/imageviewercontroler.cpp \
     chatwindow/filetransmitter/filetransmissionlistwidget.cpp \
-    chatwindow/filetransmitter/progressinfowidget.cpp
+    chatwindow/filetransmitter/progressinfowidget.cpp \
+    chatwindow/filetransmitter/clientfiletransmissionpacketsparser.cpp \
+    chatwindow/filetransmitter/clientfiletransmissionmanager.cpp
 FORMS += contactinfowidget/contactinfowidget.ui \
     informationtips/userinfotipwindow.ui \
     chatwindow/contactchatwidget.ui \

@@ -237,6 +237,16 @@ FileManager * ResourcesManager::getFileManager(){
 
 }
 
+void ResourcesManager::stopFileManager(){
+    if(!m_fileManager){
+        return;
+    }
+
+    m_fileManager->quit();
+    delete m_fileManager;
+    m_fileManager = 0;
+}
+
 
 
 

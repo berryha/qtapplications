@@ -1,5 +1,6 @@
 #include <QMdiSubWindow>
 #include <QDebug>
+#include <QMessageBox>
 
 #include "chatwindowmanager.h"
 #include "../imageresource.h"
@@ -23,6 +24,12 @@ ChatWindowManager::ChatWindowManager(QWidget *parent)
     ui.stackedWidget->setCurrentWidget(ui.pageTabWidget);
 
 //    m_preferedSize = size();
+
+    m_fileTransmissionManager = 0;
+    m_fileTransmissionPacketsParser = 0;
+    m_socketConnectedToServer = INVALID_SOCK_ID;
+
+
 }
 
 ChatWindowManager::~ChatWindowManager()
@@ -879,6 +886,109 @@ void ChatWindowManager::switchToSeparatedView(){
     switchChatWindowDisplayStyle(SeparatedChatWindow);
 }
 
+void ChatWindowManager::sendUploadingFileRequest(const QString &filePath, const QByteArray &fileMD5, bool offline){
+
+    ContactChatWidget *wgt = qobject_cast<ContactChatWidget*>(sender());
+    if(!wgt){return;}
+    Contact *contact = wgt->contact();
+    //TODO
+
+    if(offline){
+        initFileTransmission();
+        while (m_socketConnectedToServer == INVALID_SOCK_ID) {
+            m_socketConnectedToServer = m_fileTransmissionPacketsParser->connectToServer();
+
+            if(m_socketConnectedToServer == INVALID_SOCK_ID){
+                int btn = QMessageBox::critical(this, tr("Connection Failed"), tr("Can not connect to server!"),
+                                                QMessageBox::Retry | QMessageBox::Cancel,
+                                                QMessageBox::Retry
+                                                );
+                if(btn == QMessageBox::Cancel){
+                    wgt->cancelFileTransmission(fileMD5);
+                    return;
+                }
+
+            }
+        }
+        QFileInfo info(filePath);
+        m_fileTransmissionPacketsParser->requestUploadFile(m_socketConnectedToServer, contact->getUserID(), fileMD5, info.fileName(), info.size());
+
+    }else{
+        emit signalSendUploadingFileRequest(contact, filePath, fileMD5);
+    }
+
+}
+
+void ChatWindowManager::cancelSendingFileRequest(const QByteArray &fileMD5){
+
+    ContactChatWidget *wgt = qobject_cast<ContactChatWidget*>(sender());
+    if(!wgt){return;}
+    Contact *contact = wgt->contact();
+
+    emit signalCancelSendingFileUploadingRequest(contact, fileMD5);
+
+}
+
+void ChatWindowManager::abortFileTransmission(const QByteArray &fileMD5){
+
+    ContactChatWidget *wgt = qobject_cast<ContactChatWidget*>(sender());
+    if(!wgt){return;}
+    Contact *contact = wgt->contact();
+
+    //m_fileTransmissionManagerBase->abortFileTransmission();
+
+    //TODO
+
+}
+
+void ChatWindowManager::acceptPeerUploadFileRequest(const QByteArray &fileMD5, const QString &localSavePath){
+
+    ContactChatWidget *wgt = qobject_cast<ContactChatWidget*>(sender());
+    if(!wgt){return;}
+    Contact *contact = wgt->contact();
+
+    emit signalAcceptPeerUploadFileRequest(contact, fileMD5, localSavePath);
+
+}
+
+void ChatWindowManager::declineFileRequest(const QByteArray &fileMD5){
+
+    ContactChatWidget *wgt = qobject_cast<ContactChatWidget*>(sender());
+    if(!wgt){return;}
+    Contact *contact = wgt->contact();
+
+    emit signalDeclinePeerUploadFileRequest(contact, fileMD5);
+
+}
+
+void ChatWindowManager::contactRequestUploadFile(const QString &contactID, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size){
+
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+    if(!ccw){return;}
+    ccw->slotFileRequestReceivedFromContact(fileName, size, fileMD5Sum);
+}
+
+void ChatWindowManager::contactRequestDownloadFile(const QString &contactID, const QString &localBaseDir, const QString &fileName){
+
+}
+
+void ChatWindowManager::fileDownloadRequestAccepted(const QString &contactID, const QString &remoteFileName, const QByteArray &fileMD5Sum, quint64 size){
+
+}
+
+void ChatWindowManager::fileDownloadRequestDenied(const QString &contactID, const QString &remoteFileName, const QString &message){
+
+}
+
+void ChatWindowManager::fileUploadRequestResponsed(const QString &contactID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
+
+    ContactChatWidget *ccw = m_contactChatWidgetHash.value(contactID);
+    if(!ccw){return;}
+
+    ccw->fileUploadRequestResponsed(fileMD5Sum, accepted, message);
+
+}
+
 ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact){
 
         ContactChatWidget *contactChatWindow = new ContactChatWidget(contact);
@@ -890,6 +1000,16 @@ ContactChatWidget * ChatWindowManager::createContactChatWindow(Contact *contact)
         connect(contactChatWindow, SIGNAL(signalCloseWindow()), this, SLOT(handleCloseWindowRequest()));
         connect(contactChatWindow, SIGNAL(toBeDstroyed()), this, SLOT(handleChatWindowClosed()));
         connect(contactChatWindow, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)), this, SIGNAL(signalRequestContactHistoryMessage(const QString &, const QString &, const QString &, bool, const QString &)));
+
+
+        //FILE TX
+        connect(contactChatWindow, SIGNAL(signalSendUploadingFileRequest(const QString &, const QByteArray &, bool)), this, SLOT(sendUploadingFileRequest(const QString &, const QByteArray &, bool)) );
+        connect(contactChatWindow, SIGNAL(signalCancelSendingUploadingFileRequest(const QByteArray &)), this, SLOT(cancelSendingFileRequest(const QByteArray &)) );
+        connect(contactChatWindow, SIGNAL(signalAbortFileTransmission(const QByteArray &)), this, SLOT(abortFileTransmission(const QByteArray &)) );
+        connect(contactChatWindow, SIGNAL(signalAcceptPeerUploadFileRequest(const QByteArray &, const QString &)), this, SLOT(acceptPeerUploadFileRequest(const QByteArray &, const QString &)) );
+        connect(contactChatWindow, SIGNAL(signalDeclinePeerUploadFileRequest(const QByteArray &)), this, SLOT(declineFileRequest(const QByteArray &)) );
+
+
 
         QString contactID = contact->getUserID();
         m_contactChatWidgetHash.insert(contactID, contactChatWindow);
@@ -1000,6 +1120,16 @@ GroupChatWindow * ChatWindowManager::findInterestGroupChatTabWidget(InterestGrou
 
 }
 
+void ChatWindowManager::initFileTransmission(){
+
+    if(!m_fileTransmissionPacketsParser){
+        QString myID = IMUser::instance()->getUserID();
+        m_fileTransmissionPacketsParser = new ClientFileTransmissionPacketsParser(myID, this);
+        m_fileTransmissionManager = new ClientFileTransmissionManager(myID, m_fileTransmissionPacketsParser, this);
+    }
+
+}
+
 QMenu *ChatWindowManager::chatHistoryMenu(){
 
     QMenu *menu = new QMenu(tr("History"));
@@ -1033,7 +1163,6 @@ QMenu *ChatWindowManager::chatHistoryMenu(){
     return menu;
 
 }
-
 
 
 //bool ChatWindowManager::isChatWindowOpened(Contact *contact){

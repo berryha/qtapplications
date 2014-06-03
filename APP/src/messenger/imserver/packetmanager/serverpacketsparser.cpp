@@ -132,6 +132,7 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     qDebug()<<"--ServerPacketsParser::parseIncomingPacketData(...) "<<" socketID:"<<socketID <<" peerID:"<<peerID<<" peerAddress:"<<peerAddress.toString()<<" peerPort:"<<peerPort<<" packetType:"<<packetType;
 
     PacketHandlerBase::recylePacket(packet);
+
     switch(packetType){
     //    case quint8(HEHUI::HeartbeatPacket):
     //    {
@@ -156,6 +157,50 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
     //        //qDebug()<<"~~ConfirmationOfReceiptPacket--"<<"packetSerialNumber:"<<packetSerialNumber;
     //    }
     //    break;
+
+
+    case quint8(IM::DataForwardRequestByClient):
+    {
+        qDebug()<<"~~DataForwardRequestByClient";
+
+        QByteArray encryptedData;
+        QString senderID = peerID;
+
+        UserInfo *senderInfo = getOnlineUserInfo(senderID);
+        if(!senderInfo){
+            qCritical()<<"ERROR! Sender Not Found!";
+            return;
+        }
+
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, senderInfo->getSessionEncryptionKey(), false);
+        //TODO
+
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+
+        QString receiverID = "";
+        QByteArray data;
+        stream >> receiverID >> data;
+
+
+        UserInfo *receiverInfo = getUserInfo(receiverID);
+        if(!receiverInfo){
+            qCritical()<<"ERROR! Receiver Not Found!";
+            return;
+        }
+        if(!receiverInfo->isOnLine()){
+            qCritical()<<"ERROR! Receiver Offline!";
+            return;
+        }
+
+        forwardDataForward(m_userSocketsHash.key(receiverInfo), data, receiverInfo->getSessionEncryptionKey());
+
+    }
+        break;
+
     case quint8(IM::ClientLookForServer):
     {
         qDebug()<<"~~ClientLookForServer";
@@ -1302,31 +1347,6 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
 
     }
         break;
-
-
-
-        //    case quint8(IM::):
-        //        {
-        //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
-
-
-        //        }
-        //        break;
-        //    case quint8(IM::):
-        //        {
-        //        sendConfirmationOfReceiptPacket(packet->getPeerHostAddress(), packet->getPeerHostPort(), packet->getPacketSerialNumber());
-
-
-        //        }
-        //        break;
-
-        //    case quint8(IM::CLIENT_REQUEST_LOGIN):
-        //        {
-        //
-        //        }
-        //        break;
-
-
 
 
     default:

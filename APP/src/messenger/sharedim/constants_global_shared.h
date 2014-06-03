@@ -154,6 +154,9 @@ enum OnlineState {
 
 enum Command {
 
+    DataForwardRequestByClient, //c
+    ForwardedDataByServer, //s
+
     ClientLookForServer = UserDefinedPacket + 100, //106
     ServerDeclare,
     ServerOnline,
@@ -265,17 +268,21 @@ enum Command {
 
     //File TX
     RequestDownloadFile,
-    RequestUploadFile,
+    CancelDownloadFileRequest,
     ResponseFileDownloadRequest,
+
+//    CLIENT_REQUEST_UPLOADING_OFFLINE_FILE,
+//    SERVER_RESPONSE_UPLOADING_OFFLINE_FILE,
+
+    RequestUploadFile,
+
+    CancelUploadFileRequest,
     ResponseFileUploadRequest,
-    RequestFileData,
-    FileData,
-    FileTXStatusChanged,
-    FileTXError,
 
-
-
- 
+//    RequestFileData,
+//    FileData,
+//    FileTXStatusChanged,
+//    FileTXError,
 
 };
 

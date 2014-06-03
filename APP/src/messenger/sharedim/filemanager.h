@@ -37,7 +37,7 @@ public:
             //name = "";
             //newFile = false;
             //pieceLength = FILE_PIECE_LENGTH;
-            sha1Sums.clear();
+            hashSums.clear();
             //verifiedPieces.fill(false);
             file = 0;
             infoFileName = "";
@@ -50,7 +50,7 @@ public:
         //QString name;
         //bool newFile;
         //int pieceLength;
-        QHash<int/*Piece Index*/, QByteArray/*SHA1 Hash*/> sha1Sums;
+        QHash<int/*Piece Index*/, QByteArray/*SHA1 Hash*/> hashSums;
         QBitArray verifiedPieces;
 
         QFile *file;
@@ -67,10 +67,10 @@ public:
 
     int readPiece(const QByteArray &fileMD5, int pieceIndex);
     void writePiece(const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
-//    void verifyPiece(QByteArray fileMD5, int pieceIndex);
+    //    void verifyPiece(QByteArray fileMD5, int pieceIndex);
 
-//    QBitArray completedPieces(const QByteArray &fileMD5) const;
-//    void setCompletedPieces(const QByteArray &fileMD5, const QBitArray &pieces);
+    //    QBitArray completedPieces(const QByteArray &fileMD5) const;
+    //    void setCompletedPieces(const QByteArray &fileMD5, const QBitArray &pieces);
 
     QList<int/*Piece Index*/> completedPieces(const QByteArray &fileMD5);
     QList<int/*Piece Index*/> uncompletedPieces(const QByteArray &fileMD5);
@@ -83,19 +83,19 @@ public:
 
     QString getFileLocalSavePath(const QByteArray &fileMD5);
 
-//    int regenerateFileID(int oldFileID);
-//    QFile *generateNewFile(quint64 size, const QString &localSavePath);
+    //    int regenerateFileID(int oldFileID);
+    //    QFile *generateNewFile(quint64 size, const QString &localSavePath);
 
-//    QString errorString() const;
+    //    QString errorString() const;
 
 public slots:
-//    void startDataVerification();
+    //    void startDataVerification();
 
 signals:
     void dataRead(int requestID, const QByteArray &fileMD5, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
     void error(int requestID, const QByteArray &fileMD5, quint8 errorCode, const QString &errorString);
-//    void verificationProgress(QByteArray fileMD5, int percent);
-//    void verificationDone(QByteArray fileMD5);
+    //    void verificationProgress(QByteArray fileMD5, int percent);
+    //    void verificationDone(QByteArray fileMD5);
     void pieceVerified(const QByteArray &fileMD5, int pieceIndex, bool verified, int verificationProgress);
 
 protected:
@@ -111,10 +111,10 @@ private:
 
 
     QByteArray readBlock(int requestID, FileMetaInfo *info, int pieceIndex);
-    bool writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataSHA1SUM);
+    bool writeBlock(FileMetaInfo *info, int pieceIndex, const QByteArray &data, const QByteArray &dataHashSUM);
     bool verifySinglePiece(FileMetaInfo *info, int pieceIndex);
-//    void verifyFileContents(FileMetaInfo *info);
-//    void VerifyAllPendingFiles();
+    //    void verifyFileContents(FileMetaInfo *info);
+    //    void VerifyAllPendingFiles();
 
     struct WriteRequest {
         //int fileID;
@@ -132,19 +132,19 @@ private:
     };
 
 
-//    QString errString;
+    //    QString errString;
 
 
 
     int readId;
-//    bool startVerification;
+    //    bool startVerification;
     bool m_quit;
     bool m_wokeUp;
 
     QList<WriteRequest> writeRequests;
     QList<ReadRequest> readRequests;
-//    QList<MD5/*File MD5*/> pendingVerificationRequests;
-//    QList<MD5/*File MD5*/> newPendingVerificationRequests;
+    //    QList<MD5/*File MD5*/> pendingVerificationRequests;
+    //    QList<MD5/*File MD5*/> newPendingVerificationRequests;
 
     mutable QMutex mutex;
     mutable QWaitCondition cond;

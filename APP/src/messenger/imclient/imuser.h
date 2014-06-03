@@ -61,6 +61,11 @@ public:
     void setRegistrationServerAddressInfo(const QString &regServerAddress);
     QString getRegistrationServerAddressInfo() const;
 
+    void setFileServerAddress(const QString &serverAddress);
+    QString getFileServerAddress();
+    void setFileServerPort(quint16 serverPort);
+    quint16 getFileServerPort();
+
     void showStrangers(bool show);
     bool isStrangersShown();
 
@@ -97,6 +102,9 @@ private:
     QString m_loginServerAddress;
     quint16 m_loginServerPort;
     QString m_regServerAddress;
+
+    QString m_fileServerAddress;
+    quint16 m_fileServerPort;
 
     bool m_showStrangers;
     bool m_autoDownloadImageFromContact;

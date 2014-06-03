@@ -6,51 +6,58 @@
 #include "progressinfowidget.h"
 
 
+
+
+//namespace HEHUI {
+
+
 namespace Ui {
 class FileTransmissionListWidget;
 }
 
-namespace HEHUI {
-
+namespace HEHUI{
+class ContactChatWidget;
+}
 
 class FileTransmissionListWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FileTransmissionListWidget(QWidget *parent = 0);
+    explicit FileTransmissionListWidget(HEHUI::ContactChatWidget *wgt, QWidget *parent = 0);
     ~FileTransmissionListWidget();
 
 
 signals:
-    void cancelSendingFileRequest(const QString &fileMD5);
-    void abortFileTransmission(const QString &fileMD5);
+//    void sendFileRequest(const QString &filePath, const QByteArray &fileMD5);
+//    void cancelSendingFileRequest(const QByteArray &fileMD5);
+//    void abortFileTransmission(const QByteArray &fileMD5);
 
-    void acceptFileRequest(const QString &fileMD5, const QString &localSavePath);
-    void declineFileRequest(const QString &fileMD5);
+//    void acceptFileRequest(const QByteArray &fileMD5, const QString &localSavePath);
+//    void declineFileRequest(const QByteArray &fileMD5);
 
-    void signlaCloseWidget();
+//    void signlaCloseWidget();
 
 public slots:
-    void slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QString &fileMD5);
-    void slotSendFileRequestToContact(const QString &fileName, const QString &fileMD5);
+    void slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QByteArray &fileMD5);
+    void slotSendUploadingFileRequest(const QString &fileName, const QByteArray &fileMD5, bool offline);
 
     //    void slotFileRequestCanceledByContact(const QString &fileMD5);
 //    void slotFileTransmissionAbortedByContact(const QString &fileMD5);
-    void slotCloseProgressInfoWidget(const QString &fileMD5);
+    void slotCloseProgressInfoWidget(const QByteArray &fileMD5);
 
+    void slotCancelSendingFileRequest(const QByteArray &fileMD5);
+    void slotAbortFileTransmission(const QByteArray &fileMD5);
+    void slotAcceptFileRequest(const QByteArray &fileMD5, const QString &localSavePath);
+    void slotDeclineFileRequest(const QByteArray &fileMD5);
 
-    void slotCancelSendingFileRequest(const QString &fileMD5);
-    void slotAbortFileTransmission(const QString &fileMD5);
-    void slotAcceptFileRequest(const QString &fileMD5, const QString &localSavePath);
-    void slotDeclineFileRequest(const QString &fileMD5);
+    void updateFileTransmissionProgress(const QByteArray &fileMD5, int percent);
 
-    void updateFileTransmissionProgress(const QString &fileMD5, int percent);
 
 
 private:
     int findListWidgetItemIndex(ProgressInfoWidget *wgt);
-    ProgressInfoWidget * createProgressInfoWidgetItem(const QString &fileMD5);
+    ProgressInfoWidget * createProgressInfoWidgetItem(const QByteArray &fileMD5);
 
 private:
     Ui::FileTransmissionListWidget *ui;
@@ -58,9 +65,10 @@ private:
     //QHash<QString /*File MD5*/, QString /*File Name*/> fileInfoHash;
     QHash<QString /*File MD5*/, ProgressInfoWidget*> progressInfoWidgetHash;
 
+    HEHUI::ContactChatWidget *m_contactChatWidget;
 
 };
 
-} //namespace HEHUI
+//} //namespace HEHUI
 
 #endif // FILETRANSMISSIONLISTWIDGET_H

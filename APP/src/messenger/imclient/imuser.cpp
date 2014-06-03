@@ -54,6 +54,9 @@ IMUser::IMUser(const QString & userID, QObject *parent)
     m_loginServerPort = 0;
     m_regServerAddress = "";
 
+    m_fileServerAddress = "";
+    m_fileServerPort = 0;
+
     m_showStrangers = true;
     m_autoDownloadImageFromContact = false;
     m_syncAllChatMessagesToServer = true;
@@ -115,6 +118,22 @@ void IMUser::setRegistrationServerAddressInfo(const QString &regServerAddress){
 
 QString IMUser::getRegistrationServerAddressInfo() const{
     return m_regServerAddress;
+}
+
+void IMUser::setFileServerAddress(const QString &serverAddress){
+    m_fileServerAddress = serverAddress;
+}
+
+QString IMUser::getFileServerAddress(){
+    return m_fileServerAddress;
+}
+
+void IMUser::setFileServerPort(quint16 serverPort){
+    m_fileServerPort = serverPort;
+}
+
+quint16 IMUser::getFileServerPort(){
+    return m_fileServerPort;
 }
 
 void IMUser::showStrangers(bool show){

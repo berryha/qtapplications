@@ -1,18 +1,22 @@
 #include "filetransmissionlistwidget.h"
 #include "ui_filetransmissionlistwidget.h"
 
+//#include "../filetransmitter/filetransmissionmanager.h"
+
+#include "../contactchatwidget.h"
+
+//namespace HEHUI {
 
 
-namespace HEHUI {
-
-
-FileTransmissionListWidget::FileTransmissionListWidget(QWidget *parent) :
+FileTransmissionListWidget::FileTransmissionListWidget(ContactChatWidget *wgt, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FileTransmissionListWidget)
+    ui(new Ui::FileTransmissionListWidget),
+    m_contactChatWidget(wgt)
 {
     ui->setupUi(this);
 
     ui->frame->hide();
+
 
 }
 
@@ -21,15 +25,23 @@ FileTransmissionListWidget::~FileTransmissionListWidget()
     delete ui;
 }
 
-void FileTransmissionListWidget::slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QString &fileMD5){
+void FileTransmissionListWidget::slotFileRequestReceivedFromContact(const QString &fileName, qint64 size, const QByteArray &fileMD5){
     ProgressInfoWidget *wgt = createProgressInfoWidgetItem(fileMD5);
     wgt->requestToReceiveFile(fileName, size, fileMD5);
+
 }
 
-void FileTransmissionListWidget::slotSendFileRequestToContact(const QString &fileName, const QString &fileMD5){
+void FileTransmissionListWidget::slotSendUploadingFileRequest(const QString &fileName, const QByteArray &fileMD5, bool offline){
     ProgressInfoWidget *wgt = createProgressInfoWidgetItem(fileMD5);
     wgt->requestToSendFile(fileName, fileMD5);
+
+    if(offline){
+        wgt->updateProgress(0);
+    }
+
+    emit m_contactChatWidget->signalSendUploadingFileRequest(fileName, fileMD5, offline);
 }
+
 
 //void FileTransmissionListWidget::slotFileRequestCanceledByContact(const QString &fileMD5){
 //    slotCloseProgressInfoWidget(fileMD5);
@@ -39,7 +51,7 @@ void FileTransmissionListWidget::slotSendFileRequestToContact(const QString &fil
 //    slotCloseProgressInfoWidget(fileMD5);
 //}
 
-void FileTransmissionListWidget::slotCloseProgressInfoWidget(const QString &fileMD5){
+void FileTransmissionListWidget::slotCloseProgressInfoWidget(const QByteArray &fileMD5){
 
     ProgressInfoWidget *wgt = progressInfoWidgetHash.take(fileMD5);
     if(!wgt){return;}
@@ -54,31 +66,36 @@ void FileTransmissionListWidget::slotCloseProgressInfoWidget(const QString &file
     delete item;
 
     if(progressInfoWidgetHash.isEmpty()){
-        emit signlaCloseWidget();
+        m_contactChatWidget->closeFileTransmissionListWidget();
+//        emit signlaCloseWidget();
     }
 
 }
 
-void FileTransmissionListWidget::slotCancelSendingFileRequest(const QString &fileMD5){
-    emit cancelSendingFileRequest(fileMD5);
+void FileTransmissionListWidget::slotCancelSendingFileRequest(const QByteArray &fileMD5){
+//    emit cancelSendingFileRequest(fileMD5);
+    emit m_contactChatWidget->signalCancelSendingUploadingFileRequest(fileMD5);
     slotCloseProgressInfoWidget(fileMD5);
 }
 
-void FileTransmissionListWidget::slotAbortFileTransmission(const QString &fileMD5){
-    emit abortFileTransmission(fileMD5);
+void FileTransmissionListWidget::slotAbortFileTransmission(const QByteArray &fileMD5){
+//    emit abortFileTransmission(fileMD5);
+    emit m_contactChatWidget->signalAbortFileTransmission(fileMD5);
     slotCloseProgressInfoWidget(fileMD5);
 }
 
-void FileTransmissionListWidget::slotAcceptFileRequest(const QString &fileMD5, const QString &localSavePath){
-    emit acceptFileRequest(fileMD5, localSavePath);
+void FileTransmissionListWidget::slotAcceptFileRequest(const QByteArray &fileMD5, const QString &localSavePath){
+//    emit acceptFileRequest(fileMD5, localSavePath);
+    emit m_contactChatWidget->signalAcceptPeerUploadFileRequest(fileMD5, localSavePath);
 }
 
-void FileTransmissionListWidget::slotDeclineFileRequest(const QString &fileMD5){
-    emit declineFileRequest(fileMD5);
+void FileTransmissionListWidget::slotDeclineFileRequest(const QByteArray &fileMD5){
+//    emit declineFileRequest(fileMD5);
+    emit m_contactChatWidget->signalDeclinePeerUploadFileRequest(fileMD5);
     slotCloseProgressInfoWidget(fileMD5);
 }
 
-void FileTransmissionListWidget::updateFileTransmissionProgress(const QString &fileMD5, int percent){
+void FileTransmissionListWidget::updateFileTransmissionProgress(const QByteArray &fileMD5, int percent){
 
     if(percent == 100){
         slotCloseProgressInfoWidget(fileMD5);
@@ -90,6 +107,7 @@ void FileTransmissionListWidget::updateFileTransmissionProgress(const QString &f
     wgt->updateProgress(percent);
 
 }
+
 
 int FileTransmissionListWidget::findListWidgetItemIndex(ProgressInfoWidget *wgt){
 
@@ -107,17 +125,17 @@ int FileTransmissionListWidget::findListWidgetItemIndex(ProgressInfoWidget *wgt)
 
 }
 
-ProgressInfoWidget * FileTransmissionListWidget::createProgressInfoWidgetItem(const QString &fileMD5){
+ProgressInfoWidget * FileTransmissionListWidget::createProgressInfoWidgetItem(const QByteArray &fileMD5){
 
     if(progressInfoWidgetHash.keys().contains(fileMD5)){
         return progressInfoWidgetHash.value(fileMD5);
     }
 
-    ProgressInfoWidget *wgt = new ProgressInfoWidget(this);
-    connect(wgt, SIGNAL(cancelSendingFileRequest(QString)), this, SLOT(slotCancelSendingFileRequest(QString)));
-    connect(wgt, SIGNAL(abortFileTransmission(QString)), this, SLOT(slotAbortFileTransmission(QString)));
-    connect(wgt, SIGNAL(acceptFileRequest(QString, QString)), this, SLOT(slotAcceptFileRequest(QString, QString)));
-    connect(wgt, SIGNAL(declineFileRequest(QString)), this, SLOT(slotDeclineFileRequest(QString)));
+    ProgressInfoWidget *wgt = new ProgressInfoWidget(this, this);
+//    connect(wgt, SIGNAL(cancelSendingFileRequest(QString)), this, SLOT(slotCancelSendingFileRequest(QString)));
+//    connect(wgt, SIGNAL(abortFileTransmission(QString)), this, SLOT(slotAbortFileTransmission(QString)));
+//    connect(wgt, SIGNAL(acceptFileRequest(QString, QString)), this, SLOT(slotAcceptFileRequest(QString, QString)));
+//    connect(wgt, SIGNAL(declineFileRequest(QString)), this, SLOT(slotDeclineFileRequest(QString)));
 
     QListWidgetItem * item = new QListWidgetItem(ui->listWidget);
     item->setSizeHint(QSize(200, 100));
@@ -131,4 +149,4 @@ ProgressInfoWidget * FileTransmissionListWidget::createProgressInfoWidgetItem(co
 }
 
 
-} //namespace HEHUI
+//} //namespace HEHUI

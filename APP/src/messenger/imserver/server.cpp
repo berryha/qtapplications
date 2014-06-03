@@ -216,6 +216,45 @@ void Server::saveClientLog(const QString &computerName, const QString &users, co
 
 }
 
+
+void Server::saveFileLog(const QString &sender, const QString &receiver, const QString &fileName, const QString &md5Hex, quint64 size){
+    //    qWarning()<<"Server::saveFileLog(...)";
+
+    if(!query){
+        if(!openDatabase()){
+            return;
+        }
+    }else{
+        query->clear();
+    }
+
+    query->prepare("INSERT INTO filelogs (Sender, Receiver, FileName, MD5Hex, Size) "
+                   "VALUES (:Sender, :Receiver, :FileName, :MD5Hex, :Size)");
+
+    query->bindValue(":Sender", sender);
+    query->bindValue(":Receiver", receiver);
+    query->bindValue(":FileName", fileName);
+    query->bindValue(":MD5Hex", md5Hex);
+    query->bindValue(":Size", size);
+
+
+    if(!query->exec()){
+        QSqlError error = query->lastError();
+        QString msg = QString("Can not write log to database! %1 Error Type:%2 Error NO.:%3").arg(error.text()).arg(error.type()).arg(error.number());
+        qCritical()<< msg;
+
+        //MySQL数据库重启，重新连接
+        if(error.number() == 2006){
+            query->clear();
+            openDatabase(true);
+        }
+
+    }
+
+    query->clear();
+
+}
+
 void Server::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
     qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 

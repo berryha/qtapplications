@@ -69,6 +69,10 @@ private slots:
 //    void sendServerOnlinePacket();
     void saveClientLog(const QString &computerName, const QString &users, const QString &log, const QString &clientAddress);
 
+    void saveFileLog(const QString &sender, const QString &receiver, const QString &fileName, const QString &md5Hex, quint64 size);
+
+
+
 
     void peerConnected(const QHostAddress &peerAddress, quint16 peerPort);
     void signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort);

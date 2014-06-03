@@ -136,7 +136,14 @@ public:
         return value("Database/DatabaseName", "im").toString();
     }
 
-
+//    QString getOfflineFileCacheDir(){
+//        QString offlineFileCacheDir = QCoreApplication::applicationDirPath() + QString("/offline_files");
+//        if(!QFile::exists(offlineFileCacheDir)){
+//            QDir dir;
+//            dir.mkpath(offlineFileCacheDir);
+//        }
+//        return offlineFileCacheDir;
+//    }
     QString getChatImageCacheDir(){
         QString pictureCacheDir = m_imagesDir + QString("/cache");
         if(!QFile::exists(pictureCacheDir)){

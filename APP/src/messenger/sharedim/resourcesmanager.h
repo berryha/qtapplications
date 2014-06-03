@@ -54,7 +54,7 @@ public:
     RTP * startRTP(const QHostAddress &localAddress = QHostAddress::Any, quint16 localPort = 0, bool tryOtherPort = true, QString *errorMessage = 0);
 
     FileManager *getFileManager();
-
+    void stopFileManager();
 
 private:
 
