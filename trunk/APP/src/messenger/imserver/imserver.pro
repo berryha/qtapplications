@@ -50,8 +50,8 @@ HEADERS += \
     resourcesmanagerinstance.h \
     usersmanager/interestgroup.h \
     usersmanager/contactgroup1.h \
-    filetransmitter/serverfiletransmissionpacketsparser.h \
-    filetransmitter/serverfiletransmissionmanager.h
+    filetransmitter/serverfiletransmissionmanager.h \
+    filetransmitter/serverfiletransmissionpacketsparser.h
 SOURCES += \
     serverutilities.cpp \
     settings.cpp \
