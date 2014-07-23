@@ -1055,7 +1055,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
         //File TX
-    case quint8(IM::RequestUploadFile):
+    case quint8(IM::REQUEST_UPLOAD_FILE):
     {
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -1073,11 +1073,11 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalContactRequestUploadFile(contactID, fileMD5Sum, fileName, size);
 
-        qDebug()<<"~~RequestUploadFile";
+        qDebug()<<"~~REQUEST_UPLOAD_FILE";
     }
         break;
 
-    case quint8(IM::RequestDownloadFile):
+    case quint8(IM::REQUEST_DOWNLOAD_FILE):
     {
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -1097,7 +1097,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
     }
         break;
 
-    case quint8(IM::ResponseFileDownloadRequest):
+    case quint8(IM::RESPONSE_FILE_DOWNLOAD_REQUEST):
     {
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -1122,10 +1122,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             stream >> message;
             signalFileDownloadRequestDenied(contactID, fileName, message);
         }
-        qDebug()<<"~~ResponseFileDownloadRequest";
+        qDebug()<<"~~RESPONSE_FILE_DOWNLOAD_REQUEST";
     }
         break;
-    case quint8(IM::ResponseFileUploadRequest):
+    case quint8(IM::RESPONSE_FILE_UPLOAD_REQUEST):
     {
         QByteArray encryptedData;
         QString contactID = peerID;
@@ -1144,7 +1144,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         emit signalFileUploadRequestResponsed(contactID, fileMD5, accepted, message);
 
-        qDebug()<<"~~ResponseFileUploadRequest";
+        qDebug()<<"~~RESPONSE_FILE_UPLOAD_REQUEST";
     }
         break;
 

@@ -73,7 +73,7 @@ private:
 
     bool mainServiceStarted;
     
-    Server *m_server;
+    IMServer *m_server;
 
 
 

@@ -41,7 +41,7 @@
 namespace HEHUI {
 
 
-Server::Server(QObject *parent)
+IMServer::IMServer(QObject *parent)
     :QObject(parent)
 {
 
@@ -64,7 +64,7 @@ Server::Server(QObject *parent)
 
 }
 
-Server::~Server(){
+IMServer::~IMServer(){
     qDebug()<<"Server::~Server()";
 
 
@@ -105,7 +105,7 @@ Server::~Server(){
 }
 
 
-bool Server::startMainService(){
+bool IMServer::startMainService(){
 
     if(mainServiceStarted){
         qWarning()<<"Main service has already started!";
@@ -179,7 +179,7 @@ bool Server::startMainService(){
 
 //}
 
-void Server::saveClientLog(const QString &computerName, const QString &users, const QString &log, const QString &clientAddress){
+void IMServer::saveClientLog(const QString &computerName, const QString &users, const QString &log, const QString &clientAddress){
     //    qWarning()<<"Server::saveClientLog(...)";
 
     if(!query){
@@ -217,7 +217,7 @@ void Server::saveClientLog(const QString &computerName, const QString &users, co
 }
 
 
-void Server::saveFileLog(const QString &sender, const QString &receiver, const QString &fileName, const QString &md5Hex, quint64 size){
+void IMServer::saveFileLog(const QString &sender, const QString &receiver, const QString &fileName, const QString &md5Hex, quint64 size){
     //    qWarning()<<"Server::saveFileLog(...)";
 
     if(!query){
@@ -255,17 +255,17 @@ void Server::saveFileLog(const QString &sender, const QString &receiver, const Q
 
 }
 
-void Server::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
+void IMServer::peerConnected(const QHostAddress &peerAddress, quint16 peerPort){
     qWarning()<<QString("Connected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
-void Server::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
+void IMServer::signalConnectToPeerTimeout(const QHostAddress &peerAddress, quint16 peerPort){
     qCritical()<<QString("Connecting Timeout! "+peerAddress.toString()+":"+QString::number(peerPort));
 
 }
 
-void Server::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
+void IMServer::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort, bool normalClose){
     qDebug()<<QString("Client Disconnected! "+peerAddress.toString()+":"+QString::number(peerPort));
 
     if(!normalClose){
@@ -277,7 +277,7 @@ void Server::peerDisconnected(const QHostAddress &peerAddress, quint16 peerPort,
 
 }
 
-void Server::peerDisconnected(int socketID){
+void IMServer::peerDisconnected(int socketID){
     //TODO
 
 
@@ -292,7 +292,7 @@ void Server::peerDisconnected(int socketID){
 
 
 
-bool Server::openDatabase(bool reopen){
+bool IMServer::openDatabase(bool reopen){
 
     if(reopen){       
         if(query){
@@ -370,7 +370,7 @@ bool Server::openDatabase(bool reopen){
 
 
 
-void Server::start()
+void IMServer::start()
 {
 
     qDebug()<<"----Server::start()";
@@ -394,7 +394,7 @@ void Server::start()
 
 }
 
-void Server::stop()
+void IMServer::stop()
 {
 //    if(sendServerOnlinePacketTimer){
 //        sendServerOnlinePacketTimer->stop();

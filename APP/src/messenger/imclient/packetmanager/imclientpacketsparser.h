@@ -1058,7 +1058,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::RequestUploadFile));
+        packet->setPacketType(quint8(IM::REQUEST_UPLOAD_FILE));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1091,7 +1091,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::CancelUploadFileRequest));
+        packet->setPacketType(quint8(IM::CANCEL_FILE_UPLOAD_REQUEST));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1124,7 +1124,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::RequestDownloadFile));
+        packet->setPacketType(quint8(IM::REQUEST_DOWNLOAD_FILE));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1156,7 +1156,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::CancelDownloadFileRequest));
+        packet->setPacketType(quint8(IM::CANCEL_FILE_DOWNLOAD_REQUEST));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1189,7 +1189,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::ResponseFileDownloadRequest));
+        packet->setPacketType(quint8(IM::RESPONSE_FILE_DOWNLOAD_REQUEST));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1221,7 +1221,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::ResponseFileDownloadRequest));
+        packet->setPacketType(quint8(IM::RESPONSE_FILE_DOWNLOAD_REQUEST));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);
@@ -1253,7 +1253,7 @@ public slots:
 
         Packet *packet = PacketHandlerBase::getPacket();
 
-        packet->setPacketType(quint8(IM::ResponseFileUploadRequest));
+        packet->setPacketType(quint8(IM::RESPONSE_FILE_UPLOAD_REQUEST));
         packet->setTransmissionProtocol(TP_UDT);
         QByteArray ba;
         QDataStream out(&ba, QIODevice::WriteOnly);

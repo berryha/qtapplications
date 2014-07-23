@@ -98,7 +98,7 @@ void ServerService::start()
 
     mainServiceStarted = false;
     
-    m_server = new Server(this);
+    m_server = new IMServer(this);
     m_server->start();
 
 
