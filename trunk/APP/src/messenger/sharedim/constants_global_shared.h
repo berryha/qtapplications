@@ -267,17 +267,17 @@ enum Command {
 
 
     //File TX
-    RequestDownloadFile,
-    CancelDownloadFileRequest,
-    ResponseFileDownloadRequest,
-
+    REQUEST_DOWNLOAD_FILE,
+    CANCEL_FILE_DOWNLOAD_REQUEST,
+    RESPONSE_FILE_DOWNLOAD_REQUEST,
 //    CLIENT_REQUEST_UPLOADING_OFFLINE_FILE,
 //    SERVER_RESPONSE_UPLOADING_OFFLINE_FILE,
 
-    RequestUploadFile,
-
-    CancelUploadFileRequest,
-    ResponseFileUploadRequest,
+    REQUEST_UPLOAD_FILE,
+    CANCEL_FILE_UPLOAD_REQUEST,
+    RESPONSE_FILE_UPLOAD_REQUEST,
+//    CancelUploadFileRequest,
+//    ResponseFileUploadRequest,
 
 //    RequestFileData,
 //    FileData,

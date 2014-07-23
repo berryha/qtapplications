@@ -29,8 +29,8 @@
 
 
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef IMSERVER_H
+#define IMSERVER_H
 
 #include <QObject>
 
@@ -50,12 +50,12 @@
 namespace HEHUI {
 
 
-class SERVERLIB_API Server : public QObject
+class SERVERLIB_API IMServer : public QObject
 {
     Q_OBJECT
 public:
-    Server(QObject *parent = 0);
-    ~Server();
+    IMServer(QObject *parent = 0);
+    ~IMServer();
 
     void start();
     void stop();
@@ -116,4 +116,4 @@ private:
 
 } //namespace HEHUI
 
-#endif // SERVER_H
+#endif // IMSERVER_H
