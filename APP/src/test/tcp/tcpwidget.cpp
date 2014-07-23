@@ -30,6 +30,10 @@ TCPWidget::TCPWidget(QWidget *parent)
 
     m_receivedDataCount = 0;
 
+    startTime = endTime = QDateTime();
+    totalDataSize = 0;
+
+
     m_peerAddress = QHostAddress(ui.lineEditIP->text());
     m_peerPort = ui.spinBoxRemotePort->value();
 
@@ -82,8 +86,8 @@ void TCPWidget::connectToPeer(){
 
     if(isConnected){
         ui.toolButtonConnect->setText("Disconnecting...");
-        tcpProtocol->abort(peerSockeet);
-        disconnected(peerSockeet, m_peerAddress.toString(), m_peerPort);
+        tcpProtocol->disconnectFromHost(peerSockeet);
+        //disconnected(peerSockeet, m_peerAddress.toString(), m_peerPort);
     }else{
 
 //        if(!isListening){
@@ -203,39 +207,42 @@ bool TCPWidget::startServer(quint16 port){
 void TCPWidget::send(){
 
     QByteArray data;
-    int size = ui.spinBoxDataSize->value();
-    //data.resize(ui.spinBoxDataSize->value());
+    int size = ui.spinBoxDataSize->value() * 1024;
+    int msec = QDateTime::currentDateTime().time().msec();
     for(int i=0; i<size; i++){
-        data.append(QString::number(i).toLatin1());
+        data.append(QString::number(i+msec).toLatin1());
         if(data.size() >= size){break;}
     }
     data.resize(size);
-
     QString md5 = Cryptography::MD5(data).toBase64();
 
-
-    ui.textBrowser->append("----"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
-    ui.textBrowser->append("Start Sending Data To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" MD5:"+md5 );
 
     int count = ui.spinBoxSendCount->value();
     int sent= 0;
     int failed = 0;
 
-    int i = 0;
-    while (i<count) {
-        if(tcpProtocol->sendData(peerSockeet, &data)){
-            i++;
-            ui.textBrowser->append(QString("Data %1 Sent!").arg(i));
-            QApplication::processEvents();
-        }else{
-            ui.textBrowser->append("Failed to send data! " +tcpProtocol->socketErrorString(peerSockeet));
-        }
+    ui.textBrowser->append("Start Sending Data To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" MD5:"+md5 +" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz") );
 
+    QByteArray a("0x0000");
+    tcpProtocol->sendData(peerSockeet, &a);
+
+    bool ok = false;
+    for(int i=0;i<count;i++) {
+        ok = tcpProtocol->sendData(peerSockeet, &data);
+        if(ok){
+            sent++;
+        }else{
+            ui.textBrowser->append(tcpProtocol->socketErrorString(peerSockeet));
+
+            failed++;
+        }
+        qApp->processEvents();
     }
 
+    QByteArray b("0xFFFF");
+    tcpProtocol->sendData(peerSockeet, &b);
 
-    ui.textBrowser->append("Sent:"+QString::number(sent)+" Failed:"+QString::number(failed)+" Data Sent To "+m_peerAddress.toString()+":"+QString::number(m_peerPort) );
-    ui.textBrowser->append("----"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
+    ui.textBrowser->append("Sent:"+QString::number(sent)+" Failed:"+QString::number(failed)+" Data Sent To "+m_peerAddress.toString()+":"+QString::number(m_peerPort)+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz") );
 
 
 }
@@ -278,15 +285,15 @@ void TCPWidget::signalConnectToPeerTimeout(const QString &peerAddress, quint16 p
 void TCPWidget::disconnected(int socketID, const QString &peerAddress, quint16 peerPort){
     ui.textBrowser->append("Disconnected! "+peerAddress+":"+QString::number(peerPort)+" Socket ID:"+QString::number(socketID));
 
-    if(!isListening){
+    isConnected = false;
+
         ui.lineEditIP->setEnabled(true);
         ui.spinBoxRemotePort->setEnabled(true);
         ui.toolButtonConnect->setText("Connect");
         ui.toolButtonConnect->setEnabled(true);
         ui.toolButtonSend->setEnabled(false);
-    }
 
-    isConnected = false;
+
 
 //    tcpProtocol->closeSocket(socketID);
 
@@ -295,15 +302,29 @@ void TCPWidget::disconnected(int socketID, const QString &peerAddress, quint16 p
 
 void TCPWidget::dataReceived(const QString &peerAddress, quint16 peerPort, QByteArray *data){
 
-    qDebug()<<"-------------2-------Thread ID:"<<QThread::currentThreadId ();
 
+    if(*data == QByteArray("0x0000")){
+        startTime = QDateTime::currentDateTime();
+        ui.textBrowser->append("---START---" + startTime.toString("mm:ss:zzz"));
+        totalDataSize = 0;
+        m_receivedDataCount = 0;
+
+        return;
+    }
+    if(*data == QByteArray("0xFFFF")){
+        endTime = QDateTime::currentDateTime();
+        ui.textBrowser->append("---END---" + endTime.toString("mm:ss:zzz"));
+        ui.textBrowser->append(QString("Total Data Size:%1 KB, Speed:%2 KB/S ").arg(totalDataSize/1024).arg((float)(totalDataSize*1000)/(startTime.msecsTo(endTime)*1024)) + endTime.toString(" mm:ss:zzz"));
+
+        return;
+    }
+
+    totalDataSize += data->size();
 
     m_receivedDataCount++;
     QString md5 = Cryptography::MD5(*data).toBase64();
 
-    ui.textBrowser->append(QString::number(m_receivedDataCount)+" Data Received From "+peerAddress+":"+QString::number(peerPort)+" MD5:"+md5+" Time:"+QDateTime::currentDateTime().toString("hh:mm:ss:zzz"));
-
-
+    ui.textBrowser->append(QString::number(m_receivedDataCount)+" MD5:"+md5);
 
 
 }

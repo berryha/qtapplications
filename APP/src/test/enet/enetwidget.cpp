@@ -165,6 +165,7 @@ void ENETWidget::send(){
 
     for(int i=0;i<count;i++){
         if(enetProtocol->sendData(m_peerID, &data)){
+            //enetProtocol->flush();
             sent++;
         }else{
             failed++;

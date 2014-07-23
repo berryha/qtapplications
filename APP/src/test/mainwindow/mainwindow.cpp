@@ -102,17 +102,17 @@ MainWindow::MainWindow(QWidget *parent, HEHUI::WindowPosition positon)
 //    ui.mdiArea->addSubWindow(rudpWidger);
 //    rudpWidger->show();
 
-//    tcpWidget = new TCPWidget(this);
-//    ui.mdiArea->addSubWindow(tcpWidget);
-//    tcpWidget->show();
+    tcpWidget = new TCPWidget(this);
+    ui.mdiArea->addSubWindow(tcpWidget);
+    tcpWidget->show();
 
-    udtWidget = new UDTWidget(this);
-    ui.mdiArea->addSubWindow(udtWidget);
-    udtWidget->show();
+//    udtWidget = new UDTWidget(this);
+//    ui.mdiArea->addSubWindow(udtWidget);
+//    udtWidget->show();
 
-    enetWidget = new ENETWidget(this);
-    ui.mdiArea->addSubWindow(enetWidget);
-    enetWidget->show();
+//    enetWidget = new ENETWidget(this);
+//    ui.mdiArea->addSubWindow(enetWidget);
+//    enetWidget->show();
 
 
 

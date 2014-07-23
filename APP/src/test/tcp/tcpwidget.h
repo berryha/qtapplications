@@ -2,6 +2,7 @@
 #define TCPPWidget_H
 
 #include <QWidget>
+#include <QDateTime>
 
 #include "ui_tcpwidget.h"
 
@@ -73,7 +74,8 @@ private:
 
     quint16 m_receivedDataCount;
 
-
+    QDateTime startTime, endTime;
+    quint64 totalDataSize;
 
 
 

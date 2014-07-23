@@ -42,7 +42,7 @@
 #include "../shared/app_constants.h"
 #include "HHSharedGUI/hmainwindowbase.h"
 
-//#include "tcp/tcpwidget.h"
+#include "tcp/tcpwidget.h"
 #include "udt/udt.h"
 
 
@@ -111,7 +111,7 @@ private:
 
     QMenu *pluginsMenu;
 
-//    TCPWidget *tcpWidget;
+    TCPWidget *tcpWidget;
 
     UDTWidget *udtWidget;
 

@@ -7,16 +7,16 @@
 
 #include "../filemanager.h"
 
-#include "HHSharedCore/hsingleton.h"
+//#include "HHSharedCore/hsingleton.h"
 
 namespace HEHUI {
 
 class FileTransmissionInfo;
 
-class FileTransmissionManagerBase : public QObject, public Singleton<FileTransmissionManagerBase>
+class SHAREDIMLIB_API FileTransmissionManagerBase : public QObject//, public Singleton<FileTransmissionManagerBase>
 {
     Q_OBJECT
-    friend class Singleton<FileTransmissionManagerBase> ;
+    //friend class Singleton<FileTransmissionManagerBase> ;
 
 public:
     explicit FileTransmissionManagerBase(const QString &myID, FileTransmissionPacketsParserBase *fileTransmissionPacketsParser, QObject *parent = 0);
