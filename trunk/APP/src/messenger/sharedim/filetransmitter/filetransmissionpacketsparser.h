@@ -50,7 +50,7 @@
 namespace HEHUI {
 
 
-class FileTransmissionPacketsParserBase : public QObject{
+class SHAREDIMLIB_API FileTransmissionPacketsParserBase : public QObject{
     Q_OBJECT
 public:
     FileTransmissionPacketsParserBase(const QString &myID, QObject *parent = 0);
