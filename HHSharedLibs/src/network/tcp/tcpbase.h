@@ -56,6 +56,7 @@ public:
 signals:
     void connected (int socketID, const QString &peerAddress, quint16 peerPort);
     void disconnected (int socketID);
+    void disconnected (int socketID, const QString &peerAddress, quint16 peerPort);
     void socketError(int socketID, QAbstractSocket::SocketError error);
 
 protected:

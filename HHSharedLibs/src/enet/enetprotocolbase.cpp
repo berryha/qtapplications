@@ -312,7 +312,8 @@ bool ENETProtocolBasePrivate::sendData(ENetPeer *peer, const QByteArray *byteArr
         return false;
     }
 
-   //enet_host_flush (localServer);
+   enet_host_flush (localServer);
+//    enet_host_service(localServer, 0, 1);
 
     return true;
 }
@@ -324,6 +325,10 @@ bool ENETProtocolBasePrivate::sendData(quint32 peerID, const QByteArray *byteArr
     }
 
     return sendData(peer, byteArray, reliable, channel);
+}
+
+void ENETProtocolBasePrivate::flush(){
+    enet_host_flush (localServer);
 }
 
 void ENETProtocolBasePrivate::disconnectNow(ENetPeer *peer){
@@ -476,6 +481,10 @@ bool ENETProtocolBase::connectToHost(const QHostAddress &address, quint16 port, 
 
 bool ENETProtocolBase::sendData(quint32 peerID, const QByteArray *byteArray, bool reliable, quint8 channel){
     return m_basePrivate->sendData(peerID, byteArray, reliable, channel);
+}
+
+void ENETProtocolBase::flush(){
+    m_basePrivate->flush();
 }
 
 void ENETProtocolBase::disconnectNow(quint32 peerID){
