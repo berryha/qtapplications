@@ -312,7 +312,7 @@ bool ENETProtocolBasePrivate::sendData(ENetPeer *peer, const QByteArray *byteArr
         return false;
     }
 
-   enet_host_flush (localServer);
+    enet_host_flush (localServer);
 //    enet_host_service(localServer, 0, 1);
 
     return true;
