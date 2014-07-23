@@ -48,6 +48,9 @@ public slots:
     //Send data
     bool sendData(quint32 peerID, const QByteArray *byteArray, bool reliable = true, quint8 channel = 0);
 
+    //enet_host_flush
+    void flush();
+
     //Close peer socket
     void disconnectNow(quint32 peerID);
     void disconnect(quint32 peerID);

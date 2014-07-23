@@ -355,7 +355,7 @@ void TCPBase::peerDisconnected (){
 
 
     qDebug()<<QString("Peer Disconnected! %1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
-    emit disconnected(socketID);
+    emit disconnected(socketID, socket->peerAddress().toString(), socket->peerPort());
 
 }
 
