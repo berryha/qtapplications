@@ -428,6 +428,7 @@ void MainWindow::startNetwork(){
     connect(m_chatWindowManager, SIGNAL(signalRequestGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), this, SLOT(getGrouptHistoryMessage(const QString &, const QString &, const QString &, bool, quint32)), Qt::QueuedConnection);
 
     //File TX
+    connect(m_chatWindowManager, SIGNAL(signalRequestFileServerInfo()), this, SLOT(slotRequestFileServerInfo()), Qt::QueuedConnection);
     connect(m_chatWindowManager, SIGNAL(signalSendUploadingFileRequest(Contact *, const QString &, const QByteArray &)), this, SLOT(slotSendUploadingFileRequest(Contact *, const QString &, const QByteArray &)), Qt::QueuedConnection);
     connect(m_chatWindowManager, SIGNAL(signalCancelSendingFileUploadingRequest(Contact *, const QByteArray &)), this, SLOT(slotCancelSendingFileRequest(Contact *, const QByteArray &)), Qt::QueuedConnection);
     connect(m_chatWindowManager, SIGNAL(signalAcceptPeerUploadFileRequest(Contact *, const QByteArray &, const QString &)), this, SLOT(slotAcceptPeerUploadFileRequest(Contact *, const QByteArray &, const QString &)), Qt::QueuedConnection);
@@ -1354,6 +1355,11 @@ void MainWindow::getGrouptHistoryMessage(const QString &startTime, const QString
     m_chatWindowManager->processGrouptHistoryMessage(messages, canFetchMore, groupID);
 }
 
+void MainWindow::slotRequestFileServerInfo(){
+    qDebug()<<"--MainWindow::slotRequestFileServerInfo()";
+    clientPacketsParser->requestFileServerInfo(m_socketConnectedToServer);
+}
+
 void MainWindow::slotSendUploadingFileRequest(Contact *contact, const QString &filePath, const QByteArray &fileMD5){
     QFileInfo info(filePath);
     clientPacketsParser->requestUploadFile(contact, fileMD5, info.fileName(), info.size() );
@@ -1364,15 +1370,12 @@ void MainWindow::slotCancelSendingFileRequest(Contact *contact, const QByteArray
 }
 
 void MainWindow::slotAcceptPeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5, const QString &localSavePath){
-
     clientPacketsParser->responseFileUploadRequest(contact, fileMD5, true, "");
-    //TODO
 }
 
 void MainWindow::slotDeclinePeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5){
     clientPacketsParser->responseFileUploadRequest(contact, fileMD5, false, "");
 }
-
 
 
 void MainWindow::slotUserVerified(){

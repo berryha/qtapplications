@@ -66,6 +66,7 @@ signals:
 
 
     //FILE TX
+    void signalRequestFileServerInfo();
     void signalSendUploadingFileRequest(Contact *contact, const QString &filePath, const QByteArray &fileMD5);
     void signalCancelSendingFileUploadingRequest(Contact *contact, const QByteArray &fileMD5);
     //void signalAbortFileTransmission(const QString &fileMD5);
@@ -135,7 +136,7 @@ private:
 
     QMenu * chatHistoryMenu();
 
-    void initFileTransmission();
+    bool initFileTransmission();
 
 
 private:

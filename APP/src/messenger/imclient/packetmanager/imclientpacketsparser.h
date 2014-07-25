@@ -246,8 +246,8 @@ public slots:
     bool requestLogin(int serverSocketID, const QString &clientVersion = APP_VERSION){
         qDebug()<<"--requestLogin(...)";
         
-        m_myUserID = user->getUserID();
-        sessionEncryptionKey = cryptography->SHA1(user->getPassword().toUtf8());
+        m_myUserID = myself->getUserID();
+        sessionEncryptionKey = cryptography->SHA1(myself->getPassword().toUtf8());
         Q_ASSERT_X(!m_myUserID.isEmpty(), "requestLogin", "Invalid User ID!");
         if(m_myUserID.isEmpty()){
             qCritical()<<"Invalid User ID!";
@@ -1052,6 +1052,34 @@ public slots:
     
     //FILE TX
     ///////////////////////////////////////////////
+    bool requestFileServerInfo(int serverSocketID){
+        qDebug()<<"--requestFileServerInfo(...)";
+
+        Packet *packet = PacketHandlerBase::getPacket();
+
+        packet->setPacketType(quint8(IM::CLIENT_REQUEST_FILE_SERVER_INFO));
+        packet->setTransmissionProtocol(TP_UDT);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+        out << m_myUserID;
+
+        QByteArray encryptedData;
+        cryptography->teaCrypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_myUserID << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+
+        return m_rtp->sendReliableData(serverSocketID, &ba);
+    }
+
     bool requestUploadFile(IMUserBase *contact, const QByteArray &fileMD5Sum, const QString &fileName, quint64 size){
         qDebug()<<"--requestUploadFile(...) Contact ID"<<contact->getUserID()<<" fileName:"<<fileName;
         QString contactID = contact->getUserID();
@@ -1407,9 +1435,9 @@ private slots:
         QString deviceInfo = "PC";
 
         //TODO:密码保存方式
-        sessionEncryptionKey = user->encryptedPassword();
+        sessionEncryptionKey = myself->encryptedPassword();
         QByteArray encryptedPassword;
-        cryptography->teaCrypto(&encryptedPassword, QByteArray::fromBase64(user->getPassword().toUtf8()), sessionEncryptionKey, true);
+        cryptography->teaCrypto(&encryptedPassword, QByteArray::fromBase64(myself->getPassword().toUtf8()), sessionEncryptionKey, true);
         
         Packet *packet = PacketHandlerBase::getPacket(serverSocketID);
         packet->setPacketType(quint8(IM::CLIENT_LOGIN_INFO));
@@ -1418,7 +1446,7 @@ private slots:
         QDataStream out(&ba, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_8);
 
-        out << m_myUserID << encryptedPassword << quint8(user->getStateAfterLoggedin()) << deviceInfo ;
+        out << m_myUserID << encryptedPassword << quint8(myself->getStateAfterLoggedin()) << deviceInfo ;
         packet->setPacketData(ba);
 
         ba.clear();
@@ -1571,7 +1599,7 @@ private:
 
     QMutex mutex;
 
-    IMUser *user;
+    IMUser *myself;
     QString m_myUserID;
     QString m_serverName;
     int m_socketConnectedToServer;
