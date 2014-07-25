@@ -196,6 +196,7 @@ private slots:
 
 //////////////////////////////
     //FILE TX
+    void slotRequestFileServerInfo();
     void slotSendUploadingFileRequest(Contact *contact, const QString &filePath, const QByteArray &fileMD5);
     void slotCancelSendingFileRequest(Contact *contact, const QByteArray &fileMD5);
     void slotAcceptPeerUploadFileRequest(Contact *contact, const QByteArray &fileMD5, const QString &localSavePath);

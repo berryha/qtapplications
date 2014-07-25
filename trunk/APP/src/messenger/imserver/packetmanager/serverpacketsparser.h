@@ -1271,6 +1271,39 @@ public slots:
 
     }
 
+    bool sendFileServerInfoToUser(int peerSocketID, const QByteArray &sessionEncryptionKey){
+        qDebug()<<"--sendFileServerInfoToUser(...)";
+
+        qCritical()<<"-------!!!!-------TODO:Get File Server Info!-------!!!!-------";
+        quint32 ipv4Address = 0;
+        quint16 port = m_localRTPListeningPort;
+
+
+        //TODO:缓存消息的格式
+        Packet *packet = PacketHandlerBase::getPacket(peerSocketID);
+        packet->setPacketType(quint8(IM::SERVER_RESPONSE_FILE_SERVER_INFO));
+        packet->setTransmissionProtocol(TP_RUDP);
+        QByteArray ba;
+        QDataStream out(&ba, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_8);
+
+        out << ipv4Address << port;
+
+        QByteArray encryptedData;
+        crypto(&encryptedData, ba, sessionEncryptionKey, true);
+        ba.clear();
+        out.device()->seek(0);
+        out << m_serverName << encryptedData;
+        packet->setPacketData(ba);
+
+        ba.clear();
+        out.device()->seek(0);
+        QVariant v;
+        v.setValue(*packet);
+        out << v;
+        return m_rtp->sendReliableData(peerSocketID, &ba);
+
+    }
 
 
 
@@ -1285,10 +1318,15 @@ private slots:
     //    void startHeartbeat(int interval = HEARTBEAT_TIMER_INTERVAL);
     //    void stopHeartbeat();
 
+
+    //TODO:Replace
     int crypto(QByteArray *destination, const QByteArray &source, const QByteArray &key, bool encrypt);
 
     bool encrypeData(const QString &userID, QByteArray *destination, const QByteArray &source);
+    bool encrypeData(UserInfo *info, QByteArray *destination, const QByteArray &source);
     bool decryptData(const QString &userID, QByteArray *destination, const QByteArray &source);
+    bool decryptData(UserInfo *info, QByteArray *destination, const QByteArray &source);
+
 
     //    void slotCheckIMUsersOnlineStatus();
 

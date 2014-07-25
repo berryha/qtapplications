@@ -8,6 +8,9 @@
 
 #include "../contactsmanager/contactsmanager.h"
 
+#include "HHSharedCore/hutilities.h"
+
+
 namespace HEHUI {
 
 ChatWindowManager::ChatWindowManager(QWidget *parent)
@@ -894,22 +897,26 @@ void ChatWindowManager::sendUploadingFileRequest(const QString &filePath, const 
     //TODO
 
     if(offline){
-        initFileTransmission();
-        while (m_socketConnectedToServer == INVALID_SOCK_ID) {
-            m_socketConnectedToServer = m_fileTransmissionPacketsParser->connectToServer();
-
-            if(m_socketConnectedToServer == INVALID_SOCK_ID){
-                int btn = QMessageBox::critical(this, tr("Connection Failed"), tr("Can not connect to server!"),
-                                                QMessageBox::Retry | QMessageBox::Cancel,
-                                                QMessageBox::Retry
-                                                );
-                if(btn == QMessageBox::Cancel){
-                    wgt->cancelFileTransmission(fileMD5);
-                    return;
-                }
-
-            }
+        if(!initFileTransmission()){
+            wgt->cancelFileTransmission(fileMD5);
+            return;
         }
+
+//        while (m_socketConnectedToServer == INVALID_SOCK_ID) {
+//            m_socketConnectedToServer = m_fileTransmissionPacketsParser->connectToServer();
+
+//            if(m_socketConnectedToServer == INVALID_SOCK_ID){
+//                int btn = QMessageBox::critical(this, tr("Connection Failed"), tr("Can not connect to server!"),
+//                                                QMessageBox::Retry | QMessageBox::Cancel,
+//                                                QMessageBox::Retry
+//                                                );
+//                if(btn == QMessageBox::Cancel){
+//                    wgt->cancelFileTransmission(fileMD5);
+//                    return;
+//                }
+
+//            }
+//        }
         QFileInfo info(filePath);
         m_fileTransmissionPacketsParser->requestUploadFile(m_socketConnectedToServer, contact->getUserID(), fileMD5, info.fileName(), info.size());
 
@@ -949,6 +956,10 @@ void ChatWindowManager::acceptPeerUploadFileRequest(const QByteArray &fileMD5, c
 
     emit signalAcceptPeerUploadFileRequest(contact, fileMD5, localSavePath);
 
+
+
+
+
 }
 
 void ChatWindowManager::declineFileRequest(const QByteArray &fileMD5){
@@ -973,11 +984,16 @@ void ChatWindowManager::contactRequestDownloadFile(const QString &contactID, con
 }
 
 void ChatWindowManager::fileDownloadRequestAccepted(const QString &contactID, const QString &remoteFileName, const QByteArray &fileMD5Sum, quint64 size){
+    //TODO:
+
+    if(!initFileTransmission()){
+        return;
+    }
 
 }
 
 void ChatWindowManager::fileDownloadRequestDenied(const QString &contactID, const QString &remoteFileName, const QString &message){
-
+    //TODO
 }
 
 void ChatWindowManager::fileUploadRequestResponsed(const QString &contactID, const QByteArray &fileMD5Sum, bool accepted, const QString &message){
@@ -986,6 +1002,13 @@ void ChatWindowManager::fileUploadRequestResponsed(const QString &contactID, con
     if(!ccw){return;}
 
     ccw->fileUploadRequestResponsed(fileMD5Sum, accepted, message);
+
+    //TODO
+    if(!accepted){return;}
+
+    if(!initFileTransmission()){
+        return;
+    }
 
 }
 
@@ -1120,13 +1143,49 @@ GroupChatWindow * ChatWindowManager::findInterestGroupChatTabWidget(InterestGrou
 
 }
 
-void ChatWindowManager::initFileTransmission(){
+bool ChatWindowManager::initFileTransmission(){
 
     if(!m_fileTransmissionPacketsParser){
-        QString myID = IMUser::instance()->getUserID();
+
+        IMUser *myself = IMUser::instance();
+        QString myID = myself->getUserID();
+
+        //TODO:Get File Server Info
+        emit signalRequestFileServerInfo();
+
+        int n = 0;
+        while (myself->getFileServerPort() == 0) {
+            Utilities::msleep(500);
+            qApp->processEvents();
+
+            n++;
+            if(10 == n){
+                QMessageBox::critical(this, tr("Error"), tr("Timeout! Can not get file server info!"));
+                return false;
+            }
+        }
+
         m_fileTransmissionPacketsParser = new ClientFileTransmissionPacketsParser(myID, this);
         m_fileTransmissionManager = new ClientFileTransmissionManager(myID, m_fileTransmissionPacketsParser, this);
+
     }
+
+    while (m_socketConnectedToServer == INVALID_SOCK_ID) {
+        m_socketConnectedToServer = m_fileTransmissionPacketsParser->connectToServer();
+
+        if(m_socketConnectedToServer == INVALID_SOCK_ID){
+            int btn = QMessageBox::critical(this, tr("Connection Failed"), tr("Can not connect to file server!"),
+                                            QMessageBox::Retry | QMessageBox::Cancel,
+                                            QMessageBox::Retry
+                                            );
+            if(btn == QMessageBox::Cancel){
+                return false;
+            }
+        }
+    }
+
+
+    return true;
 
 }
 

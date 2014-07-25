@@ -1349,6 +1349,42 @@ void ServerPacketsParser::parseIncomingPacketData(Packet *packet){
         break;
 
 
+        //FILE TX
+    case quint8(IM::CLIENT_REQUEST_FILE_SERVER_INFO):
+    {
+        qDebug()<<"--CLIENT_REQUEST_FILE_SERVER_INFO";
+
+
+        QString userID = peerID;
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        UserInfo *userInfo = getUserInfo(userID);
+        if(!userInfo){return;}
+
+        //解密数据
+        QByteArray decryptedData;
+        if(!decryptData(userID, &decryptedData, encryptedData)){return;}
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_7);
+
+        QString  id = "";
+        stream >> id;
+
+        if(id != userID){
+            qCritical()<<"ERROR! Invalid Request!";
+            return;
+        }
+
+        //TODO
+        sendFileServerInfoToUser(socketID, userInfo->getSessionEncryptionKey());
+
+
+    }
+        break;
+
+
+
     default:
         qWarning()<<"Unknown Packet Type:"<<packetType
                  <<" From:"<<peerAddress.toString()
@@ -1404,19 +1440,31 @@ int ServerPacketsParser::crypto(QByteArray *destination, const QByteArray &sourc
 bool ServerPacketsParser::encrypeData(const QString &userID, QByteArray *destination, const QByteArray &source){
 
     UserInfo *info = getUserInfo(userID);
+    return encrypeData(info, destination, source);
+}
+
+bool ServerPacketsParser::encrypeData(UserInfo *info, QByteArray *destination, const QByteArray &source){
+
     if(!info){
         return false;
     }
     return cryptography->teaCrypto(destination, source, info->getSessionEncryptionKey(), true);
-
 }
 
 bool ServerPacketsParser::decryptData(const QString &userID, QByteArray *destination, const QByteArray &source){
 
     UserInfo *info = getUserInfo(userID);
+
+    return decryptData(info, destination, source);
+
+}
+
+bool ServerPacketsParser::decryptData(UserInfo *info, QByteArray *destination, const QByteArray &source){
+
     if(!info){
         return false;
     }
+
     //TODO 验证数据是否解密成功  //qCritical()<<"Data Decryption Failed!";
     return cryptography->teaCrypto(destination, source, info->getSessionEncryptionKey(), false);
 

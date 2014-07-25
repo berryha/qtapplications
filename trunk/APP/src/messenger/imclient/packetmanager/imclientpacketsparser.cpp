@@ -85,8 +85,8 @@ IMClientPacketsParser::IMClientPacketsParser(ClientResourcesManager *resourcesMa
 
     //serverLastOnlineTime = QDateTime();
 
-    user = IMUser::instance();
-    m_myUserID = user->getUserID();
+    myself = IMUser::instance();
+    m_myUserID = myself->getUserID();
     m_serverName = "";
     m_socketConnectedToServer = INVALID_SOCK_ID;
 
@@ -379,19 +379,19 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
             Q_ASSERT(serverTime);
             ServerTime::instance()->startSync(serverTime);
 
-            user->setSessionEncryptionKey(sessionEncryptionKey);
+            myself->setSessionEncryptionKey(sessionEncryptionKey);
 
             errorTypeCode = quint8(IM::ERROR_NoError);
             errorMessage = "";
 
             //TODO:
-            user->loadMyInfoFromLocalDatabase();
+            myself->loadMyInfoFromLocalDatabase();
 
-            if(personalSummaryInfoVersionOnServer != user->getPersonalSummaryInfoVersion()){requestContactInfo(socketID, m_myUserID, true);}
-            if(personalDetailInfoVersionOnServer != user->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
+            if(personalSummaryInfoVersionOnServer != myself->getPersonalSummaryInfoVersion()){requestContactInfo(socketID, m_myUserID, true);}
+            if(personalDetailInfoVersionOnServer != myself->getPersonalDetailInfoVersion()){requestContactInfo(socketID, m_myUserID, false);}
 //            if(personalContactGroupsInfoVersionOnServer != user->getPersonalContactGroupsVersion()){requestPersonalContactGroupsInfo(socketID);}
-            if(interestGroupsInfoVersionOnServer != user->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
-            if(personalMessageInfoVersionOnServer != user->getPersonalMessageInfoVersion()){requestPersonalMessage(socketID, m_myUserID);}
+            if(interestGroupsInfoVersionOnServer != myself->getInterestGroupInfoVersion()){requestInterestGroupsList(socketID);}
+            if(personalMessageInfoVersionOnServer != myself->getPersonalMessageInfoVersion()){requestPersonalMessage(socketID, m_myUserID);}
 
         }else{
             in >> errorTypeCode >> errorMessage;
@@ -419,10 +419,10 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
         QString extIPAddress = "", loginTime = "", LogoutTime = "", deviceInfo = "";
         stream >> extIPAddress >> loginTime >> LogoutTime >> deviceInfo;
-        user->setLastLoginExternalHostAddress(extIPAddress);
-        user->setLastLoginTime(QDateTime::fromString(loginTime));
-        user->setLastLogoutTime(QDateTime::fromString(LogoutTime));
-        user->setLastLoginDeviceInfo(deviceInfo);
+        myself->setLastLoginExternalHostAddress(extIPAddress);
+        myself->setLastLoginTime(QDateTime::fromString(loginTime));
+        myself->setLastLogoutTime(QDateTime::fromString(LogoutTime));
+        myself->setLastLoginDeviceInfo(deviceInfo);
         //TODO
 
         emit signalClientLastLoginInfoPacketReceived(extIPAddress, loginTime, LogoutTime, deviceInfo);
@@ -499,12 +499,12 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         quint8 isSummaryInfo = 1;
         stream >> userInfo >> isSummaryInfo;
         
-        if(userID == user->getUserID()){
-            user->setPersonalInfoString(userInfo, isSummaryInfo);
-            user->saveMyInfoToLocalDatabase();
+        if(userID == myself->getUserID()){
+            myself->setPersonalInfoString(userInfo, isSummaryInfo);
+            myself->saveMyInfoToLocalDatabase();
         }else{
-            user->setContactInfoString(userID, userInfo, isSummaryInfo);
-            user->saveContactInfoToLocalDatabase(userID);
+            myself->setContactInfoString(userID, userInfo, isSummaryInfo);
+            myself->saveContactInfoToLocalDatabase(userID);
         }
 
         emit signalUserInfoPacketReceived(userID);
@@ -955,7 +955,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         in >> encryptedData;
 
         QByteArray decryptedData;
-        bool fromContact = user->hasContact(peerID);
+        bool fromContact = myself->hasContact(peerID);
         if(fromContact){
             //From contact
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(peerID), false);
@@ -983,7 +983,7 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
         in >> encryptedData;
 
         QByteArray decryptedData;
-        bool fromContact = user->hasContact(peerID);
+        bool fromContact = myself->hasContact(peerID);
         if(fromContact){
             //From contact
             cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKeyWithContactHash.value(peerID), false);
@@ -1055,6 +1055,39 @@ void IMClientPacketsParser::parseIncomingPacketData(Packet *packet){
 
 
         //File TX
+    case quint8(IM::SERVER_RESPONSE_FILE_SERVER_INFO):
+    {
+        qDebug()<<"~~SERVER_RESPONSE_FILE_SERVER_INFO";
+
+        QByteArray encryptedData;
+        in >> encryptedData;
+
+        QByteArray decryptedData;
+        cryptography->teaCrypto(&decryptedData, encryptedData, sessionEncryptionKey, false);
+        //TODO
+        QDataStream stream(&decryptedData, QIODevice::ReadOnly);
+        stream.setVersion(QDataStream::Qt_4_8);
+        quint32 ipv4Address = 0;
+        quint16 port = 0;
+        stream >> ipv4Address >> port ;
+
+        Q_ASSERT(port != 0);
+        if(port == 0){
+            qCritical()<<"ERROR! Invalid File Server Address Info!";
+            return;
+        }
+
+        if(ipv4Address == 0){
+            myself->setFileServerAddress(myself->getLoginServerAddress());
+        }else{
+            myself->setFileServerAddress(QHostAddress(ipv4Address).toString());
+        }
+
+        myself->setFileServerPort(port);
+
+    }
+        break;
+
     case quint8(IM::REQUEST_UPLOAD_FILE):
     {
         QByteArray encryptedData;
