@@ -47,7 +47,6 @@ HEADERS += \
     usersmanager/usersmanager.h \
     usersmanager/userinfo.h \
     serverlib.h \
-    resourcesmanagerinstance.h \
     usersmanager/interestgroup.h \
     usersmanager/contactgroup1.h \
     filetransmitter/serverfiletransmissionmanager.h \
@@ -59,7 +58,6 @@ SOURCES += \
     packetmanager/serverpacketsparser.cpp \
     usersmanager/usersmanager.cpp \
     usersmanager/userinfo.cpp \
-    resourcesmanagerinstance.cpp \
     usersmanager/contactgroup.cpp \
     usersmanager/interestgroup.cpp \
     filetransmitter/serverfiletransmissionmanager.cpp \

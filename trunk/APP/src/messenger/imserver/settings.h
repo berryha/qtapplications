@@ -27,152 +27,53 @@ public:
     ~Settings();
 
 
-    void setDataRootPath(const QString &dataRootPath){
-    	setValue("Server/DataRootPath", dataRootPath);
+    void setDataRootPath(const QString &dataRootPath);
 
-    }
+    QString getDataRootPath() const;
 
-    QString getDataRootPath() const{
-        QString dataRootPath = QCoreApplication::applicationDirPath() + QDir::separator() + QString(LOCAL_SERVER_DATA_DIR_NAME);
-    	return value("Server/DataRootPath",dataRootPath).toString();
+    void setLocalDatabaseFilePath(const QString &databaseFilePath);
 
-    }
-
-    void setLocalDatabaseFilePath(const QString &databaseFilePath){
-    	setValue("Server/DatabaseFilePath", databaseFilePath);
-
-    }
-
-    QString getLocalDatabaseFilePath() const{
-    	QString databaseFilePath = getDataRootPath() + QDir::separator() + QString(LOCAL_SERVER_DB_NAME);
-    	return value("Server/DatabaseFilePath", databaseFilePath).toString();
-
-    }
+    QString getLocalDatabaseFilePath() const;
 
 
+    void setDBType(unsigned int databaseType);
+    DatabaseType getDBType() const;
 
+    void setDBDriver(const QString &driverName);
+    QString getDBDriver() const;
 
+    void setDBServerHost(const QString &host);
+    QString getDBServerHost() const;
 
+    void setDBServerPort(quint16 port);
+    quint16 getDBServerPort();
 
-    void setDBType(unsigned int databaseType){
-        setValue("Database/Type", databaseType);
-    }
-    DatabaseType getDBType() const{
-        return DatabaseType(value("Database/Type", HEHUI::MYSQL).toUInt());
-    }
+    void setDBServerUserName(const QString &userName);
+    QString getDBServerUserName() const;
 
-    void setDBDriver(const QString &driverName)
-    {
-        setValue("Database/Driver", driverName);
-    }
-    QString getDBDriver() const{
-        return value("Database/Driver", REMOTE_SITOY_COMPUTERS_DB_DRIVER).toString();
-    }
+    void setDBServerUserPassword(const QString &userPassword);
+    QString getDBServerUserPassword() const;
 
-    void setDBServerHost(const QString &host){
-        setValue("Database/Host", host);
-    }
-    QString getDBServerHost() const{
-        return value("Database/Host", REMOTE_SITOY_COMPUTERS_DB_SERVER_HOST).toString();
-    }
+    void setDBName(const QString &databaseName);
+    QString getDBName() const;
 
-    void setDBServerPort(quint16 port){
-        setValue("Database/Port", port);
-    }
-    quint16 getDBServerPort(){
-        return value("Database/Port", REMOTE_SITOY_COMPUTERS_DB_SERVER_PORT).toUInt();
-    }
+    QString setChatImageCacheDir(const QString &dirPath);
+    QString getChatImageCacheDir();
 
-    void setDBServerUserName(const QString &userName){
-        QByteArray *destination = new QByteArray();
-        Cryptography cryptography;
-        cryptography.teaCrypto(destination, userName.toUtf8(), key, true);
-        setValue("Database/UserName", *destination);
-        delete destination;
-    }
-    QString getDBServerUserName() const{
-        QString userName = "";
-        QByteArray userNameArray = value("Database/UserName").toByteArray();
-        if(userNameArray.isEmpty()){
-            userName = REMOTE_SITOY_COMPUTERS_DB_USER_NAME;
-        }else{
-            QByteArray *destination = new QByteArray();
-            Cryptography cryptography;
-            cryptography.teaCrypto(destination, userNameArray, key, false);
-            userName = QString(*destination);
-            delete destination;
+    QString setUserIconDir(const QString &dirPath);
+    QString getUserIconDir();
 
-        }
-        return userName;
-    }
-
-    void setDBServerUserPassword(const QString &userPassword){
-        QByteArray *destination = new QByteArray();
-        Cryptography cryptography;
-        cryptography.teaCrypto(destination, userPassword.toUtf8(), key, true);
-        setValue("Database/Password", *destination);
-        delete destination;
-    }
-    QString getDBServerUserPassword() const{
-        QString password = "";
-        QByteArray passwordArray = value("Database/Password").toByteArray();
-        if(passwordArray.isEmpty()){
-            password = REMOTE_SITOY_COMPUTERS_DB_USER_PASSWORD;
-        }else{
-            QByteArray *destination = new QByteArray();
-            Cryptography cryptography;
-            cryptography.teaCrypto(destination, passwordArray, key, false);
-            password = QString(*destination);
-            delete destination;
-
-        }
-        return password;
-    }
-
-    void setDBName(const QString &databaseName){
-        setValue("Database/DatabaseName", databaseName);
-    }
-    QString getDBName() const{
-        return value("Database/DatabaseName", "im").toString();
-    }
-
-//    QString getOfflineFileCacheDir(){
-//        QString offlineFileCacheDir = QCoreApplication::applicationDirPath() + QString("/offline_files");
-//        if(!QFile::exists(offlineFileCacheDir)){
-//            QDir dir;
-//            dir.mkpath(offlineFileCacheDir);
-//        }
-//        return offlineFileCacheDir;
-//    }
-    QString getChatImageCacheDir(){
-        QString pictureCacheDir = m_imagesDir + QString("/cache");
-        if(!QFile::exists(pictureCacheDir)){
-            QDir dir;
-            dir.mkpath(pictureCacheDir);
-        }
-        return pictureCacheDir;
-    }
-    QString getUserFaceDir(){
-        QString pictureCacheDir = m_imagesDir + QString("/face");
-        if(!QFile::exists(pictureCacheDir)){
-            QDir dir;
-            dir.mkpath(pictureCacheDir);
-        }
-        return pictureCacheDir;
-    }
+    void setOfflineFileMainDirPath(const QString &dirPath);
+    QString getOfflineFileMainDirPath() const;
 
 
 
 private:
-    //void encData(const QString dataString);
-    //QString decData(const QByteArray &dataArray);
+
 
 
 private:
     QByteArray key;
-
-    QString m_imagesDir;
-
 
 
 };

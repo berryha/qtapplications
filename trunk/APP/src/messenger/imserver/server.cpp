@@ -57,7 +57,7 @@ IMServer::IMServer(QObject *parent)
     query = 0;
     mainServiceStarted = false;
 
-    clientInfoHash.clear();
+    userInfoHash.clear();
 
     onlineAdminsCount = 0;
 
@@ -84,8 +84,8 @@ IMServer::~IMServer(){
     PacketHandlerBase::clean();
 
 
-    QList<UserInfo*> clientInfoList = clientInfoHash.values();
-    clientInfoHash.clear();
+    QList<UserInfo*> clientInfoList = userInfoHash.values();
+    userInfoHash.clear();
     foreach(UserInfo *info, clientInfoList){
         delete info;
         info = 0;
