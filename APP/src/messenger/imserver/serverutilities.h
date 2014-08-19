@@ -26,19 +26,19 @@ namespace HEHUI {
 
 class ServerUtilities: public Utilities, public HEHUI::NetworkUtilities {
 public:
-	ServerUtilities();
-	virtual ~ServerUtilities();
+    ServerUtilities();
+    virtual ~ServerUtilities();
 
-        static QByteArray generateSessionEncryptionKey();
+    static QByteArray generateSessionEncryptionKey();
 
-	static QSqlQuery queryDatabase(const QString & queryString, bool localConfigDatabase) ;
+    static QSqlQuery queryDatabase(const QString & queryString, bool localConfigDatabase) ;
 
-	static QSqlQuery queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
-			const QString &host, int port, const QString &user, const QString &passwd,
-			const QString &databaseName, HEHUI::DatabaseType databaseType) ;
-        
-//        static QString databaseColumnName(IM::PropertyID propertyID);
-        
+    static QSqlQuery queryDatabase(const QString & queryString, const QString &connectionName, const QString &driver,
+                                   const QString &host, int port, const QString &user, const QString &passwd,
+                                   const QString &databaseName, HEHUI::DatabaseType databaseType) ;
+
+    //        static QString databaseColumnName(IM::PropertyID propertyID);
+
 
 
 };

@@ -1,5 +1,5 @@
 /*
- * networkmanagerinstance.h
+ * resourcesmanagerinstance.h
  *
  *  Created on: 2011-7-23
  *      Author: 贺辉
@@ -10,14 +10,14 @@
 
 #include <QObject>
 
-#include "../sharedim/resourcesmanager.h"
+#include "resourcesmanager.h"
 
 #include "HHSharedCore/hsingleton.h"
 
 namespace HEHUI {
 
 
-class ResourcesManagerInstance: public ResourcesManager, public Singleton<ResourcesManagerInstance>
+class SHAREDIMLIB_API ResourcesManagerInstance: public ResourcesManager, public Singleton<ResourcesManagerInstance>
 {
     Q_OBJECT
 

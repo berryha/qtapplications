@@ -42,6 +42,8 @@
 
 #include "serverlib.h"
 
+#include "../sharedim/resourcesmanagerinstance.h"
+
 #include "HHSharedCore/hdatabaseutility.h"
 //#include "HHSharedNetwork/hnetworkmanagerbase.h"
 
@@ -99,13 +101,12 @@ private:
     QSqlQuery *query;
 
 
-    QHash<QString, UserInfo *> clientInfoHash;
+    QHash<QString, UserInfo *> userInfoHash;
 
     int onlineAdminsCount;
 
-    QStringList recordsInDatabase;
 
-    QStringList logs;
+//    QStringList logs;
 
 
 

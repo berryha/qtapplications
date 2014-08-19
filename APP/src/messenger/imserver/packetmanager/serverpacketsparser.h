@@ -37,9 +37,9 @@
 #include <QDebug>
 
 #include "../app_constants_server.h"
-#include "../resourcesmanagerinstance.h"
 #include "../usersmanager/usersmanager.h"
 
+#include "../sharedim/resourcesmanagerinstance.h"
 
 #include "HHSharedCore/hcryptography.h"
 

@@ -1,5 +1,5 @@
 /*
- * networkmanagerinstance.cpp
+ * resourcesmanagerinstance.cpp
  *
  *  Created on: 2009-9-14
  *      Author: 贺辉

@@ -70,4 +70,6 @@
 #endif
 
 
+enum ServerType{ST_IM_SERVER, ST_FILE_SERVER, ST_ALL_IN_ONE};
+
 #endif /* APP_CONSTANTS_SERVER_H_ */
