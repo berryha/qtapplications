@@ -57,10 +57,10 @@ public:
     void setDBName(const QString &databaseName);
     QString getDBName() const;
 
-    QString setChatImageCacheDir(const QString &dirPath);
+    void setChatImageCacheDir(const QString &dirPath);
     QString getChatImageCacheDir();
 
-    QString setUserIconDir(const QString &dirPath);
+    void setUserIconDir(const QString &dirPath);
     QString getUserIconDir();
 
     void setOfflineFileMainDirPath(const QString &dirPath);

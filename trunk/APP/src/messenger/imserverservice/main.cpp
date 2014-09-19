@@ -38,6 +38,13 @@ int main(int argc, char **argv)
         qAddPostRoutine(closeDebugLog);
     }
 
+    if(arguments.contains("-im", Qt::CaseInsensitive)){
+        service.setServerTye(ST_IM_SERVER);
+    }
+    if(arguments.contains("-fs", Qt::CaseInsensitive)){
+        service.setServerTye(ST_FILE_SERVER);
+    }
+
     if(arguments.contains("-setup", Qt::CaseInsensitive)){
         QStringList databaseTypes;
         databaseTypes<<"Other"<<"MYSQL"<<"SQLITE"<<"POSTGRESQL"<<"FIREBIRD"<<"DB2"<<"ORACLE"<<"M$ SQLSERVER"<<"M$ ACCESS";
