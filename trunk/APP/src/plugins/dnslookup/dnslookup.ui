@@ -31,7 +31,7 @@
        <item>
         <widget class="QLineEdit" name="lineEditDomainName">
          <property name="text">
-          <string>www.qq.com</string>
+          <string/>
          </property>
         </widget>
        </item>

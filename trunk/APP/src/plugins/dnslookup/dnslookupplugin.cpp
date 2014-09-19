@@ -68,7 +68,7 @@ QString DnsLookupPlugin::description() const{
 }
 
 QIcon DnsLookupPlugin::icon () const{
-    return QIcon(":/resources/images/find.png");
+    return QIcon(":/resources/images/dnslookup.png");
 }
 
 QString DnsLookupPlugin::whatsThis () const{
