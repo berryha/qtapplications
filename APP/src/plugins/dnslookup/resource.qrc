@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/images/find.png</file>
+        <file>resources/images/dnslookup.png</file>
     </qresource>
 </RCC>
