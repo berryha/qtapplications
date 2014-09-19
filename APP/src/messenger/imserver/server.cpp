@@ -45,21 +45,27 @@ IMServer::IMServer(QObject *parent)
     :QObject(parent)
 {
 
-
     m_packetHandler = 0;
     resourcesManager = 0;
+
+    serverPacketsParser = 0;
+
+    m_fileTransmissionPacketsParser = 0;
+    m_fileTransmissionManager = 0;
+
     m_udpServer = 0;
     m_rtp = 0;
 
-
-    serverPacketsParser = 0;
     databaseUtility = 0;
     query = 0;
+
     mainServiceStarted = false;
 
     userInfoHash.clear();
 
     onlineAdminsCount = 0;
+
+    m_serverType = ST_ALL_IN_ONE;
 
 
 }
@@ -91,14 +97,16 @@ IMServer::~IMServer(){
         info = 0;
     }
 
+//TODO
+    delete m_fileTransmissionManager;
+    delete m_fileTransmissionPacketsParser;
+
     delete databaseUtility;
     databaseUtility = 0;
     delete query;
     query = 0;
 
-    
-//    delete sendServerOnlinePacketTimer;
-    
+        
     mainServiceStarted = false;
 
 
@@ -115,69 +123,24 @@ bool IMServer::startMainService(){
 
     //TODO
     if(openDatabase()){
-
+        qApp->exit();
     }
 
 
-    QString errorMessage = "";
-    m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), &errorMessage);
-    if(!m_udpServer){
-        qCritical()<<QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT).arg(errorMessage);
-        m_udpServer = resourcesManager->startUDPServer(QHostAddress::AnyIPv4, quint16(IM_SERVER_IPMC_LISTENING_PORT), true, &errorMessage);
-    }else{
-        qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
+    if(m_serverType != ST_FILE_SERVER){
+        startIMServer();
     }
 
-//    m_udpServer = resourcesManager->startUDPServer(QHostAddress::Any, quint16(IP_MULTICAST_GROUP_PORT), true, &errorMessage);
-//    if(!m_udpServer){
-//        logMessage(QString("Can not start UDP listening on port %1! %2").arg(IP_MULTICAST_GROUP_PORT).arg(errorMessage), QtServiceBase::Error);
-//    }else{
-//        qWarning()<<QString("UDP listening on port %1!").arg(IP_MULTICAST_GROUP_PORT);
-//    }
 
-    m_rtp = resourcesManager->startRTP(QHostAddress::Any, IM_SERVER_RTP_LISTENING_PORT, true, &errorMessage);
-    //connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
-
-
-
-    serverPacketsParser = new ServerPacketsParser(resourcesManager, this);
-//    serverPacketsParser->setLocalRUDPListeningAddress(QHostAddress::Any);
-//    serverPacketsParser->setLocalRUDPListeningPort(udpPort);
-    
-    //    connect(serverPacketsParser, SIGNAL(signalClientLogReceived(const QString&, const QString&, const QString&, const QString&)), this, SLOT(saveClientLog(const QString&, const QString&, const QString&, const QString&)), Qt::QueuedConnection);
-    //    connect(serverPacketsParser, SIGNAL(signalHeartbeatPacketReceived(const QString &, const QString&)), this, SLOT(processHeartbeatPacket(const QString &, const QString&)), Qt::QueuedConnection);
-    //    connect(serverPacketsParser, SIGNAL(signalClientOnlineStatusChanged(const QString&, quint16, const QString&, bool, bool)), this, SLOT(processClientOnlineStatusChangedPacket(const QString&, quint16, const QString&, bool, bool)), Qt::QueuedConnection);
-
-    //Single Process Thread
-    //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
-    //IMPORTANT For Multi-thread
-//    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
-//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
-//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
-//    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
-//    serverPacketsParser->startCheckIMUsersOnlineStateTimer();
-
-
-    serverPacketsParser->sendServerDeclarePacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT));
-    //serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT), networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName());
-
-//    sendServerOnlinePacketTimer = new QTimer(this);
-//    sendServerOnlinePacketTimer->setSingleShot(false);
-//    sendServerOnlinePacketTimer->setInterval(30*60000);
-//    connect(sendServerOnlinePacketTimer, SIGNAL(timeout()), this, SLOT(sendServerOnlinePacket()));
-//    sendServerOnlinePacketTimer->start();
+    if(m_serverType != ST_IM_SERVER){
+        startFileServer();
+    }
 
 
     mainServiceStarted = true;
 
     return true;
 }
-
-//void Server::sendServerOnlinePacket(){
-
-//    serverPacketsParser->sendServerOnlinePacket(networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName());
-
-//}
 
 void IMServer::saveClientLog(const QString &computerName, const QString &users, const QString &log, const QString &clientAddress){
     //    qWarning()<<"Server::saveClientLog(...)";
@@ -421,6 +384,60 @@ void IMServer::stop()
 
 }
 
+void IMServer::setServerTye(ServerType serverType){
+    this->m_serverType = serverType;
+}
+
+bool IMServer::startIMServer(){
+
+    if(!serverPacketsParser){
+
+        QString errorMessage = "";
+        m_udpServer = resourcesManager->startIPMCServer(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT), &errorMessage);
+        if(!m_udpServer){
+            qCritical()<<QString("Can not start IP Multicast listening on address '%1', port %2! %3").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT).arg(errorMessage);
+            m_udpServer = resourcesManager->startUDPServer(QHostAddress::AnyIPv4, quint16(IM_SERVER_IPMC_LISTENING_PORT), true, &errorMessage);
+        }else{
+            qWarning()<<QString("IP Multicast listening on address '%1', port %2!").arg(IM_SERVER_IPMC_ADDRESS).arg(IM_SERVER_IPMC_LISTENING_PORT);
+        }
+
+        m_rtp = resourcesManager->startRTP(QHostAddress::Any, IM_SERVER_RTP_LISTENING_PORT, true, &errorMessage);
+        //connect(m_rtp, SIGNAL(disconnected(int)), this, SLOT(peerDisconnected(int)));
+
+        serverPacketsParser = new ServerPacketsParser(resourcesManager, this);
+
+
+        //Single Process Thread
+        //QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::run);
+        //IMPORTANT For Multi-thread
+    //    QThreadPool::globalInstance()->setMaxThreadCount(MIN_THREAD_COUNT);
+    //    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
+    //    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startparseIncomingPackets);
+    //    QtConcurrent::run(serverPacketsParser, &ServerPacketsParser::startprocessOutgoingPackets);
+    //    serverPacketsParser->startCheckIMUsersOnlineStateTimer();
+
+
+        serverPacketsParser->sendServerDeclarePacket(QHostAddress(IM_SERVER_IPMC_ADDRESS), quint16(IM_SERVER_IPMC_LISTENING_PORT));
+        //serverPacketsParser->sendServerDeclarePacket(QHostAddress::Broadcast, quint16(IP_MULTICAST_GROUP_PORT), networkManager->localTCPListeningAddress(), networkManager->localTCPListeningPort(), networkManager->hostName());
+
+
+    }
+
+    return true;
+
+}
+
+bool IMServer::startFileServer(){
+
+    if(!m_fileTransmissionPacketsParser){
+        QString m_serverName = QHostInfo::localHostName().toLower();
+        m_fileTransmissionPacketsParser = new ServerFileTransmissionPacketsParser(m_serverName, this);
+        m_fileTransmissionManager = new ServerFileTransmissionManager(m_serverName, m_fileTransmissionPacketsParser, this);
+    }
+
+    return true;
+
+}
 
 
 

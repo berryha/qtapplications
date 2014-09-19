@@ -51,58 +51,44 @@ ServerService::ServerService(int argc, char **argv, const QString &serviceName, 
     setStartupType(QtServiceController::AutoStartup);
     //    setServiceFlags(CanBeSuspended);
 
+    m_server = new IMServer(this);
 
-    m_server = 0;
-    
-    
-    mainServiceStarted = false;
-
-
-
-
+    //    mainServiceStarted = false;
 
 }
 
 ServerService::~ServerService(){
-
-
-    mainServiceStarted = false;
-
+    //    mainServiceStarted = false;
     if(m_server){
         delete m_server;
         m_server = 0;
     }
 
-
 }
 
-bool ServerService::startMainService(){
-    qDebug()<<"----ServerService::startMainService()";
-
-    if(mainServiceStarted){
-        qWarning()<<"Main service has already started!";
-        return true;
-    }
-
-
-    mainServiceStarted = true;
-
-    return true;
+void ServerService::setServerTye(ServerType serverType){
+    m_server->setServerTye(serverType);
 }
+
+//bool ServerService::startMainService(){
+//    qDebug()<<"----ServerService::startMainService()";
+
+//    if(mainServiceStarted){
+//        qWarning()<<"Main service has already started!";
+//        return true;
+//    }
+
+
+//    mainServiceStarted = true;
+
+//    return true;
+//}
 
 
 void ServerService::start()
 {
-
-
-
-    mainServiceStarted = false;
-    
-    m_server = new IMServer(this);
+    //    mainServiceStarted = false;
     m_server->start();
-
-
-
 }
 
 void ServerService::stop()

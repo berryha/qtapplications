@@ -41,7 +41,7 @@
 #include "../sharedim/constants_global_shared.h"
 #include "../sharedim/filetransmitter/filetransmissionpacketsparser.h"
 
-#include "resourcesmanagerinstance.h"
+#include "../sharedim/resourcesmanagerinstance.h"
 #include "../usersmanager/userinfo.h"
 
 #include "HHSharedCore/hcryptography.h"

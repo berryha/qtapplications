@@ -35,12 +35,10 @@
 #include <QObject>
 
 
-
-#include "usersmanager/userinfo.h"
-
-#include "packetmanager/serverpacketsparser.h"
-
 #include "serverlib.h"
+#include "usersmanager/userinfo.h"
+#include "packetmanager/serverpacketsparser.h"
+#include "filetransmitter/serverfiletransmissionmanager.h"
 
 #include "../sharedim/resourcesmanagerinstance.h"
 
@@ -62,6 +60,10 @@ public:
     void start();
     void stop();
 
+    void setServerTye(ServerType serverType);
+
+    bool startIMServer();
+    bool startFileServer();
 
 signals:
 
@@ -91,14 +93,18 @@ private:
     ResourcesManagerInstance *resourcesManager;
     ServerPacketsParser *serverPacketsParser;
 
+    ServerFileTransmissionPacketsParser *m_fileTransmissionPacketsParser;
+    ServerFileTransmissionManager *m_fileTransmissionManager;
+
     UDPServer *m_udpServer;
     RTP *m_rtp;
 
 
-    bool mainServiceStarted;
 
     DatabaseUtility *databaseUtility;
     QSqlQuery *query;
+
+    bool mainServiceStarted;
 
 
     QHash<QString, UserInfo *> userInfoHash;
@@ -107,6 +113,8 @@ private:
 
 
 //    QStringList logs;
+
+    ServerType m_serverType;
 
 
 

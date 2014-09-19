@@ -127,7 +127,7 @@ QString Settings::getDBName() const{
 }
 
 
-QString Settings::setChatImageCacheDir(const QString &dirPath){
+void Settings::setChatImageCacheDir(const QString &dirPath){
     setValue("Image", dirPath);
     QDir dir;
     dir.mkpath(dirPath);
@@ -141,7 +141,7 @@ QString Settings::getChatImageCacheDir(){
     return path;
 }
 
-QString Settings::setUserIconDir(const QString &dirPath){
+void Settings::setUserIconDir(const QString &dirPath){
     setValue("UserIcon", dirPath);
     QDir dir;
     dir.mkpath(dirPath);

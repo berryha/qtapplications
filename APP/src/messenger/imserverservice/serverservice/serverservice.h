@@ -48,13 +48,14 @@ public:
     ServerService(int argc, char **argv, const QString &serviceName = "ServerService", const QString &description = "Server service for management system.");
     ~ServerService();
 
+    void setServerTye(ServerType serverType);
 
 
 signals:
 
 
 private slots:
-    bool startMainService();
+    //    bool startMainService();
 
 
 private:
@@ -71,7 +72,7 @@ protected:
 private:
 
 
-    bool mainServiceStarted;
+    //    bool mainServiceStarted;
     
     IMServer *m_server;
 
