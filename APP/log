@@ -20,3 +20,6 @@
 Q: QDateTime => not enough actual parameters for macro ‘min’ & ‘max’  
 A: 修改qdatetime.h 中的“nullJd()”　为： static inline qint64 nullJd() { return (std::numeric_limits<qint64>::min)(); }
     #define NOMINMAX before including windows.h header.
+    
+Q:VS2010:LINK : fatal error LNK1123: failure during conversion to COFF: file invalid or corrupt
+A:系统中有多个版本的cvtres.exe，将VC\bin\cvtres.exe 改名或删除
