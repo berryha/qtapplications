@@ -46,7 +46,7 @@
 namespace HEHUI {
 
 
-class ControlCenterPlugin : public GUIPluginBase/*, public QObject*/   {
+class ControlCenterPlugin : public GUIPluginBase{
     Q_OBJECT
 
     //Export Plugin
@@ -74,8 +74,7 @@ public slots:
     void slotControlCenterWidgetDestoryed(QObject * obj);
 
 private:
-    QList<ControlCenter *> controlCenterWidgetList;
-
+    QList<QWidget *> widgetList;
 
 
 

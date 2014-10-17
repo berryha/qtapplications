@@ -73,7 +73,7 @@ private slots:
     void slotSqlExplorerWidgetDestoryed(QObject * obj );
 
 private:
-    QList<SqlExplorer *> sqlExplorerWidgetList;
+    QList<QWidget *> widgetList;
 
 
 

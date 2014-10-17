@@ -43,12 +43,11 @@
 namespace HEHUI {
 
 DnsLookupPlugin::DnsLookupPlugin() {
-    dnslookupWidgetList = QList<DnsLookupWidget *> ();
-
+    widgetList = QList<QWidget *> ();
 }
 
 DnsLookupPlugin::~DnsLookupPlugin() {
-    unload();
+    //unload();
 }
 
 bool DnsLookupPlugin::isSingle(){
@@ -82,22 +81,18 @@ QString DnsLookupPlugin::toolTip () const{
 bool DnsLookupPlugin::unload(){
     qDebug("----DnsLookupPlugin::unload()");
 
-    emit signalPluginToBeUnloaded();
+    //emit signalPluginToBeUnloaded();
 
-    if(dnslookupWidgetList.isEmpty()){
-        return true;
-    }
-
-    foreach(DnsLookupWidget *wgt, dnslookupWidgetList){
-        if(!wgt){break;}
+    foreach(QWidget *wgt, widgetList){
+        if(!wgt){continue;}
         if(wgt->close()){
-            dnslookupWidgetList.removeAll(wgt);
+            widgetList.removeAll(wgt);
             delete wgt;
             wgt = 0;
         }
     }
 
-    return dnslookupWidgetList.isEmpty();
+    return widgetList.isEmpty();
 
 }
 
@@ -105,7 +100,7 @@ void DnsLookupPlugin::slotMainActionForMenuTriggered(){
 
     QWidget *parentWidget = qobject_cast<QWidget *> (parent());
     DnsLookupWidget *wgt = new DnsLookupWidget(parentWidget);
-    connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+    //connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
 
     if(parentWidget){
         if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
@@ -119,20 +114,24 @@ void DnsLookupPlugin::slotMainActionForMenuTriggered(){
             }
 
             mdiArea->addSubWindow(subWindow);
-            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+            widgetList.append(subWindow);
+        }else{
+            widgetList.append(wgt);
         }
+    }else{
+        widgetList.append(wgt);
     }
 
     wgt->show();
-    dnslookupWidgetList.append(wgt);
 }
 
 void DnsLookupPlugin::slotWidgetDestoryed(QObject * obj){
     qDebug("--DnsLookupPlugin::slotWidgetDestoryed(QObject * obj )");
 
-    DnsLookupWidget *sqlExplorer = static_cast<DnsLookupWidget *> (sender());
-    if(sqlExplorer){
-        dnslookupWidgetList.removeAll(sqlExplorer);
+    DnsLookupWidget *wgt = static_cast<DnsLookupWidget *> (sender());
+    if(wgt){
+        widgetList.removeAll(wgt);
     }
 }
 
