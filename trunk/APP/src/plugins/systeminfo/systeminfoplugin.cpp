@@ -43,13 +43,11 @@
 namespace HEHUI {
 
 SystemInfoPlugin::SystemInfoPlugin() {
-
-    systeminfoWidgetList = QList<SystemInfo *> ();
-
+    widgetList = QList<QWidget *> ();
 }
 
 SystemInfoPlugin::~SystemInfoPlugin() {
-    unload();
+    //unload();
 }
 
 
@@ -90,9 +88,7 @@ QWidget * SystemInfoPlugin::parentWidgetOfPlugin(){
 */
 
 bool SystemInfoPlugin::isSingle(){
-
     return true;
-
 }
 
 QString SystemInfoPlugin::name () const{
@@ -109,7 +105,6 @@ QString SystemInfoPlugin::description() const{
 
 QIcon SystemInfoPlugin::icon () const{
     return QIcon(":/resources/images/systeminfo.png");
-
 }
 
 QString SystemInfoPlugin::whatsThis () const{
@@ -123,22 +118,18 @@ QString SystemInfoPlugin::toolTip () const{
 bool SystemInfoPlugin::unload(){
     qDebug("----SystemInfoPlugin::unload()");
 
-    emit signalPluginToBeUnloaded();
+    //emit signalPluginToBeUnloaded();
 
-    if(systeminfoWidgetList.isEmpty()){
-        return true;
-    }
-
-    foreach(SystemInfo *systemInfo, systeminfoWidgetList){
-        if(!systemInfo){break;}
-        if(systemInfo->close()){
-            systeminfoWidgetList.removeAll(systemInfo);
-            delete systemInfo;
-            systemInfo = 0;
+    foreach(QWidget *wgt, widgetList){
+        if(!wgt){continue;}
+        if(wgt->close()){
+            widgetList.removeAll(wgt);
+            delete wgt;
+            wgt = 0;
         }
     }
 
-    return systeminfoWidgetList.isEmpty();
+    return widgetList.isEmpty();
 
 }
 
@@ -164,7 +155,7 @@ void SystemInfoPlugin::slotMainActionForMenuTriggered(){
     }
 
     SystemInfo *systemInfo = new SystemInfo(user.getUserID(), parentWidget);
-    connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
+    //connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
 
     if(parentWidget){
         if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
@@ -172,15 +163,19 @@ void SystemInfoPlugin::slotMainActionForMenuTriggered(){
             subWindow->setWidget(systemInfo);
             subWindow->setAttribute(Qt::WA_DeleteOnClose);
             mdiArea->addSubWindow(subWindow);
-            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
             //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
 
+            widgetList.append(subWindow);
+        }else{
+            widgetList.append(systemInfo);
         }
+    }else{
+        widgetList.append(systemInfo);
     }
 
     systemInfo->show();
-    systeminfoWidgetList.append(systemInfo);
 }
 
 void SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj){
@@ -188,7 +183,7 @@ void SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj){
 
     SystemInfo *systemInfo = static_cast<SystemInfo *> (sender());
     if(systemInfo){
-        systeminfoWidgetList.removeAll(systemInfo);
+        widgetList.removeAll(systemInfo);
     }
 
 }

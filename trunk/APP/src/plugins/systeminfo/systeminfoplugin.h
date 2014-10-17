@@ -44,35 +44,35 @@
 
 namespace HEHUI {
 
-class SystemInfoPlugin : public GUIPluginBase/*, public QObject*/   {
-	Q_OBJECT
+class SystemInfoPlugin : public GUIPluginBase{
+    Q_OBJECT
 
     //Export Plugin
     Q_PLUGIN_METADATA(IID AbstractPluginInterface_IID)
     Q_PLUGIN_METADATA(IID GUIInterface_IID)
 
 public:
-	SystemInfoPlugin();
-	virtual ~SystemInfoPlugin();
+    SystemInfoPlugin();
+    virtual ~SystemInfoPlugin();
 
-	bool isSingle();
-	QString name () const;
-        QString version() const;
-        QString description() const;
+    bool isSingle();
+    QString name () const;
+    QString version() const;
+    QString description() const;
 
-	QIcon icon () const;
-	QString whatsThis () const;
-	QString toolTip () const;
+    QIcon icon () const;
+    QString whatsThis () const;
+    QString toolTip () const;
 
-        bool unload();
+    bool unload();
 
 
 public slots:
-        void slotMainActionForMenuTriggered();
-        void slotSysteminfoWidgetDestoryed(QObject * obj);
+    void slotMainActionForMenuTriggered();
+    void slotSysteminfoWidgetDestoryed(QObject * obj);
 
 private:
-        QList<SystemInfo *> systeminfoWidgetList;
+    QList<QWidget *> widgetList;
 
 
 

@@ -43,13 +43,11 @@ namespace HEHUI {
 
 
 ControlCenterPlugin::ControlCenterPlugin() {
-
-    controlCenterWidgetList = QList<ControlCenter *> ();
-
+    widgetList = QList<QWidget *> ();
 }
 
 ControlCenterPlugin::~ControlCenterPlugin() {
-    //unload();
+    qDebug()<<"--ControlCenterPlugin::~ControlCenterPlugin()";
 }
 
 
@@ -90,9 +88,7 @@ QWidget * SystemInfoPlugin::parentWidgetOfPlugin(){
 */
 
 bool ControlCenterPlugin::isSingle(){
-
     return true;
-
 }
 
 QString ControlCenterPlugin::name () const{
@@ -109,7 +105,6 @@ QString ControlCenterPlugin::description() const{
 
 QIcon ControlCenterPlugin::icon () const{
     return QIcon(":/icon/resources/images/controlcenter.png");
-
 }
 
 QString ControlCenterPlugin::whatsThis () const{
@@ -121,26 +116,35 @@ QString ControlCenterPlugin::toolTip () const{
 }
 
 bool ControlCenterPlugin::unload(){
-    qDebug("----ControlCenterPlugin::unload()");
 
-    emit signalPluginToBeUnloaded();
+    //    emit signalPluginToBeUnloaded();
 
-    if(controlCenterWidgetList.isEmpty()){
-        return true;
-    }
-
-    foreach(ControlCenter *controlCenter, controlCenterWidgetList){
-        if(!controlCenter){break;}
-        if(controlCenter->close()){
-            controlCenterWidgetList.removeAll(controlCenter);
-            controlCenter->close();
-            delete controlCenter;
-            controlCenter = 0;
+    foreach(QWidget *wgt, widgetList){
+        if(!wgt){continue;}
+        if(wgt->close()){
+            widgetList.removeAll(wgt);
+            delete wgt;
+            wgt = 0;
         }
     }
 
-    return controlCenterWidgetList.isEmpty();
+    //    if(controlCenterWidgetList.isEmpty()){
+    //        return true;
+    //    }
 
+    //    QWidget *parentWidget = qobject_cast<QWidget *> (parent());
+    //    if(!parentWidget){
+    //        foreach(ControlCenter *controlCenter, controlCenterWidgetList){
+    //            if(!controlCenter){break;}
+    //            if(controlCenter->close()){
+    //                controlCenterWidgetList.removeAll(controlCenter);
+    //                delete controlCenter;
+    //                controlCenter = 0;
+    //            }
+    //        }
+    //    }
+
+    return widgetList.isEmpty();
 }
 
 void ControlCenterPlugin::slotMainActionForMenuTriggered(){
@@ -158,7 +162,7 @@ void ControlCenterPlugin::slotMainActionForMenuTriggered(){
     }
 
     ControlCenter *controlCenter = new ControlCenter(user.getUserID(), parentWidget);
-    connect(controlCenter, SIGNAL(destroyed(QObject *)), SLOT(slotControlCenterWidgetDestoryed(QObject *)));
+    //connect(controlCenter, SIGNAL(destroyed(QObject *)), SLOT(slotControlCenterWidgetDestoryed(QObject *)));
 
     if(parentWidget){
         if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
@@ -166,25 +170,26 @@ void ControlCenterPlugin::slotMainActionForMenuTriggered(){
             subWindow->setWidget(controlCenter);
             subWindow->setAttribute(Qt::WA_DeleteOnClose);
             mdiArea->addSubWindow(subWindow);
-            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-
+            widgetList.append(subWindow);
+        }else{
+            widgetList.append(controlCenter);
         }
+    }else{
+        widgetList.append(controlCenter);
     }
 
     controlCenter->show();
-    controlCenterWidgetList.append(controlCenter);
 }
 
 void ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj){
-    qDebug("----ControlCenterPlugin::slotControlCenterWidgetDestoryed(QObject * obj)");
+    qDebug()<<"--ControlCenterPlugin::slotControlCenterWidgetDestoryed(...)";
 
     ControlCenter *controlCenter = static_cast<ControlCenter *> (sender());
     if(controlCenter){
-        controlCenterWidgetList.removeAll(controlCenter);
+        widgetList.removeAll(controlCenter);
     }
-
 }
 
 

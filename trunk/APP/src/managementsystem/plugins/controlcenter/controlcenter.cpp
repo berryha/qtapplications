@@ -167,13 +167,11 @@ ControlCenter::ControlCenter(const QString &adminName, QWidget *parent)
 
 ControlCenter::~ControlCenter()
 {
-
     qDebug()<<"--ControlCenter::~ControlCenter()";
 
     if(vncProcess){
         vncProcess->terminate();
     }
-
 
     if(queryModel){
         queryModel->clear();
@@ -187,21 +185,16 @@ ControlCenter::~ControlCenter()
     }
     QSqlDatabase::removeDatabase(databaseConnectionName);
 
-
     delete controlCenterPacketsParser;
     controlCenterPacketsParser = 0;
-
 
 //    resourcesManager->cleanInstance();
     delete resourcesManager;
     resourcesManager = 0;
 
-
     PacketHandlerBase::clean();
 
-    running = false;
-    
-
+    running = false;   
 
 }
 

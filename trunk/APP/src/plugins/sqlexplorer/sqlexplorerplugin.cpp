@@ -48,32 +48,23 @@
 namespace HEHUI {
 
 SqlExplorerPlugin::SqlExplorerPlugin() {
-    sqlExplorerWidgetList = QList<SqlExplorer *> ();
-
+    widgetList = QList<QWidget *> ();
 }
 
 SqlExplorerPlugin::~SqlExplorerPlugin() {
-
-    unload();
-
+    //unload();
 }
 
-
-
-
 bool SqlExplorerPlugin::isSingle(){
-
-        return true;
-
+    return true;
 }
 
 QString SqlExplorerPlugin::name () const{
-	return QString(tr("SQL Explorer"));
+    return QString(tr("SQL Explorer"));
 }
 
 QString SqlExplorerPlugin::version() const{
     return "2010.05.10";
-
 }
 
 QString SqlExplorerPlugin::description() const{
@@ -81,95 +72,94 @@ QString SqlExplorerPlugin::description() const{
 }
 
 QIcon SqlExplorerPlugin::icon () const{
-	return QIcon(":/resources/images/console.png");
-
+    return QIcon(":/resources/images/console.png");
 }
 
 QString SqlExplorerPlugin::whatsThis () const{
-	return QString(tr("SQL Explorer"));
+    return QString(tr("SQL Explorer"));
 }
 
 QString SqlExplorerPlugin::toolTip () const{
-	return QString(tr("SQL Explorer"));
+    return QString(tr("SQL Explorer"));
 }
 
 bool SqlExplorerPlugin::unload(){
     qDebug("----SqlExplorerPlugin::unload()");
 
-    emit signalPluginToBeUnloaded();
+    //emit signalPluginToBeUnloaded();
 
-    if(sqlExplorerWidgetList.isEmpty()){
-        return true;
-    }
-
-    foreach(SqlExplorer *sqlExplorer, sqlExplorerWidgetList){
-        if(!sqlExplorer){break;}
-        if(sqlExplorer->close()){
-            sqlExplorerWidgetList.removeAll(sqlExplorer);
-            delete sqlExplorer;
-            sqlExplorer = 0;
+    foreach(QWidget *wgt, widgetList){
+        if(!wgt){continue;}
+        if(wgt->close()){
+            widgetList.removeAll(wgt);
+            delete wgt;
+            wgt = 0;
         }
     }
 
-    return sqlExplorerWidgetList.isEmpty();
+    return widgetList.isEmpty();
 
 }
 
 bool SqlExplorerPlugin::verifyUser(){
-    qWarning()<<"--------SqlExplorerPlugin::verifyUser()";
-        return true;
+    return true;
 }
 
 void SqlExplorerPlugin::slotMainActionForMenuTriggered(){
 
-	if(isSingle() && SqlExplorer::isRunning()){
-		//TODO: Activate the widget
-		return;
-            }else{
-                QString msg = tr("<p>Make sure you are familiar with database systems, SQL and the operating mechanism of this plugin!</p>");
-                msg += tr("<p>It is also highly recommended that you close all other plugins first! </p>");
-                msg += tr("<font color = 'red'><b>It may cause unexpected behavior!</b></font>");
-                QMessageBox msgBox;
-                msgBox.setWindowTitle(tr("Warning: Dangerous Operations"));
-                msgBox.setIcon(QMessageBox::Warning);
-                msgBox.setText(msg);
+    if(isSingle() && SqlExplorer::isRunning()){
+        //TODO: Activate the widget
+        return;
+    }else{
+        QString msg = tr("<p>Make sure you are familiar with database systems, SQL and the operating mechanism of this plugin!</p>");
+        msg += tr("<p>It is also highly recommended that you close all other plugins first! </p>");
+        msg += tr("<font color = 'red'><b>It may cause unexpected behavior!</b></font>");
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Warning: Dangerous Operations"));
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText(msg);
 
-                msgBox.addButton(tr("&Continue"), QMessageBox::AcceptRole);
-                QPushButton *abortButton = msgBox.addButton(tr("&Abort"), QMessageBox::RejectRole);
-                msgBox.setDefaultButton(abortButton);
+        msgBox.addButton(tr("&Continue"), QMessageBox::AcceptRole);
+        QPushButton *abortButton = msgBox.addButton(tr("&Abort"), QMessageBox::RejectRole);
+        msgBox.setDefaultButton(abortButton);
 
-                msgBox.exec();
-                if(msgBox.clickedButton() == abortButton){
-                    return;
-                }
+        msgBox.exec();
+        if(msgBox.clickedButton() == abortButton){
+            return;
+        }
 
-            }
+    }
 
-        QWidget *parentWidget = qobject_cast<QWidget *> (parent());
+    QWidget *parentWidget = qobject_cast<QWidget *> (parent());
 
-        HEHUI::User user;
-        HEHUI::LoginBase login(&user, name(), parentWidget);
-        if (!login.isVerified() ) {
-		return ;
-	}
+    HEHUI::User user;
+    HEHUI::LoginBase login(&user, name(), parentWidget);
+    if (!login.isVerified() ) {
+        return ;
+    }
 
-	SqlExplorer *sqlExplorer = new SqlExplorer(parentWidget);
-        connect(sqlExplorer, SIGNAL(destroyed(QObject *)), this, SLOT(slotSqlExplorerWidgetDestoryed(QObject *)));
+    SqlExplorer *sqlExplorer = new SqlExplorer(parentWidget);
+    //connect(sqlExplorer, SIGNAL(destroyed(QObject *)), this, SLOT(slotSqlExplorerWidgetDestoryed(QObject *)));
 
-	if(parentWidget){
-		if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-                    QMdiSubWindow *subWindow = new QMdiSubWindow;
-                         subWindow->setWidget(sqlExplorer);
-                         subWindow->setAttribute(Qt::WA_DeleteOnClose);
-                         mdiArea->addSubWindow(subWindow);
-                         connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+    if(parentWidget){
+        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+            QMdiSubWindow *subWindow = new QMdiSubWindow;
+            subWindow->setWidget(sqlExplorer);
+            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+            mdiArea->addSubWindow(subWindow);
+            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-                        //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-		}
-	}
+            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
 
-	sqlExplorer->show();
-        sqlExplorerWidgetList.append(sqlExplorer);
+            widgetList.append(subWindow);
+        }else{
+            widgetList.append(sqlExplorer);
+        }
+    }else{
+        widgetList.append(sqlExplorer);
+    }
+
+    sqlExplorer->show();
 }
 
 void SqlExplorerPlugin::slotSqlExplorerWidgetDestoryed(QObject * obj){
@@ -177,7 +167,7 @@ void SqlExplorerPlugin::slotSqlExplorerWidgetDestoryed(QObject * obj){
 
     SqlExplorer *sqlExplorer = static_cast<SqlExplorer *> (sender());
     if(sqlExplorer){
-        sqlExplorerWidgetList.removeAll(sqlExplorer);
+        widgetList.removeAll(sqlExplorer);
     }
 
 

@@ -42,12 +42,11 @@ namespace HEHUI {
 
 
 UserManagerPlugin::UserManagerPlugin() {
-    userManagerWidgetList = QList<UserManagerMainWindow *> ();
-
+    widgetList = QList<QWidget *> ();
 }
 
 UserManagerPlugin::~UserManagerPlugin() {
-    unload();
+    //unload();
 }
 
 
@@ -88,9 +87,7 @@ QWidget * UserManagerPlugin::parentWidgetOfPlugin(){
 
 
 bool UserManagerPlugin::isSingle(){
-
     return true;
-
 }
 
 QString UserManagerPlugin::name () const{
@@ -107,7 +104,6 @@ QString UserManagerPlugin::description() const{
 
 QIcon UserManagerPlugin::icon () const{
     return QIcon(":/resources/images/usermanager.png");
-
 }
 
 QString UserManagerPlugin::whatsThis () const{
@@ -121,25 +117,18 @@ QString UserManagerPlugin::toolTip () const{
 bool UserManagerPlugin::unload(){
     qDebug("----UserManagerPlugin::unload()");
 
-    emit signalPluginToBeUnloaded();
+    //emit signalPluginToBeUnloaded();
 
-    if(userManagerWidgetList.isEmpty()){
-        return true;
-    }
-
-    foreach(UserManagerMainWindow *userManager, userManagerWidgetList){
-        if(!userManager){break;}
-        if(userManager->close()){
-            userManagerWidgetList.removeAll(userManager);
-            delete userManager;
-            userManager = 0;
+    foreach(QWidget *wgt, widgetList){
+        if(!wgt){continue;}
+        if(wgt->close()){
+            widgetList.removeAll(wgt);
+            delete wgt;
+            wgt = 0;
         }
-
     }
 
-
-
-    return userManagerWidgetList.isEmpty();
+    return widgetList.isEmpty();
 
 }
 
@@ -166,7 +155,7 @@ void UserManagerPlugin::slotMainActionForMenuTriggered(){
     }
 
     UserManagerMainWindow *userManager = new UserManagerMainWindow(isYDAdmin, parentWidget);
-    connect(userManager, SIGNAL(destroyed(QObject *)), this, SLOT(slotUserManagerWidgetDestoryed(QObject *)));
+    //connect(userManager, SIGNAL(destroyed(QObject *)), this, SLOT(slotUserManagerWidgetDestoryed(QObject *)));
 
     if(parentWidget){
         if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
@@ -174,15 +163,17 @@ void UserManagerPlugin::slotMainActionForMenuTriggered(){
             subWindow->setWidget(userManager);
             subWindow->setAttribute(Qt::WA_DeleteOnClose);
             mdiArea->addSubWindow(subWindow);
-            connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
+            widgetList.append(subWindow);
+        }else{
+            widgetList.append(userManager);
         }
+    }else{
+        widgetList.append(userManager);
     }
 
     userManager->show();
-    userManagerWidgetList.append(userManager);
-
 
 }
 
@@ -191,7 +182,7 @@ void UserManagerPlugin::slotUserManagerWidgetDestoryed(QObject *obj){
 
     UserManagerMainWindow *um = static_cast<UserManagerMainWindow *> (sender());
     if(um){
-        userManagerWidgetList.removeAll(um);
+        widgetList.removeAll(um);
     }
 
 

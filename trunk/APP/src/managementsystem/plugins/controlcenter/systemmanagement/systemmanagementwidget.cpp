@@ -306,6 +306,7 @@ SystemManagementWidget::~SystemManagementWidget()
 }
 
 void SystemManagementWidget::closeEvent(QCloseEvent *event){
+    qDebug()<<"--SystemManagementWidget::closeEvent(...)";
 
 #ifdef Q_OS_WIN32
     if(!adminProcesses.isEmpty()){

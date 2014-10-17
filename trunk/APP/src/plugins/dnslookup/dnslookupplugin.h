@@ -71,7 +71,7 @@ private slots:
     void slotWidgetDestoryed(QObject * obj );
 
 private:
-    QList<DnsLookupWidget *> dnslookupWidgetList;
+    QList<QWidget *> widgetList;
 
 
 

@@ -75,7 +75,7 @@ private slots:
 
 
 private:
-    QList<UserManagerMainWindow *> userManagerWidgetList;
+    QList<QWidget *> widgetList;
 
 
 
