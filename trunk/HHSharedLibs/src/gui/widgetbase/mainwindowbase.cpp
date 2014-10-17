@@ -78,7 +78,7 @@ MainWindowBase::~MainWindowBase() {
         m_pluginsMenu->deleteLater();
     }
 
-    unloadPlugins();
+    //unloadPlugins();
 
 }
 
