@@ -329,15 +329,18 @@ long ADSI::AD_GetLastErrorCode(){
 QString ADSI::AD_GetLastErrorString(){
     qDebug()<<"--ADSI::AD_GetLastErrorString()";
 
-    return QString::fromWCharArray( m_AD_GetLastErrorString() );
-
-//    const wchar_t *temp = m_AD_GetLastErrorString();
-//    return QString::fromWCharArray(temp);
+    //return QString::fromWCharArray( m_AD_GetLastErrorString() );
+    const wchar_t *temp = m_AD_GetLastErrorString();
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 
 }
 
 QString ADSI::AD_DefaultNamingContext(){
-    return QString::fromWCharArray(m_AD_DefaultNamingContext());
+    //return QString::fromWCharArray(m_AD_DefaultNamingContext());
+    const wchar_t *temp = m_AD_DefaultNamingContext();
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 bool ADSI::AD_ObjectExists(const QString &object, const QString &property){
@@ -350,10 +353,7 @@ bool ADSI::AD_RenameObject(const QString &object, const QString &cn){
 
 bool ADSI::AD_MoveObject(const QString &ou, const QString &object, const QString &cn){
     qDebug()<<"ADSI::AD_MoveObject(...)";
-
-    qWarning();
     return m_AD_MoveObject(ou.toStdWString().c_str(), object.toStdWString().c_str(), cn.toStdWString().c_str());
-
 }
 
 bool ADSI::AD_DeleteObject(const QString &object, const QString &objectClass){
@@ -388,11 +388,11 @@ bool ADSI::AD_SetUserPasswordChange(const QString &object, bool enableChange){
 QString ADSI::AD_GetObjectAttribute(const QString &object, const QString &attribute){
     qDebug()<<"ADSI::AD_GetObjectAttribute(...)";
 
-    return QString::fromWCharArray(m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str()));
+    //return QString::fromWCharArray(m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str()));
 
-//    const wchar_t *temp = m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str());
-//    return QString::fromWCharArray(temp);
-
+    const wchar_t *temp = m_AD_GetObjectAttribute(object.toStdWString().c_str(), attribute.toStdWString().c_str());
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 bool ADSI::AD_ModifyAttribute(const QString &object, const QString &attribute, const QString &value, long option){
@@ -406,21 +406,21 @@ bool ADSI::AD_CreateOU(const QString &parentOU, const QString &ouName){
 QString ADSI::AD_GetAllOUs(const QString &root, const QString &separator, const QString &subOUSeparator){
     qDebug()<<"--ADSI::AD_GetAllOUs(...)";
 
-    return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
+    //return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
 
-//    const wchar_t *temp = m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str());
-//    return QString::fromWCharArray(temp);
-
+    const wchar_t *temp = m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str());
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 QString ADSI::AD_GetObjectsInOU(const QString &ou, const QString &filter, const QString &dataToRetrieve, const QString &itemSeparator, const QString &attributeSeparator){
     qDebug()<<"--ADSI::AD_GetObjectsInOU(...)";
 
-    return QString::fromWCharArray( m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str()));
+    //return QString::fromWCharArray( m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str()));
 
-//    const wchar_t *temp = m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str());
-//    return QString::fromWCharArray(temp);
-
+    const wchar_t *temp = m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str());
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 bool ADSI::AD_CreateUser(const QString &ou, const QString &userName, const QString &userCN){
@@ -428,17 +428,22 @@ bool ADSI::AD_CreateUser(const QString &ou, const QString &userName, const QStri
 }
 
 bool ADSI::AD_SetPassword(const QString &userName, const QString &password, bool expire){
-    qWarning();
     return m_AD_SetPassword(userName.toStdWString().c_str(), password.toStdWString().c_str(), expire?1:0);
 }
 
 
 QString ADSI::ComputerName(){
-    return QString::fromWCharArray(m_ComputerName());
+    //return QString::fromWCharArray(m_ComputerName());
+    const wchar_t *temp = m_ComputerName();
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 QString ADSI::UserNameOfCurrentThread(){
-    return QString::fromWCharArray(m_UserNameOfCurrentThread());
+    //return QString::fromWCharArray(m_UserNameOfCurrentThread());
+    const wchar_t *temp = m_UserNameOfCurrentThread();
+    if(!temp){return "";}
+    return QString::fromWCharArray(temp);
 }
 
 
