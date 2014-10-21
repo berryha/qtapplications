@@ -70,7 +70,7 @@ public:
 
 private slots:
     void slotMainActionForMenuTriggered();
-    void slotUserManagerWidgetDestoryed(QObject *obj);
+    void slotWidgetDestoryed(QObject *obj);
 
 
 

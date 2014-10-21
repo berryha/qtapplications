@@ -111,6 +111,7 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     view->setVisible(true);
 
 
+//    validator = 0;
     dc = new DatabaseConnecter(this);
     queryModel = 0;
 
@@ -119,12 +120,7 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
     installEventFilter(this);
 
 
-
-
-
-
     initStatusBar();
-
 
     running = true;
     isScanning = false;
@@ -134,19 +130,13 @@ SystemInfo::SystemInfo(const QString &adminName, QWidget *parent)
 
     recordExists = false;
 
-
-
     process = new QProcess(this);
     process->setProcessChannelMode(QProcess::MergedChannels);
     connect(process, SIGNAL(finished( int , QProcess::ExitStatus)), this, SLOT(slotScannerExit( int , QProcess::ExitStatus )));
 
-
     slotScanSystem();
 
-
-
     statusBar()->showMessage(tr("Ctrl+S: Upload    F5: Scan    Ctrl+Return: Query"));
-
 
 }
 
@@ -163,10 +153,10 @@ SystemInfo::~SystemInfo() {
         process = 0;
     }
 
-    if(validator){
-        delete validator;
-        validator = 0;
-    }
+//    if(validator){
+//        delete validator;
+//        validator = 0;
+//    }
 
     if(dc){
         delete dc;

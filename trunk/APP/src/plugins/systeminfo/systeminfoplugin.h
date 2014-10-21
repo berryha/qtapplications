@@ -69,7 +69,7 @@ public:
 
 public slots:
     void slotMainActionForMenuTriggered();
-    void slotSysteminfoWidgetDestoryed(QObject * obj);
+    void slotWidgetDestoryed(QObject * obj);
 
 private:
     QList<QWidget *> widgetList;

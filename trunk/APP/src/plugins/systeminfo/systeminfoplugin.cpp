@@ -123,7 +123,7 @@ bool SystemInfoPlugin::unload(){
     foreach(QWidget *wgt, widgetList){
         if(!wgt){continue;}
         if(wgt->close()){
-            widgetList.removeAll(wgt);
+            //widgetList.removeAll(wgt);
             delete wgt;
             wgt = 0;
         }
@@ -154,37 +154,60 @@ void SystemInfoPlugin::slotMainActionForMenuTriggered(){
         isYDAdmin = true;
     }
 
-    SystemInfo *systemInfo = new SystemInfo(user.getUserID(), parentWidget);
+    SystemInfo *wgt = new SystemInfo(user.getUserID(), parentWidget);
     //connect(systemInfo, SIGNAL(destroyed(QObject *)), SLOT(slotSysteminfoWidgetDestoryed(QObject *)));
 
+    QMdiArea *mdiArea = 0;
     if(parentWidget){
-        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-            QMdiSubWindow *subWindow = new QMdiSubWindow;
-            subWindow->setWidget(systemInfo);
-            subWindow->setAttribute(Qt::WA_DeleteOnClose);
-            mdiArea->addSubWindow(subWindow);
-            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+        mdiArea = qobject_cast<QMdiArea *>(parentWidget);
+    }
+    if(mdiArea){
+        QMdiSubWindow *subWindow = new QMdiSubWindow;
+        subWindow->setWidget(wgt);
+        subWindow->setAttribute(Qt::WA_DeleteOnClose);
+        mdiArea->addSubWindow(subWindow);
+        //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
-
-            widgetList.append(subWindow);
-        }else{
-            widgetList.append(systemInfo);
-        }
+        connect(subWindow, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+        widgetList.append(subWindow);
     }else{
-        widgetList.append(systemInfo);
+        connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+        widgetList.append(wgt);
     }
 
-    systemInfo->show();
+//    if(parentWidget){
+//        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+//            QMdiSubWindow *subWindow = new QMdiSubWindow;
+//            subWindow->setWidget(wgt);
+//            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+//            mdiArea->addSubWindow(subWindow);
+//            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+
+//            //mdiArea->addSubWindow(sqlExplorer, Qt::Dialog);
+
+//            widgetList.append(subWindow);
+//        }else{
+//            widgetList.append(wgt);
+//        }
+//    }else{
+//        widgetList.append(wgt);
+//    }
+
+    wgt->show();
 }
 
-void SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj){
-    qDebug("----SystemInfoPlugin::slotSysteminfoWidgetDestoryed(QObject * obj)");
+void SystemInfoPlugin::slotWidgetDestoryed(QObject * obj){
+    qDebug("----SystemInfoPlugin::slotWidgetDestoryed(QObject * obj)");
 
-    SystemInfo *systemInfo = static_cast<SystemInfo *> (sender());
-    if(systemInfo){
-        widgetList.removeAll(systemInfo);
+    QWidget *wgt = static_cast<QWidget *> (sender());
+    if(wgt){
+        widgetList.removeAll(wgt);
     }
+
+//    SystemInfo *systemInfo = static_cast<SystemInfo *> (sender());
+//    if(systemInfo){
+//        widgetList.removeAll(systemInfo);
+//    }
 
 }
 

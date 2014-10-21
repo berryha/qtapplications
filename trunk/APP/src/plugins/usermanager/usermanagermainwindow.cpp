@@ -181,9 +181,7 @@ UserManagerMainWindow::UserManagerMainWindow(bool isYDAdmin, QWidget *parent)
 
 UserManagerMainWindow::~UserManagerMainWindow()
 {
-    qDebug()<<"----UserManager::~UserManager()";
-
-
+    qDebug()<<"----UserManagerMainWindow::~UserManagerMainWindow()";
 
     running = false;
 
@@ -199,7 +197,6 @@ UserManagerMainWindow::~UserManagerMainWindow()
         progressDlg = 0;
     }
 
-
     if(model){
         model->clear();
         delete model;
@@ -213,8 +210,8 @@ UserManagerMainWindow::~UserManagerMainWindow()
     QSqlDatabase::removeDatabase(databaseConnectionName);
 
     activityTimer->stop();
-    activityTimer->deleteLater();
-
+    delete activityTimer;
+    activityTimer = 0;
 
 }
 

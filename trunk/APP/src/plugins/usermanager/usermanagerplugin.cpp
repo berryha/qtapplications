@@ -122,14 +122,13 @@ bool UserManagerPlugin::unload(){
     foreach(QWidget *wgt, widgetList){
         if(!wgt){continue;}
         if(wgt->close()){
-            widgetList.removeAll(wgt);
+            //widgetList.removeAll(wgt);
             delete wgt;
             wgt = 0;
         }
     }
 
     return widgetList.isEmpty();
-
 }
 
 void UserManagerPlugin::slotMainActionForMenuTriggered(){
@@ -154,36 +153,61 @@ void UserManagerPlugin::slotMainActionForMenuTriggered(){
         isYDAdmin = true;
     }
 
-    UserManagerMainWindow *userManager = new UserManagerMainWindow(isYDAdmin, parentWidget);
+    UserManagerMainWindow *wgt = new UserManagerMainWindow(isYDAdmin, parentWidget);
     //connect(userManager, SIGNAL(destroyed(QObject *)), this, SLOT(slotUserManagerWidgetDestoryed(QObject *)));
 
+    QMdiArea *mdiArea = 0;
     if(parentWidget){
-        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-            QMdiSubWindow *subWindow = new QMdiSubWindow;
-            subWindow->setWidget(userManager);
-            subWindow->setAttribute(Qt::WA_DeleteOnClose);
-            mdiArea->addSubWindow(subWindow);
-            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+        mdiArea = qobject_cast<QMdiArea *>(parentWidget);
+    }
+    if(mdiArea){
+        QMdiSubWindow *subWindow = new QMdiSubWindow;
+        subWindow->setWidget(wgt);
+        subWindow->setAttribute(Qt::WA_DeleteOnClose);
+        mdiArea->addSubWindow(subWindow);
+        //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-            widgetList.append(subWindow);
-        }else{
-            widgetList.append(userManager);
-        }
+        connect(subWindow, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+        widgetList.append(subWindow);
     }else{
-        widgetList.append(userManager);
+        connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+        widgetList.append(wgt);
     }
 
-    userManager->show();
+//    if(parentWidget){
+//        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+//            QMdiSubWindow *subWindow = new QMdiSubWindow;
+//            subWindow->setWidget(userManager);
+//            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+//            mdiArea->addSubWindow(subWindow);
+//            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+
+//            connect(subWindow, SIGNAL(destroyed(QObject *)), this, SLOT(slotUserManagerWidgetDestoryed(QObject *)));
+//            widgetList.append(subWindow);
+//        }else{
+//            widgetList.append(userManager);
+//        }
+//    }else{
+//        widgetList.append(userManager);
+//    }
+
+    wgt->show();
 
 }
 
-void UserManagerPlugin::slotUserManagerWidgetDestoryed(QObject *obj){
-    qDebug("----UserManagerPlugin::slotUserManagerWidgetDestoryed(QObject *obj)");
+void UserManagerPlugin::slotWidgetDestoryed(QObject *obj){
+    qDebug("--UserManagerPlugin::slotWidgetDestoryed(QObject *obj)");
 
-    UserManagerMainWindow *um = static_cast<UserManagerMainWindow *> (sender());
-    if(um){
-        widgetList.removeAll(um);
+    QWidget *wgt = static_cast<QWidget *> (sender());
+    if(wgt){
+        widgetList.removeAll(wgt);
     }
+
+//    UserManagerMainWindow *um = static_cast<UserManagerMainWindow *> (sender());
+//    if(um){
+//        widgetList.removeAll(um);
+//    }
+
 
 
 }

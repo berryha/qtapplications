@@ -71,7 +71,7 @@ public:
 
 public slots:
     void slotMainActionForMenuTriggered();
-    void slotControlCenterWidgetDestoryed(QObject * obj);
+    void slotWidgetDestoryed(QObject * obj);
 
 private:
     QList<QWidget *> widgetList;

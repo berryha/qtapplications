@@ -110,7 +110,7 @@ private:
 
     bool recordExists;
 
-    QRegExpValidator *validator;
+//    QRegExpValidator *validator;
 
     DatabaseConnecter *dc;
     QSqlQueryModel *queryModel;

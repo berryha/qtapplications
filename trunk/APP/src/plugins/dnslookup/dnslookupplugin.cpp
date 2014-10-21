@@ -86,14 +86,13 @@ bool DnsLookupPlugin::unload(){
     foreach(QWidget *wgt, widgetList){
         if(!wgt){continue;}
         if(wgt->close()){
-            widgetList.removeAll(wgt);
+            //widgetList.removeAll(wgt);
             delete wgt;
             wgt = 0;
         }
     }
 
     return widgetList.isEmpty();
-
 }
 
 void DnsLookupPlugin::slotMainActionForMenuTriggered(){
@@ -102,26 +101,44 @@ void DnsLookupPlugin::slotMainActionForMenuTriggered(){
     DnsLookupWidget *wgt = new DnsLookupWidget(parentWidget);
     //connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
 
+    QMdiArea *mdiArea = 0;
     if(parentWidget){
-        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
-            QMdiSubWindow *subWindow = new QMdiSubWindow;
-            subWindow->setWidget(wgt);
-            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+        mdiArea = qobject_cast<QMdiArea *>(parentWidget);
+    }
+    if(mdiArea){
+        QMdiSubWindow *subWindow = new QMdiSubWindow;
+        subWindow->setWidget(wgt);
+        subWindow->setAttribute(Qt::WA_DeleteOnClose);
+        mdiArea->addSubWindow(subWindow);
+        //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
 
-            QLayout *layout = subWindow->layout();
-            if(layout){
-                layout->setSizeConstraint(QLayout::SetFixedSize);
-            }
-
-            mdiArea->addSubWindow(subWindow);
-            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
-            widgetList.append(subWindow);
-        }else{
-            widgetList.append(wgt);
-        }
+        connect(subWindow, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
+        widgetList.append(subWindow);
     }else{
+        connect(wgt, SIGNAL(destroyed(QObject *)), this, SLOT(slotWidgetDestoryed(QObject *)));
         widgetList.append(wgt);
     }
+
+//    if(parentWidget){
+//        if(QMdiArea *mdiArea = qobject_cast<QMdiArea *>(parentWidget)){
+//            QMdiSubWindow *subWindow = new QMdiSubWindow;
+//            subWindow->setWidget(wgt);
+//            subWindow->setAttribute(Qt::WA_DeleteOnClose);
+
+//            QLayout *layout = subWindow->layout();
+//            if(layout){
+//                layout->setSizeConstraint(QLayout::SetFixedSize);
+//            }
+
+//            mdiArea->addSubWindow(subWindow);
+//            //connect(this, SIGNAL(signalPluginToBeUnloaded()), subWindow, SLOT(close()));
+//            widgetList.append(subWindow);
+//        }else{
+//            widgetList.append(wgt);
+//        }
+//    }else{
+//        widgetList.append(wgt);
+//    }
 
     wgt->show();
 }
@@ -129,10 +146,15 @@ void DnsLookupPlugin::slotMainActionForMenuTriggered(){
 void DnsLookupPlugin::slotWidgetDestoryed(QObject * obj){
     qDebug("--DnsLookupPlugin::slotWidgetDestoryed(QObject * obj )");
 
-    DnsLookupWidget *wgt = static_cast<DnsLookupWidget *> (sender());
+    QWidget *wgt = static_cast<QWidget *> (sender());
     if(wgt){
         widgetList.removeAll(wgt);
     }
+
+//    DnsLookupWidget *wgt = static_cast<DnsLookupWidget *> (sender());
+//    if(wgt){
+//        widgetList.removeAll(wgt);
+//    }
 }
 
 
