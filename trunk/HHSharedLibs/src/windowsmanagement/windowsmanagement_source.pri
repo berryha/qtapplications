@@ -18,7 +18,7 @@ win32 {
         -lWinspool \
         -lVersion \
         -Lresources/lib/AutoIt3 \
-        -lautoitx3 \
+        -lAutoItX3 \
         -Lresources/lib/WinAPI \
         -lWindowsAPI
 

@@ -55,7 +55,7 @@
 #include <Tlhelp32.h>
 #include <Lmjoin.h>
 
-#include "AutoIt3.h"
+#include "autoit3.h"
 
 const int MaxUserAccountNameLength = 20;
 const int MaxUserPasswordLength = LM20_PWLEN;
