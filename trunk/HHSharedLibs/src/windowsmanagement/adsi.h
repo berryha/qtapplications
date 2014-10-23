@@ -54,6 +54,7 @@ public:
 
     bool loadLibrary(const QString &fileName);
     bool unloadLibrary();
+    bool isLibraryLoaded();
     QString lastErrorString() const;
 
     bool AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag = 1);
