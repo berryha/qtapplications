@@ -37,7 +37,6 @@
 
 #include "ui_adusermanagerwidget.h"
 #include "aduserinfomodel.h"
-#include "aduserinfowidget.h"
 
 #ifdef Q_OS_WIN32
 #include "HHSharedWindowsManagement/hadsi.h"
@@ -53,7 +52,8 @@ class ADUserManagerWidget : public QWidget
     
 public:
     explicit ADUserManagerWidget(QWidget *parent = 0);
-    
+    ~ADUserManagerWidget();
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void changeEvent(QEvent *e);
@@ -110,7 +110,6 @@ private:
     ADSI *m_adsi;
     bool m_adOpened;
     ADUser *m_selectedADUser;
-    ADUserInfoWidget *m_adUserInfoWidget;
 
     QString m_defaultNamingContext;
 
@@ -119,8 +118,6 @@ private:
 
     QTimer *activityTimer;
     bool m_verified;
-
-
 
 
 };
