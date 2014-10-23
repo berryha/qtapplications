@@ -522,14 +522,16 @@ bool WindowsManagement::isUserAutoLogin(){
     LPCWSTR key = QString("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon").toStdWString().c_str();
     LPCWSTR valueName = QString("AutoAdminLogon").toStdWString().c_str();
     int size = sizeof(REG_SZ) + 1;
+
     LPWSTR value = new wchar_t[size];
+//    value[size-1] = L'\0';
+
     AU3_RegRead(key, valueName, value, size);
 
-    QString v = QString::fromWCharArray(value);
+    QString v = QString::fromWCharArray(value, size);
     delete [] value;
 
     return v.toInt();
-
 }
 
 bool WindowsManagement::setUserAutoLogin(LPCWSTR userName, LPCWSTR password, bool autoLogin)

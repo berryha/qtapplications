@@ -68,10 +68,6 @@ ADSI::ADSI(QObject *parent) :
     m_ComputerName = 0;
     m_UserNameOfCurrentThread = 0;
 
-
-
-
-
 }
 
 ADSI::~ADSI(){
@@ -82,6 +78,11 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     if(!adsiLibrary){
         adsiLibrary = new QLibrary(this);
+    }
+    if(adsiLibrary->isLoaded()){
+        m_lastErrorString = "Library '" + fileName + "'already loaded!";
+        qCritical()<<m_lastErrorString;
+        return false;
     }
 
 //    adsiLibrary->unload();
@@ -95,6 +96,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_Open = (AD_OpenFunction) adsiLibrary->resolve("AD_Open");
     if(!m_AD_Open){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_Open' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -102,6 +104,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_Close = (AD_CloseFunction) adsiLibrary->resolve("AD_Close");
     if(!m_AD_Close){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_Close' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -109,6 +112,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_GetLastErrorCode = (AD_GetLastErrorCodeFunction) adsiLibrary->resolve("AD_GetLastErrorCode");
     if(!m_AD_GetLastErrorCode){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_GetLastErrorCode' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -116,6 +120,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_GetLastErrorString = (AD_GetLastErrorStringFunction) adsiLibrary->resolve("AD_GetLastErrorString");
     if(!m_AD_GetLastErrorString){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_GetLastErrorString' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -123,6 +128,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_DefaultNamingContext = (AD_DefaultNamingContextFunction) adsiLibrary->resolve("AD_DefaultNamingContext");
     if(!m_AD_DefaultNamingContext){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_DefaultNamingContext' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -130,6 +136,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_ObjectExists = (AD_ObjectExistsFunction) adsiLibrary->resolve("AD_ObjectExists");
     if(!m_AD_ObjectExists){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_ObjectExists' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -137,6 +144,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_RenameObject = (AD_RenameObjectFunction) adsiLibrary->resolve("AD_RenameObject");
     if(!m_AD_RenameObject){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_RenameObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -144,6 +152,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_MoveObject = (AD_MoveObjectFunction) adsiLibrary->resolve("AD_MoveObject");
     if(!m_AD_MoveObject){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_MoveObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -151,6 +160,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_DeleteObject = (AD_DeleteObjectFunction) adsiLibrary->resolve("AD_DeleteObject");
     if(!m_AD_DeleteObject){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_DeleteObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -158,6 +168,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_UnlockObject = (AD_UnlockObjectFunction) adsiLibrary->resolve("AD_UnlockObject");
     if(!m_AD_UnlockObject){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_UnlockObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -165,6 +176,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_EnableObject = (AD_EnableObjectFunction) adsiLibrary->resolve("AD_EnableObject");
     if(!m_AD_EnableObject){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_EnableObject' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -172,6 +184,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_IsObjectDisabled = (AD_IsObjectDisabledFunction) adsiLibrary->resolve("AD_IsObjectDisabled");
     if(!m_AD_IsObjectDisabled){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_IsObjectDisabled' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -179,6 +192,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_SetAccountExpire = (AD_SetAccountExpireFunction) adsiLibrary->resolve("AD_SetAccountExpire");
     if(!m_AD_SetAccountExpire){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_SetAccountExpire' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -186,6 +200,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_SetPasswordExpire = (AD_SetPasswordExpireFunction) adsiLibrary->resolve("AD_SetPasswordExpire");
     if(!m_AD_SetPasswordExpire){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_SetPasswordExpire' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -193,6 +208,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_SetUserPasswordChange = (AD_SetUserPasswordChangeFunction) adsiLibrary->resolve("AD_SetUserPasswordChange");
     if(!m_AD_SetUserPasswordChange){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_SetUserPasswordChange' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -200,6 +216,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_GetObjectAttribute = (AD_GetObjectAttributeFunction) adsiLibrary->resolve("AD_GetObjectAttribute");
     if(!m_AD_GetObjectAttribute){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_GetObjectAttribute' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -207,6 +224,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_ModifyAttribute = (AD_ModifyAttributeFunction) adsiLibrary->resolve("AD_ModifyAttribute");
     if(!m_AD_ModifyAttribute){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_ModifyAttribute' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -214,6 +232,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_CreateOU = (AD_CreateOUFunction) adsiLibrary->resolve("AD_CreateOU");
     if(!m_AD_CreateOU){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_CreateOU' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -221,6 +240,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_GetAllOUs = (AD_GetAllOUsFunction) adsiLibrary->resolve("AD_GetAllOUs");
     if(!m_AD_GetAllOUs){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_GetAllOUs' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -228,6 +248,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_GetObjectsInOU = (AD_GetObjectsInOUFunction) adsiLibrary->resolve("AD_GetObjectsInOU");
     if(!m_AD_GetObjectsInOU){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_GetObjectsInOU' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -235,6 +256,7 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_CreateUser = (AD_CreateUserFunction) adsiLibrary->resolve("AD_CreateUser");
     if(!m_AD_CreateUser){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_CreateUser' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -242,14 +264,15 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_AD_SetPassword = (AD_SetPasswordFunction) adsiLibrary->resolve("AD_SetPassword");
     if(!m_AD_SetPassword){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'AD_SetPassword' !" ;
         qCritical()<<m_lastErrorString;
         return false;
     }
 
-
     m_ComputerName = (ComputerNameFunction) adsiLibrary->resolve("ComputerName");
     if(!m_ComputerName){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'ComputerName' !" ;
         qCritical()<<m_lastErrorString;
         return false;
@@ -257,15 +280,20 @@ bool ADSI::loadLibrary(const QString &fileName){
 
     m_UserNameOfCurrentThread = (UserNameOfCurrentThreadFunction) adsiLibrary->resolve("UserNameOfCurrentThread");
     if(!m_UserNameOfCurrentThread){
+        unloadLibrary();
         m_lastErrorString = "Failed to resolve function  'UserNameOfCurrentThread' !" ;
         qCritical()<<m_lastErrorString;
         return false;
     }
 
-
-
-
     return true;
+}
+
+bool ADSI::isLibraryLoaded(){
+    if(!adsiLibrary){
+        return false;
+    }
+    return adsiLibrary->isLoaded();
 }
 
 bool ADSI::unloadLibrary(){
@@ -298,8 +326,6 @@ bool ADSI::unloadLibrary(){
 
     m_ComputerName = 0;
     m_UserNameOfCurrentThread = 0;
-
-
 
     m_lastErrorString = "";
 
@@ -406,15 +432,33 @@ bool ADSI::AD_CreateOU(const QString &parentOU, const QString &ouName){
 QString ADSI::AD_GetAllOUs(const QString &root, const QString &separator, const QString &subOUSeparator){
     qDebug()<<"--ADSI::AD_GetAllOUs(...)";
 
-    //return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
+//    return QString::fromWCharArray( m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str()) );
 
     const wchar_t *temp = m_AD_GetAllOUs(root.toStdWString().c_str(), separator.toStdWString().c_str(), subOUSeparator.toStdWString().c_str());
+
+//    int size = wcslen(temp);
+//    qDebug()<<"-------------size:"<<size;
+//    for(int i=0;i<=size;i++){
+//        QChar c(temp[i]);
+//        qDebug()<<i<<":"<<c.unicode()<<" NULL:"<<c.isNull();
+//    }
+
+
     if(!temp){return "";}
     return QString::fromWCharArray(temp);
+
+//    std::wstring string(temp);
+//    qDebug()<<"------string.size():"<<string.size();
+//    return QString::fromStdWString(string);
+
+//    return QString::fromUtf16((const ushort *)temp);
+
+//    return QString((QChar*)temp, wcslen(temp));
+
 }
 
 QString ADSI::AD_GetObjectsInOU(const QString &ou, const QString &filter, const QString &dataToRetrieve, const QString &itemSeparator, const QString &attributeSeparator){
-    qDebug()<<"--ADSI::AD_GetObjectsInOU(...)";
+    qDebug()<<"--ADSI::AD_GetObjectsInOU(...)------";
 
     //return QString::fromWCharArray( m_AD_GetObjectsInOU(ou.toStdWString().c_str(), filter.toStdWString().c_str(), dataToRetrieve.toStdWString().c_str(), itemSeparator.toStdWString().c_str(), attributeSeparator.toStdWString().c_str()));
 
