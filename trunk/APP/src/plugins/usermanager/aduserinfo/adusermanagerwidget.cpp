@@ -40,10 +40,10 @@
 #define DOMAIN_DC_IP "200.200.200.118"
 #endif
 #ifndef DOMAIN_ADMIN_NAME
-#define DOMAIN_ADMIN_NAME "dgadmin"
+#define DOMAIN_ADMIN_NAME "admin"
 #endif
 #ifndef DOMAIN_ADMIN_PASSWORD
-#define DOMAIN_ADMIN_PASSWORD "dmsto&*("
+#define DOMAIN_ADMIN_PASSWORD "admin"
 #endif
 
 #ifndef ADSI_LIB
@@ -59,6 +59,7 @@
 #include <QTime>
 
 #include "adusermanagerwidget.h"
+#include "aduserinfowidget.h"
 
 #include "HHSharedGUI/hdataoutputdialog.h"
 
@@ -78,7 +79,6 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
     m_adOpened = false;
 
     m_selectedADUser = 0;
-    m_adUserInfoWidget = 0;
 
     m_defaultNamingContext = "";
 
@@ -123,6 +123,21 @@ ADUserManagerWidget::ADUserManagerWidget(QWidget *parent) :
 //    wordList << "uSNChanged" << "uSNCreated" << "whenChanged" << "whenCreated";
 
 
+
+}
+
+ADUserManagerWidget::~ADUserManagerWidget(){
+    qDebug()<<"--ADUserManagerWidget::~ADUserManagerWidget()";
+
+    if(m_adOpened){
+        m_adsi->AD_Close();
+    }
+    m_adsi->unloadLibrary();
+    delete m_adsi;
+
+    activityTimer->stop();
+    delete activityTimer;
+    activityTimer = 0;
 
 }
 
@@ -235,7 +250,7 @@ void ADUserManagerWidget::on_toolButtonConnect_clicked(){
     }
 
 
-    if (!m_adsi->loadLibrary(ADSI_LIB)){
+    if ( (!m_adsi->isLibraryLoaded()) && (!m_adsi->loadLibrary(ADSI_LIB)) ){
         QMessageBox::critical(this, tr("Error"), tr("Failed to load ADSI library! \r\n %1").arg(m_adsi->lastErrorString()) );
         m_adsi->unloadLibrary();
         ui.toolButtonConnect->setEnabled(true);
@@ -656,22 +671,16 @@ void ADUserManagerWidget::updateActions() {
 
 void ADUserManagerWidget::getSelectedADUser(const QModelIndex &index){
 
-
     if(!index.isValid()){
         m_selectedADUser = 0;
         return;
     }
 
-
     m_selectedADUser = m_userInfoModel->getADUser(index);
-
 }
 
 void ADUserManagerWidget::activityTimeout(){
-
-
     m_verified = false;
-
 }
 
 bool ADUserManagerWidget::verifyPrivilege(){

@@ -297,6 +297,7 @@ void UserManagerMainWindow::languageChange() {
 }
 
 void UserManagerMainWindow::closeEvent(QCloseEvent *e) {
+    qDebug()<<"----UserManagerMainWindow::~closeEvent(...)";
 
     if(isAddingUser){
         QMessageBox::critical(this, tr("Job Inprogress"), tr("Job Inprogress! Application will exit later!"));
@@ -307,7 +308,6 @@ void UserManagerMainWindow::closeEvent(QCloseEvent *e) {
         e->accept();
         deleteLater();
 
-        qDebug()<<"----UserManager::~closeEvent(...)~~e->accept()";
     }
 
 
@@ -334,9 +334,7 @@ QString UserManagerMainWindow::UserName() const {
 }
 
 QString UserManagerMainWindow::UserDept() const {
-
     return ui.userDeptComboBox->currentText();
-
 }
 
 QString UserManagerMainWindow::UserPassword() const {
@@ -346,7 +344,6 @@ QString UserManagerMainWindow::UserPassword() const {
     }
 
     return pwd;
-
 }
 
 QString UserManagerMainWindow::hasExtMail() const{

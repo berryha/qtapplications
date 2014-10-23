@@ -165,8 +165,6 @@ private:
     bool m_verified;
 
 
-
-
 };
 
 } //namespace HEHUI
