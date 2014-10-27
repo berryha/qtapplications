@@ -300,6 +300,8 @@ bool ADSI::unloadLibrary(){
 
     if(adsiLibrary){
         adsiLibrary->unload();
+        delete adsiLibrary;
+        adsiLibrary = 0;
     }
 
     m_AD_Open = 0;
@@ -338,9 +340,6 @@ QString ADSI::lastErrorString() const{
 
 bool ADSI::AD_Open(const QString &userID, const QString &password, const QString &serverHost, ulong securityFlag){
 //    qDebug()<<"--ADSI::AD_Open(...)";
-
-//    qWarning();
-
     return m_AD_Open(userID.toStdWString().c_str(), password.toStdWString().c_str(), serverHost.toStdWString().c_str(), securityFlag );
 }
 
