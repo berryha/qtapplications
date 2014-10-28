@@ -20,26 +20,20 @@ GLOBAL oAD_Command AS ADOCommand
 'global as ADORecordset
 GLOBAL bAD_BindFlags AS DWORD ' Bind flags
 
+
 GLOBAL sAD_UserId AS WSTRINGZ * 256
 GLOBAL sAD_Password AS WSTRINGZ * 256
 GLOBAL sAD_HostServer AS WSTRINGZ * 256
 
-GLOBAL sAD_LastErrorString AS WSTRING
+GLOBAL sAD_LastErrorString AS WSTRINGZ * 1024
 GLOBAL lAD_LastErrorCode AS LONG
 
 GLOBAL oAD_RootDSE AS IADs
-GLOBAL sAD_DNSDomain AS WSTRING
+GLOBAL sAD_DNSDomain AS WSTRINGZ * 256
 GLOBAL oAD_RootContainer AS IADsContainer
 
 'Global oADOpenDSObject As IADsOpenDSObject
-
-
-
-
-
-
-
-
+ 
 
 
 
@@ -99,7 +93,6 @@ GLOBAL oAD_RootContainer AS IADsContainer
 'FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_PasswordParam AS WSTRING, BYVAL sAD_HostServerParam AS WSTRING, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
 FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_PasswordParam AS WSTRINGz, BYREF sAD_HostServerParam AS WSTRINGz, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
 
-
     sAD_UserId = sAD_UserIdParam
     sAD_Password = sAD_PasswordParam
     sAD_HostServer = sAD_HostServerParam
@@ -125,9 +118,11 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     'oAD_Connection.ConnectionString = "Provider=ADsDSOObject" ' Sets Service providertype
     IF sAD_UserId <> "" THEN
         IF sAD_Password = "" THEN
-            SetError(2, "Parameter sAD _PasswordParam is required when sAD _UserIdParam is specified")
-            FUNCTION = 0
-            EXIT FUNCTION
+			  AD_Close()
+			  
+           SetError(2, "Parameter sAD _PasswordParam is required when sAD _UserIdParam is specified")								
+           FUNCTION = 0
+           EXIT FUNCTION
         END IF
 
 
@@ -156,7 +151,9 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     ' Create an ADO command object
     oAD_Command = NEWCOM "ADODB.Command"
     IF ISFALSE ISOBJECT(oAD_Command) THEN
-        SetError(1, "Creation of the COM object to the AD failed")
+		  AD_Close()
+		  
+        SetError(1, "Creation of the COM object to the AD failed")		  
         FUNCTION = 0
         EXIT FUNCTION
     END IF
@@ -165,13 +162,7 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
 
 ''''''''''''''''''''''''''''''''''''''''
 
-
-
-
-
-
     DIM hr AS LONG
-
 
 ''''''''''''''''''''''''''''''''''
 
@@ -182,10 +173,12 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     END IF
 
     IF FAILED(hr) THEN
+		  AD_Close()
+		  
         SetError(3, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
-        FUNCTION = 0
+		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$		  				 
+		  FUNCTION = %FALSE
         EXIT FUNCTION
     END IF
 
@@ -203,6 +196,8 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     END IF
 
     IF FAILED(hr) THEN
+		  AD_Close()
+		  
         SetError(4, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
 		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
@@ -230,14 +225,17 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
 
 
 
-    FUNCTION = 1
+    'FUNCTION = 1
+	 FUNCTION = %TRUE
 
 END FUNCTION
 
 
 FUNCTION AD_Close ALIAS "AD_Close" () EXPORT AS LONG
 
-    oAD_Connection.Close() ' Close Connection
+    IF ISOBJECT(oAD_Connection) THEN
+	    oAD_Connection.Close() ' Close Connection
+	 END IF
     oAD_Connection = NOTHING
     oAD_Command = NOTHING
 
@@ -1602,7 +1600,11 @@ End Function   '==>AD_GetAllOUs
 '                  The final example illustrates the use of the escaping mechanism to represent various non-ASCII UTF-8 characters.
 ' Related .......: AD_GetAllOUs
 ' Link ..........:
-' Example .......: Yes
+' Example .......: 
+    'AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(cn=" & "test" & "*))" , "sAMAccountName,distinguishedName,objectSid", ";", "|")
+    'AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*)(displayName=Tes*))" , "memberOf", ";", "|")
+    'AD_GetObjectsInOU("DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "he" & "*))" , "lastLogon", ";", "|")
+
 ' ===============================================================================================================================
 'Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstring, BYVAL sAD_FilterParam as wstring,  BYVAL sAD_DataToRetrieveParam as wstring, _
 '																			 BYVAL sAD_ItemSeparatorParam as wstring, BYVAL sAD_AttributeSeparatorParam as wstring ) export as wstring

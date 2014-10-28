@@ -20,26 +20,20 @@ GLOBAL oAD_Command AS ADOCommand
 'global as ADORecordset
 GLOBAL bAD_BindFlags AS DWORD ' Bind flags
 
+
 GLOBAL sAD_UserId AS WSTRINGZ * 256
 GLOBAL sAD_Password AS WSTRINGZ * 256
 GLOBAL sAD_HostServer AS WSTRINGZ * 256
 
-GLOBAL sAD_LastErrorString AS WSTRING
+GLOBAL sAD_LastErrorString AS WSTRINGZ * 1024
 GLOBAL lAD_LastErrorCode AS LONG
 
 GLOBAL oAD_RootDSE AS IADs
-GLOBAL sAD_DNSDomain AS WSTRING
+GLOBAL sAD_DNSDomain AS WSTRINGZ * 256
 GLOBAL oAD_RootContainer AS IADsContainer
 
 'Global oADOpenDSObject As IADsOpenDSObject
-
-
-
-
-
-
-
-
+ 
 
 
 
@@ -99,7 +93,6 @@ GLOBAL oAD_RootContainer AS IADsContainer
 'FUNCTION AD_Open ALIAS "AD_Open" (BYVAL sAD_UserIdParam AS WSTRING, BYVAL sAD_PasswordParam AS WSTRING, BYVAL sAD_HostServerParam AS WSTRING, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
 FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_PasswordParam AS WSTRINGz, BYREF sAD_HostServerParam AS WSTRINGz, BYVAL iAD_SecurityParam AS DWORD) EXPORT AS LONG
 
-
     sAD_UserId = sAD_UserIdParam
     sAD_Password = sAD_PasswordParam
     sAD_HostServer = sAD_HostServerParam
@@ -125,9 +118,11 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     'oAD_Connection.ConnectionString = "Provider=ADsDSOObject" ' Sets Service providertype
     IF sAD_UserId <> "" THEN
         IF sAD_Password = "" THEN
-            SetError(2, "Parameter sAD _PasswordParam is required when sAD _UserIdParam is specified")
-            FUNCTION = 0
-            EXIT FUNCTION
+			  AD_Close()
+			  
+           SetError(2, "Parameter sAD _PasswordParam is required when sAD _UserIdParam is specified")								
+           FUNCTION = 0
+           EXIT FUNCTION
         END IF
 
 
@@ -156,7 +151,9 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     ' Create an ADO command object
     oAD_Command = NEWCOM "ADODB.Command"
     IF ISFALSE ISOBJECT(oAD_Command) THEN
-        SetError(1, "Creation of the COM object to the AD failed")
+		  AD_Close()
+		  
+        SetError(1, "Creation of the COM object to the AD failed")		  
         FUNCTION = 0
         EXIT FUNCTION
     END IF
@@ -165,13 +162,7 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
 
 ''''''''''''''''''''''''''''''''''''''''
 
-
-
-
-
-
     DIM hr AS LONG
-
 
 ''''''''''''''''''''''''''''''''''
 
@@ -182,10 +173,12 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     END IF
 
     IF FAILED(hr) THEN
+		  AD_Close()
+		  
         SetError(3, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
-		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
-        FUNCTION = 0
+		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$		  				 
+		  FUNCTION = %FALSE
         EXIT FUNCTION
     END IF
 
@@ -203,6 +196,8 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
     END IF
 
     IF FAILED(hr) THEN
+		  AD_Close()
+		  
         SetError(4, OBJRESULT$(hr))
         #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
 		  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error:	" & FUNCNAME$
@@ -230,14 +225,17 @@ FUNCTION AD_Open ALIAS "AD_Open" (BYREF sAD_UserIdParam AS WSTRINGz, BYREF sAD_P
 
 
 
-    FUNCTION = 1
+    'FUNCTION = 1
+	 FUNCTION = %TRUE
 
 END FUNCTION
 
 
 FUNCTION AD_Close ALIAS "AD_Close" () EXPORT AS LONG
 
-    oAD_Connection.Close() ' Close Connection
+    IF ISOBJECT(oAD_Connection) THEN
+	    oAD_Connection.Close() ' Close Connection
+	 END IF
     oAD_Connection = NOTHING
     oAD_Command = NOTHING
 
@@ -261,7 +259,7 @@ FUNCTION AD_GetLastErrorCode ALIAS "AD_GetLastErrorCode" () EXPORT AS LONG
 END FUNCTION
 
 FUNCTION AD_GetLastErrorString ALIAS "AD_GetLastErrorString" () EXPORT AS WSTRING
-   FUNCTION = sAD_LastErrorString
+   FUNCTION = sAD_LastErrorString + $$NUL
 END FUNCTION
 
 'FUNCTION SetError(BYVAL errorCode AS LONG, BYVAL errorString AS WSTRING) AS LONG
@@ -307,7 +305,7 @@ END FUNCTION
 
 
 function AD_DefaultNamingContext alias "AD_DefaultNamingContext" () export as wstring
-	function = sAD_DNSDomain
+	function = sAD_DNSDomain + $$NUL
 END FUNCTION
 
 
@@ -1057,7 +1055,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
         SetError(1, "Object '" & sAD_Object & "' could not be found!")
         #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
         'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-        FUNCTION = ""
+        FUNCTION = $$NUL
         EXIT FUNCTION
     END IF
 
@@ -1083,7 +1081,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
           SetError(3, OBJRESULT$(hr))
           #DEBUG PRINT "Error! " & OBJRESULT$(hr) & " Code:" & STR$(hr) & " Function:" & FUNCNAME$
           'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-          FUNCTION = ""
+          FUNCTION = $$NUL
           EXIT FUNCTION
     END IF
     oAD_ADSObject.GetInfo()
@@ -1095,7 +1093,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
         SetError(4, "No values for the specified property '" & sAD_Property & "'.")
         #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
         'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-        FUNCTION = ""
+        FUNCTION = $$NUL
         EXIT FUNCTION
     END IF
 
@@ -1136,7 +1134,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
                 'MSGBOX "HiPart: " & STR$(HiPart) & " LoPart: " & STR$(LoPart)
 					 'msgbox str$(VARIANT#(HiPart) * (2^32) + VARIANT#(LoPart))
                 IF HiPart = 0 OR LoPart = 0 OR LoPart = -1 THEN
-                    FUNCTION = ""
+                    FUNCTION = $$NUL
                     EXIT FUNCTION
                 END IF
 
@@ -1168,7 +1166,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
                     SetError(5, "Failed to create PowerArray object!")
                     #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
                     'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-                    FUNCTION = ""
+                    FUNCTION = $$NUL
                     EXIT FUNCTION
                 END IF
                 ' Copy the variant to the PowerArray
@@ -1202,7 +1200,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
                         SetError(6, "Failed to convert SID to string sid!")
                         #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
                         'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-                        FUNCTION = ""
+                        FUNCTION = $$NUL
                         EXIT FUNCTION
                     ELSE
                         resultArray(valueIndex) = @pStringSid
@@ -1225,14 +1223,14 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
                     SetError(3, "Function 'VariantTimeToSystemTime' Call Failed!")
                     #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
                     'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-                    FUNCTION = ""
+                    FUNCTION = $$NUL
                     EXIT FUNCTION
                 END IF
                 IF SystemTimeToFileTime(ST, FT) = 0 THEN
                     SetError(3, "Function Call Failed!")
                     #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
                     'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-                    FUNCTION = ""
+                    FUNCTION = $$NUL
                     EXIT FUNCTION
                 END IF
 
@@ -1265,7 +1263,7 @@ FUNCTION AD_GetObjectAttribute ALIAS "AD_GetObjectAttribute" (BYREF sAD_ObjectPa
 
    'MSGBOX "resultArray: " & JOIN$(resultArray(), ";")
 
-   FUNCTION = JOIN$(resultArray(), ";")
+   FUNCTION = JOIN$(resultArray(), ";") + $$NUL
 
 END FUNCTION '==>AD_GetObjectAttribute
 
@@ -1499,7 +1497,7 @@ Function AD_GetAllOUs alias "AD_GetAllOUs" (BYREF sAD_RootParam as wstringz, opt
 			SetError(2, "Object '" & sAD_Root & "' does not exist!")
 			#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 			'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-			FUNCTION = ""
+			FUNCTION = $$NUL
 			EXIT FUNCTION 
 		end if
 	End If
@@ -1516,7 +1514,7 @@ Function AD_GetAllOUs alias "AD_GetAllOUs" (BYREF sAD_RootParam as wstringz, opt
 			SetError(1, "No OUs found!")
 			#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 			'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-			FUNCTION = ""
+			FUNCTION = $$NUL
 			EXIT FUNCTION 
 	end if
 	dim aAD_OUs(1 to iCount1) as wstring
@@ -1554,7 +1552,8 @@ Function AD_GetAllOUs alias "AD_GetAllOUs" (BYREF sAD_RootParam as wstringz, opt
 	loop
   
 	
-	function = JOIN$(aAD_OUs(), sAD_Separator)     
+	function = JOIN$(aAD_OUs(), sAD_Separator) + $$NUL
+
 
 End Function   '==>AD_GetAllOUs
 
@@ -1601,7 +1600,11 @@ End Function   '==>AD_GetAllOUs
 '                  The final example illustrates the use of the escaping mechanism to represent various non-ASCII UTF-8 characters.
 ' Related .......: AD_GetAllOUs
 ' Link ..........:
-' Example .......: Yes
+' Example .......: 
+    'AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(cn=" & "test" & "*))" , "sAMAccountName,distinguishedName,objectSid", ";", "|")
+    'AD_GetObjectsInOU("OU=TestOU1,DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "test" & "*)(displayName=Tes*))" , "memberOf", ";", "|")
+    'AD_GetObjectsInOU("DC=test,DC=local", "(&(objectcategory=person)(objectclass=user)(sAMAccountName=" & "he" & "*))" , "lastLogon", ";", "|")
+
 ' ===============================================================================================================================
 'Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYVAL sAD_OUParam as wstring, BYVAL sAD_FilterParam as wstring,  BYVAL sAD_DataToRetrieveParam as wstring, _
 '																			 BYVAL sAD_ItemSeparatorParam as wstring, BYVAL sAD_AttributeSeparatorParam as wstring ) export as wstring
@@ -1609,7 +1612,7 @@ End Function   '==>AD_GetAllOUs
 Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstringz, BYREF sAD_FilterParam as wstringz,  BYREF sAD_DataToRetrieveParam as wstringz, _
 																			 BYREF sAD_ItemSeparatorParam as wstringz, BYREF sAD_AttributeSeparatorParam as wstringz ) export as wstring														  
 	
-	SetError(0, "")
+	SetError(0, "")	
 
     local sAD_OU AS WSTRINGZ * 256, sAD_Filter AS WSTRINGZ * 256, sAD_DataToRetrieve as WSTRINGZ * 256
 	 local sAD_ItemSeparator as WSTRINGZ * 2, sAD_AttributeSeparator as WSTRINGZ * 2
@@ -1633,7 +1636,7 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstri
 			SetError(1, "OU '" & sAD_OU & "' does not exist!")
 			#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 			'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-			FUNCTION = ""
+			FUNCTION = $$NUL
 			EXIT FUNCTION  
 		end if
 			
@@ -1664,7 +1667,7 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstri
 		SetError(2, "No records returned from Active Directory! sAD_DataToRetrieve is invalid (attribute may not exist)")
 		#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 		'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-		FUNCTION = ""
+		FUNCTION = $$NUL
 		EXIT FUNCTION  
 	end if
 
@@ -1674,7 +1677,7 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstri
 		SetError(3, "No records returned from Active Directory! sAD_Filter didn't return a record")
 		#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 		'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-		FUNCTION = ""	
+		FUNCTION = $$NUL	
 		EXIT FUNCTION
 	end if
 
@@ -1731,8 +1734,8 @@ Function AD_GetObjectsInOU alias "AD_GetObjectsInOU" (BYREF sAD_OUParam as wstri
 	End If
 	'oAD_Command.Properties("Sort On") = "" ' Reset sort property
 	
-	
-	function = JOIN$(aAD_Objects(), sAD_ItemSeparator)     
+
+	function = JOIN$(aAD_Objects(), sAD_ItemSeparator) + $$NUL  
 
 End Function   '==>AD_GetObjectsInOU
 
@@ -1774,7 +1777,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
                 OBJECT GET largeInteger.LowPart TO LoPart
 
                 IF HiPart = 0 OR LoPart = 0 OR LoPart = -1 THEN
-                    FUNCTION = ""
+                    FUNCTION = $$NUL
                     EXIT FUNCTION
                 END IF
 
@@ -1809,7 +1812,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
 			valuesArray = CLASS "PowerArray"
 			IF ISFALSE(ISOBJECT(valuesArray)) THEN
 				SetError(1, "Failed to create PowerArray object!")
-				FUNCTION = ""
+				FUNCTION = $$NUL
 				EXIT FUNCTION
 			END IF
 			' Copy the variant to the PowerArray
@@ -1842,7 +1845,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
 		
 		case 8209 'objectGUID-OctetString; objectSid-Sid; nTSecurityDescriptor-NTSecurityDescriptor
 			if sAD_Attribute =  "nTSecurityDescriptor" THEN
-				result = ""
+				result = $$NUL
 				EXIT SELECT         
 			END IF
 			
@@ -1853,7 +1856,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
 				  SetError(1, "Failed to create PowerArray object!")
 				  #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 				  'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-				  FUNCTION = ""
+				  FUNCTION = $$NUL
 				  EXIT FUNCTION
 			 END IF
 			 ' Copy the variant to the PowerArray
@@ -1884,7 +1887,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
 						SetError(2, "Failed to convert SID to string sid!")
 						#DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
 						'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-						FUNCTION = ""
+						FUNCTION = $$NUL
 						EXIT FUNCTION
 				  ELSE
 						result = @pStringSid
@@ -1904,7 +1907,7 @@ function convertADOVariantToString(byval vValue as variant, byval sAD_Attribute 
 			result = afxTime.DateString & " " & afxTime.TimeStringFull
 
 		CASE ELSE
-			result = ""
+			result = $$NUL
 	END SELECT
 	
 	'msgbox "variantvt(vValue):	" & str$(variantType) & $crlf & "result:	" & result
@@ -2138,7 +2141,7 @@ FUNCTION AD_SamAccountNameToFQDN(BYREF sAD_SamAccountName AS WSTRINGz) AS WSTRIN
       SetError(1, "No record returned from Active Directory!")
       #DEBUG PRINT "Error! " & sAD_LastErrorString & " Function:" & FUNCNAME$
       'MSGBOX sAD_LastErrorString, %MB_ICONERROR, "Error"
-      FUNCTION = ""
+      FUNCTION = $$NUL
       EXIT FUNCTION
     END IF
 
@@ -2188,7 +2191,7 @@ FUNCTION ComputerName ALIAS "ComputerName" () EXPORT AS WSTRING
   END IF
 
   'Function = LCase$(sTmp)
-  FUNCTION = sTmp
+  FUNCTION = sTmp + $$NUL
 
 END FUNCTION
 
@@ -2200,38 +2203,6 @@ function UserNameOfCurrentThread alias "UserNameOfCurrentThread" () export as ws
    FUNCTION = buff
 
 END FUNCTION
-
-
-
-FUNCTION test ALIAS "test" () EXPORT AS LONG
-
-
-    ' AD_GetObjectAttribute("test", "userWorkstations")
-     'AD_GetObjectAttribute("test", "objectClass")
-    'AD_GetObjectAttribute("DC=test,DC=local", "NTSecurityDescriptor")
-
-
-     'MSGBOX "text: " & AD_GetObjectAttribute("test", "accountExpires")
-
-    'AD_GetObjectProperties("test", "accountExpires")
-
-
-    FUNCTION = 1
-
-END FUNCTION
-
-
-
- 
-
-
-
-
-
-
-
-
-
 
 
 
