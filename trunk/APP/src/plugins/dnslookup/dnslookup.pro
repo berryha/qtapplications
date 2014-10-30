@@ -32,10 +32,9 @@ HEADERS  += \
 FORMS    += \
     dnslookup.ui
 
+RESOURCES += resource.qrc
 
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "DNS Lookup"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform DNS Lookup Based On Qt"
 
-RESOURCES += \
-    resource.qrc
