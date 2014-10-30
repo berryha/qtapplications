@@ -165,6 +165,4 @@ INSTALLS += target
 # QMAKE_TARGET_COMPANY	= "He Hui"
 QMAKE_TARGET_PRODUCT = "Messenger"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Client Application For IM Based On Qt"
-
-# QMAKE_TARGET_COPYRIGHT	= "Copyright (C) 2007 - 2010 He Hui"
-DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""
+DEFINES *= "APP_NAME=\\\"$${QMAKE_TARGET_PRODUCT}\\\""

@@ -85,4 +85,4 @@ INSTALLS += target
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "Server Library For IM System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Server Library For IM System Based On Qt"
-DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""
+DEFINES *= "APP_NAME=\\\"$${QMAKE_TARGET_PRODUCT}\\\""

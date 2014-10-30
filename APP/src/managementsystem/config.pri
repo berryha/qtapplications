@@ -22,15 +22,16 @@ APP_AUTHOR = "He Hui"
 APP_AUTHOR_EMAIL = "hehui@hehui.org"
 APP_LICENSE = "LGPL"
 
+
 # define variable for source code
-#DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\"" \
-DEFINES	*= "APP_VERSION=\"\\\"$${VERSION}\\\"\"" \
-        "APP_ORG=\"\\\"$${APP_ORG}\\\"\"" \
-        "APP_ORG_DOMAIN=\"\\\"$${PACKAGE_DOMAIN}\\\"\"" \
-        "APP_AUTHOR=\"\\\"$${APP_AUTHOR}\\\"\"" \
-        "APP_AUTHOR_EMAIL=\"\\\"$${APP_AUTHOR_EMAIL}\\\"\"" \
-         "APP_LICENSE=\"\\\"$${APP_LICENSE}\\\"\"" \
-        "APP_COPYRIGHTS=\"\\\"$${QMAKE_TARGET_COPYRIGHT}\\\"\""
+DEFINES	*= "APP_NAME=\\\"$${QMAKE_TARGET_PRODUCT}\\\"" \
+        "APP_VERSION=\\\"$${VERSION}\\\"" \
+        "APP_ORG=\\\"$${APP_ORG}\\\"" \
+        "APP_ORG_DOMAIN=\\\"$${PACKAGE_DOMAIN}\\\"" \
+        "APP_AUTHOR=\\\"$${APP_AUTHOR}\\\"" \
+        "APP_AUTHOR_EMAIL=\\\"$${APP_AUTHOR_EMAIL}\\\"" \
+        "APP_LICENSE=\\\"$${APP_LICENSE}\\\"" \
+        "APP_COPYRIGHTS=\\\"$${QMAKE_TARGET_COPYRIGHT}\\\""
 
 
 #####Release Builed With Debug Info####

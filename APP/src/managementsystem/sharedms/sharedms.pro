@@ -68,5 +68,3 @@ INSTALLS += target
 # QMAKE_TARGET_COMPANY	= "He Hui Team"
 QMAKE_TARGET_PRODUCT = "Shared Library For Management System"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Library Based On Qt"
-
-
