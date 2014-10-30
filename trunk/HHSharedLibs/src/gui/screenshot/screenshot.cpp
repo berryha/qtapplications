@@ -29,9 +29,6 @@
 
 
 
-
-
-
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QDir>
@@ -42,18 +39,19 @@
 
 #include "screenshot.h"
 
+#include "ui_screenshot.h"
 
 
 namespace HEHUI {
 
 
 Screenshot::Screenshot(QWidget *parent, Qt::WindowFlags fl)
-    : QWidget(parent, fl)
+    : QWidget(parent, fl),
+      ui(new Ui::ScreenshotUI)
 {
-    ui.setupUi(this);
+    ui->setupUi(this);
 
-
-//    originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
+    //    originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
     QScreen *screen = QApplication::primaryScreen();
     if (screen){
         originalPixmap = screen->grabWindow(0);
@@ -73,10 +71,8 @@ Screenshot::Screenshot(QWidget *parent, Qt::WindowFlags fl)
 
 Screenshot::~Screenshot()
 {
-
+    delete ui;
 }
-
-
 
 bool Screenshot::event(QEvent *e){
 
@@ -91,9 +87,8 @@ bool Screenshot::event(QEvent *e){
             close();
             return true;
         }
-
     }
-    break;
+        break;
     case QEvent::MouseButtonPress:
     {
         QMouseEvent *event = static_cast<QMouseEvent *> (e);
@@ -112,7 +107,7 @@ bool Screenshot::event(QEvent *e){
             }
         }
     }
-    break;
+        break;
     case QEvent::MouseMove:
     {
         QMouseEvent *event = static_cast<QMouseEvent *> (e);
@@ -124,19 +119,16 @@ bool Screenshot::event(QEvent *e){
             return true;
         }
     }
-    break;
+        break;
     default:
         break;
     }
 
     //return false;
     return QWidget::event(e);
-
 }
 
-
 void Screenshot::drawBackground(){
-
 
     QPainter painter(&backgroundImage);
 
@@ -156,11 +148,9 @@ void Screenshot::drawBackground(){
 
     painter.end();
 
-    ui.label->setPixmap(QPixmap::fromImage(backgroundImage));
-
+    ui->label->setPixmap(QPixmap::fromImage(backgroundImage));
 
     raise();
-
 
 }
 
@@ -190,19 +180,15 @@ void Screenshot::showSelectedRect(){
     if(!m_targetPixmapWidget){
         m_targetPixmapWidget = new SelectTargetImageWidget(originalPixmap.toImage(), QRect(topLeft, bottomRight), this);
         connect(m_targetPixmapWidget, SIGNAL(imageSelected(const QImage &)), this, SIGNAL(imageSelected(const QImage &)));
-
     }
 
     m_targetPixmapWidget->show();
     //m_targetPixmapWidget->raise();
 
-
 }
 
 void Screenshot::updateSelectedRect(){
-
     m_targetPixmapWidget->resize(bottomRight.x() - topLeft.x(), bottomRight.y() - topLeft.y());
-
 }
 
 

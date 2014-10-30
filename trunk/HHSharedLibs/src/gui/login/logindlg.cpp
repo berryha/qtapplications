@@ -10,12 +10,14 @@
 namespace HEHUI {
 
 LoginDlg::LoginDlg(User *user, const QString &windowTitle, QWidget *parent) :
-    QDialog(parent){
+    QDialog(parent),
+    ui(new Ui::LoginDlgUI)
+{
 
     qDebug("----LoginDlg::LoginDlg(User *user, QWidget *parent)");
     Q_ASSERT_X(user != NULL, "LoginDlg::LoginDlg(User *user, QWidget *parent)", " 'user' is NULL!");
 
-    ui.setupUi(this);
+    ui->setupUi(this);
 
     if(!windowTitle.isEmpty()){
         setWindowTitle(windowTitle);
@@ -23,13 +25,13 @@ LoginDlg::LoginDlg(User *user, const QString &windowTitle, QWidget *parent) :
 
     setUser(user);
 
-    ui.userIDComboBox->setEditText(user->getUserID());
+    ui->userIDComboBox->setEditText(user->getUserID());
     //ui.passwordLineEdit->setText(user->getPassword());
 
 }
 
 LoginDlg::~LoginDlg() {
-
+    delete ui;
 }
 
 void LoginDlg::keyPressEvent(QKeyEvent *e) {
@@ -42,18 +44,18 @@ void LoginDlg::keyPressEvent(QKeyEvent *e) {
         break;
     case Qt::Key_Return:
     case Qt::Key_Enter:
-        if (ui.userIDComboBox->hasFocus()) {
-            ui.passwordLineEdit->setFocus();
-        } else if (ui.passwordLineEdit->hasFocus()) {
-            ui.lineEditAuthenticode->setFocus();
+        if (ui->userIDComboBox->hasFocus()) {
+            ui->passwordLineEdit->setFocus();
+        } else if (ui->passwordLineEdit->hasFocus()) {
+            ui->lineEditAuthenticode->setFocus();
         }else{
-            ui.loginButton->click();
+            ui->loginButton->click();
         }
         break;
     case Qt::Key_R:
         //是否进入RestoreMode
         //Whether enter RestoreMode
-        if(ui.loginButton->hasFocus()){
+        if(ui->loginButton->hasFocus()){
             bool ok = false;
             QString text = QInputDialog::getText(this, tr("Authentication Required"),
                                                  tr("Access Code:"), QLineEdit::NoEcho,
@@ -65,7 +67,7 @@ void LoginDlg::keyPressEvent(QKeyEvent *e) {
                     user->setRootMode(true);
                     accept();
                 }else{
-                    ui.userIDComboBox->setFocus();
+                    ui->userIDComboBox->setFocus();
                 }
             }
         }
@@ -78,7 +80,7 @@ void LoginDlg::keyPressEvent(QKeyEvent *e) {
 }
 
 void LoginDlg::languageChange() {
-    ui.retranslateUi(this);
+    ui->retranslateUi(this);
 }
 
 void LoginDlg::setUser(User *user){
@@ -86,11 +88,11 @@ void LoginDlg::setUser(User *user){
 }
 
 inline QString LoginDlg::userID() const {
-    return ui.userIDComboBox->currentText().trimmed();
+    return ui->userIDComboBox->currentText().trimmed();
 }
 
 inline QString LoginDlg::passWord() const {
-    return ui.passwordLineEdit->text();
+    return ui->passwordLineEdit->text();
 }
 
 void LoginDlg::on_toolButtonUser_clicked(){
@@ -110,22 +112,22 @@ void LoginDlg::on_loginButton_clicked() {
         QMessageBox::critical(this, tr("What's your name?"), tr(
                                   "<b>How can I help you?<br> I don't know how to do that, I don't know!</b>"));
 
-        ui.userIDComboBox->setFocus();
+        ui->userIDComboBox->setFocus();
         return;
 
     } else if (passWord().isEmpty()) {
 
         QMessageBox::critical(this, tr("What's your password?"), tr(
                                   "<b>How can I help you?<br> I don't know how to do that, I don't know!</b>"));
-        ui.passwordLineEdit->setFocus();
+        ui->passwordLineEdit->setFocus();
         return;
 
-    } else if(ui.lineEditAuthenticode->text() != QDateTime::currentDateTime().toString("HHmm")){
+    } else if(ui->lineEditAuthenticode->text() != QDateTime::currentDateTime().toString("HHmm")){
         qDebug()<<"Authenti code:"<<QDateTime::currentDateTime().toString("HHmm");
         QMessageBox::critical(this, tr("Authentication Failed"), tr(
                                   "<b>Incorrect Authenticode!</b>"));
-        ui.lineEditAuthenticode->clear();
-        ui.lineEditAuthenticode->setFocus();
+        ui->lineEditAuthenticode->clear();
+        ui->lineEditAuthenticode->setFocus();
         return;
 
     }else{
@@ -134,7 +136,7 @@ void LoginDlg::on_loginButton_clicked() {
 
         //从密码输入框取回明文密码,将其进行SHA-1加密
         //Fetch the password from the 'ui.passwordLineEdit' and  encrypt it with SHA-1h
-        QByteArray password(ui.passwordLineEdit->text().toUtf8());
+        QByteArray password(ui->passwordLineEdit->text().toUtf8());
         password = QCryptographicHash::hash (password, QCryptographicHash::Sha1);
 
         user->setPassword(password);
@@ -142,17 +144,14 @@ void LoginDlg::on_loginButton_clicked() {
         //qWarning()<<"~~ password:"<<ui.passwordLineEdit->text();
         //qWarning()<<"~~ password.toBase64():"<<password.toBase64();
 
-        ui.passwordLineEdit->clear();
+        ui->passwordLineEdit->clear();
         accept();
-
     }
-
 }
 
 void LoginDlg::on_cancelButton_clicked() {
-    ui.passwordLineEdit->clear();
+    ui->passwordLineEdit->clear();
     reject();
-
 }
 
 

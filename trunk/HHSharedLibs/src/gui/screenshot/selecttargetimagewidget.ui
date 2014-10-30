@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SelectTargetImageWidgetClass</class>
- <widget class="QWidget" name="SelectTargetImageWidgetClass">
+ <class>SelectTargetImageWidgetUI</class>
+ <widget class="QWidget" name="SelectTargetImageWidgetUI">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>

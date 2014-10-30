@@ -11,6 +11,10 @@
 #include "../../core/user.h"
 
 
+namespace Ui {
+class LoginDlgUI;
+}
+
 namespace HEHUI {
 
 class LoginDlg : public QDialog /*, public Singleton<LoginDlg>*/
@@ -25,16 +29,12 @@ public:
 
     void setUser(User *user);
 
-
 private:
-
-
 
 
 protected:
     void keyPressEvent(QKeyEvent *);
     void languageChange();
-
 
 signals:
     void signalUserButtonClicked();
@@ -49,7 +49,7 @@ private slots:
 
 
 private:
-    Ui::LoginDlgUI ui;
+    Ui::LoginDlgUI *ui;
 
     User *user;
 

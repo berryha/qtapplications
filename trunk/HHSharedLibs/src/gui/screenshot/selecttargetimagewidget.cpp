@@ -42,6 +42,7 @@
 #include <QToolTip>
 
 #include "selecttargetimagewidget.h"
+#include "ui_selecttargetimagewidget.h"
 
 
 
@@ -49,10 +50,11 @@ namespace HEHUI {
 
 
 SelectTargetImageWidget::SelectTargetImageWidget(const QImage &originalImage, const QRect &selectedRect, QWidget *parent, Qt::WindowFlags fl)
-    : QWidget(parent, fl), m_originalImage(originalImage)
+    : QWidget(parent, fl), m_originalImage(originalImage),
+      ui(new Ui::SelectTargetImageWidgetUI)
 {
 
-    ui.setupUi(this);
+    ui->setupUi(this);
 
     Q_ASSERT_X(!originalImage.isNull(), "TargetPixmapWidget::TargetPixmapWidget(...)", "Invalid Pixmap!");
 
@@ -76,7 +78,7 @@ SelectTargetImageWidget::SelectTargetImageWidget(const QImage &originalImage, co
 
 SelectTargetImageWidget::~SelectTargetImageWidget()
 {
-
+    delete ui;
 }
 
 void SelectTargetImageWidget::paintEvent(QPaintEvent *)

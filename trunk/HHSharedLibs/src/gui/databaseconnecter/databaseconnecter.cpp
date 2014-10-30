@@ -37,7 +37,7 @@
 #include "../../core/database/databaseutility.h"
 
 DatabaseConnecter::DatabaseConnecter(QObject *parent) :
-	QObject(parent) {
+    QObject(parent) {
 
     qDebug() << "----DatabaseConnecter::DatabaseConnecter(QObject *parent)";
 
@@ -72,9 +72,9 @@ bool DatabaseConnecter::isDatabaseOpened(const QString &connectionName,
 
     if (!db.isValid()) {
         db = getDatabase(connectionName, driver, host, port, user, passwd,
-                    databaseName, databaseType);
+                         databaseName, databaseType);
 
-//        db = QSqlDatabase::database(connectionName);
+        //        db = QSqlDatabase::database(connectionName);
 
     }
 
@@ -144,7 +144,7 @@ QSqlDatabase DatabaseConnecter::getDatabase(const QString &connectionName,
             DatabaseConnecterDialog dbConnecterDlg(connectionName, host, port, "", "", databaseName, databaseType, parentWidget);
             QStringList parameters = dbConnecterDlg.getParameters();
             if (parameters.size() <= 0) {
-//                QMessageBox::critical(parentWidget, tr("Fatal Error"), tr("Can not connect to database server!"));
+                //                QMessageBox::critical(parentWidget, tr("Fatal Error"), tr("Can not connect to database server!"));
                 qCritical() << QString("XX Fatal Error!") << QString("Can not connect to database server!");
                 return QSqlDatabase();
             }
@@ -175,9 +175,9 @@ bool DatabaseConnecter::connectToNewDatabase(QString *connectionName) {
     QStringList parameters = dbConnecterDlg.getParameters();
     if (parameters.size() <= 0) {
         QMessageBox::critical(parentWidget, tr("Fatal Error"), tr(
-                "Can not connect to database server!"));
+                                  "Can not connect to database server!"));
         qCritical() << QString("XX Fatal Error!") << QString(
-                "Can not connect to database server!");
+                           "Can not connect to database server!");
         return false;
     }
 

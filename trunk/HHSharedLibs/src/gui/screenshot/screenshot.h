@@ -36,12 +36,16 @@
 #include <QEvent>
 
 
-#include "ui_screenshot.h"
 
 #include "selecttargetimagewidget.h"
 
 #include "../guilib.h"
 
+
+
+namespace Ui {
+class ScreenshotUI;
+}
 
 namespace HEHUI {
 
@@ -56,14 +60,11 @@ public:
 
     ~Screenshot();
 
-
 protected:
     bool event(QEvent *e);
 
-
 signals:
     void imageSelected(const QImage &image);
-
 
 public slots:
 
@@ -75,7 +76,7 @@ private:
     void updateSelectedRect();
 
 private:
-    Ui::ScreenshotClass ui;
+    Ui::ScreenshotUI *ui;
 
     SelectTargetImageWidget * m_targetPixmapWidget;
 
@@ -89,10 +90,6 @@ private:
 
     QPoint topLeft;
     QPoint bottomRight;
-
-
-
-
 
 };
 

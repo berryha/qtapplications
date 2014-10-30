@@ -37,8 +37,12 @@
 #include <QDialog>
 #include <QMessageBox>
 
-#include "ui_databaseconnecterdialog.h"
 #include "../../core/global_core.h"
+
+
+namespace Ui {
+class DatabaseConnecterDialogUI;
+}
 
 class DatabaseConnecterDialog : public QDialog
 {
@@ -85,7 +89,7 @@ protected:
 
 
 private:
-    Ui::DatabaseConnecterDialogUI ui;
+    Ui::DatabaseConnecterDialogUI *ui;
 
     HEHUI::DatabaseType selectedDatabaseType;
     QList <QPair<QString, HEHUI::DatabaseType> >supportedDatabases;

@@ -31,12 +31,14 @@
 
 
 #include "progressdlg.h"
+#include "ui_progressdlg.h"
+
 
 ProgressDlg::ProgressDlg(const QString &jobName, QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      ui(new Ui::ProgressDlgClass)
 {
-    ui.setupUi(this);
-
+    ui->setupUi(this);
 
     setWindowFlags(Qt::SplashScreen);
 
@@ -46,31 +48,28 @@ ProgressDlg::ProgressDlg(const QString &jobName, QWidget *parent)
 
     setJobName(jobName);
 
-    connect(ui.pushButtonClose, SIGNAL(clicked()), this, SIGNAL(widgetClosed()));
+    connect(ui->pushButtonClose, SIGNAL(clicked()), this, SIGNAL(widgetClosed()));
 
 }
 
 ProgressDlg::~ProgressDlg()
 {
-
+    delete ui;
 }
 
 void ProgressDlg::setJobName(const QString &name)
 {
-    ui.groupBox->setTitle(name);
-
+    ui->groupBox->setTitle(name);
 }
 
 void ProgressDlg::setProgressMessage(const QString &message)
 {
-    ui.labelDescription->setText(message);
-
+    ui->labelDescription->setText(message);
 }
 
 void ProgressDlg::setJobProgress(int progressValue)
 {
-    ui.progressBar->setValue(progressValue);
-
+    ui->progressBar->setValue(progressValue);
 }
 
 //void ProgressDlg::closeEvent(QCloseEvent *event){
@@ -83,53 +82,42 @@ void ProgressDlg::setJobProgress(int progressValue)
 void ProgressDlg::slotUpdateProgress(const QString &progressMessage, int progressValue)
 {
 
-    ui.labelDescription->setText(progressMessage);
-    ui.textBrowserDetails->append(progressMessage);
+    ui->labelDescription->setText(progressMessage);
+    ui->textBrowserDetails->append(progressMessage);
 
     if(progressValue){
-        ui.progressBar->setValue(progressValue);
+        ui->progressBar->setValue(progressValue);
     }
 
     QCoreApplication::processEvents();
-
 }
 
 void ProgressDlg::slotUpdateProcessOutput(const QString &message){
-    ui.textBrowserDetails->append(message);
-
+    ui->textBrowserDetails->append(message);
 }
 
 void ProgressDlg::showDetails(bool show){
-
     on_toolButtonShowDetails_toggled(show);
-
 }
 
 void ProgressDlg::closeWidget(){
-
-    ui.labelDescription->clear();
-    ui.progressBar->setValue(0);
-    ui.textBrowserDetails->clear();
+    ui->labelDescription->clear();
+    ui->progressBar->setValue(0);
+    ui->textBrowserDetails->clear();
 
     hide();
     //showMinimized();
 
     emit widgetClosed();
-
 }
-
-
 
 void ProgressDlg::on_toolButtonShowDetails_toggled ( bool checked )
 {
     if(checked){
-        ui.textBrowserDetails->show();
+        ui->textBrowserDetails->show();
     }else{
-        ui.textBrowserDetails->hide();
-
+        ui->textBrowserDetails->hide();
     }
-
-
 }
 
 

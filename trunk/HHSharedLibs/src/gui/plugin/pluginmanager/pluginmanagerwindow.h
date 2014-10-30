@@ -35,10 +35,12 @@
 
 
 #include "plugininfomodel.h"
-#include "ui_pluginmanagerwindow.h"
 
 #include "../../guilib.h"
 
+namespace Ui {
+class PluginManagerWindowUI;
+}
 
 namespace HEHUI {
 
@@ -58,12 +60,11 @@ public slots:
 private slots:
     void slotUpdateUI(const QModelIndex &index);
 
-
 protected:
     //	bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    Ui::PluginManagerWindowUI ui;
+    Ui::PluginManagerWindowUI *ui;
 
     PluginInfoModel *pluginInfoModel;
 
