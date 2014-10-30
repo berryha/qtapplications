@@ -36,9 +36,15 @@
 #define PREFERENCESWINDOW_H
 
 #include <QWidget>
-#include "ui_preferenceswindow.h"
+
+
+
+namespace Ui {
+class PreferencesWindowClass;
+}
 
 namespace HEHUI {
+
 
 class PreferencesWindow : public QWidget
 {
@@ -52,7 +58,7 @@ private:
     void loadPreferenceRootItems();
 
 private:
-    Ui::PreferencesWindowClass ui;
+    Ui::PreferencesWindowClass *ui;
 
 
 

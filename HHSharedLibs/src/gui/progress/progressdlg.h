@@ -35,11 +35,12 @@
 #include <QWidget>
 #include <QCloseEvent>
 
-#include "ui_progressdlg.h"
 
 #include "../guilib.h"
 
-
+namespace Ui {
+class ProgressDlgClass;
+}
 
 class GUI_LIB_API ProgressDlg : public QWidget
 {
@@ -76,7 +77,7 @@ private slots:
 
 
 private:
-    Ui::ProgressDlgClass ui;
+    Ui::ProgressDlgClass *ui;
 
 
 };

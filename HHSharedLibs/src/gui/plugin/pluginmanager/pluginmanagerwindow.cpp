@@ -39,23 +39,25 @@
 #include "../../../core/plugin/pluginmanager.h"
 
 #include "pluginmanagerwindow.h"
+#include "ui_pluginmanagerwindow.h"
 
 
 
 namespace HEHUI{
 
 
-PluginManagerWindow::PluginManagerWindow(QWidget *parent)
-    :QWidget(parent)
+PluginManagerWindow::PluginManagerWindow(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::PluginManagerWindowUI)
 {
-    ui.setupUi(this);
+    ui->setupUi(this);
 
-    ui.groupBoxDetails->hide();
+    ui->groupBoxDetails->hide();
 
     pluginInfoModel = new PluginInfoModel();
     pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
 
-    ui.tableView->setModel(pluginInfoModel);
+    ui->tableView->setModel(pluginInfoModel);
 
     //    dataWidgetMapper = new QDataWidgetMapper(this);
     //    dataWidgetMapper->setOrientation(Qt::Horizontal);
@@ -71,10 +73,10 @@ PluginManagerWindow::PluginManagerWindow(QWidget *parent)
     //    connect(ui.tableView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(slotShowPluginDetails(const QModelIndex &)));
     //dataWidgetMapper->toNext();
 
-    connect(ui.tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
+    connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(slotUpdateUI(const QModelIndex &)));
 
-    ui.tableView->selectRow(0);
+    ui->tableView->selectRow(0);
 
 }
 
@@ -84,6 +86,7 @@ PluginManagerWindow::~PluginManagerWindow(){
     delete pluginInfoModel;
     pluginInfoModel = 0;
 
+    delete ui;
 }
 
 /*
@@ -104,10 +107,10 @@ bool PluginManagerWindow::eventFilter(QObject *object, QEvent *event){
 
 void PluginManagerWindow::on_toolButtonDetails_clicked(bool checked) {
     if (checked) {
-        ui.groupBoxDetails->show();
-        slotUpdateUI(ui.tableView->currentIndex());
+        ui->groupBoxDetails->show();
+        slotUpdateUI(ui->tableView->currentIndex());
     } else {
-        ui.groupBoxDetails->hide();
+        ui->groupBoxDetails->hide();
     }
 
 }
@@ -152,7 +155,7 @@ void PluginManagerWindow::on_toolButtonLoad_clicked(){
 
     //pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
 
-    ui.tableView->selectRow(0);
+    ui->tableView->selectRow(0);
 
 
 }
@@ -160,7 +163,7 @@ void PluginManagerWindow::on_toolButtonLoad_clicked(){
 void PluginManagerWindow::on_toolButtonUnload_clicked(){
     qDebug("----PluginManagerWindow::on_toolButtonunload_clicked()");
 
-    QModelIndex index = ui.tableView->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if(!index.isValid()){
         return;
     }
@@ -179,30 +182,30 @@ void PluginManagerWindow::on_toolButtonUnload_clicked(){
     }
 
     pluginInfoModel->removePluginInfo(plugin);
-//    pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
+    //    pluginInfoModel->setPluginsHash(PluginManager::instance()->getPluginsHash());
 
-    slotUpdateUI(ui.tableView->currentIndex());
+    slotUpdateUI(ui->tableView->currentIndex());
 
 }
 
 void PluginManagerWindow::slotUpdateUI(const QModelIndex &index){
     qDebug("----PluginManagerWindow::slotUpdateUI(const QModelIndex &index)");
 
-    ui.toolButtonUnload->setEnabled(index.isValid());
+    ui->toolButtonUnload->setEnabled(index.isValid());
 
-    if((!index.isValid()) || ui.groupBoxDetails->isHidden()){
-        ui.labelAuthor->clear();
-        ui.labelURL->clear();
-        ui.textBrowserDescription->clear();
-        ui.textBrowserLicense->clear();
+    if((!index.isValid()) || ui->groupBoxDetails->isHidden()){
+        ui->labelAuthor->clear();
+        ui->labelURL->clear();
+        ui->textBrowserDescription->clear();
+        ui->textBrowserLicense->clear();
         return;
     }
 
     HEHUI::AbstractPluginInterface *plugin = PluginManager::instance()->getPluginsHash().values().at(index.row());
-    ui.labelAuthor->setText(plugin->author());
-    ui.labelURL->setText(QString("<a href = \"%1\">%1</a>").arg(QUrl::fromUserInput(plugin->url()).toString()));
-    ui.textBrowserDescription->setHtml(plugin->description());
-    ui.textBrowserLicense->setHtml(plugin->license());
+    ui->labelAuthor->setText(plugin->author());
+    ui->labelURL->setText(QString("<a href = \"%1\">%1</a>").arg(QUrl::fromUserInput(plugin->url()).toString()));
+    ui->textBrowserDescription->setHtml(plugin->description());
+    ui->textBrowserLicense->setHtml(plugin->license());
 
 }
 

@@ -38,31 +38,33 @@
 #include "../guilib.h"
 
 class GUI_LIB_API DatabaseConnecter: public QObject {
-	Q_OBJECT
+
+    Q_OBJECT
+
 public:
-	DatabaseConnecter(QObject *parent = 0);
-	virtual ~DatabaseConnecter();
+    DatabaseConnecter(QObject *parent = 0);
+    virtual ~DatabaseConnecter();
 
-	bool isDatabaseOpened(const QString &connectionName, const QString &driver,
-			const QString &host, int port, const QString &user,
-			const QString &passwd, const QString &databaseName,
-			HEHUI::DatabaseType databaseType);
+    bool isDatabaseOpened(const QString &connectionName, const QString &driver,
+                          const QString &host, int port, const QString &user,
+                          const QString &passwd, const QString &databaseName,
+                          HEHUI::DatabaseType databaseType);
 
-        bool connectToNewDatabase(QString *connectionName = NULL);
+    bool connectToNewDatabase(QString *connectionName = NULL);
 
 private:
-	QSqlDatabase getDatabase(const QString &connectionName,
-			const QString &driver, const QString &host, int port,
-			const QString &user, const QString &passwd,
-			const QString &databaseName, HEHUI::DatabaseType databaseType);
+    QSqlDatabase getDatabase(const QString &connectionName,
+                             const QString &driver, const QString &host, int port,
+                             const QString &user, const QString &passwd,
+                             const QString &databaseName, HEHUI::DatabaseType databaseType);
 
 signals:
-	void signalNewDatabaseConnected(const QString &connectionName);
+    void signalNewDatabaseConnected(const QString &connectionName);
 
 private slots:
 
 private:
-	QWidget *parentWidget;
+    QWidget *parentWidget;
 
 };
 

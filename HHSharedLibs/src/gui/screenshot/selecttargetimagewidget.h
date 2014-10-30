@@ -39,7 +39,12 @@
 #include <QResizeEvent>
 
 
-#include "ui_selecttargetimagewidget.h"
+
+
+
+namespace Ui {
+class SelectTargetImageWidgetUI;
+}
 
 namespace HEHUI {
 
@@ -80,16 +85,12 @@ private slots:
 
 
 private:
-    Ui::SelectTargetImageWidgetClass ui;
-
+    Ui::SelectTargetImageWidgetUI *ui;
 
     QImage m_originalImage;
     QImage m_resultImage;
 
     QPoint dragPosition;
-
-
-
 
 };
 

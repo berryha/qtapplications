@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ScreenshotClass</class>
- <widget class="QWidget" name="ScreenshotClass">
+ <class>ScreenshotUI</class>
+ <widget class="QWidget" name="ScreenshotUI">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -23,7 +23,16 @@
    <string>Screenshot</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <property name="spacing">

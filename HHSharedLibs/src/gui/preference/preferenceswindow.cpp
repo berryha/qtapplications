@@ -30,24 +30,23 @@
 
 
 #include "preferenceswindow.h"
+#include "ui_preferenceswindow.h"
+
+
 
 namespace HEHUI {
 
-PreferencesWindow::PreferencesWindow(QWidget *parent)
-    : QWidget(parent)
+PreferencesWindow::PreferencesWindow(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::PreferencesWindowClass)
 {
-	ui.setupUi(this);
+    ui->setupUi(this);
 }
 
 PreferencesWindow::~PreferencesWindow()
 {
-
+    delete ui;
 }
-
-
-
-
-
 
 
 
