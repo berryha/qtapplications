@@ -63,4 +63,4 @@ RESOURCES += controlcenter.qrc
 # define some usefull values
 QMAKE_TARGET_PRODUCT = "Control Center"
 QMAKE_TARGET_DESCRIPTION = "Crossplatform Control Center For Sitoy Based On Qt"
-DEFINES *= "APP_NAME=\\\"$${QMAKE_TARGET_PRODUCT}\\\""
+DEFINES *= "APP_NAME=\"\\\"$${QMAKE_TARGET_PRODUCT}\\\"\""

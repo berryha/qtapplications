@@ -7,15 +7,15 @@
 namespace HEHUI {
 
 Settings::Settings( const QString& pName, const QString& pVersion, const QString fileBaseName, const QString fileDirPath, QObject* parent )
-        : SettingsBase(pName, pVersion, fileBaseName, fileDirPath, parent )
+    : SettingsBase(pName, pVersion, fileBaseName, fileDirPath, parent )
 {
 
-	//beginGroup( mProgramVersion );
+    //beginGroup( mProgramVersion );
 }
 
 Settings::~Settings()
 {
-	//endGroup();
+    //endGroup();
 
 
 }
