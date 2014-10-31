@@ -18,12 +18,12 @@ namespace HEHUI{
 
 class Settings : public SettingsBase, public Singleton<Settings>
 {
-	Q_OBJECT
-        friend class Singleton<Settings>;
+    Q_OBJECT
+    friend class Singleton<Settings>;
 
 public:
-        Settings( const QString &appName = APP_NAME, const QString &appVersion = APP_VERSION, const QString fileBaseName = APP_NAME, const QString fileDirPath = QCoreApplication::applicationDirPath(), QObject *parent = 0 );
-	~Settings();
+    Settings( const QString &appName = APP_NAME, const QString &appVersion = APP_VERSION, const QString fileBaseName = APP_NAME, const QString fileDirPath = QCoreApplication::applicationDirPath(), QObject *parent = 0 );
+    ~Settings();
 
 
 
